@@ -11,3 +11,7 @@ SQL_USERNAME = 'chris_readonly'
 SQL_PASSWORD = ''
 SQL_DATABASE = 'chris'
 
+#
+# ChRIS Filesystem
+#
+CHRIS_FILESYSTEM = '/chb/users/chris/data/'
