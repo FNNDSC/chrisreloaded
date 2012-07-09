@@ -15,6 +15,8 @@
 		<link href="assets/css/bootstrap.css" rel="stylesheet">
 		<link href="assets/css/bootstrap-responsive.css" rel="stylesheet">
 		<link href="assets/css/docs.css" rel="stylesheet">
+		<link href="assets/css/chris.css" rel="stylesheet">
+
 		<link href="assets/js/google-code-prettify/prettify.css" rel="stylesheet">
 
 		<!-- fav and touch icons -->
@@ -24,55 +26,6 @@
 		<link rel="apple-touch-icon" sizes="114x114" href="assets/ico/apple-touch-icon-114x114.png">
 	</head>
 
-	<style>
-		body {
-			position: relative;
-			background-color: #fff;
-			background-image: url(http://twitter.github.com/bootstrap/assets/img/grid-18px-masked.png);
-			background-repeat: repeat-x;
-		}
-		h1 {
-			margin-top: 10px;
-			margin-bottom: 10px;
-		}
-
-		/*.mainsection {
-		 margin-bottom: 20px;
-		 }*/
-
-		.login-form {
-			width: 250;
-			height: 300;
-			padding: 20px;
-		}
-
-		.footer {
-			height: 100px;
-			color: #111111;
-			background-color: #333333;
-			color: #ffffff;
-		}
-		.intro {
-			font-size: large;
-		}
-
-		.more {
-		}
-
-		.block {
-			background-color: #333333;
-			color: #ffffff;
-			margin-top: 10px;
-			margin-bottom: 10px;
-			-webkit-border-radius: 10px 10px 10px 10px;
-			-moz-border-radius: 10px 10px 10px 10px;
-			border-radius: 10px 10px 10px 10px;
-			-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-			-moz-box-shadow: 0 1px 2px rgba(0,0,0,.15);
-			box-shadow: 0 1px 2px rgba(0,0,0,.15);
-		}
-	</style>
-
 	<body data-spy="scroll" data-target=".subnav" data-offset="50">
 
 		<div class="container">
@@ -81,41 +34,35 @@
 				<div class="span8 intro">
 					<h1>Welcome to ChRIS 2.0 -Reloaded</h1>
 					<p>
-						Brought by FNNDSC <a class="btn btn-primary btn-large" onclick="_gaq.push(['_trackEvent', 'Jumbotron actions', 'GitHub Project', 'View project on GitHub']);" href="http://childrenshospital.org/cfapps/research/data_admin/Site3068/mainpageS3068P0.html">Website</a>
-
+						Brought by FNNDSC
 					</p>
 					<p>
 						Super cool features, you can do that that that:
 						<ul>
 							<li>
-								First
+								First link
 							</li>
 							<li>
-								Second
+								Second linsdddddddddddddddddk
 							</li>
 							<li>
-								Third
+								Third link sdddddddddddd
 							</li>
 						</ul>
 
 					</p>
-					<!--     <p>
-					<a class="btn btn-primary btn-large">
-					Learn more
-					</a>
-					</p> -->
 
 				</div>
 				<div class="span4">
 					<div class="login-form block">
 						<h2>Login</h2>
-						<form action="">
+						<form action="application/login.php" method="post">
 							<fieldset>
 								<div class="clearfix">
-									<input type="text" placeholder="Username">
+									<input type="text" name="username" placeholder="Username">
 								</div>
 								<div class="clearfix">
-									<input type="password" placeholder="Password">
+									<input type="password" name="password" placeholder="Password">
 								</div>
 								<button class="btn btn-primary" type="submit">
 									Sign in
@@ -129,7 +76,7 @@
 
 			<div class="row mainsection">
 				<div class="span8">
-					<div id="myCarousel" class="carousel slide">
+					<div id="highlights" class="carousel slide">
 						<div class="carousel-inner">
 							<div class="item active">
 								<img src="assets/img/carina.jpg" alt="">
@@ -159,40 +106,13 @@
 								</div>
 							</div>
 						</div>
-						<a class="left carousel-control" href="#myCarousel" data-slide="prev">&lsaquo;</a>
-						<a class="right carousel-control" href="#myCarousel" data-slide="next">&rsaquo;</a>
+						<a class="left carousel-control" href="#highlights" data-slide="prev">&lsaquo;</a>
+						<a class="right carousel-control" href="#highlights" data-slide="next">&rsaquo;</a>
 					</div>
 
 				</div>
 				<div class="span4">
-					<script charset="utf-8" src="http://widgets.twimg.com/j/2/widget.js"></script>
-					<script>
-						new TWTR.Widget({
-							version : 2,
-							type : 'profile',
-							rpp : 4,
-							interval : 30000,
-							width : 'auto',
-							height : 250,
-							theme : {
-								shell : {
-									background : '#333333',
-									color : '#ffffff'
-								},
-								tweets : {
-									background : '#000000',
-									color : '#ffffff',
-									links : '#4aed05'
-								}
-							},
-							features : {
-								scrollbar : true,
-								loop : true,
-								live : true,
-								behavior : 'default'
-							}
-						}).render().setUser('FNNDSC').start();
-					</script>
+					<?php include("application/widgets/twitter_widget.php") ?>
 				</div>
 			</div>
 
@@ -219,7 +139,7 @@
 
 			<footer>
 				<p>
-					&copy; FNNDSC 2012
+					&copy; FNNDSC 2012 - Boston Children's Hospital
 				</p>
 			</footer>
 
