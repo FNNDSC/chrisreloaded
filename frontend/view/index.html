@@ -1,14 +1,41 @@
-${HEADER}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		${TITLE}
+		${STYLE}
+	</head>
 
-STARTPAGE<br><br>
+	<body data-spy="scroll" data-target=".subnav" data-offset="50">
 
-${LOGIN_FORM}
+		<div class="container">
 
-<br><br>
+			<div class="row">
+				<div class="span8 intro">
+					${WELCOME}
+				</div>
+				<div class="span4">
+					${LOGIN_FORM}
+				</div>
+			</div>
 
-${ACTIVITY_FEED}
+			<div class="row mainsection">
+				<div class="span8">
+					${HIGHLIGHTS}
+				</div>
+				<div class="span4">
+					${TWITTER}
+				</div>
+			</div>
 
-<br><br>
+			<div class="row links">
+				${MORE}
+			</div>
 
+			${FOOTER}
 
-${FOOTER}
+		</div>
+
+		${JAVASCRIPT}
+
+	</body>
+</html>

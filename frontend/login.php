@@ -39,15 +39,11 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
 function testTemplateClass() {
 
-	$t = new Template('index.html');
+	$t = new Template('login.html');
 	$t -> replace('TITLE', "<title>ChRIS 2 -Reloaded</title>");
 	$t -> replace('STYLE', joinPaths(CHRIS_VIEW_FOLDER, 'style.html'));
-	$t -> replace('WELCOME', joinPaths(CHRIS_VIEW_FOLDER, 'welcome.html'));
-	$t -> replace('LOGIN_FORM', joinPaths(CHRIS_VIEW_FOLDER, 'login_form.html'));
-	$t -> replace('HIGHLIGHTS', joinPaths(CHRIS_VIEW_FOLDER, 'highlights.html'));
-	$t -> replace('TWITTER', joinPaths(CHRIS_VIEW_FOLDER, 'twitter.php'));
-	$t -> replace('MORE', joinPaths(CHRIS_VIEW_FOLDER, 'more.html'));
 	$t -> replace('JAVASCRIPT', joinPaths(CHRIS_VIEW_FOLDER, 'javascript.html'));
+	$t -> replace('NAVBAR', joinPaths(CHRIS_VIEW_FOLDER, 'navbar.html'));
 	$t -> replace('FOOTER', joinPaths(CHRIS_VIEW_FOLDER, 'footer.html'));
 
 	return $t;
