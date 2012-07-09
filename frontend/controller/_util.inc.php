@@ -27,7 +27,7 @@
  */
 
 // security check
-require_once('../_security.inc.php');
+require_once('_security.inc.php');
 
 
 /**
