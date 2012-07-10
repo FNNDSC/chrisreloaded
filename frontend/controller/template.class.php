@@ -39,7 +39,18 @@ require_once('_security.inc.php');
  */
 class Template {
 
+  /**
+   * The template name.
+   *
+   * @var string
+   */
   private $name = '';
+
+  /**
+   * The template content after replacing tags.
+   *
+   * @var string
+   */
   private $content = '';
 
   /**
