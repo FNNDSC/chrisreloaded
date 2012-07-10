@@ -77,7 +77,7 @@ class Object {
 
     $classname = get_called_class();
 
-    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($classname).' WHERE id=(?)',array(0=>$id));
+    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($classname).' WHERE id=(?)', array(0=>$id));
 
     if (count($results) == 0) {
 

@@ -111,7 +111,7 @@ class DB {
    * @param string $query The SQL query to execute.
    * @param array|null $variables An array of variables to bind as parameters in the SQL query.
    *                              The type of the variables gets automatically detected.
-   * @return array An array of rows representing each resulting dataset. This can be an empty array,
+   * @return An array of rows representing each resulting dataset. This can be an empty array,
    *               if the query does not result in any datasets.
    * @throws Exception An exception if the query can not be prepared or executed.
    */

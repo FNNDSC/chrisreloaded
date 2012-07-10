@@ -27,39 +27,28 @@
  */
 
 // we define a valid entry point
-define('__CHRIS_ENTRY_POINT__', 666);
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
 require_once('../../config.inc.php');
 
+// include the simpletest framework
+require_once(SIMPLETEST);
+
 // include the db class
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
+
+// include the test object class since we derive from that
+require_once('test.object.class.php');
 
 // include the patient class
 require_once(joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
 
-function testPatientToString() {
+class TestPatientClass extends TestObjectClass {
 
-  $p = new Patient();
-  echo $p;
 
 }
-
-function testPatientGet() {
-
-  echo Patient::get(1);
-
-}
-
-// TODO use php unit testing framework
-// TODO more tests regarding failures
-
-
-// execute the test
-//echo testPatientClass();
-testPatientGet();
-
 
 ?>

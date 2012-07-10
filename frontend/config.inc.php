@@ -46,7 +46,8 @@ define('CHRIS_MODEL_FOLDER', joinPaths(CHRIS_WWWROOT,'model'));
 define('CHRIS_VIEW_FOLDER', joinPaths(CHRIS_WWWROOT,'view'));
 define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
 
-
+// TESTING
+define('SIMPLETEST', joinPaths(CHRIS_WWWROOT,'lib/simpletest/autorun.php'));
 
 
 // if CHRIS_DEBUG is defined, print all constants

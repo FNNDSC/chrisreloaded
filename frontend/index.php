@@ -40,15 +40,15 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 function testTemplateClass() {
 
 	$t = new Template('index.html');
-	$t -> replace('TITLE', "<title>ChRIS 2 -Reloaded</title>");
-	$t -> replace('STYLE',  'style.html');
-	$t -> replace('WELCOME',  'welcome.html');
-	$t -> replace('LOGIN_FORM',  'login_form.html');
-	$t -> replace('HIGHLIGHTS',  'highlights.html');
-	$t -> replace('TWITTER',  'twitter.php');
-	$t -> replace('MORE',  'more.html');
-	$t -> replace('JAVASCRIPT',  'javascript.html');
-	$t -> replace('FOOTER',  'footer.html');
+	$t->replace('TITLE', "<title>ChRIS 2 -Reloaded</title>");
+	$t->replace('STYLE',  'style.html');
+	$t->replace('WELCOME',  'welcome.html');
+	$t->replace('LOGIN_FORM',  'login_form.html');
+	$t->replace('HIGHLIGHTS',  'highlights.html');
+	$t->replace('TWITTER',  'twitter.php');
+	$t->replace('MORE',  'more.html');
+	$t->replace('JAVASCRIPT',  'javascript.html');
+	$t->replace('FOOTER',  'footer.html');
 
 	return $t;
 
