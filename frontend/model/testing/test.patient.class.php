@@ -34,14 +34,22 @@ define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration
 require_once('../../config.inc.php');
 
-// include the template class
+// include the db class
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 
-function testDbClass() {
+// include the patient class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
 
-  $results = DB::getInstance()->execute('SELECT * FROM patient;');
+function testPatientToString() {
 
-  print_r($results);
+  $p = new Patient();
+  echo $p;
+
+}
+
+function testPatientGet() {
+
+  echo Patient::get(1);
 
 }
 
@@ -50,7 +58,8 @@ function testDbClass() {
 
 
 // execute the test
-echo testDbClass();
+//echo testPatientClass();
+testPatientGet();
 
 
 ?>

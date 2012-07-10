@@ -26,31 +26,62 @@
  *
  */
 
-// we define a valid entry point
-define('__CHRIS_ENTRY_POINT__', 666);
+// prevent direct calls
+if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
-//define('CHRIS_CONFIG_DEBUG',true);
+// grab the super class for all entities
+require_once 'object.class.php';
 
-// include the configuration
-require_once('../../config.inc.php');
 
-// include the template class
-require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
+/**
+ *
+ * The Patient class which describes the Patient entity of the database.
+ *
+ */
+class Patient extends Object {
 
-function testDbClass() {
+  /**
+   * The unique id of this patient.
+   *
+   * @var int
+   */
+  public $id = -1;
 
-  $results = DB::getInstance()->execute('SELECT * FROM patient;');
+  /**
+   * The lastname of this patient.
+   *
+   * @var string
+   */
+  public $lastname = null;
 
-  print_r($results);
+  /**
+   * The firstname of this patient.
+   *
+   * @var string
+   */
+  public $firstname = null;
+
+  /**
+   * The date of birth of this patient.
+   *
+   * @var string
+   */
+  public $dob = null;
+
+  /**
+   * The sex of this patient (M|F).
+   *
+   * @var string
+   */
+  public $sex = null;
+
+  /**
+   * The patient_id of this patient. This is also known as the MRN.
+   *
+   * @var string
+   */
+  public $patient_id = null;
 
 }
-
-// TODO use php unit testing framework
-// TODO more tests regarding failures
-
-
-// execute the test
-echo testDbClass();
-
 
 ?>

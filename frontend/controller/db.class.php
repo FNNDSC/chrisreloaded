@@ -26,8 +26,8 @@
  *
  */
 
-// security check
-require_once('_security.inc.php');
+// prevent direct calls
+if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 
 /**
@@ -37,10 +37,32 @@ require_once('_security.inc.php');
  */
 class DB {
 
+  /**
+   *
+   * The instance reference for the singleton pattern.
+   *
+   * @var DB
+   */
   private static $instance = null;
 
+  /**
+   * The link to the MySQL database.
+   *
+   * @var mysqli|null
+   */
   private $link = null;
 
+  /**
+   * The constructor which also opens a connection to the database.
+   *
+   * This constructor is private and can not be called. All access must
+   * happen through the static DB::getInstance() method to apply the singleton
+   * pattern.
+   *
+   * The login credentials are defined in the ChRIS config.inc.php file.
+   *
+   * @throws Exception An exception if the database connection fails.
+   */
   private function __construct() {
 
     $link = new mysqli(SQL_HOST, SQL_USERNAME, SQL_PASSWORD, SQL_DATABASE);
@@ -51,25 +73,110 @@ class DB {
 
     }
 
+    // store the link
     $this->link = $link;
 
   }
 
+  /**
+   * Get the instance of the database connector. This always creates a valid
+   * instance by either creating a new one or by returning an existing one.
+   *
+   * @return DB The instance to use.
+   */
   public static function getInstance() {
 
     if (!self::$instance) {
 
+      // first call, create an instance
       self::$instance = new DB();
 
     }
 
+    // return the new or existing instance
     return self::$instance;
 
   }
 
-  public function execute($query) {
+  /**
+   * Execute an SQL query as a prepared statement. This protects against SQL injections.
+   *
+   * <i>Example usage</i>:
+   * <pre>
+   * DB::getInstance()->execute('SELECT * FROM patient WHERE id=(?)',array(0=>$id));
+   * </pre>
+   * In this case, the (?) question mark gets replaced by the value of the $id variable. The
+   * type of the $id variable gets automatically detected based on its php type.
+   *
+   * @param string $query The SQL query to execute.
+   * @param array|null $variables An array of variables to bind as parameters in the SQL query.
+   *                              The type of the variables gets automatically detected.
+   * @return array An array of rows representing each resulting dataset. This can be an empty array,
+   *               if the query does not result in any datasets.
+   * @throws Exception An exception if the query can not be prepared or executed.
+   */
+  public function execute($query, $variables=null) {
 
-    $this->link->query($query);
+    $link = $this->link;
+
+    // prepare the query
+    if (!($statement = $link->prepare($query))) {
+
+      throw new Exception('Failed to prepare query: '.$link->error);
+
+    }
+
+    // bind the parameters
+    if ($variables != null) {
+      foreach($variables as $variable) {
+
+        // detect the type and store the first letter
+        // i for integer
+        // d for double
+        // s for string etc.
+        $type = gettype($variable);
+
+        $statement->bind_param($type{0}, $variable);
+
+      }
+    }
+
+    // execute the query
+    $statement->execute();
+
+    // grab the meta data of the query
+    $result = $statement->result_metadata();
+
+    // check which fields are expected
+    $fields = array();
+    $resultFields = array();
+    while ($field = $result->fetch_field()) {
+
+      $fields[] = $field->name;
+      $resultFields[] = &${$field->name};
+
+    }
+
+    // call $statement->bind_result for each of the expected fields
+    call_user_func_array(array($statement, 'bind_result'), $resultFields);
+
+    // grab the results
+    $results = array();
+    $i = 0; // results counter
+    while ($statement->fetch()) {
+
+      // loop through all fields for each result
+      foreach($fields as $field){
+
+        $results[$i][$field] = $$field;
+
+      }
+
+      $i++;
+    }
+
+    // return the results
+    return $results;
 
   }
 
