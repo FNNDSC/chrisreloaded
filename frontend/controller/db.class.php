@@ -51,6 +51,8 @@ class DB {
 
     }
 
+    $this->link = $link;
+
   }
 
   public static function getInstance() {

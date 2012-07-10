@@ -36,7 +36,7 @@ require_once('controller/_util.inc.php');
 // MYSQL configuration
 define('SQL_HOST', 'chris');
 define('SQL_USERNAME', 'chris');
-define('SQL_PASSWORD', '');
+define('SQL_PASSWORD', 'YOURPASSWORD');
 define('SQL_DATABASE', 'chris');
 
 // PATH configuration
