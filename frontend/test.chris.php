@@ -32,22 +32,29 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
-if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
+require_once('config.inc.php');
 
 // include the simpletest framework
 require_once(SIMPLETEST);
 
-// include the db class
-require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
+// include all the tests suites
+require_once(joinPaths(CHRIS_MODEL_FOLDER,'testing/test.model.php'));
 
-// include the test object class since we derive from that
-require_once('test.object.class.php');
 
-// include the institution class
-require_once(joinPaths(CHRIS_MODEL_FOLDER, 'institution.class.php'));
+/**
+ *
+ * The test suite which includes all tests for the model classes.
+ *
+ */
+class TestChris extends TestSuite {
 
-class TestInstitutionClass extends TestObjectClass {
+  function __construct() {
 
+    parent::__construct();
+
+    $this->add(new TestModel());
+
+  }
 
 }
 
