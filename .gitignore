@@ -7,3 +7,6 @@
 # 'compiled' python files
 ##########################
 *.pyc
+
+# eclipse files
+.settings
