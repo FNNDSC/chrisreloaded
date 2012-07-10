@@ -42,8 +42,9 @@ function testTemplateClass() {
 	$t = new Template('login.html');
 	$t -> replace('TITLE', "<title>ChRIS 2 -Reloaded</title>");
 	$t -> replace('STYLE', joinPaths(CHRIS_VIEW_FOLDER, 'style.html'));
-	$t -> replace('JAVASCRIPT', joinPaths(CHRIS_VIEW_FOLDER, 'javascript.html'));
 	$t -> replace('NAVBAR', joinPaths(CHRIS_VIEW_FOLDER, 'navbar.html'));
+	$t -> replace('TWITTER', joinPaths(CHRIS_VIEW_FOLDER, 'twitter.php'));
+	$t -> replace('JAVASCRIPT', joinPaths(CHRIS_VIEW_FOLDER, 'javascript.html'));
 	$t -> replace('FOOTER', joinPaths(CHRIS_VIEW_FOLDER, 'footer.html'));
 
 	return $t;
