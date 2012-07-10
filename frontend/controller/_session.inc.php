@@ -26,8 +26,8 @@
  *
  */
 
-// include the configuration
-require_once('../config.inc.php');
+// prevent direct calls
+if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 
 // start the session

@@ -26,8 +26,8 @@
  *
  */
 
-// security check
-require_once('controller/_security.inc.php');
+// prevent direct calls
+if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 // include the utilities
 require_once('controller/_util.inc.php');

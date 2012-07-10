@@ -26,8 +26,8 @@
  *
  */
 
-// security check
-require_once('_security.inc.php');
+// prevent direct calls
+if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 
 /**
