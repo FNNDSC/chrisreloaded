@@ -41,14 +41,14 @@ function testTemplateClass() {
 
 	$t = new Template('index.html');
 	$t -> replace('TITLE', "<title>ChRIS 2 -Reloaded</title>");
-	$t -> replace('STYLE', joinPaths(CHRIS_VIEW_FOLDER, 'style.html'));
-	$t -> replace('WELCOME', joinPaths(CHRIS_VIEW_FOLDER, 'welcome.html'));
-	$t -> replace('LOGIN_FORM', joinPaths(CHRIS_VIEW_FOLDER, 'login_form.html'));
-	$t -> replace('HIGHLIGHTS', joinPaths(CHRIS_VIEW_FOLDER, 'highlights.html'));
-	$t -> replace('TWITTER', joinPaths(CHRIS_VIEW_FOLDER, 'twitter.php'));
-	$t -> replace('MORE', joinPaths(CHRIS_VIEW_FOLDER, 'more.html'));
-	$t -> replace('JAVASCRIPT', joinPaths(CHRIS_VIEW_FOLDER, 'javascript.html'));
-	$t -> replace('FOOTER', joinPaths(CHRIS_VIEW_FOLDER, 'footer.html'));
+	$t -> replace('STYLE',  'style.html');
+	$t -> replace('WELCOME',  'welcome.html');
+	$t -> replace('LOGIN_FORM',  'login_form.html');
+	$t -> replace('HIGHLIGHTS',  'highlights.html');
+	$t -> replace('TWITTER',  'twitter.php');
+	$t -> replace('MORE',  'more.html');
+	$t -> replace('JAVASCRIPT',  'javascript.html');
+	$t -> replace('FOOTER',  'footer.html');
 
 	return $t;
 

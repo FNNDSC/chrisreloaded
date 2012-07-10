@@ -103,10 +103,10 @@ class Template {
   public function replace($tag, $content) {
 
     // check if the content is a file
-    if (file_exists($content)) {
+    if (file_exists(joinPaths(CHRIS_VIEW_FOLDER,$content))) {
 
       // yes, it is
-      $content = $this->parse($content);
+      $content = $this->parse(joinPaths(CHRIS_VIEW_FOLDER,$content));
 
     }
 
