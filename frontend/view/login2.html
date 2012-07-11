@@ -19,8 +19,6 @@
 											<button  id="search" class="btn btn-primary">
 							Search
 						</button>
-						<span class="badge badge-success">8 matches</span>
-
 					</form>
 											
 					<div id="filter" class="row-fluid">
@@ -76,11 +74,5 @@
 			${FOOTER}
 		</div>
 		${JAVASCRIPT}
-		<script type="text/javascript">
-				$("#search").click(function(event) {
-					event.preventDefault();
-$('#filter').append('<div class="span2 alert alert-info"><button type="button" class="close" data-dismiss="alert">×</button>Tractography analysis</div>');
-				});
-		</script>
 	</body>
 </html>
