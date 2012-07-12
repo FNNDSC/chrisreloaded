@@ -27,11 +27,11 @@
  */
 
 // prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__'))
+	die('Invalid access.');
 
 // grab the super class for all entities
 require_once 'object.class.php';
-
 
 /**
  *
@@ -40,55 +40,61 @@ require_once 'object.class.php';
  */
 class Scan extends Object {
 
-  /**
-   * The patient_id of this scan.
-   *
-   * @var int
-   */
-  public $patient_id = -1;
+	/**
+	 * The unique of this scan.
+	 *
+	 * @var int
+	 */
+	public $id = -1;
 
-  /**
-   * The modality_id of this scan.
-   *
-   * @var int
-   */
-  public $modality_id = -1;
+	/**
+	 * The patient_id of this scan.
+	 *
+	 * @var int
+	 */
+	public $patient_id = -1;
 
-  /**
-   * The scanner_id of this scan.
-   *
-   * @var int
-   */
-  public $scanner_id = -1;
+	/**
+	 * The modality_id of this scan.
+	 *
+	 * @var int
+	 */
+	public $modality_id = -1;
 
-  /**
-   * The name of the scan.
-   *
-   * @var string
-   */
-  public $name = null;
+	/**
+	 * The scanner_id of this scan.
+	 *
+	 * @var int
+	 */
+	public $scanner_id = -1;
 
-  /**
-   * The time of the scan.
-   *
-   * @var string
-   */
-  public $time = null;
+	/**
+	 * The name of the scan.
+	 *
+	 * @var string
+	 */
+	public $name = null;
 
-  /**
-   * The dimension of the scan.
-   *
-   * @var string
-   */
-  public $dimensions = null;
-  
-    /**
-   * The spacings of the scan.
-   *
-   * @var string
-   */
-  public $spacings = null;
+	/**
+	 * The time of the scan.
+	 *
+	 * @var string
+	 */
+	public $time = null;
+
+	/**
+	 * The dimension of the scan.
+	 *
+	 * @var string
+	 */
+	public $dimensions = null;
+
+	/**
+	 * The spacings of the scan.
+	 *
+	 * @var string
+	 */
+	public $spacings = null;
 
 }
-
 ?>

@@ -46,7 +46,7 @@ require_once('test.object.class.php');
 // include the result class
 require_once(joinPaths(CHRIS_MODEL_FOLDER, 'scan.class.php'));
 
-class TestResultClass extends TestObjectClass {
+class TestScanClass extends TestObjectClass {
 
 
 }

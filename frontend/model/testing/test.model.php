@@ -27,22 +27,24 @@
  */
 
 // we define a valid entry point
-if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+if (!defined('__CHRIS_ENTRY_POINT__'))
+	define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
-if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
+if (!defined('CHRIS_CONFIG_PARSED'))
+	require_once ('../../config.inc.php');
 
 // include the simpletest framework
-require_once(SIMPLETEST);
+require_once (SIMPLETEST);
 
 // include all the tests
-require_once('test.institution.class.php');
-require_once('test.modality.class.php');
-require_once('test.patient.class.php');
-require_once('test.result_configuration.class.php');
-require_once('test.result.class.php');
+require_once ('test.institution.class.php');
+require_once ('test.modality.class.php');
+require_once ('test.patient.class.php');
+require_once ('test.result_configuration.class.php');
+require_once ('test.result.class.php');
 
 /**
  *
@@ -51,18 +53,18 @@ require_once('test.result.class.php');
  */
 class TestModel extends TestSuite {
 
-  function __construct() {
+	function __construct() {
 
-    parent::__construct();
+		parent::__construct();
 
-    $this->add(new TestInstitutionClass());
-    $this->add(new TestModalityClass());
-    $this->add(new TestPatientClass());
-    $this->add(new TestResult_configurationClass());
-    $this->add(new TestResultClass());
+		$this -> add(new TestInstitutionClass());
+		$this -> add(new TestModalityClass());
+		$this -> add(new TestPatientClass());
+		$this -> add(new TestResult_configurationClass());
+		$this -> add(new TestResultClass());
+		$this -> add(new TestScanClass());
 
-  }
+	}
 
 }
-
 ?>
