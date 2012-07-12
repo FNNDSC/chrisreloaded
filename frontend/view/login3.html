@@ -1,0 +1,148 @@
+<html>
+<head>
+<title>ChRIS reloaded</title>
+<link href="view/assets/css/bootstrap.css" rel="stylesheet">
+<link href="view/assets/css/bootstrap-responsive.css" rel="stylesheet">
+<script src="view/assets/js/jquery.js"></script>
+<script src="view/assets/js/bootstrap-tooltip.js"></script>
+<style type="text/css">
+.expand_it {
+	height: 100%;
+}
+</style>
+<script>
+  jQuery(function() {
+
+    jQuery("[rel=right_tooltip]").tooltip({
+      placement: 'right'
+    });
+    
+    jQuery("[rel=bottom_tooltip]").tooltip({
+      placement: 'bottom'
+    });
+    
+    _height = jQuery(window).height();
+    _height = _height - 290;
+    jQuery('#my_data').height(_height / 2);
+    jQuery('#my_results').height(_height / 2);
+    
+    jQuery('.resizer').click(function() {
+
+      if (jQuery(this).closest('div').height() == _height - 30) {
+        
+        // max
+        jQuery('#my_data').height(_height / 2);
+        jQuery('#my_results').height(_height / 2);
+        
+        jQuery('i',jQuery(this)).removeClass('icon-resize-small');
+        jQuery('i',jQuery(this)).addClass('icon-resize-full');            
+        
+      } else {
+        
+        jQuery('#my_data').height(28);
+        jQuery('#my_results').height(28);
+        
+        jQuery(this).closest('div').height(_height - 30);
+        
+        jQuery('i',jQuery(this)).removeClass('icon-resize-full');
+        jQuery('i',jQuery(this)).addClass('icon-resize-small');        
+        
+      }
+      
+    });
+    
+
+
+  });
+</script>
+
+</head>
+
+<body>
+
+ <div class="row">
+  <div class="span4">LOGO</div>
+  <div class="span4 offset4">TOOLBOX</div>
+ </div>
+ <div class="row">
+  <div class="span6">Results</div>
+  <div class="span6">Projects</div>
+ </div>
+ <div class="row">
+  <div class="span6">Data</div>
+  <div class="span6">Plugins</div>
+ </div>
+<!-- 
+	<div id='logo' style='position: absolute; top: 0px; left: 0px;'>
+		<img src='view/assets/img/chris2.png'><span
+			style='float: right; margin-top: 26px; margin-left: 10px;'><h1
+				style='line-height: 20px;'>
+				<span style='color: grey;'>Ch</span><span style='color: slategrey;'>RIS</span>
+			</h1> <small style='margin-left: 60px;'><a href='#' id='reloaded'
+				rel="bottom_tooltip" title="damn right!!">reloaded</a></small></span>
+	</div>
+
+	<div id='menu_top' style='position: absolute; top: 5px; right: 20px;'>Help
+		Settings Logout</div>
+
+	<div id='search' class='well'
+		style='background-color: white; padding: 10px; margin-top: 100px; margin-left: 10px; margin-right: 10px;'>
+		<h3>
+			<i class="icon-search" style='margin-right: 3px; margin-top: 4px;'></i>Search
+		</h3>
+		<form class="form-inline" style='margin: 2px'>
+			<input type="text" class="input-small" placeholder="MRN"
+				style='height: 28px;'> <input type="text"
+				class="input-small" placeholder="Last Name" style='height: 28px;'>
+			<input type="text" class="input-small" placeholder="First Name"
+				style='height: 28px;'> <input type="text"
+				class="input-small" placeholder="Age" style='height: 28px;'>
+			<input type="text" class="input-small" placeholder="Sex"
+				style='height: 28px;'>
+		</form>
+	</div>
+	<div id='my_results' class='well expand_it'
+		style='overflow-y: scroll; padding: 10px; margin-top: 0px; margin-left: 10px; margin-right: 10px;'>
+		<h3 class='resizer' style='cursor: pointer;'>
+			<i class="icon-resize-full"
+				style='cursor: pointer; margin-right: 3px; margin-top: 4px;'></i>My
+			Results
+		</h3>
+		<div id='data1' class='well' style='background-color: lavender'>Result
+			1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Result
+			1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Result
+			1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Result
+			1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Result
+			1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Result
+			1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Result
+			1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Result
+			1 blabla</div>
+	</div>
+	<div id='my_data' class='well'
+		style='overflow-y: scroll; padding: 10px; margin-top: 0px; margin-left: 10px; margin-right: 10px;'>
+		<h3 class='resizer' style='cursor: pointer;'>
+			<i class="icon-resize-full"
+				style='cursor: pointer; margin-right: 3px; margin-top: 4px;'></i>My
+			Data
+		</h3>
+		<div id='data1' class='well' style='background-color: lavender'>Scan 1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Scan 1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Scan 1 blabla</div>
+		<div id='data1' class='well' style='background-color: lavender'>Scan 1 blabla</div>
+    <div id='data1' class='well' style='background-color: lavender'>Scan 1 blabla</div>
+    <div id='data1' class='well' style='background-color: lavender'>Scan 1 blabla</div>
+    <div id='data1' class='well' style='background-color: lavender'>Scan 1 blabla</div>
+    <div id='data1' class='well' style='background-color: lavender'>Scan 1 blabla</div>		
+	</div>
+-->
+
+</body>
+
+</html>
