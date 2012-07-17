@@ -82,48 +82,6 @@ class TestObjectClass extends UnitTestCase {
     }
 
   }
-
-  /**
-   * Test to get one entity from the database.
-   */
-  public function testGet() {
-
-    $classname = $this->getClassname();
-
-    // exit if the classname is null since this means we are not testing a child class
-    if (!$classname) return;
-
-    // grab the test dataset (first one in the table)
-    $groundtruths = DB::getInstance()->execute("SELECT * FROM ".strtolower($classname)." WHERE id=(?)",array(0=>1));
-
-    $groundtruth = $groundtruths[0];
-
-    // now try to grab the same data set using the convenience function
-    $i = $classname::get(1);
-
-    foreach($groundtruth as $key => $value) {
-
-      $this->assertEqual($value, $i->$key);
-
-    }
-
-  }
-
-  /**
-   * Test to get a not existing entity from the database.
-   */
-  public function testGetNotExisting() {
-
-    $classname = $this->getClassname();
-
-    // exit if the classname is null since this means we are not testing a child class
-    if (!$classname) return;
-
-
-    $i = $classname::get(-3);
-    $this->assertNull($i);
-  }
-
 }
 
 ?>

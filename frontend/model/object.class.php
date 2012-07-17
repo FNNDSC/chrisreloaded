@@ -66,46 +66,6 @@ class Object {
 
   }
 
-  /**
-   * Grab the entity with a specific id.
-   *
-   * @param int $id The id of the requested entity.
-   * @return An instance representing the requested entity or null if nothing was found.
-   * @throws Exception An exception if the query resulted in more than one entity which should never happen.
-   */
-  public static function get($id) {
-
-    $classname = get_called_class();
-
-    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($classname).' WHERE id=(?)', array(0=>$id));
-
-    if (count($results) == 0) {
-
-      // we didn't find anything
-      return null;
-
-    }
-
-    if (count($results) != 1) {
-
-      throw new Exception('Result was not unique - something went terribly wrong when search '.$classname.' with id='.$id.'!');
-
-    }
-
-    // create the new object
-    $object = new $classname();
-
-    // map all the attributes from the first result
-    foreach ($object as $key => $value) {
-
-      $object->$key = $results[0][$key];
-
-    }
-
-    return $object;
-
-  }
-
 }
 
 ?>

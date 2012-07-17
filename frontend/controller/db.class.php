@@ -154,9 +154,9 @@ class DB {
 
       $fields[] = $field->name;
       $resultFields[] = &${$field->name};
-
-    }
-
+    
+        }
+    
     // call $statement->bind_result for each of the expected fields
     call_user_func_array(array($statement, 'bind_result'), $resultFields);
 
@@ -164,14 +164,16 @@ class DB {
     $results = array();
     $i = 0; // results counter
     while ($statement->fetch()) {
-
+      $j = 0;
       // loop through all fields for each result
       foreach($fields as $field){
 
-        $results[$i][$field] = $$field;
-
+        // save field name
+        $results[$i][$j][0] = $field;
+        //save field value
+        $results[$i][$j][1] = $$field;
+        $j++;
       }
-
       $i++;
     }
 
