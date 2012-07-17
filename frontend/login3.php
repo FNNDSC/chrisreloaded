@@ -37,6 +37,6 @@ require_once ('config.inc.php');
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
-echo new Template('login4.html');
+echo new Template('login5.html');
 
 ?>
