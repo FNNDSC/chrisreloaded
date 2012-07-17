@@ -28,107 +28,136 @@
 
 // prevent direct calls
 if (!defined('__CHRIS_ENTRY_POINT__'))
-	die('Invalid access.');
+  die('Invalid access.');
 
 /**
  *
  * The database mapper.
+ * Long description
  *
  */
 class Mapper {
+  /**
+   *
+   *
+   */
+  private $objectname = null;
 
-	private $objectname = null;
-	private $targetids = Array();
-	private $joins = '';
-	private $selects = '';
+  /**
+   *
+   */
+  private $joins = '';
 
-	private $joinObjects = Array();
+  /**
+   *
+   */
+  private $selects = '';
 
-	/**
-	 * The constructor.
-	 *
-	 */
-	public function __construct($name) {
-		$this -> objectname = $name;
-		Array_push($this -> joinObjects, $name);
-	}
-	
-	private function _getCondition()
-	{
-		if(empty($this->selects)){
-			return '';
-		}
-		else{
-		return ' WHERE (' . strtolower($this->selects) . ')';
-		}
-	}
+  /**
+   *
+   */
+  private $joinObjects = Array();
 
-	public function filter($condition) {
-		// dont need the "AND" statement for the first condition
-		if (!empty($this -> selects)) {
-			$this -> selects .= ' AND ';
-		}
-		// update the condition string
-		$this -> selects .= strtolower($condition);
-		return $this;
-	}
+  /**
+   * The constructor.
+   *
+   */
+  public function __construct($object) {
+    $this -> objectname = get_class($object);
+    Array_push($this -> joinObjects, $this -> objectname);
+  }
 
-	public function join($table, $joinCondition) {
-		// update the join string
-		$this -> joins .= ' JOIN ' . strtolower($table) . ' ON ' . strtolower($joinCondition);
+  /**
+   *
+   */
+  private function _getCondition() {
+    if (empty($this -> selects)) {
+      return '';
+    } else {
+      return ' WHERE (' . strtolower($this -> selects) . ')';
+    }
+  }
 
-		// store table name in array for conveniency to return objects
-		Array_push($this -> joinObjects, $table);
+  /**
+   *
+   */
+  public function filter($condition) {
+    // dont need the "AND" statement for the first condition
+    if (!empty($this -> selects)) {
+      $this -> selects .= ' AND ';
+    }
+    // update the condition string
+    $this -> selects .= strtolower($condition);
+    return $this;
+  }
 
-		return $this;
-	}
+  /**
+   *
+   */
+  public function join($tableObject, $joinCondition = '') {
+    $tableName = get_class($tableObject);
+    if (empty($joinCondition)) {
+      $this -> joins .= ' JOIN ' . strtolower($tableName) . ' ON ' . strtolower($tableName) . '.id =' . strtolower($this -> objectname) . '.' . strtolower($tableName) . '_id';
+    } else {
+      // update the join string
+      $this -> joins .= ' JOIN ' . strtolower($tableName) . ' ON ' . strtolower($joinCondition);
+    }
+    // store table name in array for conveniency to return objects
+    Array_push($this -> joinObjects, $tableName);
 
-	// get objects
-	public function getObject($id = -1) {
-		$condition = '';
-		if ($id != -1) {
-			$this -> selects = strtolower($this -> objectname) . '.id =' . $id;
-		}
+    return $this;
+  }
 
-		$results = DB::getInstance() -> execute('SELECT * FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getCondition()));
-		// return all objects...
-		// create the new object
-		$objects = Array();
+  /**
+   *
+   */
+  public function getObject($id = -1) {
+    $condition = '';
+    if ($id != -1) {
+      $this -> selects = strtolower($this -> objectname) . '.id =' . $id;
+    }
 
-		// create good number of columns
-		foreach ($this->joinObjects as $object) {
-			array_push($objects, Array());
-		}
+    $results = DB::getInstance() -> execute('SELECT * FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getCondition()));
+    // return all objects...
+    // create the new object
+    $objects = Array();
 
-		// map all the attributes
-		foreach ($results as $line) {
-			$i = 0;
-			$object = null;
+    // create good number of columns
+    foreach ($this->joinObjects as $object) {
+      array_push($objects, Array());
+    }
 
-			foreach ($line as $key) {
-				if ($key[0] == 'id') {
+    // map all the attributes
+    foreach ($results as $line) {
+      $i = 0;
+      $object = null;
 
-					if (!empty($object)) {
-						array_push($objects[$i], $object);
-						++$i;
-					}
-					$object = new $this->joinObjects[$i]();
+      foreach ($line as $key) {
+        if ($key[0] == 'id') {
 
-				}
-				$object -> $key[0] = $key[1];
-			}
-			if (!empty($object)) {
-				array_push($objects[$i], $object);
-			}
-		}
-		return $objects;
-	}
+          if (!empty($object)) {
+            array_push($objects[$i], $object);
+            ++$i;
+          }
+          $object = new $this->joinObjects[$i]();
 
-	// get fields
-	public function getField($field) {
-		$results = DB::getInstance() -> execute('SELECT ' . strtolower($field) . ' FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getCondition()));
-		return $results;
-	}
+        }
+        $object -> $key[0] = $key[1];
+      }
+      if (!empty($object)) {
+        array_push($objects[$i], $object);
+      }
+    }
+    return $objects;
+  }
+
+  /**
+   *
+   */
+  public function getField($field) {
+    $results = DB::getInstance() -> execute('SELECT ' . strtolower($field) . ' FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getCondition()));
+    return $results;
+  }
 
 }
 ?>

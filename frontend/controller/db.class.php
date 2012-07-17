@@ -117,7 +117,6 @@ class DB {
    */
   public function execute($query, $variables=null) {
 
-echo $query;
     $link = $this->link;
 
     // prepare the query
@@ -155,9 +154,9 @@ echo $query;
 
       $fields[] = $field->name;
       $resultFields[] = &${$field->name};
-
-    }
-
+    
+        }
+    
     // call $statement->bind_result for each of the expected fields
     call_user_func_array(array($statement, 'bind_result'), $resultFields);
 
@@ -171,11 +170,10 @@ echo $query;
 
         // save field name
         $results[$i][$j][0] = $field;
-		//save field value
+        //save field value
         $results[$i][$j][1] = $$field;
         $j++;
       }
-
       $i++;
     }
 

@@ -46,75 +46,74 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'scan.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'modality.class.php'));
 
 function testMapperClass() {
+  
+  $patientObject = new Patient();
+  $scanObject = new Scan();
+  $modalityObject = new Modality();
 
-	$mapper = new Mapper('Patient');
-	$objects = $mapper -> join('Scan', 'scan.patient_id=patient.id') -> join('Modality', 'scan.modality_id=modality.id') -> filter('modality.type= \'Structural\'') -> getObject();
+  echo '=====================================================================';
+  echo '<br />';
+  echo '<br />';
 
-	echo '<br />';
-	echo '<br />';
+  $mapper = new Mapper($patientObject);
+  $objects = $mapper -> join($scanObject, 'scan.patient_id=patient.id') -> join($modalityObject, 'scan.modality_id=modality.id') -> filter('modality.type= \'Structural\'') -> getObject();
 
-	for ($j = 0; $j < count($objects[0]); $j++) {
-		foreach ($objects as $object) {
-			print $object[$j];
-			echo '<br />';
-		}
+  for ($j = 0; $j < count($objects[0]); $j++) {
+    foreach ($objects as $object) {
+      print $object[$j];
+      echo '<br />';
+    }
 
-		echo '<br />';
-	}
+    echo '<br />';
+  }
 
-	echo '<br />';
-	echo '<br />';
+  echo '=====================================================================';
+  echo '<br />';
+  echo '<br />';
 
-	$mapper2 = new Mapper('Patient');
-	$objects2 = $mapper2 -> filter('patient.dob < \'2000\'') -> getObject();
+  $mapper2 = new Mapper($patientObject);
+  $objects2 = $mapper2 -> filter('patient.dob < \'2000\'') -> getObject();
 
-	echo '<br />';
-	echo '<br />';
+  for ($j = 0; $j < count($objects2[0]); $j++) {
+    foreach ($objects2 as $object) {
+      print $object[$j];
+      echo '<br />';
+    }
 
-	for ($j = 0; $j < count($objects2[0]); $j++) {
-		foreach ($objects2 as $object) {
-			print $object[$j];
-			echo '<br />';
-		}
+    echo '<br />';
+  }
 
-		echo '<br />';
-	}
+  echo '=====================================================================';
+  echo '<br />';
+  echo '<br />';
 
-	echo '<br />';
-	echo '<br />';
+  $mapper3 = new Mapper($patientObject);
+  $objects3 = $mapper3 -> getObject(2);
 
-	$mapper3 = new Mapper('Patient');
-	$objects3 = $mapper3 -> getObject(2);
+  for ($j = 0; $j < count($objects3[0]); $j++) {
+    foreach ($objects3 as $object) {
+      print $object[$j];
+      echo '<br />';
+    }
 
-	echo '<br />';
-	echo '<br />';
+    echo '<br />';
+  }
 
-	for ($j = 0; $j < count($objects3[0]); $j++) {
-		foreach ($objects3 as $object) {
-			print $object[$j];
-			echo '<br />';
-		}
+  echo '=====================================================================';
+  echo '<br />';
+  echo '<br />';
 
-		echo '<br />';
-	}
+  $mapper4 = new Mapper($patientObject);
+  $objects4 = $mapper4 -> getField('patient_id');
 
-	echo '<br />';
-	echo '<br />';
+  for ($j = 0; $j < count($objects4[0]); $j++) {
+    foreach ($objects4 as $object) {
+      echo $object[$j][1];
+      echo '<br />';
+    }
 
-	$mapper4 = new Mapper('Patient');
-	$objects4 = $mapper4 -> getField('patient_id');
-
-	echo '<br />';
-	echo '<br />';
-
-	for ($j = 0; $j < count($objects4[0]); $j++) {
-		foreach ($objects4 as $object) {
-			echo $object[$j][1];
-			echo '<br />';
-		}
-
-		echo '<br />';
-	}
+    echo '<br />';
+  }
 
 }
 
