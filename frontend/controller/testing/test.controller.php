@@ -40,30 +40,21 @@ if (!defined('CHRIS_CONFIG_PARSED'))
 require_once (SIMPLETEST);
 
 // include all the tests
-require_once ('test.institution.class.php');
-require_once ('test.modality.class.php');
-require_once ('test.patient.class.php');
-require_once ('test.result_configuration.class.php');
-require_once ('test.result.class.php');
+require_once ('test.db.class.php');
+require_once ('test.mapper.class.php');
 
 /**
  *
  * The test suite which includes all tests for the model classes.
  *
  */
-class TestModel extends TestSuite {
+class TestController extends TestSuite {
 
   function __construct() {
 
     parent::__construct();
 
-    $this -> add(new TestInstitutionClass());
-    $this -> add(new TestModalityClass());
-    $this -> add(new TestPatientClass());
-    $this -> add(new TestResult_configurationClass());
-    $this -> add(new TestResultClass());
-    $this -> add(new TestScanClass());
-
+    $this -> add(new TestMapperClass());
   }
 
 }

@@ -32,67 +32,89 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
 
 /**
  *
- * The database mapper.
- * Long description
+ * The database mapper helps to interface between the Objects and the Database
+ * to ensure good Model View Controller (MVC) pratice.
  *
  */
 class Mapper {
   /**
-   *
-   *
+   * \var string $objectname
+   * \brief The base object's name.
    */
   private $objectname = null;
 
   /**
-   *
+   * \var string $joins
+   * \brief The join string.
    */
   private $joins = '';
 
   /**
-   *
+   * \var string $joins
+   * \brief The where string.
    */
-  private $selects = '';
+  private $where = '';
 
   /**
-   *
+   * \var string() $objects
+   * \brief Convenience variable to list all the objects which will be returned
+   * (if tables are joined)
    */
-  private $joinObjects = Array();
+  private $objects = Array();
 
   /**
-   * The constructor.
-   *
+   * \param[in] $object Base object for the mapper.
+   * \brief The constructor.
    */
   public function __construct($object) {
     $this -> objectname = get_class($object);
-    Array_push($this -> joinObjects, $this -> objectname);
+    Array_push($this -> objects, $this -> objectname);
   }
 
   /**
-   *
+   * \brief Helper to generate a clean "WHERE" condition.
+   * If no "WHERE" condition is provided, returns an empty string.
+   * If "WHERE" condition is provided, returns a clean "WHERE (condition)"
+   * string
+   * \return string with correct "WHERE" condition.
    */
-  private function _getCondition() {
-    if (empty($this -> selects)) {
+  private function _getWhere() {
+    if (empty($this -> where)) {
       return '';
     } else {
-      return ' WHERE (' . strtolower($this -> selects) . ')';
+      return ' WHERE (' . strtolower($this -> where) . ')';
     }
   }
 
   /**
-   *
+   * \param[in] $condition Condition to filter the database results.
+   * \brief The method to input where inside a database query.
+   * It prepares and format a nice "WHERE( $condition )".
+   * You can combine several filter conditions:
+   * mapper->filter('conditionA')->filter('conditionB')->objects();
+   * Doesn't query the database. See @objects()
    */
   public function filter($condition) {
     // dont need the "AND" statement for the first condition
-    if (!empty($this -> selects)) {
-      $this -> selects .= ' AND ';
+    if (!empty($this -> where)) {
+      $this -> where .= ' AND ';
     }
     // update the condition string
-    $this -> selects .= strtolower($condition);
+    $this -> where .= strtolower($condition);
     return $this;
   }
 
   /**
-   *
+   * \param[in] $tableObject New object we want to join to the base object.
+   * \param[in] $joinCondition Join condition.
+   * \brief The method to input join inside a database query.
+   * It prepares and format a nice "JOIN $tableObject, ON $joinCondition"
+   * If no $joinCondition is provided, the default join condition will be
+   * " JOIN $tableObject ON $baseObject.$tableObject_id=$tableObject.id"
+   * You can combine several join conditions:
+   * mapper->join(objectA, 'conditionA')->join(objectB)->objects();
+   * Doesn't query the database. See @objects()
+   * \return $this Pointer to current mapper
    */
   public function join($tableObject, $joinCondition = '') {
     $tableName = get_class($tableObject);
@@ -103,27 +125,40 @@ class Mapper {
       $this -> joins .= ' JOIN ' . strtolower($tableName) . ' ON ' . strtolower($joinCondition);
     }
     // store table name in array for conveniency to return objects
-    Array_push($this -> joinObjects, $tableName);
+    Array_push($this -> objects, $tableName);
 
     return $this;
   }
 
   /**
-   *
+   * \param[in] $id Id of the object we want to fetch from DB. If something is
+   * provided, it will overwritte the "WHERE" conditions provided by previous
+   * join().
+   * \brief Execute the sql query with the previously defined join and where
+   * conditions.
+   * If some input is provided, it will overwritte the "WHERE" conditions
+   * provided by previous join().
+   * // good
+   * mapper->join(objectA, 'conditionA')->join(objectB)->objects();
+   * // good
+   * mapper->objects(2);
+   * // warning
+   * "mapper->join(objectB)->objects(2);" EQUALS "mapper->objects(2);"
+   * \return Array of type (Object(Instance, Instance, etc.), Object(Instance, Instance, etc.), Object(Instance, Instance, etc.))
    */
-  public function getObject($id = -1) {
+  public function objects($id = -1) {
     $condition = '';
     if ($id != -1) {
-      $this -> selects = strtolower($this -> objectname) . '.id =' . $id;
+      $this -> where = strtolower($this -> objectname) . '.id =' . $id;
     }
 
-    $results = DB::getInstance() -> execute('SELECT * FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getCondition()));
+    $results = DB::getInstance() -> execute('SELECT * FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getWhere()));
     // return all objects...
     // create the new object
     $objects = Array();
 
     // create good number of columns
-    foreach ($this->joinObjects as $object) {
+    foreach ($this->objects as $object) {
       array_push($objects, Array());
     }
 
@@ -139,7 +174,7 @@ class Mapper {
             array_push($objects[$i], $object);
             ++$i;
           }
-          $object = new $this->joinObjects[$i]();
+          $object = new $this->objects[$i]();
 
         }
         $object -> $key[0] = $key[1];
@@ -152,10 +187,13 @@ class Mapper {
   }
 
   /**
-   *
+   * \param[in] $filed Field to be returned
+   * Get special field of a given SQL request.
+   * Sometimes it is more convenient/efficient to deal with a single string
+   * than the full object.
    */
-  public function getField($field) {
-    $results = DB::getInstance() -> execute('SELECT ' . strtolower($field) . ' FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getCondition()));
+  public function fields($field) {
+    $results = DB::getInstance() -> execute('SELECT ' . strtolower($field) . ' FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getWhere()));
     return $results;
   }
 
