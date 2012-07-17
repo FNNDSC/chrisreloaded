@@ -26,46 +26,35 @@
  *
  */
 
-// prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+// we define a valid entry point
+define('__CHRIS_ENTRY_POINT__', 666);
 
+//define('CHRIS_CONFIG_DEBUG',true);
 
-/**
- *
- * The super class for all entities.
- *
- */
-class Object {
+// include the configuration
+require_once('../../config.inc.php');
 
-  /**
-   * Represent this entity as a string.
-   *
-   * @return A string representation of this entity.
-   */
-  public function __toString() {
+// include the db class
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 
-    $classname = get_class($this);
-    $output = $classname."\n";
+// include the mapper class
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 
-    // make a fancy line (======)
-    for ($i=0; $i<strlen($classname); $i++) {
+// include the patient class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
 
-      $output .= '=';
+function testMapperClass() {
 
-    }
-    $output .= "\n";
-
-    // get all attributes
-    foreach ($this as $key => $value) {
-
-      $output .= $key.': '.$value."\n";
-
-    }
-
-    return $output;
-
-  }
-
+  $mapper = new Mapper('Patient');
+  $mapper->filter('patient.dob < \'2000\'')->join('scan', 'scan.patient_id=patient.id')->filter('patient.sex= \'M\'');
 }
+
+// TODO use php unit testing framework
+// TODO more tests regarding failures
+
+
+// execute the test
+testMapperClass();
+
 
 ?>
