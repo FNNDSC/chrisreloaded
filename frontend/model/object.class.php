@@ -27,8 +27,8 @@
  */
 
 // prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
-
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
 /**
  *
@@ -45,10 +45,10 @@ class Object {
   public function __toString() {
 
     $classname = get_class($this);
-    $output = $classname."\n";
+    $output = $classname . "\n";
 
     // make a fancy line (======)
-    for ($i=0; $i<strlen($classname); $i++) {
+    for ($i = 0; $i < strlen($classname); $i++) {
 
       $output .= '=';
 
@@ -58,7 +58,7 @@ class Object {
     // get all attributes
     foreach ($this as $key => $value) {
 
-      $output .= $key.': '.$value."\n";
+      $output .= $key . ': ' . $value . "\n";
 
     }
 
@@ -66,6 +66,33 @@ class Object {
 
   }
 
-}
+  /**
+   * Convenience method to compare 2 objects
+   *
+   *  \return 1 if objects are equals. Returns the field which doesnt match if
+   * objects are not equals.
+   */
+  public function equals($object) {
 
+    $classname = get_class($this);
+
+    if ($classname != get_class($object)) {
+      throw new Exception('You are trying to compare 2 different type of objects:  \'' . $classname . '\' vs \'' . get_class($object).'\'');
+    }
+
+    $localAttr = get_object_vars($this);
+    $externAttr = get_object_vars($object);
+
+    $diff = array_diff($localAttr, $externAttr);
+
+    if (empty($diff)) {
+      return true;
+
+    } else {
+      return $diff;
+    }
+
+  }
+
+}
 ?>

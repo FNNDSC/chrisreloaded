@@ -49,31 +49,32 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'modality.class.php'));
 
 class TestMapperClass extends UnitTestCase {
 
-  // /**
-  // * Test to get one entity from the database.
-  // */
-  // public function testGet() {
-  //
-  // $classname = $this->getClassname();
-  //
-  // // exit if the classname is null since this means we are not testing a child class
-  // if (!$classname) return;
-  //
-  // // grab the test dataset (first one in the table)
-  // $groundtruths = DB::getInstance()->execute("SELECT * FROM ".strtolower($classname)." WHERE id=(?)",array(0=>1));
-  //
-  // $groundtruth = $groundtruths[0];
-  //
-  // // now try to grab the same data set using the convenience function
-  // $i = $classname::get(1);
-  //
-  // foreach($groundtruth as $key => $value) {
-  //
-  // $this->assertEqual($value, $i->$key);
-  //
-  // }
-  //
-  // }
+  /**
+   * Test to get one entity from the database and compare to original object.
+   */
+  public function testObjects() {
+    $patientObject = new Patient();
+    $patientObject -> id = 2;
+    $patientObject -> lastname = 'Rannou';
+    $patientObject -> firstname = 'Nicolas';
+    $patientObject -> dob = '1987-03-27';
+    $patientObject -> sex = 'M';
+    $patientObject -> patient_id = 'CH156525;';
+
+    $patientObject2 = new Patient();
+    $patientObject2 -> id = 2;
+    $patientObject2 -> lastname = 'Haehn';
+    $patientObject2 -> firstname = 'Nicolas';
+    $patientObject2 -> dob = '1987-03-27';
+    $patientObject2 -> sex = 'M';
+    $patientObject2 -> patient_id = 'CH156525;';
+
+    $mapper = new Mapper($patientObject);
+    $objects = $mapper -> objects(2);
+    
+    $this -> assertTrue($objects[0][0] -> equals($patientObject2) == 1);
+  }
+
   //
   // /**
   // * Test to get a not existing entity from the database.
