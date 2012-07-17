@@ -32,29 +32,33 @@ define('__CHRIS_ENTRY_POINT__', 666);
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
-require_once('../../config.inc.php');
+require_once ('../../config.inc.php');
 
 // include the db class
-require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 
 // include the mapper class
-require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 
 // include the patient class
-require_once(joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'scan.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'modality.class.php'));
 
 function testMapperClass() {
 
-  $mapper = new Mapper('Patient');
-  $mapper->filter('patient.dob < \'2000\'')->join('scan', 'scan.patient_id=patient.id')->filter('patient.sex= \'M\'');
+	$mapper = new Mapper('Patient');
+	$objects = $mapper -> filter('patient.dob < \'2000\'') -> join('Scan', 'scan.patient_id=patient.id') -> filter('patient.sex= \'M\'') -> join('Modality', 'scan.modality_id=modality.id') -> getObject();
+	$i = 0;
+	foreach ($objects[0] as $object) {
+		$i++;
+		print $object;
+	}
 }
 
 // TODO use php unit testing framework
 // TODO more tests regarding failures
 
-
 // execute the test
 testMapperClass();
-
-
 ?>

@@ -37,22 +37,12 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
  */
 class Mapper {
 
-	/**
-	 * The name of the object to be mapped
-	 *
-	 * @var string $objectname
-	 */
 	private $objectname = null;
-
-	/**
-	 * The name of the object to be mapped
-	 *
-	 * @var array $targetids list of the target object ids
-	 */
 	private $targetids = Array();
-
-	// t1, t2, condition
 	private $joins = '';
+	private $selects = '';
+
+	private $joinObjects = Array();
 
 	/**
 	 * The constructor.
@@ -60,75 +50,76 @@ class Mapper {
 	 */
 	public function __construct($name) {
 		$this -> objectname = $name;
-	}
-
-	// helpers
-	private function getTarget($id = -1) {
-		if ($id != -1) {
-			Array_push($this -> targetids, $id);
-		}
-
-		if (empty($this -> targetids)) {
-			$this -> getAll();
-		}
-
-		// array ti string
-		$comma = implode(",", $this -> targetids);
-		return $comma;
-	}
-
-	private function updateTarget($results) {
-		//clean the array
-		unset($this -> targetids);
-		// new array
-		$this -> targetids = Array();
-
-		foreach ($results as $key => $value) {
-			Array_push($this -> targetids, $value['id']);
-		}
-	}
-
-	// update list
-	public function getAll() {
-
-		$results = DB::getInstance() -> execute('SELECT ' . strtolower($this -> objectname) .'.id FROM ' . strtolower($this -> objectname) . strtolower($this -> joins));
-		$this -> updateTarget($results);
-		return $this;
+		Array_push($this -> joinObjects, $name);
 	}
 
 	public function filter($condition) {
-		// do join, etc....
-		$results = DB::getInstance() -> execute('SELECT ' . strtolower($this -> objectname) .'.id FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . ' WHERE (' . strtolower($this -> objectname) .'.id IN (' . strtolower($this -> getTarget() . ')) AND (' . strtolower($condition) . ')'));
-		$this -> updateTarget($results);
-	
+		// dont need the "AND" statement for the first condition
+		if (!empty($this -> selects)) {
+			$this -> selects .= ' AND ';
+		}
+		// update the condition string
+		$this -> selects .= strtolower($condition);
 		return $this;
 	}
 
 	public function join($table, $joinCondition) {
-		// add join condition
-		$this->joins .= ' JOIN '. strtolower($table) . ' ON ' . strtolower($joinCondition);
+		// update the join string
+		$this -> joins .= ' JOIN ' . strtolower($table) . ' ON ' . strtolower($joinCondition);
+
+		// store table name in array for conveniency to return objects
+		Array_push($this -> joinObjects, $table);
 
 		return $this;
 	}
 
 	// get objects
-	public function object($id = -1) {
+	public function getObject($id = -1) {
+		$condition = '';
 		if ($id == -1) {
+			$condition = $this -> selects;
 		} else {
-			$this -> getTarget($id);
+			$condition = strtolower($this -> objectname) . '.id =' . $id;
 		}
 
-		// do join, etc....
-		$results = DB::getInstance() -> execute('SELECT * FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . ' WHERE ' . strtolower($this -> objectname) .'.id=(?)', array(0 => $id));
+		$results = DB::getInstance() -> execute('SELECT * FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . ' WHERE (' . strtolower($condition) . ')');
 		// return all objects...
+		// create the new object
+		$objects = Array();
+
+		// create good number of columns
+		foreach ($this->joinObjects as $object) {
+			array_push($objects, Array());
+		}
+
+		// map all the attributes
+		foreach ($results as $line) {
+			$i = 0;
+			$object = null;
+
+			foreach ($line as $key) {
+				if ($key[0] == 'id') {
+
+					if (!empty($object)) {
+						array_push($objects[$i], $object);
+						++$i;
+					}
+					$object = new $this->joinObjects[$i]();
+
+				}
+				$object -> $key[0] = $key[1];
+			}
+			if (!empty($object)) {
+				array_push($objects[$i], $object);
+			}
+		}
+		return $objects;
 	}
 
 	// get fields
 	public function getField($field) {
-		// do join, etc.
-
-		$results = DB::getInstance() -> execute('SELECT ' . strtolower($this -> objectname) .'.' . strtolower($field) . ' FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . ' WHERE ' . strtolower($this -> objectname) .'.id IN (' . strtolower($this -> getTarget()) . ')');
-		return $this;
+		$results = DB::getInstance() -> execute('SELECT ' . strtolower($field) . ' FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . ' WHERE (' . strtolower($this -> selects) . ')');
+		return $results;
 	}
 
 }

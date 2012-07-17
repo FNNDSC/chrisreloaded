@@ -165,12 +165,15 @@ echo $query;
     $results = array();
     $i = 0; // results counter
     while ($statement->fetch()) {
-
+      $j = 0;
       // loop through all fields for each result
       foreach($fields as $field){
 
-        $results[$i][$field] = $$field;
-
+        // save field name
+        $results[$i][$j][0] = $field;
+		//save field value
+        $results[$i][$j][1] = $$field;
+        $j++;
       }
 
       $i++;
