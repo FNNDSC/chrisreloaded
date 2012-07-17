@@ -52,6 +52,16 @@ class Mapper {
 		$this -> objectname = $name;
 		Array_push($this -> joinObjects, $name);
 	}
+	
+	private function _getCondition()
+	{
+		if(empty($this->selects)){
+			return '';
+		}
+		else{
+		return ' WHERE (' . strtolower($this->selects) . ')';
+		}
+	}
 
 	public function filter($condition) {
 		// dont need the "AND" statement for the first condition
@@ -76,13 +86,11 @@ class Mapper {
 	// get objects
 	public function getObject($id = -1) {
 		$condition = '';
-		if ($id == -1) {
-			$condition = $this -> selects;
-		} else {
-			$condition = strtolower($this -> objectname) . '.id =' . $id;
+		if ($id != -1) {
+			$this -> selects = strtolower($this -> objectname) . '.id =' . $id;
 		}
 
-		$results = DB::getInstance() -> execute('SELECT * FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . ' WHERE (' . strtolower($condition) . ')');
+		$results = DB::getInstance() -> execute('SELECT * FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getCondition()));
 		// return all objects...
 		// create the new object
 		$objects = Array();
@@ -118,7 +126,7 @@ class Mapper {
 
 	// get fields
 	public function getField($field) {
-		$results = DB::getInstance() -> execute('SELECT ' . strtolower($field) . ' FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . ' WHERE (' . strtolower($this -> selects) . ')');
+		$results = DB::getInstance() -> execute('SELECT ' . strtolower($field) . ' FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getCondition()));
 		return $results;
 	}
 
