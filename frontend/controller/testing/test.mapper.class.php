@@ -48,12 +48,52 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'modality.class.php'));
 function testMapperClass() {
 
 	$mapper = new Mapper('Patient');
-	$objects = $mapper -> filter('patient.dob < \'2000\'') -> join('Scan', 'scan.patient_id=patient.id') -> filter('patient.sex= \'M\'') -> join('Modality', 'scan.modality_id=modality.id') -> getObject();
-	$i = 0;
-	foreach ($objects[0] as $object) {
-		$i++;
-		print $object;
+	$objects = $mapper -> join('Scan', 'scan.patient_id=patient.id') -> join('Modality', 'scan.modality_id=modality.id') -> filter('modality.type= \'Structural\'')-> getObject();
+
+	echo '<br />';
+	echo '<br />';
+
+	for ($j = 0; $j < count($objects[0]); $j++) {
+		foreach ($objects as $object) {
+			print $object[$j];
+			echo '<br />';
+		}
+
+		echo '<br />';
 	}
+
+	echo '<br />';
+	echo '<br />';
+
+	$mapper2 = new Mapper('Patient');
+	$objects2 = $mapper2 -> filter('patient.dob < \'2000\'') -> getObject();
+
+	echo '<br />';
+	echo '<br />';
+
+	foreach ($objects2[0] as $object) {
+		print $object;
+
+		echo '<br />';
+		echo '<br />';
+	}
+
+	echo '<br />';
+	echo '<br />';
+
+	$mapper3 = new Mapper('Patient');
+	$objects3 = $mapper3 -> getObject(2);
+
+	echo '<br />';
+	echo '<br />';
+
+	foreach ($objects3[0] as $object) {
+		print $object;
+
+		echo '<br />';
+		echo '<br />';
+	}
+
 }
 
 // TODO use php unit testing framework
