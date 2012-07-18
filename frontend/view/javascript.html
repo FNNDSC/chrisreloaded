@@ -36,6 +36,10 @@
       oTable.fnFilter($("#search-input").val());
     });
 
+    $('#input-form').submit(function() {
+      return false;
+    })
+
     $('#input-search').bind('keyup', function(event) {
       $.ajax({
         type : "POST",
