@@ -21,14 +21,14 @@
   <body>
 
     <p>
-      <b>Start typing a name in the input field below:</b>
+      <b>Start typing a search pattern in the input field below:</b>
     </p>
     <form>
-      First name:
+      Search:
       <input type="text" onkeyup="showHint(this.value)" size="20" />
     </form>
     <p>
-      Suggestions: <span id="txtHint"></span>
+      Query:<span id="txtHint"></span>
     </p>
 
   </body>

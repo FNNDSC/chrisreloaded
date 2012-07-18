@@ -55,6 +55,8 @@ class Mapper {
    */
   private $where = '';
 
+  private $subwhere = Array();
+
   /**
    * \var string() $objects
    * \brief Convenience variable to list all the objects which will be returned
@@ -83,10 +85,25 @@ class Mapper {
    * \return string with correct "WHERE" condition.
    */
   private function _getWhere() {
-    if (empty($this->where)) {
+    if (empty($this->where) && empty($this->subwhere)) {
       return '';
     } else {
-      return ' WHERE ('.strtolower($this->where).')';
+      if (!empty($this->where)) {
+        return ' WHERE ('.strtolower($this->where).')';
+      } else {
+        $wherecondition = '';
+        $wherecondition .= ' WHERE (';
+        $wherecondition .= ' ('.$this->subwhere[1].' ) ';
+
+        $count = count($this->subwhere);
+        if ($count >= 3) {
+          for ($i = 2; $i < $count; $i++) {
+            $wherecondition .= $this->subwhere[0].' ('.$this->subwhere[$i].' ) ';
+          }
+        }
+        $wherecondition .= ' )';
+        return $wherecondition;
+      }
     }
   }
 
@@ -98,13 +115,30 @@ class Mapper {
    * mapper->filter('conditionA')->filter('conditionB')->objects();
    * Doesn't query the database. See @objects()
    */
-  public function filter($condition, $operator='AND') {
+  //fast
+  public function filter($condition, $operator = 'AND') {
     // dont need the "AND" statement for the first condition
     if (!empty($this->where)) {
       $this->where .= ' '.$operator.' ';
     }
     // update the condition string
     $this->where .= strtolower($condition);
+    return $this;
+  }
+
+  // advanced
+  public function advancedfilter($condition, $index = 0, $operator = 'AND') {
+    // dont need the "AND" statement for the first condition
+    if (empty($this->subwhere[$index])) {
+      array_push($this->subwhere, '');
+    } else {
+      $this->subwhere[$index] .= ' '.$operator.' ';
+    }
+    // update the condition string
+    $this->subwhere[$index] .= strtolower($condition);
+
+    print_r($this->subwhere);
+    echo '<br />';
     return $this;
   }
 
@@ -126,6 +160,7 @@ class Mapper {
     } else {
       $tableName = get_class($tableObject);
     }
+
     if (empty($joinCondition)) {
       $this->joins .= ' JOIN '.strtolower($tableName).' ON '.strtolower($tableName).'.id ='.strtolower($this->objectname).'.'.strtolower($tableName).'_id';
     } else {

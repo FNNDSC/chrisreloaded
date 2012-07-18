@@ -64,7 +64,6 @@ class Search {
     //$this->resultMapperInit();
     // $this->projectMapperInit();
     $this->dataMapperInit();
-    echo 'new instanciation';
     // $this->pipelineMapperInit();
   }
 
@@ -104,12 +103,21 @@ class Search {
   }
 
   public function search($searchField) {
-    // build query
-    foreach ($this->dataSearchFields as $field) {
-
-      $this->data->filter($field.' like \'%'.$searchField.'%\'', 'OR');
+    // AND condition on explode!!
+    $singleField = explode(" ", $searchField);
+    
+    // set index 0
+    $this->data->advancedfilter('AND', 0);
+    $i = 1;
+    foreach ($singleField as $single) {
+      
+      // build query
+      foreach ($this->dataSearchFields as $field) {
+        //$this->data->filter($field.' like \'%'.$single.'%\'', 'OR');
+        $this->data->advancedfilter($field.' like \'%'.$single.'%\'', $i, 'OR');
+      }
+      $i++;
     }
-
     $results = $this->data->objects();
 
     // search!
@@ -126,7 +134,7 @@ class Search {
 
 }
 
- $searchField = $_GET['field'];
+$searchField = $_GET['field'];
 // SELECT * FROM scan join patient on patient.id =scan.patient_id join modality on modality.id =scan.modality_id where (firstname like '%Diffusion%') OR (lastname like '%N%') OR (subtype like '%T%')
 $search = Search::getInstance();
 $search->search($searchField);
