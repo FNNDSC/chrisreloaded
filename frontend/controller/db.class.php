@@ -116,7 +116,7 @@ class DB {
    * @throws Exception An exception if the query can not be prepared or executed.
    */
   public function execute($query, $variables=null) {
-
+echo $query;
     $link = $this->link;
 
     // prepare the query

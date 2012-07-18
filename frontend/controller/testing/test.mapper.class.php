@@ -36,9 +36,6 @@ if (!defined('CHRIS_CONFIG_PARSED'))
 // include the simpletest framework
 require_once (SIMPLETEST);
 
-// include the db class
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
-
 // include the mapper class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 

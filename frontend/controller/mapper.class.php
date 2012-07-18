@@ -67,8 +67,12 @@ class Mapper {
    * \brief The constructor.
    */
   public function __construct($object) {
-    $this -> objectname = get_class($object);
-    Array_push($this -> objects, $this -> objectname);
+    if (gettype($object) == 'string') {
+      $this->objectname = $object;
+    } else {
+      $this->objectname = get_class($object);
+    }
+    Array_push($this->objects, $this->objectname);
   }
 
   /**
@@ -79,10 +83,10 @@ class Mapper {
    * \return string with correct "WHERE" condition.
    */
   private function _getWhere() {
-    if (empty($this -> where)) {
+    if (empty($this->where)) {
       return '';
     } else {
-      return ' WHERE (' . strtolower($this -> where) . ')';
+      return ' WHERE ('.strtolower($this->where).')';
     }
   }
 
@@ -94,13 +98,13 @@ class Mapper {
    * mapper->filter('conditionA')->filter('conditionB')->objects();
    * Doesn't query the database. See @objects()
    */
-  public function filter($condition) {
+  public function filter($condition, $operator='AND') {
     // dont need the "AND" statement for the first condition
-    if (!empty($this -> where)) {
-      $this -> where .= ' AND ';
+    if (!empty($this->where)) {
+      $this->where .= ' '.$operator.' ';
     }
     // update the condition string
-    $this -> where .= strtolower($condition);
+    $this->where .= strtolower($condition);
     return $this;
   }
 
@@ -117,15 +121,19 @@ class Mapper {
    * \return $this Pointer to current mapper
    */
   public function join($tableObject, $joinCondition = '') {
-    $tableName = get_class($tableObject);
+    if (gettype($tableObject) == 'string') {
+      $tableName = $tableObject;
+    } else {
+      $tableName = get_class($tableObject);
+    }
     if (empty($joinCondition)) {
-      $this -> joins .= ' JOIN ' . strtolower($tableName) . ' ON ' . strtolower($tableName) . '.id =' . strtolower($this -> objectname) . '.' . strtolower($tableName) . '_id';
+      $this->joins .= ' JOIN '.strtolower($tableName).' ON '.strtolower($tableName).'.id ='.strtolower($this->objectname).'.'.strtolower($tableName).'_id';
     } else {
       // update the join string
-      $this -> joins .= ' JOIN ' . strtolower($tableName) . ' ON ' . strtolower($joinCondition);
+      $this->joins .= ' JOIN '.strtolower($tableName).' ON '.strtolower($joinCondition);
     }
     // store table name in array for conveniency to return objects
-    Array_push($this -> objects, $tableName);
+    Array_push($this->objects, $tableName);
 
     return $this;
   }
@@ -149,10 +157,10 @@ class Mapper {
   public function objects($id = -1) {
     $condition = '';
     if ($id != -1) {
-      $this -> where = strtolower($this -> objectname) . '.id =' . $id;
+      $this->where = strtolower($this->objectname).'.id ='.$id;
     }
 
-    $results = DB::getInstance() -> execute('SELECT * FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getWhere()));
+    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()));
     // return all objects...
     // create the new object
     $objects = Array();
@@ -177,7 +185,7 @@ class Mapper {
           $object = new $this->objects[$i]();
 
         }
-        $object -> $key[0] = $key[1];
+        $object->$key[0] = $key[1];
       }
       if (!empty($object)) {
         array_push($objects[$i], $object);
@@ -193,7 +201,7 @@ class Mapper {
    * than the full object.
    */
   public function fields($field) {
-    $results = DB::getInstance() -> execute('SELECT ' . strtolower($field) . ' FROM ' . strtolower($this -> objectname) . strtolower($this -> joins) . strtolower($this -> _getWhere()));
+    $results = DB::getInstance()->execute('SELECT '.strtolower($field).' FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()));
     return $results;
   }
 
