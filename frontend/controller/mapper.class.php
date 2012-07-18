@@ -136,9 +136,6 @@ class Mapper {
     }
     // update the condition string
     $this->subwhere[$index] .= strtolower($condition);
-
-    print_r($this->subwhere);
-    echo '<br />';
     return $this;
   }
 

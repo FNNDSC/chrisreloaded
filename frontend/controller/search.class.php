@@ -102,8 +102,7 @@ class Search {
     $this->data = new Mapper('Pipeline');
   }
 
-  public function search($searchField) {
-    // AND condition on explode!!
+  public function advancedSearch($searchField) {
     $singleField = explode(" ", $searchField);
     
     // set index 0
@@ -119,6 +118,7 @@ class Search {
       $i++;
     }
     $results = $this->data->objects();
+    // echo json_encode($results);
 
     // search!
     echo '<br />';
@@ -133,9 +133,8 @@ class Search {
   }
 
 }
-
-$searchField = $_GET['field'];
+$searchField = $_POST['field'];
 // SELECT * FROM scan join patient on patient.id =scan.patient_id join modality on modality.id =scan.modality_id where (firstname like '%Diffusion%') OR (lastname like '%N%') OR (subtype like '%T%')
 $search = Search::getInstance();
-$search->search($searchField);
+$search->advancedSearch($searchField);
 ?>

@@ -26,6 +26,7 @@
     <form>
       Search:
       <input type="text" onkeyup="showHint(this.value)" size="20" />
+      <Input type = 'Checkbox' Name ='or' value ="o"/>
     </form>
     <p>
       Query:<span id="txtHint"></span>

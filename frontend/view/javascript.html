@@ -17,24 +17,36 @@
 <script src="view/assets/js/jquery.dataTables.js"></script>
 <script src="view/assets/js/DT_bootstrap.js"></script>
 
-		<script type="text/javascript">
-		$(document).ready(function() {
-				$("#search").click(function(event) {
-					event.preventDefault();
-$('#filter').append('<div class="span2 alert alert-info"><button type="button" class="close" data-dismiss="alert">×</button>Tractography analysis</div>');
-				});
-				
-								$("#search-input").on("input", null, null, function() {
-					
-				var oTable = $('#quickresults').dataTable();
-		      oTable.fnFilter($("#search-input").val());
-		      
-		      				var oTable = $('#quickimages').dataTable();
-		      oTable.fnFilter($("#search-input").val());
-		      
-		      				var oTable = $('#quickpipelines').dataTable();
-		      oTable.fnFilter($("#search-input").val());
-});
-		});
-		</script>
-	</script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("#search").click(function(event) {
+      event.preventDefault();
+      $('#filter').append('<div class="span2 alert alert-info"><button type="button" class="close" data-dismiss="alert">×</button>Tractography analysis</div>');
+    });
+
+    $("#search-input").on("input", null, null, function() {
+
+      var oTable = $('#quickresults').dataTable();
+      oTable.fnFilter($("#search-input").val());
+
+      var oTable = $('#quickimages').dataTable();
+      oTable.fnFilter($("#search-input").val());
+
+      var oTable = $('#quickpipelines').dataTable();
+      oTable.fnFilter($("#search-input").val());
+    });
+
+    $('#input-search').bind('keyup', function(event) {
+      $.ajax({
+        type : "POST",
+        url : "controller/search.class.php",
+        data : "field=" + this.value,
+        success : function(success) {
+          $('#query').html(success);
+        }
+      });
+    });
+
+  }); 
+</script>
+</script>
