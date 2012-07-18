@@ -61,10 +61,10 @@ class Search {
   private $pipelineSearchFields = null;
 
   private function __construct() {
-    //$this->resultMapperInit();
-    // $this->projectMapperInit();
+    $this->resultMapperInit();
+    $this->projectMapperInit();
     $this->dataMapperInit();
-    // $this->pipelineMapperInit();
+    $this->pipelineMapperInit();
   }
 
   public static function getInstance() {
@@ -82,12 +82,16 @@ class Search {
   }
 
   private function projectMapperInit() {
-    $this->project = new Mapper('Project');
-    //$this->project->join();
+    $this->project = new Mapper('Scan');
+    $this->project->join('Patient');
+
+    $this->projectSearchFields = Array(0 => 'firstname');
   }
 
   private function resultMapperInit() {
-    $this->result = new Mapper('Result');
+    $this->result = new Mapper('Patient');
+
+    $this->resultSearchFields = Array(0 => 'firstname', 1 => 'lastname');
   }
 
   private function dataMapperInit() {
@@ -99,32 +103,92 @@ class Search {
   }
 
   private function pipelineMapperInit() {
-    $this->data = new Mapper('Pipeline');
+    $this->pipeline = new Mapper('Scan');
+    $this->pipeline->join('Modality');
+
+    $this->pipelineSearchFields = Array(0 => 'subtype');
   }
 
   public function advancedSearch($searchField) {
     $singleField = explode(" ", $searchField);
-    
+
     // set index 0
+    $this->project->advancedfilter('AND', 0);
+    $this->result->advancedfilter('AND', 0);
     $this->data->advancedfilter('AND', 0);
+    $this->pipeline->advancedfilter('AND', 0);
+    
     $i = 1;
     foreach ($singleField as $single) {
-      
+
       // build query
+      foreach ($this->projectSearchFields as $field) {
+        $this->project->advancedfilter($field.' like \'%'.$single.'%\'', $i, 'OR');
+      }
+
+      foreach ($this->resultSearchFields as $field) {
+        $this->result->advancedfilter($field.' like \'%'.$single.'%\'', $i, 'OR');
+      }
+
       foreach ($this->dataSearchFields as $field) {
-        //$this->data->filter($field.' like \'%'.$single.'%\'', 'OR');
         $this->data->advancedfilter($field.' like \'%'.$single.'%\'', $i, 'OR');
+      }
+
+      foreach ($this->pipelineSearchFields as $field) {
+        $this->pipeline->advancedfilter($field.' like \'%'.$single.'%\'', $i, 'OR');
       }
       $i++;
     }
-    $results = $this->data->objects();
+
+    $project = $this->project->objects();
+    $result = $this->result->objects();
+    $data = $this->data->objects();
+    $pipeline = $this->pipeline->objects();
     // echo json_encode($results);
 
     // search!
     echo '<br />';
     echo '<br />';
-    for ($j = 0; $j < count($results[0]); $j++) {
-      foreach ($results as $object) {
+    echo '=============== PROJECT ===============';
+    echo '<br />';
+    for ($j = 0; $j < count($project[0]); $j++) {
+      foreach ($project as $object) {
+        print $object[$j];
+        echo '<br />';
+      }
+      echo '<br />';
+    }
+
+    echo '<br />';
+    echo '<br />';
+    echo '=============== RESULT ===============';
+    echo '<br />';
+    for ($j = 0; $j < count($result[0]); $j++) {
+      foreach ($result as $object) {
+        print $object[$j];
+        echo '<br />';
+      }
+      echo '<br />';
+    }
+
+    echo '<br />';
+    echo '<br />';
+    echo '=============== DATA ===============';
+    echo '<br />';
+    for ($j = 0; $j < count($data[0]); $j++) {
+      foreach ($data as $object) {
+        print $object[$j];
+        echo '<br />';
+      }
+      echo '<br />';
+    }
+
+    echo '<br />';
+    echo '<br />';
+    echo '=============== PIPELINE ===============';
+    echo '<br />';
+    for ($j = 0; $j < count($pipeline[0]); $j++) {
+      foreach ($pipeline as $object) {
         print $object[$j];
         echo '<br />';
       }
@@ -133,6 +197,7 @@ class Search {
   }
 
 }
+
 $searchField = $_POST['field'];
 // SELECT * FROM scan join patient on patient.id =scan.patient_id join modality on modality.id =scan.modality_id where (firstname like '%Diffusion%') OR (lastname like '%N%') OR (subtype like '%T%')
 $search = Search::getInstance();
