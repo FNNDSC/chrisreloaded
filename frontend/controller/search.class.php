@@ -146,59 +146,62 @@ class Search {
     $pipeline = $this->pipeline->objects();
 
     $all = Array();
-    $all['project'] = $project;
-    $all['result'] = $result;
-    $all['data'] = $data;
-    $all['pipeline'] = $pipeline;
+    // $all['Project'] = Array();
+    // array_push($all['Project'], $project);
+    $all['Project'] = $project;
+    $all['Result'] = $result;
+    $all['Data'] = $data;
+    $all['Pipeline'] = $pipeline;
     echo json_encode($all);
 
-    // search!
+    // // search!
     // echo '<br />';
     // echo '<br />';
     // echo '=============== PROJECT ===============';
     // echo '<br />';
+    // print_r($project);
     // for ($j = 0; $j < count($project[0]); $j++) {
-      // foreach ($project as $object) {
-        // print $object[$j];
-        // echo '<br />';
-      // }
-      // echo '<br />';
+    // foreach ($project as $object) {
+    // print $object[$j];
+    // echo '<br />';
     // }
-// 
+    // echo '<br />';
+    // }
+    //
     // echo '<br />';
     // echo '<br />';
     // echo '=============== RESULT ===============';
     // echo '<br />';
     // for ($j = 0; $j < count($result[0]); $j++) {
-      // foreach ($result as $object) {
-        // print $object[$j];
-        // echo '<br />';
-      // }
-      // echo '<br />';
+    // foreach ($result as $object) {
+    // print $object[$j];
+    // echo '<br />';
     // }
-// 
+    // echo '<br />';
+    // }
+    //
     // echo '<br />';
     // echo '<br />';
     // echo '=============== DATA ===============';
     // echo '<br />';
     // for ($j = 0; $j < count($data[0]); $j++) {
-      // foreach ($data as $object) {
-        // print $object[$j];
-        // echo '<br />';
-      // }
-      // echo '<br />';
+    // foreach ($data as $object) {
+    // print $object[$j];
+    // echo '<br />';
     // }
-// 
+    // echo '<br />';
+    // }
+    //
     // echo '<br />';
     // echo '<br />';
     // echo '=============== PIPELINE ===============';
     // echo '<br />';
     // for ($j = 0; $j < count($pipeline[0]); $j++) {
-      // foreach ($pipeline as $object) {
-        // print $object[$j];
-        // echo '<br />';
-      // }
-      // echo '<br />';
+    // foreach ($pipeline as $object) {
+    // print $object[$j];
+    // echo '<br />';
+    // }
+    // echo '<br />';
     // }
   }
 

@@ -199,9 +199,10 @@ class Mapper {
 
     // create good number of columns
     foreach ($this->objects as $object) {
-      array_push($objects, Array());
+      $objects[$object] = Array();
+      // array_push($objects, Array());
     }
-
+    
     // map all the attributes
     foreach ($results as $line) {
       $i = 0;
@@ -211,7 +212,7 @@ class Mapper {
         if ($key[0] == 'id') {
 
           if (!empty($object)) {
-            array_push($objects[$i], $object);
+            array_push($objects[$this->objects[$i]], $object);
             ++$i;
           }
           $object = new $this->objects[$i]();
@@ -220,7 +221,7 @@ class Mapper {
         $object->$key[0] = $key[1];
       }
       if (!empty($object)) {
-        array_push($objects[$i], $object);
+        array_push($objects[$this->objects[$i]], $object);
       }
     }
     return $objects;
