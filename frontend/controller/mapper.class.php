@@ -72,7 +72,7 @@ class Mapper {
     if (gettype($object) == 'string') {
       $this->objectname = $object;
     } else {
-      $this->objectname = get_class($object);
+      $this->objectname = $object->objectname ;
     }
     Array_push($this->objects, $this->objectname);
   }
@@ -155,7 +155,7 @@ class Mapper {
     if (gettype($tableObject) == 'string') {
       $tableName = $tableObject;
     } else {
-      $tableName = get_class($tableObject);
+      $tableName = $tableObject->objectname;
     }
 
     if (empty($joinCondition)) {
