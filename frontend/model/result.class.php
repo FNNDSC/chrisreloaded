@@ -41,13 +41,6 @@ require_once 'object.class.php';
 class Result extends Object {
 
   /**
-   * The unique id of this result.
-   *
-   * @var int
-   */
-  public $id = -1;
-
-  /**
    * The plugin of this result.
    *
    * @var string

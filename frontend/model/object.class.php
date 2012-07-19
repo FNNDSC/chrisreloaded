@@ -42,13 +42,20 @@ class Object {
    *
    * @return A string representation of this entity.
    */
+
+  public $objectname = '';
+  public $id = -1;
+
+  public function __construct() {
+    $this->objectname = get_class($this);
+  }
+
   public function __toString() {
 
-    $classname = get_class($this);
-    $output = $classname . "\n";
+    $output = $this->objectname."\n";
 
     // make a fancy line (======)
-    for ($i = 0; $i < strlen($classname); $i++) {
+    for ($i = 0; $i < strlen($this->objectname); $i++) {
 
       $output .= '=';
 
@@ -58,7 +65,7 @@ class Object {
     // get all attributes
     foreach ($this as $key => $value) {
 
-      $output .= $key . ': ' . $value . "\n";
+      $output .= $key.': '.$value."\n";
 
     }
 
@@ -74,10 +81,8 @@ class Object {
    */
   public function equals($object) {
 
-    $classname = get_class($this);
-
-    if ($classname != get_class($object)) {
-      throw new Exception('You are trying to compare 2 different type of objects:  \'' . $classname . '\' vs \'' . get_class($object).'\'');
+    if ($this->objectname != get_class($object)) {
+      throw new Exception('You are trying to compare 2 different type of objects:  \''.$this->objectname.'\' vs \''.get_class($object).'\'');
     }
 
     $localAttr = get_object_vars($this);

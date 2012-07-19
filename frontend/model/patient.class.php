@@ -39,14 +39,7 @@ require_once 'object.class.php';
  *
  */
 class Patient extends Object {
-
-  /**
-   * The unique id of this patient.
-   *
-   * @var int
-   */
-  public $id = -1;
-
+  
   /**
    * The lastname of this patient.
    *

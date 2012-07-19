@@ -41,13 +41,6 @@ require_once 'object.class.php';
 class Modality extends Object {
 
   /**
-   * The unique id of this modality.
-   *
-   * @var int
-   */
-  public $id = -1;
-
-  /**
    * The name of this modality.
    *
    * @var string

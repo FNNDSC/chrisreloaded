@@ -40,14 +40,7 @@ require_once 'object.class.php';
  */
 class Scan extends Object {
 
-	/**
-	 * The unique of this scan.
-	 *
-	 * @var int
-	 */
-	public $id = -1;
-
-	/**
+/**
 	 * The patient_id of this scan.
 	 *
 	 * @var int
