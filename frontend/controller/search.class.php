@@ -117,7 +117,7 @@ class Search {
     $this->result->advancedfilter('AND', 0);
     $this->data->advancedfilter('AND', 0);
     $this->pipeline->advancedfilter('AND', 0);
-    
+
     $i = 1;
     foreach ($singleField as $single) {
 
@@ -144,62 +144,67 @@ class Search {
     $result = $this->result->objects();
     $data = $this->data->objects();
     $pipeline = $this->pipeline->objects();
-    // echo json_encode($results);
+
+    $all = Array();
+    $all['project'] = $project;
+    $all['result'] = $result;
+    $all['data'] = $data;
+    $all['pipeline'] = $pipeline;
+    echo json_encode($all);
 
     // search!
-    echo '<br />';
-    echo '<br />';
-    echo '=============== PROJECT ===============';
-    echo '<br />';
-    for ($j = 0; $j < count($project[0]); $j++) {
-      foreach ($project as $object) {
-        print $object[$j];
-        echo '<br />';
-      }
-      echo '<br />';
-    }
-
-    echo '<br />';
-    echo '<br />';
-    echo '=============== RESULT ===============';
-    echo '<br />';
-    for ($j = 0; $j < count($result[0]); $j++) {
-      foreach ($result as $object) {
-        print $object[$j];
-        echo '<br />';
-      }
-      echo '<br />';
-    }
-
-    echo '<br />';
-    echo '<br />';
-    echo '=============== DATA ===============';
-    echo '<br />';
-    for ($j = 0; $j < count($data[0]); $j++) {
-      foreach ($data as $object) {
-        print $object[$j];
-        echo '<br />';
-      }
-      echo '<br />';
-    }
-
-    echo '<br />';
-    echo '<br />';
-    echo '=============== PIPELINE ===============';
-    echo '<br />';
-    for ($j = 0; $j < count($pipeline[0]); $j++) {
-      foreach ($pipeline as $object) {
-        print $object[$j];
-        echo '<br />';
-      }
-      echo '<br />';
-    }
+    // echo '<br />';
+    // echo '<br />';
+    // echo '=============== PROJECT ===============';
+    // echo '<br />';
+    // for ($j = 0; $j < count($project[0]); $j++) {
+      // foreach ($project as $object) {
+        // print $object[$j];
+        // echo '<br />';
+      // }
+      // echo '<br />';
+    // }
+// 
+    // echo '<br />';
+    // echo '<br />';
+    // echo '=============== RESULT ===============';
+    // echo '<br />';
+    // for ($j = 0; $j < count($result[0]); $j++) {
+      // foreach ($result as $object) {
+        // print $object[$j];
+        // echo '<br />';
+      // }
+      // echo '<br />';
+    // }
+// 
+    // echo '<br />';
+    // echo '<br />';
+    // echo '=============== DATA ===============';
+    // echo '<br />';
+    // for ($j = 0; $j < count($data[0]); $j++) {
+      // foreach ($data as $object) {
+        // print $object[$j];
+        // echo '<br />';
+      // }
+      // echo '<br />';
+    // }
+// 
+    // echo '<br />';
+    // echo '<br />';
+    // echo '=============== PIPELINE ===============';
+    // echo '<br />';
+    // for ($j = 0; $j < count($pipeline[0]); $j++) {
+      // foreach ($pipeline as $object) {
+        // print $object[$j];
+        // echo '<br />';
+      // }
+      // echo '<br />';
+    // }
   }
 
 }
 
 $searchField = $_POST['field'];
-// SELECT * FROM scan join patient on patient.id =scan.patient_id join modality on modality.id =scan.modality_id where (firstname like '%Diffusion%') OR (lastname like '%N%') OR (subtype like '%T%')
 $search = Search::getInstance();
 $search->advancedSearch($searchField);
 ?>

@@ -39,16 +39,49 @@
     $('#input-form').submit(function() {
       return false;
     })
-
     $('#input-search').bind('keyup', function(event) {
       $.ajax({
         type : "POST",
         url : "controller/search.class.php",
-        data : "field=" + this.value,
-        success : function(success) {
-          $('#query').html(success);
+        dataType : "json",
+        data : {
+          field : $(this).val()
+        },
+        success : function(data) {
+          if (data.project[0].length == 0) {
+            $('#project-badge').removeClass('badge-success').addClass('badge-failure');
+          } else {
+            $('#project-badge').removeClass('badge-failure').addClass('badge-success');
+          }
+          $('#project-badge').html(data.project[0].length);
+
+          if (data.result[0].length == 0) {
+            $('#result-badge').removeClass('badge-success').addClass('badge-failure');
+          } else {
+            $('#result-badge').removeClass('badge-failure').addClass('badge-success');
+          }
+          $('#result-badge').html(data.result[0].length);
+
+          if (data.data[0].length == 0) {
+            $('#data-badge').removeClass('badge-success').addClass('badge-failure');
+          } else {
+            $('#data-badge').removeClass('badge-failure').addClass('badge-success');
+          }
+          $('#data-badge').html(data.data[0].length);
+
+          if (data.pipeline[0].length == 0) {
+            $('#pipeline-badge').removeClass('badge-success').addClass('badge-failure');
+          } else {
+            $('#pipeline-badge').removeClass('badge-failure').addClass('badge-success');
+          }
+          $('#pipeline-badge').html(data.pipeline[0].length);
         }
       });
+    });
+
+    // call it when page is loaded
+    $(function() {
+      $('#input-search').keyup();
     });
 
   }); 
