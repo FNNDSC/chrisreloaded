@@ -38,132 +38,128 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
  */
 class Mapper {
   /**
-   * \var string $objectname
-   * \brief The base object's name.
+   * The base object's name.
+   *
+   * @var string $objectname
    */
   private $objectname = null;
 
   /**
-   * \var string $joins
-   * \brief The join string.
+   *  The join string.
+   *
+   * @var string $joins
    */
   private $joins = '';
 
   /**
-   * \var string $joins
-   * \brief The where string.
+   * Array containing the filter() information
+   *
+   * @var string $where
    */
-  private $where = '';
-
-  private $subwhere = Array();
+  private $where = Array();
 
   /**
-   * \var string() $objects
-   * \brief Convenience variable to list all the objects which will be returned
+   * Convenience variable to list all the objects which will be returned
    * (if tables are joined)
+   *
+   * @var string() $objects
    */
   private $objects = Array();
 
   /**
-   * \param[in] $object Base object for the mapper.
-   * \brief The constructor.
+   * The constructor
+   *
+   * @param[in] $object Base object for the mapper.
    */
   public function __construct($object) {
-    if (gettype($object) == 'string') {
-      $this->objectname = $object;
-    } else {
-      $this->objectname = $object->objectname ;
-    }
+    $this->objectname = $this->_getName($object);
     Array_push($this->objects, $this->objectname);
   }
 
+  private function _getName($object) {
+    if (gettype($object) == 'string') {
+      $name = $object;
+    } else {
+      $name = $object->objectname;
+    }
+    return $name;
+  }
+
   /**
-   * \brief Helper to generate a clean "WHERE" condition.
+   * Helper to generate a clean "WHERE" condition.
    * If no "WHERE" condition is provided, returns an empty string.
    * If "WHERE" condition is provided, returns a clean "WHERE (condition)"
    * string
-   * \return string with correct "WHERE" condition.
+   *
+   * @return string with correct "WHERE" condition.
    */
   private function _getWhere() {
-    if (empty($this->where) && empty($this->subwhere)) {
+    $count = count($this->where);
+    if ($count < 2) {
       return '';
     } else {
-      if (!empty($this->where)) {
-        return ' WHERE ('.strtolower($this->where).')';
-      } else {
-        $wherecondition = '';
-        $wherecondition .= ' WHERE (';
-        $wherecondition .= ' ('.$this->subwhere[1].' ) ';
+      // base case
+      $wherecondition = ' WHERE ( ('.$this->where[1].' ) ';
 
-        $count = count($this->subwhere);
-        if ($count >= 3) {
-          for ($i = 2; $i < $count; $i++) {
-            $wherecondition .= $this->subwhere[0].' ('.$this->subwhere[$i].' ) ';
-          }
-        }
-        $wherecondition .= ' )';
-        return $wherecondition;
+      // add other filters
+      for ($i = 2; $i < $count && $count >= 3; $i++) {
+        $wherecondition .= $this->where[0].' ('.$this->where[$i].' ) ';
       }
+
+      // finish query
+      $wherecondition .= ' )';
+      return $wherecondition;
     }
   }
 
   /**
-   * \param[in] $condition Condition to filter the database results.
-   * \brief The method to input where inside a database query.
+   * The method to input where inside a database query.
    * It prepares and format a nice "WHERE( $condition )".
    * You can combine several filter conditions:
    * mapper->filter('conditionA')->filter('conditionB')->objects();
    * Doesn't query the database. See @objects()
+   *
+   * @param[in] $condition Condition to filter the database results.
    */
-  //fast
-  public function filter($condition, $operator = 'AND') {
-    // dont need the "AND" statement for the first condition
-    if (!empty($this->where)) {
-      $this->where .= ' '.$operator.' ';
-    }
-    // update the condition string
-    $this->where .= strtolower($condition);
-    return $this;
-  }
 
   // advanced
-  public function advancedfilter($condition, $index = 0, $operator = 'AND') {
+  public function filter($condition, $index = 1, $operator = 'AND') {
     // dont need the "AND" statement for the first condition
-    if (empty($this->subwhere[$index])) {
-      array_push($this->subwhere, '');
+    if (empty($this->where[$index])) {
+      array_push($this->where, '');
     } else {
-      $this->subwhere[$index] .= ' '.$operator.' ';
+      $this->where[$index] .= ' '.$operator.' ';
     }
+
     // update the condition string
-    $this->subwhere[$index] .= strtolower($condition);
+    $this->where[$index] .= strtolower($condition);
     return $this;
   }
 
   /**
-   * \param[in] $tableObject New object we want to join to the base object.
-   * \param[in] $joinCondition Join condition.
-   * \brief The method to input join inside a database query.
+   * The method to input join inside a database query.
    * It prepares and format a nice "JOIN $tableObject, ON $joinCondition"
    * If no $joinCondition is provided, the default join condition will be
    * " JOIN $tableObject ON $baseObject.$tableObject_id=$tableObject.id"
    * You can combine several join conditions:
    * mapper->join(objectA, 'conditionA')->join(objectB)->objects();
    * Doesn't query the database. See @objects()
-   * \return $this Pointer to current mapper
+   *
+   * @param[in] $tableObject New object we want to join to the base object.
+   * @param[in] $joinCondition Join condition.
+   * @return $this Pointer to current mapper
    */
+
   public function join($tableObject, $joinCondition = '') {
-    if (gettype($tableObject) == 'string') {
-      $tableName = $tableObject;
-    } else {
-      $tableName = $tableObject->objectname;
+    $tableName = $this->_getName($tableObject);
+
+    // default join condition
+    if (empty($joinCondition)) {
+      $joinCondition = strtolower($tableName).'.id ='.strtolower($this->objectname).'.'.strtolower($tableName).'_id';
     }
 
-    if (empty($joinCondition)) {
-      $this->joins .= ' JOIN '.strtolower($tableName).' ON '.strtolower($tableName).'.id ='.strtolower($this->objectname).'.'.strtolower($tableName).'_id';
-    } else {
-      // update the join string
-      $this->joins .= ' JOIN '.strtolower($tableName).' ON '.strtolower($joinCondition);
-    }
+    // update the join string
+    $this->joins .= ' JOIN '.strtolower($tableName).' ON '.strtolower($joinCondition);
     // store table name in array for conveniency to return objects
     Array_push($this->objects, $tableName);
 
@@ -171,10 +167,7 @@ class Mapper {
   }
 
   /**
-   * \param[in] $id Id of the object we want to fetch from DB. If something is
-   * provided, it will overwritte the "WHERE" conditions provided by previous
-   * join().
-   * \brief Execute the sql query with the previously defined join and where
+   * Execute the sql query with the previously defined join and where
    * conditions.
    * If some input is provided, it will overwritte the "WHERE" conditions
    * provided by previous join().
@@ -185,53 +178,66 @@ class Mapper {
    * // warning
    * "mapper->join(objectB)->objects(2);" EQUALS "mapper->objects(2);"
    * \return Array of type (Object(Instance, Instance, etc.), Object(Instance, Instance, etc.), Object(Instance, Instance, etc.))
+   *
+   * @param[in] $id Id of the object we want to fetch from DB. If something is
+   * provided, it will overwritte the "WHERE" conditions provided by previous
+   * join().
    */
   public function objects($id = -1) {
-    $condition = '';
     if ($id != -1) {
-      $this->where = strtolower($this->objectname).'.id ='.$id;
+      // append to existing - might be an issue?
+      $this->filter(strtolower($this->objectname).'.id ='.$id);
     }
 
+    // query the database
     $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()));
-    // return all objects...
-    // create the new object
+
+    // create an array to store the objects
     $objects = Array();
 
-    // create good number of columns
+    // create one column per object (multpiple objects returned for joins)
     foreach ($this->objects as $object) {
       $objects[$object] = Array();
-      // array_push($objects, Array());
     }
-    
-    // map all the attributes
-    foreach ($results as $line) {
-      $i = 0;
+
+    // create objects and map all the attributes
+    foreach ($results as $result) {
+
+      // localid
+      $localid = 0;
       $object = null;
 
-      foreach ($line as $key) {
-        if ($key[0] == 'id') {
-
+      // parse on result
+      foreach ($result as $field) {
+        // if we reach a "id" field, create new object
+        if ($field[0] == 'id') {
+          // if there is an object existing, push it to right location and update localid
+          // we only push the object once it has been filled!
           if (!empty($object)) {
-            array_push($objects[$this->objects[$i]], $object);
-            ++$i;
+            array_push($objects[$this->objects[$localid]], $object);
+            ++$localid;
           }
-          $object = new $this->objects[$i]();
-
+          // create new object
+          $object = new $this->objects[$localid]();
         }
-        $object->$key[0] = $key[1];
+        // update fields
+        $object->$field[0] = $field[1];
       }
+      // push last object to the right location
+      // we only push the object once it has been filled!
       if (!empty($object)) {
-        array_push($objects[$this->objects[$i]], $object);
+        array_push($objects[$this->objects[$localid]], $object);
       }
     }
     return $objects;
   }
 
   /**
-   * \param[in] $filed Field to be returned
    * Get special field of a given SQL request.
    * Sometimes it is more convenient/efficient to deal with a single string
    * than the full object.
+   *
+   * @param[in] $filed Field to be returned
    */
   public function fields($field) {
     $results = DB::getInstance()->execute('SELECT '.strtolower($field).' FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()));

@@ -112,30 +112,30 @@ class Search {
   public function advancedSearch($searchField) {
     $singleField = explode(" ", $searchField);
 
-    // set index 0
-    $this->project->advancedfilter('AND', 0);
-    $this->result->advancedfilter('AND', 0);
-    $this->data->advancedfilter('AND', 0);
-    $this->pipeline->advancedfilter('AND', 0);
+    // set index 0, to join the sub filters
+    $this->project->filter('AND', 0);
+    $this->result->filter('AND', 0);
+    $this->data->filter('AND', 0);
+    $this->pipeline->filter('AND', 0);
 
     $i = 1;
     foreach ($singleField as $single) {
 
       // build query
       foreach ($this->projectSearchFields as $field) {
-        $this->project->advancedfilter($field.' like \'%'.$single.'%\'', $i, 'OR');
+        $this->project->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
       }
 
       foreach ($this->resultSearchFields as $field) {
-        $this->result->advancedfilter($field.' like \'%'.$single.'%\'', $i, 'OR');
+        $this->result->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
       }
 
       foreach ($this->dataSearchFields as $field) {
-        $this->data->advancedfilter($field.' like \'%'.$single.'%\'', $i, 'OR');
+        $this->data->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
       }
 
       foreach ($this->pipelineSearchFields as $field) {
-        $this->pipeline->advancedfilter($field.' like \'%'.$single.'%\'', $i, 'OR');
+        $this->pipeline->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
       }
       $i++;
     }
@@ -154,55 +154,6 @@ class Search {
     $all['Pipeline'] = $pipeline;
     echo json_encode($all);
 
-    // // search!
-    // echo '<br />';
-    // echo '<br />';
-    // echo '=============== PROJECT ===============';
-    // echo '<br />';
-    // print_r($project);
-    // for ($j = 0; $j < count($project[0]); $j++) {
-    // foreach ($project as $object) {
-    // print $object[$j];
-    // echo '<br />';
-    // }
-    // echo '<br />';
-    // }
-    //
-    // echo '<br />';
-    // echo '<br />';
-    // echo '=============== RESULT ===============';
-    // echo '<br />';
-    // for ($j = 0; $j < count($result[0]); $j++) {
-    // foreach ($result as $object) {
-    // print $object[$j];
-    // echo '<br />';
-    // }
-    // echo '<br />';
-    // }
-    //
-    // echo '<br />';
-    // echo '<br />';
-    // echo '=============== DATA ===============';
-    // echo '<br />';
-    // for ($j = 0; $j < count($data[0]); $j++) {
-    // foreach ($data as $object) {
-    // print $object[$j];
-    // echo '<br />';
-    // }
-    // echo '<br />';
-    // }
-    //
-    // echo '<br />';
-    // echo '<br />';
-    // echo '=============== PIPELINE ===============';
-    // echo '<br />';
-    // for ($j = 0; $j < count($pipeline[0]); $j++) {
-    // foreach ($pipeline as $object) {
-    // print $object[$j];
-    // echo '<br />';
-    // }
-    // echo '<br />';
-    // }
   }
 
 }
