@@ -54,7 +54,9 @@ class TestController extends TestSuite {
 
     parent::__construct();
 
-    $this -> add(new TestMapperClass());
+    $this->add(new TestDbClass());
+    $this->add(new TestMapperClass());
+
   }
 
 }

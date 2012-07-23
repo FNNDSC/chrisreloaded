@@ -45,6 +45,7 @@ require_once ('test.modality.class.php');
 require_once ('test.patient.class.php');
 require_once ('test.result_configuration.class.php');
 require_once ('test.result.class.php');
+require_once ('test.scan.class.php');
 
 /**
  *

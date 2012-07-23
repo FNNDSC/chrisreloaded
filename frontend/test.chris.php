@@ -38,6 +38,7 @@ require_once('config.inc.php');
 require_once(SIMPLETEST);
 
 // include all the tests suites
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'testing/test.controller.php'));
 require_once(joinPaths(CHRIS_MODEL_FOLDER,'testing/test.model.php'));
 
 
