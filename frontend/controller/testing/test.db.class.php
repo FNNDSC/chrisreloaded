@@ -27,30 +27,86 @@
  */
 
 // we define a valid entry point
-define('__CHRIS_ENTRY_POINT__', 666);
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
-require_once('../../config.inc.php');
+if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
 
-// include the template class
+// include the simpletest framework
+require_once(SIMPLETEST);
+
+// include the db class
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 
-function testDbClass() {
+class TestDBClass extends UnitTestCase {
 
-  $results = DB::getInstance()->execute('SELECT * FROM patient;');
+  /**
+   * Test the singleton pattern and the getInstance method.
+   */
+  public function testGetInstance() {
 
-  print_r($results);
+    // get an instance of the DB class
+    $db = DB::getInstance();
+
+    // and another one
+    $db2 = DB::getInstance();
+
+    // should be the same
+    $this->assertEqual($db, $db2);
+
+    // and of course should be a DB object
+    $this->assertEqual(get_class($db), 'DB');
+
+  }
+
+  /**
+   * Test execution of a simple SQL query.
+   */
+  public function testExecute() {
+
+    // get an instance of the DB class
+    $db = DB::getInstance();
+
+    $rows = $db->execute('SELECT * FROM patient');
+
+    // check if the first returned row matches (lastname check)
+    $this->assertEqual($rows[0][1][1],'Haehn');
+
+  }
+
+  /**
+   * Test execution of a simple SQL query with a variable.
+   */
+  public function testExecute2() {
+
+    // get an instance of the DB class
+    $db = DB::getInstance();
+
+    $rows = $db->execute('SELECT * FROM patient WHERE id=(?)', array(0=>1));
+
+    // check if the first returned row matches (lastname check)
+    $this->assertEqual($rows[0][1][1],'Haehn');
+
+  }
+
+  /**
+   * Test execution of a simple SQL query with no matches.
+   */
+  public function testExecute3() {
+
+    // get an instance of the DB class
+    $db = DB::getInstance();
+
+    $rows = $db->execute('SELECT * FROM patient WHERE id=(?)', array(0=>-1000));
+
+    // check if the returned rows are NULL
+    $this->assertEqual($rows, NULL);
+
+  }
+
 
 }
-
-// TODO use php unit testing framework
-// TODO more tests regarding failures
-
-
-// execute the test
-echo testDbClass();
-
 
 ?>
