@@ -91,6 +91,8 @@ class Search {
     ->join('Result', 'result.id = Result_Scan.result_id')
     ->join('Result_Project', 'Result_Project.result_id = result.id')
     ->join('Project', 'project.id = Result_Project.project_id');
+    
+    $this->project->group('project.name');
 
     $this->projectSearchFields = Array(0 => 'firstname', 1 => 'lastname', 2 => 'project.name');
   }
