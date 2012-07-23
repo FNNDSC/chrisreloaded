@@ -36,40 +36,52 @@ if (!defined('CHRIS_CONFIG_PARSED'))
 // include the simpletest framework
 require_once (SIMPLETEST);
 
-// include the mapper class
+// include the controller classes
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 
-// include the patient class
+// include the model classes
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'scan.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'modality.class.php'));
 
 class TestMapperClass extends UnitTestCase {
 
+  public function testGetName() {
+    // give string
+    $stringMapper = new Mapper('IamAString');
+    $this->assertTrue($stringMapper->objectname == 'IamAString');
+
+    // give object.
+    $patientObject = new Patient();
+    $objectMapper = new Mapper($patientObject);
+    $this->assertTrue($objectMapper->objectname == $patientObject->objectname);
+  }
+
   /**
    * Test to get one entity from the database and compare to original object.
    */
   public function testObjects() {
     $patientObject = new Patient();
-    $patientObject -> id = 2;
-    $patientObject -> lastname = 'Rannou';
-    $patientObject -> firstname = 'Nicolas';
-    $patientObject -> dob = '1987-03-27';
-    $patientObject -> sex = 'M';
-    $patientObject -> patient_id = 'CH156525;';
+    $patientObject->id = 2;
+    $patientObject->lastname = 'Rannou';
+    $patientObject->firstname = 'Nicolas';
+    $patientObject->dob = '1987-03-27';
+    $patientObject->sex = 'M';
+    $patientObject->patient_id = 'CH156525;';
 
     $patientObject2 = new Patient();
-    $patientObject2 -> id = 2;
-    $patientObject2 -> lastname = 'Haehn';
-    $patientObject2 -> firstname = 'Nicolas';
-    $patientObject2 -> dob = '1987-03-27';
-    $patientObject2 -> sex = 'M';
-    $patientObject2 -> patient_id = 'CH156525;';
+    $patientObject2->id = 2;
+    $patientObject2->lastname = 'Rannou';
+    $patientObject2->firstname = 'Nicolas';
+    $patientObject2->dob = '1987-03-27';
+    $patientObject2->sex = 'M';
+    $patientObject2->patient_id = 'CH156525;';
 
     $mapper = new Mapper($patientObject);
-    $objects = $mapper -> objects(2);
-    
-    $this -> assertTrue($objects[0][0] -> equals($patientObject2) == 1);
+    $objects = $mapper->objects(2);
+
+    $this->assertTrue($objects['Patient'][0]->equals($patientObject2) == 1);
   }
 
   //

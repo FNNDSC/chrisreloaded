@@ -50,73 +50,130 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'project.class.php'));
 
 class Search {
 
+  /**
+   *
+   * The instance reference for the singleton pattern.
+   *
+   * @var Search
+   */
   private static $instance = null;
 
+  /**
+   *
+   * The project mapper.
+   *
+   * @var Mapper
+   */
   private $project = null;
+
+  /**
+   *
+   * The project search field.
+   *
+   * @var string
+   */
   private $projectSearchFields = null;
 
+  /**
+   *
+   * The result mapper.
+   *
+   * @var Mapper
+   */
   private $result = null;
+
+  /**
+   *
+   * The result search field.
+   *
+   * @var string
+   */
   private $resultSearchFields = null;
 
+  /**
+   *
+   * The data mapper.
+   *
+   * @var Mapper
+   */
   private $data = null;
+
+  /**
+   *
+   * The data search field.
+   *
+   * @var string
+   */
   private $dataSearchFields = null;
 
-  private $pipeline = null;
-  private $pipelineSearchFields = null;
-
+  /**
+   * This constructor is private and can not be called. All access must
+   * happen through the static Search::getInstance() method to apply the singleton
+   * pattern.
+   * Creates the mappers and sets the search fields.
+   */
   private function __construct() {
     $this->dataMapperInit();
     $this->resultMapperInit();
     $this->projectMapperInit();
   }
 
+  /**
+   * Get the instance of the Search class. This always creates a valid
+   * instance by either creating a new one or by returning an existing one.
+   *
+   * @return Search The instance to use.
+   */
   public static function getInstance() {
-
     if (!self::$instance) {
-
       // first call, create an instance
       self::$instance = new Search();
-
     }
-
     // return the new or existing instance
     return self::$instance;
-
   }
 
+  /**
+   * Initiate the project mapper and the project search field
+   */
   private function projectMapperInit() {
     $this->project = new Mapper('Scan');
-    $this->project->join('Patient')
-    ->join('Result_Scan', 'scan.id = Result_Scan.scan_id')
-    ->join('Result', 'result.id = Result_Scan.result_id')
-    ->join('Result_Project', 'Result_Project.result_id = result.id')
-    ->join('Project', 'project.id = Result_Project.project_id');
-    
+    $this->project->join('Patient')->join('Result_Scan', 'scan.id = Result_Scan.scan_id')->join('Result', 'result.id = Result_Scan.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->join('Project', 'project.id = Result_Project.project_id');
     $this->project->group('project.name');
-
     $this->projectSearchFields = Array(0 => 'firstname', 1 => 'lastname', 2 => 'project.name');
   }
 
+  /**
+   * Initiate the result mapper and the result search field
+   */
   private function resultMapperInit() {
     $this->result = new Mapper('Scan');
     $this->result->join('Patient')->join('Result_Scan', 'scan.id = Result_Scan.scan_id')->join('Result', 'result.id = Result_Scan.result_id');
-
     $this->resultSearchFields = Array(0 => 'firstname', 1 => 'lastname', 2 => 'plugin');
   }
 
+  /**
+   * Initiate the data mapper and the data search field
+   */
   private function dataMapperInit() {
     $this->data = new Mapper('Scan');
     $this->data->join('Patient');
-
     $this->dataSearchFields = Array(0 => 'firstname', 1 => 'lastname');
 
   }
 
+  /**
+   * Seach for matches given a input string.
+   * String is splitted on white spaces.
+   * If special character is detected we use it directly.
+   *
+   * @param[in] $searchField the search input string
+   */
   public function advancedSearch($searchField) {
+    //split input stringon white spaces
     $singleField = explode(" ", $searchField);
 
     // set index 0, to join the sub filters
-
     $this->data->filter('AND', 0);
     $this->result->filter('AND', 0);
     $this->project->filter('AND', 0);
@@ -125,58 +182,53 @@ class Search {
     foreach ($singleField as $single) {
 
       $match = preg_match('/[\W]+/', $single);
-
+      // if special character has been detected
       if ($match) {
-
         foreach ($this->dataSearchFields as $field) {
           $this->data->filter($single, $i, 'OR');
         }
-
         foreach ($this->resultSearchFields as $field) {
           $this->result->filter($single, $i, 'OR');
         }
-        
-        //
         foreach ($this->projectSearchFields as $field) {
-        $this->project->filter($single, $i, 'OR');
+          $this->project->filter($single, $i, 'OR');
         }
-
+        // if NO special character has been detected - simple string
       } else {
-        // build query
         foreach ($this->dataSearchFields as $field) {
           $this->data->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
         }
-
         foreach ($this->resultSearchFields as $field) {
           $this->result->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
         }
-
         foreach ($this->projectSearchFields as $field) {
-        $this->project->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
+          $this->project->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
         }
       }
 
       $i++;
     }
 
+    // get objects from mapper
     $data = $this->data->objects();
     $result = $this->result->objects();
     $project = $this->project->objects();
 
+    // push objects to array
     $all = Array();
-    // $all['Project'] = Array();
-    // array_push($all['Project'], $project);
-
     $all['Data'] = $data;
     $all['Result'] = $result;
     $all['Project'] = $project;
-    echo json_encode($all);
 
+    //jsonify
+    echo json_encode($all);
   }
 
 }
 
 $searchField = $_POST['field'];
+// sanitize $searchField
+
 $search = Search::getInstance();
 $search->advancedSearch($searchField);
 ?>

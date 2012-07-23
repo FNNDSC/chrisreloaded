@@ -42,7 +42,7 @@ class Mapper {
    *
    * @var string $objectname
    */
-  private $objectname = null;
+  public $objectname = null;
 
   /**
    *  The join string.
@@ -52,7 +52,7 @@ class Mapper {
   private $joins = '';
 
   /**
-   * Array containing the filter() information
+   * Array containing the filter() information to create the "WHERE" statement
    *
    * @var string $where
    */
@@ -66,6 +66,11 @@ class Mapper {
    */
   private $objects = Array();
 
+  /**
+   * Convenience variable to group sql results by something
+   *
+   * @var string $group
+   */
   private $group = '';
 
   /**
@@ -76,8 +81,16 @@ class Mapper {
   public function __construct($object) {
     $this->objectname = $this->_getName($object);
     Array_push($this->objects, $this->objectname);
+    Array_push($this->where, '');
   }
 
+  /**
+   * Convenience variable to list all the objects which will be returned
+   * (if tables are joined)
+   *
+   * @var string() $objects
+   *
+   */
   private function _getName($object) {
     if (gettype($object) == 'string') {
       $name = $object;
@@ -116,12 +129,12 @@ class Mapper {
 
   /**
    * The method to input where inside a database query.
-   * It prepares and format a nice "WHERE( $condition )".
-   * You can combine several filter conditions:
-   * mapper->filter('conditionA')->filter('conditionB')->objects();
-   * Doesn't query the database. See @objects()
+   * Index 0 should be filled with the condition which will link the "sub-WHERE"
+   * Index 1+ contains and formats the subconditions with $operator
    *
    * @param[in] $condition Condition to filter the database results.
+   * @param[in] $index Condition to filter the database results.
+   * @param[in] $operator Condition to filter the database results.
    */
 
   // advanced
@@ -168,8 +181,16 @@ class Mapper {
     return $this;
   }
 
-  public function group($group) {
-    $this->group = ' GROUP BY '. strtolower($group);
+  /**
+   * Group a result by condition.
+   * You could group results by project.name.
+   * It will not return duplicate project.name.
+   *
+   * @param[in] $condition New object we want to join to the base object.
+   * @return $this Pointer to current mapper
+   */
+  public function group($condition) {
+    $this->group = ' GROUP BY '.strtolower($condition);
 
     return $this;
   }
@@ -198,7 +219,7 @@ class Mapper {
     }
 
     // query the database
-    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()). $this->group);
+    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group);
 
     // create an array to store the objects
     $objects = Array();
@@ -238,18 +259,6 @@ class Mapper {
       }
     }
     return $objects;
-  }
-
-  /**
-   * Get special field of a given SQL request.
-   * Sometimes it is more convenient/efficient to deal with a single string
-   * than the full object.
-   *
-   * @param[in] $filed Field to be returned
-   */
-  public function fields($field) {
-    $results = DB::getInstance()->execute('SELECT '.strtolower($field).' FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()));
-    return $results;
   }
 
 }
