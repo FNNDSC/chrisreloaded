@@ -66,6 +66,8 @@ class Mapper {
    */
   private $objects = Array();
 
+  private $group = '';
+
   /**
    * The constructor
    *
@@ -166,6 +168,12 @@ class Mapper {
     return $this;
   }
 
+  public function group($group) {
+    $this->group = ' GROUP BY '. strtolower($group);
+
+    return $this;
+  }
+
   /**
    * Execute the sql query with the previously defined join and where
    * conditions.
@@ -190,7 +198,7 @@ class Mapper {
     }
 
     // query the database
-    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()));
+    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()). $this->group);
 
     // create an array to store the objects
     $objects = Array();

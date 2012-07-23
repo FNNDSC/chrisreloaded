@@ -38,43 +38,14 @@ require_once 'object.class.php';
  * The Patient class which describes the Patient entity of the database.
  *
  */
-class Patient extends Object {
+class Project extends Object {
   
   /**
    * The lastname of this patient.
    *
    * @var string
    */
-  public $lastname = null;
-
-  /**
-   * The firstname of this patient.
-   *
-   * @var string
-   */
-  public $firstname = null;
-
-  /**
-   * The date of birth of this patient.
-   *
-   * @var string
-   */
-  public $dob = null;
-
-  /**
-   * The sex of this patient (M|F).
-   *
-   * @var string
-   */
-  public $gender = null;
-
-  /**
-   * The patient_id of this patient. This is also known as the MRN.
-   *
-   * @var string
-   */
-  public $patient_id = null;
-
+  public $name = '';
 }
 
 ?>

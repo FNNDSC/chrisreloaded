@@ -27,54 +27,26 @@
  */
 
 // prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
 // grab the super class for all entities
 require_once 'object.class.php';
 
-
 /**
  *
- * The Patient class which describes the Patient entity of the database.
+ * The Result class which describes the Result entity of the database.
  *
  */
-class Patient extends Object {
-  
-  /**
-   * The lastname of this patient.
-   *
-   * @var string
-   */
-  public $lastname = null;
+class Result_Scan extends Object {
 
   /**
-   * The firstname of this patient.
+   * The plugin of this result.
    *
    * @var string
    */
-  public $firstname = null;
-
-  /**
-   * The date of birth of this patient.
-   *
-   * @var string
-   */
-  public $dob = null;
-
-  /**
-   * The sex of this patient (M|F).
-   *
-   * @var string
-   */
-  public $gender = null;
-
-  /**
-   * The patient_id of this patient. This is also known as the MRN.
-   *
-   * @var string
-   */
-  public $patient_id = null;
+  public $result_id = -1;
+  public $scan_id = -1;
 
 }
-
 ?>

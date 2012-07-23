@@ -43,6 +43,10 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'scan.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'modality.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result_scan.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result_project.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'project.class.php'));
 
 class Search {
 
@@ -61,10 +65,9 @@ class Search {
   private $pipelineSearchFields = null;
 
   private function __construct() {
+    $this->dataMapperInit();
     $this->resultMapperInit();
     $this->projectMapperInit();
-    $this->dataMapperInit();
-    $this->pipelineMapperInit();
   }
 
   public static function getInstance() {
@@ -83,75 +86,88 @@ class Search {
 
   private function projectMapperInit() {
     $this->project = new Mapper('Scan');
-    $this->project->join('Patient');
+    $this->project->join('Patient')
+    ->join('Result_Scan', 'scan.id = Result_Scan.scan_id')
+    ->join('Result', 'result.id = Result_Scan.result_id')
+    ->join('Result_Project', 'Result_Project.result_id = result.id')
+    ->join('Project', 'project.id = Result_Project.project_id');
 
-    $this->projectSearchFields = Array(0 => 'firstname');
+    $this->projectSearchFields = Array(0 => 'firstname', 1 => 'lastname', 2 => 'project.name');
   }
 
   private function resultMapperInit() {
-    $this->result = new Mapper('Patient');
+    $this->result = new Mapper('Scan');
+    $this->result->join('Patient')->join('Result_Scan', 'scan.id = Result_Scan.scan_id')->join('Result', 'result.id = Result_Scan.result_id');
 
-    $this->resultSearchFields = Array(0 => 'firstname', 1 => 'lastname');
+    $this->resultSearchFields = Array(0 => 'firstname', 1 => 'lastname', 2 => 'plugin');
   }
 
   private function dataMapperInit() {
     $this->data = new Mapper('Scan');
-    $this->data->join('Patient')->join('Modality');
+    $this->data->join('Patient');
 
-    $this->dataSearchFields = Array(0 => 'firstname', 1 => 'lastname', 2 => 'subtype');
+    $this->dataSearchFields = Array(0 => 'firstname', 1 => 'lastname');
 
-  }
-
-  private function pipelineMapperInit() {
-    $this->pipeline = new Mapper('Scan');
-    $this->pipeline->join('Modality');
-
-    $this->pipelineSearchFields = Array(0 => 'subtype');
   }
 
   public function advancedSearch($searchField) {
     $singleField = explode(" ", $searchField);
 
     // set index 0, to join the sub filters
-    $this->project->filter('AND', 0);
-    $this->result->filter('AND', 0);
+
     $this->data->filter('AND', 0);
-    $this->pipeline->filter('AND', 0);
+    $this->result->filter('AND', 0);
+    $this->project->filter('AND', 0);
 
     $i = 1;
     foreach ($singleField as $single) {
 
-      // build query
-      foreach ($this->projectSearchFields as $field) {
+      $match = preg_match('/[\W]+/', $single);
+
+      if ($match) {
+
+        foreach ($this->dataSearchFields as $field) {
+          $this->data->filter($single, $i, 'OR');
+        }
+
+        foreach ($this->resultSearchFields as $field) {
+          $this->result->filter($single, $i, 'OR');
+        }
+        
+        //
+        foreach ($this->projectSearchFields as $field) {
+        $this->project->filter($single, $i, 'OR');
+        }
+
+      } else {
+        // build query
+        foreach ($this->dataSearchFields as $field) {
+          $this->data->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
+        }
+
+        foreach ($this->resultSearchFields as $field) {
+          $this->result->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
+        }
+
+        foreach ($this->projectSearchFields as $field) {
         $this->project->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
+        }
       }
 
-      foreach ($this->resultSearchFields as $field) {
-        $this->result->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
-      }
-
-      foreach ($this->dataSearchFields as $field) {
-        $this->data->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
-      }
-
-      foreach ($this->pipelineSearchFields as $field) {
-        $this->pipeline->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
-      }
       $i++;
     }
 
-    $project = $this->project->objects();
-    $result = $this->result->objects();
     $data = $this->data->objects();
-    $pipeline = $this->pipeline->objects();
+    $result = $this->result->objects();
+    $project = $this->project->objects();
 
     $all = Array();
     // $all['Project'] = Array();
     // array_push($all['Project'], $project);
-    $all['Project'] = $project;
-    $all['Result'] = $result;
+
     $all['Data'] = $data;
-    $all['Pipeline'] = $pipeline;
+    $all['Result'] = $result;
+    $all['Project'] = $project;
     echo json_encode($all);
 
   }
