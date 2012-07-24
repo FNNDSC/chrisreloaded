@@ -42,7 +42,7 @@ class Mapper {
    *
    * @var string $objectname
    */
-  public $objectname = null;
+  private $objectname = null;
 
   /**
    *  The join string.
@@ -109,7 +109,10 @@ class Mapper {
    * @return string with correct "WHERE" condition.
    */
   private function _getWhere() {
+    print_r($this->where);
     $count = count($this->where);
+    echo '====COUNT=====';
+    echo $count;
     if ($count < 2) {
       return '';
     } else {
@@ -123,6 +126,7 @@ class Mapper {
 
       // finish query
       $wherecondition .= ' )';
+      print_r($wherecondition);
       return $wherecondition;
     }
   }
@@ -140,14 +144,19 @@ class Mapper {
   // advanced
   public function filter($condition, $index = 1, $operator = 'AND') {
     // dont need the "AND" statement for the first condition
-    if (empty($this->where[$index])) {
+    $count = count($this->where);
+    if ($index >= $count) {
       array_push($this->where, '');
+      echo 'PUSH!';
+      echo count($this->where);
     } else {
       $this->where[$index] .= ' '.$operator.' ';
     }
 
     // update the condition string
     $this->where[$index] .= strtolower($condition);
+          echo count($this->where);
+    //print_r($this->where);
     return $this;
   }
 
