@@ -27,26 +27,26 @@
  */
 
 // prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
 // grab the super class for all entities
 require_once 'object.class.php';
-
 
 /**
  *
  * The Result class which describes the Result entity of the database.
  *
  */
-class Result extends Object {
+class Result_Project extends Object {
 
   /**
    * The plugin of this result.
    *
    * @var string
    */
-  public $plugin = null;
+  public $result_id = -1;
+  public $project_id = -1;
 
 }
-
 ?>

@@ -35,18 +35,17 @@ require_once 'object.class.php';
 
 /**
  *
- * The Result class which describes the Result entity of the database.
+ * The Patient class which describes the Patient entity of the database.
  *
  */
-class Result extends Object {
-
+class Project extends Object {
+  
   /**
-   * The plugin of this result.
+   * The lastname of this patient.
    *
    * @var string
    */
-  public $plugin = null;
-
+  public $name = '';
 }
 
 ?>

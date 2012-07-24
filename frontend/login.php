@@ -42,8 +42,6 @@ function testTemplateClass() {
   $t = new Template('login.html');
   $t -> replace('TITLE', "<title>ChRIS 2 -Reloaded</title>");
   $t -> replace('STYLE', 'style.html');
-  $t -> replace('NAVBAR', 'navbar.html');
-  $t -> replace('TWITTER', 'twitter.php');
   $t -> replace('JAVASCRIPT', 'javascript.html');
   $t -> replace('FOOTER', 'footer.html');
 

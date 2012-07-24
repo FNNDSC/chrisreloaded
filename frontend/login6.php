@@ -26,27 +26,34 @@
  *
  */
 
-// prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+// we define a valid entry point
+define('__CHRIS_ENTRY_POINT__', 666);
 
-// grab the super class for all entities
-require_once 'object.class.php';
+//define('CHRIS_CONFIG_DEBUG', true);
 
+// include the configuration
+require_once ('config.inc.php');
 
-/**
- *
- * The Result class which describes the Result entity of the database.
- *
- */
-class Result extends Object {
+// include the template class
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
-  /**
-   * The plugin of this result.
-   *
-   * @var string
-   */
-  public $plugin = null;
+function testTemplateClass() {
+
+  $t = new Template('login6.html');
+  $t -> replace('TITLE', "<title>ChRIS 2 -Reloaded</title>");
+  $t -> replace('STYLE', 'style.html');
+  $t -> replace('NAVBAR', 'navbar.html');
+  $t -> replace('TWITTER', 'twitter.php');
+  $t -> replace('JAVASCRIPT', 'javascript.html');
+  $t -> replace('FOOTER', 'footer.html');
+
+  return $t;
 
 }
 
+// TODO use php unit testing framework
+// TODO more tests regarding failures
+
+// execute the test
+echo testTemplateClass();
 ?>

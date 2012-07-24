@@ -41,13 +41,6 @@ require_once 'object.class.php';
 class Institution extends Object {
 
   /**
-   * The unique id of this institution.
-   *
-   * @var int
-   */
-  public $id = -1;
-
-  /**
    * The name of this institution.
    *
    * @var string

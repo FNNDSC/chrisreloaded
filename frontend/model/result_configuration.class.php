@@ -41,13 +41,6 @@ require_once 'object.class.php';
 class Result_configuration extends Object {
 
   /**
-   * The unique id of this result configuration.
-   *
-   * @var int
-   */
-  public $id = -1;
-
-  /**
    * The result id of this result configuration.
    *
    * @var int
