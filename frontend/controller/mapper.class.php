@@ -34,6 +34,8 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
  *
  * The database mapper helps to interface between the Objects and the Database
  * to ensure good Model View Controller (MVC) pratice.
+ * 
+ * @example test.mapper.class.php
  *
  */
 class Mapper {
@@ -165,6 +167,8 @@ class Mapper {
    * @param[in] $condition Condition to filter the database results.
    * @param[in] $index Condition to filter the database results.
    * @param[in] $operator Condition to filter the database results.
+   * 
+   * @snippet test.mapper.class.php testFilter()
    */
 
   // advanced
@@ -203,6 +207,8 @@ class Mapper {
    * @param[in] $tableObject New object we want to join to the base object.
    * @param[in] $joinCondition Join condition.
    * @return $this Pointer to current mapper
+   * 
+   * @snippet test.mapper.class.php testJoin()
    */
 
   public function join($tableObject, $joinCondition = '') {
@@ -233,6 +239,8 @@ class Mapper {
    * @param[in] $tableObject New object we want to join to the base object.
    * @param[in] $joinCondition Join condition.
    * @return $this Pointer to current mapper
+   * 
+   * @snippet test.mapper.class.php testLjoin()
    */
   public function ljoin($tableObject, $joinCondition = '') {
     $tableName = $this->_getName($tableObject);
@@ -257,6 +265,8 @@ class Mapper {
    *
    * @param[in] $condition New object we want to join to the base object.
    * @return $this Pointer to current mapper
+   * 
+   * @snippet test.mapper.class.php testGroup()
    */
   public function group($condition) {
     $this->group = ' GROUP BY '.strtolower($condition);
@@ -280,6 +290,8 @@ class Mapper {
    * @param[in] $id Id of the object we want to fetch from DB. If something is
    * provided, it will overwritte the "WHERE" conditions provided by previous
    * join().
+   * 
+   * @snippet test.mapper.class.php testObjects()
    */
   public function objects($id = -1) {
     if ($id != -1) {
