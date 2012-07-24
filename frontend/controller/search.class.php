@@ -171,6 +171,7 @@ class Search {
    */
   public function advancedSearch($searchField) {
     //split input stringon white spaces
+    // might need trim
     $singleField = explode(" ", $searchField);
 
     // set index 0, to join the sub filters
@@ -181,34 +182,35 @@ class Search {
     $i = 1;
     foreach ($singleField as $single) {
 
-      $match = preg_match('/[\W]+/', $single);
-      // if special character has been detected
-      if ($match) {
-        // foreach ($this->dataSearchFields as $field) {
-        // $this->data->filter($single, $i, 'OR');
-        // }
-        // foreach ($this->resultSearchFields as $field) {
-        // $this->result->filter($single, $i, 'OR');
-        // }
-        // foreach ($this->projectSearchFields as $field) {
-        // $this->project->filter($single, $i, 'OR');
-        // }
-        // if NO special character has been detected - simple string
-      } else {
-        foreach ($this->dataSearchFields as $field) {
-          $condition = strtolower($field).' LIKE CONCAT("%",?,"%")';
-          $this->data->filter($condition, $single, $i, 'OR');
-        }
-        foreach ($this->resultSearchFields as $field) {
-          $condition = strtolower($field).' LIKE CONCAT("%",?,"%")';
-          $this->result->filter($condition, $single, $i, 'OR');
-        }
-        foreach ($this->projectSearchFields as $field) {
-          $condition = strtolower($field).' LIKE CONCAT("%",?,"%")';
-          $this->project->filter($condition, $single, $i, 'OR');
+      if ($single != '') {
+        $match = preg_match('/[\W]+/', $single);
+        // if special character has been detected
+        if ($match) {
+          // foreach ($this->dataSearchFields as $field) {
+          // $this->data->filter($single, $i, 'OR');
+          // }
+          // foreach ($this->resultSearchFields as $field) {
+          // $this->result->filter($single, $i, 'OR');
+          // }
+          // foreach ($this->projectSearchFields as $field) {
+          // $this->project->filter($single, $i, 'OR');
+          // }
+          // if NO special character has been detected - simple string
+        } else {
+          foreach ($this->dataSearchFields as $field) {
+            $condition = strtolower($field).' LIKE CONCAT("%",?,"%")';
+            $this->data->filter($condition, $single, $i, 'OR');
+          }
+          foreach ($this->resultSearchFields as $field) {
+            $condition = strtolower($field).' LIKE CONCAT("%",?,"%")';
+            $this->result->filter($condition, $single, $i, 'OR');
+          }
+          foreach ($this->projectSearchFields as $field) {
+            $condition = strtolower($field).' LIKE CONCAT("%",?,"%")';
+            $this->project->filter($condition, $single, $i, 'OR');
+          }
         }
       }
-
       $i++;
     }
 
