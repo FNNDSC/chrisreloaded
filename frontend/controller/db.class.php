@@ -116,7 +116,7 @@ class DB {
    * @throws Exception An exception if the query can not be prepared or executed.
    */
   public function execute($query, $variables=null) {
- echo $query;
+    echo $query;
     $link = $this->link;
 
     // prepare the query
@@ -129,6 +129,7 @@ class DB {
     // bind the parameters
     if ($variables != null) {
       foreach($variables as $variable) {
+        echo $variable;
 
         // detect the type and store the first letter
         // i for integer
@@ -137,7 +138,6 @@ class DB {
         $type = gettype($variable);
 
         $statement->bind_param($type{0}, $variable);
-
       }
     }
 

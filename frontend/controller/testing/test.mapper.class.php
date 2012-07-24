@@ -63,47 +63,46 @@ class TestMapperClass extends UnitTestCase {
   // }
 
   public function testFilter() {
-    // only OPERATOR
-    $patientMapper = new Mapper('Patient');
-    $patientMapper->filter('', 0);
-    $patientResult = $patientMapper->objects();
+    // // only OPERATOR
+    // $patientMapper = new Mapper('Patient');
+    // $patientMapper->filter('', '', 0);
+    // $patientResult = $patientMapper->objects();
 
-    // only CONDITION
-    $patientMapper2 = new Mapper('Patient');
-    $condition = 'firstname like \'%Nicolas%\'';
-    $patientMapper2->filter($condition);
-    $patientResult2 = $patientMapper2->objects();
+    // // only CONDITION
+    // $patientMapper2 = new Mapper('Patient');
+    // // concat required for prepared statement to work with special characters
+    // $condition = 'firstname LIKE CONCAT("%",?,"%")';
+    // $patientMapper2->filter($condition, 'Nicolas');
+    // $patientResult2 = $patientMapper2->objects();
 
     // OPERATOR and CONDITION
     $patientMapper3 = new Mapper('Patient');
-    $condition1 = 'firstname like \'%Nicolas%\'';
-    $condition2 = 'lastname like \'%Rannou%\'';
-    $condition3 = 'lastname like \'%Haehn%\'';
-    $patientMapper3->filter('', 0, 'OR');
-    $patientMapper3->filter($condition1, 1);
-    $patientMapper3->filter($condition2, 1, 'AND');
-    $patientMapper3->filter($condition3, 2);
+    $patientMapper3->filter('', '', 0, 'OR');
+    $condition1 = 'firstname LIKE CONCAT("%",?,"%")';
+    $patientMapper3->filter($condition1, 'Nicolas', 1);
+    $condition2 = 'lastname LIKE CONCAT("%",?,"%")';
+    $patientMapper3->filter($condition2, 'Rannou', 1, 'AND');
+    // $condition3 = 'lastname LIKE CONCAT("%",?,"%")';
+    // $patientMapper3->filter($condition3, 'Haehn', 2);
     $patientResult3 = $patientMapper3->objects();
   }
 
   public function testJoin() {
-    // only OPERATOR
-    $scanMapper = new Mapper('Scan');
-    $scanMapper->join('Patient');
-    $scanResult = $scanMapper->objects();
-
-    // join condition
-    $scanMapper2 = new Mapper('Scan');
-    $scanMapper2->join('Patient')->join('Result_Scan', 'scan.id = Result_Scan.scan_id')->join('Result', 'result.id = Result_Scan.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->join('Project', 'project.id = Result_Project.project_id');
-    $scanResult2 = $scanMapper2->objects();
+    // // only OPERATOR
+    // $scanMapper = new Mapper('Scan');
+    // $scanMapper->join('Patient');
+    // $scanResult = $scanMapper->objects();
+    //
+    // // join condition
+    // $scanMapper2 = new Mapper('Scan');
+    // $scanMapper2->join('Patient')->join('Result_Scan', 'scan.id = Result_Scan.scan_id')->join('Result', 'result.id = Result_Scan.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->join('Project', 'project.id = Result_Project.project_id');
+    // $scanResult2 = $scanMapper2->objects();
   }
 
   public function testGroup() {
-    $scanMapper = new Mapper('Scan');
-    $scanMapper->group('patient_id');
-    $scanResult = $scanMapper->objects();
-
-    print_r($scanResult);
+    // $scanMapper = new Mapper('Scan');
+    // $scanMapper->group('patient_id');
+    // $scanResult = $scanMapper->objects();
   }
 
   /**

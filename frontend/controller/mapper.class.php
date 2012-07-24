@@ -58,6 +58,8 @@ class Mapper {
    */
   private $where = Array();
 
+  private $param = Array( );
+
   /**
    * Convenience variable to list all the objects which will be returned
    * (if tables are joined)
@@ -109,10 +111,7 @@ class Mapper {
    * @return string with correct "WHERE" condition.
    */
   private function _getWhere() {
-    print_r($this->where);
     $count = count($this->where);
-    echo '====COUNT=====';
-    echo $count;
     if ($count < 2) {
       return '';
     } else {
@@ -126,8 +125,36 @@ class Mapper {
 
       // finish query
       $wherecondition .= ' )';
-      print_r($wherecondition);
       return $wherecondition;
+    }
+  }
+
+  private function _getParam() {
+    $count = count($this->param[0]);
+    if ($count == 0) {
+      return null;
+    } else {
+      $param = Array();
+      foreach ($this->param as $filter) {
+        foreach ($filter as $condition) {
+          array_push($param, $condition);
+        }
+        
+      }
+            print_r($param);
+      return $param;
+      // // base case
+      // $wherecondition = ' WHERE ( ('.$this->where[1].' ) ';
+// 
+      // // add other filters
+      // for ($i = 2; $i < $count && $count >= 3; $i++) {
+        // $wherecondition .= $this->where[0].' ('.$this->where[$i].' ) ';
+      // }
+// 
+      // // finish query
+      // $wherecondition .= ' )';
+      // print_r($wherecondition);
+      // return $wherecondition;
     }
   }
 
@@ -142,21 +169,26 @@ class Mapper {
    */
 
   // advanced
-  public function filter($condition, $index = 1, $operator = 'AND') {
+  public function filter($condition, $param, $index = 1, $operator = 'AND') {
     // dont need the "AND" statement for the first condition
     $count = count($this->where);
     if ($index >= $count) {
       array_push($this->where, '');
-      echo 'PUSH!';
-      echo count($this->where);
     } else {
       $this->where[$index] .= ' '.$operator.' ';
     }
 
     // update the condition string
     $this->where[$index] .= strtolower($condition);
-          echo count($this->where);
-    //print_r($this->where);
+
+    // param
+    if ($index > 0) {
+      if ($index > count($this->param)) {
+        array_push($this->param, Array( ));
+      }
+      array_push($this->param[$index - 1], $param);
+    }
+
     return $this;
   }
 
@@ -228,7 +260,7 @@ class Mapper {
     }
 
     // query the database
-    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group);
+    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
 
     // create an array to store the objects
     $objects = Array();
