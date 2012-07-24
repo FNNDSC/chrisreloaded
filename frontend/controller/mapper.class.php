@@ -222,6 +222,35 @@ class Mapper {
   }
 
   /**
+   * The method to input left join inside a database query.
+   * It prepares and format a nice "JOIN $tableObject, ON $joinCondition"
+   * If no $joinCondition is provided, the default join condition will be
+   * " LEFT JOIN $tableObject ON $baseObject.$tableObject_id=$tableObject.id"
+   * You can combine several join conditions:
+   * mapper->ljoin(objectA, 'conditionA')->ljoin(objectB)->objects();
+   * Doesn't query the database. See @objects()
+   *
+   * @param[in] $tableObject New object we want to join to the base object.
+   * @param[in] $joinCondition Join condition.
+   * @return $this Pointer to current mapper
+   */
+  public function ljoin($tableObject, $joinCondition = '') {
+    $tableName = $this->_getName($tableObject);
+
+    // default join condition
+    if (empty($joinCondition)) {
+      $joinCondition = strtolower($tableName).'.id ='.strtolower($this->objectname).'.'.strtolower($tableName).'_id';
+    }
+
+    // update the join string
+    $this->joins .= ' LEFT JOIN '.strtolower($tableName).' ON '.strtolower($joinCondition);
+    // store table name in array for conveniency to return objects
+    $this->objects[] = $tableName;
+
+    return $this;
+  }
+
+  /**
    * Group a result by condition.
    * You could group results by project.name.
    * It will not return duplicate project.name.
