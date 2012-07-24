@@ -58,6 +58,11 @@ class Mapper {
    */
   private $where = Array();
 
+  /**
+   * Array containing the params() information to handle prepared queries
+   *
+   * @var string $where
+   */
   private $param = Array();
 
   /**
@@ -82,8 +87,8 @@ class Mapper {
    */
   public function __construct($object) {
     $this->objectname = $this->_getName($object);
-    Array_push($this->objects, $this->objectname);
-    Array_push($this->where, '');
+    $this->objects[] = $this->objectname;
+    $this->where[] = '';
   }
 
   /**
@@ -144,7 +149,7 @@ class Mapper {
       $param = Array();
       foreach ($this->param as $filter) {
         foreach ($filter as $condition) {
-          array_push($param, $condition);
+          $param[] = $condition;
         }
 
       }
@@ -167,7 +172,7 @@ class Mapper {
     // dont need the "AND" statement for the first condition
     $count = count($this->where);
     if ($index >= $count) {
-      array_push($this->where, '');
+      $this->where[] = '';
     } else {
       $this->where[$index] .= ' '.$operator.' ';
     }
@@ -178,9 +183,9 @@ class Mapper {
     // param
     if ($index > 0) {
       if ($index > count($this->param)) {
-        array_push($this->param, Array());
+        $this->param[] = Array();
       }
-      array_push($this->param[$index - 1], $param);
+      $this->param[$index - 1][] = $param;
     }
 
     return $this;
@@ -211,7 +216,7 @@ class Mapper {
     // update the join string
     $this->joins .= ' JOIN '.strtolower($tableName).' ON '.strtolower($joinCondition);
     // store table name in array for conveniency to return objects
-    Array_push($this->objects, $tableName);
+    $this->objects[] = $tableName;
 
     return $this;
   }
@@ -278,7 +283,7 @@ class Mapper {
           // if there is an object existing, push it to right location and update localid
           // we only push the object once it has been filled!
           if (!empty($object)) {
-            array_push($objects[$this->objects[$localid]], $object);
+            $objects[$this->objects[$localid]][] = $object;
             ++$localid;
           }
           // create new object
@@ -290,7 +295,7 @@ class Mapper {
       // push last object to the right location
       // we only push the object once it has been filled!
       if (!empty($object)) {
-        array_push($objects[$this->objects[$localid]], $object);
+        $objects[$this->objects[$localid]][] = $object;
       }
     }
     return $objects;
