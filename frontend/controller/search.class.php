@@ -138,9 +138,9 @@ class Search {
    */
   private function projectMapperInit() {
     $this->project = new Mapper('Scan');
-    $this->project->join('Patient')->join('Result_Scan', 'scan.id = Result_Scan.scan_id')->join('Result', 'result.id = Result_Scan.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->join('Project', 'project.id = Result_Project.project_id');
+    $this->project->ljoin('Patient')->ljoin('Result_Scan', 'scan.id = Result_Scan.scan_id')->ljoin('Result', 'result.id = Result_Scan.result_id')->ljoin('Result_Project', 'Result_Project.result_id = result.id')->ljoin('Project', 'project.id = Result_Project.project_id');
     $this->project->group('project.name');
-    $this->projectSearchFields = Array(0 => 'firstname', 1 => 'lastname', 2 => 'project.name');
+    $this->projectSearchFields = Array(0 => 'patient.firstname', 1 => 'patient.lastname', 2 => 'result.plugin', 3 => 'project.name');
   }
 
   /**
@@ -149,7 +149,7 @@ class Search {
   private function resultMapperInit() {
     $this->result = new Mapper('Scan');
     $this->result->join('Patient')->join('Result_Scan', 'scan.id = Result_Scan.scan_id')->join('Result', 'result.id = Result_Scan.result_id');
-    $this->resultSearchFields = Array(0 => 'firstname', 1 => 'lastname', 2 => 'plugin');
+    $this->resultSearchFields = Array(0 => 'patient.firstname', 1 => 'patient.lastname', 2 => 'result.plugin');
   }
 
   /**
@@ -158,7 +158,7 @@ class Search {
   private function dataMapperInit() {
     $this->data = new Mapper('Scan');
     $this->data->join('Patient');
-    $this->dataSearchFields = Array(0 => 'firstname', 1 => 'lastname');
+    $this->dataSearchFields = Array(0 => 'scan.name', 1 => 'patient.firstname', 2 => 'patient.lastname');
 
   }
 
@@ -174,9 +174,9 @@ class Search {
     $singleField = explode(" ", $searchField);
 
     // set index 0, to join the sub filters
-    $this->data->filter('AND', 0);
-    $this->result->filter('AND', 0);
-    $this->project->filter('AND', 0);
+    $this->data->filter('', '', 0);
+    $this->result->filter('', '', 0);
+    $this->project->filter('', '', 0);
 
     $i = 1;
     foreach ($singleField as $single) {
@@ -184,25 +184,28 @@ class Search {
       $match = preg_match('/[\W]+/', $single);
       // if special character has been detected
       if ($match) {
-        foreach ($this->dataSearchFields as $field) {
-          $this->data->filter($single, $i, 'OR');
-        }
-        foreach ($this->resultSearchFields as $field) {
-          $this->result->filter($single, $i, 'OR');
-        }
-        foreach ($this->projectSearchFields as $field) {
-          $this->project->filter($single, $i, 'OR');
-        }
+        // foreach ($this->dataSearchFields as $field) {
+        // $this->data->filter($single, $i, 'OR');
+        // }
+        // foreach ($this->resultSearchFields as $field) {
+        // $this->result->filter($single, $i, 'OR');
+        // }
+        // foreach ($this->projectSearchFields as $field) {
+        // $this->project->filter($single, $i, 'OR');
+        // }
         // if NO special character has been detected - simple string
       } else {
         foreach ($this->dataSearchFields as $field) {
-          $this->data->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
+          $condition = strtolower($field).' LIKE CONCAT("%",?,"%")';
+          $this->data->filter($condition, $single, $i, 'OR');
         }
         foreach ($this->resultSearchFields as $field) {
-          $this->result->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
+          $condition = strtolower($field).' LIKE CONCAT("%",?,"%")';
+          $this->result->filter($condition, $single, $i, 'OR');
         }
         foreach ($this->projectSearchFields as $field) {
-          $this->project->filter($field.' like \'%'.$single.'%\'', $i, 'OR');
+          $condition = strtolower($field).' LIKE CONCAT("%",?,"%")';
+          $this->project->filter($condition, $single, $i, 'OR');
         }
       }
 
@@ -216,9 +219,9 @@ class Search {
 
     // push objects to array
     $all = Array();
+    $all['Project'] = $project;
     $all['Data'] = $data;
     $all['Result'] = $result;
-    $all['Project'] = $project;
 
     //jsonify
     echo json_encode($all);

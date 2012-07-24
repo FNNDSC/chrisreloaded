@@ -158,7 +158,8 @@ class TestMapperClass extends UnitTestCase {
    * Test the get method.
    */
   //! [testget()]
-  public function testget() {
+  public function testGet() {
+    // get a patient by id
     $patientObject = new Patient();
     $patientObject->id = 2;
     $patientObject->lastname = 'Rannou';
@@ -166,7 +167,7 @@ class TestMapperClass extends UnitTestCase {
     $patientObject->dob = '1987-03-27';
     $patientObject->sex = 'M';
     $patientObject->patient_id = 'CH156525;';
-    
+
     $patientObject2 = new Patient();
     $patientObject2->id = 2;
     $patientObject2->lastname = 'Rannou';
@@ -174,101 +175,27 @@ class TestMapperClass extends UnitTestCase {
     $patientObject2->dob = '1987-03-27';
     $patientObject2->sex = 'M';
     $patientObject2->patient_id = 'CH156525;';
-    
-    $mapper = new Mapper($patientObject);
-    $objects = $mapper->get(2);
-    
-    $this->assertTrue($objects['Patient'][0]->equals($patientObject2) == 1);
-  }
 
-  //! [testget()]
-  //
-  // /**
-  // * Test to get a not existing entity from the database.
-  // */
-  // public function testGetNotExisting() {
-  //
-  // $classname = $this->getClassname();
-  //
-  // // exit if the classname is null since this means we are not testing a child class
-  // if (!$classname) return;
-  //
-  //
-  // $i = $classname::get(-3);
-  // $this->assertNull($i);
-  // }
-  //
-  // function testAll() {
-  //
-  // $patientObject = new Patient();
-  // $scanObject = new Scan();
-  // $modalityObject = new Modality();
-  //
-  // echo '=====================================================================';
-  // echo '<br />';
-  // echo '<br />';
-  //
-  // $mapper = new Mapper($patientObject);
-  // $objects = $mapper -> join($scanObject, 'scan.patient_id=patient.id') -> join($modalityObject, 'scan.modality_id=modality.id') -> filter('modality.type= \'Structural\'') -> get();
-  //
-  // for ($j = 0; $j < count($objects[0]); $j++) {
-  // foreach ($objects as $object) {
-  // print $object[$j];
-  // echo '<br />';
-  // }
-  //
-  // echo '<br />';
-  // }
-  //
-  // echo '=====================================================================';
-  // echo '<br />';
-  // echo '<br />';
-  //
-  // $mapper2 = new Mapper($patientObject);
-  // $objects2 = $mapper2 -> filter('patient.dob < \'2000\'') -> get();
-  //
-  // for ($j = 0; $j < count($objects2[0]); $j++) {
-  // foreach ($objects2 as $object) {
-  // print $object[$j];
-  // echo '<br />';
-  // }
-  //
-  // echo '<br />';
-  // }
-  //
-  // echo '=====================================================================';
-  // echo '<br />';
-  // echo '<br />';
-  //
-  // $mapper3 = new Mapper($patientObject);
-  // $objects3 = $mapper3 -> get(2);
-  //
-  // for ($j = 0; $j < count($objects3[0]); $j++) {
-  // foreach ($objects3 as $object) {
-  // print $object[$j];
-  // echo '<br />';
-  // }
-  //
-  // echo '<br />';
-  // }
-  //
-  // echo '=====================================================================';
-  // echo '<br />';
-  // echo '<br />';
-  //
-  // $mapper4 = new Mapper($patientObject);
-  // $objects4 = $mapper4 -> get('patient_id');
-  //
-  // for ($j = 0; $j < count($objects4[0]); $j++) {
-  // foreach ($objects4 as $object) {
-  // echo $object[$j][1];
-  // echo '<br />';
-  // }
-  //
-  // echo '<br />';
-  // }
-  //
-  // }
+    $patientMapper = new Mapper($patientObject);
+    $patientResult = $patientMapper->get(2);
+
+    // should be equal
+    $this->assertTrue($patientResult['Patient'][0]->equals($patientObject2) == 1);
+
+    $patientMapper2 = new Mapper('Patient');
+    $patientResult2 = $patientMapper2->get(-3);
+
+    // should return nothing
+    $this->assertTrue(count($patientResult2['Patient']) == 0);
+
+    // get all
+    $patientMapper3 = new Mapper($patientObject);
+    $patientMapper3->filter('AND', '', 0);
+    $patientResult3 = $patientMapper3->get();
+
+    // should return 6 patients
+    $this->assertTrue(count($patientResult3['Patient']) == 6);
+  }
 
 }
 ?>

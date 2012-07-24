@@ -296,7 +296,7 @@ class Mapper {
    * provided, it will overwritte the "WHERE" conditions provided by previous
    * join().
    *
-   * @snippet test.mapper.class.php testget()
+   * @snippet test.mapper.class.php testGet()
    */
   public function get($id = -1) {
     if ($id != -1) {
