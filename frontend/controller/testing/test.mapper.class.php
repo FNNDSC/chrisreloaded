@@ -81,9 +81,9 @@ class TestMapperClass extends UnitTestCase {
     // concat required for prepared statement to work with special characters
     $condition1 = 'firstname LIKE CONCAT("%",?,"%")';
     $patientMapper3->filter($condition1, 'Nicolas', 1);
-    // concat required for prepared statement to work with special characters
-    $condition2 = 'lastname LIKE CONCAT("%",?,"%")';
-    $patientMapper3->filter($condition2, 'Rannou', 1, 'AND');
+    // empty prepared statement
+    $condition2 = 'lastname LIKE \'%Rannou%\'';
+    $patientMapper3->filter($condition2, '', 1, 'AND');
     // concat required for prepared statement to work with special characters
     $condition3 = 'lastname LIKE CONCAT("%",?,"%")';
     $patientMapper3->filter($condition3, 'Haehn', 2);

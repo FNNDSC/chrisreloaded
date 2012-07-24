@@ -31,36 +31,37 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
   die('Invalid access.');
 
 /**
- *
- * The database mapper helps to interface between the Objects and the Database
+ * Interface between the Objects and the Database
  * to ensure good Model View Controller (MVC) pratice.
- * 
+ *
  * @example test.mapper.class.php
  *
  */
 class Mapper {
   /**
-   * The base object's name.
+   * Base object name.
    *
    * @var string $objectname
    */
   private $objectname = null;
 
   /**
-   *  The join string.
+   *  Join string.
    *
    * @var string $joins
    */
   private $joins = '';
 
   /**
-   * Array containing the filter() information to create the "WHERE" statement
+   * Filter Array.
+   * Array containing the filter() information to create the "WHERE" statement.
    *
    * @var string $where
    */
   private $where = Array();
 
   /**
+   * Param Array
    * Array containing the params() information to handle prepared queries
    *
    * @var string $where
@@ -68,14 +69,16 @@ class Mapper {
   private $param = Array();
 
   /**
-   * Convenience variable to list all the objects which will be returned
-   * (if tables are joined)
+   * Objects Array.
+   * Array listing all the objects which will be returned.
+   * (if tables are joined, we potentially return N objects).
    *
-   * @var string() $objects
+   * @var string $objects
    */
   private $objects = Array();
 
   /**
+   * Group string.
    * Convenience variable to group sql results by something
    *
    * @var string $group
@@ -83,7 +86,8 @@ class Mapper {
   private $group = '';
 
   /**
-   * The constructor
+   * The constructor.
+   * Instantiate a mapper for a given object type.
    *
    * @param[in] $object Base object for the mapper.
    */
@@ -94,10 +98,13 @@ class Mapper {
   }
 
   /**
-   * Convenience variable to list all the objects which will be returned
-   * (if tables are joined)
+   * Convenience method to get the name of the input.
+   * If input is a string just return the string.
+   * If input is an object, get its name.
    *
-   * @var string() $objects
+   * @param[in] string() $objects
+   *
+   * @return string Name of the input object
    *
    */
   private function _getName($object) {
@@ -110,14 +117,15 @@ class Mapper {
   }
 
   /**
-   * Helper to generate a clean "WHERE" condition.
+   * Convenience method to generate a clean "WHERE" condition.
    * If no "WHERE" condition is provided, returns an empty string.
-   * If "WHERE" condition is provided, returns a clean "WHERE (condition)"
-   * string
+   * If "WHERE" condition is provided, returns a clean "WHERE" statement.
    *
    * @return string with correct "WHERE" condition.
    */
   private function _getWhere() {
+    // if we have applied a filter
+    // count($this->where) should be >= 2
     $count = count($this->where);
     if ($count < 2) {
       return '';
@@ -137,17 +145,18 @@ class Mapper {
   }
 
   /**
-   * Helper to generate a clean "WHERE" condition.
-   * If no "WHERE" condition is provided, returns an empty string.
-   * If "WHERE" condition is provided, returns a clean "WHERE (condition)"
-   * string
+   * Convenience method  to generate a clean Array() ready to use in the
+   * prepared statement.
    *
-   * @return string with correct "WHERE" condition.
+   * @return Array() clean prepared statement array
    */
   private function _getParam() {
+    // return null if we dont use prepared statements
     if ($this->param == null) {
       return null;
-    } else {
+    }
+    // else return nice prepared statements
+    else {
       $param = Array();
       foreach ($this->param as $filter) {
         foreach ($filter as $condition) {
@@ -160,14 +169,16 @@ class Mapper {
   }
 
   /**
-   * The method to input where inside a database query.
+   * Input filter conditions to sql query.
+   *
    * Index 0 should be filled with the condition which will link the "sub-WHERE"
    * Index 1+ contains and formats the subconditions with $operator
    *
    * @param[in] $condition Condition to filter the database results.
+   * @param[in] $param Condition to filter the database results.
    * @param[in] $index Condition to filter the database results.
    * @param[in] $operator Condition to filter the database results.
-   * 
+   *
    * @snippet test.mapper.class.php testFilter()
    */
 
@@ -184,30 +195,29 @@ class Mapper {
     // update the condition string
     $this->where[$index] .= strtolower($condition);
 
-    // param
+    // deal with the parameters
     if ($index > 0) {
-      if ($index > count($this->param)) {
-        $this->param[] = Array();
+      if ($param != '') {
+        if ($index > count($this->param)) {
+          $this->param[] = Array();
+        }
+        $this->param[$index - 1][] = $param;
       }
-      $this->param[$index - 1][] = $param;
     }
 
     return $this;
   }
 
   /**
-   * The method to input join inside a database query.
-   * It prepares and format a nice "JOIN $tableObject, ON $joinCondition"
+   * Input join condition to sql query.
+   * 
    * If no $joinCondition is provided, the default join condition will be
    * " JOIN $tableObject ON $baseObject.$tableObject_id=$tableObject.id"
-   * You can combine several join conditions:
-   * mapper->join(objectA, 'conditionA')->join(objectB)->objects();
-   * Doesn't query the database. See @objects()
    *
    * @param[in] $tableObject New object we want to join to the base object.
    * @param[in] $joinCondition Join condition.
    * @return $this Pointer to current mapper
-   * 
+   *
    * @snippet test.mapper.class.php testJoin()
    */
 
@@ -228,18 +238,15 @@ class Mapper {
   }
 
   /**
-   * The method to input left join inside a database query.
-   * It prepares and format a nice "JOIN $tableObject, ON $joinCondition"
+   * Input left join condition to sql query.
+   * 
    * If no $joinCondition is provided, the default join condition will be
    * " LEFT JOIN $tableObject ON $baseObject.$tableObject_id=$tableObject.id"
-   * You can combine several join conditions:
-   * mapper->ljoin(objectA, 'conditionA')->ljoin(objectB)->objects();
-   * Doesn't query the database. See @objects()
    *
    * @param[in] $tableObject New object we want to join to the base object.
    * @param[in] $joinCondition Join condition.
    * @return $this Pointer to current mapper
-   * 
+   *
    * @snippet test.mapper.class.php testLjoin()
    */
   public function ljoin($tableObject, $joinCondition = '') {
@@ -259,13 +266,11 @@ class Mapper {
   }
 
   /**
-   * Group a result by condition.
-   * You could group results by project.name.
-   * It will not return duplicate project.name.
+   * Input group condition to sql query.
    *
    * @param[in] $condition New object we want to join to the base object.
    * @return $this Pointer to current mapper
-   * 
+   *
    * @snippet test.mapper.class.php testGroup()
    */
   public function group($condition) {
@@ -290,7 +295,7 @@ class Mapper {
    * @param[in] $id Id of the object we want to fetch from DB. If something is
    * provided, it will overwritte the "WHERE" conditions provided by previous
    * join().
-   * 
+   *
    * @snippet test.mapper.class.php testObjects()
    */
   public function objects($id = -1) {
