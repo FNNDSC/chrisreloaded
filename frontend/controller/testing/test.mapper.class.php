@@ -63,27 +63,30 @@ class TestMapperClass extends UnitTestCase {
   // }
 
   public function testFilter() {
-    // // only OPERATOR
-    // $patientMapper = new Mapper('Patient');
-    // $patientMapper->filter('', '', 0);
-    // $patientResult = $patientMapper->objects();
+    // only OPERATOR
+    $patientMapper = new Mapper('Patient');
+    $patientMapper->filter('', '', 0);
+    $patientResult = $patientMapper->objects();
 
-    // // only CONDITION
-    // $patientMapper2 = new Mapper('Patient');
-    // // concat required for prepared statement to work with special characters
-    // $condition = 'firstname LIKE CONCAT("%",?,"%")';
-    // $patientMapper2->filter($condition, 'Nicolas');
-    // $patientResult2 = $patientMapper2->objects();
+    // only CONDITION
+    $patientMapper2 = new Mapper('Patient');
+    // concat required for prepared statement to work with special characters
+    $condition = 'firstname LIKE CONCAT("%",?,"%")';
+    $patientMapper2->filter($condition, 'Nicolas');
+    $patientResult2 = $patientMapper2->objects();
 
     // OPERATOR and CONDITION
     $patientMapper3 = new Mapper('Patient');
     $patientMapper3->filter('', '', 0, 'OR');
+    // concat required for prepared statement to work with special characters
     $condition1 = 'firstname LIKE CONCAT("%",?,"%")';
     $patientMapper3->filter($condition1, 'Nicolas', 1);
+    // concat required for prepared statement to work with special characters
     $condition2 = 'lastname LIKE CONCAT("%",?,"%")';
     $patientMapper3->filter($condition2, 'Rannou', 1, 'AND');
-    // $condition3 = 'lastname LIKE CONCAT("%",?,"%")';
-    // $patientMapper3->filter($condition3, 'Haehn', 2);
+    // concat required for prepared statement to work with special characters
+    $condition3 = 'lastname LIKE CONCAT("%",?,"%")';
+    $patientMapper3->filter($condition3, 'Haehn', 2);
     $patientResult3 = $patientMapper3->objects();
   }
 

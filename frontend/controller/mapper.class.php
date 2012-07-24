@@ -58,7 +58,7 @@ class Mapper {
    */
   private $where = Array();
 
-  private $param = Array( );
+  private $param = Array();
 
   /**
    * Convenience variable to list all the objects which will be returned
@@ -129,9 +129,16 @@ class Mapper {
     }
   }
 
+  /**
+   * Helper to generate a clean "WHERE" condition.
+   * If no "WHERE" condition is provided, returns an empty string.
+   * If "WHERE" condition is provided, returns a clean "WHERE (condition)"
+   * string
+   *
+   * @return string with correct "WHERE" condition.
+   */
   private function _getParam() {
-    $count = count($this->param[0]);
-    if ($count == 0) {
+    if ($this->param == null) {
       return null;
     } else {
       $param = Array();
@@ -139,22 +146,9 @@ class Mapper {
         foreach ($filter as $condition) {
           array_push($param, $condition);
         }
-        
+
       }
-            print_r($param);
       return $param;
-      // // base case
-      // $wherecondition = ' WHERE ( ('.$this->where[1].' ) ';
-// 
-      // // add other filters
-      // for ($i = 2; $i < $count && $count >= 3; $i++) {
-        // $wherecondition .= $this->where[0].' ('.$this->where[$i].' ) ';
-      // }
-// 
-      // // finish query
-      // $wherecondition .= ' )';
-      // print_r($wherecondition);
-      // return $wherecondition;
     }
   }
 
@@ -184,7 +178,7 @@ class Mapper {
     // param
     if ($index > 0) {
       if ($index > count($this->param)) {
-        array_push($this->param, Array( ));
+        array_push($this->param, Array());
       }
       array_push($this->param[$index - 1], $param);
     }

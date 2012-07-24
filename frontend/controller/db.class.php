@@ -116,7 +116,6 @@ class DB {
    * @throws Exception An exception if the query can not be prepared or executed.
    */
   public function execute($query, $variables=null) {
-    echo $query;
     $link = $this->link;
 
     // prepare the query
@@ -128,17 +127,37 @@ class DB {
 
     // bind the parameters
     if ($variables != null) {
+      $types = '';
+      $temp = array();
       foreach($variables as $variable) {
-        echo $variable;
-
         // detect the type and store the first letter
         // i for integer
         // d for double
         // s for string etc.
         $type = gettype($variable);
-
-        $statement->bind_param($type{0}, $variable);
+        $types .= $type{0};
       }
+      
+    // bind_names[0] == 'sssid'
+    $bind_names[] = $types;
+    // update bind_names[1], bind_names[2] with corresponding value
+    for ($i=0; $i<count($variables);$i++) {
+      $bind_names[] = &$variables[$i];
+    }
+
+    call_user_func_array(array($statement,'bind_param'),$bind_names);
+    
+      
+  // $args   = array();
+  // $args[] = implode('', array_values($variables));
+// 
+  // foreach ($params as $paramName => $paramType)
+  // {
+    // $args[] = &$params[$paramName];
+    // $params[$paramName] = null;
+  // }
+//   
+        // call_user_func_array(array($statement, 'bind_param'),$args); 
     }
 
     // execute the query
