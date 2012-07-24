@@ -210,9 +210,9 @@ class Search {
     }
 
     // get objects from mapper
-    $data = $this->data->objects();
-    $result = $this->result->objects();
-    $project = $this->project->objects();
+    $data = $this->data->get();
+    $result = $this->result->get();
+    $project = $this->project->get();
 
     // push objects to array
     $all = Array();

@@ -285,23 +285,23 @@ class Mapper {
    * If some input is provided, it will overwritte the "WHERE" conditions
    * provided by previous join().
    * // good
-   * mapper->join(objectA, 'conditionA')->join(objectB)->objects();
+   * mapper->join(objectA, 'conditionA')->join(objectB)->get();
    * // good
-   * mapper->objects(2);
+   * mapper->get(2);
    * // warning
-   * "mapper->join(objectB)->objects(2);" EQUALS "mapper->objects(2);"
+   * "mapper->join(objectB)->get(2);" EQUALS "mapper->get(2);"
    * \return Array of type (Object(Instance, Instance, etc.), Object(Instance, Instance, etc.), Object(Instance, Instance, etc.))
    *
    * @param[in] $id Id of the object we want to fetch from DB. If something is
    * provided, it will overwritte the "WHERE" conditions provided by previous
    * join().
    *
-   * @snippet test.mapper.class.php testObjects()
+   * @snippet test.mapper.class.php testget()
    */
-  public function objects($id = -1) {
+  public function get($id = -1) {
     if ($id != -1) {
       // append to existing - might be an issue?
-      $this->filter(strtolower($this->objectname).'.id ='.$id);
+      $this->filter(strtolower($this->objectname).'.id =?', $id);
     }
 
     // query the database

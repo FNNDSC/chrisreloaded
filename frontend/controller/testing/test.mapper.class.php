@@ -60,7 +60,7 @@ class TestMapperClass extends UnitTestCase {
     // only OPERATOR
     $patientMapper = new Mapper('Patient');
     $patientMapper->filter('', '', 0);
-    $patientResult = $patientMapper->objects();
+    $patientResult = $patientMapper->get();
 
     // should return 6 patients
     $this->assertTrue(count($patientResult['Patient']) == 6);
@@ -70,7 +70,7 @@ class TestMapperClass extends UnitTestCase {
     // concat required for prepared statement to work with special characters
     $condition = 'firstname LIKE CONCAT("%",?,"%")';
     $patientMapper2->filter($condition, 'Nicolas');
-    $patientResult2 = $patientMapper2->objects();
+    $patientResult2 = $patientMapper2->get();
 
     // should return 1 patient
     $this->assertTrue(count($patientResult2['Patient']) == 1);
@@ -87,7 +87,7 @@ class TestMapperClass extends UnitTestCase {
     // concat required for prepared statement to work with special characters
     $condition3 = 'lastname LIKE CONCAT("%",?,"%")';
     $patientMapper3->filter($condition3, 'Haehn', 2);
-    $patientResult3 = $patientMapper3->objects();
+    $patientResult3 = $patientMapper3->get();
 
     // should return 2 patients
     $this->assertTrue(count($patientResult3['Patient']) == 2);
@@ -103,7 +103,7 @@ class TestMapperClass extends UnitTestCase {
     // only OPERATOR
     $scanMapper = new Mapper('Scan');
     $scanMapper->join('Patient');
-    $scanResult = $scanMapper->objects();
+    $scanResult = $scanMapper->get();
 
     // should return 4 Scan object and 4 Patient objects
     $this->assertTrue((count($scanResult['Scan']) == 4) && (count($scanResult['Patient']) == 4));
@@ -111,7 +111,7 @@ class TestMapperClass extends UnitTestCase {
     // join condition
     $scanMapper2 = new Mapper('Scan');
     $scanMapper2->join('Patient')->join('Result_Scan', 'scan.id = Result_Scan.scan_id')->join('Result', 'result.id = Result_Scan.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->join('Project', 'project.id = Result_Project.project_id');
-    $scanResult2 = $scanMapper2->objects();
+    $scanResult2 = $scanMapper2->get();
 
     // should return 1 of each object
     $this->assertTrue(count($scanResult2['Scan'] == 1) && count($scanResult2['Patient'] == 1) && count($scanResult2['Result_Scan'] == 1) && count($scanResult2['Result'] == 1) && count($scanResult2['Result_Project'] == 1) && count($scanResult2['Project'] == 1));
@@ -126,7 +126,7 @@ class TestMapperClass extends UnitTestCase {
     // only OPERATOR
     $scanMapper = new Mapper('Scan');
     $scanMapper->ljoin('Patient');
-    $scanResult = $scanMapper->objects();
+    $scanResult = $scanMapper->get();
 
     // should return 4 Scan object and 4 Patient objects
     $this->assertTrue((count($scanResult['Scan']) == 4) && (count($scanResult['Patient']) == 4));
@@ -134,7 +134,7 @@ class TestMapperClass extends UnitTestCase {
     // join condition
     $scanMapper2 = new Mapper('Scan');
     $scanMapper2->ljoin('Patient')->ljoin('Result_Scan', 'scan.id = Result_Scan.scan_id')->ljoin('Result', 'result.id = Result_Scan.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->ljoin('Project', 'project.id = Result_Project.project_id');
-    $scanResult2 = $scanMapper2->objects();
+    $scanResult2 = $scanMapper2->get();
 
     // should return 1 of each object
     $this->assertTrue(count($scanResult2['Scan'] == 3) && count($scanResult2['Patient'] == 3) && count($scanResult2['Result_Scan'] == 3) && count($scanResult2['Result'] == 3) && count($scanResult2['Result_Project'] == 3) && count($scanResult2['Project'] == 3));
@@ -149,39 +149,39 @@ class TestMapperClass extends UnitTestCase {
   public function testGroup() {
     $scanMapper = new Mapper('Scan');
     $scanMapper->group('patient_id');
-    $scanResult = $scanMapper->objects();
+    $scanResult = $scanMapper->get();
   }
 
   //! [testGroup()]
 
   /**
-   * Test to get one entity from the database and compare to original object.
+   * Test the get method.
    */
-  //! [testObjects()]
-  public function testObjects() {
-    // $patientObject = new Patient();
-    // $patientObject->id = 2;
-    // $patientObject->lastname = 'Rannou';
-    // $patientObject->firstname = 'Nicolas';
-    // $patientObject->dob = '1987-03-27';
-    // $patientObject->sex = 'M';
-    // $patientObject->patient_id = 'CH156525;';
-    //
-    // $patientObject2 = new Patient();
-    // $patientObject2->id = 2;
-    // $patientObject2->lastname = 'Rannou';
-    // $patientObject2->firstname = 'Nicolas';
-    // $patientObject2->dob = '1987-03-27';
-    // $patientObject2->sex = 'M';
-    // $patientObject2->patient_id = 'CH156525;';
-    //
-    // $mapper = new Mapper($patientObject);
-    // $objects = $mapper->objects(2);
-    //
-    // $this->assertTrue($objects['Patient'][0]->equals($patientObject2) == 1);
+  //! [testget()]
+  public function testget() {
+    $patientObject = new Patient();
+    $patientObject->id = 2;
+    $patientObject->lastname = 'Rannou';
+    $patientObject->firstname = 'Nicolas';
+    $patientObject->dob = '1987-03-27';
+    $patientObject->sex = 'M';
+    $patientObject->patient_id = 'CH156525;';
+    
+    $patientObject2 = new Patient();
+    $patientObject2->id = 2;
+    $patientObject2->lastname = 'Rannou';
+    $patientObject2->firstname = 'Nicolas';
+    $patientObject2->dob = '1987-03-27';
+    $patientObject2->sex = 'M';
+    $patientObject2->patient_id = 'CH156525;';
+    
+    $mapper = new Mapper($patientObject);
+    $objects = $mapper->get(2);
+    
+    $this->assertTrue($objects['Patient'][0]->equals($patientObject2) == 1);
   }
 
-  //! [testObjects()]
+  //! [testget()]
   //
   // /**
   // * Test to get a not existing entity from the database.
@@ -209,7 +209,7 @@ class TestMapperClass extends UnitTestCase {
   // echo '<br />';
   //
   // $mapper = new Mapper($patientObject);
-  // $objects = $mapper -> join($scanObject, 'scan.patient_id=patient.id') -> join($modalityObject, 'scan.modality_id=modality.id') -> filter('modality.type= \'Structural\'') -> objects();
+  // $objects = $mapper -> join($scanObject, 'scan.patient_id=patient.id') -> join($modalityObject, 'scan.modality_id=modality.id') -> filter('modality.type= \'Structural\'') -> get();
   //
   // for ($j = 0; $j < count($objects[0]); $j++) {
   // foreach ($objects as $object) {
@@ -225,7 +225,7 @@ class TestMapperClass extends UnitTestCase {
   // echo '<br />';
   //
   // $mapper2 = new Mapper($patientObject);
-  // $objects2 = $mapper2 -> filter('patient.dob < \'2000\'') -> objects();
+  // $objects2 = $mapper2 -> filter('patient.dob < \'2000\'') -> get();
   //
   // for ($j = 0; $j < count($objects2[0]); $j++) {
   // foreach ($objects2 as $object) {
@@ -241,7 +241,7 @@ class TestMapperClass extends UnitTestCase {
   // echo '<br />';
   //
   // $mapper3 = new Mapper($patientObject);
-  // $objects3 = $mapper3 -> objects(2);
+  // $objects3 = $mapper3 -> get(2);
   //
   // for ($j = 0; $j < count($objects3[0]); $j++) {
   // foreach ($objects3 as $object) {
@@ -257,7 +257,7 @@ class TestMapperClass extends UnitTestCase {
   // echo '<br />';
   //
   // $mapper4 = new Mapper($patientObject);
-  // $objects4 = $mapper4 -> objects('patient_id');
+  // $objects4 = $mapper4 -> get('patient_id');
   //
   // for ($j = 0; $j < count($objects4[0]); $j++) {
   // foreach ($objects4 as $object) {
