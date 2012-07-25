@@ -150,6 +150,9 @@ class TestMapperClass extends UnitTestCase {
     $scanMapper = new Mapper('Scan');
     $scanMapper->group('patient_id');
     $scanResult = $scanMapper->get();
+    
+    // should return 3 results
+    $this->assertTrue(count($scanResult['Scan']) == 3);
   }
 
   //! [testGroup()]
