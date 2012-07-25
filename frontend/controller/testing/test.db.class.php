@@ -114,7 +114,7 @@ class TestDBClass extends UnitTestCase {
     // get an instance of the DB class
     $db = DB::getInstance();
 
-    $rows = $db->execute("SELECT * FROM patient WHERE id=(?) AND lastname='?'", array(0=>1,1=>'Haehn'));
+    $rows = $db->execute("SELECT * FROM patient WHERE id=(?) AND lastname=?", array(0=>1,1=>'Haehn'));
 
     // check if the first returned row matches (lastname check)
     $this->assertEqual($rows[0][1][1],'Haehn');
