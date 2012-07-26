@@ -27,20 +27,20 @@
  */
 
 // we define a valid entry point
-if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
-require_once('config.inc.php');
+require_once ('config.inc.php');
 
 // include the simpletest framework
-require_once(SIMPLETEST);
+require_once (SIMPLETEST);
 
 // include all the tests suites
-require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'testing/test.controller.php'));
-require_once(joinPaths(CHRIS_MODEL_FOLDER,'testing/test.model.php'));
-
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'testing/test.controller.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'testing/test.model.php'));
 
 /**
  *
@@ -53,10 +53,9 @@ class TestChris extends TestSuite {
 
     parent::__construct();
 
+    $this->add(new TestController());
     $this->add(new TestModel());
-
   }
 
 }
-
 ?>
