@@ -111,7 +111,7 @@ class Mapper {
     if (gettype($object) == 'string') {
       $name = $object;
     } else {
-      $name = $object->objectname;
+      $name = get_class($object);
     }
     return $name;
   }
@@ -210,7 +210,7 @@ class Mapper {
 
   /**
    * Input join condition to sql query.
-   * 
+   *
    * If no $joinCondition is provided, the default join condition will be
    * " JOIN $tableObject ON $baseObject.$tableObject_id=$tableObject.id"
    *
@@ -239,7 +239,7 @@ class Mapper {
 
   /**
    * Input left join condition to sql query.
-   * 
+   *
    * If no $joinCondition is provided, the default join condition will be
    * " LEFT JOIN $tableObject ON $baseObject.$tableObject_id=$tableObject.id"
    *
@@ -345,6 +345,82 @@ class Mapper {
       }
     }
     return $objects;
+  }
+
+  /**
+   * Add object in database.
+   *
+   * @param[in] Object $object Object to be added in the database.
+   * @return in ID of the object. Retuns "-1" if object already exists
+   * @throws Exception An exception if the object is unvalid.
+   *
+   * @snippet test.mapper.class.php testAdd()
+   */
+  public static function add($object) {
+
+    // get object properties
+    $properties = get_object_vars($object);
+
+    $where = '';
+
+    // build sql query to know if object exists
+    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+
+    // build sql query with prepared statements
+    $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+
+
+    return $this;
+  }
+
+  /**
+   * Delete object in database.
+   *
+   * @param[in] Object $object Object to be added in the database.
+   * @return in ID of the object. Retuns "-1" if object didnt exists
+   *
+   * @snippet test.mapper.class.php testAdd()
+   */
+  public static function delete($object) {
+
+    // get object properties
+    $properties = get_object_vars($object);
+
+    $where = '';
+
+    // build sql query to know if object exists
+    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+
+    // build sql query with prepared statements
+    $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+
+
+    return $this;
+  }
+
+  /**
+   * Update object in database. Update all fields but the "id"
+   *
+   * @param[in] Object $object Object to be added in the database.
+   * @return in ID of the object. Retuns "-1" if object didnt exists.
+   *
+   * @snippet test.mapper.class.php testUpdate()
+   */
+  public static function update($object) {
+
+    // get object properties
+    $properties = get_object_vars($object);
+
+    $where = '';
+
+    // build sql query to know if object exists
+    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+
+    // build sql query with prepared statements
+    $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+
+
+    return $this;
   }
 
 }
