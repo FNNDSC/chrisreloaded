@@ -363,6 +363,8 @@ class Mapper {
     $where = '';
     $insertcolumn ='';
     $inservalue = '';
+    $preparedValue = Array();
+
     foreach ($properties as $key => $value){
       if($key != 'id'){
         if($where != '')
@@ -371,25 +373,25 @@ class Mapper {
           $insertcolumn .=', ';
           $inservalue .= ', ';
         }
-        $where .= ' ('.$key . '=\''.$value.'\') ';
+        $where .= ' ('.$key . '=?) ';
         $insertcolumn .= $key;
-        $inservalue .= '\''.$value.'\'';
+        $inservalue .= '?';
+        $preparedValue[] = $value;
       }
     }
     // SHOULD USE PREPARED STATEMENTS
-    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where));
+    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where), $preparedValue);
 
+    // return -1 if the object we try to add already exists
     if(!empty($exists) )
     {
       return -1;
     }
 
     // build sql query with prepared statements
-    /*     $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
-     */
     $insertcolumn = '('.$insertcolumn.')';
     $inservalue = '('.$inservalue.')';
-    $id = DB::getInstance()->execute('INSERT INTO '.strtolower(get_class($object)).' '.strtolower($insertcolumn).' VALUES '.strtolower($inservalue));
+    $id = DB::getInstance()->execute('INSERT INTO '.strtolower(get_class($object)).' '.strtolower($insertcolumn).' VALUES '.strtolower($inservalue), $preparedValue);
 
     return $id;
   }

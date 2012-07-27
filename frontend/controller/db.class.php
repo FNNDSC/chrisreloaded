@@ -157,7 +157,7 @@ class DB {
     // grab the meta data of the query
     $result = $statement->result_metadata();
 
-    // if insert, no result
+    // if insert, no result, return last inserted id
     if(empty($result))
     {
       return $statement->insert_id;
