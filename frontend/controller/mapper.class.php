@@ -352,25 +352,46 @@ class Mapper {
    *
    * @param[in] Object $object Object to be added in the database.
    * @return in ID of the object. Retuns "-1" if object already exists
-   * @throws Exception An exception if the object is unvalid.
    *
    * @snippet test.mapper.class.php testAdd()
    */
-  public static function add($object) {
-
+  static public function add($object) {
     // get object properties
     $properties = get_object_vars($object);
 
+    // loop through properties to create the "WHERE" condition
     $where = '';
+    $insertcolumn ='';
+    $inservalue = '';
+    foreach ($properties as $key => $value){
+      if($key != 'id'){
+        if($where != '')
+        {
+          $where .= ' AND ';
+          $insertcolumn .=', ';
+          $inservalue .= ', ';
+        }
+        $where .= ' ('.$key . '=\''.$value.'\') ';
+        $insertcolumn .= $key;
+        $inservalue .= '\''.$value.'\'';
+      }
+    }
+    // SHOULD USE PREPARED STATEMENTS
+    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where));
 
-    // build sql query to know if object exists
-    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+    if(!empty($exists) )
+    {
+      return -1;
+    }
 
     // build sql query with prepared statements
-    $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+    /*     $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+     */
+    $insertcolumn = '('.$insertcolumn.')';
+    $inservalue = '('.$inservalue.')';
+    $id = DB::getInstance()->execute('INSERT INTO '.strtolower(get_class($object)).' '.strtolower($insertcolumn).' VALUES '.strtolower($inservalue));
 
-
-    return $this;
+    return $id;
   }
 
   /**
@@ -381,10 +402,10 @@ class Mapper {
    *
    * @snippet test.mapper.class.php testAdd()
    */
-  public static function delete($object) {
+  static public function delete($object) {
 
-    // get object properties
-    $properties = get_object_vars($object);
+    /*     // get object properties
+     $properties = get_object_vars($object);
 
     $where = '';
 
@@ -395,7 +416,7 @@ class Mapper {
     $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
 
 
-    return $this;
+    return $this; */
   }
 
   /**
@@ -406,10 +427,10 @@ class Mapper {
    *
    * @snippet test.mapper.class.php testUpdate()
    */
-  public static function update($object) {
+  static public function update($object) {
 
-    // get object properties
-    $properties = get_object_vars($object);
+    /*     // get object properties
+     $properties = get_object_vars($object);
 
     $where = '';
 
@@ -420,7 +441,7 @@ class Mapper {
     $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
 
 
-    return $this;
+    return $this; */
   }
 
 }

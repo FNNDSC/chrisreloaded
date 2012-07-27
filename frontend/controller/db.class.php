@@ -116,6 +116,9 @@ class DB {
    * @throws Exception An exception if the query can not be prepared or executed.
    */
   public function execute($query, $variables=null) {
+    echo $query;
+    echo '<br/>';
+
     $link = $this->link;
 
     // prepare the query
@@ -137,27 +140,15 @@ class DB {
         $type = gettype($variable);
         $types .= $type{0};
       }
-      
-    // bind_names[0] == 'sssid'
-    $bind_names[] = $types;
-    // update bind_names[1], bind_names[2] with corresponding value
-    for ($i=0; $i<count($variables);$i++) {
-      $bind_names[] = &$variables[$i];
-    }
 
-    call_user_func_array(array($statement,'bind_param'),$bind_names);
-    
-      
-  // $args   = array();
-  // $args[] = implode('', array_values($variables));
-// 
-  // foreach ($params as $paramName => $paramType)
-  // {
-    // $args[] = &$params[$paramName];
-    // $params[$paramName] = null;
-  // }
-//   
-        // call_user_func_array(array($statement, 'bind_param'),$args); 
+      // bind_names[0] == 'sssid'
+      $bind_names[] = $types;
+      // update bind_names[1], bind_names[2] with corresponding value
+      for ($i=0; $i<count($variables);$i++) {
+        $bind_names[] = &$variables[$i];
+      }
+
+      call_user_func_array(array($statement,'bind_param'),$bind_names);
     }
 
     // execute the query
@@ -166,16 +157,24 @@ class DB {
     // grab the meta data of the query
     $result = $statement->result_metadata();
 
+    // if insert, no result
+    if(empty($result))
+    {
+      return $statement->insert_id;
+    }
+
+
     // check which fields are expected
     $fields = array();
     $resultFields = array();
     while ($field = $result->fetch_field()) {
 
       $fields[] = $field->name;
-      $resultFields[] = &${$field->name};
-    
-        }
-    
+      $resultFields[] = &${
+        $field->name};
+
+    }
+
     // call $statement->bind_result for each of the expected fields
     call_user_func_array(array($statement, 'bind_result'), $resultFields);
 

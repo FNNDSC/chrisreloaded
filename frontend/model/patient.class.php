@@ -66,7 +66,7 @@ class Patient extends Object {
    *
    * @var string
    */
-  public $gender = null;
+  public $sex = null;
 
   /**
    * The patient_id of this patient. This is also known as the MRN.

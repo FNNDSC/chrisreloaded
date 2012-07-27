@@ -119,8 +119,8 @@ class TestMapperClass extends UnitTestCase {
 
   //! [testJoin()]
   /**
-   * Test the ljoin function
-   */
+  * Test the ljoin function
+  */
   //! [testLjoin()]
   public function testLjoin() {
     // only OPERATOR
@@ -150,7 +150,7 @@ class TestMapperClass extends UnitTestCase {
     $scanMapper = new Mapper('Scan');
     $scanMapper->group('patient_id');
     $scanResult = $scanMapper->get();
-    
+
     // should return 3 results
     $this->assertTrue(count($scanResult['Scan']) == 3);
   }
@@ -199,6 +199,35 @@ class TestMapperClass extends UnitTestCase {
     // should return 6 patients
     $this->assertTrue(count($patientResult3['Patient']) == 6);
   }
+
+  //! [testget()]
+   
+  /**
+   * Test the add method.
+   */
+  //! [testadd()]
+  public function testAdd() {
+    // get a patient by id
+    $patientObject = new Patient();
+    $patientObject->lastname = 'Zinedine';
+    $patientObject->firstname = 'Zidane';
+    $patientObject->dob = '1998-07-13';
+    $patientObject->sex = 'M';
+    $patientObject->patient_id = 'WORLDCHAMPION;';
+
+    $patientID = Mapper::add($patientObject);
+
+    // should be =! -1
+    $this->assertTrue($patientID >= 0);
+
+    // add same patient
+    $patientID = Mapper::add($patientObject);
+
+    // should be -1
+    $this->assertTrue($patientID == -1);
+  }
+
+  //! [testadd()]
 
 }
 ?>
