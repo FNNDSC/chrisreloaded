@@ -1,5 +1,6 @@
 <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
-<script src="view/assets/js/jquery.js"></script>
+<script src="view/assets/js/jquery-1.7.2.min.js"></script>
+<script src="view/assets/js/jquery-ui-1.8.22.custom.min.js"></script>
 <script src="view/assets/js/jquery.json-2.3.min.js"></script>
 <script src="view/assets/js/google-code-prettify/prettify.js"></script>
 <script src="view/assets/js/bootstrap-transition.js"></script>
@@ -21,10 +22,10 @@
 <script type="text/javascript">
   $(document).ready(function() {
 
-    // $("#or-button").click(function(event) {
-    // event.preventDefault();
-    // $('#filter').append('<div class="span2 alert alert-info"><button type="button" class="close" data-dismiss="alert">×</button>Tractography analysis</div>');
-    // });
+     $("#or-button").click(function(event) {
+     event.preventDefault();
+     $('#filter').append('<div class="span2 alert alert-info"><button type="button" class="close" data-dismiss="alert">×</button>' + $('#input-search').val() +'</div>');
+     });
 
     $("#search-input").on("input", null, null, function() {
 
@@ -85,7 +86,43 @@
     $(function() {
       $('#input-search').keyup();
     });
+    
+    $('.nav-tabs').button();
 
+    $("#result-button").click(function() {
+         if($(this).val() == false)
+        {
+        alert('Enabled');
+        }
+      else{
+          alert('Disabled');
+      } 
+    });
+    
+    $(".btn-resize").click(function(event) {
+        alert("HI");
+
+/*         if($(this).is(':disabled') == false)
+        {
+        alert('Enabled');
+        }
+      else{
+          alert('Disabled');
+      } */
+    });
+    
+    $(function() {
+        $( "#data" ).resizable({
+          animate: true
+        });
+      });
+    
+    $(function() {
+        $( "#result" ).resizable({
+          animate: true
+        });
+      });
+    
   }); 
 </script>
 </script>

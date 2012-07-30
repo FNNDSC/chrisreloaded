@@ -1,50 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    ${TITLE}
-    ${STYLE}
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="span12">
-          <div id='search' class='well'>
-            <h4><i class="icon-search"></i> Search</h4>
-            <form id='input-form well form-horizontal' class="form-inline" style='margin: 2px'>
-              <input type="text" class="input-xlarge" id='input-search'
-              placeholder="Search for MRN, age, scan type etc."
-              style='height: 28px;'>
-              <!--                                     <button  id="or-button" class="btn btn-primary">
-              OR
-              </button> -->
+<head>${TITLE} ${STYLE}
+</head>
+<body>
+ <div class="container-fluid">
 
-            </form>
+  <div class="row-fluid">
+   <div class="span2">
+    <img src='view/assets/img/chris2.png'>
+   </div>
+   <div class="span8">
+    <div id='search' class='well'>
+     <h4>
+      <i class="icon-search"></i> Search
+     </h4>
+     <form id='input-form well form-horizontal' class="form-inline">
+      <input type="text" class="input-xlarge" id='input-search'
+       placeholder="Search for MRN, age, scan type etc.">
+      <button id="or-button" class="btn btn-primary">Add Filter</button>
 
-          </div>
-          <div id="filter" class="row"></div>
-        </div>
-      </div>
-      <div class="row-fluid">
-        <div class="span12" id="project">
-          Project: <span class="badge badge-success" id="project-badge"></span>
-          <div id="project-data"></div>
-        </div>
-      </div>
-      <div class="row-fluid">
-        <div class="span12" id="result">
-          Result: <span class="badge badge-success " id="result-badge"></span>
-          <div id="result-data"></div>
-        </div>
-      </div>
-      <div class="row-fluid">
-        <div class="span12" id="data">
-          Data: <span class="badge badge-success" id="data-badge"></span>
-          <div id="data-data"></div>
-        </div>
-      </div>
+     </form>
 
-      ${FOOTER}
     </div>
-    ${JAVASCRIPT}
-  </body>
+    <div id="filter" class="row-fluid"></div>
+   </div>
+
+   <div class="span2">Help Settings Logout</div>
+  </div>
+
+
+  <div class="row-fluid">
+   <div class="span2">
+    <div class="row-fluid">
+     <div id="project">
+      Project: <span class="badge badge-success" id="project-badge"></span>
+      <div id="project-data"></div>
+     </div>
+    </div>
+   </div>
+
+   <div class="span8">
+       <div class="row-fluid">
+    <div class="btn-group " data-toggle="buttons-c">
+     <button class="btn-resize btn btn-primary">
+      Result <span class="badge badge-success " id="result-badge"></span>
+     </button>
+     <button class="btn-resize btn btn-primary">
+      Data <span class="badge badge-success" id="data-badge"></span>
+     </button>
+    </div>
+    </div>
+
+    <div class="row-fluid">
+
+     <div class="span6">
+      <div id="result" class="ui-widget-content" style="border: 1px solid">
+       RESULTS:
+       <div id="result-data"></div>
+      </div>
+     </div>
+     <div class="span6" >
+      <div id="data" class="ui-widget-content" style="border: 1px solid">
+       DATA:
+       <div id="data-data"></div>
+      </div>
+     </div>
+    </div>
+    <!--    <div class="row-fluid">
+    <div id="data">
+     Data: <span class="badge badge-success" id="data-badge"></span>
+     <div id="data-data"></div>
+    </div>
+   </div> -->
+
+    ${FOOTER}
+   </div>
+   <div class="span2">Pipelines</div>
+  </div>
+ </div>
+ ${JAVASCRIPT}
+</body>
 </html>
