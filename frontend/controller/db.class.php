@@ -153,17 +153,18 @@ class DB {
 
     // execute the query
     $statement->execute();
+    // -1 = select because select doesnt affect rows
+    $queryType = $statement->affected_rows;
 
-    // grab the meta data of the query
-    $result = $statement->result_metadata();
-
-    // if insert, no result, return last inserted id
-    if(empty($result))
+    // return last inserted
+    // returns 0 for update and delete
+    if($queryType >= 0)
     {
       return $statement->insert_id;
     }
 
-
+    // grab the meta data of the query
+    $result = $statement->result_metadata();
     // check which fields are expected
     $fields = array();
     $resultFields = array();

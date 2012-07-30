@@ -417,7 +417,7 @@ class Mapper {
    * Add object in database.
    *
    * @param[in] Object $object Object to be added in the database.
-   * @return in ID of the object. Retuns "-1" if object already exists
+   * @return in ID of the object. If object already exists in DB, return its ID
    *
    * @snippet test.mapper.class.php testAdd()
    */
@@ -446,12 +446,12 @@ class Mapper {
       }
     }
     // SHOULD USE PREPARED STATEMENTS
-    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where), $preparedValue);
+    $exists = DB::getInstance()->execute('SELECT id FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where), $preparedValue);
 
     // return -1 if the object we try to add already exists
     if(!empty($exists) )
     {
-      return -1;
+      return $exists[0][0][1];
     }
 
     // build sql query with prepared statements
@@ -472,12 +472,11 @@ class Mapper {
    * @snippet test.mapper.class.php testDelete()
    */
   static public function delete($object, $objectid) {
-
     $objectName = Mapper::_getName($object);
     $preparedValue = Array();
     $preparedValue[] = $objectid;
 
-    $id = DB::getInstance()->execute('DELETE FROM '.strtolower($objectName).' WHERE id=?', $preparedValue);
+    DB::getInstance()->execute('DELETE FROM '.strtolower($objectName).' WHERE id=?', $preparedValue);
   }
 
   /**
@@ -491,24 +490,36 @@ class Mapper {
   static public function update($object, $objectid) {
     // get object properties
     $properties = get_object_vars($object);
-    
+
     // loop through properties to create the "WHERE" condition
+    $where = '';
     $set = '';
     $preparedValue = Array();
-    
+
     foreach ($properties as $key => $value){
       if($key != 'id'){
         if($set != '')
         {
           $set .= ' , ';
+          $where .= ' AND ';
         }
+        $where .= ' ('.$key . '=?) ';
         $set .= ' '.$key . '=? ';
         $preparedValue[] = $value;
       }
     }
-    
+
+
+    // SHOULD USE PREPARED STATEMENTS
+    $exists = DB::getInstance()->execute('SELECT id FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where), $preparedValue);
+
+    // return the id of the same object
+    if(!empty($exists) )
+    {
+      return $exists[0][0][1];
+    }
+
     $preparedValue[] = $objectid;
-    
     // SHOULD USE PREPARED STATEMENTS
     $exists = DB::getInstance()->execute('UPDATE '.strtolower(get_class($object)).' SET '.strtolower($set).' WHERE id=?', $preparedValue);
   }
