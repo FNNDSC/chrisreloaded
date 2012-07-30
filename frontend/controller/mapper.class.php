@@ -101,13 +101,14 @@ class Mapper {
    * Convenience method to get the name of the input.
    * If input is a string just return the string.
    * If input is an object, get its name.
+   * We make it staic to call it from "add", "delete" and "update"
    *
    * @param[in] string() $objects
    *
    * @return string Name of the input object
    *
    */
-  private function _getName($object) {
+  static private function _getName($object) {
     if (gettype($object) == 'string') {
       $name = $object;
     } else {
@@ -348,6 +349,71 @@ class Mapper {
   }
 
   /**
+   * Get object based on provided ID. If nothing provided,
+   * // good
+   * mapper::getStatic();
+   * // good
+   * mapper::getStatic(2);
+   * \return Array of type (Object(Instance, Instance, etc.), Object(Instance, Instance, etc.), Object(Instance, Instance, etc.))
+   *
+   * @param[in] $objectName get the name of the object to be returned.
+   * @param[in] $id Id of the object we want to fetch from DB. If something is
+   * provided, it will overwritte the "WHERE" conditions provided by previous
+   * join().
+   *
+   * @snippet test.mapper.class.php testGetStatic()
+   */
+  public function getStatic($objectName, $id = -1) {
+    $objectName = Mapper::_getName($objectName);
+    $where = '';
+    $preparedValue = Array();
+
+    if ($id != -1) {
+      // append to existing - might be an issue?
+      $where .=' WHERE id =? ';
+      $preparedValue[] = $id;
+    }
+
+    // query the database
+    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($objectName).strtolower($where), $preparedValue);
+
+    // create an array to store the objects
+    $objects = Array();
+
+    // create one column per object (multpiple objects returned for joins)
+
+    $objects[$objectName] = Array();
+    // create objects and map all the attributes
+    foreach ($results as $result) {
+
+      // localid
+      $object = null;
+
+      // parse on result
+      foreach ($result as $field) {
+        // if we reach a "id" field, create new object
+        if ($field[0] == 'id') {
+          // if there is an object existing, push it to right location and update localid
+          // we only push the object once it has been filled!
+          if (!empty($object)) {
+            $objects[$objectName][] = $object;
+          }
+          // create new object
+          $object = new $objectName();
+        }
+        // update fields
+        $object->$field[0] = $field[1];
+      }
+      // push last object to the right location
+      // we only push the object once it has been filled!
+      if (!empty($object)) {
+        $objects[$objectName][] = $object;
+      }
+    }
+    return $objects;
+  }
+
+  /**
    * Add object in database.
    *
    * @param[in] Object $object Object to be added in the database.
@@ -399,51 +465,52 @@ class Mapper {
   /**
    * Delete object in database.
    *
-   * @param[in] Object $object Object to be added in the database.
+   * @param[in] string|Object $object Object type to be removed.
+   * @param[in] int $objectid Object to be added in the database.
    * @return in ID of the object. Retuns "-1" if object didnt exists
    *
-   * @snippet test.mapper.class.php testAdd()
+   * @snippet test.mapper.class.php testDelete()
    */
-  static public function delete($object) {
+  static public function delete($object, $objectid) {
 
-    /*     // get object properties
-     $properties = get_object_vars($object);
+    $objectName = Mapper::_getName($object);
+    $preparedValue = Array();
+    $preparedValue[] = $objectid;
 
-    $where = '';
-
-    // build sql query to know if object exists
-    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
-
-    // build sql query with prepared statements
-    $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
-
-
-    return $this; */
+    $id = DB::getInstance()->execute('DELETE FROM '.strtolower($objectName).' WHERE id=?', $preparedValue);
   }
 
   /**
    * Update object in database. Update all fields but the "id"
    *
-   * @param[in] Object $object Object to be added in the database.
+   * @param[in] Object $object Object to be adMapperded in the database.
    * @return in ID of the object. Retuns "-1" if object didnt exists.
    *
    * @snippet test.mapper.class.php testUpdate()
    */
-  static public function update($object) {
-
-    /*     // get object properties
-     $properties = get_object_vars($object);
-
-    $where = '';
-
-    // build sql query to know if object exists
-    $exists = DB::getInstance()->execute('SELECT 1 FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
-
-    // build sql query with prepared statements
-    $results = DB::getInstance()->execute('INSERT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
-
-
-    return $this; */
+  static public function update($object, $objectid) {
+    // get object properties
+    $properties = get_object_vars($object);
+    
+    // loop through properties to create the "WHERE" condition
+    $set = '';
+    $preparedValue = Array();
+    
+    foreach ($properties as $key => $value){
+      if($key != 'id'){
+        if($set != '')
+        {
+          $set .= ' , ';
+        }
+        $set .= ' '.$key . '=? ';
+        $preparedValue[] = $value;
+      }
+    }
+    
+    $preparedValue[] = $objectid;
+    
+    // SHOULD USE PREPARED STATEMENTS
+    $exists = DB::getInstance()->execute('UPDATE '.strtolower(get_class($object)).' SET '.strtolower($set).' WHERE id=?', $preparedValue);
   }
 
 }

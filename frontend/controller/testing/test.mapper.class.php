@@ -201,6 +201,22 @@ class TestMapperClass extends UnitTestCase {
   }
 
   //! [testget()]
+  
+  /**
+   * Test the get static method.
+   */
+  //! [testgetstatic()]
+  public function testGetStatic() {
+    $patientResult = Mapper::getStatic('Patient');
+    
+    print_r($patientResult);
+    
+    $patientResult2 = Mapper::getStatic('Patient', 2);
+    
+    print_r($patientResult2);
+  }
+  
+  //! [testgetstatic()]
    
   /**
    * Test the add method.
@@ -228,6 +244,48 @@ class TestMapperClass extends UnitTestCase {
   }
 
   //! [testadd()]
+  
+  /**
+   * Test the delete method.
+   */
+  //! [testdelete()]
+  public function testDelete() {
+    // get a patient by id
+    $patientObject = new Patient();
+    $patientObject->lastname = 'Thierry';
+    $patientObject->firstname = 'Henry';
+    $patientObject->dob = '1998-07-13';
+    $patientObject->sex = 'M';
+    $patientObject->patient_id = 'WORLDCHAMPION2;';
+  
+    $patientID = Mapper::add($patientObject);
+  
+    // delete same patient
+    Mapper::delete('Patient', $patientID);
 
+    $result = Mapper::getStatic('Patient', $patientID);
+  }
+  //! [testdelete()]
+  
+  /**
+   * Test the delete method.
+   */
+  //! [testupdate()]
+  public function testUpdate() {
+    // get a patient by id
+    $patientObject = new Patient();
+    $patientObject->lastname = 'Zinedine';
+    $patientObject->firstname = 'Zzou';
+    $patientObject->dob = '1998-07-13';
+    $patientObject->sex = 'M';
+    $patientObject->patient_id = 'WORLDCHAMPION3;';
+  
+    $patientID = Mapper::add($patientObject);
+  
+    // delete same patient
+    $patientObject->lastname = 'Materazzi';
+    Mapper::update($patientObject, $patientID);
+  }
+  //! [testupdate()]
 }
 ?>
