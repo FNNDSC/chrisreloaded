@@ -299,6 +299,13 @@ class TestMapperClass extends UnitTestCase {
 
     // should return the id of the object which already exists
     $this->assertTrue($patientID == $existingID);
+    
+    //update object that does not exist
+    $patientObject->lastname = 'PLN4';
+    $existingID = Mapper::update($patientObject, -1);
+    
+    // update should return 0 if object does not exist
+    $this->assertTrue($existingID == 0);
 
     // clean the DB
     Mapper::delete('Patient', $patientID);

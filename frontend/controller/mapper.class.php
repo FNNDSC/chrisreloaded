@@ -285,9 +285,9 @@ class Mapper {
    * conditions.
    * If some input is provided, it will overwritte the "WHERE" conditions
    * provided by previous join().
-   * // good
+   * // valid
    * mapper->join(objectA, 'conditionA')->join(objectB)->get();
-   * // good
+   * // valid
    * mapper->get(2);
    * // warning
    * "mapper->join(objectB)->get(2);" EQUALS "mapper->get(2);"
@@ -350,9 +350,9 @@ class Mapper {
 
   /**
    * Get object based on provided ID. If nothing provided,
-   * // good
+   * // valid
    * mapper::getStatic();
-   * // good
+   * // valid
    * mapper::getStatic(2);
    * \return Array of type (Object(Instance, Instance, etc.), Object(Instance, Instance, etc.), Object(Instance, Instance, etc.))
    *
@@ -379,14 +379,10 @@ class Mapper {
 
     // create an array to store the objects
     $objects = Array();
-
-    // create one column per object (multpiple objects returned for joins)
-
     $objects[$objectName] = Array();
+
     // create objects and map all the attributes
     foreach ($results as $result) {
-
-      // localid
       $object = null;
 
       // parse on result
@@ -432,6 +428,7 @@ class Mapper {
     $preparedValue = Array();
 
     foreach ($properties as $key => $value){
+      // we do not use the "id" field
       if($key != 'id'){
         if($where != '')
         {
@@ -445,10 +442,11 @@ class Mapper {
         $preparedValue[] = $value;
       }
     }
-    // SHOULD USE PREPARED STATEMENTS
+
+    // does object we want to add exists in database?
     $exists = DB::getInstance()->execute('SELECT id FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where), $preparedValue);
 
-    // return -1 if the object we try to add already exists
+    // return the id of the object if it already exists in the database
     if(!empty($exists) )
     {
       return $exists[0][0][1];
@@ -459,6 +457,7 @@ class Mapper {
     $inservalue = '('.$inservalue.')';
     $id = DB::getInstance()->execute('INSERT INTO '.strtolower(get_class($object)).' '.strtolower($insertcolumn).' VALUES '.strtolower($inservalue), $preparedValue);
 
+    // return id of the new inserted object
     return $id;
   }
 
@@ -467,7 +466,6 @@ class Mapper {
    *
    * @param[in] string|Object $object Object type to be removed.
    * @param[in] int $objectid Object to be added in the database.
-   * @return in ID of the object. Retuns "-1" if object didnt exists
    *
    * @snippet test.mapper.class.php testDelete()
    */
@@ -483,7 +481,7 @@ class Mapper {
    * Update object in database. Update all fields but the "id"
    *
    * @param[in] Object $object Object to be adMapperded in the database.
-   * @return in ID of the object. Retuns "-1" if object didnt exists.
+   * @return in ID of the object. Retuns "0" if object didnt exists.
    *
    * @snippet test.mapper.class.php testUpdate()
    */
@@ -491,7 +489,7 @@ class Mapper {
     // get object properties
     $properties = get_object_vars($object);
 
-    // loop through properties to create the "WHERE" condition
+    // loop through properties to create the "WHERE" and "SET" conditions
     $where = '';
     $set = '';
     $preparedValue = Array();
@@ -510,18 +508,18 @@ class Mapper {
     }
 
 
-    // SHOULD USE PREPARED STATEMENTS
+    // After update, will the object be the same as one which currently exists
     $exists = DB::getInstance()->execute('SELECT id FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where), $preparedValue);
 
-    // return the id of the same object
+    // Return the id of the same object. Do not perform any update.
     if(!empty($exists) )
     {
       return $exists[0][0][1];
     }
 
     $preparedValue[] = $objectid;
-    // SHOULD USE PREPARED STATEMENTS
     $exists = DB::getInstance()->execute('UPDATE '.strtolower(get_class($object)).' SET '.strtolower($set).' WHERE id=?', $preparedValue);
+    return $exists;
   }
 
 }
