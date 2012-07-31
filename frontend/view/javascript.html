@@ -24,8 +24,12 @@
 
      $("#or-button").click(function(event) {
      event.preventDefault();
+     if($('#input-search').val() != '')
+    	 {
      $('#filter').append('<div class="span2 alert alert-info"><button type="button" class="close" data-dismiss="alert">×</button>' + $('#input-search').val() +'</div>');
-     });
+         }
+    	 });
+
 
     $("#search-input").on("input", null, null, function() {
 
@@ -86,30 +90,10 @@
     $(function() {
       $('#input-search').keyup();
     });
-    
-    $('.nav-tabs').button();
 
-    $("#result-button").click(function() {
-         if($(this).val() == false)
-        {
-        alert('Enabled');
-        }
-      else{
-          alert('Disabled');
-      } 
-    });
-    
-    $(".btn-resize").click(function(event) {
-        alert("HI");
-
-/*         if($(this).is(':disabled') == false)
-        {
-        alert('Enabled');
-        }
-      else{
-          alert('Disabled');
-      } */
-    });
+    $(".btn-resize").click(function() {
+        var buttonChecked = $(this).val();
+    }); 
     
     $(function() {
         $( "#data" ).resizable({
