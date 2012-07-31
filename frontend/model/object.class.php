@@ -43,19 +43,18 @@ class Object {
    * @return A string representation of this entity.
    */
 
-  public $objectname = '';
   public $id = -1;
 
   public function __construct() {
-    $this->objectname = get_class($this);
   }
 
   public function __toString() {
-
-    $output = $this->objectname."\n";
+    $objectname = get_class($this);
+    
+    $output = $objectname."\n";
 
     // make a fancy line (======)
-    for ($i = 0; $i < strlen($this->objectname); $i++) {
+    for ($i = 0; $i < strlen($objectname); $i++) {
 
       $output .= '=';
 
@@ -81,8 +80,8 @@ class Object {
    */
   public function equals($object) {
 
-    if ($this->objectname != get_class($object)) {
-      throw new Exception('You are trying to compare 2 different type of objects:  \''.$this->objectname.'\' vs \''.get_class($object).'\'');
+    if (get_class($this) != get_class($object)) {
+      throw new Exception('You are trying to compare 2 different type of objects:  \''.get_class($this).'\' vs \''.get_class($object).'\'');
     }
 
     $localAttr = get_object_vars($this);

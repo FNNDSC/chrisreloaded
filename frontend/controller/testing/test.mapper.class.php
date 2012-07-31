@@ -119,8 +119,8 @@ class TestMapperClass extends UnitTestCase {
 
   //! [testJoin()]
   /**
-   * Test the ljoin function
-   */
+  * Test the ljoin function
+  */
   //! [testLjoin()]
   public function testLjoin() {
     // only OPERATOR
@@ -150,7 +150,7 @@ class TestMapperClass extends UnitTestCase {
     $scanMapper = new Mapper('Scan');
     $scanMapper->group('patient_id');
     $scanResult = $scanMapper->get();
-    
+
     // should return 3 results
     $this->assertTrue(count($scanResult['Scan']) == 3);
   }
@@ -183,7 +183,7 @@ class TestMapperClass extends UnitTestCase {
     $patientResult = $patientMapper->get(2);
 
     // should be equal
-    $this->assertTrue($patientResult['Patient'][0]->equals($patientObject2) == 1);
+    $this->assertTrue($patientResult['Patient'][0]->equals($patientObject2) == True);
 
     $patientMapper2 = new Mapper('Patient');
     $patientResult2 = $patientMapper2->get(-3);
@@ -200,5 +200,116 @@ class TestMapperClass extends UnitTestCase {
     $this->assertTrue(count($patientResult3['Patient']) == 6);
   }
 
+  //! [testget()]
+
+  /**
+   * Test the get static method.
+   */
+  //! [testgetstatic()]
+  public function testGetStatic() {
+    $patientResult = Mapper::getStatic('Patient');
+
+    $patientResult2 = Mapper::getStatic('Patient', 2);
+  }
+
+  //! [testgetstatic()]
+   
+  /**
+   * Test the add method.
+   */
+  //! [testadd()]
+  public function testAdd() {
+    // get a patient by id
+    $patientObject = new Patient();
+    $patientObject->lastname = 'PLN0';
+    $patientObject->firstname = 'PFN0';
+    $patientObject->dob = '2000-01-01';
+    $patientObject->sex = 'M';
+    $patientObject->patient_id = 'PID0;';
+
+    $patientID = Mapper::add($patientObject);
+    $patientResult = Mapper::getStatic($patientObject, $patientID);
+
+    // compared object we just added with its "base" object
+    $this->assertTrue($patientResult['Patient'][0]->equals($patientObject) == True);
+
+    $patientID2 = Mapper::add($patientObject);
+
+    // IDs should be the same: nothing added
+    $this->assertTrue($patientID == $patientID2);
+    
+    // clean the DB
+    Mapper::delete('Patient', $patientID);
+  }
+
+  //! [testadd()]
+
+  /**
+   * Test the delete method.
+   */
+  //! [testdelete()]
+  public function testDelete() {
+    // get a patient by id
+    $patientObject = new Patient();
+    $patientObject->lastname = 'PLN1';
+    $patientObject->firstname = 'PFN1';
+    $patientObject->dob = '2001-01-01';
+    $patientObject->sex = 'F';
+    $patientObject->patient_id = 'PID1;';
+
+    $patientID = Mapper::add($patientObject);
+
+    // delete same patient
+    Mapper::delete('Patient', $patientID);
+
+    $result = Mapper::getStatic('Patient', $patientID);
+    // IDs should be the same: nothing added
+    $this->assertTrue(empty($result['Patient']));
+  }
+  //! [testdelete()]
+
+  /**
+   * Test the delete method.
+   */
+  //! [testupdate()]
+  public function testUpdate() {
+    // get a patient by id
+    $patientObject = new Patient();
+    $patientObject->lastname = 'PLN2';
+    $patientObject->firstname = 'PFN2';
+    $patientObject->dob = '2002-01-01';
+    $patientObject->sex = 'F';
+    $patientObject->patient_id = 'PID2;';
+
+    $patientID = Mapper::add($patientObject);
+
+    // Modify one field
+    $patientObject->lastname = 'PLN3';
+    // Update database and get object
+    Mapper::update($patientObject, $patientID);
+    $patientResult = Mapper::getStatic('Patient', $patientID);
+
+    // compared object we just added with its "base" object
+    // we make sure id match
+    $patientObject->id = $patientID;
+    $this->assertTrue($patientResult['Patient'][0]->equals($patientObject) == True);
+
+    // update "silly" object to create one object which alread exists
+    $existingID = Mapper::update($patientObject, -1);
+
+    // should return the id of the object which already exists
+    $this->assertTrue($patientID == $existingID);
+    
+    //update object that does not exist
+    $patientObject->lastname = 'PLN4';
+    $existingID = Mapper::update($patientObject, -1);
+    
+    // update should return 0 if object does not exist
+    $this->assertTrue($existingID == 0);
+
+    // clean the DB
+    Mapper::delete('Patient', $patientID);
+  }
+  //! [testupdate()]
 }
 ?>
