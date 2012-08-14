@@ -73,21 +73,21 @@ class TestModel extends TestSuite {
     parent::__construct();
     // data related models
     $this -> add(new TestDataClass());
-    $this -> add(new TestDataProjectClass());
+    $this -> add(new TestData_ProjectClass());
     // group related models
     $this -> add(new TestGroupClass());
-    $this -> add(new TestGroupDataClass());
-    $this -> add(new TestGroupProjectClass());
+    $this -> add(new TestGroup_DataClass());
+    $this -> add(new TestGroup_ProjectClass());
     // result related models
     $this -> add(new TestResultClass());
-    $this -> add(new TestResultDataClass());
-    $this -> add(new TestResultProjectClass());
+    $this -> add(new TestResult_DataClass());
+    $this -> add(new TestResult_ProjectClass());
     // user related models
     $this -> add(new TestUserClass());
-    $this -> add(new TestUserDataClass());
-    $this -> add(new TestUserGroupClass());
-    $this -> add(new TestUserProjectClass());
-    $this -> add(new TestUserResultClass());
+    $this -> add(new TestUser_DataClass());
+    $this -> add(new TestUser_GroupClass());
+    $this -> add(new TestUser_ProjectClass());
+    $this -> add(new TestUser_ResultClass());
     // other models
     $this -> add(new TestPatientClass());
     $this -> add(new TestProjectClass());

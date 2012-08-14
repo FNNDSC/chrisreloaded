@@ -42,12 +42,11 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 
 // include the model classes
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'scan.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result_scan.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result_data.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result_project.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'project.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'modality.class.php'));
 
 class TestMapperClass extends UnitTestCase {
 
@@ -101,20 +100,20 @@ class TestMapperClass extends UnitTestCase {
   //! [testJoin()]
   public function testJoin() {
     // only OPERATOR
-    $scanMapper = new Mapper('Scan');
-    $scanMapper->join('Patient');
-    $scanResult = $scanMapper->get();
+    $dataMapper = new Mapper('data');
+    $dataMapper->join('Patient');
+    $dataResult = $dataMapper->get();
 
-    // should return 4 Scan object and 4 Patient objects
-    $this->assertTrue((count($scanResult['Scan']) == 4) && (count($scanResult['Patient']) == 4));
+    // should return 4 data object and 4 Patient objects
+    $this->assertTrue((count($dataResult['data']) == 4) && (count($dataResult['Patient']) == 4));
 
     // join condition
-    $scanMapper2 = new Mapper('Scan');
-    $scanMapper2->join('Patient')->join('Result_Scan', 'scan.id = Result_Scan.scan_id')->join('Result', 'result.id = Result_Scan.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->join('Project', 'project.id = Result_Project.project_id');
-    $scanResult2 = $scanMapper2->get();
+    $dataMapper2 = new Mapper('data');
+    $dataMapper2->join('Patient')->join('Result_data', 'data.id = Result_data.data_id')->join('Result', 'result.id = Result_data.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->join('Project', 'project.id = Result_Project.project_id');
+    $dataResult2 = $dataMapper2->get();
 
     // should return 1 of each object
-    $this->assertTrue(count($scanResult2['Scan'] == 1) && count($scanResult2['Patient'] == 1) && count($scanResult2['Result_Scan'] == 1) && count($scanResult2['Result'] == 1) && count($scanResult2['Result_Project'] == 1) && count($scanResult2['Project'] == 1));
+    $this->assertTrue(count($dataResult2['data'] == 1) && count($dataResult2['Patient'] == 1) && count($dataResult2['Result_data'] == 1) && count($dataResult2['Result'] == 1) && count($dataResult2['Result_Project'] == 1) && count($dataResult2['Project'] == 1));
   }
 
   //! [testJoin()]
@@ -124,20 +123,20 @@ class TestMapperClass extends UnitTestCase {
   //! [testLjoin()]
   public function testLjoin() {
     // only OPERATOR
-    $scanMapper = new Mapper('Scan');
-    $scanMapper->ljoin('Patient');
-    $scanResult = $scanMapper->get();
+    $dataMapper = new Mapper('data');
+    $dataMapper->ljoin('Patient');
+    $dataResult = $dataMapper->get();
 
-    // should return 4 Scan object and 4 Patient objects
-    $this->assertTrue((count($scanResult['Scan']) == 4) && (count($scanResult['Patient']) == 4));
+    // should return 4 data object and 4 Patient objects
+    $this->assertTrue((count($dataResult['data']) == 4) && (count($dataResult['Patient']) == 4));
 
     // join condition
-    $scanMapper2 = new Mapper('Scan');
-    $scanMapper2->ljoin('Patient')->ljoin('Result_Scan', 'scan.id = Result_Scan.scan_id')->ljoin('Result', 'result.id = Result_Scan.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->ljoin('Project', 'project.id = Result_Project.project_id');
-    $scanResult2 = $scanMapper2->get();
+    $dataMapper2 = new Mapper('data');
+    $dataMapper2->ljoin('Patient')->ljoin('Result_data', 'data.id = Result_data.data_id')->ljoin('Result', 'result.id = Result_data.result_id')->join('Result_Project', 'Result_Project.result_id = result.id')->ljoin('Project', 'project.id = Result_Project.project_id');
+    $dataResult2 = $dataMapper2->get();
 
     // should return 1 of each object
-    $this->assertTrue(count($scanResult2['Scan'] == 3) && count($scanResult2['Patient'] == 3) && count($scanResult2['Result_Scan'] == 3) && count($scanResult2['Result'] == 3) && count($scanResult2['Result_Project'] == 3) && count($scanResult2['Project'] == 3));
+    $this->assertTrue(count($dataResult2['data'] == 3) && count($dataResult2['Patient'] == 3) && count($dataResult2['Result_data'] == 3) && count($dataResult2['Result'] == 3) && count($dataResult2['Result_Project'] == 3) && count($dataResult2['Project'] == 3));
   }
 
   //! [testLjoin()]
@@ -147,12 +146,12 @@ class TestMapperClass extends UnitTestCase {
    */
   //! [testGroup()]
   public function testGroup() {
-    $scanMapper = new Mapper('Scan');
-    $scanMapper->group('patient_id');
-    $scanResult = $scanMapper->get();
+    $dataMapper = new Mapper('data');
+    $dataMapper->group('patient_id');
+    $dataResult = $dataMapper->get();
 
     // should return 3 results
-    $this->assertTrue(count($scanResult['Scan']) == 3);
+    $this->assertTrue(count($dataResult['data']) == 3);
   }
 
   //! [testGroup()]
