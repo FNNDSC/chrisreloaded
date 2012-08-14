@@ -46,7 +46,7 @@ require_once('test.object.class.php');
 // include the result_data class
 require_once(joinPaths(CHRIS_MODEL_FOLDER, 'result_data.class.php'));
 
-class TestResultDataClass extends TestObjectClass {
+class TestResult_DataClass extends TestObjectClass {
 
 
 }

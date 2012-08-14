@@ -46,7 +46,7 @@ require_once('test.object.class.php');
 // include the user_project class
 require_once(joinPaths(CHRIS_MODEL_FOLDER, 'user_project.class.php'));
 
-class TestUserProjectClass extends TestObjectClass {
+class TestUser_ProjectClass extends TestObjectClass {
 
 
 }
