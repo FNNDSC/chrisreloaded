@@ -26,47 +26,33 @@
  *
  */
 
-// we define a valid entry point
+// prevent direct calls
 if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
+  die('Invalid access.');
 
-//define('CHRIS_CONFIG_DEBUG',true);
-
-// include the configuration
-
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once ('../../config.inc.php');
-// include the simpletest framework
-require_once (SIMPLETEST);
-
-// include all the tests
-require_once ('test.data.class.php');
-require_once ('test.data_project.class.php');
-require_once ('test.group.class.php');
-require_once ('test.patient.class.php');
-require_once ('test.result_configuration.class.php');
-require_once ('test.result.class.php');
-
+// grab the super class for all entities
+require_once 'object.class.php';
 
 /**
  *
- * The test suite which includes all tests for the model classes.
+ * The Group class which describes the Group entity of the database.
  *
  */
-class TestModel extends TestSuite {
+class Group extends Object {
 
-  function __construct() {
+  /**
+   * The name of the group.
+   *
+   * @var string
+   */
+  public $name = null;
 
-    parent::__construct();
-
-    $this -> add(new TestInstitutionClass());
-    $this -> add(new TestModalityClass());
-    $this -> add(new TestPatientClass());
-    $this -> add(new TestResult_configurationClass());
-    $this -> add(new TestResultClass());
-    $this -> add(new TestScanClass());
-
-  }
-
+  /**
+   * The meta_information for the group
+   * Description of the group, etc.
+   *
+   * @var string
+   */
+  public $meta_information = null;
 }
 ?>

@@ -27,46 +27,28 @@
  */
 
 // we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
+if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
 
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once ('../../config.inc.php');
 // include the simpletest framework
-require_once (SIMPLETEST);
+require_once(SIMPLETEST);
 
-// include all the tests
-require_once ('test.data.class.php');
-require_once ('test.data_project.class.php');
-require_once ('test.group.class.php');
-require_once ('test.patient.class.php');
-require_once ('test.result_configuration.class.php');
-require_once ('test.result.class.php');
+// include the db class
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 
+// include the test object class since we derive from that
+require_once('test.object.class.php');
 
-/**
- *
- * The test suite which includes all tests for the model classes.
- *
- */
-class TestModel extends TestSuite {
+// include the group class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'group.class.php'));
 
-  function __construct() {
+class TestGroupClass extends TestObjectClass {
 
-    parent::__construct();
-
-    $this -> add(new TestInstitutionClass());
-    $this -> add(new TestModalityClass());
-    $this -> add(new TestPatientClass());
-    $this -> add(new TestResult_configurationClass());
-    $this -> add(new TestResultClass());
-    $this -> add(new TestScanClass());
-
-  }
 
 }
+
 ?>
