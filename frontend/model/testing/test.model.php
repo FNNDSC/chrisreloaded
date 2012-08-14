@@ -40,16 +40,20 @@ if (!defined('CHRIS_CONFIG_PARSED'))
 require_once (SIMPLETEST);
 
 // include all the tests
+// data related models
 require_once ('test.data.class.php');
 require_once ('test.data_project.class.php');
+// group related models
 require_once ('test.group.class.php');
 require_once ('test.group_data.class.php');
 require_once ('test.group_project.class.php');
+// result related models
+require_once ('test.result.class.php');
+require_once ('test.result_data.class.php');
+require_once ('test.result_project.class.php');
+//other models
 require_once ('test.patient.class.php');
 require_once ('test.project.class.php');
-require_once ('test.result_configuration.class.php');
-require_once ('test.result.class.php');
-
 
 /**
  *
@@ -61,13 +65,20 @@ class TestModel extends TestSuite {
   function __construct() {
 
     parent::__construct();
-
-    $this -> add(new TestInstitutionClass());
-    $this -> add(new TestModalityClass());
-    $this -> add(new TestPatientClass());
-    $this -> add(new TestResult_configurationClass());
+    // data related models
+    $this -> add(new TestDataClass());
+    $this -> add(new TestDataProjectClass());
+    // group related models
+    $this -> add(new TestGroupClass());
+    $this -> add(new TestGroupDataClass());
+    $this -> add(new TestGroupProjectClass());
+    // result related models
     $this -> add(new TestResultClass());
-    $this -> add(new TestScanClass());
+    $this -> add(new TestResultDataClass());
+    $this -> add(new TestResultProjectClass());
+    // other models
+    $this -> add(new TestPatientClass());
+    $this -> add(new TestProjectClass());
 
   }
 

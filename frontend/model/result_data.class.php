@@ -35,18 +35,24 @@ require_once 'object.class.php';
 
 /**
  *
- * The Result class which describes the Result entity of the database.
+ * The Result_Data class which describes the Result_Data entity of the database.
  *
  */
-class Result_Scan extends Object {
+class Result_Data extends Object {
 
   /**
-   * The plugin of this result.
+   * The result id.
    *
-   * @var string
+   * @var int
    */
   public $result_id = -1;
-  public $scan_id = -1;
+  
+  /**
+   * The data id.
+   *
+   * @var int
+   */
+  public $data_id = -1;
 
 }
 ?>
