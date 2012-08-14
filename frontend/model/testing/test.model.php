@@ -40,12 +40,10 @@ if (!defined('CHRIS_CONFIG_PARSED'))
 require_once (SIMPLETEST);
 
 // include all the tests
-require_once ('test.institution.class.php');
-require_once ('test.modality.class.php');
 require_once ('test.patient.class.php');
 require_once ('test.result_configuration.class.php');
 require_once ('test.result.class.php');
-require_once ('test.scan.class.php');
+require_once ('test.data.class.php');
 
 /**
  *
