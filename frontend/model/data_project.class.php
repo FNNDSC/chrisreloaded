@@ -27,33 +27,31 @@
  */
 
 // prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
 // grab the super class for all entities
 require_once 'object.class.php';
 
-
 /**
  *
- * The Institution class which describes the Institution entity of the database.
+ * The Data_Project class which describes the Data_Project entity of the database.
  *
  */
-class Institution extends Object {
+class Data_Project extends Object {
 
   /**
-   * The name of this institution.
+   * The data ID.
    *
-   * @var string
+   * @var int
    */
-  public $name = null;
+  public $data_id = -1;
 
   /**
-   * The location of this institution.
+   * The project ID.
    *
-   * @var string
+   * @var int
    */
-  public $location = null;
-
+  public $project_id = null;
 }
-
 ?>

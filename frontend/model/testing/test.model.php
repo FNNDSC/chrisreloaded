@@ -40,12 +40,26 @@ if (!defined('CHRIS_CONFIG_PARSED'))
 require_once (SIMPLETEST);
 
 // include all the tests
-require_once ('test.institution.class.php');
-require_once ('test.modality.class.php');
-require_once ('test.patient.class.php');
-require_once ('test.result_configuration.class.php');
+// data related models
+require_once ('test.data.class.php');
+require_once ('test.data_project.class.php');
+// group related models
+require_once ('test.group.class.php');
+require_once ('test.group_data.class.php');
+require_once ('test.group_project.class.php');
+// result related models
 require_once ('test.result.class.php');
-require_once ('test.scan.class.php');
+require_once ('test.result_data.class.php');
+require_once ('test.result_project.class.php');
+// user related models
+require_once ('test.user.class.php');
+require_once ('test.user_data.class.php');
+require_once ('test.user_group.class.php');
+require_once ('test.user_project.class.php');
+require_once ('test.user_result.class.php');
+//other models
+require_once ('test.patient.class.php');
+require_once ('test.project.class.php');
 
 /**
  *
@@ -57,13 +71,26 @@ class TestModel extends TestSuite {
   function __construct() {
 
     parent::__construct();
-
-    $this -> add(new TestInstitutionClass());
-    $this -> add(new TestModalityClass());
-    $this -> add(new TestPatientClass());
-    $this -> add(new TestResult_configurationClass());
+    // data related models
+    $this -> add(new TestDataClass());
+    $this -> add(new TestDataProjectClass());
+    // group related models
+    $this -> add(new TestGroupClass());
+    $this -> add(new TestGroupDataClass());
+    $this -> add(new TestGroupProjectClass());
+    // result related models
     $this -> add(new TestResultClass());
-    $this -> add(new TestScanClass());
+    $this -> add(new TestResultDataClass());
+    $this -> add(new TestResultProjectClass());
+    // user related models
+    $this -> add(new TestUserClass());
+    $this -> add(new TestUserDataClass());
+    $this -> add(new TestUserGroupClass());
+    $this -> add(new TestUserProjectClass());
+    $this -> add(new TestUserResultClass());
+    // other models
+    $this -> add(new TestPatientClass());
+    $this -> add(new TestProjectClass());
 
   }
 

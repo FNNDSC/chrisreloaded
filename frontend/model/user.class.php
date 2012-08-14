@@ -26,29 +26,47 @@
  *
  */
 
-// we define a valid entry point
-if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+// prevent direct calls
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
-//define('CHRIS_CONFIG_DEBUG',true);
+// grab the super class for all entities
+require_once 'object.class.php';
 
-// include the configuration
-if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
+/**
+ *
+ * The User class which describes the User entity of the database.
+ *
+ */
+class User extends Object {
 
-// include the simpletest framework
-require_once(SIMPLETEST);
+  /**
+   * The user name.
+   *
+   * @var string
+   */
+  public $username = null;
 
-// include the db class
-require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
-
-// include the test object class since we derive from that
-require_once('test.object.class.php');
-
-// include the result_configuration class
-require_once(joinPaths(CHRIS_MODEL_FOLDER, 'result_configuration.class.php'));
-
-class TestResult_configurationClass extends TestObjectClass {
-
-
+  /**
+   * The encrypted password.
+   *
+   * @var string
+   */
+  public $password = null;
+  
+  /**
+   * The email of the user.
+   *
+   * @var string
+   */
+  public $email = null;
+  
+  /**
+   * Extra information about the user.
+   * background, privacy settings, etc.
+   *
+   * @var string
+   */
+  public $meta_information = null;
 }
-
 ?>

@@ -26,29 +26,33 @@
  *
  */
 
-// we define a valid entry point
-if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+// prevent direct calls
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
-//define('CHRIS_CONFIG_DEBUG',true);
+// grab the super class for all entities
+require_once 'object.class.php';
 
-// include the configuration
-if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
+/**
+ *
+ * The Group class which describes the Group entity of the database.
+ *
+ */
+class Group extends Object {
 
-// include the simpletest framework
-require_once(SIMPLETEST);
+  /**
+   * The name of the group.
+   *
+   * @var string
+   */
+  public $name = null;
 
-// include the db class
-require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
-
-// include the test object class since we derive from that
-require_once('test.object.class.php');
-
-// include the institution class
-require_once(joinPaths(CHRIS_MODEL_FOLDER, 'institution.class.php'));
-
-class TestInstitutionClass extends TestObjectClass {
-
-
+  /**
+   * The meta_information for the group
+   * Description of the group, etc.
+   *
+   * @var string
+   */
+  public $meta_information = null;
 }
-
 ?>

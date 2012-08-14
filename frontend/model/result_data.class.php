@@ -27,40 +27,32 @@
  */
 
 // prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
 // grab the super class for all entities
 require_once 'object.class.php';
 
-
 /**
  *
- * The Modality class which describes the Modality entity of the database.
+ * The Result_Data class which describes the Result_Data entity of the database.
  *
  */
-class Modality extends Object {
+class Result_Data extends Object {
 
   /**
-   * The name of this modality.
+   * The result id.
    *
-   * @var string
+   * @var int
    */
-  public $name = null;
-
+  public $result_id = -1;
+  
   /**
-   * The type of this modality.
+   * The data id.
    *
-   * @var string
+   * @var int
    */
-  public $type = null;
-
-  /**
-   * The subtype of this modality.
-   *
-   * @var string
-   */
-  public $subtype = null;
+  public $data_id = -1;
 
 }
-
 ?>

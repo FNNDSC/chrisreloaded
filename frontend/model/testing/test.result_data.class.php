@@ -26,40 +26,28 @@
  *
  */
 
-// prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+// we define a valid entry point
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
-// grab the super class for all entities
-require_once 'object.class.php';
+//define('CHRIS_CONFIG_DEBUG',true);
 
+// include the configuration
+if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
 
-/**
- *
- * The Result_configuration class which describes the Result_configuration entity of the database.
- *
- */
-class Result_configuration extends Object {
+// include the simpletest framework
+require_once(SIMPLETEST);
 
-  /**
-   * The result id of this result configuration.
-   *
-   * @var int
-   */
-  public $result_id = -1;
+// include the db class
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 
-  /**
-   * The name of this result configuration.
-   *
-   * @var string
-   */
-  public $name = null;
+// include the test object class since we derive from that
+require_once('test.object.class.php');
 
-  /**
-   * The value of this result configuration.
-   *
-   * @var string
-   */
-  public $value = null;
+// include the result_data class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'result_data.class.php'));
+
+class TestResultDataClass extends TestObjectClass {
+
 
 }
 

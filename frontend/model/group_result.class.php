@@ -35,24 +35,23 @@ require_once 'object.class.php';
 
 /**
  *
- * The Result_Project class which describes the Result_Project entity of the database.
+ * The Group_Result class which describes the Group_Result entity of the database.
  *
  */
-class Result_Project extends Object {
+class Group_Result extends Object {
 
   /**
-   * The result id
+   * The group ID.
+   *
+   * @var int
+   */
+  public $group_id = -1;
+  
+  /**
+   * The result ID.
    *
    * @var int
    */
   public $result_id = -1;
-  
-  /**
-   * The project id
-   *
-   * @var int
-   */
-  public $project_id = -1;
-
 }
 ?>

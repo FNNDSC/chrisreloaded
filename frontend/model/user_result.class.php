@@ -28,66 +28,30 @@
 
 // prevent direct calls
 if (!defined('__CHRIS_ENTRY_POINT__'))
-	die('Invalid access.');
+  die('Invalid access.');
 
 // grab the super class for all entities
 require_once 'object.class.php';
 
 /**
  *
- * The Patient class which describes the Patient entity of the database.
+ * The User_Result class which describes the User_Result entity of the database.
  *
  */
-class Scan extends Object {
+class User_Result extends Object {
 
-/**
-	 * The patient_id of this scan.
-	 *
-	 * @var int
-	 */
-	public $patient_id = -1;
+  /**
+   * The user id.
+   *
+   * @var int
+   */
+  public $user_id = -1;
 
-	/**
-	 * The modality_id of this scan.
-	 *
-	 * @var int
-	 */
-	public $modality_id = -1;
-
-	/**
-	 * The scanner_id of this scan.
-	 *
-	 * @var int
-	 */
-	public $scanner_id = -1;
-
-	/**
-	 * The name of the scan.
-	 *
-	 * @var string
-	 */
-	public $name = null;
-
-	/**
-	 * The time of the scan.
-	 *
-	 * @var string
-	 */
-	public $time = null;
-
-	/**
-	 * The dimension of the scan.
-	 *
-	 * @var string
-	 */
-	public $dimensions = null;
-
-	/**
-	 * The spacings of the scan.
-	 *
-	 * @var string
-	 */
-	public $spacings = null;
-
+  /**
+   * The result id.
+   *
+   * @var int
+   */
+  public $result_id = -1;
 }
 ?>

@@ -35,24 +35,47 @@ require_once 'object.class.php';
 
 /**
  *
- * The Result_Project class which describes the Result_Project entity of the database.
+ * The Data class which describes the Data entity of the database.
  *
  */
-class Result_Project extends Object {
+class Data extends Object {
 
   /**
-   * The result id
+   * The patient_id of this scan.
    *
    * @var int
    */
-  public $result_id = -1;
-  
+  public $patient_id = -1;
+
   /**
-   * The project id
+   * The data unique ID.
+   * We use it to make sure data we will add to the database doesn't already exists.
    *
-   * @var int
+   * @var string
    */
-  public $project_id = -1;
+  public $unique_id = null;
+
+  /**
+   * The name of the data.
+   * Text file name, dicom protocol, etc...
+   *
+   * @var string
+   */
+  public $name = null;
+
+  /**
+   * The time of the data creation.
+   *
+   * @var string
+   */
+  public $time = null;
+
+  /**
+   * Extra information for this data. (spacing, size...)
+   *
+   * @var string
+   */
+  public $meta_information = null;
 
 }
 ?>
