@@ -46,7 +46,22 @@ class Result extends Object {
    * @var string
    */
   public $plugin = null;
-
+  
+  /**
+   * The status of this result
+   * success, failure, progress:50, progress:70
+   *
+   * @var string
+   */
+  public $status = null;
+  
+  /**
+   * The extra information about this result.
+   * Parameters values, duration
+   *
+   * @var string
+   */
+  public $meta_information = null;
 }
 
 ?>
