@@ -35,7 +35,10 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
 
 // include the simpletest framework
-require_once(SIMPLETEST);
+require_once (SIMPLETEST_TEMPLATE);
+require_once (SIMPLETEST_SIMPLETEST);
+SimpleTest::prefer(new ShowPasses());
+require_once (SIMPLETEST_AUTORUN);
 
 // include the db class
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));

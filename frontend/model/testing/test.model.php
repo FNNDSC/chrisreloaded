@@ -37,7 +37,10 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
 if (!defined('CHRIS_CONFIG_PARSED'))
   require_once ('../../config.inc.php');
 // include the simpletest framework
-require_once (SIMPLETEST);
+require_once (SIMPLETEST_TEMPLATE);
+require_once (SIMPLETEST_SIMPLETEST);
+SimpleTest::prefer(new ShowPasses());
+require_once (SIMPLETEST_AUTORUN);
 
 // include all the tests
 // data related models
@@ -66,7 +69,7 @@ require_once ('test.project.class.php');
  * The test suite which includes all tests for the model classes.
  *
  */
-class TestModel extends TestSuite {
+/* class TestModel extends TestSuite {
 
   function __construct() {
 
@@ -92,7 +95,7 @@ class TestModel extends TestSuite {
     $this -> add(new TestPatientClass());
     $this -> add(new TestProjectClass());
 
-  }
+  } 
 
-}
+}*/
 ?>

@@ -54,7 +54,9 @@ define('CHRIS_SESSIONPATH', '/chb/users/chris/files/');
 define('CHRIS_AETITLE', 'CHRIS');
 
 // TESTING
-define('SIMPLETEST', joinPaths(CHRIS_WWWROOT,'lib/simpletest/autorun.php'));
+define('SIMPLETEST_TEMPLATE', joinPaths(CHRIS_WWWROOT,'lib/show_passes.php'));
+define('SIMPLETEST_SIMPLETEST', joinPaths(CHRIS_WWWROOT,'lib/simpletest/simpletest.php'));
+define('SIMPLETEST_AUTORUN', joinPaths(CHRIS_WWWROOT,'lib/simpletest/autorun.php'));
 
 
 // if CHRIS_DEBUG is defined, print all constants

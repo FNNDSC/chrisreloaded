@@ -36,7 +36,11 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
 require_once ('config.inc.php');
 
 // include the simpletest framework
-require_once (SIMPLETEST);
+require_once (SIMPLETEST_TEMPLATE);
+require_once (SIMPLETEST_SIMPLETEST);
+SimpleTest::prefer(new ShowPasses());
+require_once (SIMPLETEST_AUTORUN);
+
 
 // include all the tests suites
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'testing/test.controller.php'));
@@ -47,7 +51,7 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'testing/test.model.php'));
  * The test suite which includes all tests for the model classes.
  *
  */
-class TestChris extends TestSuite {
+/* class TestChris extends TestSuite {
 
   function __construct() {
 
@@ -57,5 +61,5 @@ class TestChris extends TestSuite {
     $this->add(new TestModel());
   }
 
-}
+} */
 ?>
