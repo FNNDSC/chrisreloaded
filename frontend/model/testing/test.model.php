@@ -51,6 +51,8 @@ require_once ('test.group_project.class.php');
 require_once ('test.result.class.php');
 require_once ('test.result_data.class.php');
 require_once ('test.result_project.class.php');
+// user related models
+require_once ('test.user.class.php');
 //other models
 require_once ('test.patient.class.php');
 require_once ('test.project.class.php');
@@ -76,6 +78,8 @@ class TestModel extends TestSuite {
     $this -> add(new TestResultClass());
     $this -> add(new TestResultDataClass());
     $this -> add(new TestResultProjectClass());
+    // user related models
+    $this -> add(new TestUserClass());
     // other models
     $this -> add(new TestPatientClass());
     $this -> add(new TestProjectClass());
