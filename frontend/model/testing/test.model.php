@@ -46,6 +46,7 @@ require_once ('test.group.class.php');
 require_once ('test.group_data.class.php');
 require_once ('test.group_project.class.php');
 require_once ('test.patient.class.php');
+require_once ('test.project.class.php');
 require_once ('test.result_configuration.class.php');
 require_once ('test.result.class.php');
 

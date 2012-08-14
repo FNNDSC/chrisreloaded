@@ -41,11 +41,19 @@ require_once 'object.class.php';
 class Project extends Object {
   
   /**
-   * The lastname of this patient.
+   * The name of the project.
    *
    * @var string
    */
-  public $name = '';
+  public $name = null;
+  
+  /**
+   * Extra information about the project.
+   * Description, owner, creation date, etc.
+   *
+   * @var string
+   */
+  public $meta_information = null;
 }
 
 ?>
