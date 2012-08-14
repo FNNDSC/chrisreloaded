@@ -35,10 +35,10 @@ require_once 'object.class.php';
 
 /**
  *
- * The Group_Data class which describes the Group_Data entity of the database.
+ * The Group_Project class which describes the Group_Project entity of the database.
  *
  */
-class Group_Data extends Object {
+class Group_Project extends Object {
 
   /**
    * The group ID.
@@ -48,10 +48,10 @@ class Group_Data extends Object {
   public $group_id = -1;
   
   /**
-   * The data ID.
+   * The project ID.
    *
    * @var int
    */
-  public $data_id = -1;
+  public $project_id = -1;
 }
 ?>
