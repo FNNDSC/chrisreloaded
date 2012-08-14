@@ -25,41 +25,12 @@
  *                        dev@babyMRI.org
  *
  */
-
-// we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
-
-//define('CHRIS_CONFIG_DEBUG',true);
+define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
+require_once ('../config.inc.php');
+require_once 'pacs.class.php';
 
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once ('../../config.inc.php');
-// include the simpletest framework
-require_once (SIMPLETEST);
-
-// include all the tests
-require_once ('test.db.class.php');
-require_once ('test.mapper.class.php');
-require_once ('test.pacs.class.php');
-
-/**
- *
- * The test suite which includes all tests for the model classes.
- *
- */
-class TestController extends TestSuite {
-
-  function __construct() {
-
-    parent::__construct();
-
-    $this->add(new TestDbClass());
-    $this->add(new TestMapperClass());
-    $this->add(new TestPACSClass());
-
-  }
-
-}
+$pacs_query = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR']);
+echo json_encode($pacs_query->ping());
 ?>

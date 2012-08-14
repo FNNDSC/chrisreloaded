@@ -46,6 +46,13 @@ define('CHRIS_MODEL_FOLDER', joinPaths(CHRIS_WWWROOT,'model'));
 define('CHRIS_VIEW_FOLDER', joinPaths(CHRIS_WWWROOT,'view'));
 define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
 
+// PACS
+define('CHRIS_DCMTK', '/usr/bin/');
+define('CHRIS_INCOMINGDATA', '/chb/users/chris/incoming/');
+define('CHRIS_DCMRENAME', '/chb/users/nicolas.rannou/arch/scripts/dcm_rename');
+define('CHRIS_SESSIONPATH', '/chb/users/chris/files/');
+define('CHRIS_AETITLE', 'CHRIS');
+
 // TESTING
 define('SIMPLETEST', joinPaths(CHRIS_WWWROOT,'lib/simpletest/autorun.php'));
 

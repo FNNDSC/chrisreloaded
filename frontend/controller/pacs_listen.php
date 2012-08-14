@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -25,41 +26,15 @@
  *                        dev@babyMRI.org
  *
  */
-
 // we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
-
-//define('CHRIS_CONFIG_DEBUG',true);
-
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration
+$configurationPath = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config.inc.php';
+if(!defined('CHRIS_CONFIG_PARSED')) require_once($configurationPath);
 
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once ('../../config.inc.php');
-// include the simpletest framework
-require_once (SIMPLETEST);
-
-// include all the tests
-require_once ('test.db.class.php');
-require_once ('test.mapper.class.php');
-require_once ('test.pacs.class.php');
-
-/**
- *
- * The test suite which includes all tests for the model classes.
- *
- */
-class TestController extends TestSuite {
-
-  function __construct() {
-
-    parent::__construct();
-
-    $this->add(new TestDbClass());
-    $this->add(new TestMapperClass());
-    $this->add(new TestPACSClass());
-
-  }
-
-}
+// build full storescp command
+$processincoming = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php');
+$executeonreceive = '-xcr  \''.$processincoming.' -d ' . CHRIS_SESSIONPATH . ' -t #p -f #f -a #a -c #c\'';
+$command = '/usr/bin/storescp -id -aet ' . CHRIS_AETITLE . ' -od ' . CHRIS_INCOMINGDATA . ' -pm ' . $executeonreceive . ' -ss RX -tos 120';
+exec($command);
 ?>

@@ -1,0 +1,66 @@
+<div class="tabbable">
+ <!-- Only required for left/right tabs -->
+ <ul class="nav nav-tabs">
+  <li class="active"><a href="#tab1" data-toggle="tab">PACS
+    Search</a></li>
+  <li><a href="#tab2" data-toggle="tab">PACS Settings</a></li>
+ </ul>
+ <div class="tab-content">
+  <div class="tab-pane active" id="tab1">
+   <div>
+    Patient ID: <input id='PACS_MRN' type="text" value='4562009' />
+   </div>
+   <div>
+    Study Date: <input id='PACS_DAT' type="text" value='' />
+   </div>
+   <div id="pacsadvancedcontainer">
+    <input class='btn btn-primary pacsAdanced' type="button"
+     value="Advanced">
+    <div class="pacsadvanced">
+     <div>
+      Study Description: <input id='PACS_STU_DES' type="text" value='' />
+     </div>
+     <div>
+      Accession Number: <input id='PACS_ACC_NUM' type="text" value='' />
+     </div>
+     <div>
+      Study Modality: <input id='PACS_MOD' type="text" value='' />
+     </div>
+     <div>
+      Patient Name: <input id='PACS_NAM' type="text" value='' />
+     </div>
+    </div>
+   </div>
+
+   <input class='btn btn-primary pacsQuery' type="button" value="Query">
+   <input class='btn btn-primary pacsRetrieve' type="button"
+    value="Retrieve">
+   <!-- Results of the PACS pull -->
+   <div class="row-fluid">
+
+    <div id='pacscontainer' class="span12">
+     <div id="slideshow">
+      <div id="slidesContainer">
+       <div id='studylist' class="slide"></div>
+       <div id='serieslist' class="slide"></div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+  <div class="tab-pane" id="tab2">
+   <div>
+    AET: <input id='USER_AET' type="text" value='FNNDSC-CHRIS'>
+   </div>
+   <div>
+    Server IP/hotname: <input id='SERVER_IP' type="text"
+     value='134.174.12.21' />
+   </div>
+   <div>
+    Port: <input id='SERVER_POR' type="text" value='104' />
+   </div>
+   <input class='btn btn-primary pacsPing' type="button" value="Ping">
+   <div id='pacsping'></div>
+  </div>
+ </div>
+</div>

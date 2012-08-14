@@ -25,41 +25,30 @@
  *                        dev@babyMRI.org
  *
  */
-
-// we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
-
-//define('CHRIS_CONFIG_DEBUG',true);
+define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
+require_once ('../config.inc.php');
+require_once 'pacs.class.php';
 
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once ('../../config.inc.php');
-// include the simpletest framework
-require_once (SIMPLETEST);
+$pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 
-// include all the tests
-require_once ('test.db.class.php');
-require_once ('test.mapper.class.php');
-require_once ('test.pacs.class.php');
-
-/**
- *
- * The test suite which includes all tests for the model classes.
- *
- */
-class TestController extends TestSuite {
-
-  function __construct() {
-
-    parent::__construct();
-
-    $this->add(new TestDbClass());
-    $this->add(new TestMapperClass());
-    $this->add(new TestPACSClass());
-
-  }
-
+if($_POST['PACS_LEV'] == 'STUDY'){
+  $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
+  $pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
+  $pacs->addParameter('RetrieveAETitle', $_POST['USER_AET']);
+  $pacs->addParameter('ModalitiesInStudy', $_POST['PACS_MOD']);
+  $pacs->addParameter('StudyDescription', $_POST['PACS_STU_DES']);
+  $pacs->addParameter('PatientName', $_POST['PACS_NAM']);
+  $pacs->addParameter('PatientID', $_POST['PACS_MRN']);
+  $pacs->addParameter('PatientBirthDate', '');
+  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+  echo json_encode($pacs->moveStudy());
+}
+else{
+  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+  // SERIESInstanceUID shouldnt be empty...
+  $pacs->addParameter('SeriesInstanceUID', '');
+  echo json_encode($pacs->moveSeries());
 }
 ?>
