@@ -469,20 +469,7 @@ class PACS implements PACSInterface {
 
     $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
 
-    $result = PACS::_executeAndFormat($command);
-
-    $myFile = "/chb/tmp/pacs_process.txt";
-    $fh = fopen($myFile, 'w') or die("can't open file");
-    fwrite($fh, $command);
-    fclose($fh);
-
-    // parse results
-
-    // update database
-
-    // rename and move file to appropriate location
-    //$command = '/bin/mv '.$options['p'].'/'.$options['f'].' '.CHRIS_DATA.$options['f'];
-
+    return PACS::_executeAndFormat($command);
   }
 }
 ?>

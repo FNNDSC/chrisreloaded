@@ -33,7 +33,15 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 $confFile = dirname(__FILE__).'/../config.inc.php';
 if(!defined('CHRIS_CONFIG_PARSED')) require_once($confFile);
 
+// include the controller classes
+require_once 'db.class.php';
+require_once 'mapper.class.php';
 require_once 'pacs.class.php';
+
+// include the model classes
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
+
 
 // define command line arguments
 $shortopts = "";
@@ -43,8 +51,72 @@ $shortopts .= "a:"; // File name
 $shortopts .= "c:"; // Optional value
 
 $options = getopt($shortopts);
-var_dump($options);
+//var_dump($options);
 
 /* PACS::process($options['p'].'/'.$options['f']); */
-PACS::process('/chb/users/chris/tmp/RX_20120815_143408184/US.1.2.840.113619.2.256.896737926219.1336499244.3424');
+$result = PACS::process('/chb/users/chris/tmp/RX_20120815_143408184/US.1.2.840.113619.2.256.896737926219.1336499244.3424');
+
+$patient_chris_id = -1;
+$data_chris_id = -1;
+
+// parse results patient first
+// Does patient exist
+// Unique Name/Birthdate combination
+/* if (array_key_exists('PatientName',$result) && array_key_exists('PatientBirthdate',$result))
+ */
+if (array_key_exists('PatientName',$result))
+{
+  $patientMapper = new Mapper('Patient');
+
+  $namearray = explode('^', $result['PatientName'][0]);
+  print_r($namearray);
+  $lastname = $namearray[0];
+  $firstname = $namearray[1];
+  $patientMapper->filter('lastname = (?)',$lastname );
+  $patientMapper->filter('firstname = (?)',$firstname );
+
+  /*   $dob = $result['PatientBirthdate'][0];
+   $patientMapper->filter('dob = (?)',$dob ); */
+
+  $patientResult = $patientMapper->get();
+
+  if(count($patientResult) == 0)
+  {
+    // add the patient
+
+    // get its id
+    //$patient_chris_id = 1;
+  }
+  else {
+    // get patient id
+    //$patient_chris_id = $patientResult['patient']
+  }
+}
+else {
+  echo 'PatientName or PatientBirthdate not there';
+  return;
+}
+
+// Does Image exist: SOPInstanceUID
+if (array_key_exists('SOPInstanceUID',$result))
+{
+  $dataMapper = new Mapper('Data');
+  $value = $result['SOPInstanceUID'][0];
+  $dataMapper->filter('unique_id = (?)',$value );
+  $dataResult = $dataMapper->get();
+
+  if(count($dataResult) == 0)
+  {
+    // update data db with patient id
+
+    // update data id
+    //$data_chris_id
+  }
+}
+else {
+  echo 'SOPInstanceUID not there';
+  return;
+}
+// rename and move file to appropriate location
+//$command = '/bin/mv '.$options['p'].'/'.$options['f'].' '.CHRIS_DATA.$options['f'];
 ?>
