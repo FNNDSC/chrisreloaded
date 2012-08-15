@@ -49,7 +49,7 @@ interface PACSInterface
   // method to the retrieve series
   public function moveSeries();
   // method to process result received by the listener
-  public function process();
+  static public function process($filename);
 }
 
 /**
@@ -288,7 +288,7 @@ class PACS implements PACSInterface {
    * @param[in|out] int  $i counter to keep track of line to be parsed.
    *
    */
-  private function _parseEOL(&$array, &$lines, &$i)
+  static private function _parseEOL(&$array, &$lines, &$i)
   {
     //check for error in result (if line starts with E)
     if(preg_match("/^E/", $lines[$i])){
@@ -299,13 +299,13 @@ class PACS implements PACSInterface {
     // increment counter by 4 to go to the result data
     if($lines[$i] == 'W: ---------------------------'){
       // go to data
-      $i += 4;
+      $i += 5;
       return;
     }
 
     // end of result data
     // increment counter by 2 to go to the next result line
-    if($lines[$i+1] == 'W: '){
+    if($lines[$i] == 'W: '){
       // go to next result data
       $i += 2;
       return;
@@ -314,11 +314,11 @@ class PACS implements PACSInterface {
     // process result line
 
     // 1- get field (last word in line)
-    $split_array = explode(' ', $lines[++$i]);
+    $split_array = explode(' ', $lines[$i]);
     $split_num = count($split_array);
     $field = $split_array[$split_num-1];
     // add field to results array
-    $this->_addKey($array, $field);
+    PACS::_addKey($array, $field);
 
     // 2- get value
     // value should be formated as follow
@@ -333,6 +333,8 @@ class PACS implements PACSInterface {
       $value = split('\]', $tmpsplit[1]);
       $array[$field][] =  $value[0];
     }
+
+    ++$i;
   }
 
   /**
@@ -343,7 +345,7 @@ class PACS implements PACSInterface {
    * @param[in|out] string $jsonarray array containing well formated output.
    *
    */
-  private function _addKey(&$output, &$key)
+  static private function _addKey(&$output, &$key)
   {
     if (!array_key_exists($key,$output))
     {
@@ -361,7 +363,7 @@ class PACS implements PACSInterface {
    * returns null is nothing was found for given command parmeters.
    *
    */
-  private function _executeAndFormat(&$command)
+  static private function _executeAndFormat(&$command)
   {
     // execute query
     $command_output = shell_exec($command);
@@ -374,7 +376,7 @@ class PACS implements PACSInterface {
     $output = Array();
 
     while ($i < $count) {
-      $this->_parseEOL($output, $lines, $i);
+      PACS::_parseEOL($output, $lines, $i);
     }
 
     // return null if array is enpty (prolly a wrong parameter)
@@ -454,8 +456,33 @@ class PACS implements PACSInterface {
   }
 
   // process data once something has been received by the listener
-  public function process(){
-    return "PROCESS CALLED";
+  static public function process($filename){
+    // Image information
+    $requiered_fields = '+P SOPInstanceUID';
+    $requiered_fields .= ' +P ProtocolName';
+    $requiered_fields .= ' +P ContentTime';
+    // Patient information
+    $requiered_fields .= ' +P PatientName';
+    $requiered_fields .= ' +P PatientBirthdate';
+    $requiered_fields .= ' +P PatientSex';
+    $requiered_fields .= ' +P PatientID';
+
+    $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
+
+    $result = PACS::_executeAndFormat($command);
+
+    $myFile = "/chb/tmp/pacs_process.txt";
+    $fh = fopen($myFile, 'w') or die("can't open file");
+    fwrite($fh, $command);
+    fclose($fh);
+
+    // parse results
+
+    // update database
+
+    // rename and move file to appropriate location
+    //$command = '/bin/mv '.$options['p'].'/'.$options['f'].' '.CHRIS_DATA.$options['f'];
+
   }
 }
 ?>

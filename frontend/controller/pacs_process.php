@@ -33,6 +33,8 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 $confFile = dirname(__FILE__).'/../config.inc.php';
 if(!defined('CHRIS_CONFIG_PARSED')) require_once($confFile);
 
+require_once 'pacs.class.php';
+
 // define command line arguments
 $shortopts = "";
 $shortopts .= "p:"; // Full path
@@ -43,17 +45,6 @@ $shortopts .= "c:"; // Optional value
 $options = getopt($shortopts);
 var_dump($options);
 
-$command = '/bin/mv '.$options['p'].'/'.$options['f'].' '.CHRIS_DATA.$options['f'];
-
-$output = shell_exec ( $command );
-
-$myFile = "/chb/tmp/pacs_process.txt";
-$fh = fopen($myFile, 'w') or die("can't open file");
-$command .= '\n';
-fwrite($fh, $command);
-fclose($fh);
-
-// pacs->process($filename, $tmp, $data);
-
-//dcmdump +C +P PatientID +P StudyID +P PatientSex +P PatientAge +P Modality +P Manufacturer +P InstitutionName +P InstitutionAddress +P PatientName +P PatientBirthDate MR.1.2.124.113532.132.183.50.218.20081216.82750.18430913
+/* PACS::process($options['p'].'/'.$options['f']); */
+PACS::process('/chb/users/chris/tmp/RX_20120815_143408184/US.1.2.840.113619.2.256.896737926219.1336499244.3424');
 ?>
