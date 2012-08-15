@@ -36,33 +36,14 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
 
 if (!defined('CHRIS_CONFIG_PARSED'))
   require_once ('../../config.inc.php');
-// include the simpletest framework
-require_once (SIMPLETEST_TEMPLATE);
-require_once (SIMPLETEST_SIMPLETEST);
-SimpleTest::prefer(new ShowPasses());
-require_once (SIMPLETEST_AUTORUN);
+
+// include the simpletest chris framework
+require_once (SIMPLETEST_CHRIS);
+SimpleTest_Chris::setPreference();
 
 // include all the tests
 require_once ('test.db.class.php');
 require_once ('test.mapper.class.php');
 require_once ('test.pacs.class.php');
 
-/**
- *
- * The test suite which includes all tests for the model classes.
- *
- */
-/* class TestController extends TestSuite {
-
-  function __construct() {
-
-    parent::__construct();
-
-    $this->add(new TestDbClass());
-    $this->add(new TestMapperClass());
-    $this->add(new TestPACSClass());
-
-  }
-
-} */
 ?>

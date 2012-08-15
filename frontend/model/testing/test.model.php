@@ -36,11 +36,9 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
 
 if (!defined('CHRIS_CONFIG_PARSED'))
   require_once ('../../config.inc.php');
-// include the simpletest framework
-require_once (SIMPLETEST_TEMPLATE);
-require_once (SIMPLETEST_SIMPLETEST);
-SimpleTest::prefer(new ShowPasses());
-require_once (SIMPLETEST_AUTORUN);
+// include the simpletest chris framework
+require_once (SIMPLETEST_CHRIS);
+SimpleTest_Chris::setPreference();
 
 // include all the tests
 // data related models
@@ -64,38 +62,4 @@ require_once ('test.user_result.class.php');
 require_once ('test.patient.class.php');
 require_once ('test.project.class.php');
 
-/**
- *
- * The test suite which includes all tests for the model classes.
- *
- */
-/* class TestModel extends TestSuite {
-
-  function __construct() {
-
-    parent::__construct();
-    // data related models
-    $this -> add(new TestDataClass());
-    $this -> add(new TestData_ProjectClass());
-    // group related models
-    $this -> add(new TestGroupClass());
-    $this -> add(new TestGroup_DataClass());
-    $this -> add(new TestGroup_ProjectClass());
-    // result related models
-    $this -> add(new TestResultClass());
-    $this -> add(new TestResult_DataClass());
-    $this -> add(new TestResult_ProjectClass());
-    // user related models
-    $this -> add(new TestUserClass());
-    $this -> add(new TestUser_DataClass());
-    $this -> add(new TestUser_GroupClass());
-    $this -> add(new TestUser_ProjectClass());
-    $this -> add(new TestUser_ResultClass());
-    // other models
-    $this -> add(new TestPatientClass());
-    $this -> add(new TestProjectClass());
-
-  } 
-
-}*/
 ?>

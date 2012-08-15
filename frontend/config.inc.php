@@ -54,7 +54,9 @@ define('CHRIS_SESSIONPATH', '/chb/users/chris/files/');
 define('CHRIS_AETITLE', 'CHRIS');
 
 // TESTING
-define('SIMPLETEST_TEMPLATE', joinPaths(CHRIS_WWWROOT,'lib/show_passes.php'));
+define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
+define('SIMPLETEST_HTML_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/html_chris.php'));
+define('SIMPLETEST_XML_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/xml_chris.php'));
 define('SIMPLETEST_SIMPLETEST', joinPaths(CHRIS_WWWROOT,'lib/simpletest/simpletest.php'));
 define('SIMPLETEST_AUTORUN', joinPaths(CHRIS_WWWROOT,'lib/simpletest/autorun.php'));
 

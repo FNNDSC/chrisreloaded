@@ -1,7 +1,11 @@
 <?php
-require_once(dirname(__FILE__) . '/simpletest/reporter.php');
+require_once(dirname(__FILE__) . '/../lib/simpletest/reporter.php');
 
-class ShowPasses extends HtmlReporter {
+/*
+ * based on http://www.simpletest.org/
+ */
+
+class Html_Chris extends HtmlReporter {
   function paintPass($message) {
     parent::paintPass($message);
     print "<span class=\"pass\">Pass</span>: ";
