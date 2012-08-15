@@ -28,13 +28,21 @@
  */
 // we define a valid entry point
 if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
-// include the configuration
-$configurationPath = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'config.inc.php';
-if(!defined('CHRIS_CONFIG_PARSED')) require_once($configurationPath);
+// include the configuration file
+// requires the full path
+$confFile = dirname(__FILE__).'/../config.inc.php';
+if(!defined('CHRIS_CONFIG_PARSED')) require_once($confFile);
 
-// build full storescp command
-$processincoming = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php');
-$executeonreceive = '-xcr  \''.$processincoming.' -d ' . CHRIS_SESSIONPATH . ' -t #p -f #f -a #a -c #c\'';
-$command = '/usr/bin/storescp -id -aet ' . CHRIS_AETITLE . ' -od ' . CHRIS_INCOMINGDATA . ' -pm ' . $executeonreceive . ' -ss RX -tos 120';
-exec($command);
+// build the storescp command
+// storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"
+// then each incoming data is processed by $process_command
+$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php -p #p -f #f -a #a -c #c ');
+$listen_command = '/usr/bin/storescp -id -od ' . CHRIS_TMP . ' -pm -xcr  \'' . $process_command . '\' -ss RX -tos 120';
+exec($listen_command);
+
+$myFile = "/chb/tmp/pacs_listen.txt";
+$fh = fopen($myFile, 'w') or die("can't open file");
+$listen_command .= '\n';
+fwrite($fh, $listen_command);
+fclose($fh);
 ?>

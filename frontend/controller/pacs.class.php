@@ -84,7 +84,7 @@ class PACS implements PACSInterface {
   /**
    * Parameters to build the query command.
    *
-   * @var string $server_port
+   * @var string $command_param
    */
   private $command_param = Array();
 
