@@ -67,13 +67,7 @@ $data_chris_id = -1;
 if (array_key_exists('PatientName',$result))
 {
   $patientMapper = new Mapper('Patient');
-
-  $namearray = explode('^', $result['PatientName'][0]);
-  print_r($namearray);
-  $lastname = $namearray[0];
-  $firstname = $namearray[1];
-  $patientMapper->filter('lastname = (?)',$lastname );
-  $patientMapper->filter('firstname = (?)',$firstname );
+  $patientMapper->filter('name = (?)',$result['PatientName'][0] );
 
   /*   $dob = $result['PatientBirthdate'][0];
    $patientMapper->filter('dob = (?)',$dob ); */
@@ -82,7 +76,9 @@ if (array_key_exists('PatientName',$result))
 
   if(count($patientResult) == 0)
   {
-    // add the patient
+    // create patient model
+    
+    // add the patient model
 
     // get its id
     //$patient_chris_id = 1;
