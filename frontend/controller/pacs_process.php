@@ -74,19 +74,44 @@ if (array_key_exists('PatientName',$result))
 
   $patientResult = $patientMapper->get();
 
-  if(count($patientResult) == 0)
+  if(count($patientResult['Patient']) == 0)
   {
     // create patient model
-    
-    // add the patient model
+    $patientObject = new Patient();
+    $patientObject->name = $result['PatientName'][0];
+    $patientObject->dob = '0000-00-00';
+    $patientObject->sex = $result['PatientSex'][0];
+    $patientObject->patient_id = $result['PatientID'][0].';';
 
-    // get its id
-    //$patient_chris_id = 1;
+    // add the patient model and get its id
+    $patient_chris_id = Mapper::add($patientObject);
   }
   else {
     // get patient id
-    //$patient_chris_id = $patientResult['patient']
+    $patient_chris_id = $patientResult['Patient'][0]->id;
+
+    // update MRN field if MRN provided
+    if(array_key_exists('PatientID',$result)){
+      $patient_mrn = $patientResult['Patient'][0]->patient_id;
+      $list_patient_mrn = explode(';', $patient_mrn);
+      // and if not already there...!
+      if(!in_array($result['PatientID'][0], $list_patient_mrn)){
+        // create patient model
+        $patientObject = new Patient();
+        $patientObject->name = $patientResult['Patient'][0]->name;
+        $patientObject->dob = $patientResult['Patient'][0]->dob;
+        $patientObject->sex = $patientResult['Patient'][0]->sex;
+        // previous MRN list
+        $patientObject->patient_id = $patientResult['Patient'][0]->patient_id;
+        // add new MRN
+        $patientObject->patient_id .= $result['PatientID'][0].';';
+
+        Mapper::update($patientObject, $patient_chris_id);
+      }
+    }
   }
+
+  echo $patient_chris_id;
 }
 else {
   echo 'PatientName or PatientBirthdate not there';
