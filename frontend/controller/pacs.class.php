@@ -153,8 +153,21 @@ class PACS implements PACSInterface {
    *
    * @snippet test.pacs.class.php testAddParameter()
    */
-  public function addParameter($name, $value){
-    $this->command_param[$name] = $value;
+  public function addParameter($name, $value, $force = false){
+    if (!array_key_exists($name,$this->command_param) || $force)
+    {
+      $this->command_param[$name] = $value;
+    }
+  }
+
+  /**
+   * Clean all the parameters from the command to be executed.
+   *
+   * @snippet test.pacs.class.php testCleanParameter()
+   */
+  public function cleanParameter(){
+    unset($this->command_param);
+    $this->command_param = Array();
   }
 
   /**
@@ -205,6 +218,8 @@ class PACS implements PACSInterface {
       $this->addParameter('QueryRetrieveLevel', 'STUDY');
       $this->addParameter('StudyInstanceUID', '');
 
+      PACS::_parseParam($this->command_param, $command);
+
       $this->_finishCommand($command);
 
       // execute the command, format it into a nice json and return it
@@ -236,7 +251,11 @@ class PACS implements PACSInterface {
 
       // add base parameters
       $this->addParameter('QueryRetrieveLevel', 'SERIES');
+      $this->addParameter('StudyInstanceUID', '');
       $this->addParameter('SeriesInstanceUID', '');
+
+
+      PACS::_parseParam($this->command_param, $command);
 
       $this->_finishCommand($command);
 
@@ -248,7 +267,79 @@ class PACS implements PACSInterface {
   // method to the query the PACS for a series
   // needs to be more advance to get protocol name with is at IMAGE level
   public function queryImage(){
-    return "I am not implemented";
+    if ($this->user_aet != null)
+    {
+      // build the command
+      // dcmtk findcsu binaries
+      // -xi: proposed transmission transfer syntaxes:
+      // propose implicit VR little endian TS only
+      $command = $this->findscu.' -xi';
+      $command .= ' -S';
+      $command .= ' --aetitle '.$this->user_aet;
+
+      // add base parameters
+      $this->addParameter('QueryRetrieveLevel', 'IMAGE');
+      $this->addParameter('StudyInstanceUID', '');
+      $this->addParameter('SeriesInstanceUID', '');
+
+      PACS::_parseParam($this->command_param, $command);
+
+      $this->_finishCommand($command);
+
+      return $this->_executeAndFormat($command);
+    }
+    return null;
+  }
+
+  public function queryAll($studyParameters, $seriesParameters, $imageParameters){
+
+    $result = Array();
+
+    // append query parameters and values
+    foreach( $studyParameters as $key => $value)
+    {
+      echo $key.'-'.$value;
+      echo '<br/>';
+      $this->addParameter($key, $value);
+    }
+    $resultquery = $this->queryStudy();
+
+    // loop though studies
+    if (array_key_exists('StudyInstanceUID',$resultquery))
+    {
+      foreach ($resultquery['StudyInstanceUID'] as $key => $value){
+        $this->cleanParameter();
+        foreach( $seriesParameters as $key => $value)
+        {
+          $this->addParameter($key, $value);
+        }
+        $this->addParameter('StudyInstanceUID', $value);
+
+        $resultseries = $this->querySeries();
+
+        // loop though series
+        if (array_key_exists('StudyInstanceUID',$resultseries))
+        {
+          $j = 0;
+          foreach ($resultseries['StudyInstanceUID'] as $key => $value){
+            $this->cleanParameter();
+            foreach( $imageParameters as $key => $value)
+            {
+              $this->addParameter($key, $value);
+            }
+            $this->addParameter('StudyInstanceUID', $resultseries['StudyInstanceUID'][$j]);
+            $this->addParameter('SeriesInstanceUID', $resultseries['SeriesInstanceUID'][$j]);
+            $resultimage = $this->queryImage();
+
+            print_r($resultimage);
+            echo '<br/>';
+          }
+          ++$j;
+        }
+      }
+    }
+
+    return $result;
   }
 
 
@@ -260,8 +351,23 @@ class PACS implements PACSInterface {
    */
   private function _finishCommand(&$command)
   {
+    // add host and port
+    $command .= ' '.$this->server_ip;
+    $command .= ' '.$this->server_port;
+    // redirect stderr to stdout since the useful information is inside stderr
+    $command .= ' 2>&1';
+  }
+
+  /**
+   * Convenience method to parse parameters and add it to the command.
+   *
+   * @param[in] array $param array containing parameters to be parsed.
+   * @param[in|out] string $command command to update.
+   *
+   */
+  static private function _parseParam(&$param, &$command){
     // append query parameters and values
-    foreach($this->command_param as $key => $value)
+    foreach( $param as $key => $value)
     {
       //if value provided
       if($value){
@@ -272,12 +378,6 @@ class PACS implements PACSInterface {
         $command .= ' -k '.$key;
       }
     }
-
-    // add host and port
-    $command .= ' '.$this->server_ip;
-    $command .= ' '.$this->server_port;
-    // redirect stderr to stdout since the useful information is inside stderr
-    $command .= ' 2>&1';
   }
 
   /**
@@ -307,7 +407,7 @@ class PACS implements PACSInterface {
     // increment counter by 2 to go to the next result line
     if($lines[$i] == 'W: '){
       // go to next result data
-      $i += 2;
+      ++$i;
       return;
     }
 
