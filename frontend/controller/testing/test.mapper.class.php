@@ -68,8 +68,8 @@ class TestMapperClass extends UnitTestCase {
     // only CONDITION
     $patientMapper2 = new Mapper('Patient');
     // concat required for prepared statement to work with special characters
-    $condition = 'firstname LIKE CONCAT("%",?,"%")';
-    $patientMapper2->filter($condition, 'Nicolas');
+    $condition = 'name LIKE CONCAT("%",?,"%")';
+    $patientMapper2->filter($condition, 'Rannou');
     $patientResult2 = $patientMapper2->get();
 
     // should return 1 patient
@@ -79,13 +79,13 @@ class TestMapperClass extends UnitTestCase {
     $patientMapper3 = new Mapper('Patient');
     $patientMapper3->filter('', '', 0, 'OR');
     // concat required for prepared statement to work with special characters
-    $condition1 = 'firstname LIKE CONCAT("%",?,"%")';
+    $condition1 = 'name LIKE CONCAT("%",?,"%")';
     $patientMapper3->filter($condition1, 'Nicolas', 1);
     // empty prepared statement
-    $condition2 = 'lastname LIKE \'%Rannou%\'';
+    $condition2 = 'sex LIKE \'%M%\'';
     $patientMapper3->filter($condition2, '', 1, 'AND');
     // concat required for prepared statement to work with special characters
-    $condition3 = 'lastname LIKE CONCAT("%",?,"%")';
+    $condition3 = 'name LIKE CONCAT("%",?,"%")';
     $patientMapper3->filter($condition3, 'Haehn', 2);
     $patientResult3 = $patientMapper3->get();
 
@@ -165,16 +165,14 @@ class TestMapperClass extends UnitTestCase {
     // get a patient by id
     $patientObject = new Patient();
     $patientObject->id = 2;
-    $patientObject->lastname = 'Rannou';
-    $patientObject->firstname = 'Nicolas';
+    $patientObject->name = 'Rannou';
     $patientObject->dob = '1987-03-27';
     $patientObject->sex = 'M';
     $patientObject->patient_id = 'CH156525;';
 
     $patientObject2 = new Patient();
     $patientObject2->id = 2;
-    $patientObject2->lastname = 'Rannou';
-    $patientObject2->firstname = 'Nicolas';
+    $patientObject2->name = 'Rannou';
     $patientObject2->dob = '1987-03-27';
     $patientObject2->sex = 'M';
     $patientObject2->patient_id = 'CH156525;';
@@ -221,8 +219,7 @@ class TestMapperClass extends UnitTestCase {
   public function testAdd() {
     // get a patient by id
     $patientObject = new Patient();
-    $patientObject->lastname = 'PLN0';
-    $patientObject->firstname = 'PFN0';
+    $patientObject->name = 'PLN0';
     $patientObject->dob = '2000-01-01';
     $patientObject->sex = 'M';
     $patientObject->patient_id = 'PID0;';
@@ -251,8 +248,7 @@ class TestMapperClass extends UnitTestCase {
   public function testDelete() {
     // get a patient by id
     $patientObject = new Patient();
-    $patientObject->lastname = 'PLN1';
-    $patientObject->firstname = 'PFN1';
+    $patientObject->name = 'PLN1';
     $patientObject->dob = '2001-01-01';
     $patientObject->sex = 'F';
     $patientObject->patient_id = 'PID1;';
@@ -275,8 +271,7 @@ class TestMapperClass extends UnitTestCase {
   public function testUpdate() {
     // get a patient by id
     $patientObject = new Patient();
-    $patientObject->lastname = 'PLN2';
-    $patientObject->firstname = 'PFN2';
+    $patientObject->name = 'PLN2';
     $patientObject->dob = '2002-01-01';
     $patientObject->sex = 'F';
     $patientObject->patient_id = 'PID2;';
@@ -284,7 +279,7 @@ class TestMapperClass extends UnitTestCase {
     $patientID = Mapper::add($patientObject);
 
     // Modify one field
-    $patientObject->lastname = 'PLN3';
+    $patientObject->name = 'PLN3';
     // Update database and get object
     Mapper::update($patientObject, $patientID);
     $patientResult = Mapper::getStatic('Patient', $patientID);
@@ -301,7 +296,7 @@ class TestMapperClass extends UnitTestCase {
     $this->assertTrue($patientID == $existingID);
     
     //update object that does not exist
-    $patientObject->lastname = 'PLN4';
+    $patientObject->name = 'PLN4';
     $existingID = Mapper::update($patientObject, -1);
     
     // update should return 0 if object does not exist

@@ -6,7 +6,7 @@ require_once(dirname(__FILE__) . '/../lib/simpletest/reporter.php');
  */
 
 class Html_Chris extends HtmlReporter {
-  function paintPass($message) {
+/*   function paintPass($message) {
     parent::paintPass($message);
     print "<span class=\"pass\">Pass</span>: ";
     $breadcrumb = $this->getTestList();
@@ -17,6 +17,6 @@ class Html_Chris extends HtmlReporter {
 
   protected function getCss() {
     return parent::getCss() . ' .pass { color: green; }';
-  }
+  } */
 }
 ?>
