@@ -222,10 +222,12 @@ class TestPACSClass extends UnitTestCase {
     $study_parameter['PatientID'] = '4098178';
 
     $series_parameter = Array();
+    $series_parameter['NumberOfSeriesRelatedInstances'] = '';
 
     $image_parameter = Array();
     $image_parameter['DeviceSerialNumber']= '35235';
-    $image_parameter['ProtocolName']= 'MPRAGE';
+    $image_parameter['ProtocolName']= '"*MPRAGE*"';
+    //$image_parameter['SOPInstanceUID']= '';
 
     $result_all = $pacs_all->queryAll($study_parameter, $series_parameter, $image_parameter);
 

@@ -259,6 +259,9 @@ class PACS implements PACSInterface {
 
       $this->_finishCommand($command);
 
+      echo $command;
+      echo '<br/>';
+
       return $this->_executeAndFormat($command);
     }
     return null;
@@ -286,6 +289,9 @@ class PACS implements PACSInterface {
 
       $this->_finishCommand($command);
 
+      echo $command;
+      echo '<br/>';
+
       return $this->_executeAndFormat($command);
     }
     return null;
@@ -298,8 +304,6 @@ class PACS implements PACSInterface {
     // append query parameters and values
     foreach( $studyParameters as $key => $value)
     {
-      echo $key.'-'.$value;
-      echo '<br/>';
       $this->addParameter($key, $value);
     }
     $resultquery = $this->queryStudy();
@@ -307,36 +311,43 @@ class PACS implements PACSInterface {
     // loop though studies
     if (array_key_exists('StudyInstanceUID',$resultquery))
     {
-      foreach ($resultquery['StudyInstanceUID'] as $key => $value){
+      foreach ($resultquery['StudyInstanceUID'] as $key => $studyvalue){
+        echo 'SERIES';
+        echo '<br/>';
         $this->cleanParameter();
         foreach( $seriesParameters as $key => $value)
         {
           $this->addParameter($key, $value);
         }
-        $this->addParameter('StudyInstanceUID', $value);
+        $this->addParameter('StudyInstanceUID', $studyvalue);
 
         $resultseries = $this->querySeries();
 
-        // loop though series
+        // loop though images
         if (array_key_exists('StudyInstanceUID',$resultseries))
         {
           $j = 0;
-          foreach ($resultseries['StudyInstanceUID'] as $key => $value){
+          foreach ($resultseries['StudyInstanceUID'] as $key => $seriesvalue){
+            echo 'IMAGE';
+            echo '<br/>';
             $this->cleanParameter();
             foreach( $imageParameters as $key => $value)
             {
               $this->addParameter($key, $value);
             }
-            $this->addParameter('StudyInstanceUID', $resultseries['StudyInstanceUID'][$j]);
+            $this->addParameter('StudyInstanceUID', $seriesvalue);
             $this->addParameter('SeriesInstanceUID', $resultseries['SeriesInstanceUID'][$j]);
-            $resultimage = $this->queryImage();
+            $result[] = $this->queryImage();
 
-            print_r($resultimage);
-            echo '<br/>';
           }
           ++$j;
+          echo '<br/>';
         }
+        echo '<br/>';
       }
+      echo '<br/>';
+      echo '<br/>';
+      echo '<br/>';
     }
 
     return $result;
