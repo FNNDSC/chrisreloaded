@@ -222,6 +222,9 @@ class PACS implements PACSInterface {
 
       $this->_finishCommand($command);
 
+      echo $command;
+      echo '<br/>';
+
       // execute the command, format it into a nice json and return it
       return $this->_executeAndFormat($command);
     }
@@ -309,7 +312,7 @@ class PACS implements PACSInterface {
     $resultquery = $this->queryStudy();
 
     // loop though studies
-    if (array_key_exists('StudyInstanceUID',$resultquery))
+    if ($resultquery != null && array_key_exists('StudyInstanceUID',$resultquery))
     {
       foreach ($resultquery['StudyInstanceUID'] as $key => $studyvalue){
         echo 'SERIES';
@@ -324,7 +327,7 @@ class PACS implements PACSInterface {
         $resultseries = $this->querySeries();
 
         // loop though images
-        if (array_key_exists('StudyInstanceUID',$resultseries))
+        if ($resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
         {
           $j = 0;
           foreach ($resultseries['StudyInstanceUID'] as $key => $seriesvalue){
