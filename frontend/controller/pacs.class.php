@@ -340,7 +340,18 @@ class PACS implements PACSInterface {
             }
             $this->addParameter('StudyInstanceUID', $seriesvalue);
             $this->addParameter('SeriesInstanceUID', $resultseries['SeriesInstanceUID'][$j]);
-            $result[] = $this->queryImage();
+            $tmpresult = $this->queryImage();
+
+            // if no previous results, copy the array
+            if(empty($result)){
+              $result = $tmpresult;
+            }
+            // if previous results, merge arrays
+            else{
+              foreach ($tmpresult as $key => $value){
+                array_merge($result[$key], $tmpresult[$key]);
+              }
+            }
 
           }
           ++$j;
