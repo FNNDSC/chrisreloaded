@@ -225,6 +225,7 @@ class TestPACSClass extends UnitTestCase {
     $series_parameter['NumberOfSeriesRelatedInstances'] = '';
 
     $image_parameter = Array();
+    $image_parameter['NumberOfSeriesRelatedInstances'] = '';
     $image_parameter['DeviceSerialNumber']= '';
     $image_parameter['ProtocolName']= '';
     //$image_parameter['SOPInstanceUID']= '';

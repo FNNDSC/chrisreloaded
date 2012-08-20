@@ -349,7 +349,7 @@ class PACS implements PACSInterface {
             // if previous results, merge arrays
             else{
               foreach ($tmpresult as $key => $value){
-                array_merge($result[$key], $tmpresult[$key]);
+                $result[$key] = array_merge($result[$key], $tmpresult[$key]);
               }
             }
 
