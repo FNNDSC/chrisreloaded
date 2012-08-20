@@ -54,9 +54,9 @@ $options = getopt($shortopts);
 //var_dump($options);
 
 /* PACS::process($options['p'].'/'.$options['f']); */
-$p = $options['p'];
-$f = $options['f'];
-/* $p = '/chb/users/chris/tmp/RX_20120815_143408184'; //$options['p']
+ $p = $options['p'];
+$f = $options['f']; /*
+ $p = '/chb/users/chris/tmp/RX_20120815_143408184'; //$options['p']
  $f = 'US.1.2.840.113619.2.256.896737926219.1336499244.3424'; //$options['f'] */
 $tmpfile = $p.'/'.$f;
 
@@ -65,7 +65,7 @@ echo '<br/>';
 $patient_chris_id = -1;
 $data_chris_id = -1;
 $image_chris_id = -1;
-$protocol_name = '';
+$protocol_name = 'NoProtocolName';
 
 // parse results patient first
 // Does patient exist
@@ -151,9 +151,10 @@ if (array_key_exists('SeriesInstanceUID',$result))
     $dataObject = new Data();
     $dataObject->patient_id = $patient_chris_id;
     $dataObject->unique_id = $result['SeriesInstanceUID'][0];
+    // remove potential white spaces
     if(array_key_exists('ProtocolName',$result))
     {
-      $protocol_name = $result['ProtocolName'][0];
+      $protocol_name = str_replace (' ', '_', $result['ProtocolName'][0]);
     }
     $dataObject->name = $protocol_name;
     $dataObject->time = $result['ContentTime'][0];
