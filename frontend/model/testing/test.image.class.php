@@ -27,40 +27,29 @@
  */
 
 // we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
+if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
 
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once ('../../config.inc.php');
 // include the simpletest chris framework
 require_once (SIMPLETEST_CHRIS);
 SimpleTest_Chris::setPreference();
 
-// include all the tests
-// data related models
-require_once ('test.data.class.php');
-require_once ('test.data_project.class.php');
-require_once ('test.image.class.php');
-// group related models
-require_once ('test.group.class.php');
-require_once ('test.group_data.class.php');
-require_once ('test.group_project.class.php');
-// result related models
-require_once ('test.result.class.php');
-require_once ('test.result_data.class.php');
-require_once ('test.result_project.class.php');
-// user related models
-require_once ('test.user.class.php');
-require_once ('test.user_data.class.php');
-require_once ('test.user_group.class.php');
-require_once ('test.user_project.class.php');
-require_once ('test.user_result.class.php');
-//other models
-require_once ('test.patient.class.php');
-require_once ('test.project.class.php');
+// include the db class
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
+
+// include the test object class since we derive from that
+require_once('test.object.class.php');
+
+// include the user class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'image.class.php'));
+
+class TestImageClass extends TestObjectClass {
+
+
+}
 
 ?>

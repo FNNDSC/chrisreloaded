@@ -219,7 +219,7 @@ class TestPACSClass extends UnitTestCase {
     $pacs_all = new PACS($server_ip, $server_port, $user_aetitle);
 
     $study_parameter = Array();
-    $study_parameter['PatientID'] = '2006630';
+    $study_parameter['PatientID'] = '2199064';
 
     $series_parameter = Array();
     $series_parameter['NumberOfSeriesRelatedInstances'] = '';
