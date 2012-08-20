@@ -54,10 +54,15 @@ $options = getopt($shortopts);
 //var_dump($options);
 
 /* PACS::process($options['p'].'/'.$options['f']); */
-$result = PACS::process('/chb/users/chris/tmp/RX_20120815_143408184/US.1.2.840.113619.2.256.896737926219.1336499244.3424');
+$p = '/chb/users/chris/tmp/RX_20120815_143408184'; //$options['p']
+$f = 'US.1.2.840.113619.2.256.896737926219.1336499244.3424'; //$options['f']
+$tmpfile = $p.'/'.$f;
 
+$result = PACS::process($tmpfile);
+echo '<br/>';
 $patient_chris_id = -1;
 $data_chris_id = -1;
+$image_chris_id = -1;
 
 // parse results patient first
 // Does patient exist
@@ -76,6 +81,8 @@ if (array_key_exists('PatientName',$result))
 
   if(count($patientResult['Patient']) == 0)
   {
+    echo 'Patient NOT in DB';
+    echo '<br/>';
     // create patient model
     $patientObject = new Patient();
     $patientObject->name = $result['PatientName'][0];
@@ -87,6 +94,8 @@ if (array_key_exists('PatientName',$result))
     $patient_chris_id = Mapper::add($patientObject);
   }
   else {
+    echo 'Patient ALREADY in DB';
+    echo '<br/>';
     // get patient id
     $patient_chris_id = $patientResult['Patient'][0]->id;
 
@@ -112,32 +121,94 @@ if (array_key_exists('PatientName',$result))
   }
 
   echo $patient_chris_id;
+  echo '<br/>';
 }
 else {
   echo 'PatientName or PatientBirthdate not there';
+  echo '<br/>';
   return;
 }
 
 // Does Image exist: SOPInstanceUID
-if (array_key_exists('SOPInstanceUID',$result))
+if (array_key_exists('SeriesInstanceUID',$result))
 {
+  // does data (series) exist??
   $dataMapper = new Mapper('Data');
-  $value = $result['SOPInstanceUID'][0];
+  $value = $result['SeriesInstanceUID'][0];
   $dataMapper->filter('unique_id = (?)',$value );
   $dataResult = $dataMapper->get();
 
-  if(count($dataResult) == 0)
+  // if doesnt exist, create data
+  if(count($dataResult['Data']) == 0)
   {
-    // update data db with patient id
+    echo 'DATA NOT IN DB ';
+    echo '<br/>';
+    print_r($result);
+    // create data model
+    $dataObject = new Data();
+    $dataObject->patient_id = $patient_chris_id;
+    $dataObject->unique_id = $result['SeriesInstanceUID'][0];
+    if(array_key_exists('ProtocolName',$result))
+    {
+      $dataObject->name = $result['ProtocolName'][0];
+    }
+    else{
+      $dataObject->name = 'NoProtocolName';
+    }
+    $dataObject->time = $result['ContentTime'][0];
+    $dataObject->meta_information = '';
 
-    // update data id
-    //$data_chris_id
+    // add the data model and get its id
+    $data_chris_id = Mapper::add($dataObject);
   }
+  // else get data id
+  else{
+    echo 'DATA ALREADY IN DB ';
+    echo '<br/>';
+    $data_chris_id = $dataResult['Data'][0]->id;
+  }
+  echo $data_chris_id;
+  echo '<br/>';
+
 }
 else {
-  echo 'SOPInstanceUID not there';
+  echo 'SOPInstanceUID or SeriesInstanceUID not there';
+  echo '<br/>';
   return;
 }
-// rename and move file to appropriate location
-//$command = '/bin/mv '.$options['p'].'/'.$options['f'].' '.CHRIS_DATA.$options['f'];
+
+// FILESYSTEM STUFF
+$dirname = '/chb/users/chris/data/'.$result['PatientID'][0].'_'.$data_chris_id;
+echo $dirname;
+echo '<br/>';
+// create folder if doesnt exists
+if(!is_dir($dirname)){
+  mkdir($dirname);
+  echo 'Create DIR';
+}
+else{
+  echo 'DIR already there';
+}
+
+echo '<br/>';
+
+// cp file over if doesnt exist
+$filename = $dirname .'/'.$f;
+echo $filename;
+echo '<br/>';
+echo $tmpfile;
+echo '<br/>';
+if(!is_file($filename)){
+  echo 'Move IMAGE';
+  copy($tmpfile, $filename);
+}
+else{
+  echo 'IMAGE already there';
+}
+echo '<br/>';
+
+// keep it for testing
+echo 'delete: '.$filename.' - NOT HOOKED';
+echo '<br/>';
+//delete($options['p'].'/'.$options['f']);
 ?>

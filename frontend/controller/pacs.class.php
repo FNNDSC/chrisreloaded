@@ -583,7 +583,8 @@ class PACS implements PACSInterface {
   // process data once something has been received by the listener
   static public function process($filename){
     // Image information
-    $requiered_fields = '+P SOPInstanceUID';
+    $requiered_fields = '+P SeriesInstanceUID';
+    $requiered_fields .= ' +P SOPInstanceUID';
     $requiered_fields .= ' +P ProtocolName';
     $requiered_fields .= ' +P ContentTime';
     // Patient information
@@ -593,7 +594,7 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P PatientID';
 
     $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
-
+    echo $command;
     return PACS::_executeAndFormat($command);
   }
 }

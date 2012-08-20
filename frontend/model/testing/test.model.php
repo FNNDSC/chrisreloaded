@@ -44,7 +44,6 @@ SimpleTest_Chris::setPreference();
 // data related models
 require_once ('test.data.class.php');
 require_once ('test.data_project.class.php');
-require_once ('test.image.class.php');
 // group related models
 require_once ('test.group.class.php');
 require_once ('test.group_data.class.php');
