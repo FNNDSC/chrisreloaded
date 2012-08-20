@@ -54,8 +54,10 @@ $options = getopt($shortopts);
 //var_dump($options);
 
 /* PACS::process($options['p'].'/'.$options['f']); */
-$p = '/chb/users/chris/tmp/RX_20120815_143408184'; //$options['p']
-$f = 'US.1.2.840.113619.2.256.896737926219.1336499244.3424'; //$options['f']
+$p = $options['p'];
+$f = $options['f'];
+/* $p = '/chb/users/chris/tmp/RX_20120815_143408184'; //$options['p']
+ $f = 'US.1.2.840.113619.2.256.896737926219.1336499244.3424'; //$options['f'] */
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
@@ -63,6 +65,7 @@ echo '<br/>';
 $patient_chris_id = -1;
 $data_chris_id = -1;
 $image_chris_id = -1;
+$protocol_name = '';
 
 // parse results patient first
 // Does patient exist
@@ -150,11 +153,9 @@ if (array_key_exists('SeriesInstanceUID',$result))
     $dataObject->unique_id = $result['SeriesInstanceUID'][0];
     if(array_key_exists('ProtocolName',$result))
     {
-      $dataObject->name = $result['ProtocolName'][0];
+      $protocol_name = $result['ProtocolName'][0];
     }
-    else{
-      $dataObject->name = 'NoProtocolName';
-    }
+    $dataObject->name = $protocol_name;
     $dataObject->time = $result['ContentTime'][0];
     $dataObject->meta_information = '';
 
@@ -178,22 +179,36 @@ else {
 }
 
 // FILESYSTEM STUFF
-$dirname = '/chb/users/chris/data/'.$result['PatientID'][0].'_'.$data_chris_id;
+$patientdirname = '/chb/users/chris/data/'.$result['PatientID'][0].'-'.$patient_chris_id;
 echo $dirname;
 echo '<br/>';
 // create folder if doesnt exists
-if(!is_dir($dirname)){
-  mkdir($dirname);
+if(!is_dir($patientdirname)){
+  mkdir($patientdirname);
   echo 'Create DIR';
 }
 else{
   echo 'DIR already there';
 }
 
+$datadirname = $patientdirname.'/'.$protocol_name.'-'.$data_chris_id;
+echo $datadirname;
+echo '<br/>';
+// create folder if doesnt exists
+if(!is_dir($datadirname)){
+  mkdir($datadirname);
+  echo 'Create DIR';
+}
+else{
+  echo 'DIR already there';
+}
+
+
+
 echo '<br/>';
 
 // cp file over if doesnt exist
-$filename = $dirname .'/'.$f;
+$filename = $datadirname .'/'.$f;
 echo $filename;
 echo '<br/>';
 echo $tmpfile;
