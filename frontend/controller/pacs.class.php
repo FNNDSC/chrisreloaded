@@ -236,7 +236,7 @@ class PACS implements PACSInterface {
    * @return Array well formated array output based on the input parameters.
    * returns null is nothing was found for given command parmeters.
    *
-   * @snippet test.pacs.class.php testSeriesStudy()
+   * @snippet test.pacs.class.php testQuerySeries()
    */
   public function querySeries(){
     if ($this->user_aet != null)
@@ -264,8 +264,16 @@ class PACS implements PACSInterface {
     return null;
   }
 
-  // method to the query the PACS for a series
-  // needs to be more advance to get protocol name with is at IMAGE level
+  /**
+   * Query PACS on image.
+   *
+   * The query is built based on the $this->command_param.
+   *
+   * @return Array well formated array output based on the input parameters.
+   * returns null is nothing was found for given command parmeters.
+   *
+   * @snippet test.pacs.class.php testQueryImage()
+   */
   public function queryImage(){
     if ($this->user_aet != null)
     {
@@ -291,9 +299,28 @@ class PACS implements PACSInterface {
     return null;
   }
 
+  /**
+   * Query PACS on everything. (study, series, image)
+   *
+   * @param[in] $studyParameters parameters for the study query
+   * @param[in] $seriesParameters parameters for the series query
+   * @param[in] $imageParameters parameters for the image query
+   *
+   * @return Array well formated array output based on the input parameters.
+   * Array[0] is the study results, Array[1] is the series results, Array[2] is the image results
+   *
+   * @snippet test.pacs.class.php testQueryAll()
+   */
   public function queryAll($studyParameters, $seriesParameters, $imageParameters){
 
+    // initiate arrays which will be returned
     $result = Array();
+    // Study array
+    $result[] = Array();
+    // Series array
+    $result[] = Array();
+    // Image array
+    $result[] = Array();
 
     // append query parameters and values
     foreach( $studyParameters as $key => $value)
@@ -301,6 +328,7 @@ class PACS implements PACSInterface {
       $this->addParameter($key, $value);
     }
     $resultquery = $this->queryStudy();
+    $this->_appendResults($result[0], $resultquery);
 
     // loop though studies
     if ($resultquery != null && array_key_exists('StudyInstanceUID',$resultquery))
@@ -314,6 +342,7 @@ class PACS implements PACSInterface {
         $this->addParameter('StudyInstanceUID', $studyvalue);
 
         $resultseries = $this->querySeries();
+        $this->_appendResults($result[1], $resultseries);
 
         // loop though images
         if ($resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
@@ -327,28 +356,36 @@ class PACS implements PACSInterface {
             }
             $this->addParameter('StudyInstanceUID', $seriesvalue);
             $this->addParameter('SeriesInstanceUID', $resultseries['SeriesInstanceUID'][$j]);
-            $tmpresult = $this->queryImage();
-
-            // if no previous results, copy the array
-            if(empty($result)){
-              $result = $tmpresult;
-            }
-            // if previous results, merge arrays
-            else{
-              foreach ($tmpresult as $key => $value){
-                $result[$key] = array_merge($result[$key], $tmpresult[$key]);
-              }
-            }
-
+            $resultimage = $this->queryImage();
+            $this->_appendResults($result[2], $resultimage);
           }
           ++$j;
         }
       }
     }
-
     return $result;
   }
 
+  /**
+   * Convenience method to append array to another array.
+   *
+   * @param[in|out] array $base array in which we will add data
+   * @param[in|out] array $toappend array which will be added to base
+   *
+   */
+  private function _appendResults(&$base, &$toappend)
+  {
+    // if base is empty, don't append, just copy
+    if(empty($base)){
+      $base = $toappend;
+    }
+    // if base is not empty, append
+    else{
+      foreach ($toappend as $key => $value){
+        $base[$key] = array_merge($base[$key], $toappend[$key]);
+      }
+    }
+  }
 
   /**
    * Convenience method to finish the command to be executed. Append the command parameters, the PACS IP and the PACS port.

@@ -159,7 +159,7 @@ class TestPACSClass extends UnitTestCase {
   }
 
   //! [testQueryStudy()]
-
+   
   /**
    * Test the querySeries method
    */
@@ -195,20 +195,20 @@ class TestPACSClass extends UnitTestCase {
   }
 
   //! [testQuerySeries()]
-
+  */
   /**
    * Test the queryImage method
-   */
-
-  //! [testQueryImage()]
+  */
+  /*
+   //! [testQueryImage()]
   public function testQueryImage() {
   }
 
   //! [testQueryImage()]
-
+   
   /**
-   * Test the queryAll method
-   */
+  * Test the queryAll method
+  */
 
   //! [testQueryAll()]
   public function testQueryAll() {
@@ -233,8 +233,10 @@ class TestPACSClass extends UnitTestCase {
     $result_all = $pacs_all->queryAll($study_parameter, $series_parameter, $image_parameter);
 
     // should return an array with all the results
-    // should return study and series array as well
-    $this->assertTrue(gettype($result_all['ProtocolName']) == 'array');
+    // $result_all[0] returns the Study results
+    // $result_all[1] returns the Series results
+    // $result_all[2] returns the Image results
+    //$this->assertTrue(count($result_all) == 3);
   }
 
   //! [testQueryAll()]
