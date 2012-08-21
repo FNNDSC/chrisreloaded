@@ -45,53 +45,34 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
 
 // define command line arguments
 $shortopts = "";
-$shortopts .= "p:"; // Full path
-$shortopts .= "f:"; // File name
-$shortopts .= "a:"; // File name
-$shortopts .= "c:"; // Optional value
+$shortopts .= "p:"; // Incoming file location
+$shortopts .= "f:"; // Incoming file name
 
 $options = getopt($shortopts);
-//var_dump($options);
 
-/* PACS::process($options['p'].'/'.$options['f']); */
 $p = $options['p'];
-$f = $options['f'];/*
-$p = '/chb/users/chris/tmp/RX_20120821_084754202'; //$options['p']
-$f = 'MR.1.3.12.2.1107.5.2.32.35288.2009050808141747084288216'; //$options['f']*/
+$f = $options['f'];
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
-echo '<br/>';
+
 $patient_chris_id = -1;
 $data_chris_id = -1;
 $image_chris_id = -1;
 $protocol_name = 'NoProtocolName';
 
-// start locks
+// start lock
 $db = DB::getInstance();
-
-// parse results patient first
-// Does patient exist
-// Unique Name/Birthdate combination
-/* if (array_key_exists('PatientName',$result) && array_key_exists('PatientBirthdate',$result))
- */
-
 $db->lock('patient', 'WRITE');
 
 if (array_key_exists('PatientName',$result))
 {
   $patientMapper = new Mapper('Patient');
   $patientMapper->filter('name = (?)',$result['PatientName'][0] );
-
-  /*   $dob = $result['PatientBirthdate'][0];
-   $patientMapper->filter('dob = (?)',$dob ); */
-
   $patientResult = $patientMapper->get();
 
   if(count($patientResult['Patient']) == 0)
   {
-    echo 'Patient NOT in DB';
-    echo '<br/>';
     // create patient model
     $patientObject = new Patient();
     $patientObject->name = $result['PatientName'][0];
@@ -103,8 +84,6 @@ if (array_key_exists('PatientName',$result))
     $patient_chris_id = Mapper::add($patientObject);
   }
   else {
-    echo 'Patient ALREADY in DB';
-    echo '<br/>';
     // get patient id
     $patient_chris_id = $patientResult['Patient'][0]->id;
 
@@ -128,23 +107,15 @@ if (array_key_exists('PatientName',$result))
       }
     }
   }
-
-  echo $patient_chris_id;
-  echo '<br/>';
 }
 else {
   echo 'PatientName or PatientBirthdate not there';
-  echo '<br/>';
+  $db->unlock();
   return;
 }
 $db->unlock();
 
 $db->lock('data', 'WRITE');
-/* $myFile = "/chb/tmp/pacs_listen.txt";
- $fh = fopen($myFile, 'a') or die("can't open file");
-$listen_command = '.';
-sleep(1); */
-
 // Does Image exist: SOPInstanceUID
 if (array_key_exists('SeriesInstanceUID',$result))
 {
@@ -154,15 +125,9 @@ if (array_key_exists('SeriesInstanceUID',$result))
   $dataMapper->filter('unique_id = (?)',$value );
   $dataResult = $dataMapper->get();
 
-  /*   sleep(1);
-   $listen_command .= '-'; */
-
   // if doesnt exist, create data
   if(count($dataResult['Data']) == 0)
   {
-    echo 'DATA NOT IN DB ';
-    echo '<br/>';
-    print_r($result);
     // create data model
     $dataObject = new Data();
     $dataObject->patient_id = $patient_chris_id;
@@ -182,71 +147,37 @@ if (array_key_exists('SeriesInstanceUID',$result))
   }
   // else get data id
   else{
-    echo 'DATA ALREADY IN DB ';
-    echo '<br/>';
     $protocol_name = $dataResult['Data'][0]->name;
     $data_chris_id = $dataResult['Data'][0]->id;
   }
-  echo $data_chris_id;
-  echo '<br/>';
-
 }
 else {
   echo 'SOPInstanceUID or SeriesInstanceUID not there';
-  echo '<br/>';
+  $db->unlock();
   return;
 }
-/* sleep(1);
- $listen_command .= '+';
-fwrite($fh, $listen_command);
-fclose($fh); */
 $db->unlock();
 
 // FILESYSTEM STUFF
 $patientdirname = '/chb/users/chris/data/'.$result['PatientID'][0].'-'.$patient_chris_id;
-echo $patientdirname;
-echo '<br/>';
 // create folder if doesnt exists
 if(!is_dir($patientdirname)){
   mkdir($patientdirname);
-  echo 'Create DIR';
-}
-else{
-  echo 'DIR already there';
 }
 
 $datadirname = $patientdirname.'/'.$protocol_name.'-'.$data_chris_id;
-echo $datadirname;
-echo '<br/>';
+
 // create folder if doesnt exists
 if(!is_dir($datadirname)){
   mkdir($datadirname);
-  echo 'Create DIR';
 }
-else{
-  echo 'DIR already there';
-}
-
-
-
-echo '<br/>';
 
 // cp file over if doesnt exist
 $filename = $datadirname .'/'.$f;
-echo $filename;
-echo '<br/>';
-echo $tmpfile;
-echo '<br/>';
 if(!is_file($filename)){
-  echo 'Move IMAGE';
   copy($tmpfile, $filename);
 }
-else{
-  echo 'IMAGE already there';
-}
-echo '<br/>';
 
-// keep it for testing
-echo 'delete: '.$filename.' - NOT HOOKED';
-echo '<br/>';
+// delete tmp file
+unlink($tmpfile);
 ?>
