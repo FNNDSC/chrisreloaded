@@ -54,10 +54,10 @@ $options = getopt($shortopts);
 //var_dump($options);
 
 /* PACS::process($options['p'].'/'.$options['f']); */
- $p = $options['p'];
-$f = $options['f']; /*
- $p = '/chb/users/chris/tmp/RX_20120815_143408184'; //$options['p']
- $f = 'US.1.2.840.113619.2.256.896737926219.1336499244.3424'; //$options['f'] */
+$p = $options['p'];
+$f = $options['f'];/*
+$p = '/chb/users/chris/tmp/RX_20120821_084754202'; //$options['p']
+$f = 'MR.1.3.12.2.1107.5.2.32.35288.2009050808141747084288216'; //$options['f']*/
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
@@ -67,14 +67,20 @@ $data_chris_id = -1;
 $image_chris_id = -1;
 $protocol_name = 'NoProtocolName';
 
+// start locks
+$db = DB::getInstance();
+
 // parse results patient first
 // Does patient exist
 // Unique Name/Birthdate combination
 /* if (array_key_exists('PatientName',$result) && array_key_exists('PatientBirthdate',$result))
  */
+
+$db->query('LOCK TABLES patient WRITE;');
+
 if (array_key_exists('PatientName',$result))
 {
-  $patientMapper = new Mapper('Patient');
+  $patientMapper = new Mapper('Patient', $db);
   $patientMapper->filter('name = (?)',$result['PatientName'][0] );
 
   /*   $dob = $result['PatientBirthdate'][0];
@@ -94,7 +100,7 @@ if (array_key_exists('PatientName',$result))
     $patientObject->patient_id = $result['PatientID'][0].';';
 
     // add the patient model and get its id
-    $patient_chris_id = Mapper::add($patientObject);
+    $patient_chris_id = Mapper::add($patientObject, $db);
   }
   else {
     echo 'Patient ALREADY in DB';
@@ -118,7 +124,7 @@ if (array_key_exists('PatientName',$result))
         // add new MRN
         $patientObject->patient_id .= $result['PatientID'][0].';';
 
-        Mapper::update($patientObject, $patient_chris_id);
+        Mapper::update($patientObject, $patient_chris_id, $db);
       }
     }
   }
@@ -131,12 +137,18 @@ else {
   echo '<br/>';
   return;
 }
+$db->query('UNLOCK TABLES;');
+
+$db->query('LOCK TABLES data WRITE;');
+$myFile = "/chb/tmp/pacs_listen.txt";
+$fh = fopen($myFile, 'a') or die("can't open file");
+$listen_command .= '++';
 
 // Does Image exist: SOPInstanceUID
 if (array_key_exists('SeriesInstanceUID',$result))
 {
   // does data (series) exist??
-  $dataMapper = new Mapper('Data');
+  $dataMapper = new Mapper('Data', $db);
   $value = $result['SeriesInstanceUID'][0];
   $dataMapper->filter('unique_id = (?)',$value );
   $dataResult = $dataMapper->get();
@@ -161,12 +173,13 @@ if (array_key_exists('SeriesInstanceUID',$result))
     $dataObject->meta_information = '';
 
     // add the data model and get its id
-    $data_chris_id = Mapper::add($dataObject);
+    $data_chris_id = Mapper::add($dataObject, $db);
   }
   // else get data id
   else{
     echo 'DATA ALREADY IN DB ';
     echo '<br/>';
+    $protocol_name = $dataResult['Data'][0]->name;
     $data_chris_id = $dataResult['Data'][0]->id;
   }
   echo $data_chris_id;
@@ -178,10 +191,14 @@ else {
   echo '<br/>';
   return;
 }
+$listen_command .= '--';
+fwrite($fh, $listen_command);
+fclose($fh);
+$db->query('UNLOCK TABLES;');
 
 // FILESYSTEM STUFF
 $patientdirname = '/chb/users/chris/data/'.$result['PatientID'][0].'-'.$patient_chris_id;
-echo $dirname;
+echo $patientdirname;
 echo '<br/>';
 // create folder if doesnt exists
 if(!is_dir($patientdirname)){
@@ -226,5 +243,4 @@ echo '<br/>';
 // keep it for testing
 echo 'delete: '.$filename.' - NOT HOOKED';
 echo '<br/>';
-//delete($options['p'].'/'.$options['f']);
 ?>

@@ -99,6 +99,17 @@ class DB {
   }
 
   /**
+   * Run a query on the database without using the prepared statements mechanism.
+   * Returns the raw result.
+   * It can be used to lock/unlock tables in the database.
+   *
+   * @return DB The result of the query.
+   */
+  public function query($query) {
+    return $this->link->query($query);
+  }
+
+  /**
    * Execute an SQL query as a prepared statement. This protects against SQL injections.
    *
    * <i>Example usage</i>:
