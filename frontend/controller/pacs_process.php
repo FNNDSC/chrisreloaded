@@ -80,7 +80,7 @@ $db->query('LOCK TABLES patient WRITE;');
 
 if (array_key_exists('PatientName',$result))
 {
-  $patientMapper = new Mapper('Patient', $db);
+  $patientMapper = new Mapper('Patient');
   $patientMapper->filter('name = (?)',$result['PatientName'][0] );
 
   /*   $dob = $result['PatientBirthdate'][0];
@@ -100,7 +100,7 @@ if (array_key_exists('PatientName',$result))
     $patientObject->patient_id = $result['PatientID'][0].';';
 
     // add the patient model and get its id
-    $patient_chris_id = Mapper::add($patientObject, $db);
+    $patient_chris_id = Mapper::add($patientObject);
   }
   else {
     echo 'Patient ALREADY in DB';
@@ -124,7 +124,7 @@ if (array_key_exists('PatientName',$result))
         // add new MRN
         $patientObject->patient_id .= $result['PatientID'][0].';';
 
-        Mapper::update($patientObject, $patient_chris_id, $db);
+        Mapper::update($patientObject, $patient_chris_id);
       }
     }
   }
@@ -140,18 +140,22 @@ else {
 $db->query('UNLOCK TABLES;');
 
 $db->query('LOCK TABLES data WRITE;');
-$myFile = "/chb/tmp/pacs_listen.txt";
-$fh = fopen($myFile, 'a') or die("can't open file");
-$listen_command .= '++';
+/* $myFile = "/chb/tmp/pacs_listen.txt";
+ $fh = fopen($myFile, 'a') or die("can't open file");
+$listen_command = '.';
+sleep(1); */
 
 // Does Image exist: SOPInstanceUID
 if (array_key_exists('SeriesInstanceUID',$result))
 {
   // does data (series) exist??
-  $dataMapper = new Mapper('Data', $db);
+  $dataMapper = new Mapper('Data');
   $value = $result['SeriesInstanceUID'][0];
   $dataMapper->filter('unique_id = (?)',$value );
   $dataResult = $dataMapper->get();
+
+  /*   sleep(1);
+   $listen_command .= '-'; */
 
   // if doesnt exist, create data
   if(count($dataResult['Data']) == 0)
@@ -173,7 +177,7 @@ if (array_key_exists('SeriesInstanceUID',$result))
     $dataObject->meta_information = '';
 
     // add the data model and get its id
-    $data_chris_id = Mapper::add($dataObject, $db);
+    $data_chris_id = Mapper::add($dataObject);
   }
   // else get data id
   else{
@@ -191,9 +195,10 @@ else {
   echo '<br/>';
   return;
 }
-$listen_command .= '--';
+/* sleep(1);
+ $listen_command .= '+';
 fwrite($fh, $listen_command);
-fclose($fh);
+fclose($fh); */
 $db->query('UNLOCK TABLES;');
 
 // FILESYSTEM STUFF
