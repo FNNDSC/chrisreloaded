@@ -195,20 +195,20 @@ class TestPACSClass extends UnitTestCase {
   }
 
   //! [testQuerySeries()]
-  */
+
   /**
    * Test the queryImage method
-  */
-  /*
-   //! [testQueryImage()]
+   */
+
+  //! [testQueryImage()]
   public function testQueryImage() {
   }
 
   //! [testQueryImage()]
    
   /**
-  * Test the queryAll method
-  */
+   * Test the queryAll method
+   */
 
   //! [testQueryAll()]
   public function testQueryAll() {
