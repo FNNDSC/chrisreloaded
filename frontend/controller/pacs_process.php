@@ -56,19 +56,20 @@ $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
 
+// initiate variables
 $patient_chris_id = -1;
 $data_chris_id = -1;
 $image_chris_id = -1;
 $protocol_name = 'NoProtocolName';
 
-// start lock
+// start patient table lock
 $db = DB::getInstance();
 $db->lock('patient', 'WRITE');
 
 if (array_key_exists('PatientName',$result))
 {
   $patientMapper = new Mapper('Patient');
-  $patientMapper->filter('name = (?)',$result['PatientName'][0] );
+  $patientMapper->filter('name = (?)',$result['PatientName'][0]);
   $patientResult = $patientMapper->get();
 
   if(count($patientResult['Patient']) == 0)
@@ -110,13 +111,16 @@ if (array_key_exists('PatientName',$result))
 }
 else {
   echo 'PatientName or PatientBirthdate not there';
+  // finish patient table lock
   $db->unlock();
   return;
 }
+// finish patient table lock
 $db->unlock();
 
+// start data table lock
 $db->lock('data', 'WRITE');
-// Does Image exist: SOPInstanceUID
+// Does data exist: SeriesInstanceUID
 if (array_key_exists('SeriesInstanceUID',$result))
 {
   // does data (series) exist??
@@ -145,7 +149,7 @@ if (array_key_exists('SeriesInstanceUID',$result))
     // add the data model and get its id
     $data_chris_id = Mapper::add($dataObject);
   }
-  // else get data id
+  // else get data name and id
   else{
     $protocol_name = $dataResult['Data'][0]->name;
     $data_chris_id = $dataResult['Data'][0]->id;
@@ -153,12 +157,14 @@ if (array_key_exists('SeriesInstanceUID',$result))
 }
 else {
   echo 'SOPInstanceUID or SeriesInstanceUID not there';
+  // finish data table lock
   $db->unlock();
   return;
 }
+// finish data table lock
 $db->unlock();
 
-// FILESYSTEM STUFF
+// FILESYSTEM Processing
 $patientdirname = '/chb/users/chris/data/'.$result['PatientID'][0].'-'.$patient_chris_id;
 // create folder if doesnt exists
 if(!is_dir($patientdirname)){
@@ -180,4 +186,10 @@ if(!is_file($filename)){
 
 // delete tmp file
 unlink($tmpfile);
+
+// delete tmp dir if dir is empty
+$files = scandir($p);
+if(count($files) <= 2){
+  rmdir($p);
+}
 ?>
