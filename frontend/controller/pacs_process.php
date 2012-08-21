@@ -76,7 +76,7 @@ $db = DB::getInstance();
 /* if (array_key_exists('PatientName',$result) && array_key_exists('PatientBirthdate',$result))
  */
 
-$db->query('LOCK TABLES patient WRITE;');
+$db->lock('patient', 'WRITE');
 
 if (array_key_exists('PatientName',$result))
 {
@@ -137,9 +137,9 @@ else {
   echo '<br/>';
   return;
 }
-$db->query('UNLOCK TABLES;');
+$db->unlock();
 
-$db->query('LOCK TABLES data WRITE;');
+$db->lock('data', 'WRITE');
 /* $myFile = "/chb/tmp/pacs_listen.txt";
  $fh = fopen($myFile, 'a') or die("can't open file");
 $listen_command = '.';
@@ -199,7 +199,7 @@ else {
  $listen_command .= '+';
 fwrite($fh, $listen_command);
 fclose($fh); */
-$db->query('UNLOCK TABLES;');
+$db->unlock();
 
 // FILESYSTEM STUFF
 $patientdirname = '/chb/users/chris/data/'.$result['PatientID'][0].'-'.$patient_chris_id;

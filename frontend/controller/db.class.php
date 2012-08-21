@@ -99,14 +99,24 @@ class DB {
   }
 
   /**
-   * Run a query on the database without using the prepared statements mechanism.
-   * Returns the raw result.
-   * It can be used to lock/unlock tables in the database.
+   * Lock a table in the database.
+   *
+   * @param[in] $tablename table to be locked
+   * @param[in] $type lock type (READ or WRITE)
    *
    * @return DB The result of the query.
    */
-  public function query($query) {
-    return $this->link->query($query);
+  public function lock($tablename, $type) {
+    return $this->link->query('LOCK TABLES '.$tablename.' '.$type.';');
+  }
+
+  /**
+   * Unlock a table in the database.
+   *
+   * @return DB The result of the query.
+   */
+  public function unlock() {
+    return $this->link->query('UNLOCK TABLES;');
   }
 
   /**
