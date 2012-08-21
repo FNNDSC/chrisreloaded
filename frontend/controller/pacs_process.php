@@ -171,6 +171,7 @@ if (array_key_exists('SeriesInstanceUID',$result))
     if(array_key_exists('ProtocolName',$result))
     {
       $protocol_name = str_replace (' ', '_', $result['ProtocolName'][0]);
+      $protocol_name = str_replace ('/', '_', $protocol_name);
     }
     $dataObject->name = $protocol_name;
     $dataObject->time = $result['ContentTime'][0];
