@@ -43,168 +43,168 @@ class TestPACSClass extends UnitTestCase {
   /**
    * Test the ping method
    */
-  /*
-   //! [testPing()]
+
+  //! [testPing()]
   public function testPing() {
-  // ping a valid host (CHB)
-  $server_ip = '134.174.12.21';
-  $server_port = 104;
+    // ping a valid host (CHB)
+    $server_ip = '134.174.12.21';
+    $server_port = 104;
 
-  $pacs_ping = new PACS($server_ip, $server_port);
-  $result = $pacs_ping->ping();
+    $pacs_ping = new PACS($server_ip, $server_port);
+    $result = $pacs_ping->ping();
 
 
-  // should return 1 on success
-  $this->assertTrue($result == 1);
+    // should return 1 on success
+    $this->assertTrue($result == 1);
 
-  // ping unvalid host
-  $server_port = 10;
-  $pacs_ping2 = new PACS($server_ip, $server_port);
-  $result2 = $pacs_ping2->ping();
+    // ping unvalid host
+    $server_port = 10;
+    $pacs_ping2 = new PACS($server_ip, $server_port);
+    $result2 = $pacs_ping2->ping();
 
-  // should return 0 on failure
-  $this->assertTrue($result2 == 0);
+    // should return 0 on failure
+    $this->assertTrue($result2 == 0);
   }
 
-  //! [testPing()] */
+  //! [testPing()]
 
   /**
    * Test the addParameter method
    */
-  /*
-   //! [testAddParameter()]
+
+  //! [testAddParameter()]
   public function testAddParameter() {
-  $server_ip = '134.174.12.21';
-  $server_port = 104;
+    $server_ip = '134.174.12.21';
+    $server_port = 104;
 
-  // we add not enough parameter (no user AE Title)
-  $pacs_not_enough = new PACS($server_ip, $server_port);
-  $pacs_not_enough->addParameter('PatientID', 4562009);
-  $result_not_enough = $pacs_not_enough->queryStudy();
+    // we add not enough parameter (no user AE Title)
+    $pacs_not_enough = new PACS($server_ip, $server_port);
+    $pacs_not_enough->addParameter('PatientID', 4562009);
+    $result_not_enough = $pacs_not_enough->queryStudy();
 
-  // should return null
-  $this->assertTrue($result_not_enough == null);
+    // should return null
+    $this->assertTrue($result_not_enough == null);
 
-  // we add enough parameter: AE Title and Query Retrieve Level
-  $user_aetitle = 'FNNDSC-CHRIS';
-  $pacs_enough = new PACS($server_ip, $server_port, $user_aetitle);
-  $pacs_enough->addParameter('PatientID', 4562009);
-  $result_enough = $pacs_enough->queryStudy();
+    // we add enough parameter: AE Title and Query Retrieve Level
+    $user_aetitle = 'FNNDSC-CHRIS';
+    $pacs_enough = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_enough->addParameter('PatientID', 4562009);
+    $result_enough = $pacs_enough->queryStudy();
 
-  // should return an array containing a 'PatientID' array
-  $this->assertTrue(gettype($result_enough['PatientID']) == 'array');
+    // should return an array containing a 'PatientID' array
+    $this->assertTrue(gettype($result_enough['PatientID']) == 'array');
 
-  // we add unknown parameters
-  $pacs_fake = new PACS($server_ip, $server_port, $user_aetitle);
-  $pacs_fake->addParameter('PatientID', 4562009);
-  $pacs_fake->addParameter('FakeParameter','IAmAFakeParameter');
-  $result_fake = $pacs_fake->queryStudy();
+    // we add unknown parameters
+    $pacs_fake = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_fake->addParameter('PatientID', 4562009);
+    $pacs_fake->addParameter('FakeParameter','IAmAFakeParameter');
+    $result_fake = $pacs_fake->queryStudy();
 
-  // should return null
-  $this->assertTrue($result_fake == null);
+    // should return null
+    $this->assertTrue($result_fake == null);
   }
 
-  //! [testAddParameter()] */
+  //! [testAddParameter()]
 
   /**
    * Test the queryStudy method
    */
-  /*
-   //! [testQueryStudy()]
-   public function testQueryStudy() {
-   // query on MRN
-   $server_ip = '134.174.12.21';
-   $server_port = 104;
-   $user_aetitle = 'FNNDSC-CHRIS';
-   $pacs_mrn = new PACS($server_ip, $server_port, $user_aetitle);
-   $pacs_mrn->addParameter('PatientID', 4562009);
-   $result_mrn = $pacs_mrn->queryStudy();
 
-   // should return 4 results
-   $this->assertTrue(count($result_mrn['PatientID']) == 4);
+  //! [testQueryStudy()]
+  public function testQueryStudy() {
+    // query on MRN
+    $server_ip = '134.174.12.21';
+    $server_port = 104;
+    $user_aetitle = 'FNNDSC-CHRIS';
+    $pacs_mrn = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_mrn->addParameter('PatientID', 4562009);
+    $result_mrn = $pacs_mrn->queryStudy();
 
-   // query on name
-   $pacs_name = new PACS($server_ip, $server_port, $user_aetitle);
-   $pacs_name->addParameter('PatientName', 'RONDO^RAJON');
-   $result_name = $pacs_name->queryStudy();
+    // should return 4 results
+    $this->assertTrue(count($result_mrn['PatientID']) == 4);
 
-   // should return 1 result
-   $this->assertTrue(count($result_name['PatientName']) == 1);
+    // query on name
+    $pacs_name = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_name->addParameter('PatientName', 'RONDO^RAJON');
+    $result_name = $pacs_name->queryStudy();
 
-   // query on MRN and name
-   $pacs_mrn_name = new PACS($server_ip, $server_port, $user_aetitle);
-   $pacs_mrn_name->addParameter('PatientID', 4562009);
-   $pacs_mrn_name->addParameter('PatientName', 'RONDO^RAJON');
-   $result_mrn_name = $pacs_mrn_name->queryStudy();
+    // should return 1 result
+    $this->assertTrue(count($result_name['PatientName']) == 1);
 
-   // MRN should take over, 4 results should be returned then
-   $this->assertTrue(count($result_mrn_name['PatientID']) == 4);
+    // query on MRN and name
+    $pacs_mrn_name = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_mrn_name->addParameter('PatientID', 4562009);
+    $pacs_mrn_name->addParameter('PatientName', 'RONDO^RAJON');
+    $result_mrn_name = $pacs_mrn_name->queryStudy();
 
-   // we add unknown parameters
-   $pacs_fake = new PACS($server_ip, $server_port, $user_aetitle);
-   $pacs_fake->addParameter('PatientID', 4562009);
-   $pacs_fake->addParameter('FakeParameter','IAmAFakeParameter');
-   $result_fake = $pacs_fake->queryStudy();
+    // MRN should take over, 4 results should be returned then
+    $this->assertTrue(count($result_mrn_name['PatientID']) == 4);
 
-   // should return null
-   $this->assertTrue($result_fake == null);
+    // we add unknown parameters
+    $pacs_fake = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_fake->addParameter('PatientID', 4562009);
+    $pacs_fake->addParameter('FakeParameter','IAmAFakeParameter');
+    $result_fake = $pacs_fake->queryStudy();
 
-   // we add not enough parameter (no user AE Title)
-   $pacs_not_enough = new PACS($server_ip, $server_port);
-   $pacs_not_enough->addParameter('PatientID', 4562009);
-   $result_not_enough = $pacs_not_enough->queryStudy();
+    // should return null
+    $this->assertTrue($result_fake == null);
 
-   // should return null
-   $this->assertTrue($result_not_enough == null);
-   }
+    // we add not enough parameter (no user AE Title)
+    $pacs_not_enough = new PACS($server_ip, $server_port);
+    $pacs_not_enough->addParameter('PatientID', 4562009);
+    $result_not_enough = $pacs_not_enough->queryStudy();
 
-   //! [testQueryStudy()] */
+    // should return null
+    $this->assertTrue($result_not_enough == null);
+  }
+
+  //! [testQueryStudy()]
 
   /**
    * Test the querySeries method
    */
-  /*
-   //! [testQuerySeries()]
-   public function testQuerySeries() {
-   // query in StudyInstanceUID
-   $server_ip = '134.174.12.21';
-   $server_port = 104;
-   $user_aetitle = 'FNNDSC-CHRIS';
-   $pacs_siiud = new PACS($server_ip, $server_port, $user_aetitle);
-   $pacs_siiud->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120409172607.5904669');
-   $result_siiud = $pacs_siiud->querySeries();
 
-   // should return 34 results
-   $this->assertTrue(count($result_siiud['StudyInstanceUID']) == 34);
+  //! [testQuerySeries()]
+  public function testQuerySeries() {
+    // query in StudyInstanceUID
+    $server_ip = '134.174.12.21';
+    $server_port = 104;
+    $user_aetitle = 'FNNDSC-CHRIS';
+    $pacs_siiud = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_siiud->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120409172607.5904669');
+    $result_siiud = $pacs_siiud->querySeries();
 
-   // query on unknown parameter
-   $pacs_fake = new PACS($server_ip, $server_port, $user_aetitle);
-   $pacs_fake->addParameter('FakeParameter','IAmAFakeParameter');
-   $result_fake = $pacs_fake->querySeries();
+    // should return 34 results
+    $this->assertTrue(count($result_siiud['StudyInstanceUID']) == 34);
 
-   // should return an empty array
-   $this->assertTrue($result_fake == null);
+    // query on unknown parameter
+    $pacs_fake = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_fake->addParameter('FakeParameter','IAmAFakeParameter');
+    $result_fake = $pacs_fake->querySeries();
 
-   // we add not enough parameter (no user AE Title)
-   $pacs_not_enough = new PACS($server_ip, $server_port);
-   $pacs_not_enough->addParameter('PatientID', 4562009);
-   $result_not_enough = $pacs_not_enough->querySeries();
+    // should return an empty array
+    $this->assertTrue($result_fake == null);
 
-   // should return null
-   $this->assertTrue($result_not_enough == null);
-   }
+    // we add not enough parameter (no user AE Title)
+    $pacs_not_enough = new PACS($server_ip, $server_port);
+    $pacs_not_enough->addParameter('PatientID', 4562009);
+    $result_not_enough = $pacs_not_enough->querySeries();
 
-   //! [testQuerySeries()] */
+    // should return null
+    $this->assertTrue($result_not_enough == null);
+  }
+
+  //! [testQuerySeries()]
 
   /**
    * Test the queryImage method
    */
 
-  /*   //! [testQueryImage()]
-   public function testQueryImage() {
-   }
+  //! [testQueryImage()]
+  public function testQueryImage() {
+  }
 
-   //! [testQueryImage()] */
+  //! [testQueryImage()]
 
   /**
    * Test the queryAll method
@@ -232,7 +232,9 @@ class TestPACSClass extends UnitTestCase {
 
     $result_all = $pacs_all->queryAll($study_parameter, $series_parameter, $image_parameter);
 
-    print_r($result_all);
+    // should return an array with all the results
+    // should return study and series array as well
+    $this->assertTrue(gettype($result_all['ProtocolName']) == 'array');
   }
 
   //! [testQueryAll()]
@@ -241,90 +243,90 @@ class TestPACSClass extends UnitTestCase {
    * Test the moveStudy method
    */
 
-  /*   //! [testMoveStudy()]
-   public function testMoveStudy() {
-  // move on MRN + Study Date
-  $server_ip = '134.174.12.21';
-  $server_port = 104;
-  $user_aetitle = 'FNNDSC-CHRIS';
-  $pacs_mrn = new PACS($server_ip, $server_port, $user_aetitle);
-  $pacs_mrn->addParameter('PatientID', 4562009);
-  $pacs_mrn->addParameter('StudyDate', 20120508);
-  $result_mrn = $pacs_mrn->moveStudy();
+  //! [testMoveStudy()]
+  public function testMoveStudy() {
+    // move on MRN + Study Date
+    $server_ip = '134.174.12.21';
+    $server_port = 104;
+    $user_aetitle = 'FNNDSC-CHRIS';
+    $pacs_mrn = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_mrn->addParameter('PatientID', 4562009);
+    $pacs_mrn->addParameter('StudyDate', 20120508);
+    $result_mrn = $pacs_mrn->moveStudy();
 
-  // should return null (no error message)
-  $this->assertTrue($result_mrn == null);
+    // should return null (no error message)
+    $this->assertTrue($result_mrn == null);
 
-  // we add unknown parameters
-  $pacs_fake = new PACS($server_ip, $server_port, $user_aetitle);
-  $pacs_fake->addParameter('PatientID', 4562009);
-  $pacs_fake->addParameter('FakeParameter','IAmAFakeParameter');
-  $result_fake = $pacs_fake->moveStudy();
+    // we add unknown parameters
+    $pacs_fake = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_fake->addParameter('PatientID', 4562009);
+    $pacs_fake->addParameter('FakeParameter','IAmAFakeParameter');
+    $result_fake = $pacs_fake->moveStudy();
 
-  // should return error message
-  $this->assertTrue($result_fake != null);
+    // should return error message
+    $this->assertTrue($result_fake != null);
 
-  // we add not enough parameter (no user AE Title)
-  $pacs_not_enough = new PACS($server_ip, $server_port);
-  $pacs_not_enough->addParameter('PatientID', 4562009);
-  $result_not_enough = $pacs_not_enough->moveStudy();
+    // we add not enough parameter (no user AE Title)
+    $pacs_not_enough = new PACS($server_ip, $server_port);
+    $pacs_not_enough->addParameter('PatientID', 4562009);
+    $result_not_enough = $pacs_not_enough->moveStudy();
 
-  // should return error message
-  $this->assertTrue($result_not_enough != null);
+    // should return error message
+    $this->assertTrue($result_not_enough != null);
   }
 
-  //! [testMoveStudy()] */
+  //! [testMoveStudy()]
 
   /**
    * Test the moveSeries method
-  */
-  /*
-   //! [testMoveSeries()]
+   */
+
+  //! [testMoveSeries()]
   public function testMoveSeries() {
-  // move on MRN + Study Date
-  $server_ip = '134.174.12.21';
-  $server_port = 104;
-  $user_aetitle = 'FNNDSC-CHRIS';
-  $pacs = new PACS($server_ip, $server_port, $user_aetitle);
-  $pacs->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120508133531.5943861');
-  $pacs->addParameter('SeriesInstanceUID', '1.2.840.113619.2.256.896737926219.1336498845.3088');
-  $result = $pacs->moveSeries();
+    // move on MRN + Study Date
+    $server_ip = '134.174.12.21';
+    $server_port = 104;
+    $user_aetitle = 'FNNDSC-CHRIS';
+    $pacs = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120508133531.5943861');
+    $pacs->addParameter('SeriesInstanceUID', '1.2.840.113619.2.256.896737926219.1336498845.3088');
+    $result = $pacs->moveSeries();
 
-  // should return null (no error message)
-  $this->assertTrue($result == null);
+    // should return null (no error message)
+    $this->assertTrue($result == null);
 
-  // missing StudyInstanceUID
-  $server_ip = '134.174.12.21';
-  $server_port = 104;
-  $user_aetitle = 'FNNDSC-CHRIS';
-  $pacs_miss_study = new PACS($server_ip, $server_port, $user_aetitle);
-  $pacs_miss_study->addParameter('SeriesInstanceUID', '1.2.840.113619.2.256.896737926219.1336498845.3088');
-  $result_miss_study = $pacs_miss_study->moveSeries();
+    // missing StudyInstanceUID
+    $server_ip = '134.174.12.21';
+    $server_port = 104;
+    $user_aetitle = 'FNNDSC-CHRIS';
+    $pacs_miss_study = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_miss_study->addParameter('SeriesInstanceUID', '1.2.840.113619.2.256.896737926219.1336498845.3088');
+    $result_miss_study = $pacs_miss_study->moveSeries();
 
-  // should return an error message
-  $this->assertTrue($result_miss_study != null);
+    // should return an error message
+    $this->assertTrue($result_miss_study != null);
 
-  // missing SeriesInstanceUID
-  $server_ip = '134.174.12.21';
-  $server_port = 104;
-  $user_aetitle = 'FNNDSC-CHRIS';
-  $pacs_miss_series = new PACS($server_ip, $server_port, $user_aetitle);
-  $pacs_miss_series->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120508133531.5943861');
-  $result_miss_series = $pacs_miss_series->moveSeries();
+    // missing SeriesInstanceUID
+    $server_ip = '134.174.12.21';
+    $server_port = 104;
+    $user_aetitle = 'FNNDSC-CHRIS';
+    $pacs_miss_series = new PACS($server_ip, $server_port, $user_aetitle);
+    $pacs_miss_series->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120508133531.5943861');
+    $result_miss_series = $pacs_miss_series->moveSeries();
 
-  // should return an error message
-  $this->assertTrue($result_miss_series != null);
+    // should return an error message
+    $this->assertTrue($result_miss_series != null);
 
-  // missing AE Title
-  $pacs_missing_aetitle = new PACS($server_ip, $server_port);
-  $pacs_missing_aetitle->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120508133531.5943861');
-  $pacs_missing_aetitle->addParameter('SeriesInstanceUID', '1.2.840.113619.2.256.896737926219.1336498845.3088');
-  $result_missing_aetitle = $pacs_missing_aetitle->moveSeries();
+    // missing AE Title
+    $pacs_missing_aetitle = new PACS($server_ip, $server_port);
+    $pacs_missing_aetitle->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120508133531.5943861');
+    $pacs_missing_aetitle->addParameter('SeriesInstanceUID', '1.2.840.113619.2.256.896737926219.1336498845.3088');
+    $result_missing_aetitle = $pacs_missing_aetitle->moveSeries();
 
-  // should return null (no error message)
-  $this->assertTrue($result_missing_aetitle != null);
+    // should return null (no error message)
+    $this->assertTrue($result_missing_aetitle != null);
   }
-  */
+
   //! [testMoveSeries()]
 }
 ?>

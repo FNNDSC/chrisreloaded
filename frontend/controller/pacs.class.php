@@ -222,9 +222,6 @@ class PACS implements PACSInterface {
 
       $this->_finishCommand($command);
 
-      echo $command;
-      echo '<br/>';
-
       // execute the command, format it into a nice json and return it
       return $this->_executeAndFormat($command);
     }
@@ -262,9 +259,6 @@ class PACS implements PACSInterface {
 
       $this->_finishCommand($command);
 
-      echo $command;
-      echo '<br/>';
-
       return $this->_executeAndFormat($command);
     }
     return null;
@@ -292,9 +286,6 @@ class PACS implements PACSInterface {
 
       $this->_finishCommand($command);
 
-      echo $command;
-      echo '<br/>';
-
       return $this->_executeAndFormat($command);
     }
     return null;
@@ -315,8 +306,6 @@ class PACS implements PACSInterface {
     if ($resultquery != null && array_key_exists('StudyInstanceUID',$resultquery))
     {
       foreach ($resultquery['StudyInstanceUID'] as $key => $studyvalue){
-        echo 'SERIES';
-        echo '<br/>';
         $this->cleanParameter();
         foreach( $seriesParameters as $key => $value)
         {
@@ -331,8 +320,6 @@ class PACS implements PACSInterface {
         {
           $j = 0;
           foreach ($resultseries['StudyInstanceUID'] as $key => $seriesvalue){
-            echo 'IMAGE';
-            echo '<br/>';
             $this->cleanParameter();
             foreach( $imageParameters as $key => $value)
             {
@@ -355,13 +342,8 @@ class PACS implements PACSInterface {
 
           }
           ++$j;
-          echo '<br/>';
         }
-        echo '<br/>';
       }
-      echo '<br/>';
-      echo '<br/>';
-      echo '<br/>';
     }
 
     return $result;
@@ -594,7 +576,6 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P PatientID';
 
     $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
-    echo $command;
     return PACS::_executeAndFormat($command);
   }
 }
