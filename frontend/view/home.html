@@ -1,183 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-<link href="css/bootstrap.min.css" rel="stylesheet">
-<script type="text/javascript" src="js/jquery.min.js"></script>
-<script type="text/javascript" src="js/bootstrap.dropdown.js"></script>
-<script type="text/javascript" src="js/bootstrap.tooltip.js"></script>
-
-<style type="text/css">
-.navbar-fixed-top,.navbar-fixed-bottom {
-	z-index: 1020;
-}
-
-.tooltip-inner {
-	color: black;
-	background-color: yellow;
-}
-
-.tooltip.bottom .tooltip-arrow {
-	border-bottom: 5px solid yellow;
-}
-.tooltip.right .tooltip-arrow {
-  border-right: 5px solid yellow;
-}
-</style>
-<script type="text/javascript">
-  jQuery(function() {
-
-    jQuery('.dropdown-toggle').dropdown();
-    
-    jQuery("[rel=bottom_tooltip]").tooltip({
-      placement: 'bottom'
-    });
-    jQuery("[rel=right_tooltip]").tooltip({
-      placement: 'right'
-    });
-    
-    jQuery('#pacs_pull').focus(function() {
-
-      $(this).animate({
-        height: '80px'
-      }, 200);
-      jQuery('#pacs_pull_ui').show();
-    });
-    
-    jQuery('#pacs_pull').blur(function() {
-
-      $(this).animate({
-        height: '19px'
-      }, 200);
-      jQuery('#pacs_pull_ui').hide();
-    });
-    
-  });
-</script>
+<head>${CSS}
 </head>
 
-<body style='background: url("gfx/background1.jpg")'>
+<body style='background: url("view/gfx/background1.jpg")'>
 
-	<div class="navbar navbar-fixed-top">
-		<div class="navbar-inner">
-			<div class="container" id='navigationbar'>
+ ${NAVBAR}
 
-				<!-- THE LEFT NAVIGATION BUTTONS -->
-				<ul class="nav">
-					<li class="active"><a href="#" rel="bottom_tooltip"
-						title="Show the activity feed"><i class="icon-home icon-white"></i>
-							Home</a></li>
-					<li><a href="#" rel="bottom_tooltip" title="Browse your data"><i
-							class="icon-white icon-list-alt"></i> Data</a></li>
-					<li><a href="#" rel="bottom_tooltip"
-						title="Browse your results"><i class="icon-white icon-tasks"></i>
-							Results</a></li>
-				</ul>
-				<img src="gfx/bch_symbol.png"
-					style="margin-top: 4px; left: 50%; position: absolute;">
+ <div class="container"
+  style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
 
-				<!-- START NEW JOB -->
-				<a class="btn btn-success pull-right" href="#" rel="right_tooltip"
-					title="Start a new Job" class="dropdown-toggle"
-					data-toggle="dropdown"  href="#menu2"><i class="icon-play icon-white"></i> </a>
-				<ul class="dropdown-menu">
-					<li><a href="#">Settings2</a></li>
-				</ul>
+${CART}
 
-				<!-- SETTINGS -->
-				<ul class="nav nav-pills pull-right">
-					<li class="divider-vertical"></li>
-					<li class="dropdown" id="menu1"><a class="dropdown-toggle"
-						data-toggle="dropdown" href="#menu1"><i
-							class="icon-white icon-user"></i> <b class="caret"></b> </a>
-						<ul class="dropdown-menu">
-							<li><a href="#">Settings</a></li>
-							<li><a href="#">Help?</a></li>
-							<li class="divider"></li>
-							<li><a href="login.html">Logout</a></li>
-						</ul></li>
+  <div id='home' class="row">
+   <div class="span4">
+    <div class="well">
+     <!-- GREETING -->
+     Welcome back, <span style="font-weight: bold;">Daniel Haehn</span>!
 
-					<li class="divider-vertical"></li>
-				</ul>
+     <!-- STATISTICS -->
+     <ul class="nav nav-pills"
+      style="margin-top: 6px; margin-left: -20px; margin-right: -20px; border: 1px solid #e8e8e8">
+      <li style="padding: 6px 20px;"><b>0</b> <br> <span
+       style="color: #999; font-size: 10px;">DATA</span></li>
+      <li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;">
+       <b>0</b><br> <span style="color: #999; font-size: 10px;">RESULTS</span>
+      </li>
+      <li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;"><b>0</b><br>
+       <span style="color: #999; font-size: 10px;">PROJECTS</span></li>
+     </ul>
+    </div>
+    <div class="well">
+     <!-- PACS PULL -->
+     <textarea id="pacs_pull"
+      placeholder="Enter MRN(s) to pull from PACS..."
+      style="width: 248px; height: 19px; overflow: hidden; padding-bottom: 5px; margin-top: 0px; margin-bottom: 0px; max-width: 248px"></textarea>
+     <div id="pacs_pull_ui" style="display: none">
+      <a href="" class="btn" style="margin-top: 6px; float: left"
+       rel="bottom_tooltip"
+       title="Query the PACS for patient name, age, scan type..">Advanced</a><a
+       href="" class="btn btn-warning"
+       style="margin-top: 6px; float: right"><i
+       class="icon icon-white icon-ok"></i> Pull</a> <br> <br>
+     </div>
+    </div>
+    <div class="well"></div>
+   </div>
+   <div class="span8">
+    <div class="well">
+     <span style="font-size: 16px; font-weight: bold;">Activity
+      Feed</span> <sub>( <b>Me</b> / <a href="#">All</a> )
+     </sub> <br> <br> <br> <br> <br> <br> <br>
+     <br> <br> <br> <br> <br> <br> <br>
+     <br> <br> <br> <br> <br> <br> <br>
+     <br> <br> <br> <br> <br> <br> <br>
+    </div>
+   </div>
 
-				<!-- SEARCH -->
-				<form class="navbar-search pull-right">
-					<input type="text" class="search-query" placeholder="Search"
-						rel="bottom_tooltip"
-						title="Search data and results for MRN, Name, Age..">
-				</form>
-			</div>
-		</div>
-	</div>
+  </div>
 
-	<div class="container"
-		style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
-		<div class="row">
-			<div class="span4">
-				<div class="well">
-					<!-- GREETING -->
-					Welcome back, <span style="font-weight: bold;">Daniel Haehn</span>!
+ </div>
 
-					<!-- STATISTICS -->
-					<ul class="nav nav-pills"
-						style="margin-top: 6px; margin-left: -20px; margin-right: -20px; border: 1px solid #e8e8e8">
-						<li style="padding: 6px 20px;"><b>0</b> <br> <span
-							style="color: #999; font-size: 10px;">DATA</span></li>
-						<li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;">
-							<b>0</b><br> <span style="color: #999; font-size: 10px;">RESULTS</span>
-						</li>
-						<li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;"><b>0</b><br>
-							<span style="color: #999; font-size: 10px;">PROJECTS</span></li>
-					</ul>
-
-					<!-- PACS PULL -->
-					<textarea id="pacs_pull"
-						placeholder="Enter MRN(s) to pull from PACS..."
-						style="width: 248px; height: 19px; overflow: hidden; padding-bottom: 5px; margin-top: 0px; margin-bottom: 0px; max-width: 248px"></textarea>
-					<div id="pacs_pull_ui" style="display: none">
-						<a href="" class="btn" style="margin-top: 6px; float: left"
-							rel="bottom_tooltip"
-							title="Query the PACS for patient name, age, scan type..">Advanced</a><a
-							href="" class="btn btn-warning"
-							style="margin-top: 6px; float: right"><i
-							class="icon icon-white icon-ok"></i> Pull</a> <br> <br>
-					</div>
-
-
-				</div>
-				<div class="well"></div>
-				<div class="well"></div>
-			</div>
-			<div class="span8">
-				<div class="well">
-					<span style="font-size: 16px; font-weight: bold;">Activity
-						Feed</span> <sub>( <b>Me</b> / <a href="#">All</a> )
-					</sub> <br> <br> <br> <br> <br> <br> <br>
-					<br> <br> <br> <br> <br> <br> <br>
-					<br> <br> <br> <br> <br> <br> <br>
-					<br> <br> <br>
-				</div>
-			</div>
-
-		</div>
-	</div>
-
-	</div>
-	</div>
-
-	<div class="container" style="margin-bottom: 0px; font-size: 0.8em;">&copy;
-		Fetal-Neonatal Neuroimaging & Developmental Science Center, Boston
-		Children's Hospital 2012</div>
-
-	<div
-		style="padding: 2px; border: thin solid black; width: 202px; display: none;">
-		<img src="gfx/fetal_moco.png"
-			style="margin: 1px 0px 1px; border: thin solid black;"> <img
-			src="gfx/fyborg.png"
-			style="margin: 1px 0px 1px; border: thin solid black;"> <img
-			src="gfx/slicer_modules.png"
-			style="margin: 1px 0px 1px; border: thin solid black;">
-	</div>
+ ${FOOTER} ${JAVASCRIPT}
 
 </body>
 </html>

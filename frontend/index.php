@@ -38,7 +38,14 @@ require_once ('config.inc.php');
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
 // create the login page
-$t = new Template('login.html');
-return $t;
+function loginPage() {
+  // create the login page
+  $t = new Template('login.html');
+  $t -> replace('FOOTER', 'footer.html');
+  return $t;
+}
+
+// execute the test
+echo loginPage();
 
 ?>

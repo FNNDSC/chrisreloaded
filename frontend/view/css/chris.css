@@ -1,0 +1,16 @@
+.navbar-fixed-top,.navbar-fixed-bottom {
+  z-index: 1020;
+}
+
+.tooltip-inner {
+  color: black;
+  background-color: yellow;
+}
+
+.tooltip.bottom .tooltip-arrow {
+  border-bottom: 5px solid yellow;
+}
+
+.tooltip.right .tooltip-arrow {
+  border-right: 5px solid yellow;
+}
