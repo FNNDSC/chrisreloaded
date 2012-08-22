@@ -39,15 +39,18 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
 session_start();
 
-// create the login page
-function loginPage() {
+function pipelinesPage() {
   // create the login page
-  $t = new Template('login.html');
+  $t = new Template('pipelines.html');
+  $t -> replace('CSS', 'css.html');
+  $t -> replace('NAVBAR', 'navbar.html');
+  $t -> replace('CART', 'cart.html');
   $t -> replace('FOOTER', 'footer.html');
+  $t -> replace('JAVASCRIPT', 'javascript.html');
   return $t;
 }
 
 // execute the test
-echo loginPage();
+echo pipelinesPage();
 
 ?>

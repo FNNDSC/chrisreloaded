@@ -37,17 +37,21 @@ require_once ('config.inc.php');
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
-session_start();
+session_start(); // start up your PHP session!
+$_SESSION['username'] = 'Ellen'; // store session data
 
-// create the login page
-function loginPage() {
-  // create the login page
-  $t = new Template('login.html');
+function homePage() {
+  $t = new Template('home.html');
+  $t -> replace('CSS', 'css.html');
+  $t -> replace('USERNAME', $_SESSION['username']);
+  $t -> replace('NAVBAR', 'navbar.html');
+  $t -> replace('CART', 'cart.html');
   $t -> replace('FOOTER', 'footer.html');
+  $t -> replace('JAVASCRIPT', 'javascript.html');
   return $t;
 }
 
 // execute the test
-echo loginPage();
+echo homePage();
 
 ?>
