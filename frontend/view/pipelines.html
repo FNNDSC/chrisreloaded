@@ -23,18 +23,23 @@
   <div class='row '>
    <div class='span3'>
     <div class='well'>
-     <div class="btn-group">
-      <button class="btn btn-large dropdown-toggle"
-       data-toggle="dropdown">
-       Motion Correction <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu">
-       <li><a href="#">Motion Correction</a></li>
-       <li><a href="#">Recon-All</a></li>
-       <li><a href="#">Tractography</a></li>
-      </ul>
-     </div>
-     <br /> <img src=view/gfx/fetal_moco.png class="img-rounded">
+     <form class="form-search">
+      <div class="input-append">
+       <span class='btn-group'> <input type="text"
+        class="span2 search-query" placeholder="Motion Correction">
+        <button class=" btn dropdown-toggle" data-toggle="dropdown"
+         href="#">
+         <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu pull-right">
+         <li><a href="#">Motion Correction</a></li>
+         <li><a href="#">Recon-All</a></li>
+         <li><a href="#">Tractography</a></li>
+        </ul>
+       </span>
+      </div>
+     </form>
+     <img src=view/gfx/fetal_moco.png class="img-rounded">
     </div>
    </div>
    <div class='span6'>
@@ -64,17 +69,6 @@
       Input data
       <button class="btn btn-large btn-primary pull-right" type="button">+</button>
      </h3>
-     <div id='input3' class='well'>
-      <h4>Set #3</h4>
-      <div>
-       T1 <input type="text" class="input-small search-query">
-       <button type="submit" class="btn">+</button>
-       <div>
-        T2 <input type="text" class="input-small search-query">
-       <button type="submit" class="btn">+</button>
-       </div>
-      </div>
-     </div>
      <div id='input2' class='well'>
       <h4>Set #2</h4>
       <div>
@@ -82,7 +76,7 @@
        <button type="submit" class="btn">+</button>
        <div>
         T2 <input type="text" class="input-small search-query">
-       <button type="submit" class="btn">+</button>
+        <button type="submit" class="btn">+</button>
        </div>
       </div>
      </div>
@@ -93,7 +87,7 @@
        <button type="submit" class="btn">+</button>
        <div>
         T2 <input type="text" class="input-small search-query">
-       <button type="submit" class="btn">+</button>
+        <button type="submit" class="btn">+</button>
        </div>
       </div>
      </div>
@@ -103,8 +97,8 @@
     <div class='well'>
      <h3>
       Parameters
-      <button type="button" class="btn btn-large btn-success pull-right">Submit
-       jobs</button>
+      <button id='submit' type="button"
+       class="btn btn-large btn-success pull-right">Submit jobs</button>
      </h3>
      <div id='input1' class='well'>
       <h4>

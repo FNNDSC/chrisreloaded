@@ -1,3 +1,13 @@
+function blinking(elm) {
+  timer = setInterval(blink, 2000);
+  function blink() {
+    // elm.show('highlight',{color: 'yellow'},'slow');
+    /* elm.effect("pulsate", { times:1 }, 1000); */
+    elm.fadeTo(1000, 0.5, function() {
+      elm.fadeTo(1000, 1);
+    });
+  }
+}
 $(document).ready(function() {
   jQuery('.dropdown-toggle').dropdown();
   jQuery("[rel=bottom_tooltip]").tooltip({
@@ -21,13 +31,14 @@ $(document).ready(function() {
   jQuery("#cart").click(function(event) {
     if ($("#cartdiv").is(":visible")) {
       $("#cartdiv").hide('blind');
+      blinking($("#cart"));
     } else {
       $("#cartdiv").show('blind');
+      clearInterval(timer);
     }
   });
-  //var mySessionVar='<%= Session["username"] %>';
-  //alert(<?php echo $_SESSION['cart'] ?>);
 
-  // var test = <?=$_SESSION["username"];?>;
   jQuery("#cartdiv").hide();
+  blinking($("#cart"));
+  // blinking($("#submit"));
 });

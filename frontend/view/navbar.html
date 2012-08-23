@@ -17,9 +17,6 @@
     <li><a href="./results.php" rel="bottom_tooltip"
      title="Browse your results"><i class="icon-white icon-tasks"></i>
       Results</a></li>
-    <li><a id='cart' rel="bottom_tooltip"
-     title="Show/hide the selection"><i
-      class="icon-white  icon-star"></i> Selection</a></li>
    </ul>
    <img src="view/gfx/bch_symbol.png"
     style="margin-top: 4px; left: 50%; position: absolute;">
@@ -49,12 +46,11 @@
     </ul>
 
     <!-- START NEW JOB -->
-    <a class="btn btn-inverse" href="./pipelines.php"
-     rel="right_tooltip" title="Start a new Job" data-toggle="dropdown"
-     href="#menu2"><i class="icon-play icon-white"></i> </a>
-    <!--     <ul class="dropdown-menu">
-     <li><a href="#">Settings2</a></li>
-    </ul> -->
+    <a id='cart' class="btn btn-warning" rel="bottom_tooltip"
+     title="Show/hide the selection"><i class="icon-star"></i> </a> <a
+     id='startpipeline' class="btn btn-warning" href="./pipelines.php"
+     rel="right_tooltip" title="Start a new Job"><i
+     class="icon-play"></i> </a>
    </div>
   </div>
  </div>
