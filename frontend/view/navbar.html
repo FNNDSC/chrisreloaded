@@ -1,42 +1,57 @@
-<div class="navbar navbar">
-	<div class="navbar-inner">
-		<div class="container">
-			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a>
-			<a class="brand" href="#">ChRIS 2.0 -Reloaded</a>
-			<div class="nav-collapse">
-				<ul class="nav">
-					<li>
-						<a href="./login.php"><i class="icon-white icon-home"></i> Home</a>
-					</li>
-					<li>
-						<a href="./results.php"><i class="icon-white icon-list-alt"></i> Results</a>
-					</li>
-					<li>
-						<a href="#"><i class="icon-white icon-folder-open"></i> Projects</a>
-					</li>
-					<li>
-						<a href="#"><i class="icon-white icon-cog"></i> Pipelines</a>
-					</li>
-					<li>
-						<a href="./library.php"><i class="icon-white icon-book"></i> Library</a>
-					</li>
 
-				</ul>
+<div class="navbar navbar-fixed-top navbar-inverse">
+ <div class="navbar-inner">
+  <div class="container" id='navigationbar'>
 
-				<form class="navbar-search pull-left" action="">
-					<input type="text" class="search-query span2" placeholder="Command">
-				</form>
+   <!-- THE LEFT NAVIGATION BUTTONS -->
+   <ul class="nav">
+    <li class="active"><a href="./home.php" rel="bottom_tooltip"
+     title="Show the activity feed"><i class="icon-home icon-white"></i>
+      Home</a></li>
+    <li><a href="./projects.php" rel="bottom_tooltip"
+     title="Browse your projects"><i
+      class="icon-white icon-folder-open"></i> Projects</a></li>
+    <li><a href="./data.php" rel="bottom_tooltip"
+     title="Browse your data"><i class="icon-white icon-list-alt"></i>
+      Data</a></li>
+    <li><a href="./results.php" rel="bottom_tooltip"
+     title="Browse your results"><i class="icon-white icon-tasks"></i>
+      Results</a></li>
+   </ul>
+   <img src="view/gfx/bch_symbol.png"
+    style="margin-top: 4px; left: 50%; position: absolute;">
 
-				<ul class="nav pull-right">
-					<li>
-						<a href="#"><i class="icon-white icon-wrench"></i> Settings</a>
+   <!-- SEARCH -->
+   <div class='pull-right'>
+    <form class="navbar-search">
+     <input type="text" class="search-query" placeholder="Search"
+      rel="bottom_tooltip"
+      title="Search data and results for MRN, Name, Age..">
+    </form>
 
-					</li>
-					<li>
-						<a href="#"><i class="icon-white icon-user"></i> Log out</a>
-					</li>
-				</ul>
-			</div><!-- /.nav-collapse -->
-		</div>
-	</div><!-- /navbar-inner -->
-</div><!-- /navbar -->
+    <!-- SETTINGS -->
+    <ul class="nav nav-pills">
+     <li class="divider-vertical"></li>
+     <li class="dropdown" id="menu1"><a class="dropdown-toggle"
+      data-toggle="dropdown" href="#menu1"><i
+       class="icon-white icon-user"></i> <b class="caret"></b> </a>
+      <ul class="dropdown-menu">
+       <li><a href="#">Settings</a></li>
+       <li><a href="#">Help?</a></li>
+       <li class="divider"></li>
+       <li><a href="login.html">Logout</a></li>
+      </ul></li>
+
+     <li class="divider-vertical"></li>
+    </ul>
+
+    <!-- START NEW JOB -->
+    <a id='cart' class="btn btn-warning" rel="bottom_tooltip"
+     title="Show/hide the selection"><i class="icon-star"></i> </a> <a
+     id='startpipeline' class="btn btn-warning" href="./pipelines.php"
+     rel="right_tooltip" title="Start a new Job"><i
+     class="icon-play"></i> </a>
+   </div>
+  </div>
+ </div>
+</div>

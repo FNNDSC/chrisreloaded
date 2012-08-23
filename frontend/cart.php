@@ -30,24 +30,41 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG', true);
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 
 // include the configuration
 require_once ('config.inc.php');
 
-// include the template class
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
+class Cart {
+  static function add($item = null){
+    // if item provided
+    if(!isset($item)){
+      // if item not inside the cart
+      if( !array_key_exists($item, $_SESSION['cart'])){
+        $_SESSION['cart'][$item]=$item;
+      }
+    }
+  }
 
-session_start();
+  static function remove($item = null){
+    // if item provided
+    if(!isset($item)){
+      // remove it from the cart
+      if( !array_key_exists($item, $_SESSION['cart'])){
+        unset($_SESSION['cart'][$item]);
+      }
+    }
+  }
 
-// create the login page
-function loginPage() {
-  // create the login page
-  $t = new Template('login.html');
-  $t -> replace('FOOTER', 'footer.html');
-  return $t;
+  static function visibility($visibility = false){
+    $_SESSION['cart']['visibility'] = $visibility;
+  }
+
+  static function draw(){
+    // go though cart
+
+    // return html
+  }
 }
-
-// execute the test
-echo loginPage();
 
 ?>

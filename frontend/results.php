@@ -37,22 +37,20 @@ require_once ('config.inc.php');
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
-function testTemplateClass() {
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 
-	$t = new Template('results.html');
-	$t -> replace('TITLE', "<title>ChRIS 2 -Reloaded</title>");
-	$t -> replace('STYLE', 'style.html');
-	$t -> replace('JAVASCRIPT', 'javascript.html');
-	$t -> replace('NAVBAR',  'navbar.html');
-		$t -> replace('FOOTER', 'footer.html');
-
-	return $t;
-
+function resultsPage() {
+  // create the login page
+  $t = new Template('results.html');
+  $t -> replace('CSS', 'css.html');
+  $t -> replace('NAVBAR', 'navbar.html');
+  $t -> replace('CART', 'cart.html');
+  $t -> replace('FOOTER', 'footer.html');
+  $t -> replace('JAVASCRIPT', 'javascript.html');
+  return $t;
 }
 
-// TODO use php unit testing framework
-// TODO more tests regarding failures
-
 // execute the test
-echo testTemplateClass();
+echo resultsPage();
+
 ?>

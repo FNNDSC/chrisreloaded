@@ -68,7 +68,7 @@ class Template {
     // look up if we have the requested template in our view folder
     if (!file_exists($file_path)) {
 
-      throw new Exception('The requested template '.$name.' was not found.');
+      throw new Exception('The requested template '.$name.' ('.$file_path.') was not found.');
 
     }
 
