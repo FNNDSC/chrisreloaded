@@ -37,7 +37,7 @@ require_once ('config.inc.php');
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
-session_start();
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 
 function projectPage() {
   // create the login page
@@ -45,6 +45,7 @@ function projectPage() {
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
   $t -> replace('CART', 'cart.html');
+  $t -> replace('USERNAME', $_SESSION['username']);
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');
   return $t;

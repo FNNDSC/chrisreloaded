@@ -11,14 +11,19 @@
  <div class="container"
   style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
 
-  ${CART}
 
-  <div id='home' class="row">
+
+  <div id='pipeline' class="row">
    <div class="span12">
-    <div class="well">
-     <div class="page-header">
-      <h1>Pipelines <button type="button" class="btn btn-success pull-right">Submit jobs</button></h1>
-     </div>
+    <div class="page-header">
+     <h1>Pipelines</h1>
+    </div>
+   </div>
+  </div>
+  <!-- /btn-group -->
+  <div class='row '>
+   <div class='span3'>
+    <div class='well'>
      <div class="btn-group">
       <button class="btn btn-large dropdown-toggle"
        data-toggle="dropdown">
@@ -30,8 +35,49 @@
        <li><a href="#">Tractography</a></li>
       </ul>
      </div>
-     <!-- /btn-group -->
-     <div>Motion Correction</div>
+     <br /> <img src=view/gfx/fetal_moco.png class="img-polaroid">
+    </div>
+   </div>
+   <div class='span6'>
+    <div class='well'>
+     <h3>Description</h3>
+     In recent years, postprocessing of fast multislice magnetic
+     resonance imaging (MRI) to correct fetal motion has provided the
+     first true 3-D MR images of the developing human brain in utero.
+     Early approaches have used reconstruction...
+    </div>
+   </div>
+
+   <div class='span3'>
+    <div class='well'>
+     <h3>Credits</h3>
+     Kim K, Habas PA, Rousseau F, Glenn OA, Barkovich AJ, Studholme C.
+    </div>
+   </div>
+
+
+   <!--    </div> -->
+  </div>
+
+
+  ${CART}
+
+  <div id='moco' class='row'>
+   <div class='span3'>
+    <div class='well'>
+     <button class="btn btn-large btn-primary" type="button">Add
+      input</button>
+     <br> <br> <br> <br> <br> <br> <br>
+     <br> <br> <br> <br> <br> <br> <br>
+     <br> <br> <br> <br> <br> <br> <br>
+     <br> <br> <br> <br> <br> <br> <br>
+    </div>
+   </div>
+   <div class='span9'>
+    <div class='well'>
+     <a href="#" class="btn btn-large btn-primary disabled">Parameters</a>
+     <button type="button" class="btn btn-large btn-success pull-right">Submit
+      jobs</button>
      <br> <br> <br> <br> <br> <br> <br>
      <br> <br> <br> <br> <br> <br> <br>
      <br> <br> <br> <br> <br> <br> <br>

@@ -37,14 +37,19 @@ require_once ('config.inc.php');
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
-session_start(); // start up your PHP session!
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
+
 $_SESSION['username'] = 'Ellen'; // store session data
+$_SESSION['cart'] = array();
+$_SESSION['cart']['visibility'] = false;
 
 function homePage() {
   $t = new Template('home.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('USERNAME', $_SESSION['username']);
   $t -> replace('NAVBAR', 'navbar.html');
+  // create cart with good visibility(html)
+  
   $t -> replace('CART', 'cart.html');
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');

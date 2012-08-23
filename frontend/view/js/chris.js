@@ -1,4 +1,4 @@
-jQuery(function() {
+$(document).ready(function() {
   jQuery('.dropdown-toggle').dropdown();
   jQuery("[rel=bottom_tooltip]").tooltip({
     placement : 'bottom'
@@ -18,12 +18,16 @@ jQuery(function() {
     }, 200);
     jQuery('#pacs_pull_ui').hide();
   });
-  $("#cart").click(function(event) {
+  jQuery("#cart").click(function(event) {
     if ($("#cartdiv").is(":visible")) {
       $("#cartdiv").hide('blind');
     } else {
       $("#cartdiv").show('blind');
     }
   });
-  $("#cartdiv").hide();
+  //var mySessionVar='<%= Session["username"] %>';
+  //alert(<?php echo $_SESSION['cart'] ?>);
+
+  // var test = <?=$_SESSION["username"];?>;
+  jQuery("#cartdiv").hide();
 });
