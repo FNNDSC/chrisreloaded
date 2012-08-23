@@ -41,18 +41,12 @@ require_once 'object.class.php';
 class Patient extends Object {
   
   /**
-   * The lastname of this patient.
+   * The name of this patient following the dicom convention.
+   * LASTNAME^FIRSTNAME^MIDDLENAME
    *
    * @var string
    */
-  public $lastname = null;
-
-  /**
-   * The firstname of this patient.
-   *
-   * @var string
-   */
-  public $firstname = null;
+  public $name = null;
 
   /**
    * The date of birth of this patient.

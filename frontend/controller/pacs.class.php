@@ -49,7 +49,7 @@ interface PACSInterface
   // method to the retrieve series
   public function moveSeries();
   // method to process result received by the listener
-  public function process();
+  static public function process($filename);
 }
 
 /**
@@ -84,7 +84,7 @@ class PACS implements PACSInterface {
   /**
    * Parameters to build the query command.
    *
-   * @var string $server_port
+   * @var string $command_param
    */
   private $command_param = Array();
 
@@ -153,8 +153,21 @@ class PACS implements PACSInterface {
    *
    * @snippet test.pacs.class.php testAddParameter()
    */
-  public function addParameter($name, $value){
-    $this->command_param[$name] = $value;
+  public function addParameter($name, $value, $force = false){
+    if (!array_key_exists($name,$this->command_param) || $force)
+    {
+      $this->command_param[$name] = $value;
+    }
+  }
+
+  /**
+   * Clean all the parameters from the command to be executed.
+   *
+   * @snippet test.pacs.class.php testCleanParameter()
+   */
+  public function cleanParameter(){
+    unset($this->command_param);
+    $this->command_param = Array();
   }
 
   /**
@@ -205,6 +218,8 @@ class PACS implements PACSInterface {
       $this->addParameter('QueryRetrieveLevel', 'STUDY');
       $this->addParameter('StudyInstanceUID', '');
 
+      PACS::_parseParam($this->command_param, $command);
+
       $this->_finishCommand($command);
 
       // execute the command, format it into a nice json and return it
@@ -221,7 +236,7 @@ class PACS implements PACSInterface {
    * @return Array well formated array output based on the input parameters.
    * returns null is nothing was found for given command parmeters.
    *
-   * @snippet test.pacs.class.php testSeriesStudy()
+   * @snippet test.pacs.class.php testQuerySeries()
    */
   public function querySeries(){
     if ($this->user_aet != null)
@@ -236,7 +251,11 @@ class PACS implements PACSInterface {
 
       // add base parameters
       $this->addParameter('QueryRetrieveLevel', 'SERIES');
+      $this->addParameter('StudyInstanceUID', '');
       $this->addParameter('SeriesInstanceUID', '');
+
+
+      PACS::_parseParam($this->command_param, $command);
 
       $this->_finishCommand($command);
 
@@ -245,12 +264,128 @@ class PACS implements PACSInterface {
     return null;
   }
 
-  // method to the query the PACS for a series
-  // needs to be more advance to get protocol name with is at IMAGE level
+  /**
+   * Query PACS on image.
+   *
+   * The query is built based on the $this->command_param.
+   *
+   * @return Array well formated array output based on the input parameters.
+   * returns null is nothing was found for given command parmeters.
+   *
+   * @snippet test.pacs.class.php testQueryImage()
+   */
   public function queryImage(){
-    return "I am not implemented";
+    if ($this->user_aet != null)
+    {
+      // build the command
+      // dcmtk findcsu binaries
+      // -xi: proposed transmission transfer syntaxes:
+      // propose implicit VR little endian TS only
+      $command = $this->findscu.' -xi';
+      $command .= ' -S';
+      $command .= ' --aetitle '.$this->user_aet;
+
+      // add base parameters
+      $this->addParameter('QueryRetrieveLevel', 'IMAGE');
+      $this->addParameter('StudyInstanceUID', '');
+      $this->addParameter('SeriesInstanceUID', '');
+
+      PACS::_parseParam($this->command_param, $command);
+
+      $this->_finishCommand($command);
+
+      return $this->_executeAndFormat($command);
+    }
+    return null;
   }
 
+  /**
+   * Query PACS on everything. (study, series, image)
+   *
+   * @param[in] $studyParameters parameters for the study query
+   * @param[in] $seriesParameters parameters for the series query
+   * @param[in] $imageParameters parameters for the image query
+   *
+   * @return Array well formated array output based on the input parameters.
+   * Array[0] is the study results, Array[1] is the series results, Array[2] is the image results
+   *
+   * @snippet test.pacs.class.php testQueryAll()
+   */
+  public function queryAll($studyParameters, $seriesParameters, $imageParameters){
+
+    // initiate arrays which will be returned
+    $result = Array();
+    // Study array
+    $result[] = Array();
+    // Series array
+    $result[] = Array();
+    // Image array
+    $result[] = Array();
+
+    // append query parameters and values
+    foreach( $studyParameters as $key => $value)
+    {
+      $this->addParameter($key, $value);
+    }
+    $resultquery = $this->queryStudy();
+    $this->_appendResults($result[0], $resultquery);
+
+    // loop though studies
+    if ($resultquery != null && array_key_exists('StudyInstanceUID',$resultquery))
+    {
+      foreach ($resultquery['StudyInstanceUID'] as $key => $studyvalue){
+        $this->cleanParameter();
+        foreach( $seriesParameters as $key => $value)
+        {
+          $this->addParameter($key, $value);
+        }
+        $this->addParameter('StudyInstanceUID', $studyvalue);
+
+        $resultseries = $this->querySeries();
+        $this->_appendResults($result[1], $resultseries);
+
+        // loop though images
+        if ($resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
+        {
+          $j = 0;
+          foreach ($resultseries['StudyInstanceUID'] as $key => $seriesvalue){
+            $this->cleanParameter();
+            foreach( $imageParameters as $key => $value)
+            {
+              $this->addParameter($key, $value);
+            }
+            $this->addParameter('StudyInstanceUID', $seriesvalue);
+            $this->addParameter('SeriesInstanceUID', $resultseries['SeriesInstanceUID'][$j]);
+            $resultimage = $this->queryImage();
+            $this->_appendResults($result[2], $resultimage);
+          }
+          ++$j;
+        }
+      }
+    }
+    return $result;
+  }
+
+  /**
+   * Convenience method to append array to another array.
+   *
+   * @param[in|out] array $base array in which we will add data
+   * @param[in|out] array $toappend array which will be added to base
+   *
+   */
+  private function _appendResults(&$base, &$toappend)
+  {
+    // if base is empty, don't append, just copy
+    if(empty($base)){
+      $base = $toappend;
+    }
+    // if base is not empty, append
+    else{
+      foreach ($toappend as $key => $value){
+        $base[$key] = array_merge($base[$key], $toappend[$key]);
+      }
+    }
+  }
 
   /**
    * Convenience method to finish the command to be executed. Append the command parameters, the PACS IP and the PACS port.
@@ -260,8 +395,23 @@ class PACS implements PACSInterface {
    */
   private function _finishCommand(&$command)
   {
+    // add host and port
+    $command .= ' '.$this->server_ip;
+    $command .= ' '.$this->server_port;
+    // redirect stderr to stdout since the useful information is inside stderr
+    $command .= ' 2>&1';
+  }
+
+  /**
+   * Convenience method to parse parameters and add it to the command.
+   *
+   * @param[in] array $param array containing parameters to be parsed.
+   * @param[in|out] string $command command to update.
+   *
+   */
+  static private function _parseParam(&$param, &$command){
     // append query parameters and values
-    foreach($this->command_param as $key => $value)
+    foreach( $param as $key => $value)
     {
       //if value provided
       if($value){
@@ -272,12 +422,6 @@ class PACS implements PACSInterface {
         $command .= ' -k '.$key;
       }
     }
-
-    // add host and port
-    $command .= ' '.$this->server_ip;
-    $command .= ' '.$this->server_port;
-    // redirect stderr to stdout since the useful information is inside stderr
-    $command .= ' 2>&1';
   }
 
   /**
@@ -288,7 +432,7 @@ class PACS implements PACSInterface {
    * @param[in|out] int  $i counter to keep track of line to be parsed.
    *
    */
-  private function _parseEOL(&$array, &$lines, &$i)
+  static private function _parseEOL(&$array, &$lines, &$i)
   {
     //check for error in result (if line starts with E)
     if(preg_match("/^E/", $lines[$i])){
@@ -299,26 +443,26 @@ class PACS implements PACSInterface {
     // increment counter by 4 to go to the result data
     if($lines[$i] == 'W: ---------------------------'){
       // go to data
-      $i += 4;
+      $i += 5;
       return;
     }
 
     // end of result data
     // increment counter by 2 to go to the next result line
-    if($lines[$i+1] == 'W: '){
+    if($lines[$i] == 'W: '){
       // go to next result data
-      $i += 2;
+      ++$i;
       return;
     }
 
     // process result line
 
     // 1- get field (last word in line)
-    $split_array = explode(' ', $lines[++$i]);
+    $split_array = explode(' ', $lines[$i]);
     $split_num = count($split_array);
     $field = $split_array[$split_num-1];
     // add field to results array
-    $this->_addKey($array, $field);
+    PACS::_addKey($array, $field);
 
     // 2- get value
     // value should be formated as follow
@@ -333,6 +477,8 @@ class PACS implements PACSInterface {
       $value = split('\]', $tmpsplit[1]);
       $array[$field][] =  $value[0];
     }
+
+    ++$i;
   }
 
   /**
@@ -343,7 +489,7 @@ class PACS implements PACSInterface {
    * @param[in|out] string $jsonarray array containing well formated output.
    *
    */
-  private function _addKey(&$output, &$key)
+  static private function _addKey(&$output, &$key)
   {
     if (!array_key_exists($key,$output))
     {
@@ -361,7 +507,7 @@ class PACS implements PACSInterface {
    * returns null is nothing was found for given command parmeters.
    *
    */
-  private function _executeAndFormat(&$command)
+  static private function _executeAndFormat(&$command)
   {
     // execute query
     $command_output = shell_exec($command);
@@ -374,7 +520,7 @@ class PACS implements PACSInterface {
     $output = Array();
 
     while ($i < $count) {
-      $this->_parseEOL($output, $lines, $i);
+      PACS::_parseEOL($output, $lines, $i);
     }
 
     // return null if array is enpty (prolly a wrong parameter)
@@ -454,8 +600,20 @@ class PACS implements PACSInterface {
   }
 
   // process data once something has been received by the listener
-  public function process(){
-    return "PROCESS CALLED";
+  static public function process($filename){
+    // Image information
+    $requiered_fields = '+P SeriesInstanceUID';
+    $requiered_fields .= ' +P SOPInstanceUID';
+    $requiered_fields .= ' +P ProtocolName';
+    $requiered_fields .= ' +P ContentTime';
+    // Patient information
+    $requiered_fields .= ' +P PatientName';
+    $requiered_fields .= ' +P PatientBirthdate';
+    $requiered_fields .= ' +P PatientSex';
+    $requiered_fields .= ' +P PatientID';
+
+    $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
+    return PACS::_executeAndFormat($command);
   }
 }
 ?>

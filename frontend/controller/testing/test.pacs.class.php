@@ -159,7 +159,7 @@ class TestPACSClass extends UnitTestCase {
   }
 
   //! [testQueryStudy()]
-
+   
   /**
    * Test the querySeries method
    */
@@ -205,6 +205,41 @@ class TestPACSClass extends UnitTestCase {
   }
 
   //! [testQueryImage()]
+   
+  /**
+   * Test the queryAll method
+   */
+
+  //! [testQueryAll()]
+  public function testQueryAll() {
+    // query on MRN
+    $server_ip = '134.174.12.21';
+    $server_port = 104;
+    $user_aetitle = 'FNNDSC-CHRIS';
+    $pacs_all = new PACS($server_ip, $server_port, $user_aetitle);
+
+    $study_parameter = Array();
+    $study_parameter['PatientID'] = '2199064';
+
+    $series_parameter = Array();
+    $series_parameter['NumberOfSeriesRelatedInstances'] = '';
+
+    $image_parameter = Array();
+    $image_parameter['NumberOfSeriesRelatedInstances'] = '';
+    $image_parameter['DeviceSerialNumber']= '';
+    $image_parameter['ProtocolName']= '';
+    //$image_parameter['SOPInstanceUID']= '';
+
+    $result_all = $pacs_all->queryAll($study_parameter, $series_parameter, $image_parameter);
+
+    // should return an array with all the results
+    // $result_all[0] returns the Study results
+    // $result_all[1] returns the Series results
+    // $result_all[2] returns the Image results
+    //$this->assertTrue(count($result_all) == 3);
+  }
+
+  //! [testQueryAll()]
 
   /**
    * Test the moveStudy method

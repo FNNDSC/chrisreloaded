@@ -47,10 +47,14 @@ define('CHRIS_VIEW_FOLDER', joinPaths(CHRIS_WWWROOT,'view'));
 define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
 
 // PACS
+// folder containing dcmtk binaries
 define('CHRIS_DCMTK', '/usr/bin/');
-define('CHRIS_INCOMINGDATA', '/chb/users/chris/incoming/');
+// chris file system
+define('CHRIS_DATA', '/chb/users/chris/data/');
+define('CHRIS_TMP', '/chb/users/chris/tmp/');
+// anonymize data
 define('CHRIS_DCMRENAME', '/chb/users/nicolas.rannou/arch/scripts/dcm_rename');
-define('CHRIS_SESSIONPATH', '/chb/users/chris/files/');
+// useless?
 define('CHRIS_AETITLE', 'CHRIS');
 
 // TESTING
