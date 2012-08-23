@@ -20,7 +20,6 @@
     </div>
    </div>
   </div>
-  <!-- /btn-group -->
   <div class='row '>
    <div class='span3'>
     <div class='well'>
@@ -35,7 +34,7 @@
        <li><a href="#">Tractography</a></li>
       </ul>
      </div>
-     <br /> <img src=view/gfx/fetal_moco.png class="img-polaroid">
+     <br /> <img src=view/gfx/fetal_moco.png class="img-rounded">
     </div>
    </div>
    <div class='span6'>
@@ -47,16 +46,12 @@
      Early approaches have used reconstruction...
     </div>
    </div>
-
    <div class='span3'>
     <div class='well'>
      <h3>Credits</h3>
      Kim K, Habas PA, Rousseau F, Glenn OA, Barkovich AJ, Studholme C.
     </div>
    </div>
-
-
-   <!--    </div> -->
   </div>
 
 
@@ -65,30 +60,88 @@
   <div id='moco' class='row'>
    <div class='span3'>
     <div class='well'>
-     <button class="btn btn-large btn-primary" type="button">Add
-      input</button>
-     <br> <br> <br> <br> <br> <br> <br>
-     <br> <br> <br> <br> <br> <br> <br>
-     <br> <br> <br> <br> <br> <br> <br>
-     <br> <br> <br> <br> <br> <br> <br>
+     <h3>
+      Input data
+      <button class="btn btn-large btn-primary pull-right" type="button">+</button>
+     </h3>
+     <div id='input3' class='well'>
+      <h4>Set #3</h4>
+      <div>
+       T1 <input type="text" class="input-small search-query">
+       <button type="submit" class="btn">+</button>
+       <div>
+        T2 <input type="text" class="input-small search-query">
+       <button type="submit" class="btn">+</button>
+       </div>
+      </div>
+     </div>
+     <div id='input2' class='well'>
+      <h4>Set #2</h4>
+      <div>
+       T1 <input type="text" class="input-small search-query">
+       <button type="submit" class="btn">+</button>
+       <div>
+        T2 <input type="text" class="input-small search-query">
+       <button type="submit" class="btn">+</button>
+       </div>
+      </div>
+     </div>
+     <div id='input1' class='well'>
+      <h4>Set #1</h4>
+      <div>
+       T1 <input type="text" class="input-small search-query">
+       <button type="submit" class="btn">+</button>
+       <div>
+        T2 <input type="text" class="input-small search-query">
+       <button type="submit" class="btn">+</button>
+       </div>
+      </div>
+     </div>
     </div>
    </div>
    <div class='span9'>
     <div class='well'>
-     <a href="#" class="btn btn-large btn-primary disabled">Parameters</a>
-     <button type="button" class="btn btn-large btn-success pull-right">Submit
-      jobs</button>
-     <br> <br> <br> <br> <br> <br> <br>
-     <br> <br> <br> <br> <br> <br> <br>
-     <br> <br> <br> <br> <br> <br> <br>
-     <br> <br> <br> <br> <br> <br> <br>
+     <h3>
+      Parameters
+      <button type="button" class="btn btn-large btn-success pull-right">Submit
+       jobs</button>
+     </h3>
+     <div id='input1' class='well'>
+      <h4>
+       Motion Correction
+       <button class="btn btn-primary pull-right" type="button">Advanced</button>
+      </h4>
+      <div>
+       Parameter1 <input type="text" class="input-small search-query">
+       <button type="submit" class="btn">+</button>
+       <button type="submit" class="btn">-</button>
+       <div>
+        Parameter2 <input type="text" class="input-small search-query">
+        <button type="submit" class="btn">+</button>
+        <button type="submit" class="btn">-</button>
+       </div>
+      </div>
+     </div>
+     <div id='input1' class='well'>
+      <h4>
+       Global Parameters
+       <button class="btn btn-primary pull-right" type="button">Advanced</button>
+      </h4>
+      <div>
+       Project <input type="text" class="input-small search-query">
+       <button type="submit" class="btn">+</button>
+       <div>
+        <label class="checkbox"> <input type="checkbox">
+         Email me when job finished
+        </label>
+       </div>
+      </div>
+     </div>
     </div>
    </div>
   </div>
-
  </div>
 
  ${FOOTER} ${JAVASCRIPT}
-
 </body>
 </html>
