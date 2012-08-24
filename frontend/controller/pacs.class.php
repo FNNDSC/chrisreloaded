@@ -44,6 +44,8 @@ interface PACSInterface
   public function querySeries();
   // method to the query the PACS for a series
   public function queryImage();
+  // method to the query the PACS for a mrn studies, series and images
+  public function queryAll($studyParameters, $seriesParameters, $imageParameters);
   // method to the retrieve study
   public function moveStudy();
   // method to the retrieve series

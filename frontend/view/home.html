@@ -31,17 +31,18 @@
        <span style="color: #999; font-size: 10px;">PROJECTS</span></li>
      </ul>
      <!-- PACS PULL -->
-     <textarea id="pacs_pull"
+     <textarea id="pacs_pull_mrns"
       placeholder="Enter MRN(s) to pull from PACS..."
       style="width: 248px; height: 19px; overflow: hidden; padding-bottom: 5px; margin-top: 0px; margin-bottom: 0px; max-width: 248px"></textarea>
      <div id="pacs_pull_ui" style="display: none">
-      <a href="" class="btn" style="margin-top: 6px; float: left"
+      <a id='pacs_pull_advanced' class="btn" style="margin-top: 6px; float: left"
        rel="bottom_tooltip"
        title="Query the PACS for patient name, age, scan type..">Advanced</a><a
-       href="" class="btn btn-warning"
+       id='pacs_pull' class="btn btn-warning"
        style="margin-top: 6px; float: right"><i
        class="icon icon-white icon-ok"></i> Pull</a> <br> <br>
      </div>
+
     </div>
     <div class="well"></div>
     <div class="well"></div>
