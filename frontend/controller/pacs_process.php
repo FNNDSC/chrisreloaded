@@ -52,20 +52,17 @@ $options = getopt($shortopts);
 
 $p = $options['p'];
 $f = $options['f'];
-/* $p = '/chb/users/chris/data/4668929-343/Ax_T2_4mm-294';
- $f = 'MR.1.3.12.2.1107.5.2.32.35288.2009050808223020719188252'; */
+/*  $p = '/chb/users/chris/data/4387255-361/AX_T2_BLADE-498';
+ $f = 'NoFileName.dcm';  */
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
-echo $tmpfile;
-print_r($result);
 
 // initiate variables
 $patient_chris_id = -1;
 $data_chris_id = -1;
 $image_chris_id = -1;
 $protocol_name = 'NoProtocolName';
-$filename = 'NoFileName';
 
 // start patient table lock
 $db = DB::getInstance();
@@ -152,7 +149,6 @@ if (array_key_exists('SeriesInstanceUID',$result))
   else{
     $protocol_name = $dataResult['Data'][0]->name;
     $data_chris_id = $dataResult['Data'][0]->id;
-    $filename = $result['InstanceNumber'][0];
   }
 }
 else {
@@ -179,7 +175,8 @@ if(!is_dir($datadirname)){
 }
 
 // cp file over if doesnt exist
-$filename = $datadirname .'/'.$filename.'.dcm';
+$filenum = $result['InstanceNumber'][0];
+$filename = $datadirname .'/'.$filenum.'.dcm';
 if(!is_file($filename)){
   copy($tmpfile, $filename);
 }
