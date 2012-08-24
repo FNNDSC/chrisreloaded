@@ -86,7 +86,7 @@ class TestPACSClass extends UnitTestCase {
     $this->assertTrue($result_not_enough == null);
 
     // we add enough parameter: AE Title and Query Retrieve Level
-    $user_aetitle = 'FNNDSC-CHRIS';
+    $user_aetitle = 'FNNDSC-CHRISDEV';
     $pacs_enough = new PACS($server_ip, $server_port, $user_aetitle);
     $pacs_enough->addParameter('PatientID', 4562009);
     $result_enough = $pacs_enough->queryStudy();
@@ -115,7 +115,7 @@ class TestPACSClass extends UnitTestCase {
     // query on MRN
     $server_ip = '134.174.12.21';
     $server_port = 104;
-    $user_aetitle = 'FNNDSC-CHRIS';
+    $user_aetitle = 'FNNDSC-CHRISDEV';
     $pacs_mrn = new PACS($server_ip, $server_port, $user_aetitle);
     $pacs_mrn->addParameter('PatientID', 4562009);
     $result_mrn = $pacs_mrn->queryStudy();
@@ -169,7 +169,7 @@ class TestPACSClass extends UnitTestCase {
     // query in StudyInstanceUID
     $server_ip = '134.174.12.21';
     $server_port = 104;
-    $user_aetitle = 'FNNDSC-CHRIS';
+    $user_aetitle = 'FNNDSC-CHRISDEV';
     $pacs_siiud = new PACS($server_ip, $server_port, $user_aetitle);
     $pacs_siiud->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120409172607.5904669');
     $result_siiud = $pacs_siiud->querySeries();
@@ -215,7 +215,7 @@ class TestPACSClass extends UnitTestCase {
     // query on MRN
     $server_ip = '134.174.12.21';
     $server_port = 104;
-    $user_aetitle = 'FNNDSC-CHRIS';
+    $user_aetitle = 'FNNDSC-CHRISDEV';
     $pacs_all = new PACS($server_ip, $server_port, $user_aetitle);
 
     $study_parameter = Array();
@@ -250,7 +250,7 @@ class TestPACSClass extends UnitTestCase {
     // move on MRN + Study Date
     $server_ip = '134.174.12.21';
     $server_port = 104;
-    $user_aetitle = 'FNNDSC-CHRIS';
+    $user_aetitle = 'FNNDSC-CHRISDEV';
     $pacs_mrn = new PACS($server_ip, $server_port, $user_aetitle);
     $pacs_mrn->addParameter('PatientID', 4562009);
     $pacs_mrn->addParameter('StudyDate', 20120508);
@@ -288,7 +288,7 @@ class TestPACSClass extends UnitTestCase {
     // move on MRN + Study Date
     $server_ip = '134.174.12.21';
     $server_port = 104;
-    $user_aetitle = 'FNNDSC-CHRIS';
+    $user_aetitle = 'FNNDSC-CHRISDEV';
     $pacs = new PACS($server_ip, $server_port, $user_aetitle);
     $pacs->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120508133531.5943861');
     $pacs->addParameter('SeriesInstanceUID', '1.2.840.113619.2.256.896737926219.1336498845.3088');
@@ -300,7 +300,7 @@ class TestPACSClass extends UnitTestCase {
     // missing StudyInstanceUID
     $server_ip = '134.174.12.21';
     $server_port = 104;
-    $user_aetitle = 'FNNDSC-CHRIS';
+    $user_aetitle = 'FNNDSC-CHRISDEV';
     $pacs_miss_study = new PACS($server_ip, $server_port, $user_aetitle);
     $pacs_miss_study->addParameter('SeriesInstanceUID', '1.2.840.113619.2.256.896737926219.1336498845.3088');
     $result_miss_study = $pacs_miss_study->moveSeries();
@@ -311,7 +311,7 @@ class TestPACSClass extends UnitTestCase {
     // missing SeriesInstanceUID
     $server_ip = '134.174.12.21';
     $server_port = 104;
-    $user_aetitle = 'FNNDSC-CHRIS';
+    $user_aetitle = 'FNNDSC-CHRISDEV';
     $pacs_miss_series = new PACS($server_ip, $server_port, $user_aetitle);
     $pacs_miss_series->addParameter('StudyInstanceUID', '1.2.840.113845.11.1000000001785349915.20120508133531.5943861');
     $result_miss_series = $pacs_miss_series->moveSeries();
