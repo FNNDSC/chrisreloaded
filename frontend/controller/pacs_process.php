@@ -49,11 +49,11 @@ $shortopts .= "p:"; // Incoming file location
 $shortopts .= "f:"; // Incoming file name
 
 $options = getopt($shortopts);
-/*
- $p = $options['p'];
-$f = $options['f'];*/
-$p = '/chb/users/chris/data/4668929-343/Ax_T2_4mm-294';
-$f = 'MR.1.3.12.2.1107.5.2.32.35288.2009050808223020719188252';
+
+$p = $options['p'];
+$f = $options['f'];
+/* $p = '/chb/users/chris/data/4668929-343/Ax_T2_4mm-294';
+ $f = 'MR.1.3.12.2.1107.5.2.32.35288.2009050808223020719188252'; */
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
@@ -86,10 +86,8 @@ if (array_key_exists('PatientName',$result) && array_key_exists('PatientID',$res
     if(array_key_exists('PatientBirthDate',$result))
     {
       $date = $result['PatientBirthDate'][0];
-      //$patientObject->dob = substr($date, -6, 4).'-'.substr($date, -4, 2).'-'.substr($date, -2, 2);
-      $datetime =  strtotime(substr($date, -6, 4).'-'.substr($date, -4, 2).'-'.substr($date, -2, 2));
-      $mysqldate = date("m/d/y g:i A", $datetime);
-      $patientObject->dob = $mysqldate;
+      $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
+      $patientObject->dob = $datetime;
     }
     else{
       $patientObject->dob = '0000-00-00';
@@ -101,7 +99,6 @@ if (array_key_exists('PatientName',$result) && array_key_exists('PatientID',$res
     $patient_chris_id = Mapper::add($patientObject);
   }
   else {
-    echo 'patient already there';
     // get patient id
     $patient_chris_id = $patientResult['Patient'][0]->id;
   }
@@ -140,7 +137,12 @@ if (array_key_exists('SeriesInstanceUID',$result))
       $protocol_name = str_replace ('/', '_', $protocol_name);
     }
     $dataObject->name = $protocol_name;
-    $dataObject->time = $result['ContentTime'][0];
+    $date = $result['ContentDate'][0];
+    $datemysql =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
+    $time = $result['ContentTime'][0];
+    $timemysql = substr($time, 0, 2).':'.substr($time, 2, 2).':'.substr($time, 4, 2);
+    $datetimemysql = $datemysql.' '. $timemysql;
+    $dataObject->time = $datetimemysql;
     $dataObject->meta_information = '';
 
     // add the data model and get its id
@@ -178,11 +180,10 @@ if(!is_dir($datadirname)){
 
 // cp file over if doesnt exist
 $filename = $datadirname .'/'.$filename.'.dcm';
-echo $filename;
 if(!is_file($filename)){
   copy($tmpfile, $filename);
 }
-/*
+
 // delete tmp file
 unlink($tmpfile);
 
@@ -190,5 +191,5 @@ unlink($tmpfile);
 $files = scandir($p);
 if(count($files) <= 2){
   rmdir($p);
-}*/
+}
 ?>

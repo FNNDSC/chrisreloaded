@@ -605,7 +605,7 @@ class PACS implements PACSInterface {
     $requiered_fields = '+P SeriesInstanceUID';
     $requiered_fields .= ' +P SOPInstanceUID';
     $requiered_fields .= ' +P ProtocolName';
-    // should be contentTime
+    $requiered_fields .= ' +P ContentDate';
     $requiered_fields .= ' +P ContentTime';
     $requiered_fields .= ' +P InstanceNumber';
     
