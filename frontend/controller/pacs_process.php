@@ -49,27 +49,33 @@ $shortopts .= "p:"; // Incoming file location
 $shortopts .= "f:"; // Incoming file name
 
 $options = getopt($shortopts);
-
-$p = $options['p'];
-$f = $options['f'];
+/*
+ $p = $options['p'];
+$f = $options['f'];*/
+$p = '/chb/users/chris/data/4668929-343/Ax_T2_4mm-294';
+$f = 'MR.1.3.12.2.1107.5.2.32.35288.2009050808223020719188252';
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
+echo $tmpfile;
+print_r($result);
 
 // initiate variables
 $patient_chris_id = -1;
 $data_chris_id = -1;
 $image_chris_id = -1;
 $protocol_name = 'NoProtocolName';
+$filename = 'NoFileName';
 
 // start patient table lock
 $db = DB::getInstance();
 $db->lock('patient', 'WRITE');
 
-if (array_key_exists('PatientName',$result))
+if (array_key_exists('PatientName',$result) && array_key_exists('PatientID',$result))
 {
   $patientMapper = new Mapper('Patient');
   $patientMapper->filter('name = (?)',$result['PatientName'][0]);
+  $patientMapper->filter('patient_id = (?)',$result['PatientID'][0]);
   $patientResult = $patientMapper->get();
 
   if(count($patientResult['Patient']) == 0)
@@ -77,40 +83,31 @@ if (array_key_exists('PatientName',$result))
     // create patient model
     $patientObject = new Patient();
     $patientObject->name = $result['PatientName'][0];
-    $patientObject->dob = '0000-00-00';
+    if(array_key_exists('PatientBirthDate',$result))
+    {
+      $date = $result['PatientBirthDate'][0];
+      //$patientObject->dob = substr($date, -6, 4).'-'.substr($date, -4, 2).'-'.substr($date, -2, 2);
+      $datetime =  strtotime(substr($date, -6, 4).'-'.substr($date, -4, 2).'-'.substr($date, -2, 2));
+      $mysqldate = date("m/d/y g:i A", $datetime);
+      $patientObject->dob = $mysqldate;
+    }
+    else{
+      $patientObject->dob = '0000-00-00';
+    }
     $patientObject->sex = $result['PatientSex'][0];
-    $patientObject->patient_id = $result['PatientID'][0].';';
+    $patientObject->patient_id = $result['PatientID'][0];
 
     // add the patient model and get its id
     $patient_chris_id = Mapper::add($patientObject);
   }
   else {
+    echo 'patient already there';
     // get patient id
     $patient_chris_id = $patientResult['Patient'][0]->id;
-
-    // update MRN field if MRN provided
-    if(array_key_exists('PatientID',$result)){
-      $patient_mrn = $patientResult['Patient'][0]->patient_id;
-      $list_patient_mrn = explode(';', $patient_mrn);
-      // and if not already there...!
-      if(!in_array($result['PatientID'][0], $list_patient_mrn)){
-        // create patient model
-        $patientObject = new Patient();
-        $patientObject->name = $patientResult['Patient'][0]->name;
-        $patientObject->dob = $patientResult['Patient'][0]->dob;
-        $patientObject->sex = $patientResult['Patient'][0]->sex;
-        // previous MRN list
-        $patientObject->patient_id = $patientResult['Patient'][0]->patient_id;
-        // add new MRN
-        $patientObject->patient_id .= $result['PatientID'][0].';';
-
-        Mapper::update($patientObject, $patient_chris_id);
-      }
-    }
   }
 }
 else {
-  echo 'PatientName or PatientBirthdate not there';
+  echo 'PatientName or PatientMRN not there';
   // finish patient table lock
   $db->unlock();
   return;
@@ -153,6 +150,7 @@ if (array_key_exists('SeriesInstanceUID',$result))
   else{
     $protocol_name = $dataResult['Data'][0]->name;
     $data_chris_id = $dataResult['Data'][0]->id;
+    $filename = $result['InstanceNumber'][0];
   }
 }
 else {
@@ -179,11 +177,12 @@ if(!is_dir($datadirname)){
 }
 
 // cp file over if doesnt exist
-$filename = $datadirname .'/'.$f;
+$filename = $datadirname .'/'.$filename.'.dcm';
+echo $filename;
 if(!is_file($filename)){
   copy($tmpfile, $filename);
 }
-
+/*
 // delete tmp file
 unlink($tmpfile);
 
@@ -191,5 +190,5 @@ unlink($tmpfile);
 $files = scandir($p);
 if(count($files) <= 2){
   rmdir($p);
-}
+}*/
 ?>
