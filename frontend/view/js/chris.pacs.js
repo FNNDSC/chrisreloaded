@@ -2,12 +2,14 @@
 function fnFormatDetails(oTable, data) {
   var numberOfResults = data.StudyInstanceUID.length;
   var i = 0;
-  var content = '<table id="seriesResults" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>UID</th><th># files</th></tr></thead><tbody>';
+  var content = '<table id="seriesResults" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>UID</th><th># files</th><th></th><th></th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
     content += '<tr class="parent pacsStudyRows" value="'
         + data.SeriesInstanceUID[i] + '">';
     content += '<td>' + data.SeriesInstanceUID[i] + '</td>';
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + ' files</td>';
+    content += '<td><button class="btn btn-success preview_series row-fluid" type="button"><i class="icon-eye-open icon-white"></i></button></td>';
+    content += '<td><button class="btn btn-primary download_series row-fluid" type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
     content += '</tr>';
   }
   content += '</body></table>';
@@ -32,8 +34,8 @@ function fnInitTable(tableName, nbColumn, icon) {
    */
   var nCloneTh = document.createElement('th');
   var nCloneTd = document.createElement('td');
-  nCloneTd.innerHTML = '<i class="icon-circle-arrow-down download' + tableName
-      + '"></i>';
+  nCloneTd.innerHTML = '<button class="btn btn-primary download_study row-fluid" type="button"><i class="icon-circle-arrow-down icon-white download' + tableName
+      + '"></i></button>';
   nCloneTd.className = "center";
   $('#' + tableName + 'Results thead tr').each(function() {
     this.insertBefore(nCloneTh, this.childNodes[nbColumn]);
@@ -56,6 +58,7 @@ function fnInitTable(tableName, nbColumn, icon) {
               "bSortable" : false,
               "aTargets" : [ 0, nbColumn ]
             } ],
+            "aaSorting" : [ [ 1, 'asc' ] ]
           });
   return oTable;
 }
@@ -117,7 +120,7 @@ $(document)
                             $('#results_container').html(content);
                             var oTable = fnInitTable('quick', 6,
                                 'icon-chevron-down');
-                            $(".downloadquick").click(function(event) {
+                            $(".download_study").click(function(event) {
                               alert('PACS STUDY PULL TRIGERED!');
                             });
                             $('.icon-chevron-down').click(function() {
