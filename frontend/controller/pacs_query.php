@@ -35,14 +35,14 @@ $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 
 if($_POST['PACS_LEV'] == 'STUDY'){
   $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
-  $pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
+  //$pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
   $pacs->addParameter('RetrieveAETitle', $_POST['USER_AET']);
   $pacs->addParameter('ModalitiesInStudy', $_POST['PACS_MOD']);
-  $pacs->addParameter('StudyDescription', $_POST['PACS_STU_DES']);
+  //$pacs->addParameter('StudyDescription', $_POST['PACS_STU_DES']);
   $pacs->addParameter('PatientName', $_POST['PACS_NAM']);
   $pacs->addParameter('PatientID', $_POST['PACS_MRN']);
   $pacs->addParameter('PatientBirthDate', '');
-  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+  //$pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
   echo json_encode($pacs->queryStudy());
 }
 else{
