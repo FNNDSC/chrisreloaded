@@ -26,6 +26,10 @@ table.dataTable td {
 	padding: 3px 10px;
 }
 
+table.dataTable td.details {
+  padding: 0px 0px;
+}
+
 table.dataTable td.center,
 table.dataTable td.dataTables_empty {
 	text-align: center;

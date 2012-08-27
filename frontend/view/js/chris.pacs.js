@@ -2,7 +2,7 @@
 function fnFormatDetails(oTable, data) {
   var numberOfResults = data.StudyInstanceUID.length;
   var i = 0;
-  var content = '<table id="seriesResults" class="table table-bordered"><thead><tr><th>UID</th><th># files</th></tr></thead><tbody>';
+  var content = '<table id="seriesResults" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>UID</th><th># files</th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
     content += '<tr class="parent pacsStudyRows" value="'
         + data.SeriesInstanceUID[i] + '">';
@@ -135,7 +135,19 @@ $(document)
                                   PACS_STU_UID : studyUID
                                 },
                                 success : function(data) {
-                                  alert('DATA RECEIVED');
+                                  //alert('DATA RECEIVED');
+                                  //var i = $.inArray( nTr, anOpen );
+                                   
+                                  //if ( i === -1 ) {
+                                     //$('img', this).attr( 'src', sImageUrl+"details_close.png" );
+                                     oTable.fnOpen( nTr, fnFormatDetails(oTable, data), 'details' );
+                                     //anOpen.push( nTr );
+                                   //}
+                                   //else {
+                                     //$('img', this).attr( 'src', sImageUrl+"details_open.png" );
+                                     //oTable.fnClose( nTr );
+                                    // anOpen.splice( i, 1 );
+                                   //}
                                   /*
                                    * $('#serieslist') .html(
                                    * fnFormatDetails(oTable, data)); var oTable =
