@@ -45,11 +45,18 @@ if($_POST['PACS_LEV'] == 'STUDY'){
   $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
   echo json_encode($pacs->queryStudy());
 }
-else{
+elseif ($_POST['PACS_LEV'] == 'SERIES'){
   $pacs->addParameter('RetrieveAETitle', '');
   $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
   $pacs->addParameter('SeriesInstanceUID', '');
   $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
   echo json_encode($pacs->querySeries());
+}
+else{
+  $pacs->addParameter('RetrieveAETitle', '');
+  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+  $pacs->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
+  $pacs->addParameter('ProtocolName', '');
+  echo json_encode($pacs->queryImage());
 }
 ?>
