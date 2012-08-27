@@ -472,7 +472,7 @@ class PACS implements PACSInterface {
     $tmpsplit = split('\[', $lines[$i]);
     // we didn't find any "[": no value was provided
     if(count($tmpsplit) == 1){
-      $array[$field][] =  'no value provided';
+      $array[$field][] =  'nvp';
     }
     // else, finish splitting and append value to result array
     else{

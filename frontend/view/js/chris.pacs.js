@@ -44,18 +44,19 @@ function fnInitTable(tableName, nbColumn, icon) {
   /*
    * Initialse DataTables, with no sorting on the 'details' column
    */
-  var oTable = $('#' + tableName + 'Results').dataTable({
-    "aoColumnDefs" : [ {
-      "bSortable" : false,
-      "aTargets" : [ 0, nbColumn ]
-    } ],
-    "aaSorting" : [ [ 1, 'asc' ] ],
-    "sDom" : "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
-    // "sDom" : '<"slide"rtf>',
-    "sScrollY" : "200px",
-    "bPaginate" : false,
-    "bScrollCollapse" : true
-  });
+  var oTable = $('#' + tableName + 'Results')
+      .dataTable(
+          {
+            "sDom" : "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+            "sPaginationType" : "bootstrap",
+            "oLanguage" : {
+              "sLengthMenu" : "_MENU_ records per page"
+            },
+            "aoColumnDefs" : [ {
+              "bSortable" : false,
+              "aTargets" : [ 0, nbColumn ]
+            } ],
+          });
   return oTable;
 }
 /* Formating function for row details */
@@ -73,9 +74,10 @@ $(document)
            * PACS_ACC_NUM : $("#PACS_ACC_NUM").val() }, success : function(data) { }
            * }); });
            */
-/*          $('#example').dataTable({
-            "sDom" : "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
-          });*/
+          /*
+           * $('#example').dataTable({ "sDom" : "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
+           * });
+           */
           $("#PACS_QUERY")
               .click(
                   function(event) {
@@ -93,60 +95,64 @@ $(document)
                             PACS_NAM : $("#PACS_NAM").val(),
                             PACS_MOD : $("#PACS_MOD").val(),
                             PACS_DAT : $("#PACS_DAT").val(),
+                            PACS_STU_DES : '',
+                            PACS_STU_UID : '',
+                            PACS_ACC_NUM : ''
                           },
                           success : function(data) {
-                            alert(data);
-                            var boot = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="example">';
+                            var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="quickResults">';
                             var numberOfResults = data.PatientID.length;
                             var i = 0;
-                            var content = '<table id="studyResults" class="table table-bordered"><thead><tr><th>PatientName</th><th>DateOfBirth</th><th>StudyDescription</th><th>StudyDate</th><th>Modality</th></tr></thead><tbody>';
+                            content += '<thead><tr><th>PatientName</th><th>DateOfBirth</th><th>StudyDescription</th><th>StudyDate</th><th>Modality</th></tr></thead><tbody>';
                             for (i = 0; i < numberOfResults; ++i) {
-                              content += '<trclass="parent pacsStudyRows" value="'
-                                  + data.StudyInstanceUID[i] + '">';
+                              content += '<tr class="parent pacsStudyRows" value="' + data.StudyInstanceUID[i] + '">';
                               content += '<td>' + data.PatientName[i] + '</td>';
-                              content += '<td>' + data.PatientBirthDate[i]
-                                  + '</td>';
-                              content += '<td>' + data.StudyDescription[i]
-                                  + '</td>';
+                              content += '<td>' + data.PatientBirthDate[i] + '</td>';
+                              content += '<td>' + data.StudyDescription[i] + '</td>';
                               content += '<td>' + data.StudyDate[i] + '</td>';
-                              content += '<td>' + data.ModalitiesInStudy[i]
-                                  + '</td>';
+                              content += '<td>' + data.ModalitiesInStudy[i] + '</td>';
                               content += '</tr>';
                             }
                             content += '</tbody></table>';
-                            $('#studylist').html(content);
-                            var oTable = fnInitTable('study', 6,
-                                'icon-chevron-right');
-                            // $('#slideInner').animate({ 'marginLeft' : 0 });
-                            /*
-                             * Add event listener for opening and closing
-                             * details Note that the indicator for showing which
-                             * row is open is not controlled by DataTables,
-                             * rather it is done here
-                             */
-                            /*
-                             * $(".downloadstudy").click(function(event) {
-                             * alert('PACS STUDY PULL TRIGERED!'); });
-                             * $('.icon-chevron-right') .click( function() { var
-                             * nTr = $(this).parents('tr')[0]; var studyUID =
-                             * nTr.getAttribute('value'); $ .ajax({ type :
-                             * "POST", url : "controller/pacs_query.php",
-                             * dataType : "json", data : { USER_AET :
-                             * $("#USER_AET").val(), SERVER_IP :
-                             * $("#SERVER_IP").val(), SERVER_POR :
-                             * $("#SERVER_POR") .val(), PACS_LEV : 'SERIES',
-                             * PACS_STU_UID : studyUID }, success :
-                             * function(data) { $('#serieslist') .html(
-                             * fnFormatDetails(oTable, data)); var oTable =
-                             * fnInitTable( 'series', 3, 'icon-chevron-left');
-                             * $('#slideInner').animate( { 'marginLeft' : -$(
-                             * "#slideshow").width() });
-                             * $(".icon-chevron-left").click( function(event) {
-                             * $('#slideInner').animate({ 'marginLeft' : 0 });
-                             * }); $(".downloadseries") .click( function(event) {
-                             * alert('PACS SERIES PULL TRIGERED!'); }); } });
-                             * });
-                             */
+                            $('#results_container').html(content);
+                            var oTable = fnInitTable('quick', 6,
+                                'icon-chevron-down');
+                            $(".downloadquick").click(function(event) {
+                              alert('PACS STUDY PULL TRIGERED!');
+                            });
+                            $('.icon-chevron-down').click(function() {
+                              var nTr = $(this).parents('tr')[0];
+                              var studyUID = nTr.getAttribute('value');
+                              $.ajax({
+                                type : "POST",
+                                url : "controller/pacs_query.php",
+                                dataType : "json",
+                                data : {
+                                  USER_AET : $("#USER_AET").val(),
+                                  SERVER_IP : $("#SERVER_IP").val(),
+                                  SERVER_POR : $("#SERVER_POR").val(),
+                                  PACS_LEV : 'SERIES',
+                                  PACS_STU_UID : studyUID
+                                },
+                                success : function(data) {
+                                  alert('DATA RECEIVED');
+                                  /*
+                                   * $('#serieslist') .html(
+                                   * fnFormatDetails(oTable, data)); var oTable =
+                                   * fnInitTable( 'series', 3,
+                                   * 'icon-chevron-left');
+                                   * $('#slideInner').animate( { 'marginLeft' :
+                                   * -$( "#slideshow").width() });
+                                   * $(".icon-chevron-left").click(
+                                   * function(event) {
+                                   * $('#slideInner').animate({ 'marginLeft' : 0
+                                   * }); }); $(".downloadseries") .click(
+                                   * function(event) { alert('PACS SERIES PULL
+                                   * TRIGERED!'); });
+                                   */
+                                }
+                              });
+                            });
                           }
                         });
                   });

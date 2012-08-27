@@ -25,31 +25,33 @@
  *                        dev@babyMRI.org
  *
  */
+
+// we define a valid entry point
 define('__CHRIS_ENTRY_POINT__', 666);
 
+//define('CHRIS_CONFIG_DEBUG', true);
+
 // include the configuration
-require_once ('../config.inc.php');
-require_once 'pacs.class.php';
+require_once ('config.inc.php');
 
-$pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
+// include the template class
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
-if($_POST['PACS_LEV'] == 'STUDY'){
-  $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
-  $pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
-  $pacs->addParameter('RetrieveAETitle', $_POST['USER_AET']);
-  $pacs->addParameter('ModalitiesInStudy', $_POST['PACS_MOD']);
-  $pacs->addParameter('StudyDescription', $_POST['PACS_STU_DES']);
-  $pacs->addParameter('PatientName', $_POST['PACS_NAM']);
-  $pacs->addParameter('PatientID', $_POST['PACS_MRN']);
-  $pacs->addParameter('PatientBirthDate', '');
-  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
-  echo json_encode($pacs->queryStudy());
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
+
+function pacsPage() {
+  // create the login page
+  $t = new Template('pacs.html');
+  $t -> replace('CSS', 'css.html');
+  $t -> replace('NAVBAR', 'navbar.html');
+  /* $t -> replace('CART', 'cart.html');
+   $t -> replace('USERNAME', $_SESSION['username']); */
+  $t -> replace('FOOTER', 'footer.html');
+  $t -> replace('JAVASCRIPT', 'javascript.html');
+  return $t;
 }
-else{
-  $pacs->addParameter('RetrieveAETitle', '');
-  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
-  $pacs->addParameter('SeriesInstanceUID', '');
-  $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
-  echo json_encode($pacs->querySeries());
-}
+
+// execute the test
+echo pacsPage();
+
 ?>
