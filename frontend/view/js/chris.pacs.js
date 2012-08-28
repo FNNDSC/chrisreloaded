@@ -2,17 +2,21 @@
 function fnFormatDetails(oTable, data) {
   var numberOfResults = data.StudyInstanceUID.length;
   var i = 0;
-  var content = '<table id="seriesResults" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Protocol</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
+  var content = '<div class="studydetails-'
+      + data.StudyInstanceUID[0].replace(/\./g, "_")
+      + '" ><table id="seriesResults" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Protocol</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
     content += '<tr class="parent pacsStudyRows" value="'
         + data.SeriesInstanceUID[i] + '">';
-    content += '<td id="series-'+ data.SeriesInstanceUID[i].replace(/\./g,"_") +'">' + data.SeriesInstanceUID[i] + '</td>';
+    content += '<td id="series-'
+        + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">'
+        + data.SeriesInstanceUID[i] + '</td>';
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + ' files</td>';
     content += '<td><button class="btn btn-success preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
     content += '<td><button class="btn btn-info download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
     content += '</tr>';
   }
-  content += '</body></table>';
+  content += '</body></table></div>';
   return content;
 }
 function fnInitTable(tableName, nbColumn, icon) {
@@ -129,62 +133,84 @@ $(document)
                             $(".download_study").click(function(event) {
                               alert('PACS STUDY PULL TRIGERED!');
                             });
-                            $('.control').click(
-                                function() {
-                                  var nTr = $(this).parents('tr')[0];
-                                  var studyUID = nTr.getAttribute('value');
-                                  var i = $.inArray(nTr, anOpen);
-                                  if (i === -1) {
-                                    $('i', this).attr('class',
-                                        'icon-chevron-up');
-                                    $.ajax({
-                                      type : "POST",
-                                      url : "controller/pacs_query.php",
-                                      dataType : "json",
-                                      data : {
-                                        USER_AET : $("#USER_AET").val(),
-                                        SERVER_IP : $("#SERVER_IP").val(),
-                                        SERVER_POR : $("#SERVER_POR").val(),
-                                        PACS_LEV : 'SERIES',
-                                        PACS_STU_UID : studyUID
-                                      },
-                                      success : function(data2) {
-                                        oTable.fnOpen(nTr, fnFormatDetails(
-                                            oTable, data2), 'details');
-                                        anOpen.push(nTr);
-                                        
-                                        var numberOfResults = data2.StudyInstanceUID.length;
-                                        var j = 0;
-                                        for (j = 0; j < numberOfResults; ++j) {
-                                          $.ajax({
-                                            type : "POST",
-                                            url : "controller/pacs_query.php",
-                                            dataType : "json",
-                                            data : {
-                                              USER_AET : $("#USER_AET").val(),
-                                              SERVER_IP : $("#SERVER_IP").val(),
-                                              SERVER_POR : $("#SERVER_POR").val(),
-                                              PACS_LEV : 'IMAGE',
-                                              PACS_STU_UID : data2.StudyInstanceUID[j],
-                                              PACS_SER_UID : data2.SeriesInstanceUID[j]
-                                            },
-                                            success : function(data3) {
-                                              var idseries = '#series-'+data3.SeriesInstanceUID[0].replace(/\./g,"_");
-                                              $(idseries).text(data3.ProtocolName[0]);
+                            $('.control')
+                                .click(
+                                    function() {
+                                      var nTr = $(this).parents('tr')[0];
+                                      var studyUID = nTr.getAttribute('value');
+                                      var i = $.inArray(nTr, anOpen);
+                                      if (i === -1) {
+                                        $
+                                            .ajax({
+                                              type : "POST",
+                                              url : "controller/pacs_query.php",
+                                              dataType : "json",
+                                              data : {
+                                                USER_AET : $("#USER_AET").val(),
+                                                SERVER_IP : $("#SERVER_IP")
+                                                    .val(),
+                                                SERVER_POR : $("#SERVER_POR")
+                                                    .val(),
+                                                PACS_LEV : 'SERIES',
+                                                PACS_STU_UID : studyUID
+                                              },
+                                              success : function(data2) {
+                                                $('i', this).attr('class',
+                                                    'icon-chevron-up');
+                                                var nDetailsRow = oTable
+                                                    .fnOpen(nTr,
+                                                        fnFormatDetails(oTable,
+                                                            data2), 'details');
+/*                                                var studydetails = '#studydetails-'
+                                                    + data2.StudyInstanceUID[0]
+                                                        .replace(/\./g, "_");
+                                                $(studydetails).slideDown(
+                                                    'slow');*/
+                                                anOpen.push(nTr);
+                                                var numberOfResults = data2.StudyInstanceUID.length;
+                                                var j = 0;
+                                                for (j = 0; j < numberOfResults; ++j) {
+                                                  $
+                                                      .ajax({
+                                                        type : "POST",
+                                                        url : "controller/pacs_query.php",
+                                                        dataType : "json",
+                                                        data : {
+                                                          USER_AET : $(
+                                                              "#USER_AET")
+                                                              .val(),
+                                                          SERVER_IP : $(
+                                                              "#SERVER_IP")
+                                                              .val(),
+                                                          SERVER_POR : $(
+                                                              "#SERVER_POR")
+                                                              .val(),
+                                                          PACS_LEV : 'IMAGE',
+                                                          PACS_STU_UID : data2.StudyInstanceUID[j],
+                                                          PACS_SER_UID : data2.SeriesInstanceUID[j]
+                                                        },
+                                                        success : function(
+                                                            data3) {
+                                                          var idseries = '#series-'
+                                                              + data3.SeriesInstanceUID[0]
+                                                                  .replace(
+                                                                      /\./g,
+                                                                      "_");
+                                                          $(idseries)
+                                                              .text(
+                                                                  data3.ProtocolName[0]);
+                                                        }
+                                                      });
+                                                }
                                               }
-                                          });
-
-                                        }
-                                        
+                                            });
+                                      } else {
+                                        $('i', this).attr('class',
+                                            'icon-chevron-down');
+                                        oTable.fnClose(nTr);
+                                        anOpen.splice(i, 1);
                                       }
                                     });
-                                  } else {
-                                    $('i', this).attr('class',
-                                        'icon-chevron-down');
-                                    oTable.fnClose(nTr);
-                                    anOpen.splice(i, 1);
-                                  }
-                                });
                           }
                         });
                   });

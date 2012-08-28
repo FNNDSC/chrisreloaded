@@ -295,6 +295,8 @@ class PACS implements PACSInterface {
       PACS::_parseParam($this->command_param, $command);
 
       $this->_finishCommand($command);
+      
+      //echo $command;
 
       return $this->_executeAndFormat($command);
     }
