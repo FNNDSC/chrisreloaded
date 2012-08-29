@@ -134,7 +134,9 @@ $(document)
                             var oTable = fnInitTable('quick', 6,
                                 'icon-chevron-down');
                             $(".download_study").click(function(event) {
-                              alert('PACS STUDY PULL TRIGERED!');
+                              var nTr = $(this).parents('tr')[0];
+                              var studyUID = nTr.getAttribute('value');
+                              alert('PACS STUDY PULL TRIGERED!' + studyUID);
                             });
                             $('.control')
                                 .click(
@@ -180,42 +182,48 @@ $(document)
                                                           } ],
                                                         });
                                                 anOpen.push(nTr);
-                                                var numberOfResults = data2.StudyInstanceUID.length;
-                                                var j = 0;
-                                                for (j = 0; j < numberOfResults; ++j) {
-                                                  $
-                                                      .ajax({
-                                                        type : "POST",
-                                                        async : false,
-                                                        url : "controller/pacs_query.php",
-                                                        dataType : "json",
-                                                        data : {
-                                                          USER_AET : $(
-                                                              "#USER_AET")
-                                                              .val(),
-                                                          SERVER_IP : $(
-                                                              "#SERVER_IP")
-                                                              .val(),
-                                                          SERVER_POR : $(
-                                                              "#SERVER_POR")
-                                                              .val(),
-                                                          PACS_LEV : 'IMAGE',
-                                                          PACS_STU_UID : data2.StudyInstanceUID[j],
-                                                          PACS_SER_UID : data2.SeriesInstanceUID[j]
-                                                        },
-                                                        success : function(
-                                                            data3) {
-                                                          var idseries = '#series-'
-                                                              + data3.SeriesInstanceUID[0]
-                                                                  .replace(
-                                                                      /\./g,
-                                                                      "_");
-                                                          $(idseries)
-                                                              .text(
-                                                                  data3.ProtocolName[0]);
-                                                        }
-                                                      });
-                                                }
+                                                $(".download_series")
+                                                    .click(
+                                                        function(event) {
+                                                          var nTr = $(this)
+                                                              .parents('tr')[0];
+                                                          var seriesUID = nTr
+                                                              .getAttribute('value');
+                                                          alert('PACS SERIES PULL TRIGERED!'
+                                                              + seriesUID);
+                                                          var nTr = $(this)
+                                                              .parents('table')[0];
+                                                          var seriesUID = nTr
+                                                              .getAttribute('id');
+                                                          alert('STUDY'
+                                                              + seriesUID);
+                                                        });
+                                                /*
+                                                 * var numberOfResults =
+                                                 * data2.StudyInstanceUID.length;
+                                                 * var j = 0; for (j = 0; j <
+                                                 * numberOfResults; ++j) { $
+                                                 * .ajax({ type : "POST", async :
+                                                 * false, url :
+                                                 * "controller/pacs_query.php",
+                                                 * dataType : "json", data : {
+                                                 * USER_AET : $( "#USER_AET")
+                                                 * .val(), SERVER_IP : $(
+                                                 * "#SERVER_IP") .val(),
+                                                 * SERVER_POR : $(
+                                                 * "#SERVER_POR") .val(),
+                                                 * PACS_LEV : 'IMAGE',
+                                                 * PACS_STU_UID :
+                                                 * data2.StudyInstanceUID[j],
+                                                 * PACS_SER_UID :
+                                                 * data2.SeriesInstanceUID[j] },
+                                                 * success : function( data3) {
+                                                 * var idseries = '#series-' +
+                                                 * data3.SeriesInstanceUID[0]
+                                                 * .replace( /\./g, "_");
+                                                 * $(idseries) .text(
+                                                 * data3.ProtocolName[0]); } }); }
+                                                 */
                                               }
                                             });
                                       } else {
