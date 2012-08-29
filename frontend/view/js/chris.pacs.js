@@ -4,14 +4,16 @@ function fnFormatDetails(oTable, data) {
   var i = 0;
   var content = '<div class="studydetails-'
       + data.StudyInstanceUID[0].replace(/\./g, "_")
-      + '" ><table id="seriesResults" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Protocol</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
+      + '" ><table id="seriesResults-'
+      + data.StudyInstanceUID[0].replace(/\./g, "_")
+      + '" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Protocol</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
     content += '<tr class="parent pacsStudyRows" value="'
         + data.SeriesInstanceUID[i] + '">';
     content += '<td id="series-'
         + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">'
         + data.SeriesInstanceUID[i] + '</td>';
-    content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + ' files</td>';
+    content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + '</td>';
     content += '<td><button class="btn btn-success preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
     content += '<td><button class="btn btn-info download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
     content += '</tr>';
@@ -63,7 +65,7 @@ function fnInitTable(tableName, nbColumn, icon) {
               "bSortable" : false,
               "aTargets" : [ 0, nbColumn ]
             } ],
-            "aaSorting" : [ [ 1, 'asc' ] ]
+            "aaSorting" : [ [ 1, 'desc' ] ]
           });
   return oTable;
 }
@@ -87,6 +89,7 @@ $(document)
            * });
            */
           var anOpen = [];
+          var anSeriesLoaded = [];
           $("#PACS_QUERY")
               .click(
                   function(event) {
@@ -140,6 +143,8 @@ $(document)
                                       var studyUID = nTr.getAttribute('value');
                                       var i = $.inArray(nTr, anOpen);
                                       if (i === -1) {
+                                        $('i', this).attr('class',
+                                            'icon-chevron-up');
                                         $
                                             .ajax({
                                               type : "POST",
@@ -155,17 +160,25 @@ $(document)
                                                 PACS_STU_UID : studyUID
                                               },
                                               success : function(data2) {
-                                                $('i', this).attr('class',
-                                                    'icon-chevron-up');
                                                 var nDetailsRow = oTable
                                                     .fnOpen(nTr,
                                                         fnFormatDetails(oTable,
                                                             data2), 'details');
-/*                                                var studydetails = '#studydetails-'
-                                                    + data2.StudyInstanceUID[0]
-                                                        .replace(/\./g, "_");
-                                                $(studydetails).slideDown(
-                                                    'slow');*/
+                                                $(
+                                                    "#seriesResults-"
+                                                        + data2.StudyInstanceUID[0]
+                                                            .replace(/\./g, "_"))
+                                                    .dataTable(
+                                                        {
+                                                          "sDom" : "t",
+                                                          "aaSorting" : [ [ 1,
+                                                              'desc' ] ],
+                                                          "bPaginate" : false,
+                                                          "aoColumnDefs" : [ {
+                                                            "bSortable" : false,
+                                                            "aTargets" : [ 2, 3 ]
+                                                          } ],
+                                                        });
                                                 anOpen.push(nTr);
                                                 var numberOfResults = data2.StudyInstanceUID.length;
                                                 var j = 0;
@@ -173,6 +186,7 @@ $(document)
                                                   $
                                                       .ajax({
                                                         type : "POST",
+                                                        async : false,
                                                         url : "controller/pacs_query.php",
                                                         dataType : "json",
                                                         data : {
