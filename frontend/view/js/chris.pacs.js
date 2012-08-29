@@ -233,11 +233,13 @@ function ajaxSeriesResults(data, oTable, openStudies, nTr) {
           "bSortable" : false,
           "aTargets" : [ 2, 3 ]
         } ],
-        "sScrollY": "200px",
-        "bScrollCollapse": true
+        "sScrollY" : "200px",
+        "bScrollCollapse" : true
       });
   openStudies.push(nTr);
   setupDownloadSeries();
+  // query server for protocol name
+  // not working
   /*
    * var numberOfResults = data2.StudyInstanceUID.length; var j = 0; for (j = 0;
    * j < numberOfResults; ++j) { $ .ajax({ type : "POST", async : false, url :
@@ -282,6 +284,37 @@ function setupDownloadSeries() {
 /**
  * 
  */
+function ajaxPing() {
+  $.ajax({
+    type : "POST",
+    url : "controller/pacs_ping.php",
+    dataType : "json",
+    data : {
+      USER_AET : $("#USER_AET").val(),
+      SERVER_IP : $("#SERVER_IP").val(),
+      SERVER_POR : $("#SERVER_POR").val()
+    },
+    success : function(data) {
+      ajaxPingResults(data);
+    }
+  });
+}
+/**
+ * 
+ * @param data
+ */
+function ajaxPingResults(data) {
+  var pingResult = '';
+  if (data == 1) {
+    pingResult = ' <span class="alert alert-success fade in">Server accessible</span>';
+  } else {
+    pingResult = ' <span class="alert alert-error fade in">Server not accessible</span>';
+  }
+  $('#pacsping').html(pingResult);
+}
+/**
+ * 
+ */
 $(document).ready(function() {
   // store "opened" studies
   var openStudies = [];
@@ -293,18 +326,6 @@ $(document).ready(function() {
   });
   // ping the server
   $(".pacsPing").click(function(event) {
-    $.ajax({
-      type : "POST",
-      url : "controller/pacs_ping.php",
-      dataType : "json",
-      data : {
-        USER_AET : $("#USER_AET").val(),
-        SERVER_IP : $("#SERVER_IP").val(),
-        SERVER_POR : $("#SERVER_POR").val()
-      },
-      success : function(data) {
-        $('#pacsping').html(data);
-      }
-    });
+    ajaxPing();
   });
 });

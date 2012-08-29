@@ -43,7 +43,7 @@ function pacsPage() {
   // create the login page
   $t = new Template('pacs.html');
   $t -> replace('CSS', 'css.html');
-  $t -> replace('NAVBAR', 'navbar.html');
+  $t -> replace('NAVBAR', 'pacs_navbar.html');
   /* $t -> replace('CART', 'cart.html');
    $t -> replace('USERNAME', $_SESSION['username']); */
   $t -> replace('FOOTER', 'footer.html');
