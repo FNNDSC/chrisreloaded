@@ -47,8 +47,7 @@ if($_POST['PACS_LEV'] == 'STUDY'){
 }
 else{
   $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
-  // SERIESInstanceUID shouldnt be empty...
-  $pacs->addParameter('SeriesInstanceUID', '');
+  $pacs->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
   echo json_encode($pacs->moveSeries());
 }
 ?>

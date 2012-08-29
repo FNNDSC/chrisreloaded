@@ -6,6 +6,8 @@ function fnFormatDetails(oTable, data) {
       + data.StudyInstanceUID[0].replace(/\./g, "_")
       + '" ><table id="seriesResults-'
       + data.StudyInstanceUID[0].replace(/\./g, "_")
+      + '" value="'
+      + data.StudyInstanceUID[0]
       + '" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Protocol</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
     content += '<tr class="parent pacsStudyRows" value="'
@@ -73,21 +75,6 @@ function fnInitTable(tableName, nbColumn, icon) {
 $(document)
     .ready(
         function() {
-          /*
-           * $(".pacsRetrieve").click(function(event) { $.ajax({ type : "POST",
-           * url : "controller/pacs_move.php", dataType : "json", data : {
-           * USER_AET : $("#USER_AET").val(), SERVER_IP : $("#SERVER_IP").val(),
-           * SERVER_POR : $("#SERVER_POR").val(), PACS_LEV : 'STUDY',
-           * PACS_STU_UID : '', PACS_MRN : $("#PACS_MRN").val(), PACS_NAM :
-           * $("#PACS_NAM").val(), PACS_MOD : $("#PACS_MOD").val(), PACS_DAT :
-           * $("#PACS_DAT").val(), PACS_STU_DES : $("#PACS_STU_DES").val(),
-           * PACS_ACC_NUM : $("#PACS_ACC_NUM").val() }, success : function(data) { }
-           * }); });
-           */
-          /*
-           * $('#example').dataTable({ "sDom" : "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>"
-           * });
-           */
           var anOpen = [];
           var anSeriesLoaded = [];
           $("#PACS_QUERY")
@@ -136,7 +123,26 @@ $(document)
                             $(".download_study").click(function(event) {
                               var nTr = $(this).parents('tr')[0];
                               var studyUID = nTr.getAttribute('value');
-                              alert('PACS STUDY PULL TRIGERED!' + studyUID);
+                              $.ajax({
+                                type : "POST",
+                                url : "controller/pacs_move.php",
+                                dataType : "json",
+                                data : {
+                                  USER_AET : 'FNNDSC-CHRISDEV',
+                                  SERVER_IP : '134.174.12.21',
+                                  SERVER_POR : '104',
+                                  PACS_LEV : 'STUDY',
+                                  PACS_STU_UID : studyUID,
+                                  PACS_MRN : $("#PACS_MRN").val(),
+                                  PACS_NAM : '',
+                                  PACS_MOD : '',
+                                  PACS_DAT : '',
+                                  PACS_STU_DES : '',
+                                  PACS_ACC_NUM : ''
+                                },
+                                success : function(data) {
+                                }
+                              });
                             });
                             $('.control')
                                 .click(
@@ -189,14 +195,33 @@ $(document)
                                                               .parents('tr')[0];
                                                           var seriesUID = nTr
                                                               .getAttribute('value');
-                                                          alert('PACS SERIES PULL TRIGERED!'
-                                                              + seriesUID);
                                                           var nTr = $(this)
                                                               .parents('table')[0];
-                                                          var seriesUID = nTr
-                                                              .getAttribute('id');
-                                                          alert('STUDY'
-                                                              + seriesUID);
+                                                          var studyUID = nTr
+                                                              .getAttribute('value');
+                                                          $
+                                                              .ajax({
+                                                                type : "POST",
+                                                                url : "controller/pacs_move.php",
+                                                                dataType : "json",
+                                                                data : {
+                                                                  USER_AET : 'FNNDSC-CHRISDEV',
+                                                                  SERVER_IP : '134.174.12.21',
+                                                                  SERVER_POR : '104',
+                                                                  PACS_LEV : 'SERIES',
+                                                                  PACS_STU_UID : studyUID,
+                                                                  PACS_SER_UID : seriesUID,
+                                                                  PACS_MRN : '',
+                                                                  PACS_NAM : '',
+                                                                  PACS_MOD : '',
+                                                                  PACS_DAT : '',
+                                                                  PACS_STU_DES : '',
+                                                                  PACS_ACC_NUM : ''
+                                                                },
+                                                                success : function(
+                                                                    data) {
+                                                                }
+                                                              });
                                                         });
                                                 /*
                                                  * var numberOfResults =
@@ -251,18 +276,4 @@ $(document)
               }
             });
           });
-          /*
-           * $(".pacsAdanced").click(function(event) { if
-           * ($(".pacsadvanced").is(":visible")) { $(".pacsadvanced").hide(); }
-           * else { $(".pacsadvanced").show(); } }); $(".pacsadvanced").hide(); //
-           * pacs stuff var currentPosition = 0; var slideWidth =
-           * $("#slideshow").width(); var slides = $('.slide'); var
-           * numberOfSlides = slides.length; // Remove scrollbar in JS
-           * $('#slidesContainer').css('overflow', 'hidden'); // Wrap all
-           * .slides with #slideInner div slides.wrapAll('<div id="slideInner"></div>') //
-           * Float left to display horizontally, readjust .slides // width
-           * .css({ 'float' : 'left', 'width' : slideWidth }); // Set
-           * #slideInner width equal to total width of all slides
-           * $('#slideInner').css('width', slideWidth * numberOfSlides);
-           */
         });
