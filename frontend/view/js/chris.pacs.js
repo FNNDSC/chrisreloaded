@@ -4,21 +4,17 @@
  * @param data
  * @returns {String}
  */
-function fnFormatDetails(oTable, data) {
+function fnFormatDetails(data) {
   var numberOfResults = data.StudyInstanceUID.length;
   var i = 0;
   // set table id
-  var content = '<table id="studyDetails-'
+  var content = '<table id="'
       + data.StudyInstanceUID[0].replace(/\./g, "_")
-      + '" value="'
-      + data.StudyInstanceUID[0]
-      + '" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Protocol</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
+      + '-details" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Protocol</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
-    content += '<tr class="parent pacsStudyRows" value="'
-        + data.SeriesInstanceUID[i] + '">';
-    content += '<td id="series-'
-        + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">'
-        + data.SeriesInstanceUID[i] + '</td>';
+    content += '<tr class="parent pacsStudyRows" id="'
+        + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">';
+    content += '<td>' + data.SeriesInstanceUID[i] + '</td>';
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + '</td>';
     content += '<td><button class="btn btn-success preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
     content += '<td><button class="btn btn-info download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
@@ -87,7 +83,7 @@ function fnInitTable(tableName, nbColumn, icon) {
 function setupDownloadStudy() {
   $(".download_study").click(function(event) {
     var nTr = $(this).parents('tr')[0];
-    var studyUID = nTr.getAttribute('value');
+    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     $.ajax({
       type : "POST",
       url : "controller/pacs_move.php",
@@ -116,7 +112,7 @@ function setupDownloadStudy() {
 function setupDetailStudy(oTable, openStudies) {
   $('.control').click(function() {
     var nTr = $(this).parents('tr')[0];
-    var studyUID = nTr.getAttribute('value');
+    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     var i = $.inArray(nTr, openStudies);
     if (i === -1) {
       $('i', this).attr('class', 'icon-chevron-up');
@@ -144,8 +140,8 @@ function ajaxStudyResults(data, openStudies) {
     var i = 0;
     content += '<thead><tr><th>PatientName</th><th>DateOfBirth</th><th>StudyDescription</th><th>StudyDate</th><th>Modality</th></tr></thead><tbody>';
     for (i = 0; i < numStudies; ++i) {
-      content += '<tr class="parent pacsStudyRows" value="'
-          + data.StudyInstanceUID[i] + '">';
+      content += '<tr class="parent pacsStudyRows" id="'
+          + data.StudyInstanceUID[i].replace(/\./g, "_") + '">';
       content += '<td>' + data.PatientName[i] + '</td>';
       content += '<td>' + data.PatientBirthDate[i] + '</td>';
       content += '<td>' + data.StudyDescription[i] + '</td>';
@@ -221,21 +217,20 @@ function ajaxSeries(studyUID, oTable, openStudies, nTr) {
  */
 function ajaxSeriesResults(data, oTable, openStudies, nTr) {
   // format the details row table
-  var nDetailsRow = oTable
-      .fnOpen(nTr, fnFormatDetails(oTable, data), 'details');
+  oTable.fnOpen(nTr, fnFormatDetails(data), 'details');
   // make the details table sortable
-  $("#studyDetails-" + data.StudyInstanceUID[0].replace(/\./g, "_")).dataTable(
-      {
-        "sDom" : "t",
-        "aaSorting" : [ [ 1, 'desc' ] ],
-        "bPaginate" : false,
-        "aoColumnDefs" : [ {
-          "bSortable" : false,
-          "aTargets" : [ 2, 3 ]
-        } ],
-        "sScrollY" : "200px",
-        "bScrollCollapse" : true
-      });
+  var test = "#" + data.StudyInstanceUID[0].replace(/\./g, "_") + "-details";
+  $(test).dataTable({
+    "sDom" : "t",
+    "aaSorting" : [ [ 1, 'desc' ] ],
+    "bPaginate" : false,
+    "aoColumnDefs" : [ {
+      "bSortable" : false,
+      "aTargets" : [ 2, 3 ]
+    } ],
+    "sScrollY" : "200px",
+    "bScrollCollapse" : true
+  });
   openStudies.push(nTr);
   setupDownloadSeries();
   // query server for protocol name
@@ -255,9 +250,11 @@ function ajaxSeriesResults(data, oTable, openStudies, nTr) {
 function setupDownloadSeries() {
   $(".download_series").click(function(event) {
     var nTr = $(this).parents('tr')[0];
-    var seriesUID = nTr.getAttribute('value');
+    var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
     var nTr = $(this).parents('table')[0];
-    var studyUID = nTr.getAttribute('value');
+    // remove last 8 character (-details)
+    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
+    studyUID = studyUID.substring(0, studyUID.length - 8);
     $.ajax({
       type : "POST",
       url : "controller/pacs_move.php",
