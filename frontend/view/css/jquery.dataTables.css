@@ -30,6 +30,8 @@ table.dataTable td.details {
   padding: 0px 0px;
 }
 
+div.innerDetails { display: none }
+
 table.dataTable td.center,
 table.dataTable td.dataTables_empty {
 	text-align: center;

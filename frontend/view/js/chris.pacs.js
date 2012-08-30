@@ -8,7 +8,7 @@ function fnFormatDetails(data) {
   var numberOfResults = data.StudyInstanceUID.length;
   var i = 0;
   // set table id
-  var content = '<table id="'
+  var content = '<div class="innerDetails"><table id="'
       + data.StudyInstanceUID[0].replace(/\./g, "_")
       + '-details" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Protocol</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
@@ -20,7 +20,7 @@ function fnFormatDetails(data) {
     content += '<td><button class="btn btn-info download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
     content += '</tr>';
   }
-  content += '</body></table>';
+  content += '</body></table></div>';
   return content;
 }
 /**
@@ -81,7 +81,7 @@ function fnInitTable(tableName, nbColumn, icon) {
  * 
  */
 function setupDownloadStudy() {
-  $(".download_study").live( 'click', function(event) {
+  $(".download_study").live('click', function(event) {
     var nTr = $(this).parents('tr')[0];
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     $.ajax({
@@ -110,8 +110,7 @@ function setupDownloadStudy() {
  * 
  */
 function setupDetailStudy(oTable, openStudies, loadedStudies) {
-  $('#quick-results td .control').live( 'click', function() {
-
+  $('#quick-results td .control').live('click', function() {
     var nTr = $(this).parents('tr')[0];
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     var i = $.inArray(nTr, openStudies);
@@ -128,8 +127,10 @@ function setupDetailStudy(oTable, openStudies, loadedStudies) {
       }
     } else {
       $('i', this).attr('class', 'icon-chevron-down');
-      oTable.fnClose(nTr);
-      openStudies.splice(i, 1);
+      $('div.innerDetails', $(nTr).next()[0]).slideUp(function() {
+        oTable.fnClose(nTr);
+        openStudies.splice(i, 1);
+      });
     }
   });
 }
@@ -138,6 +139,15 @@ function setupDetailStudy(oTable, openStudies, loadedStudies) {
  * @param data
  */
 function ajaxStudyResults(data, openStudies, loadedStudies) {
+  // destroy table if exists
+  if ($('#quick-results').length > 0) {
+    // unlink all click events
+    $('#quick-results td .control').die('click');
+    // destroy dataTable
+    $('#quick-results').dataTable().fnDestroy();
+    // empty container
+    $('#results_container').html("");
+  }
   if (data != null) {
     // fill table with results
     // table id is important:
@@ -227,7 +237,7 @@ function ajaxSeries(studyUID, oTable, openStudies, nTr, loadedStudies) {
  */
 function ajaxSeriesResults(data, oTable, openStudies, nTr) {
   // format the details row table
-  oTable.fnOpen(nTr, fnFormatDetails(data), 'details');
+  var nDetailsRow = oTable.fnOpen(nTr, fnFormatDetails(data), 'details');
   // make the details table sortable
   var test = "#" + data.StudyInstanceUID[0].replace(/\./g, "_") + "-details";
   $(test).dataTable({
@@ -238,9 +248,10 @@ function ajaxSeriesResults(data, oTable, openStudies, nTr) {
       "bSortable" : false,
       "aTargets" : [ 2, 3 ]
     } ],
-    "sScrollY" : "200px",
-    "bScrollCollapse" : true
+/*    "sScrollY" : "200px",
+    "bScrollCollapse" : true*/
   });
+  $('div.innerDetails', nDetailsRow).slideDown();
   openStudies.push(nTr);
   setupDownloadSeries();
   // query server for protocol name
@@ -258,7 +269,7 @@ function ajaxSeriesResults(data, oTable, openStudies, nTr) {
    */
 }
 function setupDownloadSeries() {
-  $(".download_series").live( 'click', function(event) {
+  $(".download_series").live('click', function(event) {
     var nTr = $(this).parents('tr')[0];
     var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
     var nTr = $(this).parents('table')[0];
@@ -328,7 +339,7 @@ $(document).ready(function() {
   // store "loaded" studies
   var loadedStudies = [];
   // search button pushed
-  $("#PACS_QUERY").live( 'click', function(event) {
+  $("#PACS_QUERY").live('click', function(event) {
     ajaxStudy(openStudies, loadedStudies);
   });
   // ping the server
