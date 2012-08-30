@@ -81,7 +81,7 @@ function fnInitTable(tableName, nbColumn, icon) {
  * 
  */
 function setupDownloadStudy() {
-  $(".download_study").click(function(event) {
+  $(".download_study").live( 'click', function(event) {
     var nTr = $(this).parents('tr')[0];
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     $.ajax({
@@ -110,7 +110,8 @@ function setupDownloadStudy() {
  * 
  */
 function setupDetailStudy(oTable, openStudies, loadedStudies) {
-  $('.control').click(function() {
+  $('#quick-results td .control').live( 'click', function() {
+
     var nTr = $(this).parents('tr')[0];
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     var i = $.inArray(nTr, openStudies);
@@ -257,7 +258,7 @@ function ajaxSeriesResults(data, oTable, openStudies, nTr) {
    */
 }
 function setupDownloadSeries() {
-  $(".download_series").click(function(event) {
+  $(".download_series").live( 'click', function(event) {
     var nTr = $(this).parents('tr')[0];
     var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
     var nTr = $(this).parents('table')[0];
@@ -327,7 +328,7 @@ $(document).ready(function() {
   // store "loaded" studies
   var loadedStudies = [];
   // search button pushed
-  $("#PACS_QUERY").click(function(event) {
+  $("#PACS_QUERY").live( 'click', function(event) {
     ajaxStudy(openStudies, loadedStudies);
   });
   // ping the server
