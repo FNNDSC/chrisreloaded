@@ -109,14 +109,22 @@ function setupDownloadStudy() {
 /**
  * 
  */
-function setupDetailStudy(oTable, openStudies) {
+function setupDetailStudy(oTable, openStudies, loadedStudies) {
   $('.control').click(function() {
     var nTr = $(this).parents('tr')[0];
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     var i = $.inArray(nTr, openStudies);
     if (i === -1) {
       $('i', this).attr('class', 'icon-chevron-up');
-      ajaxSeries(studyUID, oTable, openStudies, nTr);
+      // is it good practice
+      var j = studyUID in loadedStudies;
+      // if not cached
+      if (j == 0) {
+        ajaxSeries(studyUID, oTable, openStudies, nTr, loadedStudies);
+        // if cached
+      } else {
+        ajaxSeriesResults(loadedStudies[studyUID], oTable, openStudies, nTr);
+      }
     } else {
       $('i', this).attr('class', 'icon-chevron-down');
       oTable.fnClose(nTr);
@@ -128,7 +136,7 @@ function setupDetailStudy(oTable, openStudies) {
  * 
  * @param data
  */
-function ajaxStudyResults(data, openStudies) {
+function ajaxStudyResults(data, openStudies, loadedStudies) {
   if (data != null) {
     // fill table with results
     // table id is important:
@@ -156,7 +164,7 @@ function ajaxStudyResults(data, openStudies) {
     // make the table cooler!
     var oTable = fnInitTable('quick', 6, 'icon-chevron-down');
     setupDownloadStudy();
-    setupDetailStudy(oTable, openStudies);
+    setupDetailStudy(oTable, openStudies, loadedStudies);
   } else {
     // no studies found
     $('#results_container').html("No studies found...");
@@ -165,7 +173,7 @@ function ajaxStudyResults(data, openStudies) {
 /**
  * 
  */
-function ajaxStudy(openStudies) {
+function ajaxStudy(openStudies, loadedStudies) {
   // query pacs on parameters, at STUDY LEVEL
   $.ajax({
     type : "POST",
@@ -185,7 +193,7 @@ function ajaxStudy(openStudies) {
       PACS_STU_UID : ''
     },
     success : function(data) {
-      ajaxStudyResults(data, openStudies);
+      ajaxStudyResults(data, openStudies, loadedStudies);
     }
   });
 }
@@ -194,7 +202,7 @@ function ajaxStudy(openStudies) {
  * @param studyUID
  * @param oTable
  */
-function ajaxSeries(studyUID, oTable, openStudies, nTr) {
+function ajaxSeries(studyUID, oTable, openStudies, nTr, loadedStudies) {
   $.ajax({
     type : "POST",
     url : "controller/pacs_query.php",
@@ -207,7 +215,8 @@ function ajaxSeries(studyUID, oTable, openStudies, nTr) {
       PACS_STU_UID : studyUID
     },
     success : function(data) {
-      ajaxSeriesResults(data, oTable, openStudies, nTr)
+      loadedStudies[studyUID] = data;
+      ajaxSeriesResults(data, oTable, openStudies, nTr);
     }
   });
 }
@@ -319,7 +328,7 @@ $(document).ready(function() {
   var loadedStudies = [];
   // search button pushed
   $("#PACS_QUERY").click(function(event) {
-    ajaxStudy(openStudies);
+    ajaxStudy(openStudies, loadedStudies);
   });
   // ping the server
   $(".pacsPing").click(function(event) {
