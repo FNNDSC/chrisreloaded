@@ -20,13 +20,19 @@ function fnFormatDetails(data) {
     // need 3 cases
     // on server!
     if (data.Status[i] == 0) {
-      content += '<td class="center"><button class="btn btn-primary download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+      content += '<td class="center"><button id="'
+          + data.SeriesInstanceUID[i].replace(/\./g, "_")
+          + '-series" class="btn btn-primary download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
       // downloading!
     } else if (data.Status[i] == 1) {
-      content += '<td class="center"><button class="btn btn-warning" type="button"><i class="icon-refresh icon-white"></i></button></td>';
+      content += '<td class="center"><button id="'
+          + data.SeriesInstanceUID[i].replace(/\./g, "_")
+          + '-series" class="btn btn-warning" type="button"><i class="icon-refresh icon-white"></i></button></td>';
       // donwloaded!
     } else {
-      content += '<td class="center"><button class="btn btn-success" type="button"><i class="icon-ok icon-white"></i></button></td>';
+      content += '<td class="center"><button id="'
+          + data.SeriesInstanceUID[i].replace(/\./g, "_")
+          + '-series" class="btn btn-success" type="button"><i class="icon-ok icon-white"></i></button></td>';
     }
     content += '</tr>';
   }
@@ -91,30 +97,42 @@ function fnInitTable(tableName, nbColumn, icon) {
  * 
  */
 function setupDownloadStudy() {
-  $(".download_study").live('click', function(event) {
-    var nTr = $(this).parents('tr')[0];
-    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    $.ajax({
-      type : "POST",
-      url : "controller/pacs_move.php",
-      dataType : "json",
-      data : {
-        USER_AET : 'FNNDSC-CHRISDEV',
-        SERVER_IP : '134.174.12.21',
-        SERVER_POR : '104',
-        PACS_LEV : 'STUDY',
-        PACS_STU_UID : studyUID,
-        PACS_MRN : $("#PACS_MRN").val(),
-        PACS_NAM : '',
-        PACS_MOD : '',
-        PACS_DAT : '',
-        PACS_STU_DES : '',
-        PACS_ACC_NUM : ''
-      },
-      success : function(data) {
-      }
-    });
-  });
+  $(".download_study").live(
+      'click',
+      function(event) {
+        var nTr = $(this).parents('tr')[0];
+        var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
+        // modify class
+        var currentButton = $(this);
+        currentButton.removeClass('btn-primary').removeClass('download_study')
+            .addClass('btn-warning');
+        // modify content
+        currentButton.html('<i class="icon-refresh icon-white">');
+        // cache data
+        ajaxSeries(studyUID);
+        // loop through all series and download the one which are not
+        // downloaded
+        // and not downloading
+        var data = window.loadedStudies[studyUID];
+        var numberOfResults = data.StudyInstanceUID.length;
+        var i = 0;
+        for (i = 0; i < numberOfResults; ++i) {
+          if (data.Status[i] == 0) {
+            var buttonID = '#' + data.SeriesInstanceUID[i].replace(/\./g, "_")
+                + '-series';
+            ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i],
+                buttonID);
+          }
+        }
+        /*
+         * $.ajax({ type : "POST", url : "controller/pacs_move.php", dataType :
+         * "json", data : { USER_AET : 'FNNDSC-CHRISDEV', SERVER_IP :
+         * '134.174.12.21', SERVER_POR : '104', PACS_LEV : 'STUDY', PACS_STU_UID :
+         * studyUID, PACS_MRN : $("#PACS_MRN").val(), PACS_NAM : '', PACS_MOD :
+         * '', PACS_DAT : '', PACS_STU_DES : '', PACS_ACC_NUM : '' }, success :
+         * function(data) { } });
+         */
+      });
 }
 /**
  * 
@@ -126,15 +144,7 @@ function setupDetailStudy() {
     var i = $.inArray(nTr, window.openStudies);
     if (i === -1) {
       $('i', this).attr('class', 'icon-chevron-up');
-      // is it good practice
-      var j = studyUID in window.loadedStudies;
-      // if not cached
-      if (j == 0) {
-        ajaxSeries(studyUID, nTr);
-        // if cached
-      } else {
-        ajaxSeriesResults(window.loadedStudies[studyUID], nTr);
-      }
+      ajaxSeries(studyUID, nTr);
     } else {
       $('i', this).attr('class', 'icon-chevron-down');
       $('div.innerDetails', $(nTr).next()[0]).slideUp(function() {
@@ -184,38 +194,36 @@ function ajaxStudyResults(data) {
  * 
  */
 function ajaxStudy() {
-  $("#PACS_QUERY").live(
-      'click',
-      function(event) {
-        var currentButton = $(this);
-        currentButton.removeClass('btn-primary').addClass('btn-warning');
-        // modify content
-        currentButton.html('<i class="icon-refresh icon-white">');
-        // query pacs on parameters, at STUDY LEVEL
-        $.ajax({
-          type : "POST",
-          url : "controller/pacs_query.php",
-          dataType : "json",
-          data : {
-            USER_AET : $("#USER_AET").val(),
-            SERVER_IP : $("#SERVER_IP").val(),
-            SERVER_POR : $("#SERVER_POR").val(),
-            PACS_LEV : 'STUDY',
-            PACS_MRN : $("#PACS_MRN").val(),
-            PACS_NAM : $("#PACS_NAM").val(),
-            PACS_MOD : $("#PACS_MOD").val(),
-            PACS_DAT : $("#PACS_DAT").val(),
-            PACS_ACC_NUM : '',
-            PACS_STU_DES : '',
-            PACS_STU_UID : ''
-          },
-          success : function(data) {
-            currentButton.removeClass('btn-warning').addClass('btn-primary');
-            currentButton.html('Search');
-            ajaxStudyResults(data);
-          }
-        });
-      });
+  $("#PACS_QUERY").live('click', function(event) {
+    var currentButton = $(this);
+    currentButton.removeClass('btn-primary').addClass('btn-warning');
+    // modify content
+    currentButton.html('<i class="icon-refresh icon-white">');
+    // query pacs on parameters, at STUDY LEVEL
+    $.ajax({
+      type : "POST",
+      url : "controller/pacs_query.php",
+      dataType : "json",
+      data : {
+        USER_AET : $("#USER_AET").val(),
+        SERVER_IP : $("#SERVER_IP").val(),
+        SERVER_POR : $("#SERVER_POR").val(),
+        PACS_LEV : 'STUDY',
+        PACS_MRN : $("#PACS_MRN").val(),
+        PACS_NAM : $("#PACS_NAM").val(),
+        PACS_MOD : $("#PACS_MOD").val(),
+        PACS_DAT : $("#PACS_DAT").val(),
+        PACS_ACC_NUM : '',
+        PACS_STU_DES : '',
+        PACS_STU_UID : ''
+      },
+      success : function(data) {
+        currentButton.removeClass('btn-warning').addClass('btn-primary');
+        currentButton.html('Search');
+        ajaxStudyResults(data);
+      }
+    });
+  });
 }
 /**
  * 
@@ -223,30 +231,39 @@ function ajaxStudy() {
  * @param oTable
  */
 function ajaxSeries(studyUID, nTr) {
-  $.ajax({
-    type : "POST",
-    url : "controller/pacs_query.php",
-    dataType : "json",
-    data : {
-      USER_AET : $("#USER_AET").val(),
-      SERVER_IP : $("#SERVER_IP").val(),
-      SERVER_POR : $("#SERVER_POR").val(),
-      PACS_LEV : 'SERIES',
-      PACS_STU_UID : studyUID
-    },
-    success : function(data) {
-      // hshould be inside the results
-      // append a status field
-      data.Status = Array();
-      var numSeries = data.SeriesInstanceUID.length;
-      var i = 0;
-      for (i = 0; i < numSeries; ++i) {
-        data.Status[i] = 0;
+  // is it good practice
+  var j = studyUID in window.loadedStudies;
+  // if not cached
+  if (j == 0) {
+    $.ajax({
+      type : "POST",
+      url : "controller/pacs_query.php",
+      dataType : "json",
+      data : {
+        USER_AET : $("#USER_AET").val(),
+        SERVER_IP : $("#SERVER_IP").val(),
+        SERVER_POR : $("#SERVER_POR").val(),
+        PACS_LEV : 'SERIES',
+        PACS_STU_UID : studyUID
+      },
+      success : function(data) {
+        // hshould be inside the results
+        // append a status field
+        data.Status = Array();
+        var numSeries = data.SeriesInstanceUID.length;
+        var i = 0;
+        for (i = 0; i < numSeries; ++i) {
+          data.Status[i] = 0;
+        }
+        window.loadedStudies[studyUID] = data;
+        ajaxSeriesResults(data, nTr);
       }
-      window.loadedStudies[studyUID] = data;
-      ajaxSeriesResults(data, nTr);
-    }
-  });
+    });
+  }
+  // if cached
+  else {
+    ajaxSeriesResults(window.loadedStudies[studyUID], nTr);
+  }
 }
 /**
  * 
@@ -254,24 +271,27 @@ function ajaxSeries(studyUID, nTr) {
  */
 function ajaxSeriesResults(data, nTr) {
   // format the details row table
-  var nDetailsRow = window.oTable.fnOpen(nTr, fnFormatDetails(data), 'details');
-  // make the details table sortable
-  var detailstableid = "#" + data.StudyInstanceUID[0].replace(/\./g, "_")
-      + "-details";
-  $(detailstableid).dataTable({
-    "sDom" : "t",
-    "aaSorting" : [ [ 1, 'desc' ] ],
-    "bPaginate" : false,
-    "aoColumnDefs" : [ {
-      "bSortable" : false,
-      "aTargets" : [ 2, 3 ]
-    } ],
-  /*
-   * "sScrollY" : "200px", "bScrollCollapse" : true
-   */
-  });
-  $('div.innerDetails', nDetailsRow).slideDown();
-  window.openStudies.push(nTr);
+  if (nTr) {
+    var nDetailsRow = window.oTable.fnOpen(nTr, fnFormatDetails(data),
+        'details');
+    // make the details table sortable
+    var detailstableid = "#" + data.StudyInstanceUID[0].replace(/\./g, "_")
+        + "-details";
+    $(detailstableid).dataTable({
+      "sDom" : "t",
+      "aaSorting" : [ [ 1, 'desc' ] ],
+      "bPaginate" : false,
+      "aoColumnDefs" : [ {
+        "bSortable" : false,
+        "aTargets" : [ 2, 3 ]
+      } ],
+    /*
+     * "sScrollY" : "200px", "bScrollCollapse" : true
+     */
+    });
+    $('div.innerDetails', nDetailsRow).slideDown();
+    window.openStudies.push(nTr);
+  }
   // query server for protocol name
   // not working
   /*
@@ -287,67 +307,67 @@ function ajaxSeriesResults(data, nTr) {
    */
 }
 function setupDownloadSeries() {
-  $(".download_series").live(
-      'click',
-      function(event) {
-        var currentButton = $(this);
-        var nTr = $(this).parents('tr')[0];
-        var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
-        nTr = $(this).parents('table')[0];
-        // remove last 8 character (-details)
-        var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
-        studyUID = studyUID.substring(0, studyUID.length - 8);
-        // wait button
-        var seriesData = window.loadedStudies[studyUID];
-        var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
-        seriesData.Status[i] = 1;
-        // modify class
-        currentButton.removeClass('btn-primary').removeClass('download_series')
-            .addClass('btn-warning');
-        // modify content
-        currentButton.html('<i class="icon-refresh icon-white">');
-        $.ajax({
-          type : "POST",
-          url : "controller/pacs_move.php",
-          dataType : "json",
-          data : {
-            USER_AET : 'FNNDSC-CHRISDEV',
-            SERVER_IP : '134.174.12.21',
-            SERVER_POR : '104',
-            PACS_LEV : 'SERIES',
-            PACS_STU_UID : studyUID,
-            PACS_SER_UID : seriesUID,
-            PACS_MRN : '',
-            PACS_NAM : '',
-            PACS_MOD : '',
-            PACS_DAT : '',
-            PACS_STU_DES : '',
-            PACS_ACC_NUM : ''
-          },
-          success : function(data) {
-            var seriesData = window.loadedStudies[studyUID];
-            var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
-            seriesData.Status[i] = 2;
-            // update visu if not closed!
-            // use "this", modify style, refresh
-            currentButton.removeClass('btn-warning').addClass('btn-success');
-            // modify content
-            currentButton.html('<i class="icon-ok icon-white">');
-            // currentButton.show();
-            // alert(currentButton.attr("class"));
-            /*
-             * if (data.Status[i] == 0) { content += '<td class="center"><button
-             * class="btn btn-primary download_series " type="button"><i
-             * class="icon-circle-arrow-down icon-white"></i></button></td>'; }
-             * else if (data.Status[i] == 1) { content += '<td class="center"><button
-             * class="btn btn-warning" type="button"><i class="icon-refresh
-             * icon-white"></i></button></td>'; } else { content += '<td class="center"><button
-             * class="btn btn-success" type="button"><i class="icon-ok
-             * icon-white"></i></button></td>'; }
-             */
-          }
-        });
-      });
+  $(".download_series").live('click', function(event) {
+    var currentButtonID = '#' + $(this).attr('id');
+    var nTr = $(this).parents('tr')[0];
+    var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
+    nTr = $(this).parents('table')[0];
+    // remove last 8 character (-details)
+    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
+    studyUID = studyUID.substring(0, studyUID.length - 8);
+    ajaxImage(studyUID, seriesUID, currentButtonID);
+  });
+}
+function ajaxImage(studyUID, seriesUID, currentButtonID) {
+  // wait button
+  var seriesData = window.loadedStudies[studyUID];
+  var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
+  seriesData.Status[i] = 1;
+  // modify class
+  $(currentButtonID).removeClass('btn-primary').removeClass('download_series')
+      .addClass('btn-warning');
+  // modify content
+  $(currentButtonID).html('<i class="icon-refresh icon-white">');
+  $.ajax({
+    type : "POST",
+    url : "controller/pacs_move.php",
+    dataType : "json",
+    data : {
+      USER_AET : 'FNNDSC-CHRISDEV',
+      SERVER_IP : '134.174.12.21',
+      SERVER_POR : '104',
+      PACS_LEV : 'SERIES',
+      PACS_STU_UID : studyUID,
+      PACS_SER_UID : seriesUID,
+      PACS_MRN : '',
+      PACS_NAM : '',
+      PACS_MOD : '',
+      PACS_DAT : '',
+      PACS_STU_DES : '',
+      PACS_ACC_NUM : ''
+    },
+    success : function(data) {
+      var seriesData = window.loadedStudies[studyUID];
+      var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
+      seriesData.Status[i] = 2;
+      // update visu if not closed!
+      // use "this", modify style, refresh
+      $(currentButtonID).removeClass('btn-warning').addClass('btn-success');
+      // modify content
+      $(currentButtonID).html('<i class="icon-ok icon-white">');
+      // currentButton.show();
+      // alert(currentButton.attr("class"));
+      /*
+       * if (data.Status[i] == 0) { content += '<td class="center"><button
+       * class="btn btn-primary download_series " type="button"><i
+       * class="icon-circle-arrow-down icon-white"></i></button></td>'; }
+       * else if (data.Status[i] == 1) { content += '<td class="center"><button
+       * class="btn btn-warning" type="button"><i class="icon-refresh
+       * icon-white"></i></button></td>'; } else { content += '<td class="center"><button
+       * class="btn btn-success" type="button"><i class="icon-ok icon-white"></i></button></td>'; }
+       */
+    }
+  });
 }
 /**
  * 
