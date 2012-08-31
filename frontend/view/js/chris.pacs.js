@@ -27,7 +27,7 @@ function fnFormatDetails(data) {
     } else if (data.Status[i] == 1) {
       content += '<td class="center"><button id="'
           + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series" class="btn btn-warning" type="button"><i class="icon-refresh icon-white"></i></button></td>';
+          + '-series" class="btn btn-warning" type="button"><i class="icon-refresh icon-white rotating_class"></i></button></td>';
       // donwloaded!
     } else {
       content += '<td class="center"><button id="'
@@ -107,7 +107,7 @@ function setupDownloadStudy() {
         currentButton.removeClass('btn-primary').removeClass('download_study')
             .addClass('btn-warning').addClass('downloading_study');
         // modify content
-        currentButton.html('<i class="icon-refresh icon-white">');
+        currentButton.html('<i class="icon-refresh icon-white rotating_class">');
         // cache data
         ajaxSeries(studyUID);
       });
@@ -176,7 +176,7 @@ function ajaxStudy() {
     var currentButton = $(this);
     currentButton.removeClass('btn-primary').addClass('btn-warning');
     // modify content
-    currentButton.html('<i class="icon-refresh icon-white">');
+    currentButton.html('<i class="icon-refresh icon-white rotating_class">');
     // query pacs on parameters, at STUDY LEVEL
     $.ajax({
       type : "POST",
@@ -319,7 +319,7 @@ function ajaxImage(studyUID, seriesUID, currentButtonID) {
   $(currentButtonID).removeClass('btn-primary').removeClass('download_series')
       .addClass('btn-warning');
   // modify content
-  $(currentButtonID).html('<i class="icon-refresh icon-white">');
+  $(currentButtonID).html('<i class="icon-refresh icon-white rotating_class">');
   $
       .ajax({
         type : "POST",

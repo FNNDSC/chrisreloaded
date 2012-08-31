@@ -14,3 +14,21 @@
 .tooltip.right .tooltip-arrow {
   border-right: 5px solid yellow;
 }
+
+@-moz-keyframes rotate {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+  to { 
+    -moz-transform: rotate(360deg);
+  }
+}
+
+.rotating_class
+{
+    -moz-animation-name:             rotate; 
+    -moz-animation-duration:         0.5s; 
+    -moz-animation-iteration-count:  infinite;
+    -moz-animation-timing-function: linear;
+}
+/* //http://stackoverflow.com/questions/10123700/how-to-make-a-picture-rotate-continuously */
