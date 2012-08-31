@@ -146,15 +146,6 @@ function setupDetailStudy() {
  * @param data
  */
 function ajaxStudyResults(data) {
-  // destroy table if exists
-  if ($('#quick-results').length > 0) {
-    // unlink all click events
-    $('#quick-results td .control').die('click');
-    // destroy dataTable
-    $('#quick-results').dataTable().fnDestroy();
-    // empty container
-    $('#results_container').html("");
-  }
   if (data != null) {
     // fill table with results
     // table id is important:
