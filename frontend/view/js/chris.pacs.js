@@ -16,14 +16,14 @@ function fnFormatDetails(data) {
         + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">';
     content += '<td>' + data.SeriesInstanceUID[i] + '</td>';
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + '</td>';
-    content += '<td><button class="btn btn-success preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
+    content += '<td><button class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
     // need 3 cases
     if (data.Status[i] == 0) {
-      content += '<td><button class="btn btn-info download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+      content += '<td><button class="btn btn-primary download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
     } else if (data.Status[i] == 1) {
       content += '<td><button class="btn btn-warning download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
     } else {
-      content += '<td><button class="btn download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+      content += '<td><button class="btn btn-success download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
     }
     content += '</tr>';
   }
@@ -291,12 +291,11 @@ function setupDownloadSeries() {
     // remove last 8 character (-details)
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     studyUID = studyUID.substring(0, studyUID.length - 8);
-    /*
-     * var seriesData = window.loadedStudies[studyUID]; var i =
-     * seriesData.SeriesInstanceUID.indexOf(seriesUID); seriesData.Status[i] =
-     * 1; currentButton.toggleClass('btn-info', false);
-     * currentButton.toggleClass('btn-warning', true);
-     */
+    // wait button
+    var seriesData = window.loadedStudies[studyUID];
+    var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
+    seriesData.Status[i] = 1;
+    currentButton.removeClass('btn-primary').addClass('btn-warning');
     $.ajax({
       type : "POST",
       url : "controller/pacs_move.php",
@@ -321,7 +320,9 @@ function setupDownloadSeries() {
         seriesData.Status[i] = 2;
         // update visu if not closed!
         // use "this", modify style, refresh
-        // currentButton.toggleClass('btn-warning', false);
+        currentButton.removeClass('btn-warning').addClass('btn-success');
+        // currentButton.show();
+        // alert(currentButton.attr("class"));
       }
     });
   });
