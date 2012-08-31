@@ -116,27 +116,27 @@ function setupDownloadStudy() {
 /**
  * 
  */
-function setupDetailStudy(oTable, openStudies, loadedStudies) {
+function setupDetailStudy(oTable) {
   $('#quick-results td .control').live('click', function() {
     var nTr = $(this).parents('tr')[0];
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    var i = $.inArray(nTr, openStudies);
+    var i = $.inArray(nTr, window.openStudies);
     if (i === -1) {
       $('i', this).attr('class', 'icon-chevron-up');
       // is it good practice
-      var j = studyUID in loadedStudies;
+      var j = studyUID in window.loadedStudies;
       // if not cached
       if (j == 0) {
-        ajaxSeries(studyUID, oTable, openStudies, nTr, loadedStudies);
+        ajaxSeries(studyUID, oTable, nTr);
         // if cached
       } else {
-        ajaxSeriesResults(loadedStudies[studyUID], oTable, openStudies, nTr);
+        ajaxSeriesResults(window.loadedStudies[studyUID], oTable, nTr);
       }
     } else {
       $('i', this).attr('class', 'icon-chevron-down');
       $('div.innerDetails', $(nTr).next()[0]).slideUp(function() {
         oTable.fnClose(nTr);
-        openStudies.splice(i, 1);
+        window.openStudies.splice(i, 1);
       });
     }
   });
@@ -145,7 +145,7 @@ function setupDetailStudy(oTable, openStudies, loadedStudies) {
  * 
  * @param data
  */
-function ajaxStudyResults(data, openStudies, loadedStudies) {
+function ajaxStudyResults(data) {
   // destroy table if exists
   if ($('#quick-results').length > 0) {
     // unlink all click events
@@ -182,7 +182,7 @@ function ajaxStudyResults(data, openStudies, loadedStudies) {
     // make the table cooler!
     var oTable = fnInitTable('quick', 6, 'icon-chevron-down');
     setupDownloadStudy();
-    setupDetailStudy(oTable, openStudies, loadedStudies);
+    setupDetailStudy(oTable);
   } else {
     // no studies found
     $('#results_container').html("No studies found...");
@@ -191,7 +191,7 @@ function ajaxStudyResults(data, openStudies, loadedStudies) {
 /**
  * 
  */
-function ajaxStudy(openStudies, loadedStudies) {
+function ajaxStudy() {
   // query pacs on parameters, at STUDY LEVEL
   $.ajax({
     type : "POST",
@@ -211,7 +211,7 @@ function ajaxStudy(openStudies, loadedStudies) {
       PACS_STU_UID : ''
     },
     success : function(data) {
-      ajaxStudyResults(data, openStudies, loadedStudies);
+      ajaxStudyResults(data);
     }
   });
 }
@@ -220,7 +220,7 @@ function ajaxStudy(openStudies, loadedStudies) {
  * @param studyUID
  * @param oTable
  */
-function ajaxSeries(studyUID, oTable, openStudies, nTr, loadedStudies) {
+function ajaxSeries(studyUID, oTable, nTr) {
   $.ajax({
     type : "POST",
     url : "controller/pacs_query.php",
@@ -241,8 +241,8 @@ function ajaxSeries(studyUID, oTable, openStudies, nTr, loadedStudies) {
       for (i = 0; i < numSeries; ++i) {
         data.Status[i] = 0;
       }
-      loadedStudies[studyUID] = data;
-      ajaxSeriesResults(data, oTable, openStudies, nTr, loadedStudies);
+      window.loadedStudies[studyUID] = data;
+      ajaxSeriesResults(data, oTable, nTr);
     }
   });
 }
@@ -250,7 +250,7 @@ function ajaxSeries(studyUID, oTable, openStudies, nTr, loadedStudies) {
  * 
  * @param otable
  */
-function ajaxSeriesResults(data, oTable, openStudies, nTr, loadedStudies) {
+function ajaxSeriesResults(data, oTable, nTr) {
   // format the details row table
   var nDetailsRow = oTable.fnOpen(nTr, fnFormatDetails(data), 'details');
   // make the details table sortable
@@ -269,8 +269,8 @@ function ajaxSeriesResults(data, oTable, openStudies, nTr, loadedStudies) {
    */
   });
   $('div.innerDetails', nDetailsRow).slideDown();
-  openStudies.push(nTr);
-  setupDownloadSeries(loadedStudies);
+  window.openStudies.push(nTr);
+  setupDownloadSeries();
   // query server for protocol name
   // not working
   /*
@@ -285,7 +285,7 @@ function ajaxSeriesResults(data, oTable, openStudies, nTr, loadedStudies) {
    * data3.ProtocolName[0]); } }); }
    */
 }
-function setupDownloadSeries(loadedStudies) {
+function setupDownloadSeries() {
   $(".download_series").live('click', function(event) {
     var currentButton = $(this);
     var nTr = $(this).parents('tr')[0];
@@ -294,12 +294,13 @@ function setupDownloadSeries(loadedStudies) {
     // remove last 8 character (-details)
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     studyUID = studyUID.substring(0, studyUID.length - 8);
-    /*
-     * var seriesData = loadedStudies[studyUID]; var i =
-     * seriesData.SeriesInstanceUID.indexOf(seriesUID); seriesData.Status[i] =
-     * 1; currentButton.toggleClass('btn-info', false);
-     * currentButton.toggleClass('btn-warning', true);
-     */
+    
+     var seriesData = window.loadedStudies[studyUID];
+     var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
+     seriesData.Status[i] = 1;
+     currentButton.toggleClass('btn-info', false);
+     currentButton.toggleClass('btn-warning', true);
+    
     $.ajax({
       type : "POST",
       url : "controller/pacs_move.php",
@@ -319,7 +320,7 @@ function setupDownloadSeries(loadedStudies) {
         PACS_ACC_NUM : ''
       },
       success : function(data) {
-        var seriesData = loadedStudies[studyUID];
+        var seriesData = window.loadedStudies[studyUID];
         var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
         seriesData.Status[i] = 2;
         // update visu if not closed!
@@ -365,12 +366,12 @@ function ajaxPingResults(data) {
  */
 $(document).ready(function() {
   // store "opened" studies
-  var openStudies = [];
+  openStudies = [];
   // store "loaded" studies
-  var loadedStudies = [];
+  loadedStudies = [];
   // search button pushed
   $("#PACS_QUERY").live('click', function(event) {
-    ajaxStudy(openStudies, loadedStudies);
+    ajaxStudy();
   });
   // ping the server
   $(".pacsPing").click(function(event) {
