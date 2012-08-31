@@ -116,7 +116,7 @@ function setupDownloadStudy() {
 /**
  * 
  */
-function setupDetailStudy(oTable) {
+function setupDetailStudy() {
   $('#quick-results td .control').live('click', function() {
     var nTr = $(this).parents('tr')[0];
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
@@ -127,15 +127,15 @@ function setupDetailStudy(oTable) {
       var j = studyUID in window.loadedStudies;
       // if not cached
       if (j == 0) {
-        ajaxSeries(studyUID, oTable, nTr);
+        ajaxSeries(studyUID, nTr);
         // if cached
       } else {
-        ajaxSeriesResults(window.loadedStudies[studyUID], oTable, nTr);
+        ajaxSeriesResults(window.loadedStudies[studyUID], nTr);
       }
     } else {
       $('i', this).attr('class', 'icon-chevron-down');
       $('div.innerDetails', $(nTr).next()[0]).slideUp(function() {
-        oTable.fnClose(nTr);
+        window.oTable.fnClose(nTr);
         window.openStudies.splice(i, 1);
       });
     }
@@ -180,9 +180,7 @@ function ajaxStudyResults(data) {
     $('#results_container').html(content);
     // make table sortable, filterable, ...
     // make the table cooler!
-    var oTable = fnInitTable('quick', 6, 'icon-chevron-down');
-    setupDownloadStudy();
-    setupDetailStudy(oTable);
+    window.oTable = fnInitTable('quick', 6, 'icon-chevron-down');
   } else {
     // no studies found
     $('#results_container').html("No studies found...");
@@ -220,7 +218,7 @@ function ajaxStudy() {
  * @param studyUID
  * @param oTable
  */
-function ajaxSeries(studyUID, oTable, nTr) {
+function ajaxSeries(studyUID, nTr) {
   $.ajax({
     type : "POST",
     url : "controller/pacs_query.php",
@@ -242,7 +240,7 @@ function ajaxSeries(studyUID, oTable, nTr) {
         data.Status[i] = 0;
       }
       window.loadedStudies[studyUID] = data;
-      ajaxSeriesResults(data, oTable, nTr);
+      ajaxSeriesResults(data, nTr);
     }
   });
 }
@@ -250,9 +248,9 @@ function ajaxSeries(studyUID, oTable, nTr) {
  * 
  * @param otable
  */
-function ajaxSeriesResults(data, oTable, nTr) {
+function ajaxSeriesResults(data, nTr) {
   // format the details row table
-  var nDetailsRow = oTable.fnOpen(nTr, fnFormatDetails(data), 'details');
+  var nDetailsRow = window.oTable.fnOpen(nTr, fnFormatDetails(data), 'details');
   // make the details table sortable
   var detailstableid = "#" + data.StudyInstanceUID[0].replace(/\./g, "_")
       + "-details";
@@ -270,7 +268,6 @@ function ajaxSeriesResults(data, oTable, nTr) {
   });
   $('div.innerDetails', nDetailsRow).slideDown();
   window.openStudies.push(nTr);
-  setupDownloadSeries();
   // query server for protocol name
   // not working
   /*
@@ -294,13 +291,12 @@ function setupDownloadSeries() {
     // remove last 8 character (-details)
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     studyUID = studyUID.substring(0, studyUID.length - 8);
-    
-     var seriesData = window.loadedStudies[studyUID];
-     var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
-     seriesData.Status[i] = 1;
-     currentButton.toggleClass('btn-info', false);
-     currentButton.toggleClass('btn-warning', true);
-    
+    /*
+     * var seriesData = window.loadedStudies[studyUID]; var i =
+     * seriesData.SeriesInstanceUID.indexOf(seriesUID); seriesData.Status[i] =
+     * 1; currentButton.toggleClass('btn-info', false);
+     * currentButton.toggleClass('btn-warning', true);
+     */
     $.ajax({
       type : "POST",
       url : "controller/pacs_move.php",
@@ -325,7 +321,7 @@ function setupDownloadSeries() {
         seriesData.Status[i] = 2;
         // update visu if not closed!
         // use "this", modify style, refresh
-        currentButton.toggleClass('btn-warning', false);
+        // currentButton.toggleClass('btn-warning', false);
       }
     });
   });
@@ -369,10 +365,14 @@ $(document).ready(function() {
   openStudies = [];
   // store "loaded" studies
   loadedStudies = [];
+  oTable = null;
   // search button pushed
   $("#PACS_QUERY").live('click', function(event) {
     ajaxStudy();
   });
+  setupDetailStudy();
+  setupDownloadStudy();
+  setupDownloadSeries();
   // ping the server
   $(".pacsPing").click(function(event) {
     ajaxPing();
