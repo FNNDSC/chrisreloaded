@@ -17,7 +17,14 @@ function fnFormatDetails(data) {
     content += '<td>' + data.SeriesInstanceUID[i] + '</td>';
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + '</td>';
     content += '<td><button class="btn btn-success preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
-    content += '<td><button class="btn btn-info download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+    // need 3 cases
+    if (data.Status[i] == 0) {
+      content += '<td><button class="btn btn-info download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+    } else if (data.Status[i] == 1) {
+      content += '<td><button class="btn btn-warning download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+    } else {
+      content += '<td><button class="btn download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+    }
     content += '</tr>';
   }
   content += '</body></table></div>';
@@ -226,8 +233,16 @@ function ajaxSeries(studyUID, oTable, openStudies, nTr, loadedStudies) {
       PACS_STU_UID : studyUID
     },
     success : function(data) {
+      // hshould be inside the results
+      // append a status field
+      data.Status = Array();
+      var numSeries = data.SeriesInstanceUID.length;
+      var i = 0;
+      for (i = 0; i < numSeries; ++i) {
+        data.Status[i] = 0;
+      }
       loadedStudies[studyUID] = data;
-      ajaxSeriesResults(data, oTable, openStudies, nTr);
+      ajaxSeriesResults(data, oTable, openStudies, nTr, loadedStudies);
     }
   });
 }
@@ -235,12 +250,13 @@ function ajaxSeries(studyUID, oTable, openStudies, nTr, loadedStudies) {
  * 
  * @param otable
  */
-function ajaxSeriesResults(data, oTable, openStudies, nTr) {
+function ajaxSeriesResults(data, oTable, openStudies, nTr, loadedStudies) {
   // format the details row table
   var nDetailsRow = oTable.fnOpen(nTr, fnFormatDetails(data), 'details');
   // make the details table sortable
-  var test = "#" + data.StudyInstanceUID[0].replace(/\./g, "_") + "-details";
-  $(test).dataTable({
+  var detailstableid = "#" + data.StudyInstanceUID[0].replace(/\./g, "_")
+      + "-details";
+  $(detailstableid).dataTable({
     "sDom" : "t",
     "aaSorting" : [ [ 1, 'desc' ] ],
     "bPaginate" : false,
@@ -248,12 +264,13 @@ function ajaxSeriesResults(data, oTable, openStudies, nTr) {
       "bSortable" : false,
       "aTargets" : [ 2, 3 ]
     } ],
-/*    "sScrollY" : "200px",
-    "bScrollCollapse" : true*/
+  /*
+   * "sScrollY" : "200px", "bScrollCollapse" : true
+   */
   });
   $('div.innerDetails', nDetailsRow).slideDown();
   openStudies.push(nTr);
-  setupDownloadSeries();
+  setupDownloadSeries(loadedStudies);
   // query server for protocol name
   // not working
   /*
@@ -268,14 +285,21 @@ function ajaxSeriesResults(data, oTable, openStudies, nTr) {
    * data3.ProtocolName[0]); } }); }
    */
 }
-function setupDownloadSeries() {
+function setupDownloadSeries(loadedStudies) {
   $(".download_series").live('click', function(event) {
+    var currentButton = $(this);
     var nTr = $(this).parents('tr')[0];
     var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    var nTr = $(this).parents('table')[0];
+    nTr = $(this).parents('table')[0];
     // remove last 8 character (-details)
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     studyUID = studyUID.substring(0, studyUID.length - 8);
+    /*
+     * var seriesData = loadedStudies[studyUID]; var i =
+     * seriesData.SeriesInstanceUID.indexOf(seriesUID); seriesData.Status[i] =
+     * 1; currentButton.toggleClass('btn-info', false);
+     * currentButton.toggleClass('btn-warning', true);
+     */
     $.ajax({
       type : "POST",
       url : "controller/pacs_move.php",
@@ -295,6 +319,12 @@ function setupDownloadSeries() {
         PACS_ACC_NUM : ''
       },
       success : function(data) {
+        var seriesData = loadedStudies[studyUID];
+        var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
+        seriesData.Status[i] = 2;
+        // update visu if not closed!
+        // use "this", modify style, refresh
+        currentButton.toggleClass('btn-warning', false);
       }
     });
   });
