@@ -65,7 +65,7 @@ function fnInitTable(tableName, nbColumn, icon) {
    */
   var nCloneTh = document.createElement('th');
   var nCloneTd = document.createElement('td');
-  nCloneTd.innerHTML = '<button class="btn btn-primary download_study" type="button"><i class="icon-circle-arrow-down icon-white download'
+  nCloneTd.innerHTML = '<button class="btn btn-primary download_study" type="button" value="0"><i class="icon-circle-arrow-down icon-white download'
       + tableName + '"></i></button>';
   nCloneTd.className = "center";
   $('#' + tableName + '-results thead tr').each(function() {
@@ -105,33 +105,11 @@ function setupDownloadStudy() {
         // modify class
         var currentButton = $(this);
         currentButton.removeClass('btn-primary').removeClass('download_study')
-            .addClass('btn-warning');
+            .addClass('btn-warning').addClass('downloading_study');
         // modify content
         currentButton.html('<i class="icon-refresh icon-white">');
         // cache data
         ajaxSeries(studyUID);
-        // loop through all series and download the one which are not
-        // downloaded
-        // and not downloading
-        var data = window.loadedStudies[studyUID];
-        var numberOfResults = data.StudyInstanceUID.length;
-        var i = 0;
-        for (i = 0; i < numberOfResults; ++i) {
-          if (data.Status[i] == 0) {
-            var buttonID = '#' + data.SeriesInstanceUID[i].replace(/\./g, "_")
-                + '-series';
-            ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i],
-                buttonID);
-          }
-        }
-        /*
-         * $.ajax({ type : "POST", url : "controller/pacs_move.php", dataType :
-         * "json", data : { USER_AET : 'FNNDSC-CHRISDEV', SERVER_IP :
-         * '134.174.12.21', SERVER_POR : '104', PACS_LEV : 'STUDY', PACS_STU_UID :
-         * studyUID, PACS_MRN : $("#PACS_MRN").val(), PACS_NAM : '', PACS_MOD :
-         * '', PACS_DAT : '', PACS_STU_DES : '', PACS_ACC_NUM : '' }, success :
-         * function(data) { } });
-         */
       });
 }
 /**
@@ -291,6 +269,20 @@ function ajaxSeriesResults(data, nTr) {
     });
     $('div.innerDetails', nDetailsRow).slideDown();
     window.openStudies.push(nTr);
+    // download images!
+  } else {
+    // loop through all series and download the one which are not
+    // downloaded
+    // and not downloading
+    var numberOfResults = data.StudyInstanceUID.length;
+    var i = 0;
+    for (i = 0; i < numberOfResults; ++i) {
+      if (data.Status[i] == 0) {
+        var buttonID = '#' + data.SeriesInstanceUID[i].replace(/\./g, "_")
+            + '-series';
+        ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i], buttonID);
+      }
+    }
   }
   // query server for protocol name
   // not working
@@ -328,46 +320,59 @@ function ajaxImage(studyUID, seriesUID, currentButtonID) {
       .addClass('btn-warning');
   // modify content
   $(currentButtonID).html('<i class="icon-refresh icon-white">');
-  $.ajax({
-    type : "POST",
-    url : "controller/pacs_move.php",
-    dataType : "json",
-    data : {
-      USER_AET : 'FNNDSC-CHRISDEV',
-      SERVER_IP : '134.174.12.21',
-      SERVER_POR : '104',
-      PACS_LEV : 'SERIES',
-      PACS_STU_UID : studyUID,
-      PACS_SER_UID : seriesUID,
-      PACS_MRN : '',
-      PACS_NAM : '',
-      PACS_MOD : '',
-      PACS_DAT : '',
-      PACS_STU_DES : '',
-      PACS_ACC_NUM : ''
-    },
-    success : function(data) {
-      var seriesData = window.loadedStudies[studyUID];
-      var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
-      seriesData.Status[i] = 2;
-      // update visu if not closed!
-      // use "this", modify style, refresh
-      $(currentButtonID).removeClass('btn-warning').addClass('btn-success');
-      // modify content
-      $(currentButtonID).html('<i class="icon-ok icon-white">');
-      // currentButton.show();
-      // alert(currentButton.attr("class"));
-      /*
-       * if (data.Status[i] == 0) { content += '<td class="center"><button
-       * class="btn btn-primary download_series " type="button"><i
-       * class="icon-circle-arrow-down icon-white"></i></button></td>'; }
-       * else if (data.Status[i] == 1) { content += '<td class="center"><button
-       * class="btn btn-warning" type="button"><i class="icon-refresh
-       * icon-white"></i></button></td>'; } else { content += '<td class="center"><button
-       * class="btn btn-success" type="button"><i class="icon-ok icon-white"></i></button></td>'; }
-       */
-    }
-  });
+  $
+      .ajax({
+        type : "POST",
+        url : "controller/pacs_move.php",
+        dataType : "json",
+        data : {
+          USER_AET : 'FNNDSC-CHRISDEV',
+          SERVER_IP : '134.174.12.21',
+          SERVER_POR : '104',
+          PACS_LEV : 'SERIES',
+          PACS_STU_UID : studyUID,
+          PACS_SER_UID : seriesUID,
+          PACS_MRN : '',
+          PACS_NAM : '',
+          PACS_MOD : '',
+          PACS_DAT : '',
+          PACS_STU_DES : '',
+          PACS_ACC_NUM : ''
+        },
+        success : function(data) {
+          var seriesData = window.loadedStudies[studyUID];
+          var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
+          seriesData.Status[i] = 2;
+          // update visu if not closed!
+          // use "this", modify style, refresh
+          $(currentButtonID).removeClass('btn-warning').addClass('btn-success');
+          // modify content
+          $(currentButtonID).html('<i class="icon-ok icon-white">');
+          var studyButtonID = '#' + studyUID.replace(/\./g, "_") + ' button';
+          $(studyButtonID).attr('value',
+              parseInt($(studyButtonID).attr('value')) + 1);
+          // all series downloaded, update button!
+          if (parseInt($(studyButtonID).attr('value')) == seriesData.SeriesInstanceUID.length) {
+            $(studyButtonID).removeClass('btn-warning').removeClass(
+                'downloading_study').addClass('btn-success');
+            // modify content
+            $(studyButtonID).html('<i class="icon-ok icon-white">');
+          }
+          // increase study value by one
+          // currentButton.show();
+          // alert(currentButton.attr("class"));
+          /*
+           * if (data.Status[i] == 0) { content += '<td class="center"><button
+           * class="btn btn-primary download_series " type="button"><i
+           * class="icon-circle-arrow-down icon-white"></i></button></td>'; }
+           * else if (data.Status[i] == 1) { content += '<td class="center"><button
+           * class="btn btn-warning" type="button"><i class="icon-refresh
+           * icon-white"></i></button></td>'; } else { content += '<td class="center"><button
+           * class="btn btn-success" type="button"><i class="icon-ok
+           * icon-white"></i></button></td>'; }
+           */
+        }
+      });
 }
 /**
  * 
