@@ -318,52 +318,71 @@ PACS.setupDownloadSeries = function() {
   });
 }
 PACS.setupPreviewSeries = function() {
-  jQuery(".preview_series").live('click', function(event) {
-    // get parent row
-    var nTr = jQuery(this).parents('tr')[0];
-    // get series uid
-    var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    // get study uid
-    nTr = jQuery(this).parents('table')[0];
-    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    studyUID = studyUID.substring(0, studyUID.length - 8);
-    // get series description - might be a better way...!
-    var description = jQuery(this).parents('tr')[0].cells[0].firstChild.data;
-    // start pulling series
-    PACS.ajaxImage(studyUID, seriesUID);
-    // start timeout function
-    PACS.preview = setInterval(function() {
-      jQuery.ajax({
-        type : "POST",
-        url : "controller/pacs_preview.php",
-        dataType : "json",
-        data : {
-          PACS_SER_UID : seriesUID
-        },
-        success : function(data) {
-          jQuery('#modal-body').html(data);
-        }
-      });
-    }, 1000);
-    
-    // modal content
-    jQuery('#myModalLabel').html(description);
-    // loading status callback
-    // show modal
-    jQuery('#myModal').modal();
-    // if quit modal, stop preview
-  });
-  
+  jQuery(".preview_series")
+      .live(
+          'click',
+          function(event) {
+            // get parent row
+            var nTr = jQuery(this).parents('tr')[0];
+            // get series uid
+            var currentButtonID = '#' + nTr.getAttribute('id') + '-series';
+            var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
+            // get study uid
+            nTr = jQuery(this).parents('table')[0];
+            var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
+            studyUID = studyUID.substring(0, studyUID.length - 8);
+            // get series description - might be a better way...!
+            var description = jQuery(this).parents('tr')[0].cells[0].firstChild.data;
+            // start pulling series
+            PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
+            // start timeout function
+            PACS.preview = setInterval(
+                function() {
+                  jQuery
+                      .ajax({
+                        type : "POST",
+                        url : "controller/pacs_preview.php",
+                        dataType : "json",
+                        data : {
+                          PACS_SER_UID : seriesUID
+                        },
+                        success : function(data) {
+                          if (data) {
+                            var numberOfResults = data.filename.length;
+                            // render - XTK stuff here
+                            jQuery('#modal-body').html(data);
+                            
+                            
+                            // if all files there, stop callback
+                            var j = studyUID in PACS.loadedStudies;
+                            if (j) {
+                              var seriesData = PACS.loadedStudies[studyUID];
+                              var i = seriesData.SeriesInstanceUID
+                                  .indexOf(seriesUID);
+                              var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[i]
+                              if (numberOfResults == nbFilesInSeries) {
+                                clearInterval(PACS.preview);
+                              }
+                            }
+                          }
+                        }
+                      });
+                }, 1000);
+            // modal content
+            jQuery('#myModalLabel').html(description);
+            // loading status callback
+            // show modal
+            jQuery('#myModal').modal();
+            // if quit modal, stop preview
+          });
   jQuery("#modal-dismiss").live('click', function(event) {
     // stop timeout
     clearInterval(PACS.preview);
   });
-  
   jQuery("#modal-close").live('click', function(event) {
     // stop timeout
     clearInterval(PACS.preview);
   });
-  
   jQuery("#modal-download").live('click', function(event) {
     // stop timeout
     clearInterval(PACS.preview);

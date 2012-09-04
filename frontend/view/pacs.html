@@ -11,6 +11,27 @@
  <div class="container"
   style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
 
+
+  <!--   <div class="bs-docs-example" style="padding-bottom: 24px;">
+   <a data-toggle="modal" href="#myModal"
+    class="btn btn-primary btn-large">Launch demo modal</a>
+  </div> -->
+
+  <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog"
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-header">
+    <button id='modal-dismiss' type="button" class="close" data-dismiss="modal"
+     aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Modal Heading</h3>
+   </div>
+   <div class="modal-body">2D Renderer with a scroll bar + loading
+    status.</div>
+   <div class="modal-footer">
+    <button id='modal-close' class="btn btn-danger" data-dismiss="modal">Delete</button>
+    <button id='modal-download' class="btn btn-success" data-dismiss="modal">Keep</button>
+   </div>
+  </div>
+
   <div class="tabbable well">
    <!-- Only required for left/right tabs -->
    <ul class="nav nav-tabs">
@@ -26,14 +47,19 @@
         <h2>Parameters</h2>
         <form class="form-inline">
          <input id='PACS_MRN' type="text" class="input-small"
-          placeholder="MRN" value='4562009'> <input id='PACS_NAM'
-          type="text" class="input-small" placeholder="Name" value=''>
-         <input id='PACS_DAT' type="text" class="input-small"
-          placeholder="Study Date" value=''> <input id='PACS_MOD'
-          type="text" class="input-small" placeholder="Modality"
-          value=''>
+          placeholder="MRN" value='4562009'> <input
+          id='PACS_NAM' type="text" class="input-small"
+          placeholder="Name" value=''> <input id='PACS_DAT'
+          type="text" class="input-small" placeholder="Study Date"
+          value=''> <input id='PACS_MOD' type="text"
+          class="input-small" placeholder="Modality" value=''>
          <button id='PACS_QUERY' class='btn btn-primary' type="button">Search</button>
+
+         <!--          <div class="ball"></div>
+         <div class="ball1"></div> -->
+
         </form>
+
        </div>
       </div>
      </div>
@@ -78,7 +104,7 @@
 
     <div class="tab-pane" id="tab1">
      <div class='row-fluid'>
-<!--       <div class='span12'>
+      <!--       <div class='span12'>
        <div class='well'>
         <h2>Parameters</h2>
         <form class="form-inline">
@@ -121,7 +147,6 @@
    </div>
   </div>
  </div>
-
 
  ${FOOTER} ${JAVASCRIPT}
 </body>
