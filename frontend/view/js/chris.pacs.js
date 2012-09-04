@@ -1,10 +1,13 @@
+// create the Pacs namespace
+var PACS = PACS || {};
+
 /**
  * 
  * @param oTable
  * @param data
  * @returns {String}
  */
-function fnFormatDetails(data) {
+PACS.fnFormatDetails = function(data) {
   var numberOfResults = data.StudyInstanceUID.length;
   var i = 0;
   // set table id
@@ -45,7 +48,7 @@ function fnFormatDetails(data) {
  * @param icon
  * @returns
  */
-function fnInitTable(tableName, nbColumn, icon) {
+ PACS.fnInitTable = function (tableName, nbColumn, icon) {
   /*
    * Insert a 'details' column to the table
    */
@@ -54,10 +57,10 @@ function fnInitTable(tableName, nbColumn, icon) {
   nCloneTd.innerHTML = '<span class="control"><i class="' + icon
       + '"></i></span>';
   nCloneTd.className = "center";
-  $('#' + tableName + '-results thead tr').each(function() {
+  jQuery('#' + tableName + '-results thead tr').each(function() {
     this.insertBefore(nCloneTh, this.childNodes[0]);
   });
-  $('#' + tableName + '-results tbody tr').each(function() {
+  jQuery('#' + tableName + '-results tbody tr').each(function() {
     this.insertBefore(nCloneTd.cloneNode(true), this.childNodes[0]);
   });
   /*
@@ -68,16 +71,16 @@ function fnInitTable(tableName, nbColumn, icon) {
   nCloneTd.innerHTML = '<button class="btn btn-primary download_study" type="button" value="0"><i class="icon-circle-arrow-down icon-white download'
       + tableName + '"></i></button>';
   nCloneTd.className = "center";
-  $('#' + tableName + '-results thead tr').each(function() {
+  jQuery('#' + tableName + '-results thead tr').each(function() {
     this.insertBefore(nCloneTh, this.childNodes[nbColumn]);
   });
-  $('#' + tableName + '-results tbody tr').each(function() {
+  jQuery('#' + tableName + '-results tbody tr').each(function() {
     this.insertBefore(nCloneTd.cloneNode(true), this.childNodes[nbColumn]);
   });
   /*
    * Initialse DataTables, with no sorting on the 'details' column
    */
-  var oTable = $('#' + tableName + '-results')
+  var oTable = jQuery('#' + tableName + '-results')
       .dataTable(
           {
             "sDom" : "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
@@ -96,38 +99,38 @@ function fnInitTable(tableName, nbColumn, icon) {
 /**
  * 
  */
-function setupDownloadStudy() {
-  $(".download_study").live(
+PACS.setupDownloadStudy = function() {
+  jQuery(".download_study").live(
       'click',
       function(event) {
-        var nTr = $(this).parents('tr')[0];
+        var nTr = jQuery(this).parents('tr')[0];
         var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
         // modify class
-        var currentButton = $(this);
+        var currentButton = jQuery(this);
         currentButton.removeClass('btn-primary').removeClass('download_study')
             .addClass('btn-warning').addClass('downloading_study');
         // modify content
         currentButton.html('<i class="icon-refresh rotating_class">');
         // cache data
-        ajaxSeries(studyUID);
+        PACS.ajaxSeries(studyUID);
       });
 }
 /**
  * 
  */
-function setupDetailStudy() {
-  $('#quick-results td .control').live('click', function() {
-    var nTr = $(this).parents('tr')[0];
+PACS.setupDetailStudy = function() {
+  jQuery('#quick-results td .control').live('click', function() {
+    var nTr = jQuery(this).parents('tr')[0];
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    var i = $.inArray(nTr, window.openStudies);
+    var i = jQuery.inArray(nTr, PACS.openStudies);
     if (i === -1) {
-      $('i', this).attr('class', 'icon-chevron-up');
-      ajaxSeries(studyUID, nTr);
+      jQuery('i', this).attr('class', 'icon-chevron-up');
+      PACS.ajaxSeries(studyUID, nTr);
     } else {
-      $('i', this).attr('class', 'icon-chevron-down');
-      $('div.innerDetails', $(nTr).next()[0]).slideUp(function() {
-        window.oTable.fnClose(nTr);
-        window.openStudies.splice(i, 1);
+      jQuery('i', this).attr('class', 'icon-chevron-down');
+      jQuery('div.innerDetails', jQuery(nTr).next()[0]).slideUp(function() {
+        PACS.oTable.fnClose(nTr);
+        PACS.openStudies.splice(i, 1);
       });
     }
   });
@@ -136,7 +139,7 @@ function setupDetailStudy() {
  * 
  * @param data
  */
-function ajaxStudyResults(data) {
+PACS.ajaxStudyResults = function(data) {
   if (data != null) {
     // fill table with results
     // table id is important:
@@ -159,38 +162,38 @@ function ajaxStudyResults(data) {
     }
     content += '</tbody></table>';
     // update html with table
-    $('#results_container').html(content);
+    jQuery('#results_container').html(content);
     // make table sortable, filterable, ...
     // make the table cooler!
-    window.oTable = fnInitTable('quick', 6, 'icon-chevron-down');
+    PACS.oTable = PACS.fnInitTable('quick', 6, 'icon-chevron-down');
   } else {
     // no studies found
-    $('#results_container').html("No studies found...");
+    jQuery('#results_container').html("No studies found...");
   }
 }
 /**
  * 
  */
-function ajaxStudy() {
-  $("#PACS_QUERY").live('click', function(event) {
-    var currentButton = $(this);
+PACS.ajaxStudy = function() {
+  jQuery("#PACS_QUERY").live('click', function(event) {
+    var currentButton = jQuery(this);
     currentButton.removeClass('btn-primary').addClass('btn-warning');
     // modify content
     currentButton.html('<i class="icon-refresh rotating_class">');
     // query pacs on parameters, at STUDY LEVEL
-    $.ajax({
+    jQuery.ajax({
       type : "POST",
       url : "controller/pacs_query.php",
       dataType : "json",
       data : {
-        USER_AET : $("#USER_AET").val(),
-        SERVER_IP : $("#SERVER_IP").val(),
-        SERVER_POR : $("#SERVER_POR").val(),
+        USER_AET : jQuery("#USER_AET").val(),
+        SERVER_IP : jQuery("#SERVER_IP").val(),
+        SERVER_POR : jQuery("#SERVER_POR").val(),
         PACS_LEV : 'STUDY',
-        PACS_MRN : $("#PACS_MRN").val(),
-        PACS_NAM : $("#PACS_NAM").val(),
-        PACS_MOD : $("#PACS_MOD").val(),
-        PACS_DAT : $("#PACS_DAT").val(),
+        PACS_MRN : jQuery("#PACS_MRN").val(),
+        PACS_NAM : jQuery("#PACS_NAM").val(),
+        PACS_MOD : jQuery("#PACS_MOD").val(),
+        PACS_DAT : jQuery("#PACS_DAT").val(),
         PACS_ACC_NUM : '',
         PACS_STU_DES : '',
         PACS_STU_UID : ''
@@ -198,7 +201,7 @@ function ajaxStudy() {
       success : function(data) {
         currentButton.removeClass('btn-warning').addClass('btn-primary');
         currentButton.html('Search');
-        ajaxStudyResults(data);
+        PACS.ajaxStudyResults(data);
       }
     });
   });
@@ -208,19 +211,19 @@ function ajaxStudy() {
  * @param studyUID
  * @param oTable
  */
-function ajaxSeries(studyUID, nTr) {
+PACS.ajaxSeries = function(studyUID, nTr) {
   // is it good practice
-  var j = studyUID in window.loadedStudies;
+  var j = studyUID in PACS.loadedStudies;
   // if not cached
   if (j == 0) {
-    $.ajax({
+    jQuery.ajax({
       type : "POST",
       url : "controller/pacs_query.php",
       dataType : "json",
       data : {
-        USER_AET : $("#USER_AET").val(),
-        SERVER_IP : $("#SERVER_IP").val(),
-        SERVER_POR : $("#SERVER_POR").val(),
+        USER_AET : jQuery("#USER_AET").val(),
+        SERVER_IP : jQuery("#SERVER_IP").val(),
+        SERVER_POR : jQuery("#SERVER_POR").val(),
         PACS_LEV : 'SERIES',
         PACS_STU_UID : studyUID
       },
@@ -233,29 +236,29 @@ function ajaxSeries(studyUID, nTr) {
         for (i = 0; i < numSeries; ++i) {
           data.Status[i] = 0;
         }
-        window.loadedStudies[studyUID] = data;
-        ajaxSeriesResults(data, nTr);
+        PACS.loadedStudies[studyUID] = data;
+        PACS.ajaxSeriesResults(data, nTr);
       }
     });
   }
   // if cached
   else {
-    ajaxSeriesResults(window.loadedStudies[studyUID], nTr);
+    PACS.ajaxSeriesResults(PACS.loadedStudies[studyUID], nTr);
   }
 }
 /**
  * 
  * @param otable
  */
-function ajaxSeriesResults(data, nTr) {
+PACS.ajaxSeriesResults = function(data, nTr) {
   // format the details row table
   if (nTr) {
-    var nDetailsRow = window.oTable.fnOpen(nTr, fnFormatDetails(data),
+    var nDetailsRow = PACS.oTable.fnOpen(nTr, PACS.fnFormatDetails(data),
         'details');
     // make the details table sortable
     var detailstableid = "#" + data.StudyInstanceUID[0].replace(/\./g, "_")
         + "-details";
-    $(detailstableid).dataTable({
+    jQuery(detailstableid).dataTable({
       "sDom" : "t",
       "aaSorting" : [ [ 1, 'desc' ] ],
       "bPaginate" : false,
@@ -267,8 +270,8 @@ function ajaxSeriesResults(data, nTr) {
      * "sScrollY" : "200px", "bScrollCollapse" : true
      */
     });
-    $('div.innerDetails', nDetailsRow).slideDown();
-    window.openStudies.push(nTr);
+    jQuery('div.innerDetails', nDetailsRow).slideDown();
+    PACS.openStudies.push(nTr);
     // download images!
   } else {
     // loop through all series and download the one which are not
@@ -280,7 +283,7 @@ function ajaxSeriesResults(data, nTr) {
       if (data.Status[i] == 0) {
         var buttonID = '#' + data.SeriesInstanceUID[i].replace(/\./g, "_")
             + '-series';
-        ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i], buttonID);
+        PACS.ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i], buttonID);
       }
     }
   }
@@ -288,39 +291,39 @@ function ajaxSeriesResults(data, nTr) {
   // not working
   /*
    * var numberOfResults = data2.StudyInstanceUID.length; var j = 0; for (j = 0;
-   * j < numberOfResults; ++j) { $ .ajax({ type : "POST", async : false, url :
-   * "controller/pacs_query.php", dataType : "json", data : { USER_AET : $(
-   * "#USER_AET") .val(), SERVER_IP : $( "#SERVER_IP") .val(), SERVER_POR : $(
+   * j < numberOfResults; ++j) { jQuery .ajax({ type : "POST", async : false, url :
+   * "controller/pacs_query.php", dataType : "json", data : { USER_AET : jQuery(
+   * "#USER_AET") .val(), SERVER_IP : jQuery( "#SERVER_IP") .val(), SERVER_POR : jQuery(
    * "#SERVER_POR") .val(), PACS_LEV : 'IMAGE', PACS_STU_UID :
    * data2.StudyInstanceUID[j], PACS_SER_UID : data2.SeriesInstanceUID[j] },
    * success : function( data3) { var idseries = '#series-' +
-   * data3.SeriesInstanceUID[0] .replace( /\./g, "_"); $(idseries) .text(
+   * data3.SeriesInstanceUID[0] .replace( /\./g, "_"); jQuery(idseries) .text(
    * data3.ProtocolName[0]); } }); }
    */
 }
-function setupDownloadSeries() {
-  $(".download_series").live('click', function(event) {
-    var currentButtonID = '#' + $(this).attr('id');
-    var nTr = $(this).parents('tr')[0];
+PACS.setupDownloadSeries = function() {
+  jQuery(".download_series").live('click', function(event) {
+    var currentButtonID = '#' + jQuery(this).attr('id');
+    var nTr = jQuery(this).parents('tr')[0];
     var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    nTr = $(this).parents('table')[0];
+    nTr = jQuery(this).parents('table')[0];
     // remove last 8 character (-details)
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     studyUID = studyUID.substring(0, studyUID.length - 8);
-    ajaxImage(studyUID, seriesUID, currentButtonID);
+    PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
   });
 }
-function ajaxImage(studyUID, seriesUID, currentButtonID) {
+PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
   // wait button
-  var seriesData = window.loadedStudies[studyUID];
+  var seriesData = PACS.loadedStudies[studyUID];
   var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
   seriesData.Status[i] = 1;
   // modify class
-  $(currentButtonID).removeClass('btn-primary').removeClass('download_series')
+  jQuery(currentButtonID).removeClass('btn-primary').removeClass('download_series')
       .addClass('btn-warning');
   // modify content
-  $(currentButtonID).html('<i class="icon-refresh rotating_class">');
-  $
+  jQuery(currentButtonID).html('<i class="icon-refresh rotating_class">');
+  jQuery
       .ajax({
         type : "POST",
         url : "controller/pacs_move.php",
@@ -340,23 +343,23 @@ function ajaxImage(studyUID, seriesUID, currentButtonID) {
           PACS_ACC_NUM : ''
         },
         success : function(data) {
-          var seriesData = window.loadedStudies[studyUID];
+          var seriesData = PACS.loadedStudies[studyUID];
           var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
           seriesData.Status[i] = 2;
           // update visu if not closed!
           // use "this", modify style, refresh
-          $(currentButtonID).removeClass('btn-warning').addClass('btn-success');
+          jQuery(currentButtonID).removeClass('btn-warning').addClass('btn-success');
           // modify content
-          $(currentButtonID).html('<i class="icon-ok icon-white">');
+          jQuery(currentButtonID).html('<i class="icon-ok icon-white">');
           var studyButtonID = '#' + studyUID.replace(/\./g, "_") + ' button';
-          $(studyButtonID).attr('value',
-              +$(studyButtonID).attr('value') + 1);
+          jQuery(studyButtonID).attr('value',
+              +jQuery(studyButtonID).attr('value') + 1);
           // all series downloaded, update button!
-          if (+$(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
-            $(studyButtonID).removeClass('btn-warning').removeClass(
+          if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
+            jQuery(studyButtonID).removeClass('btn-warning').removeClass(
                 'downloading_study').addClass('btn-success');
             // modify content
-            $(studyButtonID).html('<i class="icon-ok icon-white">');
+            jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
           }
           // increase study value by one
           // currentButton.show();
@@ -377,18 +380,18 @@ function ajaxImage(studyUID, seriesUID, currentButtonID) {
 /**
  * 
  */
-function ajaxPing() {
-  $.ajax({
+PACS.ajaxPing = function() {
+  jQuery.ajax({
     type : "POST",
     url : "controller/pacs_ping.php",
     dataType : "json",
     data : {
-      USER_AET : $("#USER_AET").val(),
-      SERVER_IP : $("#SERVER_IP").val(),
-      SERVER_POR : $("#SERVER_POR").val()
+      USER_AET : jQuery("#USER_AET").val(),
+      SERVER_IP : jQuery("#SERVER_IP").val(),
+      SERVER_POR : jQuery("#SERVER_POR").val()
     },
     success : function(data) {
-      ajaxPingResults(data);
+      PACS.ajaxPingResults(data);
     }
   });
 }
@@ -396,31 +399,32 @@ function ajaxPing() {
  * 
  * @param data
  */
-function ajaxPingResults(data) {
+PACS.ajaxPingResults = function(data) {
   var pingResult = '';
   if (data == 1) {
     pingResult = ' <span class="alert alert-success fade in">Server accessible</span>';
   } else {
     pingResult = ' <span class="alert alert-error fade in">Server not accessible</span>';
   }
-  $('#pacsping').html(pingResult);
+  jQuery('#pacsping').html(pingResult);
 }
 /**
  * 
  */
-$(document).ready(function() {
+jQuery(document).ready(function() {
   // store "opened" studies
-  openStudies = [];
+  PACS.openStudies = [];
   // store "loaded" studies
-  loadedStudies = [];
-  oTable = null;
+  PACS.loadedStudies = [];
+  PACS.oTable = null;
   // search button pushed
-  ajaxStudy();
-  setupDetailStudy();
-  setupDownloadStudy();
-  setupDownloadSeries();
+
+  PACS.ajaxStudy();
+  PACS.setupDetailStudy();
+  PACS.setupDownloadStudy();
+  PACS.setupDownloadSeries();
   // ping the server
-  $(".pacsPing").click(function(event) {
-    ajaxPing();
+  jQuery(".pacsPing").click(function(event) {
+    PACS.ajaxPing();
   });
 });
