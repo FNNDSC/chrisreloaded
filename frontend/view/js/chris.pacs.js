@@ -1,6 +1,5 @@
 // create the Pacs namespace
 var PACS = PACS || {};
-
 /**
  * 
  * @param oTable
@@ -48,7 +47,7 @@ PACS.fnFormatDetails = function(data) {
  * @param icon
  * @returns
  */
- PACS.fnInitTable = function (tableName, nbColumn, icon) {
+PACS.fnInitTable = function(tableName, nbColumn, icon) {
   /*
    * Insert a 'details' column to the table
    */
@@ -124,8 +123,6 @@ PACS.setupDetailStudy = function() {
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     var i = jQuery.inArray(nTr, PACS.openStudies);
     if (i === -1) {
-      // set waiting icon
-      jQuery('.control', nTr).html('<i class="icon-refresh rotating_class">');
       PACS.ajaxSeries(studyUID, nTr);
     } else {
       jQuery('i', this).attr('class', 'icon-chevron-down');
@@ -217,6 +214,8 @@ PACS.ajaxSeries = function(studyUID, nTr) {
   var j = studyUID in PACS.loadedStudies;
   // if not cached
   if (j == 0) {
+    // set waiting icon
+    jQuery('.control', nTr).html('<i class="icon-refresh rotating_class">');
     jQuery.ajax({
       type : "POST",
       url : "controller/pacs_query.php",
@@ -286,7 +285,8 @@ PACS.ajaxSeriesResults = function(data, nTr) {
       if (data.Status[i] == 0) {
         var buttonID = '#' + data.SeriesInstanceUID[i].replace(/\./g, "_")
             + '-series';
-        PACS.ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i], buttonID);
+        PACS.ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i],
+            buttonID);
       }
     }
   }
@@ -294,14 +294,14 @@ PACS.ajaxSeriesResults = function(data, nTr) {
   // not working
   /*
    * var numberOfResults = data2.StudyInstanceUID.length; var j = 0; for (j = 0;
-   * j < numberOfResults; ++j) { jQuery .ajax({ type : "POST", async : false, url :
-   * "controller/pacs_query.php", dataType : "json", data : { USER_AET : jQuery(
-   * "#USER_AET") .val(), SERVER_IP : jQuery( "#SERVER_IP") .val(), SERVER_POR : jQuery(
-   * "#SERVER_POR") .val(), PACS_LEV : 'IMAGE', PACS_STU_UID :
-   * data2.StudyInstanceUID[j], PACS_SER_UID : data2.SeriesInstanceUID[j] },
-   * success : function( data3) { var idseries = '#series-' +
-   * data3.SeriesInstanceUID[0] .replace( /\./g, "_"); jQuery(idseries) .text(
-   * data3.ProtocolName[0]); } }); }
+   * j < numberOfResults; ++j) { jQuery .ajax({ type : "POST", async : false,
+   * url : "controller/pacs_query.php", dataType : "json", data : { USER_AET :
+   * jQuery( "#USER_AET") .val(), SERVER_IP : jQuery( "#SERVER_IP") .val(),
+   * SERVER_POR : jQuery( "#SERVER_POR") .val(), PACS_LEV : 'IMAGE',
+   * PACS_STU_UID : data2.StudyInstanceUID[j], PACS_SER_UID :
+   * data2.SeriesInstanceUID[j] }, success : function( data3) { var idseries =
+   * '#series-' + data3.SeriesInstanceUID[0] .replace( /\./g, "_");
+   * jQuery(idseries) .text( data3.ProtocolName[0]); } }); }
    */
 }
 PACS.setupDownloadSeries = function() {
@@ -322,8 +322,8 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
   var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
   seriesData.Status[i] = 1;
   // modify class
-  jQuery(currentButtonID).removeClass('btn-primary').removeClass('download_series')
-      .addClass('btn-warning');
+  jQuery(currentButtonID).removeClass('btn-primary').removeClass(
+      'download_series').addClass('btn-warning');
   // modify content
   jQuery(currentButtonID).html('<i class="icon-refresh rotating_class">');
   jQuery
@@ -351,7 +351,8 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
           seriesData.Status[i] = 2;
           // update visu if not closed!
           // use "this", modify style, refresh
-          jQuery(currentButtonID).removeClass('btn-warning').addClass('btn-success');
+          jQuery(currentButtonID).removeClass('btn-warning').addClass(
+              'btn-success');
           // modify content
           jQuery(currentButtonID).html('<i class="icon-ok icon-white">');
           var studyButtonID = '#' + studyUID.replace(/\./g, "_") + ' button';
@@ -421,7 +422,6 @@ jQuery(document).ready(function() {
   PACS.loadedStudies = [];
   PACS.oTable = null;
   // search button pushed
-
   PACS.ajaxStudy();
   PACS.setupDetailStudy();
   PACS.setupDownloadStudy();
