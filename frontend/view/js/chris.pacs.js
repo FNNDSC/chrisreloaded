@@ -12,11 +12,11 @@ PACS.fnFormatDetails = function(data) {
   // set table id
   var content = '<div class="innerDetails"><table id="'
       + data.StudyInstanceUID[0].replace(/\./g, "_")
-      + '-details" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Protocol</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
+      + '-details" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Series Description</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
     content += '<tr class="parent pacsStudyRows" id="'
         + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">';
-    content += '<td>' + data.SeriesInstanceUID[i] + '</td>';
+    content += '<td>' + data.SeriesDescription[i] + '</td>';
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + '</td>';
     content += '<td class="center"><button class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
     // need 3 cases
@@ -225,7 +225,8 @@ PACS.ajaxSeries = function(studyUID, nTr) {
         SERVER_IP : jQuery("#SERVER_IP").val(),
         SERVER_POR : jQuery("#SERVER_POR").val(),
         PACS_LEV : 'SERIES',
-        PACS_STU_UID : studyUID
+        PACS_STU_UID : studyUID,
+        PACS_SER_DES : ''
       },
       success : function(data) {
         // change icon

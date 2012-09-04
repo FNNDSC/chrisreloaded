@@ -48,6 +48,7 @@ if($_POST['PACS_LEV'] == 'STUDY'){
 elseif ($_POST['PACS_LEV'] == 'SERIES'){
   $pacs->addParameter('RetrieveAETitle', '');
   $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+  $pacs->addParameter('SeriesDescription', $_POST['PACS_SER_DES']);
   $pacs->addParameter('SeriesInstanceUID', '');
   $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
   echo json_encode($pacs->querySeries());
