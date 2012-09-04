@@ -124,7 +124,8 @@ PACS.setupDetailStudy = function() {
     var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
     var i = jQuery.inArray(nTr, PACS.openStudies);
     if (i === -1) {
-      jQuery('i', this).attr('class', 'icon-chevron-up');
+      // set waiting icon
+      jQuery('.control', nTr).html('<i class="icon-refresh rotating_class">');
       PACS.ajaxSeries(studyUID, nTr);
     } else {
       jQuery('i', this).attr('class', 'icon-chevron-down');
@@ -228,6 +229,8 @@ PACS.ajaxSeries = function(studyUID, nTr) {
         PACS_STU_UID : studyUID
       },
       success : function(data) {
+        // change icon
+        jQuery('.control', nTr).html('<i class="icon-chevron-up">');
         // hshould be inside the results
         // append a status field
         data.Status = Array();
