@@ -25,17 +25,17 @@ PACS.fnFormatDetails = function(data) {
     if (data.Status[i] == 0) {
       content += '<td class="center"><button id="'
           + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series" class="btn btn-primary download_series " type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+          + '-series" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
       // downloading!
     } else if (data.Status[i] == 1) {
       content += '<td class="center"><button id="'
           + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series" class="btn btn-warning" type="button"><i class="icon-refresh rotating_class"></i></button></td>';
+          + '-series" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></i></button></td>';
       // donwloaded!
     } else {
       content += '<td class="center"><button id="'
           + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series" class="btn btn-success" type="button"><i class="icon-ok icon-white"></i></button></td>';
+          + '-series" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></i></button></td>';
     }
     content += '</tr>';
   }
@@ -68,7 +68,7 @@ PACS.fnFormatDetails = function(data) {
    */
   var nCloneTh = document.createElement('th');
   var nCloneTd = document.createElement('td');
-  nCloneTd.innerHTML = '<button class="btn btn-primary download_study" type="button" value="0"><i class="icon-circle-arrow-down icon-white download'
+  nCloneTd.innerHTML = '<button class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white download'
       + tableName + '"></i></button>';
   nCloneTd.className = "center";
   jQuery('#' + tableName + '-results thead tr').each(function() {
