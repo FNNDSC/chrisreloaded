@@ -350,9 +350,9 @@ function ajaxImage(studyUID, seriesUID, currentButtonID) {
           $(currentButtonID).html('<i class="icon-ok icon-white">');
           var studyButtonID = '#' + studyUID.replace(/\./g, "_") + ' button';
           $(studyButtonID).attr('value',
-              parseInt($(studyButtonID).attr('value')) + 1);
+              +$(studyButtonID).attr('value') + 1);
           // all series downloaded, update button!
-          if (parseInt($(studyButtonID).attr('value')) == seriesData.SeriesInstanceUID.length) {
+          if (+$(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
             $(studyButtonID).removeClass('btn-warning').removeClass(
                 'downloading_study').addClass('btn-success');
             // modify content
