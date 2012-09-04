@@ -317,6 +317,29 @@ PACS.setupDownloadSeries = function() {
     PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
   });
 }
+
+PACS.setupPreviewSeries = function() {
+  jQuery(".preview_series").live('click', function(event) {
+    // get parent row
+    var nTr = jQuery(this).parents('tr')[0];
+    // get series uid
+    var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
+    // get series description - might be a better way...!
+    var description = jQuery(this).parents('tr')[0].cells[0].firstChild.data;
+    // get uid
+
+    // modal content
+    jQuery('#myModalLabel').html();
+    
+    // loading status callback
+    
+    // show modal
+    jQuery('#myModal').modal();
+
+    // if quit modal, stop preview
+  });
+}
+
 PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
   // wait button
   var seriesData = PACS.loadedStudies[studyUID];
@@ -427,6 +450,7 @@ jQuery(document).ready(function() {
   PACS.setupDetailStudy();
   PACS.setupDownloadStudy();
   PACS.setupDownloadSeries();
+  PACS.setupPreviewSeries();
   // ping the server
   jQuery(".pacsPing").click(function(event) {
     PACS.ajaxPing();
