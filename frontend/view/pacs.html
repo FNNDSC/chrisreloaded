@@ -20,15 +20,28 @@
   <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog"
    aria-labelledby="myModalLabel" aria-hidden="true">
    <div class="modal-header">
-    <button id='modal-dismiss' type="button" class="close" data-dismiss="modal"
-     aria-hidden="true">&times;</button>
+    <button id='modal-dismiss' type="button" class="close"
+     data-dismiss="modal" aria-hidden="true">&times;</button>
     <h3 id="myModalLabel">Modal Heading</h3>
    </div>
-   <div class="modal-body">2D Renderer with a scroll bar + loading
-    status.</div>
+   <div class="modal-body">
+    <div id='sliceX' class='twoDRenderer' style='top: 0%;'>
+     <div id='yellow_slider'></div>
+     <span class='ui-icon ui-icon-extlink ren2d_icon ren2d_icon_flip'
+      onclick='javascript:showLarge(jQuery("#sliceX"),sliceX);'
+      title="Enlarge"></span> <span
+      class='ui-icon ui-icon-arrowreturnthick-1-w ren2d_icon'
+      onclick='javascript:_current_X_content.rotateCounter();'
+      style="left: 20px;" title="Rotate"></span> <span
+      class='ui-icon ui-icon-arrowreturnthick-1-w ren2d_icon ren2d_icon_flip'
+      onclick='javascript:_current_X_content.rotate();'
+      style="left: 30px;" title="Rotate"></span>
+    </div>
+   </div>
    <div class="modal-footer">
     <button id='modal-close' class="btn btn-danger" data-dismiss="modal">Delete</button>
-    <button id='modal-download' class="btn btn-success" data-dismiss="modal">Keep</button>
+    <button id='modal-download' class="btn btn-success"
+     data-dismiss="modal">Keep</button>
    </div>
   </div>
 
@@ -149,5 +162,6 @@
  </div>
 
  ${FOOTER} ${JAVASCRIPT}
+ <script type="text/javascript" src="http://get.goXTK.com/xtk_edge.js"></script>
 </body>
 </html>

@@ -504,4 +504,9 @@ jQuery(document).ready(function() {
   jQuery(".pacsPing").click(function(event) {
     PACS.ajaxPing();
   });
+  
+  sliceX = new X.renderer2D();
+  sliceX.container = 'sliceX';
+  sliceX.orientation = 'X';
+  sliceX.init();
 });
