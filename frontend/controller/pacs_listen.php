@@ -36,6 +36,7 @@ if(!defined('CHRIS_CONFIG_PARSED')) require_once($confFile);
 // build the storescp command
 // storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"
 // then each incoming data is processed by $process_command
+/* $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php -p #p -f #f'); */
 $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php -p #p -f #f');
 $listen_command = '/usr/bin/storescp -id -od ' . CHRIS_TMP . ' -pm -xcr  \'' . $process_command . '\' -ss RX -tos 120';
 exec($listen_command);
