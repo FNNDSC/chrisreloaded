@@ -54,3 +54,13 @@ table.table thead .sorting_desc_disabled {
 table.dataTable th:active {
 	outline: none;
 }
+
+.twoDRenderer {
+border-left: thin solid #666;
+background-color: #000;
+}
+
+#yellow_slider {
+margin-top: 2px;
+background: yellow;
+}

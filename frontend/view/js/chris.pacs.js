@@ -350,7 +350,7 @@ PACS.setupPreviewSeries = function() {
                           if (data) {
                             var numberOfResults = data.filename.length;
                             // render - XTK stuff here
-                            jQuery('#modal-body').html(data);
+                            //jQuery('#modal-body').html(data);
                             
                             
                             // if all files there, stop callback
@@ -505,6 +505,7 @@ jQuery(document).ready(function() {
     PACS.ajaxPing();
   });
   
+  // setup XTK viewer
   sliceX = new X.renderer2D();
   sliceX.container = 'sliceX';
   sliceX.orientation = 'X';
