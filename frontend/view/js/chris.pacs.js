@@ -1,5 +1,6 @@
 // create the Pacs namespace
 var PACS = PACS || {};
+
 /**
  * 
  * @param oTable
@@ -353,8 +354,6 @@ PACS.setupPreviewSeries = function() {
     // clean global variable
     PACS.previewReceivedData['filename'] = [];
     PACS.previewReceivedData['data'] = [];
-
-
   });
   jQuery("#modal-close").live('click', function(event) {
     // stop timeout
@@ -390,69 +389,35 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
           if (data) {
             var numberOfResults = data.filename.length;
             // setup XTK viewer
-            if (!PACS.sliceX) {
+            if (PACS.sliceX == null) {
               window.console.debug('Slice created');
+              /*PACS.sliceX = new X.renderer3D();
+              PACS.sliceX.container = '3d';*/
               PACS.sliceX = new X.renderer2D();
               PACS.sliceX.container = 'sliceX';
               PACS.sliceX.orientation = 'X';
               PACS.sliceX.init();
             }
             // create the volume
-            if (!PACS.volume) {
+            if (PACS.volume == null) {
               window.console.debug('Volume created');
               PACS.volume = new X.volume();
             }
             // get the all the files
             var i = 0;
             var seriesData = PACS.loadedStudies[studyUID];
-            var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[seriesData.SeriesInstanceUID.indexOf(seriesUID)];
-            
-            // go through ajax results and populate the preview data
-            for (i = 0; i < numberOfResults; i++) {
-              // if data already received, do nothing
-              if(jQuery.inArray(data.filename[i],PACS.previewReceivedData['filename']) != -1){
-              window.console.log('already there:' + data.filename[i]);
-              }
-              // if data not received, grab it
-              else {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', 'http://chris/data/' + data.filename[i], true);
-                xhr.responseType = 'ArrayBuffer';
-                // define error callback
-                xhr.error = function(e) {
-                  window.console.log('Error:' + e.target.error.code);
-                };
-                
-                // define onLoad callback
-                var overloadedOnLoad = function(filename){
-                  return function(e){
-                    // if data has been received in between, do nothing
-                    if(jQuery.inArray(filename,PACS.previewReceivedData['filename']) == -1){
-                    
-                    // push not good - make sure data not there already
-                    PACS.previewReceivedData['filename'].push(filename);
-                    PACS.previewReceivedData['data'].push(this.response);
-
-                    window.console.debug(' data loaded ' + filename);
-                    window.console
-                        .debug(PACS.previewReceivedData['filename'].length);
-
-                    if (nbFilesInSeries == PACS.previewReceivedData['filename'].length) {
-                      window.console.debug('All files received');
-                      clearInterval(PACS.preview);
-                      // set XTK renderer
-                      PACS.volume.file = PACS.previewReceivedData['filename'];
-                      PACS.volume.filedata = PACS.previewReceivedData['data'];
-                      PACS.sliceX.add(PACS.volume);
-                      PACS.sliceX.render();
-                    }
-                  }
-                  };
-                };
-                
-                xhr.onload = (overloadedOnLoad)(data.filename[i]);
-                xhr.send();
-              }
+            var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[seriesData.SeriesInstanceUID
+                .indexOf(seriesUID)];
+            if (nbFilesInSeries == numberOfResults) {
+              window.console.debug('All files received');
+              clearInterval(PACS.preview);
+              // set XTK renderer
+              PACS.volume.file = data.filename.map(function(v) {
+                return 'http://chris/data/' + v;
+              });
+              // PACS.volume.filedata = PACS.previewReceivedData['data'];
+              PACS.sliceX.add(PACS.volume);
+              PACS.sliceX.render();
             }
           }
         }
@@ -559,6 +524,8 @@ jQuery(document).ready(function() {
   PACS.setupDetailStudy();
   PACS.setupDownloadStudy();
   PACS.setupDownloadSeries();
+  PACS.sliceX = null;
+  PACS.volume = null;
   PACS.setupPreviewSeries();
   // ping the server
   jQuery(".pacsPing").click(function(event) {
