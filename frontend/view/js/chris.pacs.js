@@ -397,8 +397,8 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
               /*PACS.sliceX = new X.renderer3D();
               PACS.sliceX.container = '3d';*/
               PACS.sliceX = new X.renderer2D();
-              PACS.sliceX.container = 'sliceX';
-              PACS.sliceX.orientation = 'X';
+              PACS.sliceX.container = 'sliceZ';
+              PACS.sliceX.orientation = 'Z';
               PACS.sliceX.init();
             }
             // create the volume
