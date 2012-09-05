@@ -319,87 +319,42 @@ PACS.setupDownloadSeries = function() {
   });
 }
 PACS.setupPreviewSeries = function() {
-  jQuery(".preview_series")
-      .live(
-          'click',
-          function(event) {
-            // get parent row
-            var nTr = jQuery(this).parents('tr')[0];
-            // get series uid
-            var currentButtonID = '#' + nTr.getAttribute('id') + '-series';
-            var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
-            // get study uid
-            nTr = jQuery(this).parents('table')[0];
-            var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
-            studyUID = studyUID.substring(0, studyUID.length - 8);
-            // get series description - might be a better way...!
-            var description = jQuery(this).parents('tr')[0].cells[0].firstChild.data;
-            // start pulling series
-            PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
-            // start timeout function
-            PACS.preview = setInterval(
-                function() {
-                  jQuery
-                      .ajax({
-                        type : "POST",
-                        url : "controller/pacs_preview.php",
-                        dataType : "json",
-                        data : {
-                          PACS_SER_UID : seriesUID
-                        },
-                        success : function(data) {
-                          if (data) {
-                            var numberOfResults = data.filename.length;
-                            // setup XTK viewer
-                            if (!PACS.sliceX) {
-                              window.console.debug('Slice created');
-                              PACS.sliceX = new X.renderer2D();
-                              PACS.sliceX.container = 'sliceX';
-                              PACS.sliceX.orientation = 'X';
-                              PACS.sliceX.init();
-                            }
-                            // create the volume
-                            if (!PACS.volume) {
-                              window.console.debug('Volume created');
-                              PACS.volume = new X.volume();
-                            }
-                            PACS.volume.file = 'http://x.babymri.org/?avf.nrrd';
-                            PACS.sliceX.add(PACS.volume);
-                            // render!
-                            PACS.sliceX.render();
-                            // print file names in console
-                            var i = 0;
-                            for (i = 0; i < numberOfResults; i++) {
-                              // window.console.debug(data.filename[i]);
-                            }
-                            // if all files there, stop callback
-                            var j = studyUID in PACS.loadedStudies;
-                            if (j) {
-                              var seriesData = PACS.loadedStudies[studyUID];
-                              var i = seriesData.SeriesInstanceUID
-                                  .indexOf(seriesUID);
-                              var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[i]
-                              if (numberOfResults == nbFilesInSeries) {
-                                clearInterval(PACS.preview);
-                              }
-                            }
-                          }
-                        }
-                      });
-                }, 1000);
-            // modal label
-            jQuery('#myModalLabel').html(description);
-            // loading status callback
-            // show modal
-            jQuery('#myModal').modal();
-            // if quit modal, stop preview
-          });
+  jQuery(".preview_series").live('click', function(event) {
+    // get parent row
+    var nTr = jQuery(this).parents('tr')[0];
+    // get series uid
+    var currentButtonID = '#' + nTr.getAttribute('id') + '-series';
+    var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
+    // get study uid
+    nTr = jQuery(this).parents('table')[0];
+    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
+    studyUID = studyUID.substring(0, studyUID.length - 8);
+    // get series description - might be a better way...!
+    var description = jQuery(this).parents('tr')[0].cells[0].firstChild.data;
+    // start pulling series
+    PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
+    // start timeout function
+    PACS.preview = setInterval(function() {
+      PACS.ajaxPreview(studyUID, seriesUID)
+    }, 2000);
+    // modal label
+    jQuery('#myModalLabel').html(description);
+    // loading status callback
+    // show modal
+    jQuery('#myModal').modal();
+    // if quit modal, stop preview
+  });
   jQuery("#modal-dismiss").live('click', function(event) {
     // stop timeout
     clearInterval(PACS.preview);
     // delete XTK stuff
     delete PACS.sliceX;
     delete PACS.volume;
+    // clean global variable
+    PACS.previewReceivedData['filename'] = [];
+    PACS.previewReceivedData['data'] = [];
+
+
   });
   jQuery("#modal-close").live('click', function(event) {
     // stop timeout
@@ -407,6 +362,9 @@ PACS.setupPreviewSeries = function() {
     // delete XTK stuff
     delete PACS.sliceX;
     delete PACS.volume;
+    // clean global variable
+    PACS.previewReceivedData['filename'] = [];
+    PACS.previewReceivedData['data'] = [];
   });
   jQuery("#modal-download").live('click', function(event) {
     // stop timeout
@@ -414,7 +372,91 @@ PACS.setupPreviewSeries = function() {
     // delete XTK stuff
     delete PACS.sliceX;
     delete PACS.volume;
+    // clean global variable
+    PACS.previewReceivedData['filename'] = [];
+    PACS.previewReceivedData['data'] = [];
   });
+}
+PACS.ajaxPreview = function(studyUID, seriesUID) {
+  jQuery
+      .ajax({
+        type : "POST",
+        url : "controller/pacs_preview.php",
+        dataType : "json",
+        data : {
+          PACS_SER_UID : seriesUID
+        },
+        success : function(data) {
+          if (data) {
+            var numberOfResults = data.filename.length;
+            // setup XTK viewer
+            if (!PACS.sliceX) {
+              window.console.debug('Slice created');
+              PACS.sliceX = new X.renderer2D();
+              PACS.sliceX.container = 'sliceX';
+              PACS.sliceX.orientation = 'X';
+              PACS.sliceX.init();
+            }
+            // create the volume
+            if (!PACS.volume) {
+              window.console.debug('Volume created');
+              PACS.volume = new X.volume();
+            }
+            // get the all the files
+            var i = 0;
+            var seriesData = PACS.loadedStudies[studyUID];
+            var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[seriesData.SeriesInstanceUID.indexOf(seriesUID)];
+            
+            // go through ajax results and populate the preview data
+            for (i = 0; i < numberOfResults; i++) {
+              // if data already received, do nothing
+              if(jQuery.inArray(data.filename[i],PACS.previewReceivedData['filename']) != -1){
+              window.console.log('already there:' + data.filename[i]);
+              }
+              // if data not received, grab it
+              else {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'http://chris/data/' + data.filename[i], true);
+                xhr.responseType = 'ArrayBuffer';
+                // define error callback
+                xhr.error = function(e) {
+                  window.console.log('Error:' + e.target.error.code);
+                };
+                
+                // define onLoad callback
+                var overloadedOnLoad = function(filename){
+                  return function(e){
+                    // if data has been received in between, do nothing
+                    if(jQuery.inArray(filename,PACS.previewReceivedData['filename']) == -1){
+                    
+                    // push not good - make sure data not there already
+                    PACS.previewReceivedData['filename'].push(filename);
+                    PACS.previewReceivedData['data'].push(this.response);
+
+                    window.console.debug(' data loaded ' + filename);
+                    window.console
+                        .debug(PACS.previewReceivedData['filename'].length);
+
+                    if (nbFilesInSeries == PACS.previewReceivedData['filename'].length) {
+                      window.console.debug('All files received');
+                      clearInterval(PACS.preview);
+                      // set XTK renderer
+                      PACS.volume.file = PACS.previewReceivedData['filename'];
+                      PACS.volume.filedata = PACS.previewReceivedData['data'];
+                      PACS.sliceX.add(PACS.volume);
+                      PACS.sliceX.render();
+                    }
+                  }
+                  };
+                };
+                
+                xhr.onload = (overloadedOnLoad)(data.filename[i]);
+                xhr.send();
+              }
+            }
+          }
+        }
+      });
 }
 PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
   // wait button
@@ -465,19 +507,6 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
             // modify content
             jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
           }
-          // increase study value by one
-          // currentButton.show();
-          // alert(currentButton.attr("class"));
-          /*
-           * if (data.Status[i] == 0) { content += '<td class="center"><button
-           * class="btn btn-primary download_series " type="button"><i
-           * class="icon-circle-arrow-down icon-white"></i></button></td>'; }
-           * else if (data.Status[i] == 1) { content += '<td class="center"><button
-           * class="btn btn-warning" type="button"><i class="icon-refresh
-           * icon-white"></i></button></td>'; } else { content += '<td class="center"><button
-           * class="btn btn-success" type="button"><i class="icon-ok
-           * icon-white"></i></button></td>'; }
-           */
         }
       });
 }
@@ -522,6 +551,9 @@ jQuery(document).ready(function() {
   PACS.loadedStudies = [];
   PACS.oTable = null;
   PACS.preview = null;
+  PACS.previewReceivedData = [];
+  PACS.previewReceivedData['filename'] = [];
+  PACS.previewReceivedData['data'] = [];
   // search button pushed
   PACS.ajaxStudy();
   PACS.setupDetailStudy();
