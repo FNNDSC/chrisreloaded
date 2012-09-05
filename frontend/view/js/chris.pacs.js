@@ -246,6 +246,7 @@ PACS.ajaxSeries = function(studyUID, nTr) {
   }
   // if cached
   else {
+    jQuery('.control', nTr).html('<i class="icon-chevron-up">');
     PACS.ajaxSeriesResults(PACS.loadedStudies[studyUID], nTr);
   }
 }
@@ -349,10 +350,28 @@ PACS.setupPreviewSeries = function() {
                         success : function(data) {
                           if (data) {
                             var numberOfResults = data.filename.length;
-                            // render - XTK stuff here
-                            //jQuery('#modal-body').html(data);
-                            
-                            
+                            // setup XTK viewer
+                            if (!PACS.sliceX) {
+                              window.console.debug('Slice created');
+                              PACS.sliceX = new X.renderer2D();
+                              PACS.sliceX.container = 'sliceX';
+                              PACS.sliceX.orientation = 'X';
+                              PACS.sliceX.init();
+                            }
+                            // create the volume
+                            if (!PACS.volume) {
+                              window.console.debug('Volume created');
+                              PACS.volume = new X.volume();
+                            }
+                            PACS.volume.file = 'http://x.babymri.org/?avf.nrrd';
+                            PACS.sliceX.add(PACS.volume);
+                            // render!
+                            PACS.sliceX.render();
+                            // print file names in console
+                            var i = 0;
+                            for (i = 0; i < numberOfResults; i++) {
+                              // window.console.debug(data.filename[i]);
+                            }
                             // if all files there, stop callback
                             var j = studyUID in PACS.loadedStudies;
                             if (j) {
@@ -368,7 +387,7 @@ PACS.setupPreviewSeries = function() {
                         }
                       });
                 }, 1000);
-            // modal content
+            // modal label
             jQuery('#myModalLabel').html(description);
             // loading status callback
             // show modal
@@ -378,14 +397,23 @@ PACS.setupPreviewSeries = function() {
   jQuery("#modal-dismiss").live('click', function(event) {
     // stop timeout
     clearInterval(PACS.preview);
+    // delete XTK stuff
+    delete PACS.sliceX;
+    delete PACS.volume;
   });
   jQuery("#modal-close").live('click', function(event) {
     // stop timeout
     clearInterval(PACS.preview);
+    // delete XTK stuff
+    delete PACS.sliceX;
+    delete PACS.volume;
   });
   jQuery("#modal-download").live('click', function(event) {
     // stop timeout
     clearInterval(PACS.preview);
+    // delete XTK stuff
+    delete PACS.sliceX;
+    delete PACS.volume;
   });
 }
 PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
@@ -504,10 +532,4 @@ jQuery(document).ready(function() {
   jQuery(".pacsPing").click(function(event) {
     PACS.ajaxPing();
   });
-  
-  // setup XTK viewer
-  sliceX = new X.renderer2D();
-  sliceX.container = 'sliceX';
-  sliceX.orientation = 'X';
-  sliceX.init();
 });
