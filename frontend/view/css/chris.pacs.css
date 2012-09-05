@@ -57,7 +57,10 @@ table.dataTable th:active {
 
 .twoDRenderer {
 border-left: thin solid #666;
-background-color: #000;
+background-color: #0ff;
+top: 0%;
+height:256px;
+width:512px;
 }
 
 /* #yellow_slider {

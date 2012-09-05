@@ -349,6 +349,7 @@ PACS.setupPreviewSeries = function() {
     // stop timeout
     clearInterval(PACS.preview);
     // delete XTK stuff
+    PACS.sliceX.destroy();
     delete PACS.sliceX;
     delete PACS.volume;
     // clean global variable
@@ -359,6 +360,7 @@ PACS.setupPreviewSeries = function() {
     // stop timeout
     clearInterval(PACS.preview);
     // delete XTK stuff
+    PACS.sliceX.destroy();
     delete PACS.sliceX;
     delete PACS.volume;
     // clean global variable
@@ -369,6 +371,7 @@ PACS.setupPreviewSeries = function() {
     // stop timeout
     clearInterval(PACS.preview);
     // delete XTK stuff
+    PACS.sliceX.destroy();
     delete PACS.sliceX;
     delete PACS.volume;
     // clean global variable
