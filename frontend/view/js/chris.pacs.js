@@ -1,6 +1,5 @@
 // create the Pacs namespace
 var PACS = PACS || {};
-
 /**
  * 
  * @param oTable
@@ -334,16 +333,14 @@ PACS.setupPreviewSeries = function() {
     var description = jQuery(this).parents('tr')[0].cells[0].firstChild.data;
     // start pulling series
     PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
+    // modal label
+    jQuery('#myModalLabel').html(description);
+    // show modal
+    jQuery('#myModal').modal();
     // start timeout function
     PACS.preview = setInterval(function() {
       PACS.ajaxPreview(studyUID, seriesUID)
     }, 2000);
-    // modal label
-    jQuery('#myModalLabel').html(description);
-    // loading status callback
-    // show modal
-    jQuery('#myModal').modal();
-    // if quit modal, stop preview
   });
   jQuery("#modal-dismiss").live('click', function(event) {
     // stop timeout
@@ -394,8 +391,9 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
             // setup XTK viewer
             if (PACS.sliceX == null) {
               window.console.debug('Slice created');
-              /*PACS.sliceX = new X.renderer3D();
-              PACS.sliceX.container = '3d';*/
+              /*
+               * PACS.sliceX = new X.renderer3D(); PACS.sliceX.container = '3d';
+               */
               PACS.sliceX = new X.renderer2D();
               PACS.sliceX.container = 'sliceZ';
               PACS.sliceX.orientation = 'Z';
@@ -431,52 +429,55 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
   var seriesData = PACS.loadedStudies[studyUID];
   var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
   seriesData.Status[i] = 1;
+  // if series already or is being downloaded (preview use case)
+  if (jQuery(currentButtonID).hasClass('btn-primary')) {
   // modify class
   jQuery(currentButtonID).removeClass('btn-primary').removeClass(
       'download_series').addClass('btn-warning');
-  // modify content
-  jQuery(currentButtonID).html('<i class="icon-refresh rotating_class">');
-  jQuery
-      .ajax({
-        type : "POST",
-        url : "controller/pacs_move.php",
-        dataType : "json",
-        data : {
-          USER_AET : 'FNNDSC-CHRISDEV',
-          SERVER_IP : '134.174.12.21',
-          SERVER_POR : '104',
-          PACS_LEV : 'SERIES',
-          PACS_STU_UID : studyUID,
-          PACS_SER_UID : seriesUID,
-          PACS_MRN : '',
-          PACS_NAM : '',
-          PACS_MOD : '',
-          PACS_DAT : '',
-          PACS_STU_DES : '',
-          PACS_ACC_NUM : ''
-        },
-        success : function(data) {
-          var seriesData = PACS.loadedStudies[studyUID];
-          var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
-          seriesData.Status[i] = 2;
-          // update visu if not closed!
-          // use "this", modify style, refresh
-          jQuery(currentButtonID).removeClass('btn-warning').addClass(
-              'btn-success');
-          // modify content
-          jQuery(currentButtonID).html('<i class="icon-ok icon-white">');
-          var studyButtonID = '#' + studyUID.replace(/\./g, "_") + ' button';
-          jQuery(studyButtonID).attr('value',
-              +jQuery(studyButtonID).attr('value') + 1);
-          // all series downloaded, update button!
-          if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
-            jQuery(studyButtonID).removeClass('btn-warning').removeClass(
-                'downloading_study').addClass('btn-success');
+    // modify content
+    jQuery(currentButtonID).html('<i class="icon-refresh rotating_class">');
+    jQuery
+        .ajax({
+          type : "POST",
+          url : "controller/pacs_move.php",
+          dataType : "json",
+          data : {
+            USER_AET : 'FNNDSC-CHRISDEV',
+            SERVER_IP : '134.174.12.21',
+            SERVER_POR : '104',
+            PACS_LEV : 'SERIES',
+            PACS_STU_UID : studyUID,
+            PACS_SER_UID : seriesUID,
+            PACS_MRN : '',
+            PACS_NAM : '',
+            PACS_MOD : '',
+            PACS_DAT : '',
+            PACS_STU_DES : '',
+            PACS_ACC_NUM : ''
+          },
+          success : function(data) {
+            var seriesData = PACS.loadedStudies[studyUID];
+            var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
+            seriesData.Status[i] = 2;
+            // update visu if not closed!
+            // use "this", modify style, refresh
+            jQuery(currentButtonID).removeClass('btn-warning').addClass(
+                'btn-success');
             // modify content
-            jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
+            jQuery(currentButtonID).html('<i class="icon-ok icon-white">');
+            var studyButtonID = '#' + studyUID.replace(/\./g, "_") + ' button';
+            jQuery(studyButtonID).attr('value',
+                +jQuery(studyButtonID).attr('value') + 1);
+            // all series downloaded, update button!
+            if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
+              jQuery(studyButtonID).removeClass('btn-warning').removeClass(
+                  'downloading_study').addClass('btn-success');
+              // modify content
+              jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
+            }
           }
-        }
-      });
+        });
+  }
 }
 /**
  * 

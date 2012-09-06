@@ -56,14 +56,10 @@ table.dataTable th:active {
 }
 
 .twoDRenderer {
-border-left: thin solid #666;
 background-color: #0ff;
 top: 0%;
-height:256px;
-width:512px;
+height:370px;
+width:370px;
+margin-left: auto ;
+margin-right: auto ;
 }
-
-/* #yellow_slider {
-margin-top: 2px;
-background: yellow;
-} */
