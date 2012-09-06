@@ -419,6 +419,21 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
               // PACS.volume.filedata = PACS.previewReceivedData['data'];
               PACS.sliceX.add(PACS.volume);
               PACS.sliceX.render();
+              PACS.sliceX.onShowtime = function() {
+                // init slider
+                jQuery("#sliderZ").slider(
+                    {
+                      min : 0,
+                      max : nbFilesInSeries-1,
+                      value : PACS.volume.indexZ,
+                      slide : function(event, ui) {
+                        PACS.volume.indexZ = ui.value;
+                        jQuery("#currentSlice").html(PACS.volume.indexZ);
+                      }
+                    });
+                jQuery("#currentSlice").html(PACS.volume.indexZ);
+                jQuery("#totalSlices").html(nbFilesInSeries-1);
+              }
             }
           }
         }
@@ -431,9 +446,9 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
   seriesData.Status[i] = 1;
   // if series already or is being downloaded (preview use case)
   if (jQuery(currentButtonID).hasClass('btn-primary')) {
-  // modify class
-  jQuery(currentButtonID).removeClass('btn-primary').removeClass(
-      'download_series').addClass('btn-warning');
+    // modify class
+    jQuery(currentButtonID).removeClass('btn-primary').removeClass(
+        'download_series').addClass('btn-warning');
     // modify content
     jQuery(currentButtonID).html('<i class="icon-refresh rotating_class">');
     jQuery
