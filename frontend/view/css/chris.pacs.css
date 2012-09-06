@@ -56,20 +56,22 @@ table.dataTable th:active {
 }
 
 .twoDRenderer {
-background-color: #0ff;
+background-color: #000;
 top: 0%;
 height:370px;
 width:370px;
-float: left ;
-}
-
-.twoDRendererControl {
-background-color: #DEDEDE;
-top: 0%;
-height:370px;
-width:140px;
-float: right ;
+margin-left: auto ;
+margin-right: auto ;
 }
 
 #sliderZ {
+width:370px;
+margin-left: auto ;
+margin-right: auto ;
+}
+
+#sliderZOverlay {
+width:370px;
+margin-left: auto ;
+margin-right: auto ;
 }

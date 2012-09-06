@@ -421,18 +421,22 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
               PACS.sliceX.render();
               PACS.sliceX.onShowtime = function() {
                 // init slider
-                jQuery("#sliderZ").slider(
-                    {
-                      min : 0,
-                      max : nbFilesInSeries-1,
-                      value : PACS.volume.indexZ,
-                      slide : function(event, ui) {
-                        PACS.volume.indexZ = ui.value;
-                        jQuery("#currentSlice").html(PACS.volume.indexZ);
-                      }
-                    });
+                jQuery("#sliderZ").slider({
+                  min : 0,
+                  max : nbFilesInSeries - 1,
+                  value : PACS.volume.indexZ,
+                  slide : function(event, ui) {
+                    PACS.volume.indexZ = ui.value;
+                    jQuery("#currentSlice").html(PACS.volume.indexZ);
+                  }
+                });
+                PACS.sliceX.onScroll = function() {
+                  jQuery('#sliderZ').slider("option", "value",
+                      PACS.volume.indexZ);
+                  jQuery("#currentSlice").html(PACS.volume.indexZ);
+                };
                 jQuery("#currentSlice").html(PACS.volume.indexZ);
-                jQuery("#totalSlices").html(nbFilesInSeries-1);
+                jQuery("#totalSlices").html(nbFilesInSeries - 1);
               }
             }
           }
