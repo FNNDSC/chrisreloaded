@@ -343,6 +343,11 @@ PACS.setupPreviewSeries = function() {
     PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
     // modal label
     jQuery('#myModalLabel').html(description);
+    // overlay
+    jQuery("#loadOverlay").html('Retrieving data <i class="icon-refresh icon-white rotating_class">');
+    jQuery("#loadOverlay").show();
+    jQuery("#currentSlice").html('00');
+    jQuery("#totalSlices").html('00');
     // show modal
     jQuery('#myModal').modal();
     // start timeout function
@@ -368,11 +373,6 @@ PACS.setupPreviewSeries = function() {
     // clean global variable
     PACS.previewReceivedData['filename'] = [];
     PACS.previewReceivedData['data'] = [];
-    // overlay
-    jQuery("#loadOverlay").html('Retrieving data <i class="icon-refresh icon-white rotating_class">');
-    jQuery("#loadOverlay").show();
-    jQuery("#currentSlice").html('00');
-    jQuery("#totalSlices").html('00');
     // slider
     jQuery("#sliderZ").slider("destroy");
   });
