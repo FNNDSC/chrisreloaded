@@ -1,3 +1,11 @@
+goog.require('X.renderer2D');
+goog.require('X.renderer3D');
+goog.require('X.fibers');
+goog.require('X.mesh');
+goog.require('X.volume');
+goog.require('X.cube');
+goog.require('X.sphere');
+goog.require('X.cylinder');
 // create the Pacs namespace
 var PACS = PACS || {};
 /**
@@ -342,38 +350,34 @@ PACS.setupPreviewSeries = function() {
       PACS.ajaxPreview(studyUID, seriesUID)
     }, 2000);
   });
-  jQuery("#modal-dismiss").live('click', function(event) {
+  jQuery('#myModal').on('hidden', function() {
     // stop timeout
     clearInterval(PACS.preview);
     // delete XTK stuff
-    PACS.sliceX.destroy();
-    delete PACS.sliceX;
-    delete PACS.volume;
+    if (PACS.sliceX != null) {
+      PACS.sliceX.destroy();
+      delete PACS.sliceX;
+      PACS.sliceX = null;
+    }
+    if (PACS.volume != null) {
+      delete PACS.volume;
+      PACS.volume = null;
+    }
+    // stop call back
+    clearInterval(PACS.preview);
     // clean global variable
     PACS.previewReceivedData['filename'] = [];
     PACS.previewReceivedData['data'] = [];
+    // overlay
+    jQuery("#loadOverlay").html('Retrieving data <i class="icon-refresh icon-white rotating_class">');
+    jQuery("#loadOverlay").show();
+    jQuery("#currentSlice").html('00');
+    jQuery("#totalSlices").html('00');
+    // slider
+    jQuery("#sliderZ").slider("destroy");
   });
   jQuery("#modal-close").live('click', function(event) {
-    // stop timeout
-    clearInterval(PACS.preview);
-    // delete XTK stuff
-    PACS.sliceX.destroy();
-    delete PACS.sliceX;
-    delete PACS.volume;
-    // clean global variable
-    PACS.previewReceivedData['filename'] = [];
-    PACS.previewReceivedData['data'] = [];
-  });
-  jQuery("#modal-download").live('click', function(event) {
-    // stop timeout
-    clearInterval(PACS.preview);
-    // delete XTK stuff
-    PACS.sliceX.destroy();
-    delete PACS.sliceX;
-    delete PACS.volume;
-    // clean global variable
-    PACS.previewReceivedData['filename'] = [];
-    PACS.previewReceivedData['data'] = [];
+    alert('Delete not connected to the server!');
   });
 }
 PACS.ajaxPreview = function(studyUID, seriesUID) {
@@ -388,38 +392,29 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
         success : function(data) {
           if (data) {
             var numberOfResults = data.filename.length;
-            // setup XTK viewer
-            if (PACS.sliceX == null) {
-              window.console.debug('Slice created');
-              /*
-               * PACS.sliceX = new X.renderer3D(); PACS.sliceX.container = '3d';
-               */
-              PACS.sliceX = new X.renderer2D();
-              PACS.sliceX.container = 'sliceZ';
-              PACS.sliceX.orientation = 'Z';
-              PACS.sliceX.init();
-            }
-            // create the volume
-            if (PACS.volume == null) {
-              window.console.debug('Volume created');
-              PACS.volume = new X.volume();
-            }
             // get the all the files
             var i = 0;
             var seriesData = PACS.loadedStudies[studyUID];
             var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[seriesData.SeriesInstanceUID
                 .indexOf(seriesUID)];
             if (nbFilesInSeries == numberOfResults) {
-              window.console.debug('All files received');
+              jQuery("#loadOverlay").html('Creating XTK visualization...');
               clearInterval(PACS.preview);
               // set XTK renderer
+              PACS.volume = new X.volume();
               PACS.volume.file = data.filename.map(function(v) {
                 return 'http://chris/data/' + v;
               });
               // PACS.volume.filedata = PACS.previewReceivedData['data'];
+              PACS.sliceX = new X.renderer2D();
+              PACS.sliceX.container = 'sliceZ';
+              PACS.sliceX.orientation = 'Z';
+              PACS.sliceX.init();
               PACS.sliceX.add(PACS.volume);
               PACS.sliceX.render();
               PACS.sliceX.onShowtime = function() {
+                // hide overlay
+                jQuery("#loadOverlay").hide();
                 // init slider
                 jQuery("#sliderZ").slider({
                   min : 0,

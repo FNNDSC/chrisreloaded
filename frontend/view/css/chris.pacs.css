@@ -78,3 +78,10 @@ table.dataTable th:active {
 	right: 0px;
 	padding: 2px;
 }
+
+#loadOverlay {
+	background-color: #000;
+	position: absolute;
+	color: white;
+	margin: auto;
+}
