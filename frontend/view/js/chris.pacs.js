@@ -327,34 +327,39 @@ PACS.setupDownloadSeries = function() {
   });
 }
 PACS.setupPreviewSeries = function() {
-  jQuery(".preview_series").live('click', function(event) {
-    // get parent row
-    var nTr = jQuery(this).parents('tr')[0];
-    // get series uid
-    var currentButtonID = '#' + nTr.getAttribute('id') + '-series';
-    var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    // get study uid
-    nTr = jQuery(this).parents('table')[0];
-    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    studyUID = studyUID.substring(0, studyUID.length - 8);
-    // get series description - might be a better way...!
-    var description = jQuery(this).parents('tr')[0].cells[0].firstChild.data;
-    // start pulling series
-    PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
-    // modal label
-    jQuery('#myModalLabel').html(description);
-    // overlay
-    jQuery("#loadOverlay").html('Retrieving data <i class="icon-refresh icon-white rotating_class">');
-    jQuery("#loadOverlay").show();
-    jQuery("#currentSlice").html('00');
-    jQuery("#totalSlices").html('00');
-    // show modal
-    jQuery('#myModal').modal();
-    // start timeout function
-    PACS.preview = setInterval(function() {
-      PACS.ajaxPreview(studyUID, seriesUID)
-    }, 2000);
-  });
+  jQuery(".preview_series")
+      .live(
+          'click',
+          function(event) {
+            // get parent row
+            var nTr = jQuery(this).parents('tr')[0];
+            // get series uid
+            var currentButtonID = '#' + nTr.getAttribute('id') + '-series';
+            var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
+            // get study uid
+            nTr = jQuery(this).parents('table')[0];
+            var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
+            studyUID = studyUID.substring(0, studyUID.length - 8);
+            // get series description - might be a better way...!
+            var description = jQuery(this).parents('tr')[0].cells[0].firstChild.data;
+            // start pulling series
+            PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
+            // modal label
+            jQuery('#myModalLabel').html(description);
+            // overlay
+            jQuery("#loadOverlay")
+                .html(
+                    'Retrieving data <i class="icon-refresh icon-white rotating_class">');
+            jQuery("#loadOverlay").show();
+            jQuery("#currentSlice").html('00');
+            jQuery("#totalSlices").html('00');
+            // show modal
+            jQuery('#myModal').modal();
+            // start timeout function
+            PACS.preview = setInterval(function() {
+              PACS.ajaxPreview(studyUID, seriesUID)
+            }, 2000);
+          });
   jQuery('#myModal').on('hidden', function() {
     // stop timeout
     clearInterval(PACS.preview);
@@ -405,7 +410,6 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
               PACS.volume.file = data.filename.map(function(v) {
                 return 'http://chris/data/' + v;
               });
-              // PACS.volume.filedata = PACS.previewReceivedData['data'];
               PACS.sliceX = new X.renderer2D();
               PACS.sliceX.container = 'sliceZ';
               PACS.sliceX.orientation = 'Z';
