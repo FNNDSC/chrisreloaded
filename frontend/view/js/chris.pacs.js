@@ -263,7 +263,9 @@ PACS.ajaxSeries = function(studyUID, nTr) {
   }
   // if cached
   else {
-    jQuery('.control', nTr).html('<i class="icon-chevron-up">');
+    if (nTr != null) {
+      jQuery('.control', nTr).html('<i class="icon-chevron-up">');
+    }
     PACS.ajaxSeriesResults(PACS.loadedStudies[studyUID], nTr);
   }
 }
@@ -463,13 +465,14 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
         'download_series').addClass('btn-warning');
     // modify content
     jQuery(currentButtonID).html('<i class="icon-refresh rotating_class">');
+    var userAET = jQuery('#USER_AET').attr('value');
     jQuery
         .ajax({
           type : "POST",
           url : "controller/pacs_move.php",
           dataType : "json",
           data : {
-            USER_AET : 'FNNDSC-CHRISDEV',
+            USER_AET : userAET,
             SERVER_IP : '134.174.12.21',
             SERVER_POR : '104',
             PACS_LEV : 'SERIES',
