@@ -223,7 +223,9 @@ PACS.ajaxSeries = function(studyUID, nTr) {
   // if not cached
   if (j == 0) {
     // set waiting icon
-    jQuery('.control', nTr).html('<i class="icon-refresh rotating_class">');
+    if (nTr != null) {
+      jQuery('.control', nTr).html('<i class="icon-refresh rotating_class">');
+    }
     jQuery.ajax({
       type : "POST",
       url : "controller/pacs_query.php",
@@ -238,7 +240,9 @@ PACS.ajaxSeries = function(studyUID, nTr) {
       },
       success : function(data) {
         // change icon
-        jQuery('.control', nTr).html('<i class="icon-chevron-up">');
+        if (nTr != null) {
+          jQuery('.control', nTr).html('<i class="icon-chevron-up">');
+        }
         // hshould be inside the results
         // append a status field
         data.Status = Array();
@@ -264,7 +268,7 @@ PACS.ajaxSeries = function(studyUID, nTr) {
  */
 PACS.ajaxSeriesResults = function(data, nTr) {
   // format the details row table
-  if (nTr) {
+  if (nTr != null) {
     var nDetailsRow = PACS.oTable.fnOpen(nTr, PACS.fnFormatDetails(data),
         'details');
     // make the details table sortable
@@ -278,14 +282,11 @@ PACS.ajaxSeriesResults = function(data, nTr) {
         "bSortable" : false,
         "aTargets" : [ 2, 3 ]
       } ],
-    /*
-     * "sScrollY" : "200px", "bScrollCollapse" : true
-     */
     });
     jQuery('div.innerDetails', nDetailsRow).slideDown();
     PACS.openStudies.push(nTr);
-    // download images!
   } else {
+    // download images!
     // loop through all series and download the one which are not
     // downloaded
     // and not downloading
@@ -425,7 +426,7 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
                   max : nbFilesInSeries,
                   value : Math.round(PACS.volume.indexZ + 1),
                   slide : function(event, ui) {
-                    PACS.volume.indexZ = ui.value -1;
+                    PACS.volume.indexZ = ui.value - 1;
                     jQuery("#currentSlice").html(ui.value);
                   }
                 });
@@ -434,7 +435,8 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
                       PACS.volume.indexZ + 1);
                   jQuery("#currentSlice").html(PACS.volume.indexZ + 1);
                 };
-                jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
+                jQuery("#currentSlice")
+                    .html(Math.round(PACS.volume.indexZ + 1));
                 jQuery("#totalSlices").html(nbFilesInSeries);
               }
             }
@@ -443,12 +445,13 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
       });
 }
 PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
-  // wait button
+  // should it be there...(or inside ajax result)?
   var seriesData = PACS.loadedStudies[studyUID];
   var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
   seriesData.Status[i] = 1;
+  // wait button
   // if series already or is being downloaded (preview use case)
-  if (jQuery(currentButtonID).hasClass('btn-primary')) {
+  if (jQuery(currentButtonID).length == 0 || jQuery(currentButtonID).hasClass('btn-primary')) {
     // modify class
     jQuery(currentButtonID).removeClass('btn-primary').removeClass(
         'download_series').addClass('btn-warning');
