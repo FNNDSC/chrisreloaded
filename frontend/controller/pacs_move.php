@@ -39,9 +39,6 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
 $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 
 if($_POST['PACS_LEV'] == 'STUDY'){
-  // @todo should check if study already there
-  // requieres extra pacs query to get series uid (= data uid)
-  // maybe not worth it....
   $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
   $pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
   $pacs->addParameter('RetrieveAETitle', $_POST['USER_AET']);
@@ -54,21 +51,50 @@ if($_POST['PACS_LEV'] == 'STUDY'){
   echo json_encode($pacs->moveStudy());
 }
 else{
-  // check if series already there
-  // retrieve the data
-  $dataMapper = new Mapper('Data');
-  $dataMapper->filter('unique_id = (?)',$_POST['PACS_SER_UID']);
-  $dataResult = $dataMapper->get();
-  
-  // if data already there, do not do anything!
-  if(count($dataResult['Data']) > 0)
-  {
-    echo json_encode('');
-    return;
+
+  // if chris1.0, push data to chris1.0 as well for the preview
+  if($_POST['USER_AET'] == 'FNNDSC-CHRIS'){
+    $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+    $pacs->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
+    $pacs->moveSeries();
+
+    // check if series already there
+    // retrieve the data
+    $dataMapper = new Mapper('Data');
+    $dataMapper->filter('unique_id = (?)',$_POST['PACS_SER_UID']);
+    $dataResult = $dataMapper->get();
+
+    // if data already there, do not do anything!
+    if(count($dataResult['Data']) > 0)
+    {
+      echo json_encode('');
+      return;
+    }
+
+    $pacs2 = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], 'FNNDSC-CHRISDEV');
+    $pacs2->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+    $pacs2->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
+    echo json_encode($pacs2->moveSeries());
   }
-  
-  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
-  $pacs->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
-  echo json_encode($pacs->moveSeries());
+  else{
+    // check if series already there
+    // retrieve the data
+    $dataMapper = new Mapper('Data');
+    $dataMapper->filter('unique_id = (?)',$_POST['PACS_SER_UID']);
+    $dataResult = $dataMapper->get();
+
+    // if data already there, do not do anything!
+    if(count($dataResult['Data']) > 0)
+    {
+      echo json_encode('');
+      return;
+    }
+
+    $pacs2 = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
+    $pacs2->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+    $pacs2->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
+    echo json_encode($pacs2->moveSeries());
+  }
+
 }
 ?>
