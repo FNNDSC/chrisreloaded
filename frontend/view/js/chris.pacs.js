@@ -14,6 +14,11 @@ var PACS = PACS || {};
  * @param data
  * @returns {String}
  */
+jQuery('.form_content').keypress(function(e) {
+  if (e.which == 13) {
+    jQuery('#PACS_QUERY').click();
+  }
+});
 PACS.fnFormatDetails = function(data) {
   var numberOfResults = data.StudyInstanceUID.length;
   var i = 0;
@@ -451,7 +456,8 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
   seriesData.Status[i] = 1;
   // wait button
   // if series already or is being downloaded (preview use case)
-  if (jQuery(currentButtonID).length == 0 || jQuery(currentButtonID).hasClass('btn-primary')) {
+  if (jQuery(currentButtonID).length == 0
+      || jQuery(currentButtonID).hasClass('btn-primary')) {
     // modify class
     jQuery(currentButtonID).removeClass('btn-primary').removeClass(
         'download_series').addClass('btn-warning');
