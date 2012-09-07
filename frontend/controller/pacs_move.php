@@ -29,11 +29,17 @@ define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
 require_once ('../config.inc.php');
+require_once 'db.class.php';
+require_once 'mapper.class.php';
 require_once 'pacs.class.php';
+
+// include the models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
 
 $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 
 if($_POST['PACS_LEV'] == 'STUDY'){
+  // @todo should check if study already there
   $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
   $pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
   $pacs->addParameter('RetrieveAETitle', $_POST['USER_AET']);
@@ -46,6 +52,19 @@ if($_POST['PACS_LEV'] == 'STUDY'){
   echo json_encode($pacs->moveStudy());
 }
 else{
+  // check if series already there
+  // retrieve the data
+  $dataMapper = new Mapper('Data');
+  $dataMapper->filter('unique_id = (?)',$_POST['PACS_SER_UID']);
+  $dataResult = $dataMapper->get();
+  
+  // if data already there, do not do anything!
+  if(count($dataResult['Data']) > 0)
+  {
+    echo json_encode('');
+    return;
+  }
+  
   $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
   $pacs->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
   echo json_encode($pacs->moveSeries());
