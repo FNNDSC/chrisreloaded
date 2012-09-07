@@ -366,7 +366,7 @@ PACS.setupPreviewSeries = function() {
             // start timeout function
             PACS.preview = setInterval(function() {
               PACS.ajaxPreview(studyUID, seriesUID)
-            }, 2000);
+            }, 500);
           });
   jQuery('#myModal').on('hidden', function() {
     // stop timeout
