@@ -40,6 +40,8 @@ $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 
 if($_POST['PACS_LEV'] == 'STUDY'){
   // @todo should check if study already there
+  // requieres extra pacs query to get series uid (= data uid)
+  // maybe not worth it....
   $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
   $pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
   $pacs->addParameter('RetrieveAETitle', $_POST['USER_AET']);

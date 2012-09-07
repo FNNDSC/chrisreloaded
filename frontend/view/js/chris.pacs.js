@@ -421,21 +421,21 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
                 jQuery("#loadOverlay").hide();
                 // init slider
                 jQuery("#sliderZ").slider({
-                  min : 0,
-                  max : nbFilesInSeries - 1,
-                  value : PACS.volume.indexZ,
+                  min : 1,
+                  max : nbFilesInSeries,
+                  value : Math.round(PACS.volume.indexZ + 1),
                   slide : function(event, ui) {
-                    PACS.volume.indexZ = ui.value;
-                    jQuery("#currentSlice").html(PACS.volume.indexZ);
+                    PACS.volume.indexZ = ui.value -1;
+                    jQuery("#currentSlice").html(ui.value);
                   }
                 });
                 PACS.sliceX.onScroll = function() {
                   jQuery('#sliderZ').slider("option", "value",
-                      PACS.volume.indexZ);
-                  jQuery("#currentSlice").html(PACS.volume.indexZ);
+                      PACS.volume.indexZ + 1);
+                  jQuery("#currentSlice").html(PACS.volume.indexZ + 1);
                 };
-                jQuery("#currentSlice").html(PACS.volume.indexZ);
-                jQuery("#totalSlices").html(nbFilesInSeries - 1);
+                jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
+                jQuery("#totalSlices").html(nbFilesInSeries);
               }
             }
           }
