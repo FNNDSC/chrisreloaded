@@ -39,6 +39,7 @@ if($_POST['PACS_LEV'] == 'STUDY'){
   $pacs->addParameter('RetrieveAETitle', $_POST['USER_AET']);
   $pacs->addParameter('ModalitiesInStudy', $_POST['PACS_MOD']);
   $pacs->addParameter('StudyDescription', $_POST['PACS_STU_DES']);
+  $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
   $pacs->addParameter('PatientName', $_POST['PACS_NAM']);
   $pacs->addParameter('PatientID', $_POST['PACS_MRN']);
   $pacs->addParameter('PatientBirthDate', '');
@@ -53,11 +54,32 @@ elseif ($_POST['PACS_LEV'] == 'SERIES'){
   $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
   echo json_encode($pacs->querySeries());
 }
-else{
+elseif ($_POST['PACS_LEV'] == 'IMAGE'){
   $pacs->addParameter('RetrieveAETitle', '');
   $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
   $pacs->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
   $pacs->addParameter('ProtocolName', '');
   echo json_encode($pacs->queryImage());
+}
+else{
+  $study_parameter = Array();
+  $study_parameter['PatientID'] = $_POST['PACS_MRN'];
+  $study_parameter['PatientName'] = $_POST['PACS_NAM'];
+  $study_parameter['PatientBirthDate'] = '';
+  $study_parameter['StudyDate'] = $_POST['PACS_DAT'];
+  $study_parameter['StudyDescription'] = $_POST['PACS_STU_DES'];
+  $study_parameter['ModalitiesInStudy'] = $_POST['PACS_MOD'];
+
+  $series_parameter = Array();
+  $series_parameter['NumberOfSeriesRelatedInstances'] = '';
+  $series_parameter['SeriesDescription'] = '';
+/* 
+  $image_parameter = Array();
+  $image_parameter['NumberOfSeriesRelatedInstances'] = '';
+  $image_parameter['DeviceSerialNumber']= '';
+  $image_parameter['ProtocolName']= '';  */
+  //$image_parameter['SOPInstanceUID']= '';
+
+  echo json_encode($pacs->queryAll($study_parameter, $series_parameter, null));
 }
 ?>

@@ -8,15 +8,15 @@ goog.require('X.sphere');
 goog.require('X.cylinder');
 // create the Pacs namespace
 var PACS = PACS || {};
-/**
- * 
- * @param oTable
- * @param data
- * @returns {String}
- */
+//
 jQuery('.form_content').keypress(function(e) {
   if (e.which == 13) {
     jQuery('#PACS_QUERY').click();
+  }
+});
+jQuery('.form_content_a').keypress(function(e) {
+  if (e.which == 13) {
+    jQuery('#PACS_QUERY_A').click();
   }
 });
 PACS.fnFormatDetails = function(data) {
@@ -31,23 +31,33 @@ PACS.fnFormatDetails = function(data) {
         + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">';
     content += '<td>' + data.SeriesDescription[i] + '</td>';
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + '</td>';
-    content += '<td class="center"><button class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
+    content += '<td class="center"><button id="'
+        + data.StudyInstanceUID[i].replace(/\./g, "_")
+        + '-'
+        + data.SeriesInstanceUID[i].replace(/\./g, "_")
+        + '-series-sp" class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
     // need 3 cases
     // on server!
     if (data.Status[i] == 0) {
       content += '<td class="center"><button id="'
+          + data.StudyInstanceUID[i].replace(/\./g, "_")
+          + '-'
           + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+          + '-series-sd" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
       // downloading!
     } else if (data.Status[i] == 1) {
       content += '<td class="center"><button id="'
+          + data.StudyInstanceUID[i].replace(/\./g, "_")
+          + '-'
           + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></i></button></td>';
+          + '-series-sd" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></i></button></td>';
       // donwloaded!
     } else {
       content += '<td class="center"><button id="'
+          + data.StudyInstanceUID[i].replace(/\./g, "_")
+          + '-'
           + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></i></button></td>';
+          + '-series-sd" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></i></button></td>';
     }
     content += '</tr>';
   }
@@ -103,6 +113,29 @@ PACS.fnInitTable = function(tableName, nbColumn, icon) {
             "aoColumnDefs" : [ {
               "bSortable" : false,
               "aTargets" : [ 0, nbColumn ]
+            } ],
+            "aaSorting" : [ [ 1, 'desc' ] ]
+          });
+  return oTable;
+}
+PACS.fnInitTableA = function(tableName, nbColumn) {
+  /*
+   * Initialse DataTables, with no sorting on the 'details' column
+   */
+  var oTable = jQuery('#' + tableName + '-results')
+      .dataTable(
+          {
+            "sDom" : "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+            "sPaginationType" : "bootstrap",
+            "oLanguage" : {
+              "sLengthMenu" : "_MENU_ studies per page"
+            },
+            "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
+            iDisplayStart : 0,
+            iDisplayLength : 10,
+            "aoColumnDefs" : [ {
+              "bSortable" : false,
+              "aTargets" : [ nbColumn - 1, nbColumn ]
             } ],
             "aaSorting" : [ [ 1, 'desc' ] ]
           });
@@ -185,6 +218,113 @@ PACS.ajaxStudyResults = function(data) {
 /**
  * 
  */
+PACS.ajaxAllResults = function(data) {
+  if (data != null) {
+    // fill table with results
+    // table id is important:
+    // must follow the syntax: name-results
+    // name is used later to make the table sortable,
+    // searchable, etc.
+    var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="advanced-results">';
+    var numSeries = data[1].SeriesDescription.length;
+    var i = 0;
+    content += '<thead><tr><th>PatientName</th><th>PatientID</th><th>DateOfBirth</th><th>StudyDate</th><th>Modality</th><th>StudyDescription</th><th>SeriesDescription</th><th>files</th><th></th><th></th></tr></thead><tbody>';
+    for (i = 0; i < numSeries; ++i) {
+      // update loaded results
+      var studyUID = data[1].StudyInstanceUID[i];
+      var currentStudy = null;
+      var studyloaded = studyUID in PACS.loadedStudies;
+      if (!studyloaded) {
+        PACS.loadedStudies[studyUID] = Array();
+        currentStudy = PACS.loadedStudies[studyUID];
+        currentStudy.StudyInstanceUID = Array();
+        currentStudy.SeriesInstanceUID = Array();
+        currentStudy.SeriesDescription = Array();
+        currentStudy.NumberOfSeriesRelatedInstances = Array();
+        currentStudy.Status = Array();
+      } else {
+        currentStudy = PACS.loadedStudies[studyUID];
+      }
+      var seriesExist = data[1].SeriesInstanceUID[i] in currentStudy.SeriesInstanceUID;
+      if (!seriesExist) {
+        currentStudy.StudyInstanceUID.push(data[1].StudyInstanceUID[i]);
+        currentStudy.SeriesInstanceUID.push(data[1].SeriesInstanceUID[i]);
+        currentStudy.SeriesDescription.push(data[1].SeriesDescription[i]);
+        currentStudy.NumberOfSeriesRelatedInstances
+            .push(data[1].NumberOfSeriesRelatedInstances[i]);
+        currentStudy.Status.push(0);
+      }
+      content += '<tr class="parent pacsStudyRows" id="'
+          + data[1].StudyInstanceUID[i].replace(/\./g, "_") + '">';
+      // get study uid index
+      var studyIndex = data[0].StudyInstanceUID
+          .indexOf(data[1].StudyInstanceUID[i]);
+      content += '<td>' + data[0].PatientName[studyIndex].replace(/\^/g, " ");
+      +'</td>';
+      content += '<td>' + data[0].PatientID[studyIndex] + '</td>';
+      content += '<td>' + data[0].PatientBirthDate[studyIndex] + '</td>';
+      content += '<td>' + data[0].StudyDate[studyIndex] + '</td>';
+      content += '<td>' + data[0].ModalitiesInStudy[studyIndex] + '</td>';
+      content += '<td>' + data[0].StudyDescription[studyIndex] + '</td>';
+      content += '<td>' + data[1].SeriesDescription[i] + '</td>';
+      content += '<td>' + data[1].NumberOfSeriesRelatedInstances[i] + '</td>';
+      // add buttons with good uid instead of table automated stuff!
+      content += '<td class="center"><button id="'
+          + data[1].StudyInstanceUID[i].replace(/\./g, "_")
+          + '-'
+          + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
+          + '-series-ap"  class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
+      content += '<td class="center"><button id="'
+          + data[1].StudyInstanceUID[i].replace(/\./g, "_")
+          + '-'
+          + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
+          + '-series-ad" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+      content += '</tr>';
+    }
+    content += '</tbody></table>';
+    // update html with table
+    jQuery('#results_container_a').html(content);
+    // make table sortable, filterable, ...
+    // make the table cooler!
+    // if no icon add preview
+    PACS.oTableA = PACS.fnInitTableA('advanced', 9);
+  } else {
+    // no studies found
+    jQuery('#results_container_a').html("No studies found...");
+  }
+}
+PACS.ajaxAll = function() {
+  jQuery("#PACS_QUERY_A").live('click', function(event) {
+    var currentButton = jQuery(this);
+    currentButton.removeClass('btn-primary').addClass('btn-warning');
+    // modify content
+    currentButton.html('<i class="icon-refresh rotating_class">');
+    // query pacs on parameters, at STUDY LEVEL
+    jQuery.ajax({
+      type : "POST",
+      url : "controller/pacs_query.php",
+      dataType : "json",
+      data : {
+        USER_AET : jQuery("#USER_AET").val(),
+        SERVER_IP : jQuery("#SERVER_IP").val(),
+        SERVER_POR : jQuery("#SERVER_POR").val(),
+        PACS_LEV : 'ALL',
+        PACS_MRN : jQuery("#PACS_MRN_A").val(),
+        PACS_NAM : jQuery("#PACS_NAM_A").val(),
+        PACS_MOD : jQuery("#PACS_MOD_A").val(),
+        PACS_DAT : jQuery("#PACS_DAT_A").val(),
+        PACS_ACC_NUM : '',
+        PACS_STU_DES : '',
+        PACS_STU_UID : ''
+      },
+      success : function(data) {
+        currentButton.removeClass('btn-warning').addClass('btn-primary');
+        currentButton.html('Search');
+        PACS.ajaxAllResults(data);
+      }
+    });
+  });
+}
 PACS.ajaxStudy = function() {
   jQuery("#PACS_QUERY").live('click', function(event) {
     var currentButton = jQuery(this);
@@ -324,14 +464,11 @@ PACS.ajaxSeriesResults = function(data, nTr) {
 }
 PACS.setupDownloadSeries = function() {
   jQuery(".download_series").live('click', function(event) {
-    var currentButtonID = '#' + jQuery(this).attr('id');
-    var nTr = jQuery(this).parents('tr')[0];
-    var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    nTr = jQuery(this).parents('table')[0];
-    // remove last 8 character (-details)
-    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
-    studyUID = studyUID.substring(0, studyUID.length - 8);
-    PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
+    var currentButtonID = jQuery(this).attr('id');
+    var currentButtonIDSplit = currentButtonID.split('-');
+    var studyUID = currentButtonIDSplit[0].replace(/\_/g, ".");
+    var seriesUID = currentButtonIDSplit[1].replace(/\_/g, ".");
+    PACS.ajaxImage(studyUID, seriesUID, '#' + currentButtonID);
   });
 }
 PACS.setupPreviewSeries = function() {
@@ -339,19 +476,14 @@ PACS.setupPreviewSeries = function() {
       .live(
           'click',
           function(event) {
-            // get parent row
-            var nTr = jQuery(this).parents('tr')[0];
-            // get series uid
-            var currentButtonID = '#' + nTr.getAttribute('id') + '-series';
-            var seriesUID = nTr.getAttribute('id').replace(/\_/g, ".");
-            // get study uid
-            nTr = jQuery(this).parents('table')[0];
-            var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
-            studyUID = studyUID.substring(0, studyUID.length - 8);
+            var currentButtonID = jQuery(this).attr('id');
+            var currentButtonIDSplit = currentButtonID.split('-');
+            var studyUID = currentButtonIDSplit[0].replace(/\_/g, ".");
+            var seriesUID = currentButtonIDSplit[1].replace(/\_/g, ".");
             // get series description - might be a better way...!
-            var description = jQuery(this).parents('tr')[0].cells[0].firstChild.data;
-            // start pulling series
-            PACS.ajaxImage(studyUID, seriesUID, currentButtonID);
+            var description = 'I am the description';// jQuery(this).parents('tr')[0].cells[0].firstChild.data;
+            // start pulling series and update id
+            PACS.ajaxImage(studyUID, seriesUID, '#' + currentButtonID.substring(0, currentButtonID.length-1) + 'd');
             // modal label
             jQuery('#myModalLabel').html(description);
             // overlay
@@ -397,71 +529,70 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
   var seriesData = PACS.loadedStudies[studyUID];
   var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[seriesData.SeriesInstanceUID
       .indexOf(seriesUID)];
-  jQuery
-      .ajax({
-        type : "POST",
-        url : "controller/pacs_preview.php",
-        dataType : "json",
-        data : {
-          PACS_SER_UID : seriesUID,
-          PACS_SER_NOF : nbFilesInSeries
-        },
-        success : function(data) {
-          if (data) {
-            var numberOfResults = data.filename.length;
-            // get the all the files
-            var i = 0;
-            if (numberOfResults && PACS.volume == null) {
-              jQuery("#loadOverlay").html('Creating XTK visualization...');
-              clearInterval(PACS.preview);
-              // set XTK renderer
-              PACS.volume = new X.volume();
-              PACS.volume.file = 'http://chris/data/' + data.filename[0];
-/*              PACS.volume.file = data.filename.map(function(v) {
-                return 'http://chris/data/' + v;
-              });*/
-              PACS.sliceX = new X.renderer2D();
-              PACS.sliceX.container = 'sliceZ';
-              PACS.sliceX.orientation = 'Z';
-              PACS.sliceX.init();
-              PACS.sliceX.add(PACS.volume);
-              PACS.sliceX.render();
-              PACS.sliceX.onShowtime = function() {
-                // hide overlay
-                jQuery("#loadOverlay").hide();
-                // init slider
-                jQuery("#sliderZ").slider({
-                  min : 1,
-                  max : nbFilesInSeries,
-                  value : Math.round(PACS.volume.indexZ + 1),
-                  slide : function(event, ui) {
-                    PACS.volume.indexZ = ui.value - 1;
-                    jQuery("#currentSlice").html(ui.value);
-                  }
-                });
-                PACS.sliceX.onScroll = function() {
-                  jQuery('#sliderZ').slider("option", "value",
-                      PACS.volume.indexZ + 1);
-                  jQuery("#currentSlice").html(PACS.volume.indexZ + 1);
-                };
-                jQuery("#currentSlice")
-                    .html(Math.round(PACS.volume.indexZ + 1));
-                jQuery("#totalSlices").html(nbFilesInSeries);
+  jQuery.ajax({
+    type : "POST",
+    url : "controller/pacs_preview.php",
+    dataType : "json",
+    data : {
+      PACS_SER_UID : seriesUID,
+      PACS_SER_NOF : nbFilesInSeries
+    },
+    success : function(data) {
+      if (data) {
+        var numberOfResults = data.filename.length;
+        // get the all the files
+        var i = 0;
+        if (numberOfResults && PACS.volume == null) {
+          jQuery("#loadOverlay").html('Creating XTK visualization...');
+          clearInterval(PACS.preview);
+          // set XTK renderer
+          PACS.volume = new X.volume();
+          PACS.volume.file = 'http://chris/data/' + data.filename[0];
+          /*
+           * PACS.volume.file = data.filename.map(function(v) { return
+           * 'http://chris/data/' + v; });
+           */
+          PACS.sliceX = new X.renderer2D();
+          PACS.sliceX.container = 'sliceZ';
+          PACS.sliceX.orientation = 'Z';
+          PACS.sliceX.init();
+          PACS.sliceX.add(PACS.volume);
+          PACS.sliceX.render();
+          PACS.sliceX.onShowtime = function() {
+            // hide overlay
+            jQuery("#loadOverlay").hide();
+            // init slider
+            jQuery("#sliderZ").slider({
+              min : 1,
+              max : nbFilesInSeries,
+              value : Math.round(PACS.volume.indexZ + 1),
+              slide : function(event, ui) {
+                PACS.volume.indexZ = ui.value - 1;
+                jQuery("#currentSlice").html(ui.value);
               }
-            }
+            });
+            PACS.sliceX.onScroll = function() {
+              jQuery('#sliderZ').slider("option", "value",
+                  PACS.volume.indexZ + 1);
+              jQuery("#currentSlice").html(PACS.volume.indexZ + 1);
+            };
+            jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
+            jQuery("#totalSlices").html(nbFilesInSeries);
           }
         }
-      });
+      }
+    }
+  });
 }
 PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
   // should it be there...(or inside ajax result)?
   var seriesData = PACS.loadedStudies[studyUID];
   var i = seriesData.SeriesInstanceUID.indexOf(seriesUID);
   seriesData.Status[i] = 1;
-  // wait button
-  // if series already or is being downloaded (preview use case)
   if (jQuery(currentButtonID).length == 0
       || jQuery(currentButtonID).hasClass('btn-primary')) {
+    // wait button
+    // if series already or is being downloaded (preview use case)
     // modify class
     jQuery(currentButtonID).removeClass('btn-primary').removeClass(
         'download_series').addClass('btn-warning');
@@ -498,14 +629,16 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
             // modify content
             jQuery(currentButtonID).html('<i class="icon-ok icon-white">');
             var studyButtonID = '#' + studyUID.replace(/\./g, "_") + ' button';
-            jQuery(studyButtonID).attr('value',
-                +jQuery(studyButtonID).attr('value') + 1);
-            // all series downloaded, update button!
-            if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
-              jQuery(studyButtonID).removeClass('btn-warning').removeClass(
-                  'downloading_study').addClass('btn-success');
-              // modify content
-              jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
+            if (jQuery(studyButtonID).length == 0) {
+              jQuery(studyButtonID).attr('value',
+                  +jQuery(studyButtonID).attr('value') + 1);
+              // all series downloaded, update button!
+              if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
+                jQuery(studyButtonID).removeClass('btn-warning').removeClass(
+                    'downloading_study').addClass('btn-success');
+                // modify content
+                jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
+              }
             }
           }
         });
@@ -563,6 +696,9 @@ jQuery(document).ready(function() {
   PACS.sliceX = null;
   PACS.volume = null;
   PACS.setupPreviewSeries();
+  // advanced mode
+  PACS.ajaxAll();
+  PACS.oTableA = null;
   // ping the server
   jQuery(".pacsPing").click(function(event) {
     PACS.ajaxPing();

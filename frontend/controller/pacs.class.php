@@ -349,7 +349,7 @@ class PACS implements PACSInterface {
         $this->_appendResults($result[1], $resultseries);
 
         // loop though images
-        if ($resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
+        if ($imageParameters != null && $resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
         {
           $j = 0;
           foreach ($resultseries['StudyInstanceUID'] as $key => $seriesvalue){
