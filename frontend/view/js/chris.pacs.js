@@ -98,7 +98,7 @@ PACS.fnInitTable = function(tableName, nbColumn, icon) {
             "sDom" : "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
             "sPaginationType" : "bootstrap",
             "oLanguage" : {
-              "sLengthMenu" : "_MENU_ records per page"
+              "sLengthMenu" : "_MENU_ studies per page"
             },
             "aoColumnDefs" : [ {
               "bSortable" : false,
@@ -394,30 +394,32 @@ PACS.setupPreviewSeries = function() {
   });
 }
 PACS.ajaxPreview = function(studyUID, seriesUID) {
+  var seriesData = PACS.loadedStudies[studyUID];
+  var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[seriesData.SeriesInstanceUID
+      .indexOf(seriesUID)];
   jQuery
       .ajax({
         type : "POST",
         url : "controller/pacs_preview.php",
         dataType : "json",
         data : {
-          PACS_SER_UID : seriesUID
+          PACS_SER_UID : seriesUID,
+          PACS_SER_NOF : nbFilesInSeries
         },
         success : function(data) {
           if (data) {
             var numberOfResults = data.filename.length;
             // get the all the files
             var i = 0;
-            var seriesData = PACS.loadedStudies[studyUID];
-            var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[seriesData.SeriesInstanceUID
-                .indexOf(seriesUID)];
-            if (nbFilesInSeries == numberOfResults) {
+            if (numberOfResults && PACS.volume == null) {
               jQuery("#loadOverlay").html('Creating XTK visualization...');
               clearInterval(PACS.preview);
               // set XTK renderer
               PACS.volume = new X.volume();
-              PACS.volume.file = data.filename.map(function(v) {
+              PACS.volume.file = 'http://chris/data/' + data.filename[0];
+/*              PACS.volume.file = data.filename.map(function(v) {
                 return 'http://chris/data/' + v;
-              });
+              });*/
               PACS.sliceX = new X.renderer2D();
               PACS.sliceX.container = 'sliceZ';
               PACS.sliceX.orientation = 'Z';
