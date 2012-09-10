@@ -252,6 +252,7 @@ PACS.ajaxAllResults = function(data) {
         currentStudy.SeriesDescription.push(data[1].SeriesDescription[i]);
         currentStudy.NumberOfSeriesRelatedInstances
             .push(data[1].NumberOfSeriesRelatedInstances[i]);
+        window.console.log(data[1].NumberOfSeriesRelatedInstances[i]);
         currentStudy.Status.push(0);
       }
       content += '<tr class="parent pacsStudyRows" id="'
@@ -576,8 +577,8 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
             });
             PACS.sliceX.onScroll = function() {
               jQuery('#sliderZ').slider("option", "value",
-                  PACS.volume.indexZ + 1);
-              jQuery("#currentSlice").html(PACS.volume.indexZ + 1);
+                  Math.round(PACS.volume.indexZ + 1));
+              jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
             };
             jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
             jQuery("#totalSlices").html(dim[2]);
