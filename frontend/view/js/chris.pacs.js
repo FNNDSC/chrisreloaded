@@ -29,7 +29,7 @@ PACS.fnFormatDetails = function(data) {
   for (i = 0; i < numberOfResults; ++i) {
     content += '<tr class="parent pacsStudyRows" id="'
         + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">';
-    content += '<td>' + data.SeriesDescription[i] + '</td>';
+    content += '<td>' + data.SeriesDescription[i].replace(/\>/g, "&gt").replace(/\</g, "&lt") + '</td>';
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + '</td>';
     content += '<td class="center"><button id="'
         + data.StudyInstanceUID[i].replace(/\./g, "_")
@@ -199,7 +199,7 @@ PACS.ajaxStudyResults = function(data) {
           + data.StudyInstanceUID[i].replace(/\./g, "_") + '">';
       content += '<td>' + data.PatientName[i] + '</td>';
       content += '<td>' + data.PatientBirthDate[i] + '</td>';
-      content += '<td>' + data.StudyDescription[i] + '</td>';
+      content += '<td>' + data.StudyDescription[i].replace(/\>/g, "&gt").replace(/\</g, "&lt") + '</td>';
       content += '<td>' + data.StudyDate[i] + '</td>';
       content += '<td>' + data.ModalitiesInStudy[i] + '</td>';
       content += '</tr>';
@@ -266,8 +266,8 @@ PACS.ajaxAllResults = function(data) {
       content += '<td>' + data[0].PatientBirthDate[studyIndex] + '</td>';
       content += '<td>' + data[0].StudyDate[studyIndex] + '</td>';
       content += '<td>' + data[0].ModalitiesInStudy[studyIndex] + '</td>';
-      content += '<td>' + data[0].StudyDescription[studyIndex] + '</td>';
-      content += '<td>' + data[1].SeriesDescription[i] + '</td>';
+      content += '<td>' + data[0].StudyDescription[studyIndex].replace(/\>/g, "&gt").replace(/\</g, "&lt") + '</td>';
+      content += '<td>' + data[1].SeriesDescription[i].replace(/\>/g, "&gt").replace(/\</g, "&lt") + '</td>';
       content += '<td>' + data[1].NumberOfSeriesRelatedInstances[i] + '</td>';
       // add buttons with good uid instead of table automated stuff!
       content += '<td class="center"><button id="'
