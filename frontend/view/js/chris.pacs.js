@@ -481,14 +481,10 @@ PACS.setupPreviewSeries = function() {
             var currentButtonIDSplit = currentButtonID.split('-');
             var studyUID = currentButtonIDSplit[0].replace(/\_/g, ".");
             var seriesUID = currentButtonIDSplit[1].replace(/\_/g, ".");
-            // get series description - might be a better way...!
-            var description = 'I am the description';// jQuery(this).parents('tr')[0].cells[0].firstChild.data;
             // start pulling series and update id
             PACS.ajaxImage(studyUID, seriesUID, '#'
                 + currentButtonID.substring(0, currentButtonID.length - 1)
                 + 'd');
-            // modal label
-            jQuery('#myModalLabel').html(description);
             // overlay
             jQuery("#loadOverlay")
                 .html(
@@ -532,6 +528,8 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
   var seriesData = PACS.loadedStudies[studyUID];
   var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[seriesData.SeriesInstanceUID
       .indexOf(seriesUID)];
+  var description = seriesData.SeriesDescription[seriesData.SeriesInstanceUID
+                                                              .indexOf(seriesUID)];
   jQuery.ajax({
     type : "POST",
     url : "controller/pacs_preview.php",
@@ -546,6 +544,9 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
         // get the all the files
         var i = 0;
         if (numberOfResults && PACS.volume == null) {
+          // modal label
+          jQuery('#myModalLabel').html(description);
+          
           jQuery("#loadOverlay").html('Creating XTK visualization...');
           clearInterval(PACS.preview);
           // set XTK renderer
