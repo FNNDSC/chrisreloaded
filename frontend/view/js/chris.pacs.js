@@ -483,7 +483,9 @@ PACS.setupPreviewSeries = function() {
             // get series description - might be a better way...!
             var description = 'I am the description';// jQuery(this).parents('tr')[0].cells[0].firstChild.data;
             // start pulling series and update id
-            PACS.ajaxImage(studyUID, seriesUID, '#' + currentButtonID.substring(0, currentButtonID.length-1) + 'd');
+            PACS.ajaxImage(studyUID, seriesUID, '#'
+                + currentButtonID.substring(0, currentButtonID.length - 1)
+                + 'd');
             // modal label
             jQuery('#myModalLabel').html(description);
             // overlay
@@ -559,12 +561,13 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
           PACS.sliceX.add(PACS.volume);
           PACS.sliceX.render();
           PACS.sliceX.onShowtime = function() {
+            var dim = PACS.volume.dimensions;
             // hide overlay
             jQuery("#loadOverlay").hide();
             // init slider
             jQuery("#sliderZ").slider({
               min : 1,
-              max : nbFilesInSeries,
+              max : dim[2],
               value : Math.round(PACS.volume.indexZ + 1),
               slide : function(event, ui) {
                 PACS.volume.indexZ = ui.value - 1;
@@ -577,7 +580,7 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
               jQuery("#currentSlice").html(PACS.volume.indexZ + 1);
             };
             jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
-            jQuery("#totalSlices").html(nbFilesInSeries);
+            jQuery("#totalSlices").html(dim[2]);
           }
         }
       }
