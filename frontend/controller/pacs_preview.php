@@ -105,7 +105,7 @@ if ($count == $_POST['PACS_SER_NOF'])
   exec($convert_command);
 }
 // find the nifti!
-if($count >= $_POST['PACS_SER_NOF']){
+if($count == $_POST['PACS_SER_NOF']){
   if ($handle4 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
     while (false !== ($entry4 = readdir($handle4))) {
       if($entry4 != "." && $entry4 != ".."){
