@@ -6,26 +6,36 @@ goog.require('X.volume');
 goog.require('X.cube');
 goog.require('X.sphere');
 goog.require('X.cylinder');
-// create the Pacs namespace
+/**
+ * Define the PACS namespace
+ */
 var PACS = PACS || {};
-//
-jQuery('.form_content').keypress(function(e) {
+/**
+ * Bind the simple search input field to the simple search button
+ */
+jQuery('.simple_search').keypress(function(e) {
   if (e.which == 13) {
     jQuery('#PACS_QUERY').click();
   }
 });
-jQuery('.form_content_a').keypress(function(e) {
+/**
+ * Bind the advanced search input field to the advanced search button
+ */
+jQuery('.advanced_search').keypress(function(e) {
   if (e.which == 13) {
     jQuery('#PACS_QUERY_A').click();
   }
 });
-PACS.fnFormatDetails = function(data) {
+/**
+ * Format the details HTML table for a study, given some data
+ */
+PACS.formatHTMLDetails = function(data) {
+  // number of rows to be created
   var numberOfResults = data.StudyInstanceUID.length;
   var i = 0;
-  // set table id
-  var content = '<div class="innerDetails"><table id="'
-      + data.StudyInstanceUID[0].replace(/\./g, "_")
-      + '-details" class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Series Description</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
+  // set details table id to the study ID
+  // replace '.' (invalid id character) by '_'
+  var content = '<div class="innerDetails"><table class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Series Description</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
     content += '<tr class="parent pacsStudyRows" id="'
         + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">';
@@ -67,99 +77,57 @@ PACS.fnFormatDetails = function(data) {
   return content;
 }
 /**
- * @param tableName
- * @param nbColumn
- * @param icon
- * @returns
- */
-PACS.fnInitTable = function(tableName, nbColumn, icon) {
-  /*
-   * Initialse DataTables, with no sorting on the 'details' column
-   */
-  var oTable = jQuery('#' + tableName + '-results')
-      .dataTable(
-          {
-            "sDom" : "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-            "sPaginationType" : "bootstrap",
-            "oLanguage" : {
-              "sLengthMenu" : "_MENU_ studies per page"
-            },
-            "aoColumnDefs" : [ {
-              "bSortable" : false,
-              "aTargets" : [ 0, nbColumn ]
-            } ],
-            "aaSorting" : [ [ 1, 'desc' ] ]
-          });
-  return oTable;
-}
-PACS.fnInitTableA = function(tableName, nbColumn) {
-  /*
-   * Initialse DataTables, with no sorting on the 'details' column
-   */
-  var oTable = jQuery('#' + tableName + '-results')
-      .dataTable(
-          {
-            "sDom" : "<'row-fluid'<'span6'l><'span6' <'download_filter'> f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-            "sPaginationType" : "bootstrap",
-            "oLanguage" : {
-              "sLengthMenu" : "_MENU_ studies per page"
-            },
-            "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
-            iDisplayStart : 0,
-            iDisplayLength : 10,
-            "aoColumnDefs" : [ {
-              "bSortable" : false,
-              "aTargets" : [ nbColumn - 1, nbColumn ]
-            } ],
-            "aaSorting" : [ [ 1, 'desc' ] ],
-          });
-  jQuery(".download_filter")
-      .html(
-          '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
-  return oTable;
-}
-/**
- * 
+ * Setup the download button to only download the series which are remaing after
+ * filtering in the advanced mode
  */
 PACS.setupDownloadSeriesFiltered = function() {
-  jQuery(".download_filter").live('click', function(event) {
-    // get visible studies and download them
+  jQuery(".download_filter").live('click', function() {
+    // get visible series download button id
     var visibleSeries = PACS.oTableA._('tr', {
       "filter" : "applied"
     });
     var visibleCount = visibleSeries.length;
     var i = 0;
+    // click download button for all of them
     for (i = 0; i < visibleCount; i++) {
       var downloadID = visibleSeries[i][9].split(' ')[1].split('"')[1];
       jQuery('#' + downloadID).click();
     }
   });
 }
+/**
+ * Setup the download button to download all series for a given study
+ */
 PACS.setupDownloadStudy = function() {
   jQuery(".download_study").live(
       'click',
-      function(event) {
-        var nTr = jQuery(this).parents('tr')[0];
-        var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
+      function() {
+        // replace the '_'
+        var studyUID = jQuery(this).attr('id').replace(/\_/g, ".");
+        // remove the '-study' tad at the end of the id
+        studyUID = studyUID.substring(0, studyUID.length - 6)
         // modify class
-        var currentButton = jQuery(this);
-        currentButton.removeClass('btn-primary').removeClass('download_study')
+        jQuery(this).removeClass('btn-primary').removeClass('download_study')
             .addClass('btn-warning').addClass('downloading_study');
         // modify content
-        currentButton.html('<i class="icon-refresh rotating_class">');
-        // cache data
+        jQuery(this).html('<i class="icon-refresh rotating_class">');
+        // download all related series
         PACS.ajaxSeries(studyUID);
       });
 }
 /**
- * 
+ * Setup the details button to show series within a study in simple query
  */
 PACS.setupDetailStudy = function() {
   jQuery('#quick-results td .control').live('click', function() {
+    // get the row
     var nTr = jQuery(this).parents('tr')[0];
+    // get the related study UID
     var studyUID = jQuery(this).attr('id').replace(/\_/g, ".");
+    // if data has not been cached, perform ajax query, else, show it
     var i = jQuery.inArray(nTr, PACS.openStudies);
     if (i === -1) {
+      // get related series
       PACS.ajaxSeries(studyUID, nTr);
     } else {
       jQuery('i', this).attr('class', 'icon-chevron-down');
@@ -199,15 +167,29 @@ PACS.ajaxStudyResults = function(data) {
                 "&lt") + '</td>';
         content += '<td>' + data.StudyDate[i] + '</td>';
         content += '<td>' + data.ModalitiesInStudy[i] + '</td>';
-        content += '<td><button class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+        content += '<td><button id="'
+            + data.StudyInstanceUID[i].replace(/\./g, "_")
+            + '-study" class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
         content += '</tr>';
       }
       content += '</tbody></table>';
       // update html with table
       jQuery('#results_container').html(content);
       // make table sortable, filterable, ...
-      // make the table cooler!
-      PACS.oTable = PACS.fnInitTable('quick', 6, 'icon-chevron-down');
+      PACS.oTable = jQuery('#quick-results')
+          .dataTable(
+              {
+                "sDom" : "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+                "sPaginationType" : "bootstrap",
+                "oLanguage" : {
+                  "sLengthMenu" : "_MENU_ studies per page"
+                },
+                "aoColumnDefs" : [ {
+                  "bSortable" : false,
+                  "aTargets" : [ 0, 7 ]
+                } ],
+                "aaSorting" : [ [ 1, 'desc' ] ]
+              });
     } else {
       var dataToAppend = Array();
       var numStudies = data.PatientID.length;
@@ -313,9 +295,26 @@ PACS.ajaxAllResults = function(data) {
       // update html with table
       jQuery('#results_container_a').html(content);
       // make table sortable, filterable, ...
-      // make the table cooler!
-      // if no icon add preview
-      PACS.oTableA = PACS.fnInitTableA('advanced', 9);
+      PACS.oTableA = jQuery('#advanced-results')
+          .dataTable(
+              {
+                "sDom" : "<'row-fluid'<'span6'l><'span6' <'download_filter'> f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+                "sPaginationType" : "bootstrap",
+                "oLanguage" : {
+                  "sLengthMenu" : "_MENU_ studies per page"
+                },
+                "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
+                iDisplayStart : 0,
+                iDisplayLength : 10,
+                "aoColumnDefs" : [ {
+                  "bSortable" : false,
+                  "aTargets" : [ 8, 9 ]
+                } ],
+                "aaSorting" : [ [ 1, 'desc' ] ],
+              });
+      jQuery(".download_filter")
+          .html(
+              '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
       // else append!
     } else {
       var dataToAppend = Array();
@@ -510,7 +509,7 @@ PACS.ajaxSeries = function(studyUID, nTr) {
         if (nTr != null) {
           jQuery('.control', nTr).html('<i class="icon-chevron-up">');
         }
-        // hshould be inside the results
+        // should be inside the results
         // append a status field
         data.Status = Array();
         var numSeries = data.SeriesInstanceUID.length;
@@ -538,12 +537,10 @@ PACS.ajaxSeries = function(studyUID, nTr) {
 PACS.ajaxSeriesResults = function(data, nTr) {
   // format the details row table
   if (nTr != null) {
-    var nDetailsRow = PACS.oTable.fnOpen(nTr, PACS.fnFormatDetails(data),
+    var nDetailsRow = PACS.oTable.fnOpen(nTr, PACS.formatHTMLDetails(data),
         'details');
-    // make the details table sortable
-    var detailstableid = "#" + data.StudyInstanceUID[0].replace(/\./g, "_")
-        + "-details";
-    jQuery(detailstableid).dataTable({
+    // create dataTable from html table
+    jQuery('.table', nDetailsRow).dataTable({
       "sDom" : "t",
       "aaSorting" : [ [ 1, 'desc' ] ],
       "bPaginate" : false,
@@ -563,8 +560,8 @@ PACS.ajaxSeriesResults = function(data, nTr) {
     var i = 0;
     for (i = 0; i < numberOfResults; ++i) {
       if (data.Status[i] == 0) {
-        var buttonID = '#' + data.SeriesInstanceUID[i].replace(/\./g, "_")
-            + '-series';
+        var buttonID = '#' + data.StudyInstanceUID[i].replace(/\./g, "_") + '-'
+            + data.SeriesInstanceUID[i].replace(/\./g, "_") + '-series-sd';
         PACS.ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i],
             buttonID);
       }
@@ -753,17 +750,14 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
                 'btn-success');
             // modify content
             jQuery(currentButtonID).html('<i class="icon-ok icon-white">');
-            var studyButtonID = '#' + studyUID.replace(/\./g, "_") + ' button';
-            if (jQuery(studyButtonID).length == 0) {
-              jQuery(studyButtonID).attr('value',
-                  +jQuery(studyButtonID).attr('value') + 1);
-              // all series downloaded, update button!
-              if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
-                jQuery(studyButtonID).removeClass('btn-warning').removeClass(
-                    'downloading_study').addClass('btn-success');
-                // modify content
-                jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
-              }
+            jQuery(studyButtonID).attr('value',
+                +jQuery(studyButtonID).attr('value') + 1);
+            // all series downloaded, update button!
+            if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
+              jQuery(studyButtonID).removeClass('btn-warning').removeClass(
+                  'downloading_study').addClass('btn-success');
+              // modify content
+              jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
             }
           }
         });
