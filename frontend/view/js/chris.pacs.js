@@ -185,7 +185,7 @@ PACS.ajaxStudyResults = function(data) {
       var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="quick-results">';
       var numStudies = data.PatientID.length;
       var i = 0;
-      content += '<thead><tr><th></th><th>PatientName</th><th>DateOfBirth</th><th>StudyDescription</th><th>StudyDate</th><th>Modality</th><th></th></tr></thead><tbody>';
+      content += '<thead><tr><th></th><th>Name</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th></th></tr></thead><tbody>';
       for (i = 0; i < numStudies; ++i) {
         content += '<tr class="parent pacsStudyRows">';
         content += '<td><span  id="'
@@ -229,15 +229,17 @@ PACS.ajaxStudyResults = function(data) {
       jQuery('#quick-results').dataTable().fnAddData(dataToAppend);
     }
   } else {
-    // no studies found
-    jQuery('#results_container').html("No studies found...");
+    // no studies found and not doing multiple mrns
+    if (PACS.oTable == null) {
+      jQuery('#results_container').html("No studies found...");
+    }
   }
 }
 /**
  * 
  */
 PACS.ajaxAllResults = function(data) {
-  if (data != null) {
+  if (data[0] != null) {
     // fill table with results
     // table id is important:
     // must follow the syntax: name-results
@@ -248,7 +250,7 @@ PACS.ajaxAllResults = function(data) {
       var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="advanced-results">';
       var numSeries = data[1].SeriesDescription.length;
       var i = 0;
-      content += '<thead><tr><th>PatientName</th><th>PatientID</th><th>DateOfBirth</th><th>StudyDate</th><th>Modality</th><th>StudyDescription</th><th>SeriesDescription</th><th>files</th><th></th><th></th></tr></thead><tbody>';
+      content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>files</th><th></th><th></th></tr></thead><tbody>';
       for (i = 0; i < numSeries; ++i) {
         // update loaded results
         var studyUID = data[1].StudyInstanceUID[i];
@@ -375,8 +377,10 @@ PACS.ajaxAllResults = function(data) {
       jQuery('#advanced-results').dataTable().fnAddData(dataToAppend);
     }
   } else {
-    // no studies found
-    jQuery('#results_container_a').html("No results found...");
+    // no studies found and not doing multiple mrns
+    if (PACS.oTableA == null) {
+      jQuery('#results_container_a').html("No studies found...");
+    }
   }
 }
 PACS.ajaxAll = function() {
@@ -386,6 +390,9 @@ PACS.ajaxAll = function() {
     // modify content
     currentButton.html('<i class="icon-refresh rotating_class">');
     if (jQuery('#advanced-results').length != 0) {
+      // destroy the table
+      PACS.oTableA.dataTable().fnDestroy();
+      PACS.oTableA = null;
       jQuery('#advanced-results').remove();
     }
     var mrns = jQuery("#PACS_MRN_A").val().split(' ');
@@ -430,6 +437,9 @@ PACS.ajaxStudy = function() {
     // modify content
     currentButton.html('<i class="icon-refresh rotating_class">');
     if (jQuery('#quick-results').length != 0) {
+      // destroy the table
+      PACS.oTable.dataTable().fnDestroy();
+      PACS.oTable = null;
       jQuery('#quick-results').remove();
     }
     var mrns = jQuery("#PACS_MRN").val().split(' ');
