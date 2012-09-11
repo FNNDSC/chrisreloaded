@@ -185,13 +185,14 @@ PACS.ajaxStudyResults = function(data) {
       var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="quick-results">';
       var numStudies = data.PatientID.length;
       var i = 0;
-      content += '<thead><tr><th></th><th>Name</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th></th></tr></thead><tbody>';
+      content += '<thead><tr><th></th><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th></th></tr></thead><tbody>';
       for (i = 0; i < numStudies; ++i) {
         content += '<tr class="parent pacsStudyRows">';
         content += '<td><span  id="'
             + data.StudyInstanceUID[i].replace(/\./g, "_")
             + '" class="control"><i class="icon-chevron-down"></i></span></td>'
         content += '<td>' + data.PatientName[i].replace(/\^/g, " ") + '</td>';
+        content += '<td>' + data.PatientID[i] + '</td>';
         content += '<td>' + data.PatientBirthDate[i] + '</td>';
         content += '<td>'
             + data.StudyDescription[i].replace(/\>/g, "&gt").replace(/\</g,
@@ -217,6 +218,7 @@ PACS.ajaxStudyResults = function(data) {
             + data.StudyInstanceUID[i].replace(/\./g, "_")
             + '"  class="control"><i class="icon-chevron-down"></i></span>');
         localDataToAppend.push(data.PatientName[i].replace(/\^/g, " "));
+        localDataToAppend.push(data.PatientID[i]);
         localDataToAppend.push(data.PatientBirthDate[i]);
         localDataToAppend.push(data.StudyDescription[i].replace(/\>/g, "&gt")
             .replace(/\</g, "&lt"));
