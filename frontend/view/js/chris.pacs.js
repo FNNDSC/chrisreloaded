@@ -139,41 +139,17 @@ PACS.setupDetailStudy = function() {
   });
 }
 /**
- * 
- * @param data
+ * Handle ajax response after query pacs for studies, given mrn, name, date,
+ * etc.
  */
 PACS.ajaxStudyResults = function(data) {
+  // if ajax returns something, process it
   if (data != null) {
-    // fill table with results
-    // table id is important:
-    // must follow the syntax: name-results
-    // name is used later to make the table sortable,
-    // searchable, etc.
+    // if no table, create it
     if (jQuery('#quick-results').length == 0) {
       var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="quick-results">';
-      var numStudies = data.PatientID.length;
-      var i = 0;
       content += '<thead><tr><th></th><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th></th></tr></thead><tbody>';
-      for (i = 0; i < numStudies; ++i) {
-        content += '<tr class="parent pacsStudyRows">';
-        content += '<td><span  id="'
-            + data.StudyInstanceUID[i].replace(/\./g, "_")
-            + '" class="control"><i class="icon-chevron-down"></i></span></td>'
-        content += '<td>' + data.PatientName[i].replace(/\^/g, " ") + '</td>';
-        content += '<td>' + data.PatientID[i] + '</td>';
-        content += '<td>' + data.PatientBirthDate[i] + '</td>';
-        content += '<td>'
-            + data.StudyDescription[i].replace(/\>/g, "&gt").replace(/\</g,
-                "&lt") + '</td>';
-        content += '<td>' + data.StudyDate[i] + '</td>';
-        content += '<td>' + data.ModalitiesInStudy[i] + '</td>';
-        content += '<td><button id="'
-            + data.StudyInstanceUID[i].replace(/\./g, "_")
-            + '-study" class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
-        content += '</tr>';
-      }
       content += '</tbody></table>';
-      // update html with table
       jQuery('#results_container').html(content);
       // make table sortable, filterable, ...
       PACS.oTable = jQuery('#quick-results')
@@ -190,28 +166,30 @@ PACS.ajaxStudyResults = function(data) {
                 } ],
                 "aaSorting" : [ [ 1, 'desc' ] ]
               });
-    } else {
-      var dataToAppend = Array();
-      var numStudies = data.PatientID.length;
-      var i = 0;
-      for (i = 0; i < numStudies; ++i) {
-        var localDataToAppend = Array();
-        localDataToAppend.push('<span  id="'
-            + data.StudyInstanceUID[i].replace(/\./g, "_")
-            + '"  class="control"><i class="icon-chevron-down"></i></span>');
-        localDataToAppend.push(data.PatientName[i].replace(/\^/g, " "));
-        localDataToAppend.push(data.PatientID[i]);
-        localDataToAppend.push(data.PatientBirthDate[i]);
-        localDataToAppend.push(data.StudyDescription[i].replace(/\>/g, "&gt")
-            .replace(/\</g, "&lt"));
-        localDataToAppend.push(data.StudyDate[i]);
-        localDataToAppend.push(data.ModalitiesInStudy[i]);
-        localDataToAppend
-            .push('<button class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button>');
-        dataToAppend.push(localDataToAppend);
-      }
-      jQuery('#quick-results').dataTable().fnAddData(dataToAppend);
     }
+    // fill the table
+    var dataToAppend = Array();
+    var numStudies = data.PatientID.length;
+    var i = 0;
+    for (i = 0; i < numStudies; ++i) {
+      var localDataToAppend = Array();
+      localDataToAppend.push('<span  id="'
+          + data.StudyInstanceUID[i].replace(/\./g, "_")
+          + '"  class="control"><i class="icon-chevron-down"></i></span>');
+      localDataToAppend.push(data.PatientName[i].replace(/\^/g, " "));
+      localDataToAppend.push(data.PatientID[i]);
+      localDataToAppend.push(data.PatientBirthDate[i]);
+      localDataToAppend.push(data.StudyDescription[i].replace(/\>/g, "&gt")
+          .replace(/\</g, "&lt"));
+      localDataToAppend.push(data.StudyDate[i]);
+      localDataToAppend.push(data.ModalitiesInStudy[i]);
+      localDataToAppend
+          .push('<button  id="'
+              + data.StudyInstanceUID[i].replace(/\./g, "_")
+              + '-study" class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button>');
+      dataToAppend.push(localDataToAppend);
+    }
+    jQuery('#quick-results').dataTable().fnAddData(dataToAppend);
   } else {
     // no studies found and not doing multiple mrns
     if (PACS.oTable == null) {
@@ -224,73 +202,12 @@ PACS.ajaxStudyResults = function(data) {
  */
 PACS.ajaxAllResults = function(data) {
   if (data[0] != null) {
-    // fill table with results
-    // table id is important:
-    // must follow the syntax: name-results
-    // name is used later to make the table sortable,
-    // searchable, etc.
-    // if table doesnt exists, create
+    // if no table, create it
     if (jQuery('#advanced-results').length == 0) {
       var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="advanced-results">';
       var numSeries = data[1].SeriesDescription.length;
       var i = 0;
       content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>files</th><th></th><th></th></tr></thead><tbody>';
-      for (i = 0; i < numSeries; ++i) {
-        // update loaded results
-        var studyUID = data[1].StudyInstanceUID[i];
-        var currentStudy = null;
-        var studyloaded = studyUID in PACS.loadedStudies;
-        if (!studyloaded) {
-          PACS.loadedStudies[studyUID] = Array();
-          currentStudy = PACS.loadedStudies[studyUID];
-          currentStudy.StudyInstanceUID = Array();
-          currentStudy.SeriesInstanceUID = Array();
-          currentStudy.SeriesDescription = Array();
-          currentStudy.NumberOfSeriesRelatedInstances = Array();
-          currentStudy.Status = Array();
-        } else {
-          currentStudy = PACS.loadedStudies[studyUID];
-        }
-        var seriesExist = data[1].SeriesInstanceUID[i] in currentStudy.SeriesInstanceUID;
-        if (!seriesExist) {
-          currentStudy.StudyInstanceUID.push(data[1].StudyInstanceUID[i]);
-          currentStudy.SeriesInstanceUID.push(data[1].SeriesInstanceUID[i]);
-          currentStudy.SeriesDescription.push(data[1].SeriesDescription[i]);
-          currentStudy.NumberOfSeriesRelatedInstances
-              .push(data[1].NumberOfSeriesRelatedInstances[i]);
-          currentStudy.Status.push(0);
-        }
-        content += '<tr class="parent pacsStudyRows" id="'
-            + data[1].StudyInstanceUID[i].replace(/\./g, "_") + '">';
-        // get study uid index
-        var studyIndex = data[0].StudyInstanceUID
-            .indexOf(data[1].StudyInstanceUID[i]);
-        content += '<td>' + data[0].PatientName[studyIndex].replace(/\^/g, " ");
-        +'</td>';
-        content += '<td>' + data[0].PatientID[studyIndex] + '</td>';
-        content += '<td>' + data[0].PatientBirthDate[studyIndex] + '</td>';
-        content += '<td>' + data[0].StudyDate[studyIndex] + '</td>';
-        content += '<td>' + data[0].ModalitiesInStudy[studyIndex] + '</td>';
-        content += '<td>'
-            + data[0].StudyDescription[studyIndex].replace(/\>/g, "&gt")
-                .replace(/\</g, "&lt") + '</td>';
-        content += '<td>'
-            + data[1].SeriesDescription[i].replace(/\>/g, "&gt").replace(/\</g,
-                "&lt") + '</td>';
-        content += '<td>' + data[1].NumberOfSeriesRelatedInstances[i] + '</td>';
-        // add buttons with good uid instead of table automated stuff!
-        content += '<td class="center"><button id="'
-            + data[1].StudyInstanceUID[i].replace(/\./g, "_")
-            + '-'
-            + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
-            + '-series-ap"  class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
-        content += '<td class="center"><button id="'
-            + data[1].StudyInstanceUID[i].replace(/\./g, "_")
-            + '-'
-            + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
-            + '-series-ad" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
-        content += '</tr>';
-      }
       content += '</tbody></table>';
       // update html with table
       jQuery('#results_container_a').html(content);
@@ -315,68 +232,67 @@ PACS.ajaxAllResults = function(data) {
       jQuery(".download_filter")
           .html(
               '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
-      // else append!
-    } else {
-      var dataToAppend = Array();
-      var numSeries = data[1].SeriesDescription.length;
-      var i = 0;
-      for (i = 0; i < numSeries; ++i) {
-        // update loaded results
-        var studyUID = data[1].StudyInstanceUID[i];
-        var currentStudy = null;
-        var studyloaded = studyUID in PACS.loadedStudies;
-        if (!studyloaded) {
-          PACS.loadedStudies[studyUID] = Array();
-          currentStudy = PACS.loadedStudies[studyUID];
-          currentStudy.StudyInstanceUID = Array();
-          currentStudy.SeriesInstanceUID = Array();
-          currentStudy.SeriesDescription = Array();
-          currentStudy.NumberOfSeriesRelatedInstances = Array();
-          currentStudy.Status = Array();
-        } else {
-          currentStudy = PACS.loadedStudies[studyUID];
-        }
-        var seriesExist = data[1].SeriesInstanceUID[i] in currentStudy.SeriesInstanceUID;
-        if (!seriesExist) {
-          currentStudy.StudyInstanceUID.push(data[1].StudyInstanceUID[i]);
-          currentStudy.SeriesInstanceUID.push(data[1].SeriesInstanceUID[i]);
-          currentStudy.SeriesDescription.push(data[1].SeriesDescription[i]);
-          currentStudy.NumberOfSeriesRelatedInstances
-              .push(data[1].NumberOfSeriesRelatedInstances[i]);
-          currentStudy.Status.push(0);
-        }
-        content += '<tr class="parent pacsStudyRows" id="'
-            + data[1].StudyInstanceUID[i].replace(/\./g, "_") + '">';
-        // get study uid index
-        var studyIndex = data[0].StudyInstanceUID
-            .indexOf(data[1].StudyInstanceUID[i]);
-        var innerArray = Array();
-        innerArray.push(data[0].PatientName[studyIndex].replace(/\^/g, " "));
-        innerArray.push(data[0].PatientID[studyIndex]);
-        innerArray.push(data[0].PatientBirthDate[studyIndex]);
-        innerArray.push(data[0].StudyDate[studyIndex]);
-        innerArray.push(data[0].ModalitiesInStudy[studyIndex]);
-        innerArray.push(data[0].StudyDescription[studyIndex].replace(/\>/g,
-            "&gt").replace(/\</g, "&lt"));
-        innerArray.push(data[1].SeriesDescription[i].replace(/\>/g, "&gt")
-            .replace(/\</g, "&lt"));
-        innerArray.push(data[1].NumberOfSeriesRelatedInstances[i]);
-        innerArray
-            .push('<button id="'
-                + data[1].StudyInstanceUID[i].replace(/\./g, "_")
-                + '-'
-                + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
-                + '-series-ap"  class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
-        innerArray
-            .push('<button id="'
-                + data[1].StudyInstanceUID[i].replace(/\./g, "_")
-                + '-'
-                + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
-                + '-series-ad" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
-        dataToAppend.push(innerArray);
-      }
-      jQuery('#advanced-results').dataTable().fnAddData(dataToAppend);
     }
+    // add data in the table!
+    var dataToAppend = Array();
+    var numSeries = data[1].SeriesDescription.length;
+    var i = 0;
+    for (i = 0; i < numSeries; ++i) {
+      // update loaded results
+      var studyUID = data[1].StudyInstanceUID[i];
+      var currentStudy = null;
+      var studyloaded = studyUID in PACS.loadedStudies;
+      if (!studyloaded) {
+        PACS.loadedStudies[studyUID] = Array();
+        currentStudy = PACS.loadedStudies[studyUID];
+        currentStudy.StudyInstanceUID = Array();
+        currentStudy.SeriesInstanceUID = Array();
+        currentStudy.SeriesDescription = Array();
+        currentStudy.NumberOfSeriesRelatedInstances = Array();
+        currentStudy.Status = Array();
+      } else {
+        currentStudy = PACS.loadedStudies[studyUID];
+      }
+      var seriesExist = data[1].SeriesInstanceUID[i] in currentStudy.SeriesInstanceUID;
+      if (!seriesExist) {
+        currentStudy.StudyInstanceUID.push(data[1].StudyInstanceUID[i]);
+        currentStudy.SeriesInstanceUID.push(data[1].SeriesInstanceUID[i]);
+        currentStudy.SeriesDescription.push(data[1].SeriesDescription[i]);
+        currentStudy.NumberOfSeriesRelatedInstances
+            .push(data[1].NumberOfSeriesRelatedInstances[i]);
+        currentStudy.Status.push(0);
+      }
+      content += '<tr class="parent pacsStudyRows" id="'
+          + data[1].StudyInstanceUID[i].replace(/\./g, "_") + '">';
+      // get study uid index
+      var studyIndex = data[0].StudyInstanceUID
+          .indexOf(data[1].StudyInstanceUID[i]);
+      var innerArray = Array();
+      innerArray.push(data[0].PatientName[studyIndex].replace(/\^/g, " "));
+      innerArray.push(data[0].PatientID[studyIndex]);
+      innerArray.push(data[0].PatientBirthDate[studyIndex]);
+      innerArray.push(data[0].StudyDate[studyIndex]);
+      innerArray.push(data[0].ModalitiesInStudy[studyIndex]);
+      innerArray.push(data[0].StudyDescription[studyIndex]
+          .replace(/\>/g, "&gt").replace(/\</g, "&lt"));
+      innerArray.push(data[1].SeriesDescription[i].replace(/\>/g, "&gt")
+          .replace(/\</g, "&lt"));
+      innerArray.push(data[1].NumberOfSeriesRelatedInstances[i]);
+      innerArray
+          .push('<button id="'
+              + data[1].StudyInstanceUID[i].replace(/\./g, "_")
+              + '-'
+              + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
+              + '-series-ap"  class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
+      innerArray
+          .push('<button id="'
+              + data[1].StudyInstanceUID[i].replace(/\./g, "_")
+              + '-'
+              + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
+              + '-series-ad" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
+      dataToAppend.push(innerArray);
+    }
+    jQuery('#advanced-results').dataTable().fnAddData(dataToAppend);
   } else {
     // no studies found and not doing multiple mrns
     if (PACS.oTableA == null) {
@@ -750,14 +666,17 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
                 'btn-success');
             // modify content
             jQuery(currentButtonID).html('<i class="icon-ok icon-white">');
-            jQuery(studyButtonID).attr('value',
-                +jQuery(studyButtonID).attr('value') + 1);
-            // all series downloaded, update button!
-            if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
-              jQuery(studyButtonID).removeClass('btn-warning').removeClass(
-                  'downloading_study').addClass('btn-success');
-              // modify content
-              jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
+            var studyButtonID = '#' + studyUID.replace(/\./g, "_") + '-study';
+            if (jQuery(studyButtonID).length != 0) {
+              jQuery(studyButtonID).attr('value',
+                  +jQuery(studyButtonID).attr('value') + 1);
+              // all series downloaded, update button!
+              if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
+                jQuery(studyButtonID).removeClass('btn-warning').removeClass(
+                    'downloading_study').addClass('btn-success');
+                // modify content
+                jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
+              }
             }
           }
         });
