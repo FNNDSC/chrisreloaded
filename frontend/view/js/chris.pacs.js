@@ -191,7 +191,7 @@ PACS.ajaxStudyResults = function(data) {
         content += '<td><span  id="'
             + data.StudyInstanceUID[i].replace(/\./g, "_")
             + '" class="control"><i class="icon-chevron-down"></i></span></td>'
-        content += '<td>' + data.PatientName[i] + '</td>';
+        content += '<td>' + data.PatientName[i].replace(/\^/g, " ") + '</td>';
         content += '<td>' + data.PatientBirthDate[i] + '</td>';
         content += '<td>'
             + data.StudyDescription[i].replace(/\>/g, "&gt").replace(/\</g,
@@ -216,7 +216,7 @@ PACS.ajaxStudyResults = function(data) {
         localDataToAppend.push('<span  id="'
             + data.StudyInstanceUID[i].replace(/\./g, "_")
             + '"  class="control"><i class="icon-chevron-down"></i></span>');
-        localDataToAppend.push(data.PatientName[i]);
+        localDataToAppend.push(data.PatientName[i].replace(/\^/g, " "));
         localDataToAppend.push(data.PatientBirthDate[i]);
         localDataToAppend.push(data.StudyDescription[i].replace(/\>/g, "&gt")
             .replace(/\</g, "&lt"));
