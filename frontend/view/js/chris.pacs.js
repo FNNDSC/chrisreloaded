@@ -74,34 +74,6 @@ PACS.fnFormatDetails = function(data) {
  */
 PACS.fnInitTable = function(tableName, nbColumn, icon) {
   /*
-   * Insert a 'details' column to the table
-   */
-  var nCloneTh = document.createElement('th');
-  var nCloneTd = document.createElement('td');
-  nCloneTd.innerHTML = '<span class="control"><i class="' + icon
-      + '"></i></span>';
-  nCloneTd.className = "center";
-  jQuery('#' + tableName + '-results thead tr').each(function() {
-    this.insertBefore(nCloneTh, this.childNodes[0]);
-  });
-  jQuery('#' + tableName + '-results tbody tr').each(function() {
-    this.insertBefore(nCloneTd.cloneNode(true), this.childNodes[0]);
-  });
-  /*
-   * Insert a 'download' column to the table
-   */
-  var nCloneTh = document.createElement('th');
-  var nCloneTd = document.createElement('td');
-  nCloneTd.innerHTML = '<button class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white download'
-      + tableName + '"></i></button>';
-  nCloneTd.className = "center";
-  jQuery('#' + tableName + '-results thead tr').each(function() {
-    this.insertBefore(nCloneTh, this.childNodes[nbColumn]);
-  });
-  jQuery('#' + tableName + '-results tbody tr').each(function() {
-    this.insertBefore(nCloneTd.cloneNode(true), this.childNodes[nbColumn]);
-  });
-  /*
    * Initialse DataTables, with no sorting on the 'details' column
    */
   var oTable = jQuery('#' + tableName + '-results')
@@ -185,7 +157,7 @@ PACS.setupDownloadStudy = function() {
 PACS.setupDetailStudy = function() {
   jQuery('#quick-results td .control').live('click', function() {
     var nTr = jQuery(this).parents('tr')[0];
-    var studyUID = nTr.getAttribute('id').replace(/\_/g, ".");
+    var studyUID = jQuery(this).attr('id').replace(/\_/g, ".");
     var i = jQuery.inArray(nTr, PACS.openStudies);
     if (i === -1) {
       PACS.ajaxSeries(studyUID, nTr);
@@ -209,28 +181,53 @@ PACS.ajaxStudyResults = function(data) {
     // must follow the syntax: name-results
     // name is used later to make the table sortable,
     // searchable, etc.
-    var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="quick-results">';
-    var numStudies = data.PatientID.length;
-    var i = 0;
-    content += '<thead><tr><th>PatientName</th><th>DateOfBirth</th><th>StudyDescription</th><th>StudyDate</th><th>Modality</th></tr></thead><tbody>';
-    for (i = 0; i < numStudies; ++i) {
-      content += '<tr class="parent pacsStudyRows" id="'
-          + data.StudyInstanceUID[i].replace(/\./g, "_") + '">';
-      content += '<td>' + data.PatientName[i] + '</td>';
-      content += '<td>' + data.PatientBirthDate[i] + '</td>';
-      content += '<td>'
-          + data.StudyDescription[i].replace(/\>/g, "&gt")
-              .replace(/\</g, "&lt") + '</td>';
-      content += '<td>' + data.StudyDate[i] + '</td>';
-      content += '<td>' + data.ModalitiesInStudy[i] + '</td>';
-      content += '</tr>';
+    if (jQuery('#quick-results').length == 0) {
+      var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="quick-results">';
+      var numStudies = data.PatientID.length;
+      var i = 0;
+      content += '<thead><tr><th></th><th>PatientName</th><th>DateOfBirth</th><th>StudyDescription</th><th>StudyDate</th><th>Modality</th><th></th></tr></thead><tbody>';
+      for (i = 0; i < numStudies; ++i) {
+        content += '<tr class="parent pacsStudyRows">';
+        content += '<td><span  id="'
+            + data.StudyInstanceUID[i].replace(/\./g, "_")
+            + '" class="control"><i class="icon-chevron-down"></i></span></td>'
+        content += '<td>' + data.PatientName[i] + '</td>';
+        content += '<td>' + data.PatientBirthDate[i] + '</td>';
+        content += '<td>'
+            + data.StudyDescription[i].replace(/\>/g, "&gt").replace(/\</g,
+                "&lt") + '</td>';
+        content += '<td>' + data.StudyDate[i] + '</td>';
+        content += '<td>' + data.ModalitiesInStudy[i] + '</td>';
+        content += '<td><button class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+        content += '</tr>';
+      }
+      content += '</tbody></table>';
+      // update html with table
+      jQuery('#results_container').html(content);
+      // make table sortable, filterable, ...
+      // make the table cooler!
+      PACS.oTable = PACS.fnInitTable('quick', 6, 'icon-chevron-down');
+    } else {
+      var dataToAppend = Array();
+      var numStudies = data.PatientID.length;
+      var i = 0;
+      for (i = 0; i < numStudies; ++i) {
+        var localDataToAppend = Array();
+        localDataToAppend.push('<span  id="'
+            + data.StudyInstanceUID[i].replace(/\./g, "_")
+            + '"  class="control"><i class="icon-chevron-down"></i></span>');
+        localDataToAppend.push(data.PatientName[i]);
+        localDataToAppend.push(data.PatientBirthDate[i]);
+        localDataToAppend.push(data.StudyDescription[i].replace(/\>/g, "&gt")
+            .replace(/\</g, "&lt"));
+        localDataToAppend.push(data.StudyDate[i]);
+        localDataToAppend.push(data.ModalitiesInStudy[i]);
+        localDataToAppend
+            .push('<button class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button>');
+        dataToAppend.push(localDataToAppend);
+      }
+      jQuery('#quick-results').dataTable().fnAddData(dataToAppend);
     }
-    content += '</tbody></table>';
-    // update html with table
-    jQuery('#results_container').html(content);
-    // make table sortable, filterable, ...
-    // make the table cooler!
-    PACS.oTable = PACS.fnInitTable('quick', 6, 'icon-chevron-down');
   } else {
     // no studies found
     jQuery('#results_container').html("No studies found...");
@@ -432,30 +429,42 @@ PACS.ajaxStudy = function() {
     currentButton.removeClass('btn-primary').addClass('btn-warning');
     // modify content
     currentButton.html('<i class="icon-refresh rotating_class">');
-    // query pacs on parameters, at STUDY LEVEL
-    jQuery.ajax({
-      type : "POST",
-      url : "controller/pacs_query.php",
-      dataType : "json",
-      data : {
-        USER_AET : jQuery("#USER_AET").val(),
-        SERVER_IP : jQuery("#SERVER_IP").val(),
-        SERVER_POR : jQuery("#SERVER_POR").val(),
-        PACS_LEV : 'STUDY',
-        PACS_MRN : jQuery("#PACS_MRN").val(),
-        PACS_NAM : jQuery("#PACS_NAM").val(),
-        PACS_MOD : jQuery("#PACS_MOD").val(),
-        PACS_DAT : jQuery("#PACS_DAT").val(),
-        PACS_ACC_NUM : '',
-        PACS_STU_DES : '',
-        PACS_STU_UID : ''
-      },
-      success : function(data) {
-        currentButton.removeClass('btn-warning').addClass('btn-primary');
-        currentButton.html('Search');
-        PACS.ajaxStudyResults(data);
-      }
-    });
+    if (jQuery('#quick-results').length != 0) {
+      jQuery('#quick-results').remove();
+    }
+    var mrns = jQuery("#PACS_MRN").val().split(' ');
+    var mrnscount = mrns.length;
+    var received = 0;
+    var i = 0;
+    for (i = 0; i < mrnscount; i++) {
+      // query pacs on parameters, at STUDY LEVEL
+      jQuery.ajax({
+        type : "POST",
+        url : "controller/pacs_query.php",
+        dataType : "json",
+        data : {
+          USER_AET : jQuery("#USER_AET").val(),
+          SERVER_IP : jQuery("#SERVER_IP").val(),
+          SERVER_POR : jQuery("#SERVER_POR").val(),
+          PACS_LEV : 'STUDY',
+          PACS_MRN : mrns[i],
+          PACS_NAM : jQuery("#PACS_NAM").val(),
+          PACS_MOD : jQuery("#PACS_MOD").val(),
+          PACS_DAT : jQuery("#PACS_DAT").val(),
+          PACS_ACC_NUM : '',
+          PACS_STU_DES : '',
+          PACS_STU_UID : ''
+        },
+        success : function(data) {
+          received++;
+          if (received == mrnscount) {
+            currentButton.removeClass('btn-warning').addClass('btn-primary');
+            currentButton.html('Search');
+          }
+          PACS.ajaxStudyResults(data);
+        }
+      });
+    }
   });
 }
 /**
