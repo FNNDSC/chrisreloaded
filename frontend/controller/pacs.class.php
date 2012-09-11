@@ -256,9 +256,7 @@ class PACS implements PACSInterface {
       $this->addParameter('StudyInstanceUID', '');
       $this->addParameter('SeriesInstanceUID', '');
 
-
       PACS::_parseParam($this->command_param, $command);
-
       $this->_finishCommand($command);
 
       return $this->_executeAndFormat($command);
