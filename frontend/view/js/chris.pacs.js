@@ -35,7 +35,7 @@ PACS.formatHTMLDetails = function(data) {
   var i = 0;
   // set details table id to the study ID
   // replace '.' (invalid id character) by '_'
-  var content = '<div class="innerDetails"><table class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Series Description</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
+  var content = '<div class="innerDetails"><table class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Series Desc.</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < numberOfResults; ++i) {
     content += '<tr class="parent pacsStudyRows" id="'
         + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">';
@@ -108,7 +108,7 @@ PACS.setupDownloadStudy = function() {
         studyUID = studyUID.substring(0, studyUID.length - 6)
         // modify class
         jQuery(this).removeClass('btn-primary').removeClass('download_study')
-            .addClass('btn-warning').addClass('downloading_study');
+            .addClass('btn-warning');
         // modify content
         jQuery(this).html('<i class="icon-refresh rotating_class">');
         // download all related series
@@ -172,9 +172,9 @@ PACS.ajaxStudyResults = function(data) {
     var numStudies = data.PatientID.length;
     var i = 0;
     for (i = 0; i < numStudies; ++i) {
+      var studyUID = data.StudyInstanceUID[i];
       var localDataToAppend = Array();
-      localDataToAppend.push('<span  id="'
-          + data.StudyInstanceUID[i].replace(/\./g, "_")
+      localDataToAppend.push('<span  id="' + studyUID.replace(/\./g, "_")
           + '"  class="control"><i class="icon-chevron-down"></i></span>');
       localDataToAppend.push(data.PatientName[i].replace(/\^/g, " "));
       localDataToAppend.push(data.PatientID[i]);
@@ -183,10 +183,38 @@ PACS.ajaxStudyResults = function(data) {
           .replace(/\</g, "&lt"));
       localDataToAppend.push(data.StudyDate[i]);
       localDataToAppend.push(data.ModalitiesInStudy[i]);
-      localDataToAppend
-          .push('<button  id="'
-              + data.StudyInstanceUID[i].replace(/\./g, "_")
-              + '-study" class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button>');
+      // if study cached, check status of series to update icon
+      var studyloaded = studyUID in PACS.loadedStudies;
+      var status = 0;
+      if (studyloaded) {
+        var numseries = PACS.loadedStudies[studyUID].Status.length;
+        var i = 0;
+        var count = 0;
+        for (i = 0; i < numseries; i++) {
+          count += PACS.loadedStudies[studyUID].Status[i];
+        }
+        if (count == numseries) {
+          status = 1;
+        } else if (count == 2 * numseries) {
+          status = 2;
+        }
+      }
+      if (status == 0) {
+        localDataToAppend
+            .push('<button  id="'
+                + data.StudyInstanceUID[i].replace(/\./g, "_")
+                + '-study" class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button>');
+      } else if (status == 1) {
+        localDataToAppend
+            .push('<button  id="'
+                + data.StudyInstanceUID[i].replace(/\./g, "_")
+                + '-study" class="btn btn-warning pull-right" type="button" value="0"><i class="icon-refresh rotating_class"></button>');
+      } else if (status == 2) {
+        localDataToAppend
+            .push('<button  id="'
+                + data.StudyInstanceUID[i].replace(/\./g, "_")
+                + '-study" class="btn btn-success pull-right" type="button" value="0"><i class="icon-ok icon-white"></button>');
+      }
       dataToAppend.push(localDataToAppend);
     }
     jQuery('#quick-results').dataTable().fnAddData(dataToAppend);
@@ -242,6 +270,7 @@ PACS.ajaxAllResults = function(data) {
       var studyUID = data[1].StudyInstanceUID[i];
       var currentStudy = null;
       var studyloaded = studyUID in PACS.loadedStudies;
+      // if study not loaded, create container for this study
       if (!studyloaded) {
         PACS.loadedStudies[studyUID] = Array();
         currentStudy = PACS.loadedStudies[studyUID];
@@ -253,6 +282,7 @@ PACS.ajaxAllResults = function(data) {
       } else {
         currentStudy = PACS.loadedStudies[studyUID];
       }
+      // fill study container
       var seriesExist = data[1].SeriesInstanceUID[i] in currentStudy.SeriesInstanceUID;
       if (!seriesExist) {
         currentStudy.StudyInstanceUID.push(data[1].StudyInstanceUID[i]);
@@ -262,8 +292,7 @@ PACS.ajaxAllResults = function(data) {
             .push(data[1].NumberOfSeriesRelatedInstances[i]);
         currentStudy.Status.push(0);
       }
-      content += '<tr class="parent pacsStudyRows" id="'
-          + data[1].StudyInstanceUID[i].replace(/\./g, "_") + '">';
+      // fill html table
       // get study uid index
       var studyIndex = data[0].StudyInstanceUID
           .indexOf(data[1].StudyInstanceUID[i]);
@@ -292,6 +321,7 @@ PACS.ajaxAllResults = function(data) {
               + '-series-ad" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
       dataToAppend.push(innerArray);
     }
+    // add table to current table
     jQuery('#advanced-results').dataTable().fnAddData(dataToAppend);
   } else {
     // no studies found and not doing multiple mrns
@@ -672,8 +702,8 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
                   +jQuery(studyButtonID).attr('value') + 1);
               // all series downloaded, update button!
               if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
-                jQuery(studyButtonID).removeClass('btn-warning').removeClass(
-                    'downloading_study').addClass('btn-success');
+                jQuery(studyButtonID).removeClass('btn-warning').addClass(
+                    'btn-success');
                 // modify content
                 jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
               }
