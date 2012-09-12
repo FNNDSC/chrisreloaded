@@ -111,6 +111,8 @@ PACS.setupDownloadStudy = function() {
             .addClass('btn-warning');
         // modify content
         jQuery(this).html('<i class="icon-refresh rotating_class">');
+        // update study status
+        PACS.loadedStudiesStatus[studyUID] = 1;
         // download all related series
         PACS.ajaxSeries(studyUID);
       });
@@ -126,7 +128,7 @@ PACS.setupDetailStudy = function() {
     var studyUID = jQuery(this).attr('id').replace(/\_/g, ".");
     // if data has not been cached, perform ajax query, else, show it
     var i = jQuery.inArray(nTr, PACS.openStudies);
-    if (i === -1) {
+    if (i == -1) {
       // get related series
       PACS.ajaxSeries(studyUID, nTr);
     } else {
@@ -138,92 +140,52 @@ PACS.setupDetailStudy = function() {
     }
   });
 }
-/**
- * Handle ajax response after query pacs for studies, given mrn, name, date,
- * etc.
- */
-PACS.ajaxStudyResults = function(data) {
-  // if ajax returns something, process it
-  if (data != null) {
-    // if no table, create it
-    if (jQuery('#quick-results').length == 0) {
-      var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="quick-results">';
-      content += '<thead><tr><th></th><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th></th></tr></thead><tbody>';
-      content += '</tbody></table>';
-      jQuery('#results_container').html(content);
-      // make table sortable, filterable, ...
-      PACS.oTable = jQuery('#quick-results')
-          .dataTable(
-              {
-                "sDom" : "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
-                "sPaginationType" : "bootstrap",
-                "oLanguage" : {
-                  "sLengthMenu" : "_MENU_ studies per page"
-                },
-                "aoColumnDefs" : [ {
-                  "bSortable" : false,
-                  "aTargets" : [ 0, 7 ]
-                } ],
-                "aaSorting" : [ [ 1, 'desc' ] ]
-              });
+PACS.ajaxAll = function() {
+  jQuery("#PACS_QUERY_A").live('click', function(event) {
+    var currentButton = jQuery(this);
+    currentButton.removeClass('btn-primary').addClass('btn-warning');
+    // modify content
+    currentButton.html('<i class="icon-refresh rotating_class">');
+    if (jQuery('#advanced-results').length != 0) {
+      // destroy the table
+      PACS.oTableA.dataTable().fnDestroy();
+      PACS.oTableA = null;
+      jQuery('#advanced-results').remove();
     }
-    // fill the table
-    var dataToAppend = Array();
-    var numStudies = data.PatientID.length;
+    var mrns = jQuery("#PACS_MRN_A").val().split(' ');
+    var mrnscount = mrns.length;
+    var received = 0;
     var i = 0;
-    for (i = 0; i < numStudies; ++i) {
-      var studyUID = data.StudyInstanceUID[i];
-      var localDataToAppend = Array();
-      localDataToAppend.push('<span  id="' + studyUID.replace(/\./g, "_")
-          + '"  class="control"><i class="icon-chevron-down"></i></span>');
-      localDataToAppend.push(data.PatientName[i].replace(/\^/g, " "));
-      localDataToAppend.push(data.PatientID[i]);
-      localDataToAppend.push(data.PatientBirthDate[i]);
-      localDataToAppend.push(data.StudyDescription[i].replace(/\>/g, "&gt")
-          .replace(/\</g, "&lt"));
-      localDataToAppend.push(data.StudyDate[i]);
-      localDataToAppend.push(data.ModalitiesInStudy[i]);
-      // if study cached, check status of series to update icon
-      var studyloaded = studyUID in PACS.loadedStudies;
-      var status = 0;
-      if (studyloaded) {
-        var numseries = PACS.loadedStudies[studyUID].Status.length;
-        var i = 0;
-        var count = 0;
-        for (i = 0; i < numseries; i++) {
-          count += PACS.loadedStudies[studyUID].Status[i];
+    for (i = 0; i < mrnscount; i++) {
+      // query pacs on parameters, at STUDY LEVEL
+      jQuery.ajax({
+        type : "POST",
+        url : "controller/pacs_query.php",
+        dataType : "json",
+        data : {
+          USER_AET : jQuery("#USER_AET").val(),
+          SERVER_IP : jQuery("#SERVER_IP").val(),
+          SERVER_POR : jQuery("#SERVER_POR").val(),
+          PACS_LEV : 'ALL',
+          PACS_MRN : mrns[i],
+          PACS_NAM : jQuery("#PACS_NAM_A").val(),
+          PACS_MOD : jQuery("#PACS_MOD_A").val(),
+          PACS_DAT : jQuery("#PACS_DAT_A").val(),
+          PACS_ACC_NUM : '',
+          PACS_STU_DES : '',
+          PACS_STU_UID : ''
+        },
+        success : function(data) {
+          received++;
+          if (received == mrnscount) {
+            currentButton.removeClass('btn-warning').addClass('btn-primary');
+            currentButton.html('Search');
+          }
+          PACS.ajaxAllResults(data);
         }
-        if (count == numseries) {
-          status = 1;
-        } else if (count == 2 * numseries) {
-          status = 2;
-        }
-      }
-      if (status == 0) {
-        localDataToAppend
-            .push('<button  id="'
-                + data.StudyInstanceUID[i].replace(/\./g, "_")
-                + '-study" class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button>');
-      } else if (status == 1) {
-        localDataToAppend
-            .push('<button  id="'
-                + data.StudyInstanceUID[i].replace(/\./g, "_")
-                + '-study" class="btn btn-warning pull-right" type="button" value="0"><i class="icon-refresh rotating_class"></button>');
-      } else if (status == 2) {
-        localDataToAppend
-            .push('<button  id="'
-                + data.StudyInstanceUID[i].replace(/\./g, "_")
-                + '-study" class="btn btn-success pull-right" type="button" value="0"><i class="icon-ok icon-white"></button>');
-      }
-      dataToAppend.push(localDataToAppend);
+      });
     }
-    jQuery('#quick-results').dataTable().fnAddData(dataToAppend);
-  } else {
-    // no studies found and not doing multiple mrns
-    if (PACS.oTable == null) {
-      jQuery('#results_container').html("No studies found...");
-    }
-  }
+  });
 }
 /**
  * 
@@ -283,14 +245,21 @@ PACS.ajaxAllResults = function(data) {
         currentStudy = PACS.loadedStudies[studyUID];
       }
       // fill study container
-      var seriesExist = data[1].SeriesInstanceUID[i] in currentStudy.SeriesInstanceUID;
-      if (!seriesExist) {
+      var seriesExist = jQuery.inArray(data[1].SeriesInstanceUID[i],
+          currentStudy.SeriesInstanceUID);
+      if (seriesExist == -1) {
+        window.console.log('not: ' + data[1].SeriesInstanceUID[i]);
         currentStudy.StudyInstanceUID.push(data[1].StudyInstanceUID[i]);
         currentStudy.SeriesInstanceUID.push(data[1].SeriesInstanceUID[i]);
         currentStudy.SeriesDescription.push(data[1].SeriesDescription[i]);
         currentStudy.NumberOfSeriesRelatedInstances
             .push(data[1].NumberOfSeriesRelatedInstances[i]);
         currentStudy.Status.push(0);
+        // push more:
+        // QueryRetrieveLevel
+        //RetrieveAETitle
+      } else {
+        window.console.log('exists: ' + data[1].SeriesInstanceUID[i]);
       }
       // fill html table
       // get study uid index
@@ -329,53 +298,6 @@ PACS.ajaxAllResults = function(data) {
       jQuery('#results_container_a').html("No studies found...");
     }
   }
-}
-PACS.ajaxAll = function() {
-  jQuery("#PACS_QUERY_A").live('click', function(event) {
-    var currentButton = jQuery(this);
-    currentButton.removeClass('btn-primary').addClass('btn-warning');
-    // modify content
-    currentButton.html('<i class="icon-refresh rotating_class">');
-    if (jQuery('#advanced-results').length != 0) {
-      // destroy the table
-      PACS.oTableA.dataTable().fnDestroy();
-      PACS.oTableA = null;
-      jQuery('#advanced-results').remove();
-    }
-    var mrns = jQuery("#PACS_MRN_A").val().split(' ');
-    var mrnscount = mrns.length;
-    var received = 0;
-    var i = 0;
-    for (i = 0; i < mrnscount; i++) {
-      // query pacs on parameters, at STUDY LEVEL
-      jQuery.ajax({
-        type : "POST",
-        url : "controller/pacs_query.php",
-        dataType : "json",
-        data : {
-          USER_AET : jQuery("#USER_AET").val(),
-          SERVER_IP : jQuery("#SERVER_IP").val(),
-          SERVER_POR : jQuery("#SERVER_POR").val(),
-          PACS_LEV : 'ALL',
-          PACS_MRN : mrns[i],
-          PACS_NAM : jQuery("#PACS_NAM_A").val(),
-          PACS_MOD : jQuery("#PACS_MOD_A").val(),
-          PACS_DAT : jQuery("#PACS_DAT_A").val(),
-          PACS_ACC_NUM : '',
-          PACS_STU_DES : '',
-          PACS_STU_UID : ''
-        },
-        success : function(data) {
-          received++;
-          if (received == mrnscount) {
-            currentButton.removeClass('btn-warning').addClass('btn-primary');
-            currentButton.html('Search');
-          }
-          PACS.ajaxAllResults(data);
-        }
-      });
-    }
-  });
 }
 PACS.ajaxStudy = function() {
   jQuery("#PACS_QUERY").live('click', function(event) {
@@ -425,6 +347,86 @@ PACS.ajaxStudy = function() {
   });
 }
 /**
+ * Handle ajax response after query pacs for studies, given mrn, name, date,
+ * etc.
+ */
+PACS.ajaxStudyResults = function(data) {
+  // if ajax returns something, process it
+  if (data != null) {
+    // if no table, create it
+    if (jQuery('#quick-results').length == 0) {
+      var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="quick-results">';
+      content += '<thead><tr><th></th><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th></th></tr></thead><tbody>';
+      content += '</tbody></table>';
+      jQuery('#results_container').html(content);
+      // make table sortable, filterable, ...
+      PACS.oTable = jQuery('#quick-results')
+          .dataTable(
+              {
+                "sDom" : "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+                "sPaginationType" : "bootstrap",
+                "oLanguage" : {
+                  "sLengthMenu" : "_MENU_ studies per page"
+                },
+                "aoColumnDefs" : [ {
+                  "bSortable" : false,
+                  "aTargets" : [ 0, 7 ]
+                } ],
+                "aaSorting" : [ [ 1, 'desc' ] ]
+              });
+    }
+    // fill the table
+    var dataToAppend = Array();
+    var numStudies = data.PatientID.length;
+    var i = 0;
+    for (i = 0; i < numStudies; ++i) {
+      var studyUID = data.StudyInstanceUID[i];
+      var localDataToAppend = Array();
+      localDataToAppend.push('<span  id="' + studyUID.replace(/\./g, "_")
+          + '"  class="control"><i class="icon-chevron-down"></i></span>');
+      localDataToAppend.push(data.PatientName[i].replace(/\^/g, " "));
+      localDataToAppend.push(data.PatientID[i]);
+      localDataToAppend.push(data.PatientBirthDate[i]);
+      localDataToAppend.push(data.StudyDescription[i].replace(/\>/g, "&gt")
+          .replace(/\</g, "&lt"));
+      localDataToAppend.push(data.StudyDate[i]);
+      localDataToAppend.push(data.ModalitiesInStudy[i]);
+      // if study cached, check status of series to update icon
+      PACS.loadedStudiesStatus[studyUID]
+      var studyloaded = studyUID in PACS.loadedStudiesStatus;
+      var status = 0;
+      if (studyloaded) {
+        status = PACS.loadedStudiesStatus[studyUID];
+      } else {
+        PACS.loadedStudiesStatus[studyUID] = 0;
+      }
+      if (status == 0) {
+        localDataToAppend
+            .push('<button  id="'
+                + data.StudyInstanceUID[i].replace(/\./g, "_")
+                + '-study" class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button>');
+      } else if (status == 1) {
+        localDataToAppend
+            .push('<button  id="'
+                + data.StudyInstanceUID[i].replace(/\./g, "_")
+                + '-study" class="btn btn-warning pull-right" type="button" value="0"><i class="icon-refresh rotating_class"></button>');
+      } else if (status == 2) {
+        localDataToAppend
+            .push('<button  id="'
+                + data.StudyInstanceUID[i].replace(/\./g, "_")
+                + '-study" class="btn btn-success pull-right" type="button" value="0"><i class="icon-ok icon-white"></button>');
+      }
+      dataToAppend.push(localDataToAppend);
+    }
+    jQuery('#quick-results').dataTable().fnAddData(dataToAppend);
+  } else {
+    // no studies found and not doing multiple mrns
+    if (PACS.oTable == null) {
+      jQuery('#results_container').html("No studies found...");
+    }
+  }
+}
+/**
  * 
  * @param studyUID
  * @param oTable
@@ -433,7 +435,7 @@ PACS.ajaxSeries = function(studyUID, nTr) {
   // is it good practice
   var j = studyUID in PACS.loadedStudies;
   // if not cached
-  if (j == 0) {
+  if (!j) {
     // set waiting icon
     if (nTr != null) {
       jQuery('.control', nTr).html('<i class="icon-refresh rotating_class">');
@@ -702,6 +704,7 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
                   +jQuery(studyButtonID).attr('value') + 1);
               // all series downloaded, update button!
               if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
+                PACS.loadedStudiesStatus[studyUID] = 2;
                 jQuery(studyButtonID).removeClass('btn-warning').addClass(
                     'btn-success');
                 // modify content
@@ -750,7 +753,8 @@ jQuery(document).ready(function() {
   // store "opened" studies
   PACS.openStudies = [];
   // store "loaded" studies
-  PACS.loadedStudies = [];
+  PACS.loadedStudiesStatus = {};
+  PACS.loadedStudies = {};
   PACS.oTable = null;
   PACS.preview = null;
   PACS.previewReceivedData = [];
