@@ -140,6 +140,61 @@ PACS.setupDetailStudy = function() {
     }
   });
 }
+PACS.setupDownloadSeries = function() {
+  jQuery(".download_series").live('click', function(event) {
+    var currentButtonID = jQuery(this).attr('id');
+    var currentButtonIDSplit = currentButtonID.split('-');
+    var studyUID = currentButtonIDSplit[0].replace(/\_/g, ".");
+    var seriesUID = currentButtonIDSplit[1].replace(/\_/g, ".");
+    PACS.ajaxImage(studyUID, seriesUID, '#' + currentButtonID);
+  });
+}
+PACS.setupPreviewSeries = function() {
+  jQuery(".preview_series")
+      .live(
+          'click',
+          function(event) {
+            var currentButtonID = jQuery(this).attr('id');
+            var currentButtonIDSplit = currentButtonID.split('-');
+            var studyUID = currentButtonIDSplit[0].replace(/\_/g, ".");
+            var seriesUID = currentButtonIDSplit[1].replace(/\_/g, ".");
+            // start pulling series and update id
+            PACS.ajaxImage(studyUID, seriesUID, '#'
+                + currentButtonID.substring(0, currentButtonID.length - 1)
+                + 'd');
+            // overlay
+            jQuery("#loadOverlay")
+                .html(
+                    'Retrieving data <i class="icon-refresh icon-white rotating_class">');
+            jQuery("#loadOverlay").show();
+            jQuery("#currentSlice").html('00');
+            jQuery("#totalSlices").html('00');
+            // show modal
+            jQuery('#myModal').modal();
+            // start ajax preview
+            PACS.ajaxPreview(studyUID, seriesUID);
+          });
+  jQuery('#myModal').on('hidden', function() {
+    // delete XTK stuff
+    if (PACS.sliceX != null) {
+      PACS.sliceX.destroy();
+      delete PACS.sliceX;
+      PACS.sliceX = null;
+    }
+    if (PACS.volume != null) {
+      delete PACS.volume;
+      PACS.volume = null;
+    }
+    // clean global variable
+    PACS.previewReceivedData['filename'] = [];
+    PACS.previewReceivedData['data'] = [];
+    // slider
+    jQuery("#sliderZ").slider("destroy");
+  });
+  jQuery("#modal-close").live('click', function(event) {
+    alert('Delete not connected to the server!');
+  });
+}
 PACS.ajaxAll = function() {
   jQuery("#PACS_QUERY_A").live('click', function(event) {
     var currentButton = jQuery(this);
@@ -530,68 +585,9 @@ PACS.ajaxSeriesResults = function(data, nTr) {
    * jQuery(idseries) .text( data3.ProtocolName[0]); } }); }
    */
 }
-PACS.setupDownloadSeries = function() {
-  jQuery(".download_series").live('click', function(event) {
-    var currentButtonID = jQuery(this).attr('id');
-    var currentButtonIDSplit = currentButtonID.split('-');
-    var studyUID = currentButtonIDSplit[0].replace(/\_/g, ".");
-    var seriesUID = currentButtonIDSplit[1].replace(/\_/g, ".");
-    PACS.ajaxImage(studyUID, seriesUID, '#' + currentButtonID);
-  });
-}
-PACS.setupPreviewSeries = function() {
-  jQuery(".preview_series")
-      .live(
-          'click',
-          function(event) {
-            var currentButtonID = jQuery(this).attr('id');
-            var currentButtonIDSplit = currentButtonID.split('-');
-            var studyUID = currentButtonIDSplit[0].replace(/\_/g, ".");
-            var seriesUID = currentButtonIDSplit[1].replace(/\_/g, ".");
-            // start pulling series and update id
-            PACS.ajaxImage(studyUID, seriesUID, '#'
-                + currentButtonID.substring(0, currentButtonID.length - 1)
-                + 'd');
-            // overlay
-            jQuery("#loadOverlay")
-                .html(
-                    'Retrieving data <i class="icon-refresh icon-white rotating_class">');
-            jQuery("#loadOverlay").show();
-            jQuery("#currentSlice").html('00');
-            jQuery("#totalSlices").html('00');
-            // show modal
-            jQuery('#myModal').modal();
-            // start timeout function
-            PACS.preview = setInterval(function() {
-              PACS.ajaxPreview(studyUID, seriesUID)
-            }, 500);
-          });
-  jQuery('#myModal').on('hidden', function() {
-    // stop timeout
-    clearInterval(PACS.preview);
-    // delete XTK stuff
-    if (PACS.sliceX != null) {
-      PACS.sliceX.destroy();
-      delete PACS.sliceX;
-      PACS.sliceX = null;
-    }
-    if (PACS.volume != null) {
-      delete PACS.volume;
-      PACS.volume = null;
-    }
-    // stop call back
-    clearInterval(PACS.preview);
-    // clean global variable
-    PACS.previewReceivedData['filename'] = [];
-    PACS.previewReceivedData['data'] = [];
-    // slider
-    jQuery("#sliderZ").slider("destroy");
-  });
-  jQuery("#modal-close").live('click', function(event) {
-    alert('Delete not connected to the server!');
-  });
-}
 PACS.ajaxPreview = function(studyUID, seriesUID) {
+  var localStudy = studyUID;
+  var localSeries = seriesUID;
   var seriesData = PACS.loadedStudies[studyUID];
   var nbFilesInSeries = seriesData.NumberOfSeriesRelatedInstances[seriesData.SeriesInstanceUID
       .indexOf(seriesUID)];
@@ -606,51 +602,48 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
       PACS_SER_NOF : nbFilesInSeries
     },
     success : function(data) {
-      if (data) {
-        var numberOfResults = data.filename.length;
-        // get the all the files
-        var i = 0;
-        if (numberOfResults && PACS.volume == null) {
-          // modal label
-          jQuery('#myModalLabel').html(description);
-          jQuery("#loadOverlay").html('Creating XTK visualization...');
-          clearInterval(PACS.preview);
-          // set XTK renderer
-          PACS.volume = new X.volume();
-          PACS.volume.file = 'http://chris/data/' + data.filename[0];
-          /*
-           * PACS.volume.file = data.filename.map(function(v) { return
-           * 'http://chris/data/' + v; });
-           */
-          PACS.sliceX = new X.renderer2D();
-          PACS.sliceX.container = 'sliceZ';
-          PACS.sliceX.orientation = 'Z';
-          PACS.sliceX.init();
-          PACS.sliceX.add(PACS.volume);
-          PACS.sliceX.render();
-          PACS.sliceX.onShowtime = function() {
-            var dim = PACS.volume.dimensions;
-            // hide overlay
-            jQuery("#loadOverlay").hide();
-            // init slider
-            jQuery("#sliderZ").slider({
-              min : 1,
-              max : dim[2],
-              value : Math.round(PACS.volume.indexZ + 1),
-              slide : function(event, ui) {
-                PACS.volume.indexZ = ui.value - 1;
-                jQuery("#currentSlice").html(ui.value);
-              }
-            });
-            PACS.sliceX.onScroll = function() {
-              jQuery('#sliderZ').slider("option", "value",
-                  Math.round(PACS.volume.indexZ + 1));
-              jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
-            };
+      if (data && data.filename.length > 0) {
+        // modal label
+        jQuery('#myModalLabel').html(description);
+        jQuery("#loadOverlay").html('Creating XTK visualization...');
+        // set XTK renderer
+        PACS.volume = new X.volume();
+        PACS.volume.file = 'http://chris/data/' + data.filename[0];
+        PACS.sliceX = new X.renderer2D();
+        PACS.sliceX.container = 'sliceZ';
+        PACS.sliceX.orientation = 'Z';
+        PACS.sliceX.init();
+        PACS.sliceX.add(PACS.volume);
+        PACS.sliceX.render();
+        PACS.sliceX.onShowtime = function() {
+          var dim = PACS.volume.dimensions;
+          // hide overlay
+          jQuery("#loadOverlay").hide();
+          // init slider
+          jQuery("#sliderZ").slider({
+            min : 1,
+            max : dim[2],
+            value : Math.round(PACS.volume.indexZ + 1),
+            slide : function(event, ui) {
+              PACS.volume.indexZ = ui.value - 1;
+              jQuery("#currentSlice").html(ui.value);
+            }
+          });
+          PACS.sliceX.onScroll = function() {
+            jQuery('#sliderZ').slider("option", "value",
+                Math.round(PACS.volume.indexZ + 1));
             jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
-            jQuery("#totalSlices").html(dim[2]);
-          }
+          };
+          jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
+          jQuery("#totalSlices").html(dim[2]);
         }
+      } else {
+        // if modal visible, callback
+        // if (!jQuery('#myModal').is('hidden')) {
+        setTimeout(function() {
+          PACS.ajaxPreview(localStudy, localSeries)
+        }, 1000);
+        // }
       }
     }
   });
@@ -757,7 +750,6 @@ jQuery(document).ready(function() {
   PACS.loadedStudiesCount = {};
   PACS.loadedStudies = {};
   PACS.oTable = null;
-  PACS.preview = null;
   PACS.previewReceivedData = [];
   PACS.previewReceivedData['filename'] = [];
   PACS.previewReceivedData['data'] = [];
