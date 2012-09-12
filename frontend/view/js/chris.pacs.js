@@ -240,6 +240,8 @@ PACS.ajaxAllResults = function(data) {
         currentStudy.SeriesInstanceUID = Array();
         currentStudy.SeriesDescription = Array();
         currentStudy.NumberOfSeriesRelatedInstances = Array();
+        currentStudy.QueryRetrieveLevel = Array();
+        currentStudy.RetrieveAETitle = Array();
         currentStudy.Status = Array();
       } else {
         currentStudy = PACS.loadedStudies[studyUID];
@@ -248,18 +250,14 @@ PACS.ajaxAllResults = function(data) {
       var seriesExist = jQuery.inArray(data[1].SeriesInstanceUID[i],
           currentStudy.SeriesInstanceUID);
       if (seriesExist == -1) {
-        window.console.log('not: ' + data[1].SeriesInstanceUID[i]);
         currentStudy.StudyInstanceUID.push(data[1].StudyInstanceUID[i]);
         currentStudy.SeriesInstanceUID.push(data[1].SeriesInstanceUID[i]);
         currentStudy.SeriesDescription.push(data[1].SeriesDescription[i]);
         currentStudy.NumberOfSeriesRelatedInstances
             .push(data[1].NumberOfSeriesRelatedInstances[i]);
+        currentStudy.QueryRetrieveLevel.push(data[1].QueryRetrieveLevel[i]);
+        currentStudy.RetrieveAETitle.push(data[1].RetrieveAETitle[i]);
         currentStudy.Status.push(0);
-        // push more:
-        // QueryRetrieveLevel
-        // RetrieveAETitle
-      } else {
-        window.console.log('exists: ' + data[1].SeriesInstanceUID[i]);
       }
       // fill html table
       // get study uid index
