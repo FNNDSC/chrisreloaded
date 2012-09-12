@@ -257,7 +257,7 @@ PACS.ajaxAllResults = function(data) {
         currentStudy.Status.push(0);
         // push more:
         // QueryRetrieveLevel
-        //RetrieveAETitle
+        // RetrieveAETitle
       } else {
         window.console.log('exists: ' + data[1].SeriesInstanceUID[i]);
       }
@@ -282,6 +282,9 @@ PACS.ajaxAllResults = function(data) {
               + '-'
               + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
               + '-series-ap"  class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
+      /**
+       * @todo check in cached data to update button as requiered
+       */
       innerArray
           .push('<button id="'
               + data[1].StudyInstanceUID[i].replace(/\./g, "_")
@@ -392,29 +395,29 @@ PACS.ajaxStudyResults = function(data) {
       localDataToAppend.push(data.StudyDate[i]);
       localDataToAppend.push(data.ModalitiesInStudy[i]);
       // if study cached, check status of series to update icon
-      PACS.loadedStudiesStatus[studyUID]
       var studyloaded = studyUID in PACS.loadedStudiesStatus;
       var status = 0;
       if (studyloaded) {
         status = PACS.loadedStudiesStatus[studyUID];
       } else {
         PACS.loadedStudiesStatus[studyUID] = 0;
+        PACS.loadedStudiesCount[studyUID] = 0;
       }
       if (status == 0) {
         localDataToAppend
             .push('<button  id="'
                 + data.StudyInstanceUID[i].replace(/\./g, "_")
-                + '-study" class="btn btn-primary download_study pull-right" type="button" value="0"><i class="icon-circle-arrow-down icon-white"></i></button>');
+                + '-study" class="btn btn-primary download_study pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
       } else if (status == 1) {
         localDataToAppend
             .push('<button  id="'
                 + data.StudyInstanceUID[i].replace(/\./g, "_")
-                + '-study" class="btn btn-warning pull-right" type="button" value="0"><i class="icon-refresh rotating_class"></button>');
+                + '-study" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></button>');
       } else if (status == 2) {
         localDataToAppend
             .push('<button  id="'
                 + data.StudyInstanceUID[i].replace(/\./g, "_")
-                + '-study" class="btn btn-success pull-right" type="button" value="0"><i class="icon-ok icon-white"></button>');
+                + '-study" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></button>');
       }
       dataToAppend.push(localDataToAppend);
     }
@@ -699,17 +702,16 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
             // modify content
             jQuery(currentButtonID).html('<i class="icon-ok icon-white">');
             var studyButtonID = '#' + studyUID.replace(/\./g, "_") + '-study';
-            if (jQuery(studyButtonID).length != 0) {
-              jQuery(studyButtonID).attr('value',
-                  +jQuery(studyButtonID).attr('value') + 1);
+            // update count
+            PACS.loadedStudiesCount[studyUID]++;
+            if (jQuery(studyButtonID).length != 0
+                && PACS.loadedStudiesCount[studyUID] == seriesData.SeriesInstanceUID.length) {
               // all series downloaded, update button!
-              if (+jQuery(studyButtonID).attr('value') == seriesData.SeriesInstanceUID.length) {
-                PACS.loadedStudiesStatus[studyUID] = 2;
-                jQuery(studyButtonID).removeClass('btn-warning').addClass(
-                    'btn-success');
-                // modify content
-                jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
-              }
+              PACS.loadedStudiesStatus[studyUID] = 2;
+              jQuery(studyButtonID).removeClass('btn-warning').addClass(
+                  'btn-success');
+              // modify content
+              jQuery(studyButtonID).html('<i class="icon-ok icon-white">');
             }
           }
         });
@@ -754,6 +756,7 @@ jQuery(document).ready(function() {
   PACS.openStudies = [];
   // store "loaded" studies
   PACS.loadedStudiesStatus = {};
+  PACS.loadedStudiesCount = {};
   PACS.loadedStudies = {};
   PACS.oTable = null;
   PACS.preview = null;
