@@ -172,16 +172,22 @@ PACS.setupPreviewSeries = function() {
             // show modal
             jQuery('#myModal').modal();
             // start ajax preview
-            PACS.ajaxPreview(studyUID, seriesUID);
+            PACS.PreviewStudy = studyUID;
+            PACS.PreviewSeries = seriesUID;
           });
+  jQuery('#myModal').on('shown', function() {
+    PACS.ajaxPreview(PACS.PreviewStudy, PACS.PreviewSeries);
+  });
   jQuery('#myModal').on('hidden', function() {
     // delete XTK stuff
     if (PACS.sliceX != null) {
+      window.console.log('Destroy slice');
       PACS.sliceX.destroy();
       delete PACS.sliceX;
       PACS.sliceX = null;
     }
     if (PACS.volume != null) {
+      window.console.log('Destroy volume');
       delete PACS.volume;
       PACS.volume = null;
     }
@@ -191,9 +197,10 @@ PACS.setupPreviewSeries = function() {
     // slider
     jQuery("#sliderZ").slider("destroy");
   });
-  jQuery("#modal-close").live('click', function(event) {
-    alert('Delete not connected to the server!');
-  });
+  /*
+   * jQuery("#modal-close").live('click', function(event) { alert('Delete not
+   * connected to the server!'); });
+   */
 }
 PACS.ajaxAll = function() {
   jQuery("#PACS_QUERY_A").live('click', function(event) {
@@ -765,6 +772,8 @@ jQuery(document).ready(function() {
   PACS.ajaxAll();
   PACS.setupDownloadSeriesFiltered();
   PACS.oTableA = null;
+  PACS.PreviewStudy = '0';
+  PACS.PreviewSeries = '0';
   // ping the server
   jQuery(".pacsPing").click(function(event) {
     PACS.ajaxPing();
