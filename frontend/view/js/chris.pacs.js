@@ -111,6 +111,7 @@ PACS.setupPreviewSeries = function() {
             var seuid = split_id[1].replace(/\_/g, ".");
             // start pulling series and update id
             // conver id from *-sep to *-sed
+            window.console.log(id);
             PACS.ajaxImage(stuid, seuid, '#' + id.substring(0, id.length - 1)
                 + 'd');
             // Top Left overlay
@@ -128,6 +129,8 @@ PACS.setupPreviewSeries = function() {
           });
   // connect the 'shown' event
   jQuery('#PMODAL').on('shown', function() {
+    window.console.log(PACS.PreviewStudy);
+    window.console.log(PACS.PreviewSeries);
     PACS.ajaxPreview(PACS.PreviewStudy, PACS.PreviewSeries);
   });
   // connect the 'hidden' event
@@ -320,7 +323,7 @@ PACS.advancedFormat = function(data, i) {
           + data[1].StudyInstanceUID[i].replace(/\./g, "_")
           + '-'
           + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-sepa"  class="btn btn-info p_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
+          + '-ap"  class="btn btn-info p_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
   /**
    * @todo check in cached data to update button as requiered
    */
@@ -329,7 +332,7 @@ PACS.advancedFormat = function(data, i) {
           + data[1].StudyInstanceUID[i].replace(/\./g, "_")
           + '-'
           + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series-ad" class="btn btn-primary d_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
+          + '-ad" class="btn btn-primary d_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
   return sub;
 }
 /**
