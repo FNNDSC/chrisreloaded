@@ -21,7 +21,7 @@ jQuery('.asearch').keypress(function(e) {
 /**
  * Format the details (series) HTML table for a study, given some data
  */
-PACS.formatHTMLDetails = function(data) {
+PACS.formatDetails = function(data) {
   // number of rows to be created
   var nb_results = data.StudyInstanceUID.length;
   var i = 0;
@@ -29,39 +29,36 @@ PACS.formatHTMLDetails = function(data) {
   // innerDetails used for slide in/out
   var content = '<div class="innerDetails"><table class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Series Desc.</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < nb_results; ++i) {
-    content += '<tr class="parent " id="'
-        + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">';
+    // replace '.' by '_' (. is invalid for the id)
+    var studyUID = data.StudyInstanceUID[i].replace(/\./g, "_");
+    var seriesUID = data.SeriesInstanceUID[i].replace(/\./g, "_");
+    var id = studyUID + '-' + seriesUID;
+    content += '<tr class="parent " id="' + seriesUID + '">';
+    // replace some illegal characters in the series description
     content += '<td>'
         + data.SeriesDescription[i].replace(/\>/g, "&gt").replace(/\</g, "&lt")
         + '</td>';
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + '</td>';
+    // sep: SEries Preview
     content += '<td class="center"><button id="'
-        + data.StudyInstanceUID[i].replace(/\./g, "_")
-        + '-'
-        + data.SeriesInstanceUID[i].replace(/\./g, "_")
-        + '-series-sp" class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
-    // need 3 cases
-    // on server!
+        + id
+        + '-sep" class="btn btn-info p_series " type="button"><i class="icon-eye-open icon-white"></i></button></td>';
+    // sed: SEries Download
+    // status == 0: data is available
     if (data.Status[i] == 0) {
       content += '<td class="center"><button id="'
-          + data.StudyInstanceUID[i].replace(/\./g, "_")
-          + '-'
-          + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series-sd" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
-      // downloading!
+          + id
+          + '-sed" class="btn btn-primary d_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button></td>';
+      // status == 1: data is downloading!
     } else if (data.Status[i] == 1) {
       content += '<td class="center"><button id="'
-          + data.StudyInstanceUID[i].replace(/\./g, "_")
-          + '-'
-          + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series-sd" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></i></button></td>';
-      // donwloaded!
+          + id
+          + '-sed" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></i></button></td>';
+      // status == 1: data has been downloaded!
     } else {
       content += '<td class="center"><button id="'
-          + data.StudyInstanceUID[i].replace(/\./g, "_")
-          + '-'
-          + data.SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-series-sd" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></i></button></td>';
+          + id
+          + '-sed" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></i></button></td>';
     }
     content += '</tr>';
   }
@@ -73,17 +70,17 @@ PACS.formatHTMLDetails = function(data) {
  * filtering in the advanced mode
  */
 PACS.setupDownloadSeriesFiltered = function() {
-  jQuery(".download_filter").live('click', function() {
-    // get visible series download button id
-    var visibleSeries = PACS.oTableA._('tr', {
+  jQuery(".d_filter").live('click', function() {
+    // get filtered data
+    var filter = PACS.oTableA._('tr', {
       "filter" : "applied"
     });
-    var visibleCount = visibleSeries.length;
+    var nb_filter = filter.length;
     var i = 0;
-    // click download button for all of them
-    for (i = 0; i < visibleCount; i++) {
-      var downloadID = visibleSeries[i][9].split(' ')[1].split('"')[1];
-      jQuery('#' + downloadID).click();
+    // get all download button ID and simulate click on it
+    for (i = 0; i < nb_filter; i++) {
+      var id = filter[i][9].split(' ')[1].split('"')[1];
+      jQuery('#' + id).click();
     }
   });
 }
@@ -91,15 +88,15 @@ PACS.setupDownloadSeriesFiltered = function() {
  * Setup the download button to download all series for a given study
  */
 PACS.setupDownloadStudy = function() {
-  jQuery(".download_study").live(
+  jQuery(".d_study").live(
       'click',
       function() {
         // replace the '_'
         var studyUID = jQuery(this).attr('id').replace(/\_/g, ".");
-        // remove the '-study' tad at the end of the id
-        studyUID = studyUID.substring(0, studyUID.length - 6)
+        // remove the '-std' tad at the end of the id
+        studyUID = studyUID.substring(0, studyUID.length - 4);
         // modify class
-        jQuery(this).removeClass('btn-primary').removeClass('download_study')
+        jQuery(this).removeClass('btn-primary').removeClass('d_study')
             .addClass('btn-warning');
         // modify content
         jQuery(this).html('<i class="icon-refresh rotating_class">');
@@ -113,12 +110,14 @@ PACS.setupDownloadStudy = function() {
  * Setup the details button to show series within a study in simple query
  */
 PACS.setupDetailStudy = function() {
-  jQuery('#quick-results td .control').live('click', function() {
+  jQuery('#S-RESULTS td .control').live('click', function() {
     // get the row
     var nTr = jQuery(this).parents('tr')[0];
     // get the related study UID
+    // replace back '_' by '.'
     var studyUID = jQuery(this).attr('id').replace(/\_/g, ".");
-    // if data has not been cached, perform ajax query, else, show it
+    // if data has not been cached, perform ajax query, else show it without
+    // ajax!
     var i = jQuery.inArray(nTr, PACS.openStudies);
     if (i == -1) {
       // get related series
@@ -132,82 +131,88 @@ PACS.setupDetailStudy = function() {
     }
   });
 }
+/**
+ * Setup the download series button
+ */
 PACS.setupDownloadSeries = function() {
-  jQuery(".download_series").live('click', function(event) {
-    var currentButtonID = jQuery(this).attr('id');
-    var currentButtonIDSplit = currentButtonID.split('-');
-    var studyUID = currentButtonIDSplit[0].replace(/\_/g, ".");
-    var seriesUID = currentButtonIDSplit[1].replace(/\_/g, ".");
-    PACS.ajaxImage(studyUID, seriesUID, '#' + currentButtonID);
+  jQuery(".d_series").live('click', function(event) {
+    var id = jQuery(this).attr('id');
+    var split_id = id.split('-');
+    var stuid = split_id[0].replace(/\_/g, ".");
+    var seuid = split_id[1].replace(/\_/g, ".");
+    PACS.ajaxImage(stuid, seuid, '#' + id);
   });
 }
+/**
+ * Setup the preview series behavior
+ */
 PACS.setupPreviewSeries = function() {
-  jQuery(".preview_series")
+  // connect the preview button
+  jQuery(".p_series")
       .live(
           'click',
           function(event) {
-            var currentButtonID = jQuery(this).attr('id');
-            var currentButtonIDSplit = currentButtonID.split('-');
-            var studyUID = currentButtonIDSplit[0].replace(/\_/g, ".");
-            var seriesUID = currentButtonIDSplit[1].replace(/\_/g, ".");
+            var id = jQuery(this).attr('id');
+            var split_id = id.split('-');
+            var stuid = split_id[0].replace(/\_/g, ".");
+            var seuid = split_id[1].replace(/\_/g, ".");
             // start pulling series and update id
-            PACS.ajaxImage(studyUID, seriesUID, '#'
-                + currentButtonID.substring(0, currentButtonID.length - 1)
+            // conver id from *-sep to *-sed
+            PACS.ajaxImage(stuid, seuid, '#' + id.substring(0, id.length - 1)
                 + 'd');
-            // overlay
-            jQuery("#loadOverlay")
+            // Top Left overlay
+            jQuery("#TL_OVER")
                 .html(
                     'Retrieving data <i class="icon-refresh icon-white rotating_class">');
-            jQuery("#loadOverlay").show();
-            jQuery("#currentSlice").html('00');
-            jQuery("#totalSlices").html('00');
+            jQuery("#TL_OVER").show();
+            jQuery("#SLICE").html('00');
+            jQuery("#SLICE_NB").html('00');
             // show modal
-            jQuery('#myModal').modal();
+            jQuery('#PMODAL').modal();
             // start ajax preview
-            PACS.PreviewStudy = studyUID;
-            PACS.PreviewSeries = seriesUID;
+            PACS.PreviewStudy = stuid;
+            PACS.PreviewSeries = seuid;
           });
-  jQuery('#myModal').on('shown', function() {
+  // connect the 'shown' event
+  jQuery('#PMODAL').on('shown', function() {
     PACS.ajaxPreview(PACS.PreviewStudy, PACS.PreviewSeries);
   });
-  jQuery('#myModal').on('hidden', function() {
+  // connect the 'hidden' event
+  jQuery('#PMODAL').on('hidden', function() {
     // delete XTK stuff
     if (PACS.sliceX != null) {
-      window.console.log('Destroy slice');
       PACS.sliceX.destroy();
       delete PACS.sliceX;
       PACS.sliceX = null;
     }
     if (PACS.volume != null) {
-      window.console.log('Destroy volume');
       delete PACS.volume;
       PACS.volume = null;
     }
-    // clean global variable
+    // clean PACS namespace
     PACS.previewReceivedData['filename'] = [];
     PACS.previewReceivedData['data'] = [];
-    // slider
-    jQuery("#sliderZ").slider("destroy");
     // reset PACS.previewStudy and Series
     PACS.PreviewStudy = '0';
     PACS.PreviewSeries = '0';
+    // destroy slider
+    jQuery("#sliderZ").slider("destroy");
   });
-  /*
-   * jQuery("#modal-close").live('click', function(event) { alert('Delete not
-   * connected to the server!'); });
-   */
 }
+/**
+ * 
+ */
 PACS.ajaxAll = function() {
   jQuery("#A_SEARCH").live('click', function(event) {
     var currentButton = jQuery(this);
     currentButton.removeClass('btn-primary').addClass('btn-warning');
     // modify content
     currentButton.html('<i class="icon-refresh rotating_class">');
-    if (jQuery('#advanced-results').length != 0) {
+    if (jQuery('#A-RESULTS').length != 0) {
       // destroy the table
       PACS.oTableA.dataTable().fnDestroy();
       PACS.oTableA = null;
-      jQuery('#advanced-results').remove();
+      jQuery('#A-RESULTS').remove();
     }
     var mrns = jQuery("#PACS_MRN_A").val().split(' ');
     var mrnscount = mrns.length;
@@ -250,8 +255,8 @@ PACS.ajaxAll = function() {
 PACS.ajaxAllResults = function(data) {
   if (data[0] != null) {
     // if no table, create it
-    if (jQuery('#advanced-results').length == 0) {
-      var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="advanced-results">';
+    if (jQuery('#A-RESULTS').length == 0) {
+      var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="A-RESULTS">';
       var numSeries = data[1].SeriesDescription.length;
       var i = 0;
       content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>files</th><th></th><th></th></tr></thead><tbody>';
@@ -259,10 +264,10 @@ PACS.ajaxAllResults = function(data) {
       // update html with table
       jQuery('#results_container_a').html(content);
       // make table sortable, filterable, ...
-      PACS.oTableA = jQuery('#advanced-results')
+      PACS.oTableA = jQuery('#A-RESULTS')
           .dataTable(
               {
-                "sDom" : "<'row-fluid'<'span6'l><'span6' <'download_filter'> f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+                "sDom" : "<'row-fluid'<'span6'l><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'i><'span6'p>>",
                 "sPaginationType" : "bootstrap",
                 "oLanguage" : {
                   "sLengthMenu" : "_MENU_ studies per page"
@@ -276,7 +281,7 @@ PACS.ajaxAllResults = function(data) {
                 } ],
                 "aaSorting" : [ [ 1, 'desc' ] ],
               });
-      jQuery(".download_filter")
+      jQuery(".d_filter")
           .html(
               '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
     }
@@ -336,7 +341,7 @@ PACS.ajaxAllResults = function(data) {
               + data[1].StudyInstanceUID[i].replace(/\./g, "_")
               + '-'
               + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
-              + '-series-ap"  class="btn btn-info preview_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
+              + '-sepa"  class="btn btn-info p_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
       /**
        * @todo check in cached data to update button as requiered
        */
@@ -345,11 +350,11 @@ PACS.ajaxAllResults = function(data) {
               + data[1].StudyInstanceUID[i].replace(/\./g, "_")
               + '-'
               + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
-              + '-series-ad" class="btn btn-primary download_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
+              + '-series-ad" class="btn btn-primary d_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
       dataToAppend.push(innerArray);
     }
     // add table to current table
-    jQuery('#advanced-results').dataTable().fnAddData(dataToAppend);
+    jQuery('#A-RESULTS').dataTable().fnAddData(dataToAppend);
   } else {
     // no studies found and not doing multiple mrns
     if (PACS.oTableA == null) {
@@ -363,11 +368,11 @@ PACS.ajaxStudy = function() {
     currentButton.removeClass('btn-primary').addClass('btn-warning');
     // modify content
     currentButton.html('<i class="icon-refresh rotating_class">');
-    if (jQuery('#quick-results').length != 0) {
+    if (jQuery('#S-RESULTS').length != 0) {
       // destroy the table
       PACS.oTable.dataTable().fnDestroy();
       PACS.oTable = null;
-      jQuery('#quick-results').remove();
+      jQuery('#S-RESULTS').remove();
     }
     var mrns = jQuery("#PACS_MRN").val().split(' ');
     var mrnscount = mrns.length;
@@ -412,13 +417,13 @@ PACS.ajaxStudyResults = function(data) {
   // if ajax returns something, process it
   if (data != null) {
     // if no table, create it
-    if (jQuery('#quick-results').length == 0) {
-      var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="quick-results">';
+    if (jQuery('#S-RESULTS').length == 0) {
+      var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
       content += '<thead><tr><th></th><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th></th></tr></thead><tbody>';
       content += '</tbody></table>';
       jQuery('#results_container').html(content);
       // make table sortable, filterable, ...
-      PACS.oTable = jQuery('#quick-results')
+      PACS.oTable = jQuery('#S-RESULTS')
           .dataTable(
               {
                 "sDom" : "<'row-fluid'<'span6'l><'span6'f>r>t<'row-fluid'<'span6'i><'span6'p>>",
@@ -462,21 +467,21 @@ PACS.ajaxStudyResults = function(data) {
         localDataToAppend
             .push('<button  id="'
                 + data.StudyInstanceUID[i].replace(/\./g, "_")
-                + '-study" class="btn btn-primary download_study pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
+                + '-std" class="btn btn-primary d_study pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
       } else if (status == 1) {
         localDataToAppend
             .push('<button  id="'
                 + data.StudyInstanceUID[i].replace(/\./g, "_")
-                + '-study" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></button>');
+                + '-std" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></button>');
       } else if (status == 2) {
         localDataToAppend
             .push('<button  id="'
                 + data.StudyInstanceUID[i].replace(/\./g, "_")
-                + '-study" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></button>');
+                + '-std" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></button>');
       }
       dataToAppend.push(localDataToAppend);
     }
-    jQuery('#quick-results').dataTable().fnAddData(dataToAppend);
+    jQuery('#S-RESULTS').dataTable().fnAddData(dataToAppend);
   } else {
     // no studies found and not doing multiple mrns
     if (PACS.oTable == null) {
@@ -543,7 +548,7 @@ PACS.ajaxSeries = function(studyUID, nTr) {
 PACS.ajaxSeriesResults = function(data, nTr) {
   // format the details row table
   if (nTr != null) {
-    var nDetailsRow = PACS.oTable.fnOpen(nTr, PACS.formatHTMLDetails(data),
+    var nDetailsRow = PACS.oTable.fnOpen(nTr, PACS.formatDetails(data),
         'details');
     // create dataTable from html table
     jQuery('.table', nDetailsRow).dataTable({
@@ -567,7 +572,7 @@ PACS.ajaxSeriesResults = function(data, nTr) {
     for (i = 0; i < nb_results; ++i) {
       if (data.Status[i] == 0) {
         var buttonID = '#' + data.StudyInstanceUID[i].replace(/\./g, "_") + '-'
-            + data.SeriesInstanceUID[i].replace(/\./g, "_") + '-series-sd';
+            + data.SeriesInstanceUID[i].replace(/\./g, "_") + '-sed';
         PACS.ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i],
             buttonID);
       }
@@ -576,15 +581,15 @@ PACS.ajaxSeriesResults = function(data, nTr) {
   // query server for protocol name
   // not working
   /*
-   * var nb_results = data2.StudyInstanceUID.length; var j = 0; for (j = 0;
-   * j < nb_results; ++j) { jQuery .ajax({ type : "POST", async : false,
-   * url : "controller/S_SEARCH.php", dataType : "json", data : { USER_AET :
-   * jQuery( "#USER_AET") .val(), SERVER_IP : jQuery( "#SERVER_IP") .val(),
-   * SERVER_POR : jQuery( "#SERVER_POR") .val(), PACS_LEV : 'IMAGE',
-   * PACS_STU_UID : data2.StudyInstanceUID[j], PACS_SER_UID :
-   * data2.SeriesInstanceUID[j] }, success : function( data3) { var idseries =
-   * '#series-' + data3.SeriesInstanceUID[0] .replace( /\./g, "_");
-   * jQuery(idseries) .text( data3.ProtocolName[0]); } }); }
+   * var nb_results = data2.StudyInstanceUID.length; var j = 0; for (j = 0; j <
+   * nb_results; ++j) { jQuery .ajax({ type : "POST", async : false, url :
+   * "controller/S_SEARCH.php", dataType : "json", data : { USER_AET : jQuery(
+   * "#USER_AET") .val(), SERVER_IP : jQuery( "#SERVER_IP") .val(), SERVER_POR :
+   * jQuery( "#SERVER_POR") .val(), PACS_LEV : 'IMAGE', PACS_STU_UID :
+   * data2.StudyInstanceUID[j], PACS_SER_UID : data2.SeriesInstanceUID[j] },
+   * success : function( data3) { var idseries = '#series-' +
+   * data3.SeriesInstanceUID[0] .replace( /\./g, "_"); jQuery(idseries) .text(
+   * data3.ProtocolName[0]); } }); }
    */
 }
 PACS.ajaxPreview = function(studyUID, seriesUID) {
@@ -607,7 +612,7 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
       if (data && data.filename.length > 0) {
         // modal label
         jQuery('#myModalLabel').html(description);
-        jQuery("#loadOverlay").html('Creating XTK visualization...');
+        jQuery("#TL_OVER").html('Creating XTK visualization...');
         // set XTK renderer
         PACS.volume = new X.volume();
         PACS.volume.file = 'http://chris/data/' + data.filename[0];
@@ -620,7 +625,7 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
         PACS.sliceX.onShowtime = function() {
           var dim = PACS.volume.dimensions;
           // hide overlay
-          jQuery("#loadOverlay").hide();
+          jQuery("#TL_OVER").hide();
           // init slider
           jQuery("#sliderZ").slider({
             min : 1,
@@ -628,16 +633,16 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
             value : Math.round(PACS.volume.indexZ + 1),
             slide : function(event, ui) {
               PACS.volume.indexZ = ui.value - 1;
-              jQuery("#currentSlice").html(ui.value);
+              jQuery("#SLICE").html(ui.value);
             }
           });
           PACS.sliceX.onScroll = function() {
             jQuery('#sliderZ').slider("option", "value",
                 Math.round(PACS.volume.indexZ + 1));
-            jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
+            jQuery("#SLICE").html(Math.round(PACS.volume.indexZ + 1));
           };
-          jQuery("#currentSlice").html(Math.round(PACS.volume.indexZ + 1));
-          jQuery("#totalSlices").html(dim[2]);
+          jQuery("#SLICE").html(Math.round(PACS.volume.indexZ + 1));
+          jQuery("#SLICE_NB").html(dim[2]);
         }
       } else {
         // if modal visible, callback
@@ -660,8 +665,8 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
     // wait button
     // if series already or is being downloaded (preview use case)
     // modify class
-    jQuery(currentButtonID).removeClass('btn-primary').removeClass(
-        'download_series').addClass('btn-warning');
+    jQuery(currentButtonID).removeClass('btn-primary').removeClass('d_series')
+        .addClass('btn-warning');
     // modify content
     jQuery(currentButtonID).html('<i class="icon-refresh rotating_class">');
     var userAET = jQuery('#USER_AET').attr('value');
@@ -694,7 +699,7 @@ PACS.ajaxImage = function(studyUID, seriesUID, currentButtonID) {
                 'btn-success');
             // modify content
             jQuery(currentButtonID).html('<i class="icon-ok icon-white">');
-            var studyButtonID = '#' + studyUID.replace(/\./g, "_") + '-study';
+            var studyButtonID = '#' + studyUID.replace(/\./g, "_") + '-std';
             // update count
             PACS.loadedStudiesCount[studyUID]++;
             if (jQuery(studyButtonID).length != 0

@@ -78,7 +78,7 @@ table.dataTable th:active {
 	margin-right: auto;
 }
 
-#sliderZOverlay {
+#BR_OVER {
 	position: absolute;
 	color: white;
 	bottom: 0px;
@@ -86,7 +86,7 @@ table.dataTable th:active {
 	padding: 2px;
 }
 
-#loadOverlay {
+#TL_OVER {
 	background-color: #000;
 	position: absolute;
 	color: white;
