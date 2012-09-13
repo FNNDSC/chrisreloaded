@@ -8,7 +8,7 @@ function blinking(elm) {
     });
   }
 }
-$(document).ready(function() {
+jQuery(document).ready(function() {
   jQuery('.dropdown-toggle').dropdown();
   jQuery("[rel=bottom_tooltip]").tooltip({
     placement : 'bottom'
@@ -17,14 +17,14 @@ $(document).ready(function() {
     placement : 'right'
   });
   jQuery('#pacs_pull_mrns').focus(function() {
-    $(this).animate({
+    jQuery(this).animate({
       height : '80px'
     }, 200);
     jQuery('#pacs_pull_ui').show();
   });
   jQuery('#pacs_pull_mrns').blur(function() {
-    if ($('#pacs_pull_mrns').val() == '') {
-      $('#pacs_pull_mrns').animate({
+    if (jQuery('#pacs_pull_mrns').val() == '') {
+      jQuery('#pacs_pull_mrns').animate({
         height : '19px'
       }, 200);
       jQuery('#pacs_pull_ui').hide();
@@ -32,13 +32,13 @@ $(document).ready(function() {
   });
   jQuery("#pacs_pull").click(function(event) {
     // if not already querying the pacs
-    if (!$("#pacs_pull_mrns").prop("readonly")) {
-      var mrn_list = $('#pacs_pull_mrns').val();
-      $("#pacs_pull_mrns").prop("readonly", "readonly");
-      $("#pacs_pull_advanced").prop("readonly", "readonly");
-      $(this).text('Pulling...');
-      blinking($(this));
-      $.ajax({
+    if (!jQuery("#pacs_pull_mrns").prop("readonly")) {
+      var mrn_list = jQuery('#pacs_pull_mrns').val();
+      jQuery("#pacs_pull_mrns").prop("readonly", "readonly");
+      jQuery("#pacs_pull_advanced").prop("readonly", "readonly");
+      jQuery(this).text('Pulling...');
+      blinking(jQuery(this));
+      jQuery.ajax({
         type : "POST",
         url : "controller/pacs_move.php",
         dataType : "json",
@@ -57,11 +57,11 @@ $(document).ready(function() {
         },
         success : function(data) {
           clearInterval(timer);
-          $("#pacs_pull").text('Pull');
-          $("#pacs_pull_mrns").removeProp("readonly");
-          $("#pacs_pull_advanced").removeProp("readonly");
-          $('#pacs_pull_mrns').val('');
-          $('#pacs_pull_mrns').animate({
+          jQuery("#pacs_pull").text('Pull');
+          jQuery("#pacs_pull_mrns").removeProp("readonly");
+          jQuery("#pacs_pull_advanced").removeProp("readonly");
+          jQuery('#pacs_pull_mrns').val('');
+          jQuery('#pacs_pull_mrns').animate({
             height : '19px'
           }, 200);
           jQuery('#pacs_pull_ui').hide();
@@ -71,15 +71,15 @@ $(document).ready(function() {
   });
   
   jQuery("#cart").click(function(event) {
-    if ($("#cartdiv").is(":visible")) {
-      $("#cartdiv").hide('blind');
-      blinking($("#cart"));
+    if (jQuery("#cartdiv").is(":visible")) {
+      jQuery("#cartdiv").hide('blind');
+      blinking(jQuery("#cart"));
     } else {
-      $("#cartdiv").show('blind');
+      jQuery("#cartdiv").show('blind');
       clearInterval(timer);
     }
   });
   jQuery("#cartdiv").hide();
-  /*blinking($("#cart"));*/
-  // blinking($("#submit"));
+  /*blinking(jQuery("#cart"));*/
+  // blinking(jQuery("#submit"));
 });
