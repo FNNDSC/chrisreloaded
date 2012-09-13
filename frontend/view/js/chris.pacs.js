@@ -745,7 +745,6 @@ PACS.ajaxPing = function() {
 }
 /**
  * 
- * @param data
  */
 PACS.ajaxPingResults = function(data) {
   var pingResult = '';
@@ -760,32 +759,45 @@ PACS.ajaxPingResults = function(data) {
  * 
  */
 jQuery(document).ready(function() {
-  // store "opened" studies
-  PACS.openStudies = [];
-  // store "loaded" studies
+  //
+  // caching variables
+  //
   PACS.cacheStatus = {};
   PACS.cacheCount = {};
   PACS.cache = {};
-  // simple table
+  //
+  // simple mode
+  //
   PACS.sTable = null;
+  PACS.openStudies = [];
+  PACS.setupDetailStudy();
+  PACS.setupDownloadStudy();
+  PACS.ajaxSimple();
+  //
+  // advanced mode
+  //
+  PACS.aTable = null;
+  PACS.ajaxAdvanced();
+  PACS.setupDownloadSeriesFiltered();
+  //
+  // both modes
+  //
+  // preview - do not need all that but ready for DICOM support!
   PACS.previewReceivedData = [];
   PACS.previewReceivedData['filename'] = [];
   PACS.previewReceivedData['data'] = [];
-  // search button pushed
-  PACS.ajaxSimple();
-  PACS.setupDetailStudy();
-  PACS.setupDownloadStudy();
-  PACS.setupDownloadSeries();
+  // convenience variables
+  PACS.PreviewStudy = '0';
+  PACS.PreviewSeries = '0';
+  // XTK variables
   PACS.sliceX = null;
   PACS.volume = null;
   PACS.setupPreviewSeries();
-  // advanced mode
-  PACS.ajaxAdvanced();
-  PACS.setupDownloadSeriesFiltered();
-  // advanced table
-  PACS.aTable = null;
-  PACS.PreviewStudy = '0';
-  PACS.PreviewSeries = '0';
+  // search button pushed
+  PACS.setupDownloadSeries();
+  //
+  // settings
+  //
   // ping the server
   jQuery(".pacsPing").click(function(event) {
     PACS.ajaxPing();

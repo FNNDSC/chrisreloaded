@@ -10,7 +10,6 @@
 
  <div class="container"
   style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
-
   <div id="PMODAL" class="modal hide fade" tabindex="-1" role="dialog"
    aria-labelledby="myModalLabel" aria-hidden="true">
    <div class="modal-header">
@@ -31,15 +30,9 @@
      </div>
     </div>
    </div>
-   <div class="modal-footer">
-    <!--     <button id='modal-close' class="btn btn-danger" data-dismiss="modal">Delete</button>
-    <button id='modal-download' class="btn btn-success"
-     data-dismiss="modal">Keep</button> -->
-   </div>
+   <div class="modal-footer"></div>
   </div>
-
   <div class="tabbable well">
-   <!-- Only required for left/right tabs -->
    <ul class="nav nav-tabs">
     <li class="active"><a href="#tab0" data-toggle="tab">Simple</a></li>
     <li><a href="#tab1" data-toggle="tab">Advanced</a></li>
@@ -61,7 +54,6 @@
           placeholder="Modality" value='MR'>
          <button id='S_SEARCH' class='btn btn-primary' type="button">Search</button>
         </form>
-
        </div>
       </div>
      </div>
@@ -74,22 +66,19 @@
       </div>
      </div>
     </div>
-
     <div class="tab-pane" id="tab1">
      <div class='row-fluid'>
       <div class='span12'>
        <div class='well'>
         <h2>Advanced Parameters</h2>
         <form class="form-inline">
-         <input id='PACS_MRN_A' type="text"
-          class="input-small asearch" placeholder="MRN" value=''>
-         <input id='PACS_NAM_A' type="text"
-          class="input-small asearch" placeholder="Name"
+         <input id='PACS_MRN_A' type="text" class="input-small asearch"
+          placeholder="MRN" value=''> <input id='PACS_NAM_A'
+          type="text" class="input-small asearch" placeholder="Name"
           value=''> <input id='PACS_DAT_A' type="text"
-          class="input-small asearch" placeholder="Study Date"
-          value=''> <input id='PACS_MOD_A' type="text"
-          class="input-small asearch" placeholder="Modality"
-          value='MR'>
+          class="input-small asearch" placeholder="Study Date" value=''>
+         <input id='PACS_MOD_A' type="text" class="input-small asearch"
+          placeholder="Modality" value='MR'>
          <button id='A_SEARCH' class='btn btn-primary' type="button">Search</button>
         </form>
        </div>
@@ -104,9 +93,7 @@
       </div>
      </div>
     </div>
-
     <div class="tab-pane" id="tab2">
-
      <div class='span5 well'>
       <h1>Client Information</h1>
       AET Title: <input id='USER_AET' type="text"
