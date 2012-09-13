@@ -196,6 +196,9 @@ PACS.setupPreviewSeries = function() {
     PACS.previewReceivedData['data'] = [];
     // slider
     jQuery("#sliderZ").slider("destroy");
+    // reset PACS.previewStudy and Series
+    PACS.PreviewStudy = '0';
+    PACS.PreviewSeries = '0';
   });
   /*
    * jQuery("#modal-close").live('click', function(event) { alert('Delete not
@@ -646,11 +649,11 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
         }
       } else {
         // if modal visible, callback
-        // if (!jQuery('#myModal').is('hidden')) {
-        setTimeout(function() {
-          PACS.ajaxPreview(localStudy, localSeries)
-        }, 1000);
-        // }
+        if (PACS.PreviewStudy != '0' && PACS.PreviewSeries != '0') {
+          setTimeout(function() {
+            PACS.ajaxPreview(localStudy, localSeries)
+          }, 1000);
+        }
       }
     }
   });
