@@ -41,7 +41,7 @@
   <div class="tabbable well">
    <!-- Only required for left/right tabs -->
    <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab0" data-toggle="tab">Quick</a></li>
+    <li class="active"><a href="#tab0" data-toggle="tab">Simple</a></li>
     <li><a href="#tab1" data-toggle="tab">Advanced</a></li>
     <li><a href="#tab2" data-toggle="tab">Settings</a></li>
    </ul>
@@ -52,16 +52,14 @@
        <div class='well'>
         <h2>Parameters</h2>
         <form class="form-inline">
-         <input id='PACS_MRN' type="text"
-          class="input-small simple_search" placeholder="MRN" value=''>
-         <input id='PACS_NAM' type="text"
-          class="input-small simple_search" placeholder="Name" value=''>
-         <input id='PACS_DAT' type="text"
-          class="input-small simple_search" placeholder="Study Date"
-          value=''> <input id='PACS_MOD' type="text"
-          class="input-small simple_search" placeholder="Modality"
-          value='MR'>
-         <button id='PACS_QUERY' class='btn btn-primary' type="button">Search</button>
+         <input id='PACS_MRN' type="text" class="input-small ssearch"
+          placeholder="MRN" value=''> <input id='PACS_NAM'
+          type="text" class="input-small ssearch" placeholder="Name"
+          value=''> <input id='PACS_DAT' type="text"
+          class="input-small ssearch" placeholder="Study Date" value=''>
+         <input id='PACS_MOD' type="text" class="input-small ssearch"
+          placeholder="Modality" value='MR'>
+         <button id='S_SEARCH' class='btn btn-primary' type="button">Search</button>
         </form>
 
        </div>
@@ -84,15 +82,15 @@
         <h2>Advanced Parameters</h2>
         <form class="form-inline">
          <input id='PACS_MRN_A' type="text"
-          class="input-small advanced_search" placeholder="MRN" value=''>
+          class="input-small asearch" placeholder="MRN" value=''>
          <input id='PACS_NAM_A' type="text"
-          class="input-small advanced_search" placeholder="Name" value=''>
-         <input id='PACS_DAT_A' type="text"
-          class="input-small advanced_search" placeholder="Study Date"
+          class="input-small asearch" placeholder="Name"
+          value=''> <input id='PACS_DAT_A' type="text"
+          class="input-small asearch" placeholder="Study Date"
           value=''> <input id='PACS_MOD_A' type="text"
-          class="input-small advanced_search" placeholder="Modality"
+          class="input-small asearch" placeholder="Modality"
           value='MR'>
-         <button id='PACS_QUERY_A' class='btn btn-primary' type="button">Search</button>
+         <button id='A_SEARCH' class='btn btn-primary' type="button">Search</button>
         </form>
        </div>
       </div>

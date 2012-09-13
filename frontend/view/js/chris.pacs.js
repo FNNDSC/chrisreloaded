@@ -1,11 +1,3 @@
-goog.require('X.renderer2D');
-goog.require('X.renderer3D');
-goog.require('X.fibers');
-goog.require('X.mesh');
-goog.require('X.volume');
-goog.require('X.cube');
-goog.require('X.sphere');
-goog.require('X.cylinder');
 /**
  * Define the PACS namespace
  */
@@ -13,31 +5,31 @@ var PACS = PACS || {};
 /**
  * Bind the simple search input field to the simple search button
  */
-jQuery('.simple_search').keypress(function(e) {
+jQuery('.ssearch').keypress(function(e) {
   if (e.which == 13) {
-    jQuery('#PACS_QUERY').click();
+    jQuery('#S_SEARCH').click();
   }
 });
 /**
  * Bind the advanced search input field to the advanced search button
  */
-jQuery('.advanced_search').keypress(function(e) {
+jQuery('.asearch').keypress(function(e) {
   if (e.which == 13) {
-    jQuery('#PACS_QUERY_A').click();
+    jQuery('#A_SEARCH').click();
   }
 });
 /**
- * Format the details HTML table for a study, given some data
+ * Format the details (series) HTML table for a study, given some data
  */
 PACS.formatHTMLDetails = function(data) {
   // number of rows to be created
-  var numberOfResults = data.StudyInstanceUID.length;
+  var nb_results = data.StudyInstanceUID.length;
   var i = 0;
-  // set details table id to the study ID
-  // replace '.' (invalid id character) by '_'
+  // Create the "details" (i.e. series) html content
+  // innerDetails used for slide in/out
   var content = '<div class="innerDetails"><table class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Series Desc.</th><th class="span2"># files</th><th class="span1"></th><th class="span1"></th></tr></thead><tbody>';
-  for (i = 0; i < numberOfResults; ++i) {
-    content += '<tr class="parent pacsStudyRows" id="'
+  for (i = 0; i < nb_results; ++i) {
+    content += '<tr class="parent " id="'
         + data.SeriesInstanceUID[i].replace(/\./g, "_") + '">';
     content += '<td>'
         + data.SeriesDescription[i].replace(/\>/g, "&gt").replace(/\</g, "&lt")
@@ -206,7 +198,7 @@ PACS.setupPreviewSeries = function() {
    */
 }
 PACS.ajaxAll = function() {
-  jQuery("#PACS_QUERY_A").live('click', function(event) {
+  jQuery("#A_SEARCH").live('click', function(event) {
     var currentButton = jQuery(this);
     currentButton.removeClass('btn-primary').addClass('btn-warning');
     // modify content
@@ -366,7 +358,7 @@ PACS.ajaxAllResults = function(data) {
   }
 }
 PACS.ajaxStudy = function() {
-  jQuery("#PACS_QUERY").live('click', function(event) {
+  jQuery("#S_SEARCH").live('click', function(event) {
     var currentButton = jQuery(this);
     currentButton.removeClass('btn-primary').addClass('btn-warning');
     // modify content
@@ -570,9 +562,9 @@ PACS.ajaxSeriesResults = function(data, nTr) {
     // loop through all series and download the one which are not
     // downloaded
     // and not downloading
-    var numberOfResults = data.StudyInstanceUID.length;
+    var nb_results = data.StudyInstanceUID.length;
     var i = 0;
-    for (i = 0; i < numberOfResults; ++i) {
+    for (i = 0; i < nb_results; ++i) {
       if (data.Status[i] == 0) {
         var buttonID = '#' + data.StudyInstanceUID[i].replace(/\./g, "_") + '-'
             + data.SeriesInstanceUID[i].replace(/\./g, "_") + '-series-sd';
@@ -584,9 +576,9 @@ PACS.ajaxSeriesResults = function(data, nTr) {
   // query server for protocol name
   // not working
   /*
-   * var numberOfResults = data2.StudyInstanceUID.length; var j = 0; for (j = 0;
-   * j < numberOfResults; ++j) { jQuery .ajax({ type : "POST", async : false,
-   * url : "controller/pacs_query.php", dataType : "json", data : { USER_AET :
+   * var nb_results = data2.StudyInstanceUID.length; var j = 0; for (j = 0;
+   * j < nb_results; ++j) { jQuery .ajax({ type : "POST", async : false,
+   * url : "controller/S_SEARCH.php", dataType : "json", data : { USER_AET :
    * jQuery( "#USER_AET") .val(), SERVER_IP : jQuery( "#SERVER_IP") .val(),
    * SERVER_POR : jQuery( "#SERVER_POR") .val(), PACS_LEV : 'IMAGE',
    * PACS_STU_UID : data2.StudyInstanceUID[j], PACS_SER_UID :
