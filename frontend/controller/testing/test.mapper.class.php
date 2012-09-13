@@ -160,7 +160,7 @@ class TestMapperClass extends UnitTestCase {
   /**
    * Test the get method.
    */
-  //! [testget()]
+  //! [testGet()]
   public function testGet() {
     // get a patient by id
     $patientObject = new Patient();
@@ -198,24 +198,24 @@ class TestMapperClass extends UnitTestCase {
     $this->assertTrue(count($patientResult3['Patient']) == 6);
   }
 
-  //! [testget()]
+  //! [testGet()]
 
   /**
    * Test the get static method.
    */
-  //! [testgetstatic()]
+  //! [testGetStatic()]
   public function testGetStatic() {
     $patientResult = Mapper::getStatic('Patient');
 
     $patientResult2 = Mapper::getStatic('Patient', 2);
   }
 
-  //! [testgetstatic()]
+  //! [testGetStatic()]
    
   /**
    * Test the add method.
    */
-  //! [testadd()]
+  //! [testAdd()]
   public function testAdd() {
     // get a patient by id
     $patientObject = new Patient();
@@ -239,12 +239,12 @@ class TestMapperClass extends UnitTestCase {
     Mapper::delete('Patient', $patientID);
   }
 
-  //! [testadd()]
+  //! [testAdd()]
 
   /**
    * Test the delete method.
    */
-  //! [testdelete()]
+  //! [testDelete()]
   public function testDelete() {
     // get a patient by id
     $patientObject = new Patient();
@@ -262,12 +262,12 @@ class TestMapperClass extends UnitTestCase {
     // IDs should be the same: nothing added
     $this->assertTrue(empty($result['Patient']));
   }
-  //! [testdelete()]
+  //! [testDelete()]
 
   /**
    * Test the delete method.
    */
-  //! [testupdate()]
+  //! [testUpdate()]
   public function testUpdate() {
     // get a patient by id
     $patientObject = new Patient();
@@ -305,6 +305,6 @@ class TestMapperClass extends UnitTestCase {
     // clean the DB
     Mapper::delete('Patient', $patientID);
   }
-  //! [testupdate()]
+  //! [testUpdate()]
 }
 ?>

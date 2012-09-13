@@ -43,14 +43,14 @@ class Group_Project extends Object {
   /**
    * The group ID.
    *
-   * @var int
+   * @var int $group_id
    */
   public $group_id = -1;
   
   /**
    * The project ID.
    *
-   * @var int
+   * @var int $project_id
    */
   public $project_id = -1;
 }

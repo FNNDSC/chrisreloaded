@@ -44,28 +44,28 @@ class Patient extends Object {
    * The name of this patient following the dicom convention.
    * LASTNAME^FIRSTNAME^MIDDLENAME
    *
-   * @var string
+   * @var string $name
    */
   public $name = null;
 
   /**
    * The date of birth of this patient.
    *
-   * @var string
+   * @var string $dob
    */
   public $dob = null;
 
   /**
    * The sex of this patient (M|F).
    *
-   * @var string
+   * @var string $sex
    */
   public $sex = null;
 
   /**
    * The patient_id of this patient. This is also known as the MRN.
    *
-   * @var string
+   * @var string $patient_id
    */
   public $patient_id = null;
 

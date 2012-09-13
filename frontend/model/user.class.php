@@ -43,21 +43,21 @@ class User extends Object {
   /**
    * The user name.
    *
-   * @var string
+   * @var string $username
    */
   public $username = null;
 
   /**
    * The encrypted password.
    *
-   * @var string
+   * @var string $password
    */
   public $password = null;
   
   /**
    * The email of the user.
    *
-   * @var string
+   * @var string $email
    */
   public $email = null;
   
@@ -65,7 +65,7 @@ class User extends Object {
    * Extra information about the user.
    * background, privacy settings, etc.
    *
-   * @var string
+   * @var string $meta_information
    */
   public $meta_information = null;
 }

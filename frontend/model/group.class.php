@@ -43,7 +43,7 @@ class Group extends Object {
   /**
    * The name of the group.
    *
-   * @var string
+   * @var string $name
    */
   public $name = null;
 
@@ -51,7 +51,7 @@ class Group extends Object {
    * The meta_information for the group
    * Description of the group, etc.
    *
-   * @var string
+   * @var string $meta_information
    */
   public $meta_information = null;
 }

@@ -43,7 +43,7 @@ class Result extends Object {
   /**
    * The plugin of this result.
    *
-   * @var string
+   * @var string $plugin
    */
   public $plugin = null;
   
@@ -51,7 +51,7 @@ class Result extends Object {
    * The status of this result
    * success, failure, progress:50, progress:70
    *
-   * @var string
+   * @var string $status
    */
   public $status = null;
   
@@ -59,7 +59,7 @@ class Result extends Object {
    * The extra information about this result.
    * Parameters values, duration
    *
-   * @var string
+   * @var string $meta_information
    */
   public $meta_information = null;
 }

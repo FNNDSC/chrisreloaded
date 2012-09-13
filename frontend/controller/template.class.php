@@ -42,14 +42,14 @@ class Template {
   /**
    * The template name.
    *
-   * @var string
+   * @var string $name
    */
   private $name = '';
 
   /**
    * The template content after replacing tags.
    *
-   * @var string
+   * @var string $content
    */
   private $content = '';
 

@@ -41,14 +41,14 @@ class DB {
    *
    * The instance reference for the singleton pattern.
    *
-   * @var DB
+   * @var DB $instance
    */
   private static $instance = null;
 
   /**
    * The link to the MySQL database.
    *
-   * @var mysqli|null
+   * @var mysqli|null $link
    */
   private $link = null;
 

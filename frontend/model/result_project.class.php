@@ -43,14 +43,14 @@ class Result_Project extends Object {
   /**
    * The result id
    *
-   * @var int
+   * @var int $result_id
    */
   public $result_id = -1;
   
   /**
    * The project id
    *
-   * @var int
+   * @var int $project_id
    */
   public $project_id = -1;
 

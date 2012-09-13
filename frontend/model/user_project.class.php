@@ -43,14 +43,14 @@ class User_Project extends Object {
   /**
    * The user id.
    *
-   * @var int
+   * @var int $user_id
    */
   public $user_id = -1;
 
   /**
    * The project id.
    *
-   * @var int
+   * @var int $project_id
    */
   public $project_id = -1;
 }

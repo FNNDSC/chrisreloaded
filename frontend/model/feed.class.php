@@ -43,28 +43,28 @@ class Feed extends Object {
   /**
    * The user_id who owns this feed.
    *
-   * @var int
+   * @var int $user_id
    */
   public $user_id = -1;
 
   /**
    * The action which describes the feed
    *
-   * @var string
+   * @var string $action
    */
   public $action = null;
 
   /**
    * The model the feed is related to.
    *
-   * @var string
+   * @var string $model
    */
   public $model = null;
 
   /**
    * The model id the feed is related to.
    *
-   * @var int
+   * @var int $model_id
    */
   public $model_id = -1;
 
@@ -72,7 +72,7 @@ class Feed extends Object {
    * The status of the feed: 0-100
    * -1: failure
    *
-   * @var int
+   * @var int $status
    */
   public $status = 0;
 

@@ -43,14 +43,14 @@ class Group_Result extends Object {
   /**
    * The group ID.
    *
-   * @var int
+   * @var int $group_id
    */
   public $group_id = -1;
   
   /**
    * The result ID.
    *
-   * @var int
+   * @var int $result_id
    */
   public $result_id = -1;
 }

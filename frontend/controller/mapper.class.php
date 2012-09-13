@@ -103,7 +103,7 @@ class Mapper {
    * If input is an object, get its name.
    * We make it staic to call it from "add", "delete" and "update"
    *
-   * @param[in] string() $objects
+   * @param[in] string $object
    *
    * @return string Name of the input object
    *
@@ -480,7 +480,8 @@ class Mapper {
   /**
    * Update object in database. Update all fields but the "id"
    *
-   * @param[in] Object $object Object to be adMapperded in the database.
+   * @param[in] Object $object Object to be updated in the database.
+   * @param[in] int $objectid ID of the object to be updated.
    * @return in ID of the object. Retuns "0" if object didnt exists.
    *
    * @snippet test.mapper.class.php testUpdate()

@@ -43,14 +43,14 @@ class Data_Project extends Object {
   /**
    * The data ID.
    *
-   * @var int
+   * @var int $data_id
    */
   public $data_id = -1;
 
   /**
    * The project ID.
    *
-   * @var int
+   * @var int $project_id
    */
   public $project_id = null;
 }
