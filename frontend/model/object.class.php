@@ -37,20 +37,20 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
  */
 class Object {
 
+  public $id = -1;
+
+  public function __construct() {
+  }
+
   /**
    * Represent this entity as a string.
    *
    * @return A string representation of this entity.
    */
 
-  public $id = -1;
-
-  public function __construct() {
-  }
-
   public function __toString() {
     $objectname = get_class($this);
-    
+
     $output = $objectname."\n";
 
     // make a fancy line (======)
