@@ -1,3 +1,9 @@
+/**
+* Adapted from the amazing http://datatables.net/media/blog/bootstrap_2/DT_bootstrap.css
+* http://datatables.net/blog/Twitter_Bootstrap_2
+* DataTables designed and created by SpryMedia © 2008-2012
+* DataTables is dual licensed under the GPL v2 license or a BSD (3-point) license. 
+*/
 div.dataTables_length label {
 	float: left;
 	text-align: left;
@@ -66,10 +72,10 @@ table.dataTable th:active {
 }
 
 #sliderZContainer {
-  width: 370px;
-  height: 15px;
-  margin-left: auto;
-  margin-right: auto;
+	width: 370px;
+	height: 15px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 #sliderZ {

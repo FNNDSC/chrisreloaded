@@ -3,7 +3,7 @@
  */
 var PACS = PACS || {};
 /**
- * Bind the simple search input field to the simple search button
+ * Bind the simple search input field to the simple search button.
  */
 jQuery('.ssearch').keypress(function(e) {
   if (e.which == 13) {
@@ -11,7 +11,7 @@ jQuery('.ssearch').keypress(function(e) {
   }
 });
 /**
- * Bind the advanced search input field to the advanced search button
+ * Bind the advanced search input field to the advanced search button.
  */
 jQuery('.asearch').keypress(function(e) {
   if (e.which == 13) {
@@ -20,7 +20,7 @@ jQuery('.asearch').keypress(function(e) {
 });
 /**
  * Setup the download button to only download the series which are remaing after
- * filtering in the advanced mode
+ * filtering in the advanced mode.
  */
 PACS.setupDownloadSeriesFiltered = function() {
   jQuery(".d_filter").live('click', function() {
@@ -38,7 +38,7 @@ PACS.setupDownloadSeriesFiltered = function() {
   });
 }
 /**
- * Setup the download button to download all series for a given study
+ * Setup the download button to download all series for a given study.
  */
 PACS.setupDownloadStudy = function() {
   jQuery(".d_study").live(
@@ -60,7 +60,7 @@ PACS.setupDownloadStudy = function() {
       });
 }
 /**
- * Setup the details button to show series within a study in simple query
+ * Setup the details button to show series within a study in simple query.
  */
 PACS.setupDetailStudy = function() {
   jQuery('#S-RESULTS td .control').live('click', function() {
@@ -85,7 +85,7 @@ PACS.setupDetailStudy = function() {
   });
 }
 /**
- * Setup the download series button
+ * Setup the download series button.
  */
 PACS.setupDownloadSeries = function() {
   jQuery(".d_series").live('click', function(event) {
@@ -97,7 +97,7 @@ PACS.setupDownloadSeries = function() {
   });
 }
 /**
- * Setup the preview series behavior
+ * Setup the preview series behavior.
  */
 PACS.setupPreviewSeries = function() {
   // connect the preview button
@@ -153,7 +153,7 @@ PACS.setupPreviewSeries = function() {
   });
 }
 /**
- * Setup the Advanced search button
+ * Setup the 'Advanced' search button.
  */
 PACS.ajaxAdvanced = function() {
   jQuery("#A_SEARCH").live('click', function(event) {
@@ -205,7 +205,7 @@ PACS.ajaxAdvanced = function() {
   });
 }
 /**
- * 
+ * Handle 'Advanced' AJAX query results.
  */
 PACS.ajaxAdvancedResults = function(data) {
   if (data[0] != null) {
@@ -233,7 +233,7 @@ PACS.ajaxAdvancedResults = function(data) {
   }
 }
 /**
- * 
+ * Create 'Advanced' table dataTables enabled.
  */
 PACS.advancedTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="A-RESULTS">';
@@ -264,6 +264,9 @@ PACS.advancedTable = function() {
       .html(
           '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
 }
+/**
+ * Cache data after 'Advanced' AJAX query.
+ */
 PACS.advancedCaching = function(data, i) {
   var stuid = data[1].StudyInstanceUID[i];
   var study = null;
@@ -297,7 +300,7 @@ PACS.advancedCaching = function(data, i) {
   }
 }
 /**
- * 
+ * Reformat data after 'Advanced' AJAX query to fit the dataTable standard.
  */
 PACS.advancedFormat = function(data, i) {
   var index = data[0].StudyInstanceUID.indexOf(data[1].StudyInstanceUID[i]);
@@ -330,7 +333,7 @@ PACS.advancedFormat = function(data, i) {
   return sub;
 }
 /**
- * 
+ * Setup the 'Simple' search button.
  */
 PACS.ajaxSimple = function() {
   jQuery("#S_SEARCH").live('click', function(event) {
@@ -380,8 +383,7 @@ PACS.ajaxSimple = function() {
   });
 }
 /**
- * Handle ajax response after query pacs for studies, given mrn, name, date,
- * etc.
+ * Handle 'Simple' AJAX query results.
  */
 PACS.ajaxSimpleResults = function(data) {
   // if ajax returns something, process it
@@ -406,7 +408,7 @@ PACS.ajaxSimpleResults = function(data) {
   }
 }
 /**
- * 
+ * Create 'Simple' table dataTables enabled.
  */
 PACS.simpleTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
@@ -430,7 +432,7 @@ PACS.simpleTable = function() {
           });
 }
 /**
- * 
+ * Reformat data after 'Advanced' AJAX query to fit the dataTable standard.
  */
 PACS.simpleFormat = function(data, i) {
   var stuid = data.StudyInstanceUID[i];
@@ -473,7 +475,7 @@ PACS.simpleFormat = function(data, i) {
   return sub;
 }
 /**
- * 
+ * Get 'Series' data AJAX.
  */
 PACS.ajaxSeries = function(studyUID, nTr) {
   var stuid = studyUID;
@@ -523,7 +525,7 @@ PACS.ajaxSeries = function(studyUID, nTr) {
   }
 }
 /**
- * 
+ * Handle 'Series' AJAX query results.
  */
 PACS.ajaxSeriesResults = function(data, nTr) {
   // format the details row table
@@ -606,6 +608,9 @@ PACS.seriesFormat = function(data) {
   content += '</body></table></div>';
   return content;
 }
+/**
+ * Get 'Preview' data AJAX.
+ */
 PACS.ajaxPreview = function(studyUID, seriesUID) {
   var stuid = studyUID;
   var serid = seriesUID;
@@ -668,6 +673,9 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
     }
   });
 }
+/**
+ * Get 'Image' data AJAX.
+ */
 PACS.ajaxImage = function(studyUID, seriesUID, buttonID) {
   // if series already or is being downloaded (preview use case)
   if (jQuery(buttonID).length == 0 || jQuery(buttonID).hasClass('btn-primary')) {
@@ -726,7 +734,7 @@ PACS.ajaxImage = function(studyUID, seriesUID, buttonID) {
   }
 }
 /**
- * 
+ * Get 'Ping' data AJAX.
  */
 PACS.ajaxPing = function() {
   jQuery.ajax({
@@ -744,7 +752,7 @@ PACS.ajaxPing = function() {
   });
 }
 /**
- * 
+ * Handle 'Ping' AJAX query results.
  */
 PACS.ajaxPingResults = function(data) {
   var pingResult = '';
@@ -756,7 +764,7 @@ PACS.ajaxPingResults = function(data) {
   jQuery('#pacsping').html(pingResult);
 }
 /**
- * 
+ * Setup the javascript when document is ready (finshed loading)
  */
 jQuery(document).ready(function() {
   //
