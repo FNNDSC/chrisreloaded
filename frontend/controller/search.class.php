@@ -54,7 +54,7 @@ class Search {
    *
    * The instance reference for the singleton pattern.
    *
-   * @var Search
+   * @var Search $instance
    */
   private static $instance = null;
 
@@ -62,7 +62,7 @@ class Search {
    *
    * The project mapper.
    *
-   * @var Mapper
+   * @var Mapper $project
    */
   private $project = null;
 
@@ -70,7 +70,7 @@ class Search {
    *
    * The project search field.
    *
-   * @var string
+   * @var string $projectSearchFields
    */
   private $projectSearchFields = null;
 
@@ -78,7 +78,7 @@ class Search {
    *
    * The result mapper.
    *
-   * @var Mapper
+   * @var Mapper $result
    */
   private $result = null;
 
@@ -86,7 +86,7 @@ class Search {
    *
    * The result search field.
    *
-   * @var string
+   * @var string $resultSearchFields
    */
   private $resultSearchFields = null;
 
@@ -94,7 +94,7 @@ class Search {
    *
    * The data mapper.
    *
-   * @var Mapper
+   * @var Mapper $data
    */
   private $data = null;
 
@@ -102,7 +102,7 @@ class Search {
    *
    * The data search field.
    *
-   * @var string
+   * @var string $dataSearchFields
    */
   private $dataSearchFields = null;
 

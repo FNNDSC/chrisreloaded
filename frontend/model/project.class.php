@@ -43,7 +43,7 @@ class Project extends Object {
   /**
    * The name of the project.
    *
-   * @var string
+   * @var string $name
    */
   public $name = null;
   
@@ -51,7 +51,7 @@ class Project extends Object {
    * Extra information about the project.
    * Description, owner, creation date, etc.
    *
-   * @var string
+   * @var string $meta_information
    */
   public $meta_information = null;
 }

@@ -43,14 +43,14 @@ class Result_Data extends Object {
   /**
    * The result id.
    *
-   * @var int
+   * @var int $result_id
    */
   public $result_id = -1;
   
   /**
    * The data id.
    *
-   * @var int
+   * @var int $data_id
    */
   public $data_id = -1;
 

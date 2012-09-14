@@ -34,10 +34,10 @@ if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
  * Join multiple file paths.
  * From: http://stackoverflow.com/questions/1091107/how-to-join-filesystem-path-strings-in-php
  *
- * @param array|string* Multiple file paths.
+ * @param array|string $args Multiple file paths.
  *
  */
-function joinPaths() {
+function joinPaths($args) {
   $args = func_get_args();
   $paths = array();
   foreach ($args as $arg) {

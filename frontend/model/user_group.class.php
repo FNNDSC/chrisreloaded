@@ -43,14 +43,14 @@ class User_Group extends Object {
   /**
    * The user id.
    *
-   * @var int
+   * @var int $user_id
    */
   public $user_id = -1;
 
   /**
    * The group id.
    *
-   * @var int
+   * @var int $group_id
    */
   public $group_id = -1;
 }

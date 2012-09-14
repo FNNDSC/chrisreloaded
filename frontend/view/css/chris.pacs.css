@@ -1,0 +1,100 @@
+/**
+* Adapted from the amazing http://datatables.net/media/blog/bootstrap_2/DT_bootstrap.css
+* http://datatables.net/blog/Twitter_Bootstrap_2
+* DataTables designed and created by SpryMedia © 2008-2012
+* DataTables is dual licensed under the GPL v2 license or a BSD (3-point) license. 
+*/
+div.dataTables_length label {
+	float: left;
+	text-align: left;
+}
+
+div.dataTables_length select {
+	width: 75px;
+}
+
+div.dataTables_filter label {
+	float: right;
+}
+
+div.dataTables_info {
+	padding-top: 8px;
+}
+
+div.dataTables_paginate {
+	float: right;
+	margin: 0;
+}
+
+table.table {
+	clear: both;
+	margin-bottom: 6px !important;
+}
+
+table.table thead .sorting,table.table thead .sorting_asc,table.table thead .sorting_desc,table.table thead .sorting_asc_disabled,table.table thead .sorting_desc_disabled
+	{
+	cursor: pointer;
+	*cursor: hand;
+}
+
+table.table thead .sorting {
+	background: url('../gfx/sort_both.png') no-repeat center right;
+}
+
+table.table thead .sorting_asc {
+	background: url('../gfx/sort_asc.png') no-repeat center right;
+}
+
+table.table thead .sorting_desc {
+	background: url('../gfx/sort_desc.png') no-repeat center right;
+}
+
+table.table thead .sorting_asc_disabled {
+	background: url('../gfx/sort_asc_disabled.png') no-repeat center right;
+}
+
+table.table thead .sorting_desc_disabled {
+	background: url('../gfx/sort_desc_disabled.png') no-repeat center right;
+}
+
+table.dataTable th:active {
+	outline: none;
+}
+
+.twoDRenderer {
+	position: relative;
+	background-color: #000;
+	top: 0%;
+	height: 370px;
+	width: 370px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#sliderZContainer {
+	width: 370px;
+	height: 15px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#sliderZ {
+	width: 370px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#BR_OVER {
+	position: absolute;
+	color: white;
+	bottom: 0px;
+	right: 0px;
+	padding: 2px;
+}
+
+#TL_OVER {
+	background-color: #000;
+	position: absolute;
+	color: white;
+	margin: auto;
+}

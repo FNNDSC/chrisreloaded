@@ -152,6 +152,7 @@ class PACS implements PACSInterface {
    *
    * @param[in] string $name Name of the parameter.
    * @param[in] string $value Value of the parameter.
+   * @param[in] boolean $force Replace parameter if it is already defined.
    *
    * @snippet test.pacs.class.php testAddParameter()
    */
@@ -164,8 +165,6 @@ class PACS implements PACSInterface {
 
   /**
    * Clean all the parameters from the command to be executed.
-   *
-   * @snippet test.pacs.class.php testCleanParameter()
    */
   public function cleanParameter(){
     unset($this->command_param);
@@ -256,9 +255,7 @@ class PACS implements PACSInterface {
       $this->addParameter('StudyInstanceUID', '');
       $this->addParameter('SeriesInstanceUID', '');
 
-
       PACS::_parseParam($this->command_param, $command);
-
       $this->_finishCommand($command);
 
       return $this->_executeAndFormat($command);
@@ -295,6 +292,8 @@ class PACS implements PACSInterface {
       PACS::_parseParam($this->command_param, $command);
 
       $this->_finishCommand($command);
+
+      //echo $command;
 
       return $this->_executeAndFormat($command);
     }
@@ -347,7 +346,7 @@ class PACS implements PACSInterface {
         $this->_appendResults($result[1], $resultseries);
 
         // loop though images
-        if ($resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
+        if ($imageParameters != null && $resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
         {
           $j = 0;
           foreach ($resultseries['StudyInstanceUID'] as $key => $seriesvalue){
@@ -371,8 +370,8 @@ class PACS implements PACSInterface {
   /**
    * Convenience method to append array to another array.
    *
-   * @param[in|out] array $base array in which we will add data
-   * @param[in|out] array $toappend array which will be added to base
+   * @param array $base array in which we will add data
+   * @param array $toappend array which will be added to base
    *
    */
   private function _appendResults(&$base, &$toappend)
@@ -392,7 +391,7 @@ class PACS implements PACSInterface {
   /**
    * Convenience method to finish the command to be executed. Append the command parameters, the PACS IP and the PACS port.
    *
-   * @param[in|out] string $command command to be finished.
+   * @param string $command command to be finished.
    *
    */
   private function _finishCommand(&$command)
@@ -407,8 +406,8 @@ class PACS implements PACSInterface {
   /**
    * Convenience method to parse parameters and add it to the command.
    *
-   * @param[in] array $param array containing parameters to be parsed.
-   * @param[in|out] string $command command to update.
+   * @param [in] array $param array containing parameters to be parsed.
+   * @param  string $command command to update.
    *
    */
   static private function _parseParam(&$param, &$command){
@@ -429,9 +428,9 @@ class PACS implements PACSInterface {
   /**
    * Convenience method to parse each output line.
    *
-   * @param[in|out] string $jsonarray array containing well formated output.
+   * @param array $array array containing well formated output.
    * @param[in] string $lines array containing line to be parsed.
-   * @param[in|out] int  $i counter to keep track of line to be parsed.
+   * @param int  $i counter to keep track of line to be parsed.
    *
    */
   static private function _parseEOL(&$array, &$lines, &$i)
@@ -472,7 +471,7 @@ class PACS implements PACSInterface {
     $tmpsplit = split('\[', $lines[$i]);
     // we didn't find any "[": no value was provided
     if(count($tmpsplit) == 1){
-      $array[$field][] =  'no value provided';
+      $array[$field][] =  'nvp';
     }
     // else, finish splitting and append value to result array
     else{
@@ -488,7 +487,8 @@ class PACS implements PACSInterface {
    *
    * If the key already exists, do not do anything.
    *
-   * @param[in|out] string $jsonarray array containing well formated output.
+   * @param array $output array to be updated.
+   * @param string $key key to be added.
    *
    */
   static private function _addKey(&$output, &$key)
@@ -610,7 +610,7 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P ContentDate';
     $requiered_fields .= ' +P ContentTime';
     $requiered_fields .= ' +P InstanceNumber';
-    
+
     // Patient information
     $requiered_fields .= ' +P PatientName';
     $requiered_fields .= ' +P PatientBirthDate';

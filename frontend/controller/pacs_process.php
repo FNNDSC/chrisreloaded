@@ -132,6 +132,13 @@ if (array_key_exists('SeriesInstanceUID',$result))
     {
       $protocol_name = str_replace (' ', '_', $result['ProtocolName'][0]);
       $protocol_name = str_replace ('/', '_', $protocol_name);
+      $protocol_name = str_replace ('?', '_', $protocol_name);
+      $protocol_name = str_replace ('&', '_', $protocol_name);
+      $protocol_name = str_replace ('#', '_', $protocol_name);
+      $protocol_name = str_replace ('\\', '_', $protocol_name);
+      $protocol_name = str_replace ('%', '_', $protocol_name);
+      $protocol_name = str_replace ('(', '_', $protocol_name);
+      $protocol_name = str_replace (')', '_', $protocol_name);
     }
     $dataObject->name = $protocol_name;
     $date = $result['ContentDate'][0];

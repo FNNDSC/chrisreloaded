@@ -29,7 +29,12 @@ define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
 require_once ('../config.inc.php');
+require_once 'db.class.php';
+require_once 'mapper.class.php';
 require_once 'pacs.class.php';
+
+// include the models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
 
 $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 
@@ -46,9 +51,50 @@ if($_POST['PACS_LEV'] == 'STUDY'){
   echo json_encode($pacs->moveStudy());
 }
 else{
-  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
-  // SERIESInstanceUID shouldnt be empty...
-  $pacs->addParameter('SeriesInstanceUID', '');
-  echo json_encode($pacs->moveSeries());
+
+  // if chris1.0, push data to chris1.0 as well for the preview
+  if($_POST['USER_AET'] == 'FNNDSC-CHRIS'){
+    $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+    $pacs->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
+    $pacs->moveSeries();
+
+    // check if series already there
+    // retrieve the data
+    $dataMapper = new Mapper('Data');
+    $dataMapper->filter('unique_id = (?)',$_POST['PACS_SER_UID']);
+    $dataResult = $dataMapper->get();
+
+    // if data already there, do not do anything!
+    if(count($dataResult['Data']) > 0)
+    {
+      echo json_encode('');
+      return;
+    }
+
+    $pacs2 = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], 'FNNDSC-CHRISDEV');
+    $pacs2->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+    $pacs2->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
+    echo json_encode($pacs2->moveSeries());
+  }
+  else{
+    // check if series already there
+    // retrieve the data
+    $dataMapper = new Mapper('Data');
+    $dataMapper->filter('unique_id = (?)',$_POST['PACS_SER_UID']);
+    $dataResult = $dataMapper->get();
+
+    // if data already there, do not do anything!
+    if(count($dataResult['Data']) > 0)
+    {
+      echo json_encode('');
+      return;
+    }
+
+    $pacs2 = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
+    $pacs2->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
+    $pacs2->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
+    echo json_encode($pacs2->moveSeries());
+  }
+
 }
 ?>

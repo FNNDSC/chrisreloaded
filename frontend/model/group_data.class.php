@@ -43,14 +43,14 @@ class Group_Data extends Object {
   /**
    * The group ID.
    *
-   * @var int
+   * @var int $group_id
    */
   public $group_id = -1;
   
   /**
    * The data ID.
    *
-   * @var int
+   * @var int $data_id
    */
   public $data_id = -1;
 }

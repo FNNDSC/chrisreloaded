@@ -43,14 +43,14 @@ class User_Data extends Object {
   /**
    * The user id.
    *
-   * @var int
+   * @var int $user_id
    */
   public $user_id = -1;
 
   /**
    * The data id.
    *
-   * @var int
+   * @var int $data_id
    */
   public $data_id = -1;
 }

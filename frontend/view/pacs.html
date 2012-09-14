@@ -1,66 +1,123 @@
-<div class="tabbable">
- <!-- Only required for left/right tabs -->
- <ul class="nav nav-tabs">
-  <li class="active"><a href="#tab1" data-toggle="tab">PACS
-    Search</a></li>
-  <li><a href="#tab2" data-toggle="tab">PACS Settings</a></li>
- </ul>
- <div class="tab-content">
-  <div class="tab-pane active" id="tab1">
-   <div>
-    Patient ID: <input id='PACS_MRN' type="text" value='4562009' />
+<!DOCTYPE html>
+<html lang="en">
+
+<head>${CSS}
+</head>
+
+<body style='background: url("view/gfx/background1.jpg")'>
+
+ ${NAVBAR}
+
+ <div class="container"
+  style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
+  <div id="PMODAL" class="modal hide fade" tabindex="-1" role="dialog"
+   aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-header">
+    <button id='modal-dismiss' type="button" class="close"
+     data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3 id="myModalLabel">Series Description</h3>
    </div>
-   <div>
-    Study Date: <input id='PACS_DAT' type="text" value='' />
-   </div>
-   <div id="pacsadvancedcontainer">
-    <input class='btn btn-primary pacsAdanced' type="button"
-     value="Advanced">
-    <div class="pacsadvanced">
-     <div>
-      Study Description: <input id='PACS_STU_DES' type="text" value='' />
+   <div class="modal-body">
+    <div id="sliderZContainer">
+     <div id="sliderZ"></div>
+    </div>
+    <div id='sliceZ' class='twoDRenderer'>
+     <div id='TL_OVER'>
+      Retrieving data <i class="icon-refresh icon-white rotating_class"></i>
      </div>
-     <div>
-      Accession Number: <input id='PACS_ACC_NUM' type="text" value='' />
-     </div>
-     <div>
-      Study Modality: <input id='PACS_MOD' type="text" value='' />
-     </div>
-     <div>
-      Patient Name: <input id='PACS_NAM' type="text" value='' />
+     <div id='BR_OVER'>
+      Slice <span id="SLICE">00</span>/<span id="SLICE_NB">00</span>
      </div>
     </div>
    </div>
-
-   <input class='btn btn-primary pacsQuery' type="button" value="Query">
-   <input class='btn btn-primary pacsRetrieve' type="button"
-    value="Retrieve">
-   <!-- Results of the PACS pull -->
-   <div class="row-fluid">
-
-    <div id='pacscontainer' class="span12">
-     <div id="slideshow">
-      <div id="slidesContainer">
-       <div id='studylist' class="slide"></div>
-       <div id='serieslist' class="slide"></div>
+   <div class="modal-footer"></div>
+  </div>
+  <div class="tabbable well">
+   <ul class="nav nav-tabs">
+    <li class="active"><a href="#tab0" data-toggle="tab">Simple</a></li>
+    <li><a href="#tab1" data-toggle="tab">Advanced</a></li>
+    <li><a href="#tab2" data-toggle="tab">Settings</a></li>
+   </ul>
+   <div class="tab-content">
+    <div class="tab-pane active" id="tab0">
+     <div class='row-fluid'>
+      <div class='span12'>
+       <div class='well'>
+        <h2>Parameters</h2>
+        <form class="form-inline">
+         <input id='PACS_MRN' type="text" class="input-small ssearch"
+          placeholder="MRN" value=''> <input id='PACS_NAM'
+          type="text" class="input-small ssearch" placeholder="Name"
+          value=''> <input id='PACS_DAT' type="text"
+          class="input-small ssearch" placeholder="Study Date" value=''>
+         <input id='PACS_MOD' type="text" class="input-small ssearch"
+          placeholder="Modality" value='MR'>
+         <button id='S_SEARCH' class='btn btn-primary' type="button">Search</button>
+        </form>
+       </div>
+      </div>
+     </div>
+     <div class='row-fluid'>
+      <div class='span12'>
+       <div class='well'>
+        <h2>Results</h2>
+        <div id='SC-RESULTS' class='row-fluid'></div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="tab-pane" id="tab1">
+     <div class='row-fluid'>
+      <div class='span12'>
+       <div class='well'>
+        <h2>Advanced Parameters</h2>
+        <form class="form-inline">
+         <input id='PACS_MRN_A' type="text" class="input-small asearch"
+          placeholder="MRN" value=''> <input id='PACS_NAM_A'
+          type="text" class="input-small asearch" placeholder="Name"
+          value=''> <input id='PACS_DAT_A' type="text"
+          class="input-small asearch" placeholder="Study Date" value=''>
+         <input id='PACS_MOD_A' type="text" class="input-small asearch"
+          placeholder="Modality" value='MR'>
+         <button id='A_SEARCH' class='btn btn-primary' type="button">Search</button>
+        </form>
+       </div>
+      </div>
+     </div>
+     <div class='row-fluid'>
+      <div class='span12'>
+       <div class='well'>
+        <h2>Results</h2>
+        <div id='AC-RESULTS' class='row-fluid'></div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="tab-pane" id="tab2">
+     <div class='span5 well'>
+      <h1>Client Information</h1>
+      AET Title: <input id='USER_AET' type="text"
+       value='FNNDSC-CHRISDEV'>
+     </div>
+     <div class='span5 well'>
+      <h1>Server Information</h1>
+      <div>
+       IP/hotname: <input id='SERVER_IP' type="text"
+        value='134.174.12.21' />
+      </div>
+      <div>
+       Port: <input id='SERVER_POR' type="text" value='104' />
+      </div>
+      <div>
+       <input class='btn btn-primary pacsPing' type="button"
+        value="Test Connection"> <span id='pacsping'></span>
       </div>
      </div>
     </div>
    </div>
   </div>
-  <div class="tab-pane" id="tab2">
-   <div>
-    AET: <input id='USER_AET' type="text" value='FNNDSC-CHRIS'>
-   </div>
-   <div>
-    Server IP/hotname: <input id='SERVER_IP' type="text"
-     value='134.174.12.21' />
-   </div>
-   <div>
-    Port: <input id='SERVER_POR' type="text" value='104' />
-   </div>
-   <input class='btn btn-primary pacsPing' type="button" value="Ping">
-   <div id='pacsping'></div>
-  </div>
  </div>
-</div>
+
+ ${FOOTER} ${JAVASCRIPT}
+</body>
+</html>

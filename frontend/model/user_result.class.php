@@ -43,14 +43,14 @@ class User_Result extends Object {
   /**
    * The user id.
    *
-   * @var int
+   * @var int $user_id
    */
   public $user_id = -1;
 
   /**
    * The result id.
    *
-   * @var int
+   * @var int $result_id
    */
   public $result_id = -1;
 }

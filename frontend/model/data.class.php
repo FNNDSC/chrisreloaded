@@ -43,7 +43,7 @@ class Data extends Object {
   /**
    * The patient_id of this scan.
    *
-   * @var int
+   * @var int $patient_id
    */
   public $patient_id = -1;
 
@@ -51,7 +51,7 @@ class Data extends Object {
    * The data unique ID.
    * We use it to make sure data we will add to the database doesn't already exists.
    *
-   * @var string
+   * @var string $unique_id
    */
   public $unique_id = null;
 
@@ -59,21 +59,21 @@ class Data extends Object {
    * The name of the data.
    * Text file name, dicom protocol, etc...
    *
-   * @var string
+   * @var string $name
    */
   public $name = null;
 
   /**
    * The time of the data creation.
    *
-   * @var string
+   * @var string $time
    */
   public $time = null;
 
   /**
    * Extra information for this data. (spacing, size...)
    *
-   * @var string
+   * @var string $meta_information
    */
   public $meta_information = null;
 
