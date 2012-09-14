@@ -44,8 +44,7 @@ function pacsPage() {
   $t = new Template('pacs.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'pacs_navbar.html');
-  /* $t -> replace('CART', 'cart.html');
-   $t -> replace('USERNAME', $_SESSION['username']); */
+  $t -> replace('CHRIS_AETITLE', CHRIS_AETITLE);
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');
   return $t;

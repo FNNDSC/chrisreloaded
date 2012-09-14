@@ -37,7 +37,7 @@ require_once('controller/_util.inc.php');
 define('SQL_HOST', 'chris');
 define('SQL_USERNAME', 'chris');
 define('SQL_PASSWORD', 'YOURPASSWORD');
-define('SQL_DATABASE', 'chris');
+define('SQL_DATABASE', 'chrisdev');
 
 // PATH configuration
 define('CHRIS_WWWROOT', dirname(__FILE__));
@@ -52,6 +52,7 @@ define('CHRIS_DCMTK', '/usr/bin/');
 // chris file system
 define('CHRIS_DATA', '/chb/users/chris/dev/data/');
 define('CHRIS_TMP', '/chb/users/chris/dev/tmp/');
+define('CHRIS_AETITLE', 'FNNDSC-CHRISDEV');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
