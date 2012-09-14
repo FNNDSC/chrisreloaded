@@ -649,7 +649,7 @@ PACS.ajaxPreview = function(studyUID, seriesUID) {
         jQuery("#TL_OVER").html('Creating XTK visualization...');
         // set XTK renderer
         PACS.volume = new X.volume();
-        PACS.volume.file = 'http://chris/data/' + data.filename[0];
+        PACS.volume.file = 'http://chris/datadev/' + data.filename[0];
         PACS.sliceX = new X.renderer2D();
         PACS.sliceX.container = 'sliceZ';
         PACS.sliceX.orientation = 'Z';

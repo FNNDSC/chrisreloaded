@@ -50,12 +50,8 @@ define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
 // folder containing dcmtk binaries
 define('CHRIS_DCMTK', '/usr/bin/');
 // chris file system
-define('CHRIS_DATA', '/chb/users/chris/data/');
-define('CHRIS_TMP', '/chb/users/chris/tmp/');
-// anonymize data
-define('CHRIS_DCMRENAME', '/chb/users/nicolas.rannou/arch/scripts/dcm_rename');
-// useless?
-define('CHRIS_AETITLE', 'CHRIS');
+define('CHRIS_DATA', '/chb/users/chris/dev/data/');
+define('CHRIS_TMP', '/chb/users/chris/dev/tmp/');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
