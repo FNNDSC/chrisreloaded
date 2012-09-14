@@ -168,7 +168,7 @@ else {
 $db->unlock();
 
 // FILESYSTEM Processing
-$patientdirname = '/chb/users/chris/data/'.$result['PatientID'][0].'-'.$patient_chris_id;
+$patientdirname = CHRIS_DATA.$result['PatientID'][0].'-'.$patient_chris_id;
 // create folder if doesnt exists
 if(!is_dir($patientdirname)){
   mkdir($patientdirname);
