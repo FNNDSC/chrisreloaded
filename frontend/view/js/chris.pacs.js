@@ -110,8 +110,6 @@ PACS.setupPreviewSeries = function() {
             var stuid = split_id[0].replace(/\_/g, ".");
             var seuid = split_id[1].replace(/\_/g, ".");
             // start pulling series and update id
-            // conver id from *-sep to *-sed
-            window.console.log(id);
             PACS.ajaxImage(stuid, seuid, '#' + id.substring(0, id.length - 1)
                 + 'd');
             // Top Left overlay
@@ -129,8 +127,6 @@ PACS.setupPreviewSeries = function() {
           });
   // connect the 'shown' event
   jQuery('#PMODAL').on('shown', function() {
-    window.console.log(PACS.PreviewStudy);
-    window.console.log(PACS.PreviewSeries);
     PACS.ajaxPreview(PACS.PreviewStudy, PACS.PreviewSeries);
   });
   // connect the 'hidden' event
@@ -307,6 +303,9 @@ PACS.advancedCaching = function(data, i) {
  */
 PACS.advancedFormat = function(data, i) {
   var index = data[0].StudyInstanceUID.indexOf(data[1].StudyInstanceUID[i]);
+  var stuid = data[1].StudyInstanceUID[i];
+  var serid = data[1].SeriesInstanceUID[i];
+  var id = stuid.replace(/\./g, "_") + '-' + serid.replace(/\./g, "_");
   var sub = Array();
   sub.push(data[0].PatientName[index].replace(/\^/g, " "));
   sub.push(data[0].PatientID[index]);
@@ -320,19 +319,33 @@ PACS.advancedFormat = function(data, i) {
   sub.push(data[1].NumberOfSeriesRelatedInstances[i]);
   sub
       .push('<button id="'
-          + data[1].StudyInstanceUID[i].replace(/\./g, "_")
-          + '-'
-          + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
+          + id
           + '-ap"  class="btn btn-info p_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
-  /**
-   * @todo check in cached data to update button as requiered
-   */
-  sub
-      .push('<button id="'
-          + data[1].StudyInstanceUID[i].replace(/\./g, "_")
-          + '-'
-          + data[1].SeriesInstanceUID[i].replace(/\./g, "_")
-          + '-ad" class="btn btn-primary d_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
+  // update download icon based on its status
+  var status = 0;
+  var cached_study = stuid in PACS.cache;
+  if (cached_study) {
+    var series_index = PACS.cache[stuid].SeriesInstanceUID.indexOf(serid);
+    if (series_index >= 0) {
+      status = PACS.cache[stuid].Status[series_index];
+    }
+  }
+  if (status == 0) {
+    sub
+        .push('<button id="'
+            + id
+            + '-ad" class="btn btn-primary d_series pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
+  } else if (status == 1) {
+    sub
+        .push('<button id="'
+            + id
+            + '-ad" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></i></button>');
+  } else if (status == 2) {
+    sub
+        .push('<button id="'
+            + id
+            + '-ad" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></i></button>');
+  }
   return sub;
 }
 /**
@@ -577,9 +590,9 @@ PACS.seriesFormat = function(data) {
   for (i = 0; i < nb_results; ++i) {
     // replace '.' by '_' (. is invalid for the id)
     var stuid = data.StudyInstanceUID[i].replace(/\./g, "_");
-    var seriesUID = data.SeriesInstanceUID[i].replace(/\./g, "_");
-    var id = stuid + '-' + seriesUID;
-    content += '<tr class="parent " id="' + seriesUID + '">';
+    var serid = data.SeriesInstanceUID[i].replace(/\./g, "_");
+    var id = stuid + '-' + serid;
+    content += '<tr class="parent " id="' + serid + '">';
     // replace some illegal characters in the series description
     content += '<td>'
         + data.SeriesDescription[i].replace(/\>/g, "&gt").replace(/\</g, "&lt")
