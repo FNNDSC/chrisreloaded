@@ -1,0 +1,57 @@
+.feed {
+	margin-top: -1px;
+	padding: 5px;
+	border: 1px solid;
+	border-radius: 5px;
+}
+
+.feed>.preview {
+	overflow: auto;
+}
+
+.feed>.preview>.title {
+	width: 90%;
+	float: right;
+	padding: 5px;
+}
+
+.feed>.preview>.title>.time {
+	float: right;
+}
+
+.feed>.preview>.title>.user {
+	float: left;
+}
+
+.feed>.preview>.gfx {
+	float: left;
+	width: 60px;
+}
+
+.feed>.preview>.body {
+	width: 90%;
+	float: right;
+	padding: 5px;
+}
+
+.feed>.preview>.body>.main {
+	float: left;
+}
+
+.feed>.preview>.body>.more {
+	float: right;
+}
+
+.feed>.details {
+	overflow: auto;
+	display: none;
+}
+
+.feed>.details>.pipelines {
+	
+}
+
+.feed>.details>.data {
+	border-top: 1px solid;
+	margin-top: 5px
+}
