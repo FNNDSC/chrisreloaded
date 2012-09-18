@@ -69,6 +69,13 @@ class Feed extends Object {
   public $model_id = -1;
 
   /**
+   * The time of the feed creation
+   *
+   * @var string $time
+   */
+  public $time = '';
+
+  /**
    * The status of the feed: 0-100
    * -1: failure
    *

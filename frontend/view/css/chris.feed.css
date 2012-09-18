@@ -52,5 +52,7 @@
 }
 
 .feed>.details>.data {
-
+	border-top: 1px solid;
+	border-color: grey;
+	margin-top: 5px;
 }
