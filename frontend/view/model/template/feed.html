@@ -1,15 +1,18 @@
 <div class="feed">
  <div class="preview">
   <div class="gfx">
-   <img src={$IMAGE_SRC} class="img-rounded">
+   <img src=${IMAGE_SRC} class="img-rounded">
   </div>
   <div class="title">
    <div class="user">${USERNAME}</div>
    <div class="time">${TIME}</div>
   </div>
-  <div class="body">
+  <div class="content">
    <div class="main">${MAIN}</div>
-   <div class="more">${MORE}</div>
+   <div class="more">
+    <a>${MORE}</a>
+   </div>
   </div>
  </div>
+ <div class="details">${FEED_DATA}</div>
 </div>

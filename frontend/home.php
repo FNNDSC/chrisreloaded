@@ -36,21 +36,46 @@ require_once ('config.inc.php');
 
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
-
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
+// inclue the
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 
+// include the feed object and view
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.class.php'));
+require_once (joinPaths(CHRIS_VIEW_FOLDER, 'model/feed.view.class.php'));
+
 $_SESSION['username'] = 'Ellen'; // store session data
-$_SESSION['cart'] = array();
-$_SESSION['cart']['visibility'] = false;
+
+function getFeeds($nb_feeds){
+  $feed_content = '';
+  $i = 0;
+
+  // get feed objects
+  $feedMapper = new Mapper('Feed');
+  $feedMapper->order('id');
+  $feedResult = $feedMapper->get();
+
+  // for each
+  foreach ($feedResult['Feed'] as $key => $value) {
+    if($i >= $nb_feeds){
+      break;
+    }
+    $view = new FeedView($value);
+    $feed_content .= $view->getHTML();
+    $i++;
+  }
+
+  return $feed_content;
+}
 
 function homePage() {
   $t = new Template('home.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('USERNAME', $_SESSION['username']);
   $t -> replace('NAVBAR', 'navbar.html');
-  // create cart with good visibility(html)
-  
-  $t -> replace('CART', 'cart.html');
+  // get last 10 feeds
+  $t -> replace('FEED_CONTENT', getFeeds(10));
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');
   return $t;

@@ -28,17 +28,17 @@
 	width: 60px;
 }
 
-.feed>.preview>.body {
+.feed>.preview>.content {
 	width: 90%;
 	float: right;
 	padding: 5px;
 }
 
-.feed>.preview>.body>.main {
+.feed>.preview>.content>.main {
 	float: left;
 }
 
-.feed>.preview>.body>.more {
+.feed>.preview>.content>.more {
 	float: right;
 }
 
@@ -51,8 +51,9 @@
 	
 }
 
+/* CSS applied in the PHP because of JQUERY slide */
 .feed>.details>.data {
-	border-top: 1px solid;
+/* 	border-top: 1px solid;
 	border-color: grey;
-	margin-top: 5px;
+	margin-top: 5px; */
 }

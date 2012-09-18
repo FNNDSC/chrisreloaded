@@ -64,9 +64,9 @@ class Feed extends Object {
   /**
    * The model id the feed is related to.
    *
-   * @var int $model_id
+   * @var string $model_id
    */
-  public $model_id = -1;
+  public $model_id = '';
 
   /**
    * The time of the feed creation

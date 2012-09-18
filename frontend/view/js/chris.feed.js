@@ -40,7 +40,7 @@ function Feed(user, time, type, details) {
   // close title
   content += '</div>';
   // setup the body
-  content += '<div class="body">';
+  content += '<div class="main">';
   // main
   content += '<div class="main">';
   content += this.main;
@@ -109,6 +109,7 @@ Feed.prototype.parsePipeline = function() {
 }
 jQuery(".more").live('click', function() {
   // modify
+  //alert('Show details!');
   var details = jQuery(this).parent().parent().next();
   var hidden = details.is(':hidden');
   if (hidden) {
@@ -132,7 +133,7 @@ jQuery(document).ready(function() {
   dataNicolas.Name = new Array();
   dataNicolas.Name.push('GADO_AXIAL_T1');
   dataNicolas.Name.push('AX_DWI');
-  // nicolas = new Feed('Nicolas', '5mn', 'data-down', dataNicolas);
+  //nicolas = new Feed('Nicolas', '5mn', 'data-down', dataNicolas);
   // create data
   dataRudolph = {
     Pipeline : 'Tractography',

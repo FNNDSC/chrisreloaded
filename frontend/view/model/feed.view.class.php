@@ -30,7 +30,7 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
   die('Invalid access.');
 
 // include the configuration
-require_once ('../../config.inc.php');
+require_once ('config.inc.php');
 //require_once 'object.template.class.php';
 
 // include the controllers to interact with the database
@@ -78,8 +78,8 @@ class FeedView implements FeedViewInterface {
    * @param[in] $feed_object The feed base object to be converted.
    */
   public function __construct($feed_object) {
-    $this->$feed_object = $feed_object;
-    $this->details = new Array();
+    $this->feed_object = $feed_object;
+    $this->details = Array();
   }
 
   /**
@@ -90,26 +90,26 @@ class FeedView implements FeedViewInterface {
   {
     // get user name
     $userMapper = new Mapper('User');
-    $userMapper->filter('id = (?)',$this->$feed_object->id);
+
+    $userMapper->filter('id = (?)',$this->feed_object->user_id);
     $userResult = $userMapper->get();
     $this->username = $userResult['User'][0]->username;
 
     // get feed creation time
-    $this->time = $this->$feed_object->time;
+    $this->time = $this->feed_object->time;
 
     // prepare the Details array
-    $details['Name'] = new Array();
+    $this->details['Name'] = Array();
 
     // loop though models and get useful information
-    $singleID = explode(";", $this->$feed_object->model_id);
-
+    $singleID = explode(";", $this->feed_object->model_id);
     foreach ($singleID as $id) {
-      if($this->$feed_object->model == 'Data'){
+      if($this->feed_object->model == 'data'){
         $dataMapper = new Mapper('Data');
         $dataMapper->filter('id = (?)',$id);
         $dataResult = $dataMapper->get();
-        $name = $userResult['Data'][0]->name;
-        $details['Name'][] = $name;
+        $name = $dataResult['Data'][0]->name;
+        $this->details['Name'][] = $name;
       }
       else{
         // only data for now
@@ -117,7 +117,7 @@ class FeedView implements FeedViewInterface {
     }
 
     // get action and its image
-    $this->action = $this->$feed_object->action;
+    $this->action = $this->feed_object->action;
     switch ($this->action) {
       case "data-up":
         $this->image_src = 'view/gfx/upload500.png';
@@ -142,35 +142,31 @@ class FeedView implements FeedViewInterface {
   }
 
   /**
-   * Ping the PACS.
-   *
-   * Ping the PACS to make sure the provided address and port are correct.
-   *
-   * @param[in] int $timeout number of seconds before timeout.
-   * @return json string 1 if server has been successfully responded. 0 if server didn't answer within time.
-   *
-   * @snippet test.pacs.class.php testPing()
+   * Create the Feed HTML code
    */
   public function getHTML(){
     $this->_format();
     // create the html file
-    $t = new Template('template/feed.html');
+    $t = new Template('model/template/feed.html');
     $t -> replace('IMAGE_SRC', $this->image_src);
     $t -> replace('USERNAME', $this->username);
     $t -> replace('TIME', $this->time);
     $t -> replace('MAIN', $this->action_sentence);
     $t -> replace('MORE', 'More');
+    // loop through DATA
+    $feed_data = '';
+
+    foreach ($this->details['Name'] as $key => $value) {
+      $d = new Template('model/template/feed_data.html');
+      $d -> replace('DATA', $value);
+      $feed_data .= $d;
+    }
+    $t -> replace('FEED_DATA', $feed_data);
     return $t;
   }
 
   /**
-   * Add parameter to the command to be executed.
-   *
-   * @param[in] string $name Name of the parameter.
-   * @param[in] string $value Value of the parameter.
-   * @param[in] boolean $force Replace parameter if it is already defined.
-   *
-   * @snippet test.pacs.class.php testAddParameter()
+   * Create the JSON code
    */
   public function getJSON(){
     $this->_format();
