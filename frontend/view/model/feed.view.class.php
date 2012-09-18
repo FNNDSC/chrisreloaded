@@ -151,7 +151,7 @@ class FeedView implements FeedViewInterface {
           break;
         default:
           $this->image_src = 'view/gfx/unknown500.png';
-          $this->action_sentence = 'error: Unkown action: '.$this->action;
+          $this->action_sentence = '<font color="red">error: Action not known: '.$this->action.'</font>';
           break;
       }
     }
@@ -172,7 +172,7 @@ class FeedView implements FeedViewInterface {
     $t -> replace('USERNAME', $this->username);
     $t -> replace('TIME', $this->time);
     $t -> replace('MAIN', $this->action_sentence);
-    $t -> replace('MORE', 'More');
+    $t -> replace('MORE', 'Show details');
     // loop through details
     $feed_details = '';
     if($this->feed_object->model == 'data')
@@ -185,7 +185,7 @@ class FeedView implements FeedViewInterface {
         }
       }
       else{
-        $feed_details = 'error: Data not found: '.$this->feed_object->model_id;
+        $feed_details = '<font color="red">error: Data not found: '.$this->feed_object->model_id.'</font>';
       }
     }
     else if($this->feed_object->model == 'result'){
@@ -196,11 +196,11 @@ class FeedView implements FeedViewInterface {
         $feed_details .= $r;
       }
       else{
-        $feed_details = 'error: Plugin not found: '.$this->feed_object->model_id;
+        $feed_details = '<font color="red">error: Plugin not found: '.$this->feed_object->model_id.'</font>';
       }
     }
     else{
-      $feed_details = 'error: Unknowm model: '.$this->feed_object->model;
+      $feed_details = '<font color="red">error: Model not known: '.$this->feed_object->model.'</font>';
     }
     $t -> replace('FEED_DETAILS', $feed_details);
     return $t;

@@ -109,14 +109,26 @@ Feed.prototype.parsePipeline = function() {
 }
 jQuery(".more").live('click', function() {
   // modify
-  //alert('Show details!');
+  // alert('Show details!');
   var details = jQuery(this).parent().parent().next();
   var hidden = details.is(':hidden');
   if (hidden) {
-    details.show('blind', 500);
+    jQuery(this).html('<a>Hide details</a>');
+    jQuery(this).parent().parent().parent().css('margin-top', '10px');
+    jQuery(this).parent().parent().parent().css('margin-bottom', '11px');
+    details.show('blind', 100);
   } else {
-    details.hide('blind', 500);
+    jQuery(this).html('<a>Show details</a>');
+    jQuery(this).parent().parent().parent().css('margin-top', '-1px');
+    jQuery(this).parent().parent().parent().css('margin-bottom', '0px');
+    details.hide('blind', 100);
   }
+});
+jQuery(".feed").live('mouseenter', function() {
+  jQuery(this).css('background-color', '#fff');
+});
+jQuery(".feed").live('mouseleave', function() {
+  jQuery(this).css('background-color', '#eee');
 });
 // more to live
 // slide up-down effect
@@ -133,7 +145,7 @@ jQuery(document).ready(function() {
   dataNicolas.Name = new Array();
   dataNicolas.Name.push('GADO_AXIAL_T1');
   dataNicolas.Name.push('AX_DWI');
-  //nicolas = new Feed('Nicolas', '5mn', 'data-down', dataNicolas);
+  // nicolas = new Feed('Nicolas', '5mn', 'data-down', dataNicolas);
   // create data
   dataRudolph = {
     Pipeline : 'Tractography',
