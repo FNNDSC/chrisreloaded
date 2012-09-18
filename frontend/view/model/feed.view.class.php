@@ -41,6 +41,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 // include the models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result.class.php'));
 
 // interface
 interface FeedViewInterface
@@ -98,22 +99,29 @@ class FeedView implements FeedViewInterface {
     // get feed creation time
     $this->time = $this->feed_object->time;
 
-    // prepare the Details array
-    $this->details['Name'] = Array();
-
     // loop though models and get useful information
-    $singleID = explode(";", $this->feed_object->model_id);
-    foreach ($singleID as $id) {
-      if($this->feed_object->model == 'data'){
+    // data details
+    if($this->feed_object->model == 'data'){
+      // prepare the Details array
+      $this->details['Name'] = Array();
+      $singleID = explode(";", $this->feed_object->model_id);
+      foreach ($singleID as $id) {
         $dataMapper = new Mapper('Data');
         $dataMapper->filter('id = (?)',$id);
         $dataResult = $dataMapper->get();
         $name = $dataResult['Data'][0]->name;
         $this->details['Name'][] = $name;
       }
-      else{
-        // only data for now
-      }
+    }
+    else{
+      // result details
+      $resultMapper = new Mapper('Result');
+      $resultMapper->filter('id = (?)',$this->feed_object->model_id);
+      $resultResult = $resultMapper->get();
+      $plugin = $resultResult['Result'][0]->plugin;
+      $this->details['Plugin'][] = $plugin;
+      $status = $resultResult['Result'][0]->status;
+      $this->details['Status'][] = $status;
     }
 
     // get action and its image
@@ -127,12 +135,12 @@ class FeedView implements FeedViewInterface {
         $this->image_src = 'view/gfx/download500.png';
         $this->action_sentence = 'Data uploaded to the PACS.';
         break;
-      case "pipeline-start":
+      case "result-start":
         $this->image_src = 'view/gfx/play500.png';
         $this->action_sentence = 'Pipeline started.';
         break;
-      case "pipeline-finish":
-        $this->image_src = 'view/gfx/play500.png';
+      case "result-finish":
+        $this->image_src = 'view/gfx/stop500.png';
         $this->action_sentence = 'Pipeline finished.';
         break;
       default:
@@ -153,15 +161,23 @@ class FeedView implements FeedViewInterface {
     $t -> replace('TIME', $this->time);
     $t -> replace('MAIN', $this->action_sentence);
     $t -> replace('MORE', 'More');
-    // loop through DATA
-    $feed_data = '';
-
-    foreach ($this->details['Name'] as $key => $value) {
-      $d = new Template('model/template/feed_data.html');
-      $d -> replace('DATA', $value);
-      $feed_data .= $d;
+    // loop through details
+    $feed_details = '';
+    if($this->feed_object->model == 'data')
+    {
+      foreach ($this->details['Name'] as $key => $value) {
+        $d = new Template('model/template/feed_data.html');
+        $d -> replace('DATA', $value);
+        $feed_details .= $d;
+      }
     }
-    $t -> replace('FEED_DATA', $feed_data);
+    else{
+      $r = new Template('model/template/feed_result.html');
+      $r -> replace('PLUGIN', $this->details['Plugin'][0]);
+      $r -> replace('STATUS', $this->details['Status'][0]);
+      $feed_details .= $r;
+    }
+    $t -> replace('FEED_DETAILS', $feed_details);
     return $t;
   }
 
