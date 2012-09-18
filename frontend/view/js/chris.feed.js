@@ -110,17 +110,17 @@ Feed.prototype.parsePipeline = function() {
 jQuery(".more").live('click', function() {
   // modify
   // alert('Show details!');
-  var details = jQuery(this).parent().parent().next();
+  var details = jQuery(this).closest('.details');
   var hidden = details.is(':hidden');
   if (hidden) {
     jQuery(this).html('<a>Hide details</a>');
-    jQuery(this).parent().parent().parent().css('margin-top', '10px');
-    jQuery(this).parent().parent().parent().css('margin-bottom', '11px');
+    jQuery(this).closest('.feed').css('margin-top', '10px');
+    jQuery(this).closest('.feed').css('margin-bottom', '11px');
     details.show('blind', 100);
   } else {
     jQuery(this).html('<a>Show details</a>');
-    jQuery(this).parent().parent().parent().css('margin-top', '-1px');
-    jQuery(this).parent().parent().parent().css('margin-bottom', '0px');
+    jQuery(this).closest('.feed').css('margin-top', '-1px');
+    jQuery(this).closest('.feed').css('margin-bottom', '0px');
     details.hide('blind', 100);
   }
 });
@@ -145,10 +145,10 @@ jQuery(".feed").live('click', function() {
 });
 
 jQuery(".feed").live('mouseenter', function() {
-  jQuery(this).css('background-color', '#fff');
+  jQuery(this).css('background-color', '#eee');
 });
 jQuery(".feed").live('mouseleave', function() {
-  jQuery(this).css('background-color', '#eee');
+  jQuery(this).css('background-color', '#fff');
 });
 // more to live
 // slide up-down effect
