@@ -61,6 +61,14 @@ class Mapper {
   private $where = Array();
 
   /**
+   * Order results.
+   * String containing results ordering.
+   *
+   * @var string $order
+   */
+  private $order = '';
+
+  /**
    * Param Array
    * Array containing the params() information to handle prepared queries
    *
@@ -163,9 +171,25 @@ class Mapper {
         foreach ($filter as $condition) {
           $param[] = $condition;
         }
-
       }
       return $param;
+    }
+  }
+
+  /**
+   * Order results based on one column
+   *
+   * @param[in] $field Field to sort results on
+   * @param[in] $dir Sorting direction (1 == DESC, else ASC)
+   *
+   */
+  public function order($column, $dir = 1) {
+    $this->order .= ' ORDER BY '.$column;
+    if($dir == 1){
+      $this->order .= ' DESC';
+    }
+    else{
+      $this->order .= ' ASC';
     }
   }
 
@@ -304,9 +328,9 @@ class Mapper {
       // append to existing - might be an issue?
       $this->filter(strtolower($this->objectname).'.id =?', $id);
     }
-
+    
     // query the database
-    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).strtolower($this->group).strtolower($this->order), $this->_getParam());
 
     // create an array to store the objects
     $objects = Array();
