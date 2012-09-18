@@ -94,58 +94,66 @@ class FeedView implements FeedViewInterface {
 
     $userMapper->filter('id = (?)',$this->feed_object->user_id);
     $userResult = $userMapper->get();
-    $this->username = $userResult['User'][0]->username;
+    // proceed if user has been found
+    if(count($userResult['User']) == 1){
+      $this->username = $userResult['User'][0]->username;
 
-    // get feed creation time
-    $this->time = $this->feed_object->time;
+      // get feed creation time
+      $this->time = $this->feed_object->time;
 
-    // loop though models and get useful information
-    // data details
-    if($this->feed_object->model == 'data'){
-      // prepare the Details array
-      $this->details['Name'] = Array();
-      $singleID = explode(";", $this->feed_object->model_id);
-      foreach ($singleID as $id) {
-        $dataMapper = new Mapper('Data');
-        $dataMapper->filter('id = (?)',$id);
-        $dataResult = $dataMapper->get();
-        $name = $dataResult['Data'][0]->name;
-        $this->details['Name'][] = $name;
+      // loop though models and get useful information
+      // data details
+      if($this->feed_object->model == 'data'){
+        // prepare the Details array
+        $this->details['Name'] = Array();
+        $singleID = explode(";", $this->feed_object->model_id);
+        foreach ($singleID as $id) {
+          $dataMapper = new Mapper('Data');
+          $dataMapper->filter('id = (?)',$id);
+          $dataResult = $dataMapper->get();
+          if(count($dataResult['Data']) == 1){
+            $name = $dataResult['Data'][0]->name;
+            $this->details['Name'][] = $name;
+          }
+        }
       }
-    }
-    else{
-      // result details
-      $resultMapper = new Mapper('Result');
-      $resultMapper->filter('id = (?)',$this->feed_object->model_id);
-      $resultResult = $resultMapper->get();
-      $plugin = $resultResult['Result'][0]->plugin;
-      $this->details['Plugin'][] = $plugin;
-      $status = $resultResult['Result'][0]->status;
-      $this->details['Status'][] = $status;
-    }
+      else{
+        // result details
+        $resultMapper = new Mapper('Result');
+        $resultMapper->filter('id = (?)',$this->feed_object->model_id);
+        $resultResult = $resultMapper->get();
+        if(count($resultResult['Result']) == 1){
+          $plugin = $resultResult['Result'][0]->plugin;
+          $this->details['Plugin'][] = $plugin;
+          $status = $resultResult['Result'][0]->status;
+          $this->details['Status'][] = $status;
+        }
+      }
 
-    // get action and its image
-    $this->action = $this->feed_object->action;
-    switch ($this->action) {
-      case "data-up":
-        $this->image_src = 'view/gfx/upload500.png';
-        $this->action_sentence = 'Data downloaded from the PACS.';
-        break;
-      case "data-down":
-        $this->image_src = 'view/gfx/download500.png';
-        $this->action_sentence = 'Data uploaded to the PACS.';
-        break;
-      case "result-start":
-        $this->image_src = 'view/gfx/play500.png';
-        $this->action_sentence = 'Pipeline started.';
-        break;
-      case "result-finish":
-        $this->image_src = 'view/gfx/stop500.png';
-        $this->action_sentence = 'Pipeline finished.';
-        break;
-      default:
-        $this->action_sentence = 'Unkown action.';
-        break;
+      // get action and its image
+      $this->action = $this->feed_object->action;
+      switch ($this->action) {
+        case "data-up":
+          $this->image_src = 'view/gfx/upload500.png';
+          $this->action_sentence = 'Data uploaded to the PACS.';
+          break;
+        case "data-down":
+          $this->image_src = 'view/gfx/download500.png';
+          $this->action_sentence = 'Data downloaded from the PACS.';
+          break;
+        case "result-start":
+          $this->image_src = 'view/gfx/play500.png';
+          $this->action_sentence = 'Pipeline started.';
+          break;
+        case "result-finish":
+          $this->image_src = 'view/gfx/stop500.png';
+          $this->action_sentence = 'Pipeline finished.';
+          break;
+        default:
+          $this->image_src = 'view/gfx/unknown500.png';
+          $this->action_sentence = 'error: Unkown action: '.$this->action;
+          break;
+      }
     }
   }
 
@@ -154,6 +162,10 @@ class FeedView implements FeedViewInterface {
    */
   public function getHTML(){
     $this->_format();
+    // if user not found, do not return anything
+    if($this->username == ''){
+      return '';
+    }
     // create the html file
     $t = new Template('model/template/feed.html');
     $t -> replace('IMAGE_SRC', $this->image_src);
@@ -165,17 +177,30 @@ class FeedView implements FeedViewInterface {
     $feed_details = '';
     if($this->feed_object->model == 'data')
     {
-      foreach ($this->details['Name'] as $key => $value) {
-        $d = new Template('model/template/feed_data.html');
-        $d -> replace('DATA', $value);
-        $feed_details .= $d;
+      if(array_key_exists('Name',$this->details) && count($this->details['Name']) > 0){
+        foreach ($this->details['Name'] as $key => $value) {
+          $d = new Template('model/template/feed_data.html');
+          $d -> replace('DATA', $value);
+          $feed_details .= $d;
+        }
+      }
+      else{
+        $feed_details = 'error: Data not found: '.$this->feed_object->model_id;
+      }
+    }
+    else if($this->feed_object->model == 'result'){
+      if(array_key_exists('Plugin',$this->details) && count($this->details['Plugin']) > 0){
+        $r = new Template('model/template/feed_result.html');
+        $r -> replace('PLUGIN', $this->details['Plugin'][0]);
+        $r -> replace('STATUS', $this->details['Status'][0]);
+        $feed_details .= $r;
+      }
+      else{
+        $feed_details = 'error: Plugin not found: '.$this->feed_object->model_id;
       }
     }
     else{
-      $r = new Template('model/template/feed_result.html');
-      $r -> replace('PLUGIN', $this->details['Plugin'][0]);
-      $r -> replace('STATUS', $this->details['Status'][0]);
-      $feed_details .= $r;
+      $feed_details = 'error: Unknowm model: '.$this->feed_object->model;
     }
     $t -> replace('FEED_DETAILS', $feed_details);
     return $t;

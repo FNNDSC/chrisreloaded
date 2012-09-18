@@ -328,7 +328,7 @@ class Mapper {
       // append to existing - might be an issue?
       $this->filter(strtolower($this->objectname).'.id =?', $id);
     }
-    
+
     // query the database
     $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).strtolower($this->group).strtolower($this->order), $this->_getParam());
 
@@ -341,32 +341,33 @@ class Mapper {
     }
 
     // create objects and map all the attributes
-    foreach ($results as $result) {
+    if(gettype($results) == 'array'){
+      foreach ($results as $result) {
+        // localid
+        $localid = 0;
+        $object = null;
 
-      // localid
-      $localid = 0;
-      $object = null;
-
-      // parse on result
-      foreach ($result as $field) {
-        // if we reach a "id" field, create new object
-        if ($field[0] == 'id') {
-          // if there is an object existing, push it to right location and update localid
-          // we only push the object once it has been filled!
-          if (!empty($object)) {
-            $objects[$this->objects[$localid]][] = $object;
-            ++$localid;
+        // parse on result
+        foreach ($result as $field) {
+          // if we reach a "id" field, create new object
+          if ($field[0] == 'id') {
+            // if there is an object existing, push it to right location and update localid
+            // we only push the object once it has been filled!
+            if (!empty($object)) {
+              $objects[$this->objects[$localid]][] = $object;
+              ++$localid;
+            }
+            // create new object
+            $object = new $this->objects[$localid]();
           }
-          // create new object
-          $object = new $this->objects[$localid]();
+          // update fields
+          $object->$field[0] = $field[1];
         }
-        // update fields
-        $object->$field[0] = $field[1];
-      }
-      // push last object to the right location
-      // we only push the object once it has been filled!
-      if (!empty($object)) {
-        $objects[$this->objects[$localid]][] = $object;
+        // push last object to the right location
+        // we only push the object once it has been filled!
+        if (!empty($object)) {
+          $objects[$this->objects[$localid]][] = $object;
+        }
       }
     }
     return $objects;
