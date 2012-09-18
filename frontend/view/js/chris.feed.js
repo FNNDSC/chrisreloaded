@@ -107,7 +107,8 @@ Feed.prototype.parsePipeline = function() {
   content += '</div>';
   return content;
 }
-jQuery(".more").live('click', function() {
+jQuery(".more").live('click', function(e) {
+  e.stopPropagation();
   // modify
   // alert('Show details!');
   var details = jQuery(this).closest('.details');
@@ -124,26 +125,27 @@ jQuery(".more").live('click', function() {
     details.hide('blind', 100);
   }
 });
-
-jQuery(".feed").live('click', function() {
-  // modify
-  // alert('Show details!');
-  var details = jQuery(this).children('.details');
-  var more = jQuery(this).children('.preview').children('.content').children('.more');
-  var hidden = details.is(':hidden');
-  if (hidden) {
-    more.html('<a>Hide details</a>');
-    jQuery(this).css('margin-top', '10px');
-    jQuery(this).css('margin-bottom', '11px');
-    details.show('blind', 100);
-  } else {
-    more.html('<a>Show details</a>');
-    jQuery(this).css('margin-top', '-1px');
-    jQuery(this).css('margin-bottom', '0px');
-    details.hide('blind', 100);
-  }
-});
-
+jQuery(".feed").live(
+    'click',
+    function() {
+      // modify
+      // alert('Show details!');
+      var details = jQuery(this).children('.details');
+      var more = jQuery(this).children('.preview').children('.content')
+          .children('.more');
+      var hidden = details.is(':hidden');
+      if (hidden) {
+        more.html('<a>Hide details</a>');
+        jQuery(this).css('margin-top', '10px');
+        jQuery(this).css('margin-bottom', '11px');
+        details.show('blind', 100);
+      } else {
+        more.html('<a>Show details</a>');
+        jQuery(this).css('margin-top', '-1px');
+        jQuery(this).css('margin-bottom', '0px');
+        details.hide('blind', 100);
+      }
+    });
 jQuery(".feed").live('mouseenter', function() {
   jQuery(this).css('background-color', '#eee');
 });
