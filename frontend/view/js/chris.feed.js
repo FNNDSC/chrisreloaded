@@ -83,7 +83,8 @@ Feed.prototype.parseData = function() {
   var data_nb = this.details.Name.length;
   var i = 0;
   for (i = 0; i < data_nb; i++) {
-    content += '<div class="data">';
+    // css in show/hide div should be there
+    content += '<div class="data" style="border-top: 1px solid;border-color: grey;margin-top: 5px;">';
     content += '<i class=" icon-chevron-down"></i>';
     content += this.details.Name[i];
     content += '<span class="pull-right"><i class="icon-star"></i><i class="icon-eye-open"></i><i class="icon-share"></i></span>';
@@ -107,7 +108,14 @@ Feed.prototype.parsePipeline = function() {
   return content;
 }
 jQuery(".more").live('click', function() {
-  jQuery(this).parent().parent().next().show('blind', 500);
+  // modify
+  var details = jQuery(this).parent().parent().next();
+  var hidden = details.is(':hidden');
+  if (hidden) {
+    details.show('blind', 500);
+  } else {
+    details.hide('blind', 500);
+  }
 });
 // more to live
 // slide up-down effect
@@ -124,7 +132,7 @@ jQuery(document).ready(function() {
   dataNicolas.Name = new Array();
   dataNicolas.Name.push('GADO_AXIAL_T1');
   dataNicolas.Name.push('AX_DWI');
-  nicolas = new Feed('Nicolas', '5mn', 'data-down', dataNicolas);
+  // nicolas = new Feed('Nicolas', '5mn', 'data-down', dataNicolas);
   // create data
   dataRudolph = {
     Pipeline : 'Tractography',
@@ -132,7 +140,7 @@ jQuery(document).ready(function() {
     Status : '100'
   };
   // Rudolph's feed
-  rudolph = new Feed('Rudolph', '15mn', 'pipeline-start', dataRudolph);
+  // rudolph = new Feed('Rudolph', '15mn', 'pipeline-start', dataRudolph);
   // create pipeline details
   dataDaniel = {
     Pipeline : 'Motion Correction',
@@ -140,7 +148,7 @@ jQuery(document).ready(function() {
     Status : '70'
   };
   // Daniel's feed
-  daniel = new Feed('Daniel', '17mn', 'pipeline-start', dataDaniel);
+  // daniel = new Feed('Daniel', '17mn', 'pipeline-start', dataDaniel);
   // create data details
   dataEllen = {
     Name : null,
@@ -150,5 +158,5 @@ jQuery(document).ready(function() {
   dataEllen.Name = new Array();
   dataEllen.Name.push('RADIATION_ONCOLOGY_1');
   // Ellen's feed
-  ellen = new Feed('Ellen', '2 days', 'data-up', dataEllen);
+  // ellen = new Feed('Ellen', '2 days', 'data-up', dataEllen);
 });

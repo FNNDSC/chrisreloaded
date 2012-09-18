@@ -2,7 +2,7 @@
 	margin-top: -1px;
 	padding: 5px;
 	border: 1px solid;
-	border-radius: 5px;
+	border-color: grey;
 }
 
 .feed>.preview {
@@ -52,6 +52,5 @@
 }
 
 .feed>.details>.data {
-	border-top: 1px solid;
-	margin-top: 5px
+
 }
