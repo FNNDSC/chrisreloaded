@@ -165,7 +165,23 @@ _FEED_.ajaxUpdate = function() {
     dataType : "text",
     data : {},
     success : function(data) {
+      if (data) {
+        // fill cache
+        _FEED_.cachedFeeds += data;
+        // update "Update" button
+        jQuery('.feed_update').html('More feeds available');
+      }
     }
+  });
+}
+_FEED_.update_onclick = function() {
+  jQuery(".feed_update").live('click', function() {
+    // update the feeds
+    jQuery('.feed_content').prepend(_FEED_.cachedFeeds);
+    // empty buffer
+    _FEED_.cachedFeeds = [];
+    // update button
+    jQuery(this).html('Up to date');
   });
 }
 /**
@@ -173,8 +189,10 @@ _FEED_.ajaxUpdate = function() {
  */
 jQuery(document).ready(function() {
   // feed functions
+  _FEED_.cachedFeeds = '';
   _FEED_.feed_onclick();
   _FEED_.more_onclick();
+  _FEED_.update_onclick();
   _FEED_.feed_mouseenter();
   _FEED_.feed_mouseleave();
   _FEED_.updateFeedTimeout();

@@ -48,10 +48,10 @@ $feedResult = $feedMapper->get();
 
 if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->id > $feed_id){
   $old_id = $feed_id;
-  $_SESSION['feed_id'] = $feedResult['Feed'][0]->id > $feed_id;
+  $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
   // for each
   foreach ($feedResult['Feed'] as $key => $value) {
-    if($value->id > $old_id){
+    if($value->id <= $old_id){
       break;
     }
     $view = new FeedView($value);
@@ -59,6 +59,5 @@ if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->id > $feed_id){
   }
 }
 
-//echo $feed_content;
-echo $_SESSION['feed_id'];
+echo $feed_content;
 ?>
