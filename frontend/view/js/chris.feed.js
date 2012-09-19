@@ -2,7 +2,6 @@
  * Define the FEED namespace
  */
 var _FEED_ = _FEED_ || {};
-
 function Feed(user, time, type, details) {
   this.user = user;
   this.time = time;
@@ -112,7 +111,7 @@ Feed.prototype.parsePipeline = function() {
   content += '</div>';
   return content;
 }
-_FEED_.feed_onclick = function(more, details) {
+_FEED_.onclick = function(more, details) {
   var hidden = details.is(':hidden');
   if (hidden) {
     more.html('<a>Hide details</a>');
@@ -126,33 +125,59 @@ _FEED_.feed_onclick = function(more, details) {
     details.hide('blind', 100);
   }
 }
-jQuery(".more").live('click', function(e) {
-  // modify
-  e.stopPropagation();
-  var details = jQuery(this).closest('.preview').next();
-  _FEED_.feed_onclick(jQuery(this), details);
-});
-jQuery(".feed").live(
-    'click',
-    function() {
-      // modify
-      // alert('Show details!');
-      var details = jQuery(this).children('.details');
-      var more = jQuery(this).children('.preview').children('.content')
-          .children('.more');
-      _FEED_.feed_onclick(more, details);
-    });
-jQuery(".feed").live('mouseenter', function() {
-  jQuery(this).css('background-color', '#eee');
-});
-jQuery(".feed").live('mouseleave', function() {
-  jQuery(this).css('background-color', '#fff');
-});
-
+_FEED_.more_onclick = function() {
+  jQuery(".more").live('click', function(e) {
+    // modify
+    e.stopPropagation();
+    var details = jQuery(this).closest('.preview').next();
+    _FEED_.onclick(jQuery(this), details);
+  });
+}
+_FEED_.feed_onclick = function() {
+  jQuery(".feed").live(
+      'click',
+      function() {
+        // modify
+        // alert('Show details!');
+        var details = jQuery(this).children('.details');
+        var more = jQuery(this).children('.preview').children('.content')
+            .children('.more');
+        _FEED_.onclick(more, details);
+      });
+}
+_FEED_.feed_mouseenter = function() {
+  jQuery(".feed").live('mouseenter', function() {
+    jQuery(this).css('background-color', '#eee');
+  });
+}
+_FEED_.feed_mouseleave = function() {
+  jQuery(".feed").live('mouseleave', function() {
+    jQuery(this).css('background-color', '#fff');
+  });
+}
+_FEED_.updateFeedTimeout = function() {
+  timer = setInterval(_FEED_.ajaxUpdate, 5000);
+}
+_FEED_.ajaxUpdate = function() {
+  jQuery.ajax({
+    type : "POST",
+    url : "controller/feed_update.php",
+    dataType : "text",
+    data : {},
+    success : function(data) {
+    }
+  });
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
 jQuery(document).ready(function() {
+  // feed functions
+  _FEED_.feed_onclick();
+  _FEED_.more_onclick();
+  _FEED_.feed_mouseenter();
+  _FEED_.feed_mouseleave();
+  _FEED_.updateFeedTimeout();
   // create data details
   dataNicolas = {
     Name : null,
