@@ -22,7 +22,7 @@
 }
 
 .feed>.preview>.title {
-	width: 90%;
+	width: 92%;
 	float: right;
 	padding: 5px;
 }
@@ -38,12 +38,12 @@
 
 .feed>.preview>.gfx {
 	float: left;
-	width: 60px;
-	opacity:0.2;
+	width: 48px;
+	opacity:0.5;
 }
 
 .feed>.preview>.content {
-	width: 90%;
+	width: 92%;
 	float: right;
 	padding: 5px;
 }
