@@ -1,3 +1,8 @@
+/**
+ * Define the FEED namespace
+ */
+var _FEED_ = _FEED_ || {};
+
 function Feed(user, time, type, details) {
   this.user = user;
   this.time = time;
@@ -107,23 +112,25 @@ Feed.prototype.parsePipeline = function() {
   content += '</div>';
   return content;
 }
-jQuery(".more").live('click', function(e) {
-  e.stopPropagation();
-  // modify
-  // alert('Show details!');
-  var details = jQuery(this).closest('.details');
+_FEED_.feed_onclick = function(more, details) {
   var hidden = details.is(':hidden');
   if (hidden) {
-    jQuery(this).html('<a>Hide details</a>');
-    jQuery(this).closest('.feed').css('margin-top', '10px');
-    jQuery(this).closest('.feed').css('margin-bottom', '11px');
+    more.html('<a>Hide details</a>');
+    more.closest('.feed').css('margin-top', '10px');
+    more.closest('.feed').css('margin-bottom', '11px');
     details.show('blind', 100);
   } else {
-    jQuery(this).html('<a>Show details</a>');
-    jQuery(this).closest('.feed').css('margin-top', '-1px');
-    jQuery(this).closest('.feed').css('margin-bottom', '0px');
+    more.html('<a>Show details</a>');
+    more.closest('.feed').css('margin-top', '-1px');
+    more.closest('.feed').css('margin-bottom', '0px');
     details.hide('blind', 100);
   }
+}
+jQuery(".more").live('click', function(e) {
+  // modify
+  e.stopPropagation();
+  var details = jQuery(this).closest('.preview').next();
+  _FEED_.feed_onclick(jQuery(this), details);
 });
 jQuery(".feed").live(
     'click',
@@ -133,18 +140,7 @@ jQuery(".feed").live(
       var details = jQuery(this).children('.details');
       var more = jQuery(this).children('.preview').children('.content')
           .children('.more');
-      var hidden = details.is(':hidden');
-      if (hidden) {
-        more.html('<a>Hide details</a>');
-        jQuery(this).css('margin-top', '10px');
-        jQuery(this).css('margin-bottom', '11px');
-        details.show('blind', 100);
-      } else {
-        more.html('<a>Show details</a>');
-        jQuery(this).css('margin-top', '-1px');
-        jQuery(this).css('margin-bottom', '0px');
-        details.hide('blind', 100);
-      }
+      _FEED_.feed_onclick(more, details);
     });
 jQuery(".feed").live('mouseenter', function() {
   jQuery(this).css('background-color', '#eee');
@@ -152,8 +148,7 @@ jQuery(".feed").live('mouseenter', function() {
 jQuery(".feed").live('mouseleave', function() {
   jQuery(this).css('background-color', '#fff');
 });
-// more to live
-// slide up-down effect
+
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
