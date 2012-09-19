@@ -45,7 +45,9 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.class.php'));
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'model/feed.view.class.php'));
 
-$_SESSION['username'] = 'Ellen'; // store session data
+// store session data
+$_SESSION['username'] = 'Ellen';
+$_SESSION['feed_id'] = '0';
 
 function getFeeds($nb_feeds){
   $feed_content = '';
@@ -56,14 +58,22 @@ function getFeeds($nb_feeds){
   $feedMapper->order('id');
   $feedResult = $feedMapper->get();
 
-  // for each
-  foreach ($feedResult['Feed'] as $key => $value) {
-    if($i >= $nb_feeds){
-      break;
+  if(count($feedResult['Feed']) >= 1){
+
+    $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
+
+    // for each
+    foreach ($feedResult['Feed'] as $key => $value) {
+      if($i >= $nb_feeds){
+        break;
+      }
+      $view = new FeedView($value);
+      $feed_content .= $view->getHTML();
+      $i++;
     }
-    $view = new FeedView($value);
-    $feed_content .= $view->getHTML();
-    $i++;
+  }
+  else{
+    $feed_content .= 'No feed found.';
   }
 
   return $feed_content;
@@ -76,6 +86,7 @@ function homePage() {
   $t -> replace('NAVBAR', 'navbar.html');
   // get last 10 feeds
   $t -> replace('FEED_CONTENT', getFeeds(10));
+  $t -> replace('FEED_ID', 'LAST FEED ID: '.$_SESSION['feed_id']);
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');
   return $t;
