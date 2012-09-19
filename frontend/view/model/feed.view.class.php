@@ -30,7 +30,7 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
   die('Invalid access.');
 
 // include the configuration
-require_once ('config.inc.php');
+require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
 //require_once 'object.template.class.php';
 
 // include the controllers to interact with the database
@@ -134,27 +134,27 @@ class FeedView implements FeedViewInterface {
       $this->action = $this->feed_object->action;
       switch ($this->action) {
         case "data-up":
-          $this->image_src = 'view/gfx/data-up256.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_upload.png';
           $this->action_sentence = 'Data uploaded to the PACS.';
           break;
         case "data-down":
-          $this->image_src = 'view/gfx/data-down256.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_download.png';
           $this->action_sentence = 'Data downloaded from the PACS.';
           break;
         case "result-start":
-          $this->image_src = 'view/gfx/result-start256.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_settings.png';
           $this->action_sentence = 'Pipeline started.';
           break;
         case "result-success":
-          $this->image_src = 'view/gfx/result-success256.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_settings.png';
           $this->action_sentence = 'Pipeline finished.';
           break;
         case "result-failure":
-          $this->image_src = 'view/gfx/result-failure256.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_settings.png';
           $this->action_sentence = 'Pipeline finished with errors.';
           break;
         default:
-          $this->image_src = 'view/gfx/unknown256.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_close.png';
           $this->action_sentence = '<font color="red">error: Action not known: '.$this->action.'</font>';
           break;
       }

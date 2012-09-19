@@ -32,7 +32,7 @@ define('__CHRIS_ENTRY_POINT__', 666);
 //define('CHRIS_CONFIG_DEBUG', true);
 
 // include the configuration
-require_once ('config.inc.php');
+require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
 
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
@@ -49,6 +49,7 @@ require_once (joinPaths(CHRIS_VIEW_FOLDER, 'model/feed.view.class.php'));
 $_SESSION['username'] = 'Ellen';
 $_SESSION['feed_id'] = '0';
 
+// shouldnt be there!
 function getFeeds($nb_feeds){
   $feed_content = '';
   $i = 0;
