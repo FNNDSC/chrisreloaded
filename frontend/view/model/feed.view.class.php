@@ -134,23 +134,27 @@ class FeedView implements FeedViewInterface {
       $this->action = $this->feed_object->action;
       switch ($this->action) {
         case "data-up":
-          $this->image_src = 'view/gfx/upload500.png';
+          $this->image_src = 'view/gfx/data-up256.png';
           $this->action_sentence = 'Data uploaded to the PACS.';
           break;
         case "data-down":
-          $this->image_src = 'view/gfx/download500.png';
+          $this->image_src = 'view/gfx/data-down256.png';
           $this->action_sentence = 'Data downloaded from the PACS.';
           break;
         case "result-start":
-          $this->image_src = 'view/gfx/play500.png';
+          $this->image_src = 'view/gfx/result-start256.png';
           $this->action_sentence = 'Pipeline started.';
           break;
-        case "result-finish":
-          $this->image_src = 'view/gfx/stop500.png';
+        case "result-success":
+          $this->image_src = 'view/gfx/result-success256.png';
+          $this->action_sentence = 'Pipeline finished.';
+          break;
+        case "result-failure":
+          $this->image_src = 'view/gfx/result-failure256.png';
           $this->action_sentence = 'Pipeline finished.';
           break;
         default:
-          $this->image_src = 'view/gfx/unknown500.png';
+          $this->image_src = 'view/gfx/unknown256.png';
           $this->action_sentence = '<font color="red">error: Action not known: '.$this->action.'</font>';
           break;
       }
