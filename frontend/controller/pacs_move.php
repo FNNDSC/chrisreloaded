@@ -71,7 +71,7 @@ else{
       return;
     }
 
-    $pacs2 = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], 'FNNDSC_CHRISTEST');
+    $pacs2 = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], 'FNNDSC-CHRISTEST');
     $pacs2->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
     $pacs2->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
     echo json_encode($pacs2->moveSeries());
