@@ -151,7 +151,7 @@ class FeedView implements FeedViewInterface {
           break;
         case "result-failure":
           $this->image_src = 'view/gfx/result-failure256.png';
-          $this->action_sentence = 'Pipeline finished.';
+          $this->action_sentence = 'Pipeline finished with errors.';
           break;
         default:
           $this->image_src = 'view/gfx/unknown256.png';
