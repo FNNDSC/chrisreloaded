@@ -50,6 +50,7 @@ _FEED_.updateFeedTimeout = function() {
   timer = setInterval(_FEED_.ajaxUpdate, 5000);
 }
 _FEED_.ajaxUpdate = function() {
+  // ajax call
   jQuery.ajax({
     type : "POST",
     url : "controller/feed_update.php",
@@ -61,9 +62,32 @@ _FEED_.ajaxUpdate = function() {
         _FEED_.cachedFeeds += data;
         // update "Update" button
         jQuery('.feed_update').html('More feeds available');
+        jQuery('.feed_update').show('blind', 100);
       }
     }
   });
+  // update time
+  _FEED_.updateTime();
+}
+_FEED_.updateTime = function() {
+  var currentTime = new Date();
+  jQuery('.time').each(
+      function() {
+        var dateArray = jQuery(this).html().split('<b>')[1].split('</b>')[0]
+            .split(' ');
+        var year = dateArray[0].split('-');
+        var time = dateArray[1].split(':');
+        var feedTime = new Date(year[0], year[1], year[2], time[0],
+            time[1], time[2]);
+        window.console.log(currentTime);
+        window.console.log(feedTime);
+        var diff = new Date();
+        diff.setTime(currentTime - feedTime);
+        window.console.log(diff);
+        var timeString = jQuery(this).html(
+            diff.getDate() + ' days ' + diff.getHours() + ' hours '
+                + diff.getMinutes() + ' minutes');
+      });
 }
 _FEED_.update_onclick = function() {
   jQuery(".feed_update").live('click', function() {
@@ -72,7 +96,7 @@ _FEED_.update_onclick = function() {
     // empty buffer
     _FEED_.cachedFeeds = [];
     // update button
-    jQuery(this).html('Up to date');
+    jQuery(this).hide('blind', 100);
   });
 }
 /**
@@ -87,4 +111,5 @@ jQuery(document).ready(function() {
   _FEED_.feed_mouseenter();
   _FEED_.feed_mouseleave();
   _FEED_.updateFeedTimeout();
+  _FEED_.updateTime();
 });

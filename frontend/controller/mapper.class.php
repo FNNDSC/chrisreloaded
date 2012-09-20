@@ -29,6 +29,22 @@
 // prevent direct calls
 if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
+// interface
+interface MapperInterface
+{
+  public function __construct($object);
+  public function order($column, $dir);
+  public function filter($condition, $param, $index, $operator);
+  public function join($tableObject, $joinCondition);
+  public function ljoin($tableObject, $joinCondition);
+  public function group($condition);
+  public function get($id);
+  static public function getStatic($objectName, $id);
+  static public function add($object);
+  static public function update($object, $objectid);
+  static public function delete($object, $objectid);
+}
+
 /**
  * Interface between the Objects and the Database
  * to ensure good Model View Controller (MVC) pratice.
@@ -36,7 +52,7 @@ if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
  * @example test.mapper.class.php
  *
  */
-class Mapper {
+class Mapper implements MapperInterface {
   /**
    * Base object name.
    *
@@ -387,7 +403,7 @@ class Mapper {
    *
    * @snippet test.mapper.class.php testGetStatic()
    */
-  public function getStatic($objectName, $id = -1) {
+  static public function getStatic($objectName, $id = -1) {
     $objectName = Mapper::_getName($objectName);
     $where = '';
     $preparedValue = Array();

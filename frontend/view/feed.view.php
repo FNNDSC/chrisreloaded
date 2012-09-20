@@ -31,7 +31,9 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
 
 // include the configuration
 require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
-//require_once 'object.template.class.php';
+
+// include the object view interface
+require_once ('object.view.php');
 
 // include the controllers to interact with the database
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
@@ -43,21 +45,10 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result.model.php'));
 
-// interface
-interface FeedViewInterface
-{
-  // constructor feed object as parameter
-  public function __construct($feedObject);
-  // get HTML representation of the feed
-  public function getHTML();
-  // get JSON representation of the feed
-  public function getJSON();
-}
-
 /**
  * View class to get different representations of the Feed object
  */
-class FeedV implements FeedViewInterface {
+class FeedV implements ObjectViewInterface {
 
   /**
    * Base feed object

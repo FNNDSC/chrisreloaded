@@ -1,10 +1,22 @@
 .feed_title {
+	padding: 10px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+	border-color: lightgrey;
+	border-top-right-radius: 4px;
+	border-top-left-radius: 4px;
+	background-color: #fff;
+}
+
+.feed_update {
 	margin-top: -1px;
 	padding: 10px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 	border-color: grey;
-	background-color: #fff;
+	display: none;
+	cursor: pointer;
+	background: -moz-linear-gradient(top, #ddd, #ccc);
 }
 
 .feed {

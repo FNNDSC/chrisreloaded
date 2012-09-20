@@ -43,6 +43,7 @@ interface FeedControllerInterface
 {
   // get HTML representation of the feed
   static public function getHTML($nb_feeds);
+  static public function update();
 }
 
 /**
@@ -96,7 +97,7 @@ class FeedC implements FeedControllerInterface {
         if($value->id <= $old_id){
           break;
         }
-        $view = new FeedView($value);
+        $view = new FeedV($value);
         $feed_content .= $view->getHTML();
       }
     }
