@@ -26,8 +26,7 @@
  *
  */
 // prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 // include the configuration
 require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');

@@ -29,9 +29,8 @@
 // we define a valid entry point
 if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration file
-// requires the full path
-$confFile = dirname(__FILE__).'/../config.inc.php';
-if(!defined('CHRIS_CONFIG_PARSED')) require_once($confFile);
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
 
 // build the storescp command
 // storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"

@@ -26,8 +26,7 @@
  *
  */
 // prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 // interface
 interface PACSInterface

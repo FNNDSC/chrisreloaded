@@ -32,7 +32,7 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
-require_once ('../config.inc.php');
+require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
 
 // include the mapper class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));

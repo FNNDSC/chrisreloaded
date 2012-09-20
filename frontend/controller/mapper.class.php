@@ -27,8 +27,7 @@
  */
 
 // prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 /**
  * Interface between the Objects and the Database

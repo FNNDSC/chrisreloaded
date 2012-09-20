@@ -32,7 +32,8 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
-if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
 
 // include the simpletest chris framework
 require_once (SIMPLETEST_CHRIS);
