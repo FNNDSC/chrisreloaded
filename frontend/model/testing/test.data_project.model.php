@@ -25,39 +25,31 @@
  *                        dev@babyMRI.org
  *
  */
-define('__CHRIS_ENTRY_POINT__', 666);
+
+// we define a valid entry point
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+
+//define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
-require_once ('_session.inc.php');
-require_once 'db.class.php';
-require_once 'mapper.class.php';
+if(!defined('CHRIS_CONFIG_PARSED')) require_once('../../config.inc.php');
 
-// include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
-// include the view
-require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
+// include the simpletest chris framework
+require_once (SIMPLETEST_CHRIS);
+SimpleTest_Chris::setPreference();
 
-$feed_id = $_SESSION['feed_id'];
-$feed_content = '';
+// include the db class
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 
-// get feed objects
-$feedMapper = new Mapper('Feed');
-$feedMapper->order('id');
-$feedResult = $feedMapper->get();
+// include the test object class since we derive from that
+require_once('test.object.model.php');
 
-if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->id > $feed_id){
-  $old_id = $feed_id;
-  $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
-  // for each
-  foreach ($feedResult['Feed'] as $key => $value) {
-    if($value->id <= $old_id){
-      break;
-    }
-    $view = new FeedView($value);
-    $feed_content .= $view->getHTML();
-  }
+// include the data_project class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'data_project.model.php'));
+
+class TestData_ProjectModel extends TestObjectModel {
+
+
 }
 
-echo $feed_content;
 ?>

@@ -25,39 +25,48 @@
  *                        dev@babyMRI.org
  *
  */
-define('__CHRIS_ENTRY_POINT__', 666);
 
-// include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
-require_once ('_session.inc.php');
-require_once 'db.class.php';
-require_once 'mapper.class.php';
+// prevent direct calls
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
-// include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
-// include the view
-require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
+// grab the super class for all entities
+require_once 'object.model.php';
 
-$feed_id = $_SESSION['feed_id'];
-$feed_content = '';
+/**
+ *
+ * The User class which describes the User entity of the database.
+ *
+ */
+class User extends Object {
 
-// get feed objects
-$feedMapper = new Mapper('Feed');
-$feedMapper->order('id');
-$feedResult = $feedMapper->get();
+  /**
+   * The user name.
+   *
+   * @var string $username
+   */
+  public $username = null;
 
-if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->id > $feed_id){
-  $old_id = $feed_id;
-  $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
-  // for each
-  foreach ($feedResult['Feed'] as $key => $value) {
-    if($value->id <= $old_id){
-      break;
-    }
-    $view = new FeedView($value);
-    $feed_content .= $view->getHTML();
-  }
+  /**
+   * The encrypted password.
+   *
+   * @var string $password
+   */
+  public $password = null;
+  
+  /**
+   * The email of the user.
+   *
+   * @var string $email
+   */
+  public $email = null;
+  
+  /**
+   * Extra information about the user.
+   * background, privacy settings, etc.
+   *
+   * @var string $meta_information
+   */
+  public $meta_information = null;
 }
-
-echo $feed_content;
 ?>

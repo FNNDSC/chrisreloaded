@@ -40,13 +40,13 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 
 // include the patient class
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'scan.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'modality.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result_scan.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result_project.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'project.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'scan.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'modality.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result_scan.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result_project.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'project.model.php'));
 
 class Search {
 

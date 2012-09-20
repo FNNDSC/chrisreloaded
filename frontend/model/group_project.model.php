@@ -25,39 +25,33 @@
  *                        dev@babyMRI.org
  *
  */
-define('__CHRIS_ENTRY_POINT__', 666);
 
-// include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
-require_once ('_session.inc.php');
-require_once 'db.class.php';
-require_once 'mapper.class.php';
+// prevent direct calls
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
-// include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
-// include the view
-require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
+// grab the super class for all entities
+require_once 'object.model.php';
 
-$feed_id = $_SESSION['feed_id'];
-$feed_content = '';
+/**
+ *
+ * The Group_Project class which describes the Group_Project entity of the database.
+ *
+ */
+class Group_Project extends Object {
 
-// get feed objects
-$feedMapper = new Mapper('Feed');
-$feedMapper->order('id');
-$feedResult = $feedMapper->get();
-
-if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->id > $feed_id){
-  $old_id = $feed_id;
-  $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
-  // for each
-  foreach ($feedResult['Feed'] as $key => $value) {
-    if($value->id <= $old_id){
-      break;
-    }
-    $view = new FeedView($value);
-    $feed_content .= $view->getHTML();
-  }
+  /**
+   * The group ID.
+   *
+   * @var int $group_id
+   */
+  public $group_id = -1;
+  
+  /**
+   * The project ID.
+   *
+   * @var int $project_id
+   */
+  public $project_id = -1;
 }
-
-echo $feed_content;
 ?>

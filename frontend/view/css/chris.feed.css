@@ -1,10 +1,10 @@
 .feed_title {
-  margin-top: -1px;
-  padding: 10px;
-  border-top: 1px solid;
-  border-bottom: 1px solid;
-  border-color: grey;
-  background-color: #fff;
+	margin-top: -1px;
+	padding: 10px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+	border-color: grey;
+	background-color: #fff;
 }
 
 .feed {
@@ -13,8 +13,8 @@
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 	border-color: lightgrey;
-	background-color: #fff;
 	cursor: pointer;
+	background: -moz-linear-gradient(top, #fff, #eee);
 }
 
 .feed>.preview {
@@ -39,7 +39,7 @@
 .feed>.preview>.gfx {
 	float: left;
 	width: 48px;
-	opacity:0.5;
+	opacity: 0.5;
 }
 
 .feed>.preview>.content {

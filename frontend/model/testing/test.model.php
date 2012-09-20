@@ -42,25 +42,26 @@ SimpleTest_Chris::setPreference();
 
 // include all the tests
 // data related models
-require_once ('test.data.class.php');
-require_once ('test.data_project.class.php');
+require_once ('test.data.model.php');
+require_once ('test.data_project.model.php');
 // group related models
-require_once ('test.group.class.php');
-require_once ('test.group_data.class.php');
-require_once ('test.group_project.class.php');
+require_once ('test.group.model.php');
+require_once ('test.group_data.model.php');
+require_once ('test.group_project.model.php');
+require_once ('test.group_result.model.php');
 // result related models
-require_once ('test.result.class.php');
-require_once ('test.result_data.class.php');
-require_once ('test.result_project.class.php');
+require_once ('test.result.model.php');
+require_once ('test.result_data.model.php');
+require_once ('test.result_project.model.php');
 // user related models
-require_once ('test.user.class.php');
-require_once ('test.user_data.class.php');
-require_once ('test.user_group.class.php');
-require_once ('test.user_project.class.php');
-require_once ('test.user_result.class.php');
+require_once ('test.user.model.php');
+require_once ('test.user_data.model.php');
+require_once ('test.user_group.model.php');
+require_once ('test.user_project.model.php');
+require_once ('test.user_result.model.php');
 //other models
-require_once ('test.patient.class.php');
-require_once ('test.project.class.php');
-require_once ('test.feed.class.php');
+require_once ('test.patient.model.php');
+require_once ('test.project.model.php');
+require_once ('test.feed.model.php');
 
 ?>

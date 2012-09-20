@@ -34,7 +34,7 @@ require_once 'mapper.class.php';
 require_once 'pacs.class.php';
 
 // include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 
 // retrieve the data
 $dataMapper = new Mapper('Data');

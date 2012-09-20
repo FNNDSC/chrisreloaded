@@ -38,12 +38,12 @@ _FEED_.feed_onclick = function() {
 }
 _FEED_.feed_mouseenter = function() {
   jQuery(".feed").live('mouseenter', function() {
-    jQuery(this).css('background-color', '#eee');
+    jQuery(this).css('background', '-moz-linear-gradient(top, #eee, #ddd)');
   });
 }
 _FEED_.feed_mouseleave = function() {
   jQuery(".feed").live('mouseleave', function() {
-    jQuery(this).css('background-color', '#fff');
+    jQuery(this).css('background', '-moz-linear-gradient(top, #fff, #eee)');
   });
 }
 _FEED_.updateFeedTimeout = function() {

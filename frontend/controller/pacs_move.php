@@ -34,7 +34,7 @@ require_once 'mapper.class.php';
 require_once 'pacs.class.php';
 
 // include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 
 $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 

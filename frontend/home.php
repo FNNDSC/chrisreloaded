@@ -38,12 +38,13 @@ require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
+
 // inclue the
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 
 // include the feed object and view
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.class.php'));
-require_once (joinPaths(CHRIS_VIEW_FOLDER, 'model/feed.view.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
+require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
 
 // store session data
 $_SESSION['username'] = 'Ellen';

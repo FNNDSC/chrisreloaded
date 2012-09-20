@@ -25,39 +25,33 @@
  *                        dev@babyMRI.org
  *
  */
-define('__CHRIS_ENTRY_POINT__', 666);
 
-// include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
-require_once ('_session.inc.php');
-require_once 'db.class.php';
-require_once 'mapper.class.php';
+// prevent direct calls
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
-// include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
-// include the view
-require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
+// grab the super class for all entities
+require_once 'object.model.php';
 
-$feed_id = $_SESSION['feed_id'];
-$feed_content = '';
+/**
+ *
+ * The User_Data class which describes the User_Data entity of the database.
+ *
+ */
+class User_Data extends Object {
 
-// get feed objects
-$feedMapper = new Mapper('Feed');
-$feedMapper->order('id');
-$feedResult = $feedMapper->get();
+  /**
+   * The user id.
+   *
+   * @var int $user_id
+   */
+  public $user_id = -1;
 
-if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->id > $feed_id){
-  $old_id = $feed_id;
-  $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
-  // for each
-  foreach ($feedResult['Feed'] as $key => $value) {
-    if($value->id <= $old_id){
-      break;
-    }
-    $view = new FeedView($value);
-    $feed_content .= $view->getHTML();
-  }
+  /**
+   * The data id.
+   *
+   * @var int $data_id
+   */
+  public $data_id = -1;
 }
-
-echo $feed_content;
 ?>

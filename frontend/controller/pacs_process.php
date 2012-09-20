@@ -39,8 +39,8 @@ require_once 'mapper.class.php';
 require_once 'pacs.class.php';
 
 // include the model classes
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 
 
 // define command line arguments

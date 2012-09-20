@@ -25,39 +25,57 @@
  *                        dev@babyMRI.org
  *
  */
-define('__CHRIS_ENTRY_POINT__', 666);
 
-// include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
-require_once ('_session.inc.php');
-require_once 'db.class.php';
-require_once 'mapper.class.php';
+// prevent direct calls
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
-// include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
-// include the view
-require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
+// grab the super class for all entities
+require_once 'object.model.php';
 
-$feed_id = $_SESSION['feed_id'];
-$feed_content = '';
+/**
+ *
+ * The Data class which describes the Data entity of the database.
+ *
+ */
+class Data extends Object {
 
-// get feed objects
-$feedMapper = new Mapper('Feed');
-$feedMapper->order('id');
-$feedResult = $feedMapper->get();
+  /**
+   * The patient_id of this scan.
+   *
+   * @var int $patient_id
+   */
+  public $patient_id = -1;
 
-if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->id > $feed_id){
-  $old_id = $feed_id;
-  $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
-  // for each
-  foreach ($feedResult['Feed'] as $key => $value) {
-    if($value->id <= $old_id){
-      break;
-    }
-    $view = new FeedView($value);
-    $feed_content .= $view->getHTML();
-  }
+  /**
+   * The data unique ID.
+   * We use it to make sure data we will add to the database doesn't already exists.
+   *
+   * @var string $unique_id
+   */
+  public $unique_id = null;
+
+  /**
+   * The name of the data.
+   * Text file name, dicom protocol, etc...
+   *
+   * @var string $name
+   */
+  public $name = null;
+
+  /**
+   * The time of the data creation.
+   *
+   * @var string $time
+   */
+  public $time = null;
+
+  /**
+   * Extra information for this data. (spacing, size...)
+   *
+   * @var string $meta_information
+   */
+  public $meta_information = null;
+
 }
-
-echo $feed_content;
 ?>
