@@ -49,7 +49,6 @@ function homePage() {
   $t -> replace('USERNAME', $_SESSION['username']);
   $t -> replace('NAVBAR', 'navbar.html');
   $t -> replace('FEED_CONTENT', FeedC::getHTML(10));
-  $t -> replace('FEED_ID', 'LAST FEED ID: '.$_SESSION['feed_id']);
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');
   return $t;
