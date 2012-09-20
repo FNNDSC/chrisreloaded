@@ -134,27 +134,27 @@ class FeedV implements FeedViewInterface {
       $this->action = $this->feed_object->action;
       switch ($this->action) {
         case "data-up":
-          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_upload.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_upload.png';
           $this->action_sentence = 'Data uploaded to the PACS.';
           break;
         case "data-down":
-          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_download.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_download.png';
           $this->action_sentence = 'Data downloaded from the PACS.';
           break;
         case "result-start":
-          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_settings.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_settings.png';
           $this->action_sentence = 'Pipeline started.';
           break;
         case "result-success":
-          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_settings.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_settings.png';
           $this->action_sentence = 'Pipeline finished.';
           break;
         case "result-failure":
-          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_settings.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_settings.png';
           $this->action_sentence = 'Pipeline finished with errors.';
           break;
         default:
-          $this->image_src = 'view/gfx/jigsoar-icons/PNG/dark/64px/64_close.png';
+          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_close.png';
           $this->action_sentence = '<font color="red">error: Action not known: '.$this->action.'</font>';
           break;
       }
