@@ -35,59 +35,20 @@ define('__CHRIS_ENTRY_POINT__', 666);
 require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
 
 // include the template class
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
-
-// inclue the
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
-
-// include the feed object and view
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
-require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 
 // store session data
 $_SESSION['username'] = 'Ellen';
 $_SESSION['feed_id'] = '0';
-
-// shouldnt be there!
-function getFeeds($nb_feeds){
-  $feed_content = '';
-  $i = 0;
-
-  // get feed objects
-  $feedMapper = new Mapper('Feed');
-  $feedMapper->order('id');
-  $feedResult = $feedMapper->get();
-
-  if(count($feedResult['Feed']) >= 1){
-
-    $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
-
-    // for each
-    foreach ($feedResult['Feed'] as $key => $value) {
-      if($i >= $nb_feeds){
-        break;
-      }
-      $view = new FeedView($value);
-      $feed_content .= $view->getHTML();
-      $i++;
-    }
-  }
-  else{
-    $feed_content .= 'No feed found.';
-  }
-
-  return $feed_content;
-}
 
 function homePage() {
   $t = new Template('home.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('USERNAME', $_SESSION['username']);
   $t -> replace('NAVBAR', 'navbar.html');
-  // get last 10 feeds
-  $t -> replace('FEED_CONTENT', getFeeds(10));
+  $t -> replace('FEED_CONTENT', FeedC::getHTML(10));
   $t -> replace('FEED_ID', 'LAST FEED ID: '.$_SESSION['feed_id']);
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');

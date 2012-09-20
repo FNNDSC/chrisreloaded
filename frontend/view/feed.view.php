@@ -57,7 +57,7 @@ interface FeedViewInterface
 /**
  * View class to get different representations of the Feed object
  */
-class FeedView implements FeedViewInterface {
+class FeedV implements FeedViewInterface {
 
   /**
    * Base feed object
