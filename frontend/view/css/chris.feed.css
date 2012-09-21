@@ -17,6 +17,7 @@
 	display: none;
 	cursor: pointer;
 	background: -moz-linear-gradient(top, #ddd, #ccc);
+	text-align: center;
 }
 
 .feed {
@@ -26,7 +27,8 @@
 	border-bottom: 1px solid;
 	border-color: lightgrey;
 	cursor: pointer;
-	background: -moz-linear-gradient(top, #fff, #eee);
+	/* 	background: -moz-linear-gradient(top, #fff, #eee); */
+	background: #fff;
 }
 
 .feed>.preview {

@@ -38,16 +38,24 @@ _FEED_.feed_onclick = function() {
 }
 _FEED_.feed_mouseenter = function() {
   jQuery(".feed").live('mouseenter', function() {
-    jQuery(this).css('background', '-moz-linear-gradient(top, #eee, #ddd)');
+    jQuery(this).css('background', '-moz-linear-gradient(top, #fff, #eee)');
+    /* jQuery(this).css('background', '-moz-linear-gradient(top, #eee, #ddd)'); */
   });
 }
 _FEED_.feed_mouseleave = function() {
   jQuery(".feed").live('mouseleave', function() {
-    jQuery(this).css('background', '-moz-linear-gradient(top, #fff, #eee)');
+    jQuery(this).css('background', '#fff');
+    /* jQuery(this).css('background', '-moz-linear-gradient(top, #fff, #eee)'); */
   });
 }
 _FEED_.updateFeedTimeout = function() {
-  timer = setInterval(_FEED_.ajaxUpdate, 5000);
+  timer = setInterval(_FEED_.refresh, 5000);
+}
+_FEED_.refresh = function() {
+  // look for new feeds
+  _FEED_.ajaxUpdate();
+  // update the time stamps
+  _FEED_.updateTime();
 }
 _FEED_.ajaxUpdate = function() {
   // ajax call
@@ -66,27 +74,33 @@ _FEED_.ajaxUpdate = function() {
       }
     }
   });
-  // update time
-  _FEED_.updateTime();
 }
 _FEED_.updateTime = function() {
   var currentTime = new Date();
+  var m = 60 * 1000;
+  var h = m * 60;
+  var d = h * 24;
   jQuery('.time').each(
       function() {
-        var dateArray = jQuery(this).html().split('<b>')[1].split('</b>')[0]
-            .split(' ');
-        var year = dateArray[0].split('-');
-        var time = dateArray[1].split(':');
-        var feedTime = new Date(year[0], year[1], year[2], time[0],
-            time[1], time[2]);
+        var dateArray = jQuery(this).attr('id').split('_');
+        var feedTime = new Date(dateArray[0], dateArray[1] - 1, dateArray[2],
+            dateArray[3], dateArray[4], dateArray[5]);
+        window.console.log(dateArray);
         window.console.log(currentTime);
         window.console.log(feedTime);
-        var diff = new Date();
-        diff.setTime(currentTime - feedTime);
-        window.console.log(diff);
-        var timeString = jQuery(this).html(
-            diff.getDate() + ' days ' + diff.getHours() + ' hours '
-                + diff.getMinutes() + ' minutes');
+        var diff = currentTime.getTime() - feedTime.getTime();
+        var day = Math.floor(diff / d);
+        if (day == 0) {
+          var hour = Math.floor((diff % d) / h);
+          if (hour == 0) {
+            var min = Math.floor(((diff % d) % h) / m);
+            jQuery(this).html(min + ' minutes ago');
+          } else {
+            jQuery(this).html(hour + ' hours ago');
+          }
+        } else {
+          jQuery(this).html(day + ' days ago');
+        }
       });
 }
 _FEED_.update_onclick = function() {
@@ -97,6 +111,8 @@ _FEED_.update_onclick = function() {
     _FEED_.cachedFeeds = [];
     // update button
     jQuery(this).hide('blind', 100);
+    //
+    _FEED_.updateTime();
   });
 }
 /**

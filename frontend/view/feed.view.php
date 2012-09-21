@@ -89,8 +89,11 @@ class FeedV implements ObjectViewInterface {
     if(count($userResult['User']) == 1){
       $this->username = $userResult['User'][0]->username;
 
-      // get feed creation time
-      $this->time = $this->feed_object->time;
+      // get feed creation time and format it
+      $this->time = str_replace(" ", "_", $this->feed_object->time);
+      $this->time = str_replace(":", "_", $this->time);
+      $this->time = str_replace("-", "_", $this->time);
+      $this->time .= "_time";
 
       // loop though models and get useful information
       // data details
@@ -165,7 +168,7 @@ class FeedV implements ObjectViewInterface {
     $t = new Template('feed.html');
     $t -> replace('IMAGE_SRC', $this->image_src);
     $t -> replace('USERNAME', $this->username);
-    $t -> replace('TIME', $this->time);
+    $t -> replace('TIME_FORMATED', $this->time);
     $t -> replace('MAIN', $this->action_sentence);
     $t -> replace('MORE', 'Show details');
     // loop through details
