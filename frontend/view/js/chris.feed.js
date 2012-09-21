@@ -123,6 +123,37 @@ _FEED_.setupPreview = function() {
     _DATA_.startPreview();
   });
 }
+_FEED_.setupLocation = function() {
+  jQuery(".feed_location").live('mouseenter', function(e) {
+    e.stopPropagation();
+    var full_id = jQuery(this).attr('id');
+    var id = full_id.substring(0, full_id.length - 6).replace(/\_/g, ".");
+    // ajax call
+    jQuery.ajax({
+      type : "POST",
+      url : "controller/data_location.php",
+      dataType : "text",
+      data : {
+        DATA_SER_UID : id
+      },
+      success : function(data) {
+        if (data) {
+          var text_id = full_id.substring(0, full_id.length - 6) + '-feedlt';
+          jQuery("#" + text_id).html(data.replace(/\\/g, ""));
+          jQuery("#" + text_id).show();
+          // alert(data.replace(/\\/g, ""));
+        }
+      }
+    });
+  });
+  jQuery(".feed_location").live('mouseleaves', function(e) {
+    e.stopPropagation();
+    var full_id = jQuery(this).attr('id');
+    var id = full_id.substring(0, full_id.length - 6).replace(/\_/g, ".");
+    var text_id = full_id.substring(0, full_id.length - 6) + '-feedlt';
+    jQuery("#" + text_id).hide();
+  });
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -137,4 +168,5 @@ jQuery(document).ready(function() {
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
   _FEED_.setupPreview();
+  _FEED_.setupLocation();
 });

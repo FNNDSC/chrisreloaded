@@ -82,6 +82,11 @@
 /* CSS applied in the PHP because of JQUERY slide */
 .feed>.details>.data { /* 	border-top: 1px solid;
 	border-color: grey;
-	margin-top: 5px; */
+	padding-left: 60px; */
 	
+}
+
+/*  need hierarchy */
+.feed_location_text {
+	display: none;
 }

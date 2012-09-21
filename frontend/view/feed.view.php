@@ -182,7 +182,7 @@ class FeedV implements ObjectViewInterface {
         foreach ($this->details['Name'] as $key => $value) {
           $d = new Template('feed_data.html');
           $d -> replace('DATA', $value);
-          $d -> replace('FULL_ID', str_replace ('.', '_', $this->details['UID'][$key]).'-feedd');
+          $d -> replace('FULL_ID', str_replace ('.', '_', $this->details['UID'][$key]));
           $feed_details .= $d;
         }
       }
