@@ -38,7 +38,7 @@
 .feed>.preview>.title {
 	width: 92%;
 	float: right;
-	padding: 5px;
+	padding: 2px;
 }
 
 .feed>.preview>.title>.time {
@@ -59,7 +59,7 @@
 .feed>.preview>.content {
 	width: 92%;
 	float: right;
-	padding: 5px;
+	padding: 2px;
 }
 
 .feed>.preview>.content>.main {
