@@ -101,54 +101,24 @@ _PACS_.setupDownloadSeries = function() {
  */
 _PACS_.setupPreviewSeries = function() {
   // connect the preview button
-  jQuery(".p_series")
-      .live(
-          'click',
-          function(event) {
-            var id = jQuery(this).attr('id');
-            var split_id = id.split('-');
-            var stuid = split_id[0].replace(/\_/g, ".");
-            var seuid = split_id[1].replace(/\_/g, ".");
-            // start pulling series and update id
-            _PACS_.ajaxImage(stuid, seuid, '#' + id.substring(0, id.length - 1)
-                + 'd');
-            // Top Left overlay
-            jQuery("#TL_OVER")
-                .html(
-                    'Retrieving data <i class="icon-refresh icon-white rotating_class">');
-            jQuery("#TL_OVER").show();
-            jQuery("#SLICE").html('00');
-            jQuery("#SLICE_NB").html('00');
-            // show modal
-            jQuery('#PMODAL').modal();
-            // start ajax preview
-            _PACS_.PreviewStudy = stuid;
-            _PACS_.PreviewSeries = seuid;
-          });
-  // connect the 'shown' event
-  jQuery('#PMODAL').on('shown', function() {
-    _PACS_.ajaxPreview(_PACS_.PreviewStudy, _PACS_.PreviewSeries);
-  });
-  // connect the 'hidden' event
-  jQuery('#PMODAL').on('hidden', function() {
-    // delete XTK stuff
-    if (_PACS_.sliceX != null) {
-      _PACS_.sliceX.destroy();
-      delete _PACS_.sliceX;
-      _PACS_.sliceX = null;
-    }
-    if (_PACS_.volume != null) {
-      delete _PACS_.volume;
-      _PACS_.volume = null;
-    }
-    // clean _PACS_ namespace
-    _PACS_.previewReceivedData['filename'] = [];
-    _PACS_.previewReceivedData['data'] = [];
-    // reset _PACS_.previewStudy and Series
-    _PACS_.PreviewStudy = '0';
-    _PACS_.PreviewSeries = '0';
-    // destroy slider
-    jQuery("#sliderZ").slider("destroy");
+  jQuery(".p_series").live('click', function(event) {
+    var id = jQuery(this).attr('id');
+    var split_id = id.split('-');
+    var stuid = split_id[0].replace(/\_/g, ".");
+    var seuid = split_id[1].replace(/\_/g, ".");
+    // start pulling series and update id
+    _PACS_.ajaxImage(stuid, seuid, '#' + id.substring(0, id.length - 1) + 'd');
+    // setup nb_files and filename
+    var seriesData = _PACS_.cache[stuid];
+    var index = seriesData.SeriesInstanceUID.indexOf(seuid);
+    var files_nb = seriesData.NumberOfSeriesRelatedInstances[index];
+    var desc = seriesData.SeriesDescription[index];
+    // setup data previews
+    _DATA_.PreviewSeries = seuid;
+    _DATA_.PreviewNbFiles = files_nb;
+    _DATA_.PreviewDesc = desc;
+    // start data preview
+    _DATA_.startPreview();
   });
 }
 /**
@@ -546,8 +516,8 @@ _PACS_.ajaxSeries = function(studyUID, nTr) {
 _PACS_.ajaxSeriesResults = function(data, nTr) {
   // format the details row table
   if (nTr != null) {
-    var detailRown = _PACS_.sTable
-        .fnOpen(nTr, _PACS_.seriesFormat(data), 'details');
+    var detailRown = _PACS_.sTable.fnOpen(nTr, _PACS_.seriesFormat(data),
+        'details');
     // create dataTable from html table
     jQuery('.table', detailRown).dataTable({
       "sDom" : "t",
@@ -571,8 +541,8 @@ _PACS_.ajaxSeriesResults = function(data, nTr) {
       if (data.Status[i] == 0) {
         var bid = '#' + data.StudyInstanceUID[i].replace(/\./g, "_") + '-'
             + data.SeriesInstanceUID[i].replace(/\./g, "_") + '-sed';
-        _PACS_
-            .ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i], bid);
+        _PACS_.ajaxImage(data.StudyInstanceUID[i], data.SeriesInstanceUID[i],
+            bid);
       }
     }
   }
@@ -623,71 +593,6 @@ _PACS_.seriesFormat = function(data) {
   }
   content += '</body></table></div>';
   return content;
-}
-/**
- * Get 'Preview' data AJAX.
- */
-_PACS_.ajaxPreview = function(studyUID, seriesUID) {
-  var stuid = studyUID;
-  var serid = seriesUID;
-  var seriesData = _PACS_.cache[studyUID];
-  var index = seriesData.SeriesInstanceUID.indexOf(seriesUID);
-  var files_nb = seriesData.NumberOfSeriesRelatedInstances[index];
-  var desc = seriesData.SeriesDescription[index];
-  jQuery.ajax({
-    type : "POST",
-    url : "controller/pacs_preview.php",
-    dataType : "json",
-    data : {
-      PACS_SER_UID : seriesUID,
-      PACS_SER_NOF : files_nb
-    },
-    success : function(data) {
-      if (data && data.filename.length > 0) {
-        // modal label
-        jQuery('#myModalLabel').html(desc);
-        jQuery("#TL_OVER").html('Creating XTK visualization...');
-        // set XTK renderer
-        _PACS_.volume = new X.volume();
-        _PACS_.volume.file = 'http://chris/datadev/' + data.filename[0];
-        _PACS_.sliceX = new X.renderer2D();
-        _PACS_.sliceX.container = 'sliceZ';
-        _PACS_.sliceX.orientation = 'Z';
-        _PACS_.sliceX.init();
-        _PACS_.sliceX.add(_PACS_.volume);
-        _PACS_.sliceX.render();
-        _PACS_.sliceX.onShowtime = function() {
-          var dim = _PACS_.volume.dimensions;
-          // hide overlay
-          jQuery("#TL_OVER").hide();
-          // init slider
-          jQuery("#sliderZ").slider({
-            min : 1,
-            max : dim[2],
-            value : Math.round(_PACS_.volume.indexZ + 1),
-            slide : function(event, ui) {
-              _PACS_.volume.indexZ = ui.value - 1;
-              jQuery("#SLICE").html(ui.value);
-            }
-          });
-          _PACS_.sliceX.onScroll = function() {
-            jQuery('#sliderZ').slider("option", "value",
-                Math.round(_PACS_.volume.indexZ + 1));
-            jQuery("#SLICE").html(Math.round(_PACS_.volume.indexZ + 1));
-          };
-          jQuery("#SLICE").html(Math.round(_PACS_.volume.indexZ + 1));
-          jQuery("#SLICE_NB").html(dim[2]);
-        }
-      } else {
-        // if modal visible, callback
-        if (_PACS_.PreviewStudy != '0' && _PACS_.PreviewSeries != '0') {
-          setTimeout(function() {
-            _PACS_.ajaxPreview(stuid, serid)
-          }, 1000);
-        }
-      }
-    }
-  });
 }
 /**
  * Get 'Image' data AJAX.
@@ -807,15 +712,6 @@ jQuery(document).ready(function() {
   // both modes
   //
   // preview - do not need all that but ready for DICOM support!
-  _PACS_.previewReceivedData = [];
-  _PACS_.previewReceivedData['filename'] = [];
-  _PACS_.previewReceivedData['data'] = [];
-  // convenience variables
-  _PACS_.PreviewStudy = '0';
-  _PACS_.PreviewSeries = '0';
-  // XTK variables
-  _PACS_.sliceX = null;
-  _PACS_.volume = null;
   _PACS_.setupPreviewSeries();
   // search button pushed
   _PACS_.setupDownloadSeries();

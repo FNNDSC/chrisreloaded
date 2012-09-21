@@ -38,7 +38,7 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 
 // retrieve the data
 $dataMapper = new Mapper('Data');
-$dataMapper->filter('unique_id = (?)',$_POST['PACS_SER_UID']);
+$dataMapper->filter('unique_id = (?)',$_POST['DATA_SER_UID']);
 $dataResult = $dataMapper->get();
 
 // if nothing in DB yet, return null
@@ -96,16 +96,30 @@ if ($handle3 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
   closedir($handle3);
 }
 
+$nifti = false;
+if($_POST['DATA_SER_NOF'] == -1){
+  if ($handle5 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
+    while (false !== ($entry5 = readdir($handle5))) {
+      if($entry5 != "." && $entry5 != ".."){
+        if (preg_match('/.nii$/', $entry5)) {
+          $nifti = true;
+          break;
+        }
+      }
+    }
+    closedir($handle5);
+  }
+}
 // convert to nifiti and return file name if everything has arrived
 // create the nifti if we only have dicom files
-if ($count == $_POST['PACS_SER_NOF'])
+if ($count == $_POST['DATA_SER_NOF'] || $nifti == false)
 {
   // use mricron to convert
   $convert_command = '/usr/bin/dcm2nii -a y -g n '.CHRIS_DATA.$patient_entry.'/'.$data_entry;
   exec($convert_command);
 }
 // find the nifti!
-if($count >= $_POST['PACS_SER_NOF'] + 1){
+if($count >= $_POST['DATA_SER_NOF'] + 1 || $nifti == true){
   if ($handle4 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
     while (false !== ($entry4 = readdir($handle4))) {
       if($entry4 != "." && $entry4 != ".."){

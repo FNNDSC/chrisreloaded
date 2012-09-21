@@ -100,6 +100,7 @@ class FeedV implements ObjectViewInterface {
       if($this->feed_object->model == 'data'){
         // prepare the Details array
         $this->details['Name'] = Array();
+        $this->details['UID'] = Array();
         $singleID = explode(";", $this->feed_object->model_id);
         foreach ($singleID as $id) {
           $dataMapper = new Mapper('Data');
@@ -108,6 +109,8 @@ class FeedV implements ObjectViewInterface {
           if(count($dataResult['Data']) == 1){
             $name = $dataResult['Data'][0]->name;
             $this->details['Name'][] = $name;
+            $uid = $dataResult['Data'][0]->unique_id;
+            $this->details['UID'][] = $uid;
           }
         }
       }
@@ -179,6 +182,7 @@ class FeedV implements ObjectViewInterface {
         foreach ($this->details['Name'] as $key => $value) {
           $d = new Template('feed_data.html');
           $d -> replace('DATA', $value);
+          $d -> replace('FULL_ID', str_replace ('.', '_', $this->details['UID'][$key]).'-feedd');
           $feed_details .= $d;
         }
       }

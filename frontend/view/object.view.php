@@ -26,36 +26,14 @@
  *
  */
 
-// we define a valid entry point
-define('__CHRIS_ENTRY_POINT__', 666);
-
-//define('CHRIS_CONFIG_DEBUG', true);
-
-// include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
-
-// include the template class
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
-
-// store session data
-$_SESSION['username'] = 'Ellen';
-$_SESSION['feed_id'] = '0';
-
-function homePage() {
-  $t = new Template('home.html');
-  $t -> replace('CSS', 'css.html');
-  $t -> replace('USERNAME', $_SESSION['username']);
-  $t -> replace('NAVBAR', 'navbar.html');
-  $t -> replace('DATA_PREVIEW', 'data_preview.html');
-  $t -> replace('FEED_CONTENT', FeedC::getHTML(10));
-  $t -> replace('FOOTER', 'footer.html');
-  $t -> replace('JAVASCRIPT', 'javascript.html');
-  return $t;
+// interface
+interface ObjectViewInterface
+{
+  // constructor feed object as parameter
+  public function __construct($feedObject);
+  // get HTML representation of the feed
+  public function getHTML();
+  // get JSON representation of the feed
+  public function getJSON();
 }
-
-// execute the test
-echo homePage();
-
 ?>

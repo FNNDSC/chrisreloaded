@@ -85,9 +85,6 @@ _FEED_.updateTime = function() {
         var dateArray = jQuery(this).attr('id').split('_');
         var feedTime = new Date(dateArray[0], dateArray[1] - 1, dateArray[2],
             dateArray[3], dateArray[4], dateArray[5]);
-        window.console.log(dateArray);
-        window.console.log(currentTime);
-        window.console.log(feedTime);
         var diff = currentTime.getTime() - feedTime.getTime();
         var day = Math.floor(diff / d);
         if (day == 0) {
@@ -115,6 +112,17 @@ _FEED_.update_onclick = function() {
     _FEED_.updateTime();
   });
 }
+_FEED_.setupPreview = function() {
+  jQuery(".feed_preview").live('click', function(e) {
+    e.stopPropagation();
+    var full_id = jQuery(this).attr('id');
+    var id = full_id.substring(0, full_id.length - 6);
+    _DATA_.PreviewSeries = id.replace(/\_/g, ".");
+    _DATA_.PreviewNbFiles = '-1';
+    _DATA_.PreviewDesc = 'Image name';
+    _DATA_.startPreview();
+  });
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -128,4 +136,5 @@ jQuery(document).ready(function() {
   _FEED_.feed_mouseleave();
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
+  _FEED_.setupPreview();
 });
