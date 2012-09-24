@@ -30,7 +30,7 @@
 if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 // include the utilities
-require_once($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/controller/_util.inc.php');
+require_once(dirname(__FILE__).'/controller/_util.inc.php');
 
 // MYSQL configuration
 define('SQL_HOST', 'chris');

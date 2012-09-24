@@ -28,7 +28,7 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
+require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 require_once 'pacs.class.php';
 
 $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);

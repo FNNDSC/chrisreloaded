@@ -30,7 +30,7 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
   die('Invalid access.');
 
 // include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
+require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
 // include the object view interface
 require_once ('object.view.php');

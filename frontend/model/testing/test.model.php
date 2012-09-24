@@ -35,7 +35,7 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
 // include the configuration
 
 if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
+  require_once (dirname(dirname(dirname(__FILE__))).'/config.inc.php');
 // include the simpletest chris framework
 require_once (SIMPLETEST_CHRIS);
 SimpleTest_Chris::setPreference();

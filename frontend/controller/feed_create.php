@@ -28,7 +28,7 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
+require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
 // include the controller
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));

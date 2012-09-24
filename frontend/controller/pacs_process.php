@@ -30,7 +30,7 @@
 if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration file
 if(!defined('CHRIS_CONFIG_PARSED'))
-  require_once($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
+  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
 // include the controller classes
 require_once 'db.class.php';
@@ -52,8 +52,6 @@ $options = getopt($shortopts);
 
 $p = $options['p'];
 $f = $options['f'];
-/*  $p = '/chb/users/chris/data/4387255-361/AX_T2_BLADE-498';
- $f = 'NoFileName.dcm';  */
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
@@ -201,7 +199,15 @@ if(count($files) <= 2){
 // 1- create the nifti file
 // 2- update the feeds in progress
 $files2 = scandir($datadirname);
-if (count($files2) == ($result['NumberOfSeriesRelatedInstances'][0] + 2)
+// PACS query
+$pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
+$pacs->addParameter('RetrieveAETitle', '');
+$pacs->addParameter('StudyInstanceUID', $result['StudyInstanceUID'][0]);
+$pacs->addParameter('SeriesInstanceUID', $result['SeriesInstanceUID'][0]);
+$pacs->addParameter('NumberOfSeriesRelatedInstances', '');
+$all_results = $pacs->querySeries();
+
+if (count($files2) == ($all_results['NumberOfSeriesRelatedInstances'][0]  + 2))
 {
   // use mricron to convert
   $convert_command = '/usr/bin/dcm2nii -a y -g n '.$datadirname;
@@ -211,7 +217,7 @@ if (count($files2) == ($result['NumberOfSeriesRelatedInstances'][0] + 2)
   $feedMapper->filter('status != (?)','0');
   $feedResult = $feedMapper->get();
   // update in progress results
-  foreach ($this->$feedResult['Feed'] as $key => $value) {
+  foreach ($feedResult['Feed'] as $key => $value) {
     FeedC::updateDB($value, $data_chris_id);
   }
 }

@@ -19,7 +19,7 @@
  *
  *                     R  E  L  O  A  D  E  D
  *
- * (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+ * (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center4352490
  *                   Boston Children's Hospital
  *
  *              http://childrenshospital.org/FNNDSC/
@@ -29,8 +29,8 @@
 // we define a valid entry point
 if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration file
-if(!defined('CHRIS_CONFIG_PARSED'))
-  require_once($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
+ if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
 // build the storescp command
 // storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"
