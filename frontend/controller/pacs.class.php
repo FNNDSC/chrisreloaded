@@ -609,6 +609,7 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P ContentDate';
     $requiered_fields .= ' +P ContentTime';
     $requiered_fields .= ' +P InstanceNumber';
+    $requiered_fields .= ' +P NumberOfSeriesRelatedInstances';
 
     // Patient information
     $requiered_fields .= ' +P PatientName';

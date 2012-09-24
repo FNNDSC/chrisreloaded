@@ -36,6 +36,7 @@ if(!defined('CHRIS_CONFIG_PARSED'))
 require_once 'db.class.php';
 require_once 'mapper.class.php';
 require_once 'pacs.class.php';
+require_once 'feed.controller.php';
 
 // include the model classes
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
@@ -195,4 +196,24 @@ $files = scandir($p);
 if(count($files) <= 2){
   rmdir($p);
 }
+
+// if all files arrived
+// 1- create the nifti file
+// 2- update the feeds in progress
+$files2 = scandir($datadirname);
+if (count($files2) == ($result['NumberOfSeriesRelatedInstances'][0] + 2)
+{
+  // use mricron to convert
+  $convert_command = '/usr/bin/dcm2nii -a y -g n '.$datadirname;
+  exec($convert_command);
+  // update the feeds in progress
+  $feedMapper = new Mapper('Feed');
+  $feedMapper->filter('status != (?)','0');
+  $feedResult = $feedMapper->get();
+  // update in progress results
+  foreach ($this->$feedResult['Feed'] as $key => $value) {
+    FeedC::updateDB($value, $data_chris_id);
+  }
+}
+
 ?>

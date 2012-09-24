@@ -53,6 +53,8 @@ define('CHRIS_DCMTK', '/usr/bin/');
 define('CHRIS_DATA', '/chb/users/chris/dev/data/');
 define('CHRIS_TMP', '/chb/users/chris/dev/tmp/');
 define('CHRIS_AETITLE', 'FNNDSC-CHRISDEV');
+define('PACS_SERVER', '134.174.12.21');
+define('PACS_PORT', '104');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));

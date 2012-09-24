@@ -162,8 +162,14 @@ class FeedV implements ObjectViewInterface {
    * Create the Feed HTML code
    */
   public function getHTML(){
+    // if data not ready, do not return anything
+/*     if(intval($this->feed_object->status) != 0){
+      return '';
+    } */
+
     $this->_format();
-    // if user not found, do not return anything
+    // if user not found
+    // do not return anything
     if($this->username == ''){
       return '';
     }

@@ -25,39 +25,50 @@ _PACS_.pull_click = function() {
     // if not already querying the pacs
     if (!jQuery("#pacs_pull_mrns").prop("readonly")) {
       var mrn_list = jQuery('#pacs_pull_mrns').val();
-      jQuery("#pacs_pull_mrns").prop("readonly", "readonly");
-      jQuery("#pacs_pull_advanced").prop("readonly", "readonly");
-      jQuery(this).text('Pulling...');
-      blinking(jQuery(this));
+      // create feed
+      // get all datas unique id to fill the feed
       jQuery.ajax({
         type : "POST",
-        url : "controller/pacs_move.php",
+        url : "controller/feed_create.php",
         dataType : "json",
         data : {
-          USER_AET : 'FNNDSC-CHRISDEV',
-          SERVER_IP : '134.174.12.21',
-          SERVER_POR : '104',
-          PACS_LEV : 'STUDY',
-          PACS_STU_UID : '',
-          PACS_MRN : mrn_list,
-          PACS_NAM : '',
-          PACS_MOD : '',
-          PACS_DAT : '',
-          PACS_STU_DES : '',
-          PACS_ACC_NUM : ''
+          FEED_USER : 'Nicolas',
+          FEED_ACTION : 'data-down-mrn',
+          FEED_MODEL : 'data',
+          FEED_MODEL_ID : mrn_list
         },
         success : function(data) {
-          clearInterval(timer);
-          jQuery("#pacs_pull").text('Pull');
-          jQuery("#pacs_pull_mrns").removeProp("readonly");
-          jQuery("#pacs_pull_advanced").removeProp("readonly");
-          jQuery('#pacs_pull_mrns').val('');
-          jQuery('#pacs_pull_mrns').animate({
-            height : '19px'
-          }, 200);
-          jQuery('#pacs_pull_ui').hide();
+          // data is html feed for this client
+          // needed ??
+          // add feed to new feed
+          // start pulling the data
+          jQuery.ajax({
+            type : "POST",
+            url : "controller/pacs_move.php",
+            dataType : "json",
+            data : {
+              USER_AET : 'FNNDSC-CHRISDEV',
+              SERVER_IP : '134.174.12.21',
+              SERVER_POR : '104',
+              PACS_LEV : 'STUDY',
+              PACS_STU_UID : '',
+              PACS_MRN : mrn_list,
+              PACS_NAM : '',
+              PACS_MOD : '',
+              ACS_DAT : '',
+              PACS_STU_DES : '',
+              PACS_ACC_NUM : ''
+            },
+            success : function(data) {
+            }
+          });
         }
       });
+      jQuery('#pacs_pull_mrns').val('');
+      jQuery('#pacs_pull_mrns').animate({
+        height : '19px'
+      }, 200);
+      jQuery('#pacs_pull_ui').hide();
     }
   });
 }

@@ -86,54 +86,56 @@ if ($handle2 = opendir(CHRIS_DATA.$patient_entry)) {
 }
 
 // count number of files
-$count = 0;
+/*
+ $count = 0;
 if ($handle3 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
-  while (false !== ($entry3 = readdir($handle3))) {
-    if($entry3 != "." && $entry3 != ".."){
-      $count++;
-    }
-  }
-  closedir($handle3);
+while (false !== ($entry3 = readdir($handle3))) {
+if($entry3 != "." && $entry3 != ".."){
+$count++;
+}
+}
+closedir($handle3);
 }
 
 $nifti = false;
 if($_POST['DATA_SER_NOF'] == -1){
-  if ($handle5 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
-    while (false !== ($entry5 = readdir($handle5))) {
-      if($entry5 != "." && $entry5 != ".."){
-        if (preg_match('/.nii$/', $entry5)) {
-          $nifti = true;
-          break;
-        }
-      }
-    }
-    closedir($handle5);
-  }
+if ($handle5 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
+while (false !== ($entry5 = readdir($handle5))) {
+if($entry5 != "." && $entry5 != ".."){
+if (preg_match('/.nii$/', $entry5)) {
+$nifti = true;
+break;
+}
+}
+}
+closedir($handle5);
+}
 }
 // convert to nifiti and return file name if everything has arrived
 // create the nifti if we only have dicom files
 if ($count == $_POST['DATA_SER_NOF'] || $nifti == false)
 {
-  // use mricron to convert
-  $convert_command = '/usr/bin/dcm2nii -a y -g n '.CHRIS_DATA.$patient_entry.'/'.$data_entry;
-  exec($convert_command);
+// use mricron to convert
+$convert_command = '/usr/bin/dcm2nii -a y -g n '.CHRIS_DATA.$patient_entry.'/'.$data_entry;
+exec($convert_command);
 }
 // find the nifti!
 if($count >= $_POST['DATA_SER_NOF'] + 1 || $nifti == true){
-  if ($handle4 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
-    while (false !== ($entry4 = readdir($handle4))) {
-      if($entry4 != "." && $entry4 != ".."){
-        // to be used for the dicom later when xtk more stable
-        //$files['filename'][] = $patient_entry.'/'.$data_entry.'/'.$entry3;
-        if (preg_match('/.nii$/', $entry4)) {
-          $files['filename'][] = $patient_entry.'/'.$data_entry.'/'.$entry4;
-          break;
-        }
+*/
+if ($handle4 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
+  while (false !== ($entry4 = readdir($handle4))) {
+    if($entry4 != "." && $entry4 != ".."){
+      // to be used for the dicom later when xtk more stable
+      //$files['filename'][] = $patient_entry.'/'.$data_entry.'/'.$entry3;
+      if (preg_match('/.nii$/', $entry4)) {
+        $files['filename'][] = $patient_entry.'/'.$data_entry.'/'.$entry4;
+        break;
       }
     }
-    closedir($handle4);
   }
+  closedir($handle4);
 }
+//}
 
 echo json_encode($files);
 ?>
