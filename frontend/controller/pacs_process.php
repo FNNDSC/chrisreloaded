@@ -52,6 +52,8 @@ $options = getopt($shortopts);
 
 $p = $options['p'];
 $f = $options['f'];
+/*  $p = '/chb/users/chris/data/a26220be92a460b8a8386c8bfe69c287-452/SWI____t2_fl3d_tra_p2_-12251';
+ $f = '1.dcm';  */
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
@@ -59,6 +61,7 @@ $result = PACS::process($tmpfile);
 // initiate variables
 $patient_chris_id = -1;
 $data_chris_id = -1;
+$data_nb_files = -1;
 $image_chris_id = -1;
 $protocol_name = 'NoProtocolName';
 
@@ -118,9 +121,10 @@ if (array_key_exists('SeriesInstanceUID',$result))
   $dataMapper->filter('unique_id = (?)',$value );
   $dataResult = $dataMapper->get();
 
-  // if doesnt exist, create data
+  // if doesnt exist, add data
   if(count($dataResult['Data']) == 0)
   {
+    // create object
     // create data model
     $dataObject = new Data();
     $dataObject->patient_id = $patient_chris_id;
@@ -146,14 +150,48 @@ if (array_key_exists('SeriesInstanceUID',$result))
     $datetimemysql = $datemysql.' '. $timemysql;
     $dataObject->time = $datetimemysql;
     $dataObject->meta_information = '';
-
+    // get nb of files in data
+    $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
+    $pacs->addParameter('RetrieveAETitle', '');
+    $pacs->addParameter('StudyInstanceUID', $result['StudyInstanceUID'][0]);
+    $pacs->addParameter('SeriesInstanceUID', $result['SeriesInstanceUID'][0]);
+    $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
+    $all_results = $pacs->querySeries();
+    $dataObject->nb_files = $all_results['NumberOfSeriesRelatedInstances'][0]  + 2;
+    $data_nb_files = $dataObject->nb_files;
     // add the data model and get its id
     $data_chris_id = Mapper::add($dataObject);
   }
-  // else get data name and id
+  // else update data
   else{
+    // update object
+    $dataResult['Data'][0]->patient_id = $patient_chris_id;
+    // remove potential white spaces
+    if(array_key_exists('ProtocolName',$result))
+    {
+      $protocol_name = str_replace (' ', '_', $result['ProtocolName'][0]);
+      $protocol_name = str_replace ('/', '_', $protocol_name);
+      $protocol_name = str_replace ('?', '_', $protocol_name);
+      $protocol_name = str_replace ('&', '_', $protocol_name);
+      $protocol_name = str_replace ('#', '_', $protocol_name);
+      $protocol_name = str_replace ('\\', '_', $protocol_name);
+      $protocol_name = str_replace ('%', '_', $protocol_name);
+      $protocol_name = str_replace ('(', '_', $protocol_name);
+      $protocol_name = str_replace (')', '_', $protocol_name);
+    }
+    $dataResult['Data'][0]->name = $protocol_name;
+    $date = $result['ContentDate'][0];
+    $datemysql =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
+    $time = $result['ContentTime'][0];
+    $timemysql = substr($time, 0, 2).':'.substr($time, 2, 2).':'.substr($time, 4, 2);
+    $datetimemysql = $datemysql.' '. $timemysql;
+    $dataResult['Data'][0]->time = $datetimemysql;
+    $dataResult['Data'][0]->meta_information = '';
+    Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
+    // update it
     $protocol_name = $dataResult['Data'][0]->name;
     $data_chris_id = $dataResult['Data'][0]->id;
+    $data_nb_files = $dataResult['Data'][0]->nb_files;
   }
 }
 else {
@@ -189,29 +227,23 @@ if(!is_file($filename)){
 // delete tmp file
 unlink($tmpfile);
 
-// delete tmp dir if dir is empty
+// delete tmp dir if dir is empty when all files have arrived
 $files = scandir($p);
 if(count($files) <= 2){
   rmdir($p);
 }
 
+$files = scandir($datadirname);
 // if all files arrived
 // 1- create the nifti file
 // 2- update the feeds in progress
-$files2 = scandir($datadirname);
-// PACS query
-$pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
-$pacs->addParameter('RetrieveAETitle', '');
-$pacs->addParameter('StudyInstanceUID', $result['StudyInstanceUID'][0]);
-$pacs->addParameter('SeriesInstanceUID', $result['SeriesInstanceUID'][0]);
-$pacs->addParameter('NumberOfSeriesRelatedInstances', '');
-$all_results = $pacs->querySeries();
-
-if (count($files2) == ($all_results['NumberOfSeriesRelatedInstances'][0]  + 2))
+if (count($files) == $data_nb_files + 2)
 {
   // use mricron to convert
   $convert_command = '/usr/bin/dcm2nii -a y -g n '.$datadirname;
   exec($convert_command);
+  $db = DB::getInstance();
+  $db->lock('feed', 'WRITE');
   // update the feeds in progress
   $feedMapper = new Mapper('Feed');
   $feedMapper->filter('status != (?)','0');
@@ -220,6 +252,6 @@ if (count($files2) == ($all_results['NumberOfSeriesRelatedInstances'][0]  + 2))
   foreach ($feedResult['Feed'] as $key => $value) {
     FeedC::updateDB($value, $data_chris_id);
   }
+  $db->unlock();
 }
-
 ?>

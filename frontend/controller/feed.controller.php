@@ -154,8 +154,30 @@ class FeedC implements FeedControllerInterface {
         $object->status = '';
         // update ids and status
         foreach ($all_results[1]['SeriesInstanceUID'] as $key => $value){
-          $object->model_id .= $value . ';';
-          $object->status .= '0';
+          // if data not there, create new data and add it
+          // if name is not a number, get the matching id
+          $dataMapper = new Mapper('Data');
+          // retrieve the data
+          $dataMapper->filter('unique_id = (?)',$value);
+          $dataResult = $dataMapper->get();
+
+          // if nothing in DB yet, return null
+          if(count($dataResult['Data']) == 0)
+          {
+            // add data and get its id
+            $dataObject = new Data();
+            $dataObject->unique_id = $value;
+            $dataObject->nb_files = $all_results[1]['NumberOfSeriesRelatedInstances'][$key];
+            $dataObject->name = 'NoName';
+            $dataObject->time = '';
+            $dataObject->meta_information = '';
+            $data_chris_id = Mapper::add($dataObject);
+            $object->model_id .= $data_chris_id . ';';
+          }
+          else{
+            $object->model_id .= $dataResult['Data'][0]->id . ';';
+          }
+          $object->status .= '1';
         }
 
         // modify action
@@ -171,14 +193,18 @@ class FeedC implements FeedControllerInterface {
     // if feed contains this data id
     $ids = explode(';', $object->model_id);
     $location = array_search($data_id, $ids);
-    if($location){
+    if($location >= 0){
       $status_array = str_split($object->status);
       $status_array[$location] = '0';
       $object->status = implode('', $status_array);
+      // for debugging
+      $object->action .= $location.'-';
       if(intval($object->status) == 0){
         // delete previous object
         Mapper::delete('Feed', $object->id);
-        // create new object
+        // create new object with "ready status"
+        $object->action = 'data-down';
+        $object->status = '0';
         Mapper::add($object);
       }
       else{

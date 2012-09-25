@@ -69,6 +69,13 @@ class Data extends Object {
    * @var string $time
    */
   public $time = null;
+  
+  /**
+   * The number of files in this data.
+   *
+   * @var int $nb_files
+   */
+  public $nb_files = -1;
 
   /**
    * Extra information for this data. (spacing, size...)

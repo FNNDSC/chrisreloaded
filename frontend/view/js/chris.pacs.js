@@ -30,7 +30,7 @@ _PACS_.pull_click = function() {
       jQuery.ajax({
         type : "POST",
         url : "controller/feed_create.php",
-        dataType : "json",
+        dataType : "text",
         data : {
           FEED_USER : 'Nicolas',
           FEED_ACTION : 'data-down-mrn',
@@ -58,8 +58,6 @@ _PACS_.pull_click = function() {
               ACS_DAT : '',
               PACS_STU_DES : '',
               PACS_ACC_NUM : ''
-            },
-            success : function(data) {
             }
           });
         }

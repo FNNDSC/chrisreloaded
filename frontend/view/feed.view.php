@@ -187,6 +187,7 @@ class FeedV implements ObjectViewInterface {
       if(array_key_exists('Name',$this->details) && count($this->details['Name']) > 0){
         foreach ($this->details['Name'] as $key => $value) {
           $d = new Template('feed_data.html');
+          //echo $value;
           $d -> replace('DATA', $value);
           $d -> replace('FULL_ID', str_replace ('.', '_', $this->details['UID'][$key]));
           $feed_details .= $d;
