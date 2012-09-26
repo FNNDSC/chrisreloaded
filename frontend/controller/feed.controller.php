@@ -116,7 +116,7 @@ class FeedC implements FeedControllerInterface {
 
   static public function add(&$object){
     FeedC::_format($object);
-    return Mapper::add($object);
+    //return Mapper::add($object);
   }
 
   static private function _format(&$object){
@@ -138,6 +138,7 @@ class FeedC implements FeedControllerInterface {
     // if special action, model has to be updated
     switch ($object->action){
       case 'data-down-mrn':
+        // get information from the PACS
         $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
         $study_parameter = Array();
         $study_parameter['PatientID'] = $object->model_id;
@@ -150,10 +151,25 @@ class FeedC implements FeedControllerInterface {
           return null;
         }
 
+
         $object->model_id = '';
         $object->status = '';
+
+        $feeds = Array();
         // update ids and status
         foreach ($all_results[1]['SeriesInstanceUID'] as $key => $value){
+
+          // create new feed for this study if it doesnt exist yet
+          if(! array_key_exists($all_results[1]['StudyInstanceUID'][$key], $feeds)){
+            $feeds[$all_results[1]['StudyInstanceUID'][$key]] = new Feed();
+            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->user_id = $object->user_id;
+            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->action = 'data-down';
+            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->model = 'data';
+            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->model_id = '';
+            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->time = date("Y-m-d H:i:s");
+            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->status = '';
+          }
+
           // if data not there, create new data and add it
           // if name is not a number, get the matching id
           $dataMapper = new Mapper('Data');
@@ -171,17 +187,27 @@ class FeedC implements FeedControllerInterface {
             $dataObject->name = 'NoName';
             $dataObject->time = '';
             $dataObject->meta_information = '';
+            // add data in db
             $data_chris_id = Mapper::add($dataObject);
+            // append id to feed
             $object->model_id .= $data_chris_id . ';';
+            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->model_id .= $data_chris_id . ';';
           }
           else{
+            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->model_id .= $dataResult['Data'][0]->id . ';';
             $object->model_id .= $dataResult['Data'][0]->id . ';';
           }
           $object->status .= '1';
+          $feeds[$all_results[1]['StudyInstanceUID'][$key]]->status .= '1';
         }
 
+        foreach($feeds as $key => $value){
+          Mapper::add($value);
+        }
         // modify action
         $object->action = 'data-down';
+        //Mapper::add($object);
+        // add study feeds to db
         break;
       default:
         break;
@@ -205,6 +231,7 @@ class FeedC implements FeedControllerInterface {
         // create new object with "ready status"
         $object->action = 'data-down';
         $object->status = '0';
+        $object->time = date("Y-m-d H:i:s");
         Mapper::add($object);
       }
       else{

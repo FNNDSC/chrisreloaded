@@ -242,6 +242,14 @@ if (count($files) == $data_nb_files + 2)
   // use mricron to convert
   $convert_command = '/usr/bin/dcm2nii -a y -g n '.$datadirname;
   exec($convert_command);
+}
+
+$files = scandir($datadirname);
+// if all files arrived
+// 1- create the nifti file
+// 2- update the feeds in progress
+if (count($files) == $data_nb_files + 3)
+{
   $db = DB::getInstance();
   $db->lock('feed', 'WRITE');
   // update the feeds in progress

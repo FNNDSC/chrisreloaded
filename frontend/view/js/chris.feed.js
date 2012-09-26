@@ -101,16 +101,19 @@ _FEED_.updateTime = function() {
       });
 }
 _FEED_.update_onclick = function() {
-  jQuery(".feed_update").live('click', function() {
-    // update the feeds
-    jQuery('.feed_content').prepend(_FEED_.cachedFeeds);
-    // empty buffer
-    _FEED_.cachedFeeds = [];
-    // update button
-    jQuery(this).hide('blind', 100);
-    //
-    _FEED_.updateTime();
-  });
+  jQuery(".feed_update").live(
+      'click',
+      function() {
+        // update the feeds
+        jQuery(_FEED_.cachedFeeds).hide().prependTo('.feed_content').slideDown(
+            "fast", function() {
+              // Animation complete.
+              _FEED_.cachedFeeds = [];
+              //
+              jQuery(".feed_update").hide('blind', 100);
+            });
+        _FEED_.updateTime();
+      });
 }
 _FEED_.setupPreview = function() {
   jQuery(".feed_preview").live('click', function(e) {

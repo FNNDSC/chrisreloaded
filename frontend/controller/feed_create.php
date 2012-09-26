@@ -43,10 +43,11 @@ $object->model = $_POST['FEED_MODEL'];
 $object->model_id = $_POST['FEED_MODEL_ID'];
 $object->time = date("Y-m-d H:i:s");
 // add object to db
-$object->id = FeedC::add($object);
+FeedC::add($object);
+//$object->id = FeedC::add($object);
 
 // get html view of this object
-$view = new FeedV($object);
+//$view = new FeedV($object);
 
-echo $view->getHTML();
+echo "";//$view->getHTML();
 ?>
