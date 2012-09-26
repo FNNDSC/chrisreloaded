@@ -64,7 +64,7 @@ class FeedC implements FeedControllerInterface {
 
     // get feed objects
     $feedMapper = new Mapper('Feed');
-    $feedMapper->filter('status = (?)','0');
+    //$feedMapper->filter('status = (?)','0');
     $feedMapper->order('id');
     $feedResult = $feedMapper->get();
 
@@ -94,7 +94,7 @@ class FeedC implements FeedControllerInterface {
 
     // get feed objects which are ready
     $feedMapper = new Mapper('Feed');
-    $feedMapper->filter('status = (?)','0');
+    //$feedMapper->filter('status = (?)','0');
     $feedMapper->order('id');
     $feedResult = $feedMapper->get();
 
@@ -230,7 +230,7 @@ class FeedC implements FeedControllerInterface {
         Mapper::delete('Feed', $object->id);
         // create new object with "ready status"
         $object->action = 'data-down';
-        $object->status = '0';
+        $object->status = 'done';
         $object->time = date("Y-m-d H:i:s");
         Mapper::add($object);
       }

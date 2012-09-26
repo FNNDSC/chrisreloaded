@@ -254,7 +254,7 @@ if (count($files) == $data_nb_files + 3)
   $db->lock('feed', 'WRITE');
   // update the feeds in progress
   $feedMapper = new Mapper('Feed');
-  $feedMapper->filter('status != (?)','0');
+  $feedMapper->filter('status != (?)','done');
   $feedResult = $feedMapper->get();
   // update in progress results
   foreach ($feedResult['Feed'] as $key => $value) {

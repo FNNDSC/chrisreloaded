@@ -86,6 +86,11 @@
 	
 }
 
+.feed>.details>.data_patient { /*   border-top: 1px solid;
+  border-color: grey;
+  padding-left: 60px; */
+	
+}
 /*  need hierarchy */
 .feed_location_text {
 	display: none;

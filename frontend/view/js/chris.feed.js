@@ -67,7 +67,7 @@ _FEED_.ajaxUpdate = function() {
     success : function(data) {
       if (data) {
         // fill cache
-        _FEED_.cachedFeeds += data;
+        _FEED_.cachedFeeds = data + _FEED_.cachedFeeds;
         // update "Update" button
         jQuery('.feed_update').html('More feeds available');
         jQuery('.feed_update').show('blind', 100);
