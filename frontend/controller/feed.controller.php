@@ -65,11 +65,12 @@ class FeedC implements FeedControllerInterface {
     // get feed objects
     $feedMapper = new Mapper('Feed');
     //$feedMapper->filter('status = (?)','0');
-    $feedMapper->order('id');
+    $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
     if(count($feedResult['Feed']) >= 1){
 
+      $_SESSION['feed_time'] = $feedResult['Feed'][0]->time;
       $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
 
       // for each
@@ -90,20 +91,23 @@ class FeedC implements FeedControllerInterface {
 
   static public function update(){
     $feed_id = $_SESSION['feed_id'];
+    $feed_time = $_SESSION['feed_time'];
     $feed_content = '';
 
     // get feed objects which are ready
     $feedMapper = new Mapper('Feed');
     //$feedMapper->filter('status = (?)','0');
-    $feedMapper->order('id');
+    $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
-    if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->id > $feed_id){
+    if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->time > $feed_time){
       $old_id = $feed_id;
+      $old_time = $feed_time;
       $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
+      $_SESSION['feed_time'] = $feedResult['Feed'][0]->time;
       // for each
       foreach ($feedResult['Feed'] as $key => $value) {
-        if($value->id <= $old_id){
+        if($value->time <= $old_time){
           break;
         }
         $view = new FeedV($value);
@@ -224,19 +228,16 @@ class FeedC implements FeedControllerInterface {
       $status_array[$location] = '0';
       $object->status = implode('', $status_array);
       // for debugging
-      $object->action .= $location.'-';
+      //$object->action .= $location.'-';
       if(intval($object->status) == 0){
         // delete previous object
-        Mapper::delete('Feed', $object->id);
+        //Mapper::delete('Feed', $object->id);
         // create new object with "ready status"
-        $object->action = 'data-down';
+        //$object->action = 'data-down';
         $object->status = 'done';
         $object->time = date("Y-m-d H:i:s");
-        Mapper::add($object);
       }
-      else{
-        Mapper::update($object, $object->id);
-      }
+      Mapper::update($object,  $object->id);
     }
 
   }

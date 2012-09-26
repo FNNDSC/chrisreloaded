@@ -42,6 +42,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 // store session data
 $_SESSION['username'] = 'Ellen';
 $_SESSION['feed_id'] = '0';
+$_SESSION['feed_time'] = '0000-00-00 00:00:00';
 
 function homePage() {
   $t = new Template('home.html');
