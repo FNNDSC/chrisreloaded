@@ -221,8 +221,6 @@ class PACS implements PACSInterface {
       PACS::_parseParam($this->command_param, $command);
 
       $this->_finishCommand($command);
-      
-      echo $command;
 
       // execute the command, format it into a nice json and return it
       return $this->_executeAndFormat($command);
@@ -258,8 +256,6 @@ class PACS implements PACSInterface {
 
       PACS::_parseParam($this->command_param, $command);
       $this->_finishCommand($command);
-      
-      echo $command;
 
       return $this->_executeAndFormat($command);
     }
@@ -295,8 +291,6 @@ class PACS implements PACSInterface {
       PACS::_parseParam($this->command_param, $command);
 
       $this->_finishCommand($command);
-
-      echo $command;
 
       return $this->_executeAndFormat($command);
     }
@@ -567,7 +561,6 @@ class PACS implements PACSInterface {
         $query .= ' 2>&1';
 
         // execute query
-        echo $query;
         $output .= shell_exec($query);
       }
       return $output;

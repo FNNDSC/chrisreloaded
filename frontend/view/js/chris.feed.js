@@ -62,12 +62,11 @@ _FEED_.ajaxUpdate = function() {
   jQuery.ajax({
     type : "POST",
     url : "controller/feed_update.php",
-    dataType : "text",
-    data : {},
+    dataType : "json",
     success : function(data) {
-      if (data) {
+      if (data['done']) {
         // fill cache
-        _FEED_.cachedFeeds = data + _FEED_.cachedFeeds;
+        _FEED_.cachedFeeds = data['done'] + _FEED_.cachedFeeds;
         // update "Update" button
         jQuery('.feed_update').html('More feeds available');
         jQuery('.feed_update').show('blind', 100);

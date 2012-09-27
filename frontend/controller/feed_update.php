@@ -33,5 +33,5 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 // include the controller
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 
-echo FeedC::update();
+echo json_encode(FeedC::update());
 ?>

@@ -90,6 +90,10 @@ class FeedC implements FeedControllerInterface {
   }
 
   static public function update(){
+    $feed_update_all = Array();
+    $feed_update_all['done'] = '';
+    $feed_update_all['progress'] = '';
+
     $feed_id = $_SESSION['feed_id'];
     $feed_time = $_SESSION['feed_time'];
     $feed_content = '';
@@ -100,22 +104,34 @@ class FeedC implements FeedControllerInterface {
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
-    if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->time > $feed_time){
+    // get new feeds
+    if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_time)){
       $old_id = $feed_id;
       $old_time = $feed_time;
       $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
       $_SESSION['feed_time'] = $feedResult['Feed'][0]->time;
       // for each
       foreach ($feedResult['Feed'] as $key => $value) {
-        if($value->time <= $old_time){
+        if(strtotime($value->time) <= strtotime($old_time)){
           break;
         }
         $view = new FeedV($value);
-        $feed_content .= $view->getHTML();
+        $feed_update_all['done'] .= $view->getHTML();
       }
     }
 
-    echo $feed_content;
+    // get feeds to be updated
+    $feedMapper = new Mapper('Feed');
+    $feedMapper->filter('status != (?)','done');
+    $feedMapper->order('time');
+    $feedResult = $feedMapper->get();
+    if(count($feedResult['Feed']) >= 1){
+      foreach ($feedResult['Feed'] as $key => $value) {
+        $feed_update_all['progress'] .= $value->id.'-'.$value->status.'_';
+      }
+    }
+
+    return $feed_update_all;
   }
 
   static public function add(&$object){
@@ -206,11 +222,11 @@ class FeedC implements FeedControllerInterface {
         }
 
         foreach($feeds as $key => $value){
-          Mapper::add($value);
+          //Mapper::add($value);
         }
         // modify action
         $object->action = 'data-down';
-        //Mapper::add($object);
+        Mapper::add($object);
         // add study feeds to db
         break;
       default:

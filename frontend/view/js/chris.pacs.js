@@ -55,7 +55,7 @@ _PACS_.pull_click = function() {
               PACS_MRN : mrn_list,
               PACS_NAM : '',
               PACS_MOD : '',
-              ACS_DAT : '',
+              PACS_DAT : '',
               PACS_STU_DES : '',
               PACS_ACC_NUM : ''
             }

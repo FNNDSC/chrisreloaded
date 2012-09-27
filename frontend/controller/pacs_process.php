@@ -248,7 +248,8 @@ $files = scandir($datadirname);
 // if all files arrived
 // 1- create the nifti file
 // 2- update the feeds in progress
-if (count($files) == $data_nb_files + 3)
+// issue: sometimes dcm2nii create more than 1 file (>= instead of ==)
+if (count($files) >= $data_nb_files + 3)
 {
   $db = DB::getInstance();
   $db->lock('feed', 'WRITE');

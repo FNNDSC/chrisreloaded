@@ -131,10 +131,10 @@ class FeedV implements ObjectViewInterface {
                 $this->details['Patient']['ID'] = $patientResult['Patient'][0]->patient_id;
               }
               else{
-                $this->details['Patient']['Name'] = "Name";
-                $this->details['Patient']['DOB'] = "DOB";
-                $this->details['Patient']['Sex'] = "Sex";
-                $this->details['Patient']['ID'] = "ID";
+                $this->details['Patient']['Name'] = "-";
+                $this->details['Patient']['DOB'] = "-";
+                $this->details['Patient']['Sex'] = "-";
+                $this->details['Patient']['ID'] = "-";
               }
             }
           }
@@ -171,10 +171,10 @@ class FeedV implements ObjectViewInterface {
           $this->image_src = 'view/gfx/jigsoar-icons/dark/64_download.png';
           $this->action_sentence = 'PACS Pull';
           if ($this->status == 'feed_done'){
-            $this->what_sentence = 'downloaded data from <b>Patient ID '. $this->details['Patient']['ID'].'</b>';
+            $this->what_sentence = 'downloaded data from <b>Patient ID '. $this->details['Patient']['ID'].' <FONT COLOR="GREEN">FINISHED</FONT> </b>';
           }
           else{
-            $this->what_sentence = 'started to download data from <b>Patient ID '. $this->details['Patient']['ID'].'</b>';
+            $this->what_sentence = 'started to download data from <b>Patient ID '. $this->details['Patient']['ID'].' <FONT COLOR="RED">IN PROGRESS</FONT> </b> ';
           }
           break;
         case "result-start":
@@ -214,7 +214,7 @@ class FeedV implements ObjectViewInterface {
     }
     // create the html file
     $t = new Template('feed.html');
-    $t -> replace('ID', $this->id);
+    $t -> replace('ID', $this->id.'_'.$this->status);
     $t -> replace('IMAGE_SRC', $this->image_src);
     $t -> replace('USERNAME', $this->username);
     $t -> replace('WHAT', $this->what_sentence);
@@ -230,7 +230,7 @@ class FeedV implements ObjectViewInterface {
         // add patient information if available
         $d = new Template('feed_data_patient.html');
         //echo $value;
-        $d -> replace('NAME', $this->details['Patient']['Name'].$this->status);
+        $d -> replace('NAME', $this->details['Patient']['Name']);
         $d -> replace('DOB', $this->details['Patient']['DOB']);
         $d -> replace('SEX', $this->details['Patient']['Sex']);
         $d -> replace('ID', $this->details['Patient']['ID']);
