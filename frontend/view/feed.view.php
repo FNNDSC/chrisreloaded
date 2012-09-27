@@ -174,7 +174,7 @@ class FeedV implements ObjectViewInterface {
             $this->what_sentence = 'downloaded data from <b>Patient ID '. $this->details['Patient']['ID'].' <FONT COLOR="GREEN">FINISHED</FONT> </b>';
           }
           else{
-            $this->what_sentence = 'started to download data from <b>Patient ID '. $this->details['Patient']['ID'].' <FONT COLOR="RED">IN PROGRESS</FONT> </b> ';
+            $this->what_sentence = 'started to download data from <b>Patient ID '. $this->details['Patient']['ID'].' <FONT COLOR="RED">IN PROGRESS <span class="feed_progress_status">0%</span></FONT> </b> ';
           }
           break;
         case "result-start":
@@ -268,7 +268,7 @@ class FeedV implements ObjectViewInterface {
       $feed_details = '<font color="red">error: Model not known: '.$this->feed_object->model.'</font>';
     }
     $t -> replace('FEED_DETAILS', $feed_details);
-    return $t;
+    return $t -> __toString();
   }
 
   /**

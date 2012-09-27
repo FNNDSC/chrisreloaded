@@ -91,8 +91,10 @@ class FeedC implements FeedControllerInterface {
 
   static public function update(){
     $feed_update_all = Array();
-    $feed_update_all['done'] = '';
-    $feed_update_all['progress'] = '';
+    $feed_update_all['done']['id'] = Array();
+    $feed_update_all['done']['content'] = Array();
+    $feed_update_all['progress']['id'] = Array();
+    $feed_update_all['progress']['content'] = Array();
 
     $feed_id = $_SESSION['feed_id'];
     $feed_time = $_SESSION['feed_time'];
@@ -116,7 +118,8 @@ class FeedC implements FeedControllerInterface {
           break;
         }
         $view = new FeedV($value);
-        $feed_update_all['done'] .= $view->getHTML();
+        $feed_update_all['done']['id'][] = $value->id;
+        $feed_update_all['done']['content'][] = $view->getHTML();
       }
     }
 
@@ -127,7 +130,8 @@ class FeedC implements FeedControllerInterface {
     $feedResult = $feedMapper->get();
     if(count($feedResult['Feed']) >= 1){
       foreach ($feedResult['Feed'] as $key => $value) {
-        $feed_update_all['progress'] .= $value->id.'-'.$value->status.'_';
+        $feed_update_all['progress']['id'][] = $value->id;
+        $feed_update_all['progress']['content'][] = $value->status;
       }
     }
 

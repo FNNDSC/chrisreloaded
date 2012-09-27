@@ -64,12 +64,41 @@ _FEED_.ajaxUpdate = function() {
     url : "controller/feed_update.php",
     dataType : "json",
     success : function(data) {
-      if (data['done']) {
-        // fill cache
-        _FEED_.cachedFeeds = data['done'] + _FEED_.cachedFeeds;
+      var length_done = data['done']['id'].length;
+      if (length_done) {
+        for ( var i = length_done - 1; i == 0; i--) {
+          _FEED_.cachedFeeds = data['done']['content'][i] + _FEED_.cachedFeeds;
+          // delete related feeds in progress
+          var element = jQuery('#' + data['done']['id'][i]
+              + '_feed_progress-feed');
+          if (element.length) {
+            element.hide('blind', 100);
+          }
+        }
         // update "Update" button
         jQuery('.feed_update').html('More feeds available');
         jQuery('.feed_update').show('blind', 100);
+      }
+      var length_progress = data['progress']['id'].length;
+      if (length_progress) {
+        for ( var i = 0; i < length_progress; i++) {
+          // get %
+          var test = data['progress']['content'][i].split("");
+          // get number of "0"
+          var newlength = test.length;
+          var count = 0;
+          for ( var j = 0; j < newlength; j++) {
+            if (test[j] == 0) {
+              count++;
+            }
+          }
+          percent = count / newlength * 100;
+          jQuery(
+              '#' + data['progress']['id'][i]
+                  + '_feed_progress-feed .feed_progress_status').html(
+              percent + '%');
+          // Do something
+        }
       }
     }
   });
@@ -107,7 +136,7 @@ _FEED_.update_onclick = function() {
         jQuery(_FEED_.cachedFeeds).hide().prependTo('.feed_content').slideDown(
             "fast", function() {
               // Animation complete.
-              _FEED_.cachedFeeds = [];
+              _FEED_.cachedFeeds = '';
               //
               jQuery(".feed_update").hide('blind', 100);
             });
