@@ -34,32 +34,28 @@ _DATA_.preview = function() {
         _DATA_.sliceX.orientation = 'Z';
         _DATA_.sliceX.init();
         _DATA_.sliceX.add(_DATA_.volume);
-        try {
-          _DATA_.sliceX.render();
-          _DATA_.sliceX.onShowtime = function() {
-            var dim = _DATA_.volume.dimensions;
-            // hide overlay
-            jQuery("#TL_OVER").hide();
-            // init slider
-            jQuery("#sliderZ").slider({
-              min : 1,
-              max : dim[2],
-              value : Math.round(_DATA_.volume.indexZ + 1),
-              slide : function(event, ui) {
-                _DATA_.volume.indexZ = ui.value - 1;
-                jQuery("#SLICE").html(ui.value);
-              }
-            });
-            _DATA_.sliceX.onScroll = function() {
-              jQuery('#sliderZ').slider("option", "value",
-                  Math.round(_DATA_.volume.indexZ + 1));
-              jQuery("#SLICE").html(Math.round(_DATA_.volume.indexZ + 1));
-            };
+        _DATA_.sliceX.render();
+        _DATA_.sliceX.onShowtime = function() {
+          var dim = _DATA_.volume.dimensions;
+          // hide overlay
+          jQuery("#TL_OVER").hide();
+          // init slider
+          jQuery("#sliderZ").slider({
+            min : 1,
+            max : dim[2],
+            value : Math.round(_DATA_.volume.indexZ + 1),
+            slide : function(event, ui) {
+              _DATA_.volume.indexZ = ui.value - 1;
+              jQuery("#SLICE").html(ui.value);
+            }
+          });
+          _DATA_.sliceX.onScroll = function() {
+            jQuery('#sliderZ').slider("option", "value",
+                Math.round(_DATA_.volume.indexZ + 1));
             jQuery("#SLICE").html(Math.round(_DATA_.volume.indexZ + 1));
-            jQuery("#SLICE_NB").html(dim[2]);
-          }
-        } catch (e) {
-          alert(e.message);
+          };
+          jQuery("#SLICE").html(Math.round(_DATA_.volume.indexZ + 1));
+          jQuery("#SLICE_NB").html(dim[2]);
         }
       } else {
         // if modal visible, callback

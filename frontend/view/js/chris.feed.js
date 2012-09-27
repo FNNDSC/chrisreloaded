@@ -70,8 +70,8 @@ _FEED_.ajaxUpdate = function() {
           // if id there, delete it!
           var index = _FEED_.cachedFeeds[0].indexOf(data['done']['id'][i]);
           if (index >= 0) {
-            data['done']['id'][index] = '';
-            data['done']['content'][index] = '';
+            _FEED_.cachedFeeds[0][index] = '';
+            _FEED_.cachedFeeds[1][index] = '';
           }
           _FEED_.cachedFeeds[0].unshift(data['done']['id'][i]);
           _FEED_.cachedFeeds[1].unshift(data['done']['content'][i]);
