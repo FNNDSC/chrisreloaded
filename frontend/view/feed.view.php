@@ -237,9 +237,9 @@ class FeedV implements ObjectViewInterface {
         $feed_details .= $d;
 
         // add data information if completed
-        $icons_visibility = 'visible';
+        $icons_visibility = 'inline';
         if($this->status != "feed_done"){
-          $icons_visibility = 'hidden';
+          $icons_visibility = 'none';
         }
         foreach ($this->details['Name'] as $key => $value) {
           $d = new Template('feed_data.html');
