@@ -42,7 +42,7 @@ _PACS_.pull_click = function() {
           // needed ??
           // add feed to new feed
           // start pulling the data
-          jQuery.ajax({
+          /*jQuery.ajax({
             type : "POST",
             url : "controller/pacs_move.php",
             dataType : "json",
@@ -59,7 +59,7 @@ _PACS_.pull_click = function() {
               PACS_STU_DES : '',
               PACS_ACC_NUM : ''
             }
-          });
+          });*/
         }
       });
       jQuery('#pacs_pull_mrns').val('');

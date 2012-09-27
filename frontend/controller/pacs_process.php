@@ -63,7 +63,7 @@ $patient_chris_id = -1;
 $data_chris_id = -1;
 $data_nb_files = -1;
 $image_chris_id = -1;
-$protocol_name = 'NoProtocolName';
+$protocol_name = 'NoSeriesDescription';
 
 // start patient table lock
 $db = DB::getInstance();
@@ -130,9 +130,9 @@ if (array_key_exists('SeriesInstanceUID',$result))
     $dataObject->patient_id = $patient_chris_id;
     $dataObject->unique_id = $result['SeriesInstanceUID'][0];
     // remove potential white spaces
-    if(array_key_exists('ProtocolName',$result))
+    if(array_key_exists('SeriesDescription',$result))
     {
-      $protocol_name = str_replace (' ', '_', $result['ProtocolName'][0]);
+      $protocol_name = str_replace (' ', '_', $result['SeriesDescription'][0]);
       $protocol_name = str_replace ('/', '_', $protocol_name);
       $protocol_name = str_replace ('?', '_', $protocol_name);
       $protocol_name = str_replace ('&', '_', $protocol_name);
@@ -167,9 +167,9 @@ if (array_key_exists('SeriesInstanceUID',$result))
     // update object
     $dataResult['Data'][0]->patient_id = $patient_chris_id;
     // remove potential white spaces
-    if(array_key_exists('ProtocolName',$result))
+    if(array_key_exists('SeriesDescription',$result))
     {
-      $protocol_name = str_replace (' ', '_', $result['ProtocolName'][0]);
+      $protocol_name = str_replace (' ', '_', $result['SeriesDescription'][0]);
       $protocol_name = str_replace ('/', '_', $protocol_name);
       $protocol_name = str_replace ('?', '_', $protocol_name);
       $protocol_name = str_replace ('&', '_', $protocol_name);

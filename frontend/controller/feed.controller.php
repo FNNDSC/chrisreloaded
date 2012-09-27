@@ -166,7 +166,11 @@ class FeedC implements FeedControllerInterface {
         $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
         $study_parameter = Array();
         $study_parameter['PatientID'] = $object->model_id;
+        $study_parameter['PatientName'] = '';
+        $study_parameter['PatientBirthDate'] = '';
+        $study_parameter['PatientSex'] = '';
         $series_parameter = Array();
+        $series_parameter['SeriesDescription'] = '';
         $series_parameter['NumberOfSeriesRelatedInstances'] = '';
         $all_results = $pacs->queryAll($study_parameter, $series_parameter, null);
         // if no data available, return null
@@ -175,32 +179,39 @@ class FeedC implements FeedControllerInterface {
           return null;
         }
 
+        //
+        // create patient if doesn't exist
+        $patientMapper = new Mapper('Patient');
+        $patientMapper->filter('patient_id = (?)',$all_results[0]['PatientID'][0]);
+        $patientResult = $patientMapper->get();
+
+        $patient_chris_id = -1;
+        if(count($patientResult['Patient']) == 0)
+        {
+          // create patient model
+          $patientObject = new Patient();
+          $patientObject->name = $all_results[0]['PatientName'][0];
+          $date = $all_results[0]['PatientBirthDate'][0];
+          $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
+          $patientObject->dob = $datetime;
+          $patientObject->sex = $all_results[0]['PatientSex'][0];
+          $patientObject->patient_id = $all_results[0]['PatientID'][0];
+          // add the patient model and get its id
+          $patient_chris_id = Mapper::add($patientObject);
+        }
+
 
         $object->model_id = '';
         $object->status = '';
 
-        $feeds = Array();
         // update ids and status
         foreach ($all_results[1]['SeriesInstanceUID'] as $key => $value){
-
-          // create new feed for this study if it doesnt exist yet
-          if(! array_key_exists($all_results[1]['StudyInstanceUID'][$key], $feeds)){
-            $feeds[$all_results[1]['StudyInstanceUID'][$key]] = new Feed();
-            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->user_id = $object->user_id;
-            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->action = 'data-down';
-            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->model = 'data';
-            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->model_id = '';
-            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->time = date("Y-m-d H:i:s");
-            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->status = '';
-          }
-
           // if data not there, create new data and add it
           // if name is not a number, get the matching id
           $dataMapper = new Mapper('Data');
           // retrieve the data
           $dataMapper->filter('unique_id = (?)',$value);
           $dataResult = $dataMapper->get();
-
           // if nothing in DB yet, return null
           if(count($dataResult['Data']) == 0)
           {
@@ -208,21 +219,33 @@ class FeedC implements FeedControllerInterface {
             $dataObject = new Data();
             $dataObject->unique_id = $value;
             $dataObject->nb_files = $all_results[1]['NumberOfSeriesRelatedInstances'][$key];
-            $dataObject->name = 'NoName';
+            // set series description
+            // check if available...
+            $dataObject->patient_id = $patient_chris_id;
+            $dataObject->name = '';
+
+            // make sure all fiels are provided
+            $protocol_name = str_replace (' ', '_', $all_results[1]['SeriesDescription'][$key]);
+            $protocol_name = str_replace ('/', '_', $protocol_name);
+            $protocol_name = str_replace ('?', '_', $protocol_name);
+            $protocol_name = str_replace ('&', '_', $protocol_name);
+            $protocol_name = str_replace ('#', '_', $protocol_name);
+            $protocol_name = str_replace ('\\', '_', $protocol_name);
+            $protocol_name = str_replace ('%', '_', $protocol_name);
+            $protocol_name = str_replace ('(', '_', $protocol_name);
+            $protocol_name = str_replace (')', '_', $protocol_name);
+            $dataObject->name .= $protocol_name;
             $dataObject->time = '';
             $dataObject->meta_information = '';
             // add data in db
             $data_chris_id = Mapper::add($dataObject);
             // append id to feed
             $object->model_id .= $data_chris_id . ';';
-            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->model_id .= $data_chris_id . ';';
           }
           else{
-            $feeds[$all_results[1]['StudyInstanceUID'][$key]]->model_id .= $dataResult['Data'][0]->id . ';';
             $object->model_id .= $dataResult['Data'][0]->id . ';';
           }
           $object->status .= '1';
-          $feeds[$all_results[1]['StudyInstanceUID'][$key]]->status .= '1';
         }
 
         foreach($feeds as $key => $value){
