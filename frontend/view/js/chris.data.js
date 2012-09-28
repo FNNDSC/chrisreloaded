@@ -82,6 +82,8 @@ jQuery(document).ready(function() {
   });
   // connect the 'hidden' event
   jQuery('#PMODAL').on('hidden', function() {
+    // empty description
+    jQuery('#myModalLabel').html("");
     // delete XTK stuff
     if (_DATA_.sliceX != null) {
       _DATA_.sliceX.destroy();

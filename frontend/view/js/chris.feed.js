@@ -107,7 +107,7 @@ _FEED_.ajaxUpdate = function() {
                 // show icons for visible elements
                 var string = '#' + data['progress']['id'][i]
                     + '_feed_progress-feed .details .data';
-                var elt = jQuery(string).eq(j).find("span").eq(0);
+                var elt = jQuery(string).eq(j).find("span").eq(1);
                 elt.show();
               }
             }
@@ -166,15 +166,20 @@ _FEED_.update_onclick = function() {
       });
 }
 _FEED_.setupPreview = function() {
-  jQuery(".feed_preview").live('click', function(e) {
-    e.stopPropagation();
-    var full_id = jQuery(this).attr('id');
-    var id = full_id.substring(0, full_id.length - 6);
-    _DATA_.PreviewSeries = id.replace(/\_/g, ".");
-    _DATA_.PreviewNbFiles = '-1';
-    _DATA_.PreviewDesc = 'Image name';
-    _DATA_.startPreview();
-  });
+  jQuery(".feed_preview").live(
+      'click',
+      function(e) {
+        e.stopPropagation();
+        var full_id = jQuery(this).attr('id');
+        var id = full_id.substring(0, full_id.length - 6);
+        _DATA_.PreviewSeries = id.replace(/\_/g, ".");
+        _DATA_.PreviewNbFiles = '-1';
+        // get sth else
+        _DATA_.PreviewDesc = jQuery(this).parents().eq(1)
+            .find('span').eq(0).html();
+        window.console.log(_DATA_.PreviewDesc);
+        _DATA_.startPreview();
+      });
 }
 _FEED_.setupLocation = function() {
   jQuery(".feed_location").live('mouseenter', function(e) {

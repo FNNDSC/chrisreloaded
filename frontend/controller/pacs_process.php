@@ -141,6 +141,7 @@ if (array_key_exists('SeriesInstanceUID',$result))
       $series_description = str_replace ('%', '_', $series_description);
       $series_description = str_replace ('(', '_', $series_description);
       $series_description = str_replace (')', '_', $series_description);
+      $series_description = str_replace (',', '_', $series_description);
     }
     $dataObject->name = $series_description;
     $date = $result['ContentDate'][0];

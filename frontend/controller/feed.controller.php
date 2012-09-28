@@ -235,6 +235,7 @@ class FeedC implements FeedControllerInterface {
         $series_description = str_replace ('%', '_', $series_description);
         $series_description = str_replace ('(', '_', $series_description);
         $series_description = str_replace (')', '_', $series_description);
+        $series_description = str_replace (',', '_', $series_description);
         $dataObject->name .= $series_description;
         $dataObject->time = '';
         $dataObject->meta_information = '';

@@ -174,6 +174,8 @@ class FeedV implements ObjectViewInterface {
             $this->what_sentence = 'downloaded data from <b>Patient ID '. $this->details['Patient']['ID'].' <FONT COLOR="GREEN">FINISHED</FONT> </b>';
           }
           else{
+            // compute quick status %
+
             $this->what_sentence = 'started to download data from <b>Patient ID '. $this->details['Patient']['ID'].' <FONT COLOR="RED">IN PROGRESS <span class="feed_progress_status">0%</span></FONT> </b> ';
           }
           break;
@@ -237,9 +239,10 @@ class FeedV implements ObjectViewInterface {
         $feed_details .= $d;
 
         // add data information if completed
-        $icons_visibility = 'inline';
-        if($this->status != "feed_done"){
-          $icons_visibility = 'none';
+        // show/hide based on visibility - create array
+        $icons_visibility = 'none';
+        if($this->status == "feed_done"){
+          $icons_visibility = 'inline';
         }
         foreach ($this->details['Name'] as $key => $value) {
           $d = new Template('feed_data.html');
