@@ -165,17 +165,13 @@ if (array_key_exists('SeriesInstanceUID',$result))
   }
   // else update data
   else{
-    // no accessible from pacs so can't be created with feed
-    $dataResult['Data'][0]->patient_id = $patient_chris_id;
-    $dataResult['Data'][0]->name = $result['SeriesDescription'][0];
-    $dataResult['Data'][0]->unique_id = $result['SeriesInstanceUID'][0];
+    // date not accessible from pacs so can't be created with feed
     $date = $result['ContentDate'][0];
     $datemysql =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
     $time = $result['ContentTime'][0];
     $timemysql = substr($time, 0, 2).':'.substr($time, 2, 2).':'.substr($time, 4, 2);
     $datetimemysql = $datemysql.' '. $timemysql;
     $dataResult['Data'][0]->time = $datetimemysql;
-    $dataResult['Data'][0]->meta_information = '';
     Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
     // update it
     $series_description = $dataResult['Data'][0]->name;
