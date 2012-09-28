@@ -34,8 +34,7 @@ _PACS_.pull_click = function() {
         data : {
           FEED_USER : 'Nicolas',
           FEED_ACTION : 'data-down-mrn',
-          FEED_MODEL : 'data',
-          FEED_MODEL_ID : mrn_list
+          FEED_DETAILS : mrn_list
         },
         success : function(data) {
           // data is html feed for this client

@@ -63,7 +63,7 @@ $patient_chris_id = -1;
 $data_chris_id = -1;
 $data_nb_files = -1;
 $image_chris_id = -1;
-$protocol_name = 'NoSeriesDescription';
+$series_description = 'NoSeriesDescription';
 
 // start patient table lock
 $db = DB::getInstance();
@@ -132,17 +132,17 @@ if (array_key_exists('SeriesInstanceUID',$result))
     // remove potential white spaces
     if(array_key_exists('SeriesDescription',$result))
     {
-      $protocol_name = str_replace (' ', '_', $result['SeriesDescription'][0]);
-      $protocol_name = str_replace ('/', '_', $protocol_name);
-      $protocol_name = str_replace ('?', '_', $protocol_name);
-      $protocol_name = str_replace ('&', '_', $protocol_name);
-      $protocol_name = str_replace ('#', '_', $protocol_name);
-      $protocol_name = str_replace ('\\', '_', $protocol_name);
-      $protocol_name = str_replace ('%', '_', $protocol_name);
-      $protocol_name = str_replace ('(', '_', $protocol_name);
-      $protocol_name = str_replace (')', '_', $protocol_name);
+      $series_description = str_replace (' ', '_', $result['SeriesDescription'][0]);
+      $series_description = str_replace ('/', '_', $series_description);
+      $series_description = str_replace ('?', '_', $series_description);
+      $series_description = str_replace ('&', '_', $series_description);
+      $series_description = str_replace ('#', '_', $series_description);
+      $series_description = str_replace ('\\', '_', $series_description);
+      $series_description = str_replace ('%', '_', $series_description);
+      $series_description = str_replace ('(', '_', $series_description);
+      $series_description = str_replace (')', '_', $series_description);
     }
-    $dataObject->name = $protocol_name;
+    $dataObject->name = $series_description;
     $date = $result['ContentDate'][0];
     $datemysql =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
     $time = $result['ContentTime'][0];
@@ -164,22 +164,10 @@ if (array_key_exists('SeriesInstanceUID',$result))
   }
   // else update data
   else{
-    // update object
+    // no accessible from pacs so can't be created with feed
     $dataResult['Data'][0]->patient_id = $patient_chris_id;
-    // remove potential white spaces
-    if(array_key_exists('SeriesDescription',$result))
-    {
-      $protocol_name = str_replace (' ', '_', $result['SeriesDescription'][0]);
-      $protocol_name = str_replace ('/', '_', $protocol_name);
-      $protocol_name = str_replace ('?', '_', $protocol_name);
-      $protocol_name = str_replace ('&', '_', $protocol_name);
-      $protocol_name = str_replace ('#', '_', $protocol_name);
-      $protocol_name = str_replace ('\\', '_', $protocol_name);
-      $protocol_name = str_replace ('%', '_', $protocol_name);
-      $protocol_name = str_replace ('(', '_', $protocol_name);
-      $protocol_name = str_replace (')', '_', $protocol_name);
-    }
-    $dataResult['Data'][0]->name = $protocol_name;
+    $dataResult['Data'][0]->name = $result['SeriesDescription'][0];
+    $dataResult['Data'][0]->unique_id = $result['SeriesInstanceUID'][0];
     $date = $result['ContentDate'][0];
     $datemysql =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
     $time = $result['ContentTime'][0];
@@ -189,7 +177,7 @@ if (array_key_exists('SeriesInstanceUID',$result))
     $dataResult['Data'][0]->meta_information = '';
     Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
     // update it
-    $protocol_name = $dataResult['Data'][0]->name;
+    $series_description = $dataResult['Data'][0]->name;
     $data_chris_id = $dataResult['Data'][0]->id;
     $data_nb_files = $dataResult['Data'][0]->nb_files;
   }
@@ -210,7 +198,7 @@ if(!is_dir($patientdirname)){
   mkdir($patientdirname);
 }
 
-$datadirname = $patientdirname.'/'.$protocol_name.'-'.$data_chris_id;
+$datadirname = $patientdirname.'/'.$series_description.'-'.$data_chris_id;
 
 // create folder if doesnt exists
 if(!is_dir($datadirname)){

@@ -65,24 +65,25 @@ _FEED_.ajaxUpdate = function() {
     dataType : "json",
     success : function(data) {
       var length_done = data['done']['id'].length;
-      if (length_done) {
-        for ( var i = length_done - 1; i == 0; i--) {
+      if (length_done > 0) {
+        var i = length_done - 1;
+        while (i >= 0) {
           // if id there, delete it!
           var index = _FEED_.cachedFeeds[0].indexOf(data['done']['id'][i]);
           if (index >= 0) {
+            window.console.log('data already there');
             _FEED_.cachedFeeds[0][index] = '';
             _FEED_.cachedFeeds[1][index] = '';
           }
           _FEED_.cachedFeeds[0].unshift(data['done']['id'][i]);
           _FEED_.cachedFeeds[1].unshift(data['done']['content'][i]);
-          // _FEED_.cachedFeeds = data['done']['content'][i] +
-          // _FEED_.cachedFeeds;
           // delete related feeds in progress
           var element = jQuery('#' + data['done']['id'][i]
               + '_feed_progress-feed');
           if (element.length) {
             element.hide('blind', 100);
           }
+          i--;
         }
         // update "Update" button
         jQuery('.feed_update').html('More feeds available');
@@ -91,28 +92,33 @@ _FEED_.ajaxUpdate = function() {
       var length_progress = data['progress']['id'].length;
       if (length_progress) {
         for ( var i = 0; i < length_progress; i++) {
-          // get %
-          var test = data['progress']['content'][i].split("");
-          // get number of "0"
-          var newlength = test.length;
-          var count = 0;
-          for ( var j = 0; j < newlength; j++) {
-            if (test[j] == 0) {
-              count++;
-              // show icons for visible elements
-              var string = '#' + data['progress']['id'][i]
-                  + '_feed_progress-feed .details .data';
-              var elt = jQuery(string).eq(j).find("span").eq(0);
-              elt.show();
+          // if element is there!
+          var element = jQuery('#' + data['progress']['id'][i]
+              + '_feed_progress-feed');
+          if (element.length) {
+            // get %
+            var test = data['progress']['content'][i].split("");
+            // get number of "0"
+            var newlength = test.length;
+            var count = 0;
+            for ( var j = 0; j < newlength; j++) {
+              if (test[j] == 0) {
+                count++;
+                // show icons for visible elements
+                var string = '#' + data['progress']['id'][i]
+                    + '_feed_progress-feed .details .data';
+                var elt = jQuery(string).eq(j).find("span").eq(0);
+                elt.show();
+              }
             }
+            percent = Math.round(count / newlength * 100);
+            // update percent
+            jQuery(
+                '#' + data['progress']['id'][i]
+                    + '_feed_progress-feed .feed_progress_status').html(
+                percent + '%');
+            // Do something
           }
-          percent = Math.round(count / newlength * 100);
-          // update percent
-          jQuery(
-              '#' + data['progress']['id'][i]
-                  + '_feed_progress-feed .feed_progress_status').html(
-              percent + '%');
-          // Do something
         }
       }
     }
@@ -148,14 +154,14 @@ _FEED_.update_onclick = function() {
       'click',
       function() {
         // update the feeds
-        jQuery(_FEED_.cachedFeeds[1].toString()).hide().prependTo(
-            '.feed_content').slideDown("fast", function() {
-          // Animation complete.
-          _FEED_.cachedFeeds[0] = [];
-          _FEED_.cachedFeeds[1] = [];
-          //
-          jQuery(".feed_update").hide('blind', 100);
-        });
+        jQuery(_FEED_.cachedFeeds[1].join("")).hide()
+            .prependTo('.feed_content').slideDown("fast", function() {
+              // Animation complete.
+              _FEED_.cachedFeeds[0] = [];
+              _FEED_.cachedFeeds[1] = [];
+              //
+              jQuery(".feed_update").hide('blind', 100);
+            });
         _FEED_.updateTime();
       });
 }

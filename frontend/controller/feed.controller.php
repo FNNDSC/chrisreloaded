@@ -49,7 +49,7 @@ interface FeedControllerInterface
   static public function getHTML($nb_feeds);
   static public function update();
 
-  static public function add(&$object);
+  static public function create($user, $action, $details);
   static public function updateDB(&$object, $data_id);
 }
 
@@ -138,17 +138,135 @@ class FeedC implements FeedControllerInterface {
     return $feed_update_all;
   }
 
-  static public function add(&$object){
-    FeedC::_format($object);
-    //return Mapper::add($object);
+  static public function create($user, $action, $details){
+    // get user id from name or user_id
+    $user_id = FeedC::_GetUserID($user);
+
+    switch($action){
+      case "data-down-mrn":
+        FeedC::_createDataDownMRN($user_id, $details);
+        break;
+      default:
+        return "Cannot create feed from unknown action";
+        break;
+    }
   }
 
-  static private function _format(&$object){
+
+  // duplications with PACS PROCESS
+  static private function _createDataDownMRN($user_id,$details){
+    // details = MRN
+    // get information about this MRN for this action
+    $results = FeedC::_queryPACS("data-down-mrn", $details);
+
+    // if no data available, return null
+    if(count($results[1]) == 0)
+    {
+      return "No data available from pacs for: ".$action." - ".$details;
+    }
+
+    // LOCK DB PAtient on write so no patient will be added in the meanwhile
+    $db = DB::getInstance();
+    $db->lock('patient', 'WRITE');
+
+    // look for the patient
+    $patientMapper = new Mapper('Patient');
+    $patientMapper->filter('patient_id = (?)',$results[0]['PatientID'][0]);
+    $patientResult = $patientMapper->get();
+    $patient_chris_id = -1;
+    // create patient if doesn't exist
+    if(count($patientResult['Patient']) == 0)
+    {
+      // create patient model
+      $patientObject = new Patient();
+      $patientObject->name = $results[0]['PatientName'][0];
+      $date = $results[0]['PatientBirthDate'][0];
+      $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
+      $patientObject->dob = $datetime;
+      $patientObject->sex = $results[0]['PatientSex'][0];
+      $patientObject->patient_id = $results[0]['PatientID'][0];
+      // add the patient model and get its id
+      $patient_chris_id = Mapper::add($patientObject);
+    }
+    // else get its id
+    else{
+      $patient_chris_id = $patientResult['Patient'][0]->id;
+    }
+
+    // unlock patient table
+    $db->unlock();
+
+    // loop through all data to be downloaded
+    // if data not there, create it
+    // update the feed ids and status
+    $feed_ids = '';
+    $feed_status = '';
+    foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
+      // if data not there, create new data and add it
+      // if name is not a number, get the matching id
+
+      // lock data db so no data added in the meanwhile
+      $db = DB::getInstance();
+      $db->lock('data', 'WRITE');
+
+      // retrieve the data
+      $dataMapper = new Mapper('Data');
+      $dataMapper->filter('unique_id = (?)',$value);
+      $dataResult = $dataMapper->get();
+      // if nothing in DB yet, add it
+      if(count($dataResult['Data']) == 0)
+      {
+        // add data and get its id
+        $dataObject = new Data();
+        $dataObject->unique_id = $value;
+        $dataObject->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
+        // set series description
+        // check if available...
+        $dataObject->patient_id = $patient_chris_id;
+        $dataObject->name = '';
+
+        // make sure all fiels are provided
+        $series_description = str_replace (' ', '_', $results[1]['SeriesDescription'][$key]);
+        $series_description = str_replace ('/', '_', $series_description);
+        $series_description = str_replace ('?', '_', $series_description);
+        $series_description = str_replace ('&', '_', $series_description);
+        $series_description = str_replace ('#', '_', $series_description);
+        $series_description = str_replace ('\\', '_', $series_description);
+        $series_description = str_replace ('%', '_', $series_description);
+        $series_description = str_replace ('(', '_', $series_description);
+        $series_description = str_replace (')', '_', $series_description);
+        $dataObject->name .= $series_description;
+        $dataObject->time = '';
+        $dataObject->meta_information = '';
+        // add data in db
+        $feed_ids .= Mapper::add($dataObject) . ';';
+      }
+      // else get its id
+      else{
+        $feed_ids .= $dataResult['Data'][0]->id . ';';
+      }
+      $feed_status .= '1';
+      $db->unlock();
+    }
+
+    // create feed and add it to db
+    $feedObject = new Feed();
+    $feedObject->user_id = $user_id;
+    $feedObject->action = 'data-down';
+    $feedObject->model = 'data';
+    $feedObject->model_id = $feed_ids;
+    $feedObject->time = date("Y-m-d H:i:s");
+    $feedObject->status = $feed_status;
+    Mapper::add($feedObject);
+
+  }
+
+  static private function _getUserID(&$user){
     // if name is not a number, get the matching id
-    if(! is_numeric($object->user_id)){
+    if(! is_numeric($user)){
       $userMapper = new Mapper('User');
       // retrieve the data
-      $userMapper->filter('username = (?)',$object->user_id);
+      $userMapper->filter('username = (?)',$user);
       $userResult = $userMapper->get();
 
       // if nothing in DB yet, return null
@@ -156,107 +274,30 @@ class FeedC implements FeedControllerInterface {
       {
         return null;
       }
-      $object->user_id = $userResult['User'][0]->id;
+      else{
+        return $userResult['User'][0]->id;
+      }
     }
+  }
 
-    // if special action, model has to be updated
-    switch ($object->action){
-      case 'data-down-mrn':
+  static private function _queryPACS($action, &$details){
+    switch ($action){
+      case "data-down-mrn":
+        // details is mrn in this action
         // get information from the PACS
         $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
         $study_parameter = Array();
-        $study_parameter['PatientID'] = $object->model_id;
+        $study_parameter['PatientID'] = $details;
         $study_parameter['PatientName'] = '';
         $study_parameter['PatientBirthDate'] = '';
         $study_parameter['PatientSex'] = '';
         $series_parameter = Array();
         $series_parameter['SeriesDescription'] = '';
         $series_parameter['NumberOfSeriesRelatedInstances'] = '';
-        $all_results = $pacs->queryAll($study_parameter, $series_parameter, null);
-        // if no data available, return null
-        if(count($all_results[1]) == 0)
-        {
-          return null;
-        }
-
-        //
-        // create patient if doesn't exist
-        $patientMapper = new Mapper('Patient');
-        $patientMapper->filter('patient_id = (?)',$all_results[0]['PatientID'][0]);
-        $patientResult = $patientMapper->get();
-
-        $patient_chris_id = -1;
-        if(count($patientResult['Patient']) == 0)
-        {
-          // create patient model
-          $patientObject = new Patient();
-          $patientObject->name = $all_results[0]['PatientName'][0];
-          $date = $all_results[0]['PatientBirthDate'][0];
-          $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
-          $patientObject->dob = $datetime;
-          $patientObject->sex = $all_results[0]['PatientSex'][0];
-          $patientObject->patient_id = $all_results[0]['PatientID'][0];
-          // add the patient model and get its id
-          $patient_chris_id = Mapper::add($patientObject);
-        }
-
-
-        $object->model_id = '';
-        $object->status = '';
-
-        // update ids and status
-        foreach ($all_results[1]['SeriesInstanceUID'] as $key => $value){
-          // if data not there, create new data and add it
-          // if name is not a number, get the matching id
-          $dataMapper = new Mapper('Data');
-          // retrieve the data
-          $dataMapper->filter('unique_id = (?)',$value);
-          $dataResult = $dataMapper->get();
-          // if nothing in DB yet, return null
-          if(count($dataResult['Data']) == 0)
-          {
-            // add data and get its id
-            $dataObject = new Data();
-            $dataObject->unique_id = $value;
-            $dataObject->nb_files = $all_results[1]['NumberOfSeriesRelatedInstances'][$key];
-            // set series description
-            // check if available...
-            $dataObject->patient_id = $patient_chris_id;
-            $dataObject->name = '';
-
-            // make sure all fiels are provided
-            $protocol_name = str_replace (' ', '_', $all_results[1]['SeriesDescription'][$key]);
-            $protocol_name = str_replace ('/', '_', $protocol_name);
-            $protocol_name = str_replace ('?', '_', $protocol_name);
-            $protocol_name = str_replace ('&', '_', $protocol_name);
-            $protocol_name = str_replace ('#', '_', $protocol_name);
-            $protocol_name = str_replace ('\\', '_', $protocol_name);
-            $protocol_name = str_replace ('%', '_', $protocol_name);
-            $protocol_name = str_replace ('(', '_', $protocol_name);
-            $protocol_name = str_replace (')', '_', $protocol_name);
-            $dataObject->name .= $protocol_name;
-            $dataObject->time = '';
-            $dataObject->meta_information = '';
-            // add data in db
-            $data_chris_id = Mapper::add($dataObject);
-            // append id to feed
-            $object->model_id .= $data_chris_id . ';';
-          }
-          else{
-            $object->model_id .= $dataResult['Data'][0]->id . ';';
-          }
-          $object->status .= '1';
-        }
-
-        foreach($feeds as $key => $value){
-          //Mapper::add($value);
-        }
-        // modify action
-        $object->action = 'data-down';
-        Mapper::add($object);
-        // add study feeds to db
+        return $pacs->queryAll($study_parameter, $series_parameter, null);
         break;
       default:
+        return "Cannot query pacs for unknown unknown action";
         break;
     }
 

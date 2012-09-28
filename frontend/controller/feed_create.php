@@ -35,19 +35,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 // include the view
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
 
-// create object
-$object = new Feed();
-$object->user_id = $_POST['FEED_USER'];
-$object->action = $_POST['FEED_ACTION'];
-$object->model = $_POST['FEED_MODEL'];
-$object->model_id = $_POST['FEED_MODEL_ID'];
-$object->time = date("Y-m-d H:i:s");
-// add object to db
-FeedC::add($object);
-//$object->id = FeedC::add($object);
+FeedC::create($_POST['FEED_USER'], $_POST['FEED_ACTION'], $_POST['FEED_DETAILS']);
 
-// get html view of this object
-//$view = new FeedV($object);
-
-echo "";//$view->getHTML();
+echo "";
 ?>
