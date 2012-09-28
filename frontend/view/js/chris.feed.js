@@ -67,13 +67,14 @@ _FEED_.ajaxUpdate = function() {
       var length_done = data['done']['id'].length;
       if (length_done > 0) {
         var i = length_done - 1;
+        var duplicates = 0;
         while (i >= 0) {
           // if id there, delete it!
           var index = _FEED_.cachedFeeds[0].indexOf(data['done']['id'][i]);
           if (index >= 0) {
-            window.console.log('data already there');
-            _FEED_.cachedFeeds[0][index] = '';
-            _FEED_.cachedFeeds[1][index] = '';
+            // delete elements
+            _FEED_.cachedFeeds[0].splice(index, 1);
+            _FEED_.cachedFeeds[1].splice(index, 1);
           }
           _FEED_.cachedFeeds[0].unshift(data['done']['id'][i]);
           _FEED_.cachedFeeds[1].unshift(data['done']['content'][i]);
@@ -86,8 +87,11 @@ _FEED_.ajaxUpdate = function() {
           i--;
         }
         // update "Update" button
-        jQuery('.feed_update').html('More feeds available');
-        jQuery('.feed_update').show('blind', 100);
+        jQuery('.feed_update').html(
+            'More feeds available (' + _FEED_.cachedFeeds[0].length + ')');
+        if (!jQuery('.feed_update').is(':visible')) {
+          jQuery('.feed_update').show('blind', 100);
+        }
       }
       var length_progress = data['progress']['id'].length;
       if (length_progress) {
@@ -175,8 +179,8 @@ _FEED_.setupPreview = function() {
         _DATA_.PreviewSeries = id.replace(/\_/g, ".");
         _DATA_.PreviewNbFiles = '-1';
         // get sth else
-        _DATA_.PreviewDesc = jQuery(this).parents().eq(1)
-            .find('span').eq(0).html();
+        _DATA_.PreviewDesc = jQuery(this).parents().eq(1).find('span').eq(0)
+            .html();
         window.console.log(_DATA_.PreviewDesc);
         _DATA_.startPreview();
       });

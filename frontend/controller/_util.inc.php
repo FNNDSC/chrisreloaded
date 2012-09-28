@@ -49,4 +49,24 @@ function joinPaths($args) {
   return join('/', $paths);
 }
 
+/**
+ * 
+ * @param unknown_type $dirty
+ */
+function sanitize($dirty){
+
+  $clean = str_replace (' ', '_', $dirty);
+  $clean = str_replace ('/', '_', $clean);
+  $clean = str_replace ('?', '_', $clean);
+  $clean = str_replace ('&', '_', $clean);
+  $clean = str_replace ('#', '_', $clean);
+  $clean = str_replace ('\\', '_', $clean);
+  $clean = str_replace ('%', '_', $clean);
+  $clean = str_replace ('(', '_', $clean);
+  $clean = str_replace (')', '_', $clean);
+  $clean = str_replace (',', '_', $clean);
+
+  return $clean;
+}
+
 ?>

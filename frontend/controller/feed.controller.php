@@ -33,7 +33,6 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
 
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
-
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs.class.php'));
 
 // include the models
@@ -226,16 +225,7 @@ class FeedC implements FeedControllerInterface {
         $dataObject->name = '';
 
         // make sure all fiels are provided
-        $series_description = str_replace (' ', '_', $results[1]['SeriesDescription'][$key]);
-        $series_description = str_replace ('/', '_', $series_description);
-        $series_description = str_replace ('?', '_', $series_description);
-        $series_description = str_replace ('&', '_', $series_description);
-        $series_description = str_replace ('#', '_', $series_description);
-        $series_description = str_replace ('\\', '_', $series_description);
-        $series_description = str_replace ('%', '_', $series_description);
-        $series_description = str_replace ('(', '_', $series_description);
-        $series_description = str_replace (')', '_', $series_description);
-        $series_description = str_replace (',', '_', $series_description);
+        $series_description = sanitize($results[1]['SeriesDescription'][$key]);
         $dataObject->name .= $series_description;
         $dataObject->time = '';
         $dataObject->meta_information = '';

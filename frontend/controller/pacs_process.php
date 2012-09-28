@@ -52,8 +52,8 @@ $options = getopt($shortopts);
 
 $p = $options['p'];
 $f = $options['f'];
-/*  $p = '/chb/users/chris/data/a26220be92a460b8a8386c8bfe69c287-452/SWI____t2_fl3d_tra_p2_-12251';
- $f = '1.dcm';  */
+/*$p = '/chb/users/chris/data/a26220be92a460b8a8386c8bfe69c287-452/SWI____t2_fl3d_tra_p2_-12251';
+ $f = '1.dcm';*/
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
@@ -132,16 +132,7 @@ if (array_key_exists('SeriesInstanceUID',$result))
     // remove potential white spaces
     if(array_key_exists('SeriesDescription',$result))
     {
-      $series_description = str_replace (' ', '_', $result['SeriesDescription'][0]);
-      $series_description = str_replace ('/', '_', $series_description);
-      $series_description = str_replace ('?', '_', $series_description);
-      $series_description = str_replace ('&', '_', $series_description);
-      $series_description = str_replace ('#', '_', $series_description);
-      $series_description = str_replace ('\\', '_', $series_description);
-      $series_description = str_replace ('%', '_', $series_description);
-      $series_description = str_replace ('(', '_', $series_description);
-      $series_description = str_replace (')', '_', $series_description);
-      $series_description = str_replace (',', '_', $series_description);
+      $series_description = sanitize($result['SeriesDescription'][0]);
     }
     $dataObject->name = $series_description;
     $date = $result['ContentDate'][0];
