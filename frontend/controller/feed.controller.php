@@ -46,10 +46,9 @@ interface FeedControllerInterface
 {
   // get HTML representation of the feed
   static public function getHTML($nb_feeds);
-  static public function update();
-
-  static public function create($user, $action, $details);
+  static public function updateClient();
   static public function updateDB(&$object, $data_id);
+  static public function create($user, $action, $details);
 }
 
 /**
@@ -77,8 +76,7 @@ class FeedC implements FeedControllerInterface {
         if($i >= $nb_feeds){
           break;
         }
-        $view = new FeedV($value);
-        $feed_content .= $view->getHTML();
+        $feed_content .= FeedV::getHTML($value);
         $i++;
       }
     }
@@ -88,7 +86,7 @@ class FeedC implements FeedControllerInterface {
     return $feed_content;
   }
 
-  static public function update(){
+  static public function updateClient(){
     $feed_update_all = Array();
     $feed_update_all['done']['id'] = Array();
     $feed_update_all['done']['content'] = Array();
@@ -116,9 +114,8 @@ class FeedC implements FeedControllerInterface {
         if(strtotime($value->time) <= strtotime($old_time)){
           break;
         }
-        $view = new FeedV($value);
         $feed_update_all['done']['id'][] = $value->id;
-        $feed_update_all['done']['content'][] = $view->getHTML();
+        $feed_update_all['done']['content'][] = FeedV::getHTML($value);
       }
     }
 
@@ -298,20 +295,20 @@ class FeedC implements FeedControllerInterface {
     // if feed contains this data id
     $ids = explode(';', $object->model_id);
     $location = array_search($data_id, $ids);
+    
     if($location >= 0){
       $status_array = str_split($object->status);
       $status_array[$location] = '0';
       $object->status = implode('', $status_array);
-      // for debugging
-      //$object->action .= $location.'-';
       if(intval($object->status) == 0){
-        // delete previous object
-        //Mapper::delete('Feed', $object->id);
-        // create new object with "ready status"
-        //$object->action = 'data-down';
         $object->status = 'done';
         $object->time = date("Y-m-d H:i:s");
       }
+      $object->model .= $location.'-';
+      Mapper::update($object,  $object->id);
+    }
+    else{
+      $object->model .= $location.'-';
       Mapper::update($object,  $object->id);
     }
 

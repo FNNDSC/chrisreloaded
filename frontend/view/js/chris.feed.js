@@ -181,7 +181,6 @@ _FEED_.setupPreview = function() {
         // get sth else
         _DATA_.PreviewDesc = jQuery(this).parents().eq(1).find('span').eq(0)
             .html();
-        window.console.log(_DATA_.PreviewDesc);
         _DATA_.startPreview();
       });
 }

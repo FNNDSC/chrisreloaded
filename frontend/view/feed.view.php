@@ -51,225 +51,144 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
  */
 class FeedV implements ObjectViewInterface {
 
-  /**
-   * Base feed object
-   *
-   * @var Feed $user_aet
-   */
-  private $feed_object = null;
-  private $id = -1;
-  private $username = '';
-  private $action = '';
-  private $action_sentence = '';
-  private $what_sentence = '';
-  private $time = '';
-  private $details = null;
-  private $image_src = '';
-  private $status = '';
+  public static function getHTML($object){
 
-  /**
-   * The constructor.
-   * Copy given object to local instance.
-   *
-   * @param[in] $feed_object The feed base object to be converted.
-   */
-  public function __construct($feed_object) {
-    $this->feed_object = $feed_object;
-    $this->details = Array();
+    // Format username
+    $username = FeedV::_getUsername($object->user_id);
+    // Format time
+    $time = FeedV::_getTime($object->time);
+
+    switch($object->action){
+      case "data-down":
+        return FeedV::_getHTMLDataDown($username, $object->id, $object->model_id, $time, $object->status);
+        break;
+      case "data-up":
+        break;
+      case "results":
+        break;
+      default:
+        return "Unknown feed action";
+        break;
+    }
+
   }
 
-  /**
-   * Get the requiered elements from the database
-   *
-   */
-  private function _format()
-  {
-    $this->id = $this->feed_object->id;
+  private static function _getUsername($userid){
     // get user name
     $userMapper = new Mapper('User');
 
-    $userMapper->filter('id = (?)',$this->feed_object->user_id);
+    $userMapper->filter('id = (?)',$userid);
     $userResult = $userMapper->get();
-    // proceed if user has been found
+    $username = "Unknown user";
+
     if(count($userResult['User']) == 1){
-      $this->username = $userResult['User'][0]->username;
-
-      // get feed creation time and format it
-      $this->time = str_replace(" ", "_", $this->feed_object->time);
-      $this->time = str_replace(":", "_", $this->time);
-      $this->time = str_replace("-", "_", $this->time);
-      $this->time .= "_time";
-
-      // loop though models and get useful information
-      // data details
-      if($this->feed_object->model == 'data'){
-        // prepare the Details array
-        $this->details['Name'] = Array();
-        $this->details['UID'] = Array();
-        $singleID = explode(";", $this->feed_object->model_id);
-        foreach ($singleID as $id) {
-          $dataMapper = new Mapper('Data');
-          $dataMapper->filter('id = (?)',$id);
-          $dataResult = $dataMapper->get();
-          if(count($dataResult['Data']) == 1){
-            $name = $dataResult['Data'][0]->name;
-            $this->details['Name'][] = $name;
-            $uid = $dataResult['Data'][0]->unique_id;
-            $this->details['UID'][] = $uid;
-
-            // get patient information
-            if(! array_key_exists('Patient', $this->details)){
-              $this->details['Patient'] = Array();
-
-              $patientMapper = new Mapper('Patient');
-              $patientMapper->filter('id = (?)',$dataResult['Data'][0]->patient_id);
-              $patientResult = $patientMapper->get();
-              if(count($patientResult['Patient']) == 1){
-                $this->details['Patient']['Name'] = $patientResult['Patient'][0]->name;
-                $this->details['Patient']['DOB'] = $patientResult['Patient'][0]->dob;
-                $this->details['Patient']['Sex'] = $patientResult['Patient'][0]->sex;
-                $this->details['Patient']['ID'] = $patientResult['Patient'][0]->patient_id;
-              }
-              else{
-                $this->details['Patient']['Name'] = "-";
-                $this->details['Patient']['DOB'] = "-";
-                $this->details['Patient']['Sex'] = "-";
-                $this->details['Patient']['ID'] = "-";
-              }
-            }
-          }
-        }
-      }
-      else{
-        // result details
-        $resultMapper = new Mapper('Result');
-        $resultMapper->filter('id = (?)',$this->feed_object->model_id);
-        $resultResult = $resultMapper->get();
-        if(count($resultResult['Result']) == 1){
-          $plugin = $resultResult['Result'][0]->plugin;
-          $this->details['Plugin'][] = $plugin;
-          $status = $resultResult['Result'][0]->status;
-          $this->details['Status'][] = $status;
-        }
-      }
-
-      if($this->feed_object->status == 'done'){
-        $this->status = 'feed_done';
-      }
-      else{
-        $this->status = 'feed_progress';
-      }
-
-      // get action and its image
-      $this->action = $this->feed_object->action;
-      switch ($this->action) {
-        case "data-up":
-          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_upload.png';
-          $this->action_sentence = 'Data uploaded to the PACS.';
-          break;
-        case "data-down":
-          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_download.png';
-          $this->action_sentence = 'PACS Pull';
-          if ($this->status == 'feed_done'){
-            $this->what_sentence = 'downloaded data from <b>Patient ID '. $this->details['Patient']['ID'].' <FONT COLOR="GREEN">FINISHED</FONT> </b>';
-          }
-          else{
-            // compute quick status %
-
-            $this->what_sentence = 'started to download data from <b>Patient ID '. $this->details['Patient']['ID'].' <FONT COLOR="RED">IN PROGRESS <span class="feed_progress_status">0%</span></FONT> </b> ';
-          }
-          break;
-        case "result-start":
-          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_settings.png';
-          $this->action_sentence = 'Pipeline started.';
-          break;
-        case "result-success":
-          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_settings.png';
-          $this->action_sentence = 'Pipeline finished.';
-          break;
-        case "result-failure":
-          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_settings.png';
-          $this->action_sentence = 'Pipeline finished with errors.';
-          break;
-        default:
-          $this->image_src = 'view/gfx/jigsoar-icons/dark/64_close.png';
-          $this->action_sentence = '<font color="red">error: Action not known: '.$this->action.'</font>';
-          break;
-      }
+      $username = $userResult['User'][0]->username;
     }
+
+    return $username;
   }
 
-  /**
-   * Create the Feed HTML code
-   */
-  public function getHTML(){
-    // if data not ready, do not return anything
-    /*     if(intval($this->feed_object->status) != 0){
-    return '';
-    } */
+  private static function _getTime($time){
+    $formated_time = str_replace(" ", "_", $time);
+    $formated_time = str_replace(":", "_", $formated_time);
+    $formated_time = str_replace("-", "_", $formated_time);
+    $formated_time .= "_time";
+    return $formated_time;
+  }
 
-    $this->_format();
-    // if user not found
-    // do not return anything
-    if($this->username == ''){
-      return '';
-    }
-    // create the html file
-    $t = new Template('feed.html');
-    $t -> replace('ID', $this->id.'_'.$this->status);
-    $t -> replace('IMAGE_SRC', $this->image_src);
-    $t -> replace('USERNAME', $this->username);
-    $t -> replace('WHAT', $this->what_sentence);
-    $t -> replace('TIME_FORMATED', $this->time);
-    $t -> replace('ACTION', $this->action_sentence);
-    $t -> replace('MORE', 'Show details');
-    $t -> replace('STATUS', $this->status);
-    // loop through details
+  private static function _getHTMLDataDown($username, $id, $model_id, $time, $status){
+    // required patient information
+    $patient_id = '';
+    $patient_name = '';
+    $patient_sex = '';
+    $patient_dob = '';
+    // requiered data information
+    $data_id = explode(";", $model_id);
+    $data_status = array_fill(0, count($data_id) -1, 0);
+    $data_name = Array();
+    $data_real_id = Array();
+    // requiered feed information
+    $feed_status = 'feed_done';
+    $feed_image = '';
+    $feed_action_desc = '';
+    $feed_what_desc = '';
+    $feed_percent = 0;
     $feed_details = '';
-    if($this->feed_object->model == 'data')
-    {
-      if(array_key_exists('Name',$this->details) && count($this->details['Name']) > 0){
-        // add patient information if available
-        $d = new Template('feed_data_patient.html');
-        //echo $value;
-        $d -> replace('NAME', $this->details['Patient']['Name']);
-        $d -> replace('DOB', $this->details['Patient']['DOB']);
-        $d -> replace('SEX', $this->details['Patient']['Sex']);
-        $d -> replace('ID', $this->details['Patient']['ID']);
-        $feed_details .= $d;
 
-        // add data information if completed
-        // show/hide based on visibility - create array
-        $icons_visibility = 'none';
-        if($this->status == "feed_done"){
-          $icons_visibility = 'inline';
+    if($status != 'done'){
+      $data_status = str_split($status);
+      $feed_status = 'feed_progress';
+    }
+
+    foreach ($data_id as $key => $value) {
+      // get data
+      $dataMapper = new Mapper('Data');
+      $dataMapper->filter('id = (?)',$value);
+      $dataResult = $dataMapper->get();
+      // if data is there, get its name
+      if(count($dataResult['Data']) == 1){
+        $data_name[] = $dataResult['Data'][0]->name;
+        $data_real_id[] = $dataResult['Data'][0]->unique_id;
+        $feed_percent += $data_status[$key];
+        // get patient information
+        if($patient_name == ''){
+          $patientMapper = new Mapper('Patient');
+          $patientMapper->filter('id = (?)',$dataResult['Data'][0]->patient_id);
+          $patientResult = $patientMapper->get();
+          if(count($patientResult['Patient']) == 1){
+            $patient_name = $patientResult['Patient'][0]->name;
+            $patient_dob = $patientResult['Patient'][0]->dob;
+            $patient_sex = $patientResult['Patient'][0]->sex;
+            $patient_id = $patientResult['Patient'][0]->patient_id;
+          }
         }
-        foreach ($this->details['Name'] as $key => $value) {
-          $d = new Template('feed_data.html');
-          $d -> replace('VISIBILITY', $icons_visibility);
-          $d -> replace('DATA', $value);
-          $d -> replace('FULL_ID', str_replace ('.', '_', $this->details['UID'][$key]));
-          $feed_details .= $d;
-        }
-      }
-      else{
-        $feed_details = '<font color="red">error: Data not found: '.$this->feed_object->model_id.'</font>';
       }
     }
-    else if($this->feed_object->model == 'result'){
-      if(array_key_exists('Plugin',$this->details) && count($this->details['Plugin']) > 0){
-        $r = new Template('feed_result.html');
-        $r -> replace('PLUGIN', $this->details['Plugin'][0]);
-        $r -> replace('STATUS', $this->details['Status'][0]);
-        $feed_details .= $r;
-      }
-      else{
-        $feed_details = '<font color="red">error: Plugin not found: '.$this->feed_object->model_id.'</font>';
-      }
+
+    $feed_image = 'view/gfx/jigsoar-icons/dark/64_download.png';
+    $feed_action_desc = 'PACS Pull';
+    if ($feed_status == 'feed_done'){
+      $feed_what_desc = 'downloaded data from <b>Patient ID '. $patient_id .' <FONT COLOR="GREEN">FINISHED</FONT> </b>';
     }
     else{
-      $feed_details = '<font color="red">error: Model not known: '.$this->feed_object->model.'</font>';
+      $feed_percent = round((1 - $feed_percent/(count($data_id)-1))*100);
+      $feed_what_desc = 'started to download data from <b>Patient ID '. $patient_id .' <FONT COLOR="RED">IN PROGRESS <span class="feed_progress_status">'.$feed_percent.'%</span></FONT> </b> ';
     }
+
+    // create HTML with templates
+    $t = new Template('feed.html');
+    $t -> replace('ID', $id.'_'.$feed_status);
+    $t -> replace('IMAGE_SRC', $feed_image);
+    $t -> replace('USERNAME', $username);
+    $t -> replace('WHAT', $feed_what_desc);
+    $t -> replace('TIME_FORMATED', $time);
+    $t -> replace('ACTION', $feed_action_desc);
+    $t -> replace('MORE', 'Show details');
+    $t -> replace('STATUS', $feed_status);
+
+    // add patient information
+    $d = new Template('feed_data_patient.html');
+    //echo $value;
+    $d -> replace('NAME', $patient_name);
+    $d -> replace('DOB', $patient_dob);
+    $d -> replace('SEX', $patient_sex);
+    $d -> replace('ID', $patient_id);
+    $feed_details .= $d;
+
+    // add data information
+    foreach ($data_name as $key => $value) {
+      $d = new Template('feed_data.html');
+      if($data_status[$key] == 0){
+        $d -> replace('VISIBILITY', 'inline');
+      }
+      else{
+        $d -> replace('VISIBILITY', 'none');
+      }
+      $d -> replace('DATA', $value);
+      $d -> replace('FULL_ID', str_replace ('.', '_', $data_real_id[$key]));
+      $feed_details .= $d;
+    }
+
     $t -> replace('FEED_DETAILS', $feed_details);
     return $t -> __toString();
   }
@@ -277,8 +196,7 @@ class FeedV implements ObjectViewInterface {
   /**
    * Create the JSON code
    */
-  public function getJSON(){
-    $this->_format();
+  public static function getJSON($object){
     // not implemented
   }
 }

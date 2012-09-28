@@ -29,11 +29,9 @@
 // interface
 interface ObjectViewInterface
 {
-  // constructor feed object as parameter
-  public function __construct($feedObject);
   // get HTML representation of the feed
-  public function getHTML();
+  public static function getHTML($object);
   // get JSON representation of the feed
-  public function getJSON();
+  public static function getJSON($object);
 }
 ?>

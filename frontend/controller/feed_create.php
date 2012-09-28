@@ -36,6 +36,5 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
 
 FeedC::create($_POST['FEED_USER'], $_POST['FEED_ACTION'], $_POST['FEED_DETAILS']);
-
 echo "";
 ?>
