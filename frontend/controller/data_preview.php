@@ -34,6 +34,9 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 
 // find dataset on the filesystem
 $dataLocation = DataC::getLocation($_POST['DATA_SER_UID']);
+// create files array
+$files = Array();
+$files['filename'] = Array();
 
 // find nifti file to be preview in the data directory
 if ($handle = opendir(CHRIS_DATA.$dataLocation)) {

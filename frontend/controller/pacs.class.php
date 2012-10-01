@@ -592,6 +592,8 @@ class PACS implements PACSInterface {
       $command .= ' 2>&1';
 
       // execute query
+      echo $command;
+      
       $output = shell_exec($command);
       return $output;
     }

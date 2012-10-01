@@ -129,6 +129,7 @@ class FeedC implements FeedControllerInterface {
         if(strtotime($value->time) <= strtotime($old_time)){
           break;
         }
+        $feed_update_all['done']['id'][] = $value->id;
         $feed_update_all['done']['content'][] = FeedV::getHTML($value);
       }
     }
@@ -187,7 +188,7 @@ class FeedC implements FeedControllerInterface {
     // if no data available, return null
     if(count($results[1]) == 0)
     {
-      return "No data available from pacs for: ".$action." - ".$details;
+      return "No data available from pacs for: data-down-mrn - ".$details;
     }
 
     // LOCK DB Patient on write so no patient will be added in the meanwhile

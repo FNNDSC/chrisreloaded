@@ -86,7 +86,7 @@ else{
     // if data already there, do not do anything!
     if(count($dataResult['Data']) > 0)
     {
-      echo json_encode('');
+      echo json_encode('Data already there');
       return;
     }
 
