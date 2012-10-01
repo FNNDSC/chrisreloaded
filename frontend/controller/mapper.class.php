@@ -194,7 +194,7 @@ class Mapper implements MapperInterface {
   /**
    * Order results based on one column
    *
-   * @param[in] $field Field to sort results on
+   * @param[in] $column Field to sort results on
    * @param[in] $dir Sorting direction (1 == DESC, else ASC)
    *
    */
