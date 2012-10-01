@@ -13,8 +13,7 @@
   ${DATA_PREVIEW}
   <div class="tabbable well">
    <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab0" data-toggle="tab">Simple</a></li>
-    <li><a href="#tab1" data-toggle="tab">Advanced</a></li>
+    <li class="active"><a href="#tab0" data-toggle="tab">Retrieve data</a></li>
     <li><a href="#tab2" data-toggle="tab">Settings</a></li>
    </ul>
    <div class="tab-content">
@@ -31,7 +30,32 @@
           class="input-small ssearch" placeholder="Study Date" value=''>
          <input id='PACS_MOD' type="text" class="input-small ssearch"
           placeholder="Modality" value='MR'>
-         <button id='SEARCH' class='btn btn-primary' type="button">Search</button>
+         <div class="input-append">
+          <div class='btn-group'>
+           <button id="SEARCH" class="btn btn-primary">Study</button>
+           <button class=" btn btn-primary dropdown-toggle"
+            data-toggle="dropdown" href="#">
+            <span class="caret"></span>
+           </button>
+           <ul class="dropdown-menu pull-right">
+            <li><a id="S_SEARCH" href="#">Search Study</a></li>
+            <li><a id="A_SEARCH" href="#">Search Series</a></li>
+           </ul>
+          </div>
+         </div>
+         <div class="input-append">
+          <div class='btn-group'>
+           <button id="QUERY" class="btn btn-primary">PACS</button>
+           <button class=" btn btn-primary dropdown-toggle"
+            data-toggle="dropdown" href="#">
+            <span class="caret"></span>
+           </button>
+           <ul class="dropdown-menu pull-right">
+            <li><a id="P_QUERY" href="#">Query PACS</a></li>
+            <li><a id="D_QUERY" href="#">Query DB</a></li>
+           </ul>
+          </div>
+         </div>
         </form>
        </div>
       </div>
@@ -41,33 +65,6 @@
        <div class='well'>
         <h2>Results</h2>
         <div id='SC-RESULTS' class='row-fluid'></div>
-       </div>
-      </div>
-     </div>
-    </div>
-    <div class="tab-pane" id="tab1">
-     <div class='row-fluid'>
-      <div class='span12'>
-       <div class='well'>
-        <h2>Advanced Parameters</h2>
-        <form class="form-inline">
-         <input id='PACS_MRN_A' type="text" class="input-small asearch"
-          placeholder="MRN" value=''> <input id='PACS_NAM_A'
-          type="text" class="input-small asearch" placeholder="Name"
-          value=''> <input id='PACS_DAT_A' type="text"
-          class="input-small asearch" placeholder="Study Date" value=''>
-         <input id='PACS_MOD_A' type="text" class="input-small asearch"
-          placeholder="Modality" value='MR'>
-         <button id='A_SEARCH' class='btn btn-primary' type="button">Search</button>
-        </form>
-       </div>
-      </div>
-     </div>
-     <div class='row-fluid'>
-      <div class='span12'>
-       <div class='well'>
-        <h2>Results</h2>
-        <div id='AC-RESULTS' class='row-fluid'></div>
        </div>
       </div>
      </div>

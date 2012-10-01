@@ -10,14 +10,23 @@ jQuery('.ssearch').keypress(function(e) {
     jQuery("#SEARCH").click();
   }
 });
+_PACS_.studySearch = function() {
+  jQuery("#S_SEARCH").live('click', function(event) {
+    jQuery("#SEARCH").html("Study");
+  });
+}
+_PACS_.seriesSearch = function() {
+  jQuery("#A_SEARCH").live('click', function(event) {
+    jQuery("#SEARCH").html("Series");
+  });
+}
 _PACS_.ajaxSearch = function() {
   jQuery("#SEARCH").live('click', function(event) {
-/*    alert(jQuery(this).html());
-    if (jQuery(this).html() == "Study") {*/
+    if (jQuery(this).html() == "Study") {
       _PACS_.ajaxSimple();
-/*    } else {
+    } else if (jQuery(this).html() == "Series") {
       _PACS_.ajaxAdvanced();
-    }*/
+    }
   });
 }
 /**
@@ -27,7 +36,7 @@ _PACS_.ajaxSearch = function() {
 _PACS_.setupDownloadSeriesFiltered = function() {
   jQuery(".d_filter").live('click', function() {
     // get filtered data
-    var filter = _PACS_.aTable._('tr', {
+    var filter = _PACS_.sTable._('tr', {
       "filter" : "applied"
     });
     var nb_filter = filter.length;
@@ -134,12 +143,12 @@ _PACS_.ajaxAdvanced = function() {
   // modify content
   me.html('<i class="icon-refresh rotating_class">');
   // destroy the results table if it exists
-  if (jQuery('#A-RESULTS').length != 0) {
-    _PACS_.aTable.dataTable().fnDestroy();
-    _PACS_.aTable = null;
-    jQuery('#A-RESULTS').remove();
+  if (jQuery('#S-RESULTS').length != 0) {
+    _PACS_.sTable.dataTable().fnDestroy();
+    _PACS_.sTable = null;
+    jQuery('#S-RESULTS').remove();
   }
-  var mrn_split = jQuery("#PACS_MRN_A").attr('value').split(' ');
+  var mrn_split = jQuery("#PACS_MRN").attr('value').split(' ');
   var mrn_nb = mrn_split.length;
   var mrn_received = 0;
   var i = 0;
@@ -155,9 +164,9 @@ _PACS_.ajaxAdvanced = function() {
         SERVER_POR : jQuery("#SERVER_POR").attr('value'),
         PACS_LEV : 'ALL',
         PACS_MRN : mrn_split[i],
-        PACS_NAM : jQuery("#PACS_NAM_A").attr('value'),
-        PACS_MOD : jQuery("#PACS_MOD_A").attr('value'),
-        PACS_DAT : jQuery("#PACS_DAT_A").attr('value'),
+        PACS_NAM : jQuery("#PACS_NAM").attr('value'),
+        PACS_MOD : jQuery("#PACS_MOD").attr('value'),
+        PACS_DAT : jQuery("#PACS_DAT").attr('value'),
         PACS_ACC_NUM : '',
         PACS_STU_DES : '',
         PACS_STU_UID : ''
@@ -166,7 +175,7 @@ _PACS_.ajaxAdvanced = function() {
         mrn_received++;
         if (mrn_received == mrn_nb) {
           me.removeClass('btn-warning').addClass('btn-primary');
-          me.html('Search');
+          me.html('Series');
         }
         _PACS_.ajaxAdvancedResults(data);
       }
@@ -179,7 +188,7 @@ _PACS_.ajaxAdvanced = function() {
 _PACS_.ajaxAdvancedResults = function(data) {
   if (data[0] != null) {
     // if no table, create it
-    if (jQuery('#A-RESULTS').length == 0) {
+    if (jQuery('#S-RESULTS').length == 0) {
       _PACS_.advancedTable();
     }
     // add data in the table!
@@ -193,11 +202,11 @@ _PACS_.ajaxAdvancedResults = function(data) {
       append.push(_PACS_.advancedFormat(data, i));
     }
     // add table to current table
-    jQuery('#A-RESULTS').dataTable().fnAddData(append);
+    jQuery('#S-RESULTS').dataTable().fnAddData(append);
   } else {
     // no studies found and not doing multiple mrn_split
-    if (_PACS_.aTable == null) {
-      jQuery('#AC-RESULTS').html("No studies found...");
+    if (_PACS_.sTable == null) {
+      jQuery('#SC-RESULTS').html("No studies found...");
     }
   }
 }
@@ -205,14 +214,14 @@ _PACS_.ajaxAdvancedResults = function(data) {
  * Create 'Advanced' table dataTables enabled.
  */
 _PACS_.advancedTable = function() {
-  var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="A-RESULTS">';
+  var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
   var i = 0;
   content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>files</th><th></th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   // update html with table
-  jQuery('#AC-RESULTS').html(content);
+  jQuery('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
-  _PACS_.aTable = jQuery('#A-RESULTS')
+  _PACS_.sTable = jQuery('#S-RESULTS')
       .dataTable(
           {
             "sDom" : "<'row-fluid'<'span6'l><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'i><'span6'p>>",
@@ -359,7 +368,7 @@ _PACS_.ajaxSimple = function() {
         mrn_received++;
         if (mrn_received == mrn_nb) {
           me.removeClass('btn-warning').addClass('btn-primary');
-          me.html('Search');
+          me.html('Study');
         }
         _PACS_.ajaxSimpleResults(data);
       }
@@ -692,6 +701,9 @@ jQuery(document).ready(function() {
   _PACS_.cacheStatus = {};
   _PACS_.cacheCount = {};
   _PACS_.cache = {};
+  _PACS_.ajaxSearch();
+  _PACS_.studySearch();
+  _PACS_.seriesSearch();
   //
   // simple mode
   //
@@ -699,11 +711,9 @@ jQuery(document).ready(function() {
   _PACS_.openStudies = [];
   _PACS_.setupDetailStudy();
   _PACS_.setupDownloadStudy();
-  _PACS_.ajaxSearch();
   //
   // advanced mode
   //
-  _PACS_.aTable = null;
   _PACS_.setupDownloadSeriesFiltered();
   //
   // both modes
