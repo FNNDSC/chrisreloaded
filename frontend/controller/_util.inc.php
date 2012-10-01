@@ -50,8 +50,9 @@ function joinPaths($args) {
 }
 
 /**
- * 
- * @param unknown_type $dirty
+ * Remove invalid characters from a string and replace it by '_'
+ * @param string $dirty
+ * @todo use regular expressions to replace everything in one command
  */
 function sanitize($dirty){
 

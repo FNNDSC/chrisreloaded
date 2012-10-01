@@ -29,113 +29,24 @@ define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
 require_once (dirname(dirname(__FILE__)).'/config.inc.php');
-require_once 'db.class.php';
-require_once 'mapper.class.php';
-require_once 'pacs.class.php';
+// include the controller
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 
-// include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+// find dataset on the filesystem
+$dataLocation = DataC::getLocation($_POST['DATA_SER_UID']);
 
-// retrieve the data
-$dataMapper = new Mapper('Data');
-$dataMapper->filter('unique_id = (?)',$_POST['DATA_SER_UID']);
-$dataResult = $dataMapper->get();
-
-// if nothing in DB yet, return null
-if(count($dataResult['Data']) == 0)
-{
-  echo json_encode('');
-  return;
-}
-
-// get data and patient UIDs
-$data_uid = $dataResult['Data'][0]->id;
-$patient_uid = $dataResult['Data'][0]->patient_id;
-
-$files = Array();
-$files['filename'] = Array();
-
-// find the data location
-// find patient
-$patient_entry = '';
-if ($handle = opendir(CHRIS_DATA)) {
+// find nifti file to be preview in the data directory
+if ($handle = opendir(CHRIS_DATA.$dataLocation)) {
   while (false !== ($entry = readdir($handle))) {
     if($entry != "." && $entry != ".."){
-      if (preg_match('/\-'.$patient_uid.'$/', $entry)) {
-        // patient directory
-        $patient_entry = $entry;
+      if (preg_match('/.nii$/', $entry)) {
+        $files['filename'][] = $dataLocation.'/'.$entry;
         break;
       }
     }
   }
   closedir($handle);
 }
-
-// find data
-$data_entry = '';
-if ($handle2 = opendir(CHRIS_DATA.$patient_entry)) {
-  while (false !== ($entry2 = readdir($handle2))) {
-    if($entry2 != "." && $entry2 != ".."){
-      if (preg_match('/\-'.$data_uid.'$/', $entry2)) {
-        $data_entry = $entry2;
-        break;
-      }
-    }
-  }
-  closedir($handle2);
-}
-
-// count number of files
-/*
- $count = 0;
-if ($handle3 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
-while (false !== ($entry3 = readdir($handle3))) {
-if($entry3 != "." && $entry3 != ".."){
-$count++;
-}
-}
-closedir($handle3);
-}
-
-$nifti = false;
-if($_POST['DATA_SER_NOF'] == -1){
-if ($handle5 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
-while (false !== ($entry5 = readdir($handle5))) {
-if($entry5 != "." && $entry5 != ".."){
-if (preg_match('/.nii$/', $entry5)) {
-$nifti = true;
-break;
-}
-}
-}
-closedir($handle5);
-}
-}
-// convert to nifiti and return file name if everything has arrived
-// create the nifti if we only have dicom files
-if ($count == $_POST['DATA_SER_NOF'] || $nifti == false)
-{
-// use mricron to convert
-$convert_command = '/usr/bin/dcm2nii -a y -g n '.CHRIS_DATA.$patient_entry.'/'.$data_entry;
-exec($convert_command);
-}
-// find the nifti!
-if($count >= $_POST['DATA_SER_NOF'] + 1 || $nifti == true){
-*/
-if ($handle4 = opendir(CHRIS_DATA.$patient_entry.'/'.$data_entry)) {
-  while (false !== ($entry4 = readdir($handle4))) {
-    if($entry4 != "." && $entry4 != ".."){
-      // to be used for the dicom later when xtk more stable
-      //$files['filename'][] = $patient_entry.'/'.$data_entry.'/'.$entry3;
-      if (preg_match('/.nii$/', $entry4)) {
-        $files['filename'][] = $patient_entry.'/'.$data_entry.'/'.$entry4;
-        break;
-      }
-    }
-  }
-  closedir($handle4);
-}
-//}
 
 echo json_encode($files);
 ?>
