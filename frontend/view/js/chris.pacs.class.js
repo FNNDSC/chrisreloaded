@@ -5,7 +5,8 @@ var _PACS_ = _PACS_ || {};
 /**
  * Bind the simple search input field to the simple search button.
  */
-jQuery('.ssearch').keypress(function(e) {
+jQuery('#pacs_form').submit(function(e) {
+  e.preventDefault();
   if (e.which == 13) {
     jQuery("#SEARCH").click();
   }
@@ -22,6 +23,7 @@ _PACS_.seriesSearch = function() {
 }
 _PACS_.ajaxSearch = function() {
   jQuery("#SEARCH").live('click', function(event) {
+    window.console.log(jQuery("#SEARCH").html());
     if (jQuery(this).html() == "Study") {
       _PACS_.ajaxSimple();
     } else if (jQuery(this).html() == "Series") {
