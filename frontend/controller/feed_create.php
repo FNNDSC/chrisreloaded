@@ -35,6 +35,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 // include the view
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
 
+// Create a feed given a user id, an action and details about the action.
 FeedC::create($_POST['FEED_USER'], $_POST['FEED_ACTION'], $_POST['FEED_DETAILS']);
 echo "";
 ?>

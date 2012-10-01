@@ -44,10 +44,13 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 // interface
 interface FeedControllerInterface
 {
-  // get HTML representation of the feed
+  // get HTML representation of the nth last feeds
   static public function getHTML($nb_feeds);
+  // probe database to return new feeds to the client
   static public function updateClient();
+  // update feeds which contain given data_id
   static public function updateDB(&$object, $data_id);
+  // create a feed given a user id, an action and the related details
   static public function create($user, $action, $details);
 }
 
@@ -56,36 +59,49 @@ interface FeedControllerInterface
  */
 class FeedC implements FeedControllerInterface {
 
+  /**
+   * Get HTML representation of the last nth feeds.
+   * @param int $nb_feeds number of html feeds to be returned
+   * @return string
+   */
   static public function getHTML($nb_feeds){
     $feed_content = '';
-    $i = 0;
 
-    // get feed objects
+    // get feeds objects ordered by creation time
     $feedMapper = new Mapper('Feed');
-    //$feedMapper->filter('status = (?)','0');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
+    // if some feeds are available, loop through them
     if(count($feedResult['Feed']) >= 1){
-
+      // store creation date of the most up to date feed
       $_SESSION['feed_time'] = $feedResult['Feed'][0]->time;
-      $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
-
-      // for each
+      // get html for the last $nb_feeds
+      $i = 0;
       foreach ($feedResult['Feed'] as $key => $value) {
+        // exist the loop once we have the required nb of feeds
         if($i >= $nb_feeds){
           break;
         }
+        // get HTML representation of a feed object with the view class
         $feed_content .= FeedV::getHTML($value);
         $i++;
       }
     }
     else{
-      $feed_content .= 'No feed found.';
+      $feed_content .= 'No feed available.';
     }
     return $feed_content;
   }
 
+  /**
+   * Get HTML representation of the feed which have not been uploaded to the client
+   * and get status information about the feeds which have been uploaded and must be updated.
+   *
+   * @return array Array containing html for the new feeds and update information for the feeds
+   * to be updated.
+   * @todo update to support "result" feed, need a "type subarray in progress"
+   */
   static public function updateClient(){
     $feed_update_all = Array();
     $feed_update_all['done']['id'] = Array();
@@ -93,28 +109,26 @@ class FeedC implements FeedControllerInterface {
     $feed_update_all['progress']['id'] = Array();
     $feed_update_all['progress']['content'] = Array();
 
-    $feed_id = $_SESSION['feed_id'];
+    // get the value of the last uploaded feed
     $feed_time = $_SESSION['feed_time'];
     $feed_content = '';
 
-    // get feed objects which are ready
+    // get last feed objects order by creation date
     $feedMapper = new Mapper('Feed');
-    //$feedMapper->filter('status = (?)','0');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
     // get new feeds
     if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_time)){
-      $old_id = $feed_id;
+      // store latest feed updated at this point
       $old_time = $feed_time;
-      $_SESSION['feed_id'] = $feedResult['Feed'][0]->id;
+      // store latest feed updated after this function returns
       $_SESSION['feed_time'] = $feedResult['Feed'][0]->time;
-      // for each
+      // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
         if(strtotime($value->time) <= strtotime($old_time)){
           break;
         }
-        $feed_update_all['done']['id'][] = $value->id;
         $feed_update_all['done']['content'][] = FeedV::getHTML($value);
       }
     }
@@ -134,13 +148,22 @@ class FeedC implements FeedControllerInterface {
     return $feed_update_all;
   }
 
+
+  /**
+   * Create a feed given a user id, an action and the related details
+   * @param string $user owner of the action
+   * @param string $action feed action to be created
+   * @param string $details details of the feed action to be created
+   */
   static public function create($user, $action, $details){
     // get user id from name or user_id
     $user_id = FeedC::_GetUserID($user);
 
+    // create feed depending on the actions
     switch($action){
       case "data-down-mrn":
         FeedC::_createDataDownMRN($user_id, $details);
+        return $action." sucessfully created";
         break;
       default:
         return "Cannot create feed from unknown action";
@@ -149,10 +172,16 @@ class FeedC implements FeedControllerInterface {
   }
 
 
-  // duplications with PACS PROCESS
+  /**
+   * Create data download from MRN feed.
+   * Details is the MRN to be downloaded.
+   * @param int $user_id owner of the action
+   * @param string $details details of the action: "MRN to be downloaded"
+   * @return string
+   * @todo couple of duplication with pacs_process.php
+   */
   static private function _createDataDownMRN($user_id,$details){
-    // details = MRN
-    // get information about this MRN for this action
+    // get PACS information about this MRN for this action
     $results = FeedC::_queryPACS("data-down-mrn", $details);
 
     // if no data available, return null
@@ -161,7 +190,7 @@ class FeedC implements FeedControllerInterface {
       return "No data available from pacs for: ".$action." - ".$details;
     }
 
-    // LOCK DB PAtient on write so no patient will be added in the meanwhile
+    // LOCK DB Patient on write so no patient will be added in the meanwhile
     $db = DB::getInstance();
     $db->lock('patient', 'WRITE');
 
@@ -193,14 +222,11 @@ class FeedC implements FeedControllerInterface {
     $db->unlock();
 
     // loop through all data to be downloaded
-    // if data not there, create it
+    // if data not there, create rown in the data db table
     // update the feed ids and status
     $feed_ids = '';
     $feed_status = '';
     foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
-      // if data not there, create new data and add it
-      // if name is not a number, get the matching id
-
       // lock data db so no data added in the meanwhile
       $db = DB::getInstance();
       $db->lock('data', 'WRITE');
@@ -249,6 +275,14 @@ class FeedC implements FeedControllerInterface {
 
   }
 
+  /**
+   * Convenient method to get a user id from a string.
+   * If string can be evaluated as a number, this number is returned.
+   *
+   * @param string $user username or user id.
+   * @return int user id in db
+   */
+  // get user id from name or user_id
   static private function _getUserID(&$user){
     // if name is not a number, get the matching id
     if(! is_numeric($user)){
@@ -257,17 +291,30 @@ class FeedC implements FeedControllerInterface {
       $userMapper->filter('username = (?)',$user);
       $userResult = $userMapper->get();
 
-      // if nothing in DB yet, return null
+      // if nothing in DB yet, return -1
       if(count($userResult['User']) == 0)
       {
-        return null;
+        return -1;
       }
       else{
         return $userResult['User'][0]->id;
       }
     }
+    else{
+      return intval($user);
+    }
   }
 
+  /**
+   * Convenience method to get information from the PACS for a give action.
+   * Access patient information without need to download data.
+   * Information such as "NumberOfSeriesRelatedInstances" are only accessible though PACS query.
+   *
+   * @param string $action action name
+   * @param string $details action details
+   * @return array
+   */
+  // get PACS information about this MRN for this action
   static private function _queryPACS($action, &$details){
     switch ($action){
       case "data-down-mrn":
@@ -291,11 +338,19 @@ class FeedC implements FeedControllerInterface {
 
   }
 
+
+  /**
+   * Update feed in database for the given data id.
+   * If feed contains data id, update it.
+   * @param Feed $object
+   * @param int $data_id
+   */
   static public function updateDB(&$object, $data_id){
-    // if feed contains this data id
+    // convert list of data ids to array
     $ids = explode(';', $object->model_id);
+    // look for data_id in array
     $location = array_search($data_id, $ids);
-    
+    // if data is there, update db
     if($location >= 0){
       $status_array = str_split($object->status);
       $status_array[$location] = '0';
@@ -304,14 +359,8 @@ class FeedC implements FeedControllerInterface {
         $object->status = 'done';
         $object->time = date("Y-m-d H:i:s");
       }
-      $object->model .= $location.'-';
       Mapper::update($object,  $object->id);
     }
-    else{
-      $object->model .= $location.'-';
-      Mapper::update($object,  $object->id);
-    }
-
   }
 }
 ?>
