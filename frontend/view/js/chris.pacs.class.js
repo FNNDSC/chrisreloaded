@@ -7,17 +7,19 @@ var _PACS_ = _PACS_ || {};
  */
 jQuery('.ssearch').keypress(function(e) {
   if (e.which == 13) {
-    jQuery('#S_SEARCH').click();
+    jQuery("#SEARCH").click();
   }
 });
-/**
- * Bind the advanced search input field to the advanced search button.
- */
-jQuery('.asearch').keypress(function(e) {
-  if (e.which == 13) {
-    jQuery('#A_SEARCH').click();
-  }
-});
+_PACS_.ajaxSearch = function() {
+  jQuery("#SEARCH").live('click', function(event) {
+/*    alert(jQuery(this).html());
+    if (jQuery(this).html() == "Study") {*/
+      _PACS_.ajaxSimple();
+/*    } else {
+      _PACS_.ajaxAdvanced();
+    }*/
+  });
+}
 /**
  * Setup the download button to only download the series which are remaing after
  * filtering in the advanced mode.
@@ -125,53 +127,51 @@ _PACS_.setupPreviewSeries = function() {
  * Setup the 'Advanced' search button.
  */
 _PACS_.ajaxAdvanced = function() {
-  jQuery("#A_SEARCH").live('click', function(event) {
-    // keep reference to current object for the ajax response
-    var me = jQuery(this);
-    // modify class
-    me.removeClass('btn-primary').addClass('btn-warning');
-    // modify content
-    me.html('<i class="icon-refresh rotating_class">');
-    // destroy the results table if it exists
-    if (jQuery('#A-RESULTS').length != 0) {
-      _PACS_.aTable.dataTable().fnDestroy();
-      _PACS_.aTable = null;
-      jQuery('#A-RESULTS').remove();
-    }
-    var mrn_split = jQuery("#PACS_MRN_A").attr('value').split(' ');
-    var mrn_nb = mrn_split.length;
-    var mrn_received = 0;
-    var i = 0;
-    for (i = 0; i < mrn_nb; i++) {
-      // query pacs on parameters, at STUDY LEVEL
-      jQuery.ajax({
-        type : "POST",
-        url : "controller/pacs_query.php",
-        dataType : "json",
-        data : {
-          USER_AET : jQuery("#USER_AET").attr('value'),
-          SERVER_IP : jQuery("#SERVER_IP").attr('value'),
-          SERVER_POR : jQuery("#SERVER_POR").attr('value'),
-          PACS_LEV : 'ALL',
-          PACS_MRN : mrn_split[i],
-          PACS_NAM : jQuery("#PACS_NAM_A").attr('value'),
-          PACS_MOD : jQuery("#PACS_MOD_A").attr('value'),
-          PACS_DAT : jQuery("#PACS_DAT_A").attr('value'),
-          PACS_ACC_NUM : '',
-          PACS_STU_DES : '',
-          PACS_STU_UID : ''
-        },
-        success : function(data) {
-          mrn_received++;
-          if (mrn_received == mrn_nb) {
-            me.removeClass('btn-warning').addClass('btn-primary');
-            me.html('Search');
-          }
-          _PACS_.ajaxAdvancedResults(data);
+  // keep reference to current object for the ajax response
+  var me = jQuery("#SEARCH");
+  // modify class
+  me.removeClass('btn-primary').addClass('btn-warning');
+  // modify content
+  me.html('<i class="icon-refresh rotating_class">');
+  // destroy the results table if it exists
+  if (jQuery('#A-RESULTS').length != 0) {
+    _PACS_.aTable.dataTable().fnDestroy();
+    _PACS_.aTable = null;
+    jQuery('#A-RESULTS').remove();
+  }
+  var mrn_split = jQuery("#PACS_MRN_A").attr('value').split(' ');
+  var mrn_nb = mrn_split.length;
+  var mrn_received = 0;
+  var i = 0;
+  for (i = 0; i < mrn_nb; i++) {
+    // query pacs on parameters, at STUDY LEVEL
+    jQuery.ajax({
+      type : "POST",
+      url : "controller/pacs_query.php",
+      dataType : "json",
+      data : {
+        USER_AET : jQuery("#USER_AET").attr('value'),
+        SERVER_IP : jQuery("#SERVER_IP").attr('value'),
+        SERVER_POR : jQuery("#SERVER_POR").attr('value'),
+        PACS_LEV : 'ALL',
+        PACS_MRN : mrn_split[i],
+        PACS_NAM : jQuery("#PACS_NAM_A").attr('value'),
+        PACS_MOD : jQuery("#PACS_MOD_A").attr('value'),
+        PACS_DAT : jQuery("#PACS_DAT_A").attr('value'),
+        PACS_ACC_NUM : '',
+        PACS_STU_DES : '',
+        PACS_STU_UID : ''
+      },
+      success : function(data) {
+        mrn_received++;
+        if (mrn_received == mrn_nb) {
+          me.removeClass('btn-warning').addClass('btn-primary');
+          me.html('Search');
         }
-      });
-    }
-  });
+        _PACS_.ajaxAdvancedResults(data);
+      }
+    });
+  }
 }
 /**
  * Handle 'Advanced' AJAX query results.
@@ -322,51 +322,49 @@ _PACS_.advancedFormat = function(data, i) {
  * Setup the 'Simple' search button.
  */
 _PACS_.ajaxSimple = function() {
-  jQuery("#S_SEARCH").live('click', function(event) {
-    var me = jQuery(this);
-    me.removeClass('btn-primary').addClass('btn-warning');
-    // modify content
-    me.html('<i class="icon-refresh rotating_class">');
-    if (jQuery('#S-RESULTS').length != 0) {
-      // destroy the table
-      _PACS_.sTable.dataTable().fnDestroy();
-      _PACS_.sTable = null;
-      jQuery('#S-RESULTS').remove();
-    }
-    var mrn_split = jQuery("#PACS_MRN").attr('value').split(' ');
-    var mrn_nb = mrn_split.length;
-    var mrn_received = 0;
-    var i = 0;
-    for (i = 0; i < mrn_nb; i++) {
-      // query pacs on parameters, at STUDY LEVEL
-      jQuery.ajax({
-        type : "POST",
-        url : "controller/pacs_query.php",
-        dataType : "json",
-        data : {
-          USER_AET : jQuery("#USER_AET").attr('value'),
-          SERVER_IP : jQuery("#SERVER_IP").attr('value'),
-          SERVER_POR : jQuery("#SERVER_POR").attr('value'),
-          PACS_LEV : 'STUDY',
-          PACS_MRN : mrn_split[i],
-          PACS_NAM : jQuery("#PACS_NAM").attr('value'),
-          PACS_MOD : jQuery("#PACS_MOD").attr('value'),
-          PACS_DAT : jQuery("#PACS_DAT").attr('value'),
-          PACS_ACC_NUM : '',
-          PACS_STU_DES : '',
-          PACS_STU_UID : ''
-        },
-        success : function(data) {
-          mrn_received++;
-          if (mrn_received == mrn_nb) {
-            me.removeClass('btn-warning').addClass('btn-primary');
-            me.html('Search');
-          }
-          _PACS_.ajaxSimpleResults(data);
+  var me = jQuery("#SEARCH");
+  me.removeClass('btn-primary').addClass('btn-warning');
+  // modify content
+  me.html('<i class="icon-refresh rotating_class">');
+  if (jQuery('#S-RESULTS').length != 0) {
+    // destroy the table
+    _PACS_.sTable.dataTable().fnDestroy();
+    _PACS_.sTable = null;
+    jQuery('#S-RESULTS').remove();
+  }
+  var mrn_split = jQuery("#PACS_MRN").attr('value').split(' ');
+  var mrn_nb = mrn_split.length;
+  var mrn_received = 0;
+  var i = 0;
+  for (i = 0; i < mrn_nb; i++) {
+    // query pacs on parameters, at STUDY LEVEL
+    jQuery.ajax({
+      type : "POST",
+      url : "controller/pacs_query.php",
+      dataType : "json",
+      data : {
+        USER_AET : jQuery("#USER_AET").attr('value'),
+        SERVER_IP : jQuery("#SERVER_IP").attr('value'),
+        SERVER_POR : jQuery("#SERVER_POR").attr('value'),
+        PACS_LEV : 'STUDY',
+        PACS_MRN : mrn_split[i],
+        PACS_NAM : jQuery("#PACS_NAM").attr('value'),
+        PACS_MOD : jQuery("#PACS_MOD").attr('value'),
+        PACS_DAT : jQuery("#PACS_DAT").attr('value'),
+        PACS_ACC_NUM : '',
+        PACS_STU_DES : '',
+        PACS_STU_UID : ''
+      },
+      success : function(data) {
+        mrn_received++;
+        if (mrn_received == mrn_nb) {
+          me.removeClass('btn-warning').addClass('btn-primary');
+          me.html('Search');
         }
-      });
-    }
-  });
+        _PACS_.ajaxSimpleResults(data);
+      }
+    });
+  }
 }
 /**
  * Handle 'Simple' AJAX query results.
@@ -701,12 +699,11 @@ jQuery(document).ready(function() {
   _PACS_.openStudies = [];
   _PACS_.setupDetailStudy();
   _PACS_.setupDownloadStudy();
-  _PACS_.ajaxSimple();
+  _PACS_.ajaxSearch();
   //
   // advanced mode
   //
   _PACS_.aTable = null;
-  _PACS_.ajaxAdvanced();
   _PACS_.setupDownloadSeriesFiltered();
   //
   // both modes
