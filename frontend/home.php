@@ -32,14 +32,14 @@ define('__CHRIS_ENTRY_POINT__', 666);
 //define('CHRIS_CONFIG_DEBUG', true);
 
 // include the configuration
-require_once ($_SERVER['DOCUMENT_ROOT_NICOLAS'].'/config.inc.php');
+require_once ('config.inc.php');
 
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 
-// store session data
+// init session data
 $_SESSION['username'] = 'Ellen';
 $_SESSION['feed_time'] = '0000-00-00 00:00:00';
 

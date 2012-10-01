@@ -47,12 +47,16 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 
 /**
- * View class to get different representations of the Feed object
+ * View class to get different representations of the Feed object.
  */
 class FeedV implements ObjectViewInterface {
 
+  /**
+   * Get HTML representation of the given object.
+   * @param Feed $object object to be converted to HMTL.
+   * @return string HTML representation of the object
+   */
   public static function getHTML($object){
-
     // Format username
     $username = FeedV::_getUsername($object->user_id);
     // Format time
@@ -73,6 +77,11 @@ class FeedV implements ObjectViewInterface {
 
   }
 
+  /**
+   * Get username from user id.
+   * @param int $userid user ID
+   * @return string username
+   */
   private static function _getUsername($userid){
     // get user name
     $userMapper = new Mapper('User');
@@ -88,6 +97,12 @@ class FeedV implements ObjectViewInterface {
     return $username;
   }
 
+  /**
+   * Get feed creation time in an easy to manipulate format.
+   * 2012-09-09 12:12:12   => 2012_09_09_12_12_12
+   * @param string $time time to be converted
+   * @return string formated time stamp
+   */
   private static function _getTime($time){
     $formated_time = str_replace(" ", "_", $time);
     $formated_time = str_replace(":", "_", $formated_time);
@@ -96,6 +111,17 @@ class FeedV implements ObjectViewInterface {
     return $formated_time;
   }
 
+  /**
+   * Get HTML for the data_down action
+   *
+   * @param string $username username of the action owner.
+   * @param int $id id of the feed
+   * @param string $model_id id of the models contained in the feed
+   * @param string $time formated feed creation time
+   * @param string $status feed status
+   *
+   * @return string Formtaed HTML representing the given action.
+   */
   private static function _getHTMLDataDown($username, $id, $model_id, $time, $status){
     // required patient information
     $patient_id = '';
@@ -125,7 +151,7 @@ class FeedV implements ObjectViewInterface {
       $dataMapper = new Mapper('Data');
       $dataMapper->filter('id = (?)',$value);
       $dataResult = $dataMapper->get();
-      // if data is there, get its name
+      // if data is there, get relevant information
       if(count($dataResult['Data']) == 1){
         $data_name[] = $dataResult['Data'][0]->name;
         $data_real_id[] = $dataResult['Data'][0]->unique_id;
@@ -135,6 +161,7 @@ class FeedV implements ObjectViewInterface {
           $patientMapper = new Mapper('Patient');
           $patientMapper->filter('id = (?)',$dataResult['Data'][0]->patient_id);
           $patientResult = $patientMapper->get();
+          // if patient is there, get relevant information
           if(count($patientResult['Patient']) == 1){
             $patient_name = $patientResult['Patient'][0]->name;
             $patient_dob = $patientResult['Patient'][0]->dob;
@@ -168,7 +195,6 @@ class FeedV implements ObjectViewInterface {
 
     // add patient information
     $d = new Template('feed_data_patient.html');
-    //echo $value;
     $d -> replace('NAME', $patient_name);
     $d -> replace('DOB', $patient_dob);
     $d -> replace('SEX', $patient_sex);
