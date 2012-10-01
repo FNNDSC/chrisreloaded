@@ -30,8 +30,7 @@
 if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 // include the utilities
-require_once('controller/_util.inc.php');
-
+require_once(dirname(__FILE__).'/controller/_util.inc.php');
 
 // MYSQL configuration
 define('SQL_HOST', 'chris');
@@ -41,9 +40,9 @@ define('SQL_DATABASE', 'chrisdev');
 
 // PATH configuration
 define('CHRIS_WWWROOT', dirname(__FILE__));
-
 define('CHRIS_MODEL_FOLDER', joinPaths(CHRIS_WWWROOT,'model'));
 define('CHRIS_VIEW_FOLDER', joinPaths(CHRIS_WWWROOT,'view'));
+define('CHRIS_TEMPLATE_FOLDER', joinPaths(CHRIS_VIEW_FOLDER,'template'));
 define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
 
 // PACS
@@ -53,6 +52,8 @@ define('CHRIS_DCMTK', '/usr/bin/');
 define('CHRIS_DATA', '/chb/users/chris/dev/data/');
 define('CHRIS_TMP', '/chb/users/chris/dev/tmp/');
 define('CHRIS_AETITLE', 'FNNDSC-CHRISDEV');
+define('PACS_SERVER', '134.174.12.21');
+define('PACS_PORT', '104');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));

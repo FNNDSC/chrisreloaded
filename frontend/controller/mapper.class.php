@@ -27,8 +27,23 @@
  */
 
 // prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+
+// interface
+interface MapperInterface
+{
+  public function __construct($object);
+  public function order($column, $dir);
+  public function filter($condition, $param, $index, $operator);
+  public function join($tableObject, $joinCondition);
+  public function ljoin($tableObject, $joinCondition);
+  public function group($condition);
+  public function get($id);
+  static public function getStatic($objectName, $id);
+  static public function add($object);
+  static public function update($object, $objectid);
+  static public function delete($object, $objectid);
+}
 
 /**
  * Interface between the Objects and the Database
@@ -37,7 +52,7 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
  * @example test.mapper.class.php
  *
  */
-class Mapper {
+class Mapper implements MapperInterface {
   /**
    * Base object name.
    *
@@ -59,6 +74,14 @@ class Mapper {
    * @var string $where
    */
   private $where = Array();
+
+  /**
+   * Order results.
+   * String containing results ordering.
+   *
+   * @var string $order
+   */
+  private $order = '';
 
   /**
    * Param Array
@@ -163,9 +186,25 @@ class Mapper {
         foreach ($filter as $condition) {
           $param[] = $condition;
         }
-
       }
       return $param;
+    }
+  }
+
+  /**
+   * Order results based on one column
+   *
+   * @param[in] $column Field to sort results on
+   * @param[in] $dir Sorting direction (1 == DESC, else ASC)
+   *
+   */
+  public function order($column, $dir = 1) {
+    $this->order .= ' ORDER BY '.$column;
+    if($dir == 1){
+      $this->order .= ' DESC';
+    }
+    else{
+      $this->order .= ' ASC';
     }
   }
 
@@ -306,7 +345,7 @@ class Mapper {
     }
 
     // query the database
-    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).$this->group, $this->_getParam());
+    $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).strtolower($this->group).strtolower($this->order), $this->_getParam());
 
     // create an array to store the objects
     $objects = Array();
@@ -317,32 +356,33 @@ class Mapper {
     }
 
     // create objects and map all the attributes
-    foreach ($results as $result) {
+    if(gettype($results) == 'array'){
+      foreach ($results as $result) {
+        // localid
+        $localid = 0;
+        $object = null;
 
-      // localid
-      $localid = 0;
-      $object = null;
-
-      // parse on result
-      foreach ($result as $field) {
-        // if we reach a "id" field, create new object
-        if ($field[0] == 'id') {
-          // if there is an object existing, push it to right location and update localid
-          // we only push the object once it has been filled!
-          if (!empty($object)) {
-            $objects[$this->objects[$localid]][] = $object;
-            ++$localid;
+        // parse on result
+        foreach ($result as $field) {
+          // if we reach a "id" field, create new object
+          if ($field[0] == 'id') {
+            // if there is an object existing, push it to right location and update localid
+            // we only push the object once it has been filled!
+            if (!empty($object)) {
+              $objects[$this->objects[$localid]][] = $object;
+              ++$localid;
+            }
+            // create new object
+            $object = new $this->objects[$localid]();
           }
-          // create new object
-          $object = new $this->objects[$localid]();
+          // update fields
+          $object->$field[0] = $field[1];
         }
-        // update fields
-        $object->$field[0] = $field[1];
-      }
-      // push last object to the right location
-      // we only push the object once it has been filled!
-      if (!empty($object)) {
-        $objects[$this->objects[$localid]][] = $object;
+        // push last object to the right location
+        // we only push the object once it has been filled!
+        if (!empty($object)) {
+          $objects[$this->objects[$localid]][] = $object;
+        }
       }
     }
     return $objects;
@@ -363,7 +403,7 @@ class Mapper {
    *
    * @snippet test.mapper.class.php testGetStatic()
    */
-  public function getStatic($objectName, $id = -1) {
+  static public function getStatic($objectName, $id = -1) {
     $objectName = Mapper::_getName($objectName);
     $where = '';
     $preparedValue = Array();

@@ -63,7 +63,7 @@ class Template {
 
     $this->name = $name;
 
-    $file_path = joinPaths(CHRIS_VIEW_FOLDER, $name);
+    $file_path = joinPaths(CHRIS_TEMPLATE_FOLDER ,$name);
 
     // look up if we have the requested template in our view folder
     if (!file_exists($file_path)) {
@@ -103,10 +103,10 @@ class Template {
   public function replace($tag, $content) {
 
     // check if the content is a file
-    if (file_exists(joinPaths(CHRIS_VIEW_FOLDER,$content))) {
+    if (file_exists(joinPaths(CHRIS_TEMPLATE_FOLDER,$content))) {
 
       // yes, it is
-      $content = $this->parse(joinPaths(CHRIS_VIEW_FOLDER,$content));
+      $content = $this->parse(joinPaths(CHRIS_TEMPLATE_FOLDER,$content));
 
     }
 

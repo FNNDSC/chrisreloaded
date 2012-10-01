@@ -28,13 +28,13 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
-require_once ('../config.inc.php');
+require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 require_once 'db.class.php';
 require_once 'mapper.class.php';
 require_once 'pacs.class.php';
 
 // include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 
 $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 
@@ -71,7 +71,7 @@ else{
       return;
     }
 
-    $pacs2 = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], 'FNNDSC_CHRISTEST');
+    $pacs2 = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], 'FNNDSC-CHRISTEST');
     $pacs2->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
     $pacs2->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
     echo json_encode($pacs2->moveSeries());

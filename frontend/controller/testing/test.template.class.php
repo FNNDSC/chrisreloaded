@@ -27,12 +27,13 @@
  */
 
 // we define a valid entry point
-define('__CHRIS_ENTRY_POINT__', 666);
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
-require_once('../../config.inc.php');
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(dirname(__FILE__))).'/config.inc.php');
 
 // include the template class
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));

@@ -26,8 +26,7 @@
  *
  */
 // prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 // interface
 interface PACSInterface
@@ -292,8 +291,6 @@ class PACS implements PACSInterface {
       PACS::_parseParam($this->command_param, $command);
 
       $this->_finishCommand($command);
-
-      //echo $command;
 
       return $this->_executeAndFormat($command);
     }
@@ -604,12 +601,14 @@ class PACS implements PACSInterface {
   // process data once something has been received by the listener
   static public function process($filename){
     // Image information
-    $requiered_fields = '+P SeriesInstanceUID';
+    $requiered_fields = '+P StudyInstanceUID';
+    $requiered_fields .= ' +P SeriesInstanceUID';
     $requiered_fields .= ' +P SOPInstanceUID';
     $requiered_fields .= ' +P ProtocolName';
     $requiered_fields .= ' +P ContentDate';
     $requiered_fields .= ' +P ContentTime';
     $requiered_fields .= ' +P InstanceNumber';
+    $requiered_fields .= ' +P SeriesDescription';
 
     // Patient information
     $requiered_fields .= ' +P PatientName';
@@ -618,6 +617,7 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P PatientID';
 
     $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
+
     return PACS::_executeAndFormat($command);
   }
 }

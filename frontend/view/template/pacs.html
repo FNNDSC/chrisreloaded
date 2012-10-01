@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>${CSS}
+</head>
+
+<body style='background: url("view/gfx/background1.jpg")'>
+
+ ${NAVBAR}
+
+ <div class="container"
+  style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
+  ${DATA_PREVIEW}
+  <div class="tabbable well">
+   <ul class="nav nav-tabs">
+    <li class="active"><a href="#tab0" data-toggle="tab">Simple</a></li>
+    <li><a href="#tab1" data-toggle="tab">Advanced</a></li>
+    <li><a href="#tab2" data-toggle="tab">Settings</a></li>
+   </ul>
+   <div class="tab-content">
+    <div class="tab-pane active" id="tab0">
+     <div class='row-fluid'>
+      <div class='span12'>
+       <div class='well'>
+        <h2>Parameters</h2>
+        <form class="form-inline">
+         <input id='PACS_MRN' type="text" class="input-small ssearch"
+          placeholder="MRN" value=''> <input id='PACS_NAM'
+          type="text" class="input-small ssearch" placeholder="Name"
+          value=''> <input id='PACS_DAT' type="text"
+          class="input-small ssearch" placeholder="Study Date" value=''>
+         <input id='PACS_MOD' type="text" class="input-small ssearch"
+          placeholder="Modality" value='MR'>
+         <button id='S_SEARCH' class='btn btn-primary' type="button">Search</button>
+        </form>
+       </div>
+      </div>
+     </div>
+     <div class='row-fluid'>
+      <div class='span12'>
+       <div class='well'>
+        <h2>Results</h2>
+        <div id='SC-RESULTS' class='row-fluid'></div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="tab-pane" id="tab1">
+     <div class='row-fluid'>
+      <div class='span12'>
+       <div class='well'>
+        <h2>Advanced Parameters</h2>
+        <form class="form-inline">
+         <input id='PACS_MRN_A' type="text" class="input-small asearch"
+          placeholder="MRN" value=''> <input id='PACS_NAM_A'
+          type="text" class="input-small asearch" placeholder="Name"
+          value=''> <input id='PACS_DAT_A' type="text"
+          class="input-small asearch" placeholder="Study Date" value=''>
+         <input id='PACS_MOD_A' type="text" class="input-small asearch"
+          placeholder="Modality" value='MR'>
+         <button id='A_SEARCH' class='btn btn-primary' type="button">Search</button>
+        </form>
+       </div>
+      </div>
+     </div>
+     <div class='row-fluid'>
+      <div class='span12'>
+       <div class='well'>
+        <h2>Results</h2>
+        <div id='AC-RESULTS' class='row-fluid'></div>
+       </div>
+      </div>
+     </div>
+    </div>
+    <div class="tab-pane" id="tab2">
+     <div class='span5 well'>
+      <h1>Client Information</h1>
+      AET Title: <input id='USER_AET' type="text"
+       value='${CHRIS_AETITLE}'>
+     </div>
+     <div class='span5 well'>
+      <h1>Server Information</h1>
+      <div>
+       IP/hotname: <input id='SERVER_IP' type="text"
+        value='134.174.12.21' />
+      </div>
+      <div>
+       Port: <input id='SERVER_POR' type="text" value='104' />
+      </div>
+      <div>
+       <input class='btn btn-primary pacsPing' type="button"
+        value="Test Connection"> <span id='pacsping'></span>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ ${FOOTER} ${JAVASCRIPT}
+</body>
+</html>

@@ -44,6 +44,7 @@ function pacsPage() {
   $t = new Template('pacs.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'pacs_navbar.html');
+  $t -> replace('DATA_PREVIEW', 'data_preview.html');
   $t -> replace('CHRIS_AETITLE', CHRIS_AETITLE);
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');

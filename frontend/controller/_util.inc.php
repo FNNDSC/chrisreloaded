@@ -49,4 +49,25 @@ function joinPaths($args) {
   return join('/', $paths);
 }
 
+/**
+ * Remove invalid characters from a string and replace it by '_'
+ * @param string $dirty
+ * @todo use regular expressions to replace everything in one command
+ */
+function sanitize($dirty){
+
+  $clean = str_replace (' ', '_', $dirty);
+  $clean = str_replace ('/', '_', $clean);
+  $clean = str_replace ('?', '_', $clean);
+  $clean = str_replace ('&', '_', $clean);
+  $clean = str_replace ('#', '_', $clean);
+  $clean = str_replace ('\\', '_', $clean);
+  $clean = str_replace ('%', '_', $clean);
+  $clean = str_replace ('(', '_', $clean);
+  $clean = str_replace (')', '_', $clean);
+  $clean = str_replace (',', '_', $clean);
+
+  return $clean;
+}
+
 ?>
