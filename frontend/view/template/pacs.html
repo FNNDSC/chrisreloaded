@@ -71,23 +71,52 @@
      </div>
     </div>
     <div class="tab-pane" id="tab2">
-     <div class='span5 well'>
-      <h1>Client Information</h1>
-      AET Title: <input id='USER_AET' type="text"
-       value='${CHRIS_AETITLE}'>
+
+     <div class='row-fluid'>
+      <div class='span6 well'>
+       <h1 style="border-bottom: 1px solid; border-color: lightgrey;">
+        <img src='view/gfx/jigsoar-icons/dark/48_download.png'
+         class="img-rounded">Download Information
+       </h1>
+       <div>
+        IP / Host Name: <input id='SERVER_IP' type="text"
+         value='134.174.12.21' />
+       </div>
+       <div>
+        Port: <input id='SERVER_POR' type="text" value='104' />
+       </div>
+       <div>
+        <input class='btn btn-primary pacsPing' type="button"
+         value="Test Connection"> <span id='pacsping'></span>
+       </div>
+      </div>
+      <div class='span6 well'>
+       <h1 style="border-bottom: 1px solid; border-color: lightgrey;">
+        <img src='view/gfx/jigsoar-icons/dark/48_upload.png'
+         class="img-rounded"> Upload Information
+       </h1>
+
+       <div>
+        IP / Host Name: <input id='SERVER_IP' type="text"
+         value='134.174.12.21' />
+       </div>
+       <div>
+        Port: <input id='SERVER_POR' type="text" value='104' />
+       </div>
+       <div>
+        <input class='btn btn-primary pacsPing' type="button"
+         value="Test Connection"> <span id='pacsping'></span>
+       </div>
+      </div>
      </div>
-     <div class='span5 well'>
-      <h1>Server Information</h1>
-      <div>
-       IP/hotname: <input id='SERVER_IP' type="text"
-        value='134.174.12.21' />
-      </div>
-      <div>
-       Port: <input id='SERVER_POR' type="text" value='104' />
-      </div>
-      <div>
-       <input class='btn btn-primary pacsPing' type="button"
-        value="Test Connection"> <span id='pacsping'></span>
+     <div class='row-fluid'>
+      <div class='span12 well'>
+       <h1 style="border-bottom: 1px solid; border-color: lightgrey;">
+        <img src='view/gfx/jigsoar-icons/dark/48_users.png'
+         class="img-rounded"> User Information
+       </h1>
+       AE Title: <input id='USER_AET' type="text"
+        value='${CHRIS_AETITLE}'>
       </div>
      </div>
     </div>

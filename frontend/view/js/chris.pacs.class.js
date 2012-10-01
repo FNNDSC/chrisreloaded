@@ -23,7 +23,6 @@ _PACS_.seriesSearch = function() {
 }
 _PACS_.ajaxSearch = function() {
   jQuery("#SEARCH").live('click', function(event) {
-    window.console.log(jQuery("#SEARCH").html());
     if (jQuery(this).html() == "Study") {
       _PACS_.ajaxSimple();
     } else if (jQuery(this).html() == "Series") {
