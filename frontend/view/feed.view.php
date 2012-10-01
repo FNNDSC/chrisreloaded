@@ -148,7 +148,7 @@ class FeedV implements ObjectViewInterface {
     $feed_image = 'view/gfx/jigsoar-icons/dark/64_download.png';
     $feed_action_desc = 'PACS Pull';
     if ($feed_status == 'feed_done'){
-      $feed_what_desc = 'downloaded data from <b>Patient ID '. $patient_id .' <FONT COLOR="GREEN">FINISHED</FONT> </b>';
+      $feed_what_desc = 'downloaded data from <b>Patient ID '. $patient_id .' <FONT COLOR="GREEN">FINISHED</FONT></b>';
     }
     else{
       $feed_percent = round((1 - $feed_percent/(count($data_id)-1))*100);

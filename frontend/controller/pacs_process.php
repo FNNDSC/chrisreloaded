@@ -149,10 +149,10 @@ if (array_key_exists('SeriesInstanceUID',$result))
     $pacs->addParameter('SeriesInstanceUID', $result['SeriesInstanceUID'][0]);
     $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
     $all_results = $pacs->querySeries();
-    $dataObject->nb_files = $all_results['NumberOfSeriesRelatedInstances'][0]  + 2;
-    $data_nb_files = $dataObject->nb_files;
+    $dataObject->nb_files = $all_results['NumberOfSeriesRelatedInstances'][0];
     // add the data model and get its id
     $data_chris_id = Mapper::add($dataObject);
+    $data_nb_files = $dataObject->nb_files;
   }
   // else update data
   else{
