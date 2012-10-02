@@ -22,7 +22,7 @@
      <div class='row-fluid'>
       <div class='span12'>
        <div class='well'>
-        <h2>Parameters</h2>
+        <h2 style="border-bottom: 1px solid; border-color: lightgrey;">Parameters</h2>
         <form id="pacs_form" class="form-inline">
          <input id='PACS_MRN' type="text" class="input-small ssearch"
           placeholder="MRN" value=''> <input id='PACS_NAM'
@@ -58,17 +58,19 @@
            </ul>
           </div>
          </div>
+         <div id="show_advanced" style="padding-top: 10px;">
+          <i class="icon-chevron-down"></i><b>Advanced parameters</b>
+         </div>
+         <div id="pacs_advanced"
+          style="display: none; padding-top: 10px; margin-bottom: -15px; border-top: 1px solid; border-color: lightgrey;">
+          <form id="pacs_aform" class="form-inline">
+           <input id='PACS_PSAET' type="text"
+            class="input-small asearch" placeholder="StationAETitle"
+            value=''>
+          </form>
+         </div>
         </form>
-        <div id="show_advanced">
-         <i class="icon-chevron-down"></i><b>Advanced parameters</b>
-        </div>
-        <div id="pacs_advanced"
-         style="display: none; padding-top: 10px; margin-bottom: -15px">
-         <form id="pacs_aform" class="form-inline">
-          <input id='PACS_PSAET' type="text" class="input-small ssearch"
-           placeholder="StationAETitle" value=''>
-         </form>
-        </div>
+
        </div>
       </div>
      </div>

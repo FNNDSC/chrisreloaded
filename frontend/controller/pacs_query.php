@@ -33,6 +33,10 @@ require_once 'pacs.class.php';
 
 $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 
+// set values to be filtered out after pacs query
+$post_filter = Array();
+$post_filter['PerformedStationAETitle'] = $_POST['PACS_PSAET'];
+
 if($_POST['PACS_LEV'] == 'STUDY'){
   $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
   $pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
@@ -45,7 +49,7 @@ if($_POST['PACS_LEV'] == 'STUDY'){
   $pacs->addParameter('PatientBirthDate', '');
   $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
   $pacs->addParameter('PerformedStationAETitle', '');
-  echo json_encode($pacs->queryStudy());
+  echo json_encode(PACS::postFilter("study", $pacs->queryStudy(), $post_filter));
 }
 elseif ($_POST['PACS_LEV'] == 'SERIES'){
   $pacs->addParameter('RetrieveAETitle', '');

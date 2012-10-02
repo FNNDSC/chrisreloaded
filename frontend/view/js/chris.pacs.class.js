@@ -185,7 +185,8 @@ _PACS_.ajaxAdvanced = function() {
         PACS_DAT : jQuery("#PACS_DAT").attr('value'),
         PACS_ACC_NUM : '',
         PACS_STU_DES : '',
-        PACS_STU_UID : ''
+        PACS_STU_UID : '',
+        PACS_PSAET : jQuery("#PACS_PSAET").attr('value')
       },
       success : function(data) {
         jQuery("#PACS-RESULTS").show('blind', 100);
@@ -384,7 +385,8 @@ _PACS_.ajaxSimple = function() {
         PACS_DAT : jQuery("#PACS_DAT").attr('value'),
         PACS_ACC_NUM : '',
         PACS_STU_DES : '',
-        PACS_STU_UID : ''
+        PACS_STU_UID : '',
+        PACS_PSAET : jQuery("#PACS_PSAET").attr('value')
       },
       success : function(data) {
         jQuery("#PACS-RESULTS").show('blind', 100);
@@ -514,7 +516,8 @@ _PACS_.ajaxSeries = function(studyUID, nTr) {
         SERVER_POR : jQuery("#SERVER_POR").attr('value'),
         PACS_LEV : 'SERIES',
         PACS_STU_UID : stuid,
-        PACS_SER_DES : ''
+        PACS_SER_DES : '',
+        PACS_PSAET : jQuery("#PACS_PSAET").attr('value')
       },
       success : function(data) {
         // change icon

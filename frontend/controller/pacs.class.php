@@ -51,6 +51,8 @@ interface PACSInterface
   public function moveSeries();
   // method to process result received by the listener
   static public function process($filename);
+  // filter array
+  static public function postFilter($type, $arrayToFilter, $arrayFilter);
 }
 
 /**
@@ -619,6 +621,42 @@ class PACS implements PACSInterface {
     $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
 
     return PACS::_executeAndFormat($command);
+  }
+
+  static public function postFilter($type, $arrayToFilter, $arrayFilter){
+    switch($type){
+      case "study":
+        $output = $arrayToFilter;
+        // if one study contains the value to be filtered, delete it
+        foreach ($arrayFilter as $key => $value){
+          if(array_key_exists($key, $arrayToFilter) && $value !=""){
+            foreach ($arrayToFilter[$key] as $key2 => $value2){
+              // should do regex
+              if(strpos($value2,$value) === false){
+                // delete this array
+                foreach ($arrayToFilter as $key3 => $value3){
+                  unset($output[$key3][$key2]);
+                }
+              }
+            }
+          }
+        }
+        // not very optimal
+        foreach ($output as $key => $value){
+          $output[$key] = array_values($value);
+        }
+        return $output;
+        break;
+      case "series":
+        break;
+      case "image":
+        break;
+      case "all":
+        // if one study contains the value to be filtered, delete related series
+        break;
+      default:
+        break;
+    }
   }
 }
 ?>
