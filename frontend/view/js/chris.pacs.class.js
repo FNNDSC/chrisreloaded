@@ -22,16 +22,19 @@ _PACS_.seriesSearch = function() {
   });
 }
 _PACS_.pacsAdvanced = function() {
-  jQuery("#show_advanced").live('click', function(event) {
-    if(jQuery("#pacs_advanced").is(':visible')){
-      jQuery("#pacs_advanced").hide('blind', 100);
-      jQuery("#show_advanced").html('Show advanced');
-    }
-    else{
-      jQuery("#pacs_advanced").show('blind', 100);
-      jQuery("#show_advanced").html('Hide advanced');
-    }
-  });
+  jQuery("#show_advanced").live(
+      'click',
+      function(event) {
+        if (jQuery("#pacs_advanced").is(':visible')) {
+          jQuery("#pacs_advanced").hide('blind', 100);
+          jQuery("#show_advanced").html(
+              '<i class="icon-chevron-down"></i><b>Advanced parameters</b>');
+        } else {
+          jQuery("#pacs_advanced").show('blind', 100);
+          jQuery("#show_advanced").html(
+              '<i class="icon-chevron-up"></i><b>Advanced parameters</b>');
+        }
+      });
 }
 _PACS_.ajaxSearch = function() {
   jQuery("#SEARCH").live('click', function(event) {
@@ -185,6 +188,7 @@ _PACS_.ajaxAdvanced = function() {
         PACS_STU_UID : ''
       },
       success : function(data) {
+        jQuery("#PACS-RESULTS").show('blind', 100);
         mrn_received++;
         if (mrn_received == mrn_nb) {
           me.removeClass('btn-warning').addClass('btn-primary');
@@ -229,7 +233,7 @@ _PACS_.ajaxAdvancedResults = function(data) {
 _PACS_.advancedTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
   var i = 0;
-  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>files</th><th></th><th></th></tr></thead><tbody>';
+  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>Location</th><th>files</th><th></th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   // update html with table
   jQuery('#SC-RESULTS').html(content);
@@ -269,6 +273,7 @@ _PACS_.advancedCaching = function(data, i) {
     study.StudyInstanceUID = Array();
     study.SeriesInstanceUID = Array();
     study.SeriesDescription = Array();
+    study.PerformedStationAETitle = Array();
     study.NumberOfSeriesRelatedInstances = Array();
     study.QueryRetrieveLevel = Array();
     study.RetrieveAETitle = Array();
@@ -277,12 +282,14 @@ _PACS_.advancedCaching = function(data, i) {
     study = _PACS_.cache[stuid];
   }
   // fill study container
+  var index = data[0].StudyInstanceUID.indexOf(data[1].StudyInstanceUID[i]);
   var exists = jQuery.inArray(data[1].SeriesInstanceUID[i],
       study.SeriesInstanceUID);
   if (exists == -1) {
     study.StudyInstanceUID.push(data[1].StudyInstanceUID[i]);
     study.SeriesInstanceUID.push(data[1].SeriesInstanceUID[i]);
     study.SeriesDescription.push(data[1].SeriesDescription[i]);
+    study.PerformedStationAETitle.push(data[0].PerformedStationAETitle[index]);
     study.NumberOfSeriesRelatedInstances
         .push(data[1].NumberOfSeriesRelatedInstances[i]);
     study.QueryRetrieveLevel.push(data[1].QueryRetrieveLevel[i]);
@@ -308,6 +315,8 @@ _PACS_.advancedFormat = function(data, i) {
       "&lt"));
   sub.push(data[1].SeriesDescription[i].replace(/\>/g, "&gt").replace(/\</g,
       "&lt"));
+  sub.push(data[0].PerformedStationAETitle[index].replace(/\>/g, "&gt")
+      .replace(/\</g, "&lt"));
   sub.push(data[1].NumberOfSeriesRelatedInstances[i]);
   sub
       .push('<button id="'
@@ -378,6 +387,7 @@ _PACS_.ajaxSimple = function() {
         PACS_STU_UID : ''
       },
       success : function(data) {
+        jQuery("#PACS-RESULTS").show('blind', 100);
         mrn_received++;
         if (mrn_received == mrn_nb) {
           me.removeClass('btn-warning').addClass('btn-primary');
@@ -418,7 +428,7 @@ _PACS_.ajaxSimpleResults = function(data) {
  */
 _PACS_.simpleTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
-  content += '<thead><tr><th></th><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th></th></tr></thead><tbody>';
+  content += '<thead><tr><th></th><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   jQuery('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
@@ -453,6 +463,8 @@ _PACS_.simpleFormat = function(data, i) {
           .replace(/\</g, "&lt"));
   sub.push(data.StudyDate[i]);
   sub.push(data.ModalitiesInStudy[i]);
+  sub.push(data.PerformedStationAETitle[i].replace(/\>/g, "&gt").replace(/\</g,
+      "&lt"));
   // if study cached, check status of series to update icon
   var cached = stuid in _PACS_.cacheStatus;
   var status = 0;

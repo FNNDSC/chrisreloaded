@@ -30,7 +30,7 @@
           value=''> <input id='PACS_DAT' type="text"
           class="input-small ssearch" placeholder="Study Date" value=''>
          <input id='PACS_MOD' type="text" class="input-small ssearch"
-          placeholder="Modality" value='MR'>
+          placeholder="Modality" value='MR'> query
          <div class="input-append">
           <div class='btn-group'>
            <button id="SEARCH" class="btn btn-primary">Study</button>
@@ -39,11 +39,12 @@
             <span class="caret"></span>
            </button>
            <ul class="dropdown-menu pull-right">
-            <li><a id="S_SEARCH" href="#">Search Study</a></li>
-            <li><a id="A_SEARCH" href="#">Search Series</a></li>
+            <li><a id="S_SEARCH" href="#">Study</a></li>
+            <li><a id="A_SEARCH" href="#">Series</a></li>
            </ul>
           </div>
          </div>
+         from
          <div class="input-append">
           <div class='btn-group'>
            <button id="QUERY" class="btn btn-primary">PACS</button>
@@ -52,24 +53,26 @@
             <span class="caret"></span>
            </button>
            <ul class="dropdown-menu pull-right">
-            <li><a id="P_QUERY" href="#">Query PACS</a></li>
-            <li><a id="D_QUERY" href="#">Query DB</a></li>
+            <li><a id="P_QUERY" href="#">PACS</a></li>
+            <li><a id="D_QUERY" href="#">CHRIS</a></li>
            </ul>
           </div>
          </div>
-         <a id="show_advanced">Show advanced</a>
         </form>
-        <div id="pacs_advanced" style="display: none">
-         <b>Advanced parameters</b>
+        <div id="show_advanced">
+         <i class="icon-chevron-down"></i><b>Advanced parameters</b>
+        </div>
+        <div id="pacs_advanced"
+         style="display: none; padding-top: 10px; margin-bottom: -15px">
          <form id="pacs_aform" class="form-inline">
-          <input id='PACS_AET' type="text" class="input-small ssearch"
-           placeholder="AETitle" value=''>
+          <input id='PACS_PSAET' type="text" class="input-small ssearch"
+           placeholder="StationAETitle" value=''>
          </form>
         </div>
        </div>
       </div>
      </div>
-     <div class='row-fluid'>
+     <div id="PACS-RESULTS" class='row-fluid' style="display: none">
       <div class='span12'>
        <div class='well'>
         <h2>Results</h2>
