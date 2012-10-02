@@ -88,6 +88,6 @@ else{
   $image_parameter['ProtocolName']= '';  */
   //$image_parameter['SOPInstanceUID']= '';
 
-  echo json_encode($pacs->queryAll($study_parameter, $series_parameter, null));
+  echo json_encode(PACS::postFilter("all", $pacs->queryAll($study_parameter, $series_parameter, null), $post_filter));
 }
 ?>
