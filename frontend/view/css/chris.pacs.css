@@ -61,40 +61,6 @@ table.dataTable th:active {
 	outline: none;
 }
 
-.twoDRenderer {
-	position: relative;
-	background-color: #000;
-	top: 0%;
-	height: 370px;
-	width: 370px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-#sliderZContainer {
-	width: 370px;
-	height: 15px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-#sliderZ {
-	width: 370px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-#BR_OVER {
-	position: absolute;
-	color: white;
-	bottom: 0px;
-	right: 0px;
-	padding: 2px;
-}
-
-#TL_OVER {
-	background-color: #000;
-	position: absolute;
-	color: white;
-	margin: auto;
+#show_advanced {
+	cursor: pointer;
 }

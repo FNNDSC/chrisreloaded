@@ -21,6 +21,18 @@ _PACS_.seriesSearch = function() {
     jQuery("#SEARCH").html("Series");
   });
 }
+_PACS_.pacsAdvanced = function() {
+  jQuery("#show_advanced").live('click', function(event) {
+    if(jQuery("#pacs_advanced").is(':visible')){
+      jQuery("#pacs_advanced").hide('blind', 100);
+      jQuery("#show_advanced").html('Show advanced');
+    }
+    else{
+      jQuery("#pacs_advanced").show('blind', 100);
+      jQuery("#show_advanced").html('Hide advanced');
+    }
+  });
+}
 _PACS_.ajaxSearch = function() {
   jQuery("#SEARCH").live('click', function(event) {
     if (jQuery(this).html() == "Study") {
@@ -712,6 +724,7 @@ jQuery(document).ready(function() {
   _PACS_.openStudies = [];
   _PACS_.setupDetailStudy();
   _PACS_.setupDownloadStudy();
+  _PACS_.pacsAdvanced();
   //
   // advanced mode
   //
