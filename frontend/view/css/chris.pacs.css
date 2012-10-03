@@ -68,3 +68,7 @@ table.dataTable th:active {
 #S-RESULTS {
 	font-size: x-small;
 }
+
+.input-append .active, .input-prepend .active {
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
