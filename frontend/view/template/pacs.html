@@ -31,6 +31,13 @@
           class="input-small ssearch" placeholder="Study Date" value=''>
 
          <button id="SEARCH" class="btn btn-primary">Search</button>
+         <div class="input-append">
+          <div class="btn-group" data-toggle="buttons-radio">
+           <button id="SEARCH_PACS" type="button"
+            class="btn btn-primary active">PACS</button>
+           <button type="button" class="btn btn-primary">CHRIS</button>
+          </div>
+         </div>
          <!--            query
          <div class="input-append">
           <div class='btn-group'>
@@ -69,18 +76,6 @@
             placeholder="Modality" value='MR'> <input
             id='PACS_PSAET' type="text" class="input-small asearch"
             placeholder="StationAETitle" value=''>
-           <div class="input-append">
-            <div class="btn-group" data-toggle="buttons-radio">
-             <button id="SEARCH_STUDY" type="button"
-              class="btn btn-primary active">Study</button>
-             <button type="button" class="btn btn-primary">Series</button>
-            </div>
-            <div class="btn-group" data-toggle="buttons-radio">
-             <button id="SEARCH_PACS" type="button"
-              class="btn btn-primary active">PACS</button>
-             <button type="button" class="btn btn-primary">CHRIS</button>
-            </div>
-           </div>
           </form>
          </div>
         </form>
@@ -91,7 +86,14 @@
      <div id="PACS-RESULTS" class='row-fluid' style="display: none">
       <div class='span12'>
        <div class='well'>
-        <h2>Results</h2>
+        <h2>
+         Results:
+         <div class="btn-group" data-toggle="buttons-radio">
+          <button id="STUDY_VIEW" type="button"
+           class="btn btn-primary active">Study</button>
+          <button id="SERIES_VIEW" type="button" class="btn btn-primary">Series</button>
+         </div>
+        </h2>
         <div id='SC-RESULTS' class='row-fluid'></div>
        </div>
       </div>

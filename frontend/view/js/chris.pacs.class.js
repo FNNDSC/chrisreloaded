@@ -48,11 +48,7 @@ _PACS_.pacsAdvanced = function() {
 }
 _PACS_.ajaxSearch = function() {
   jQuery("#SEARCH").live('click', function(event) {
-    if (jQuery("#SEARCH_STUDY").hasClass('active')) {
       _PACS_.ajaxSimple();
-    } else {
-      _PACS_.ajaxAdvanced();
-    }
   });
 }
 /**
@@ -257,10 +253,11 @@ _PACS_.advancedTable = function() {
   _PACS_.sTable = jQuery('#S-RESULTS')
       .dataTable(
           {
-            "sDom" : "<'row-fluid'<'span6' l <'d_representation'> ><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+            "sDom" : "<'row-fluid'<'span6' il ><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'><'span6'p>>",
             "sPaginationType" : "bootstrap",
             "oLanguage" : {
-              "sLengthMenu" : "_MENU_ datasets per page"
+              "sLengthMenu" : " (_MENU_ per page)",
+              "sInfo": "Showing _START_ to _END_ of _TOTAL_ results "
             },
             "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
             iDisplayStart : 0,
@@ -275,9 +272,6 @@ _PACS_.advancedTable = function() {
   jQuery(".d_filter")
       .html(
           '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
-  jQuery(".d_representation")
-  .html(
-      '<span class="btn-group" data-toggle="buttons-radio"><button id="STUDY_VIEW" type="button" class="btn">Study</button><button id="SERIES_VIEW" type="button" class="btn">Series</button></span>');
 }
 /**
  * Cache data after 'Advanced' AJAX query.
@@ -466,10 +460,11 @@ _PACS_.simpleTable = function() {
   _PACS_.sTable = jQuery('#S-RESULTS')
       .dataTable(
           {
-            "sDom" : "<'row-fluid'<'span6' l <'d_representation'>><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'i><'span6'p>>",
+            "sDom" : "<'row-fluid'<'span6' il><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'><'span6'p>>",
             "sPaginationType" : "bootstrap",
             "oLanguage" : {
-              "sLengthMenu" : "_MENU_ datasets per page"
+              "sLengthMenu" : " (_MENU_ per page)",
+              "sInfo": "Showing _START_ to _END_ of _TOTAL_ results "
             },
             "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
             iDisplayStart : 0,
@@ -484,9 +479,6 @@ _PACS_.simpleTable = function() {
   jQuery(".d_filter")
       .html(
           '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
-  jQuery(".d_representation")
-  .html(
-      '<span class="btn-group" data-toggle="buttons-radio"><button id="STUDY_VIEW" type="button" class="btn">Study</button><button id="SERIES_VIEW" type="button" class="btn">Series</button></span>');
 }
 /**
  * Reformat data after 'Advanced' AJAX query to fit the dataTable standard.
