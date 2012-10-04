@@ -426,7 +426,9 @@ _PACS_.reformatSimpleResults = function(data) {
 /**
  * Handle 'Simple' AJAX query results.
  */
-_PACS_.ajaxSimpleResults = function(data, force = false) {
+_PACS_.ajaxSimpleResults = function(data, force) {
+  // default force value is false
+  if(typeof(force)==='undefined') force = false;
   // if ajax returns something, process it
   if (data[0] != null) {
     // if no table, create it
