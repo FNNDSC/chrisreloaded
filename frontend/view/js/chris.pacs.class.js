@@ -209,7 +209,15 @@ _PACS_.ajaxAdvanced = function() {
 /**
  * Handle 'Advanced' AJAX query results.
  */
-_PACS_.ajaxAdvancedResults = function(data, force = false) {
+_PACS_.ajaxAdvancedResults = function(data, force) {
+  
+  // default value for 'force' is false
+  if (typeof force == 'undefined') {
+    
+    force = false;
+    
+  }
+  
   // cache the data
   _PACS_.cachedData = data;
   if(data[1] == null){
