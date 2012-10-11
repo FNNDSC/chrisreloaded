@@ -31,6 +31,7 @@ _DATA_.preview = function() {
         // set XTK renderer
         _DATA_.volume = new X.volume();
         _DATA_.volume.file = 'http://chris/datadev/' + data.filename[0];
+        _DATA_.volume.reslicing = false; // we don't need to reslice here
         _DATA_.sliceX = new X.renderer2D();
         _DATA_.sliceX.container = 'sliceZ';
         _DATA_.sliceX.orientation = 'Z';
