@@ -73,3 +73,7 @@ to {
 	-ms-animation-iteration-count: infinite;
 	-ms-animation-timing-function: linear;
 }
+
+select, textarea, .btn {
+	font-size: 12px;
+}

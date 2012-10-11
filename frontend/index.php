@@ -43,7 +43,9 @@ session_start();
 function loginPage() {
   // create the login page
   $t = new Template('login.html');
+  $t -> replace('CSS', 'css.html');
   $t -> replace('FOOTER', 'footer.html');
+  $t -> replace('JAVASCRIPT', 'javascript.html');
   return $t;
 }
 
