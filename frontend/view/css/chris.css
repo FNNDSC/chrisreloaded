@@ -5,6 +5,7 @@ body,html {
 	background-size: cover;
 	background-attachment:fixed;
 	height: 100%;
+	font-size: 12px;
 }
 
 .navbar-fixed-top,.navbar-fixed-bottom {
