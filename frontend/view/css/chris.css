@@ -1,9 +1,9 @@
 body,html {
-	background: url(
-	 '../gfx/background1.jpg');
-	background-repeat: no-repeat;
-	background-size: cover;
-	background-attachment: fixed;
+/* 	background: url( */
+/* 	 '../gfx/background1.jpg'); */
+/* 	background-repeat: no-repeat; */
+/* 	background-size: 100% 100%; */
+/* 	background-attachment: fixed; */
 	height: 100%;
 	font-size: 12px;
 }

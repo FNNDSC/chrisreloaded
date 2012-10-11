@@ -6,4 +6,8 @@ jQuery(document).ready(function() {
   jQuery("[rel=right_tooltip]").tooltip({
     placement : 'right'
   });
+  
+  // activate backstretch
+  jQuery.backstretch('view/gfx/background1.jpg');
+  
 });
