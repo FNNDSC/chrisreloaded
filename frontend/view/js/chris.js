@@ -7,7 +7,7 @@ jQuery(document).ready(function() {
     placement : 'right'
   });
   
-  // activate backstretch
-  jQuery.backstretch('view/gfx/background1.jpg');
-  
 });
+
+// activate backstretch
+jQuery.backstretch('view/gfx/background1.jpg');

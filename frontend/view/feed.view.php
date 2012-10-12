@@ -172,14 +172,17 @@ class FeedV implements ObjectViewInterface {
       }
     }
 
-    $feed_image = 'view/gfx/jigsoar-icons/dark/64_download.png';
+    $feed_image = 'view/gfx/jigsoar-icons/dark/48_download.png';
     $feed_action_desc = 'PACS Pull';
     if ($feed_status == 'feed_done'){
-      $feed_what_desc = 'downloaded data from <b>Patient ID '. $patient_id .' <FONT COLOR="GREEN">FINISHED</FONT></b>';
+      $feed_what_desc = 'Data for <b>MRN '. $patient_id .'</b> was added.';
+      $feed_progress = '<font color="green">Done</font>';
     }
     else{
       $feed_percent = round((1 - $feed_percent/(count($data_id)-1))*100);
-      $feed_what_desc = 'started to download data from <b>Patient ID '. $patient_id .' <FONT COLOR="RED">IN PROGRESS <span class="feed_progress_status">'.$feed_percent.'%</span></FONT> </b> ';
+      $feed_what_desc = 'Retrieving data for <b>MRN '. $patient_id .'</b>';
+      $feed_progress = '<font color="red">'.$feed_percent.'%</font>';
+      //$feed_what_desc = 'started to download data from <b>Patient ID '. $patient_id .' <FONT COLOR="RED">IN PROGRESS <span class="feed_progress_status">'.$feed_percent.'%</span></FONT> </b> ';
     }
 
     // create HTML with templates
@@ -192,6 +195,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('ACTION', $feed_action_desc);
     $t -> replace('MORE', 'Show details');
     $t -> replace('STATUS', $feed_status);
+    $t -> replace('PROGRESS', $feed_progress);
 
     // add patient information
     $d = new Template('feed_data_patient.html');
