@@ -27,7 +27,7 @@
 	border-bottom: 1px solid;
 	border-color: lightgrey;
 	cursor: pointer;
-	/* 	background: -moz-linear-gradient(top, #fff, #eee); */
+  overflow: hidden;
 	background: #fff;
 }
 

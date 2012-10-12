@@ -133,6 +133,7 @@ class FeedV implements ObjectViewInterface {
     $data_status = array_fill(0, count($data_id) -1, 0);
     $data_name = Array();
     $data_real_id = Array();
+    $data_time = '';
     // requiered feed information
     $feed_status = 'feed_done';
     $feed_image = '';
@@ -155,6 +156,7 @@ class FeedV implements ObjectViewInterface {
       if(count($dataResult['Data']) == 1){
         $data_name[] = $dataResult['Data'][0]->name;
         $data_real_id[] = $dataResult['Data'][0]->unique_id;
+        $data_time = $dataResult['Data'][0]->time;
         $feed_percent += $data_status[$key];
         // get patient information
         if($patient_name == ''){
@@ -197,12 +199,21 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('STATUS', $feed_status);
     $t -> replace('PROGRESS', $feed_progress);
 
+    // we want to extract the scan date and calculate the age at the time of scan
+    $scan_date_array = explode(' ', $data_time);
+    $scan_date_as_datetime = new DateTime($scan_date_array[0]);
+    $patient_dob_as_datetime = new DateTime($patient_dob);
+    $scan_age = $scan_date_as_datetime -> diff($patient_dob_as_datetime);
+    $scan_age = $scan_age->y.' yr '.$scan_age->m.' m';
+
     // add patient information
     $d = new Template('feed_data_patient.html');
     $d -> replace('NAME', $patient_name);
     $d -> replace('DOB', $patient_dob);
     $d -> replace('SEX', $patient_sex);
     $d -> replace('ID', $patient_id);
+    $d -> replace('SCANDATE', $scan_date_array[0]);
+    $d -> replace('SCANAGE', $scan_age);
     $feed_details .= $d;
 
     // add data information
