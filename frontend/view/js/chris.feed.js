@@ -129,12 +129,13 @@ _FEED_.ajaxUpdate = function() {
                 elt.show();
               }
             }
-            percent = Math.round(count / newlength * 100);
+            var percent = Math.round(count / newlength * 100);
             // update percent
-            jQuery(
-                '#' + data['progress']['id'][i] +
-                    '_feed_progress-feed .feed_progress_status').html(
-                percent + '%');
+            var _current_feed = jQuery('#' + data['progress']['id'][i] +
+                '_feed_progress-feed');
+            _current_feed.find('.feed_status').html(
+                'Status: <font color="red">' + percent + '%</font>');
+            
             // Do something
           }
         }
