@@ -6,7 +6,9 @@ jQuery(document).ready(function() {
   jQuery("[rel=right_tooltip]").tooltip({
     placement : 'right'
   });
-  
+  jQuery("[rel=left_tooltip]").tooltip({
+    placement : 'left'
+  });  
 });
 
 // activate backstretch

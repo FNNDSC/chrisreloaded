@@ -205,8 +205,9 @@ _FEED_.setupPreview = function() {
         _DATA_.PreviewSeries = id.replace(/\_/g, ".");
         _DATA_.PreviewNbFiles = '-1';
         // get sth else
-        _DATA_.PreviewDesc = jQuery(this).parents().eq(1).find('span').eq(0)
-            .html();
+        _DATA_.PreviewDesc = jQuery(this).closest('.data').find('.feed_data_name').html();
+        console.log(jQuery(this));
+        abcdef= jQuery(this);
         _DATA_.startPreview();
       });
 }

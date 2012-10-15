@@ -16,7 +16,6 @@
 	border-color: grey;
 	display: none;
 	cursor: pointer;
-	
 	text-align: center;
 }
 
@@ -27,19 +26,18 @@
 	border-bottom: 1px solid;
 	border-color: lightgrey;
 	cursor: pointer;
-  overflow: hidden;
+	overflow: hidden;
 	background: #fff;
 }
 
-
-.feed_gradient {
-  
-  /* gradient*/
-  background: #eee; /* for non-css3 browsers */
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee', endColorstr='#ffffff'); /* for IE */
-  background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#fff)); /* for webkit browsers */
-  background: -moz-linear-gradient(top,  #eee,  #fff); /* for firefox 3.6+ */ 
-    
+.feed_gradient { /* gradient*/
+	background: #eee; /* for non-css3 browsers */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee',
+		endColorstr='#ffffff' ); /* for IE */
+	background: -webkit-gradient(linear, left top, left bottom, from(#eee),
+		to(#fff) ); /* for webkit browsers */
+	background: -moz-linear-gradient(top, #eee, #fff);
+	/* for firefox 3.6+ */
 }
 
 .feed_header {
@@ -51,11 +49,11 @@
 }
 
 .feed_header_line_two {
-  width: 100%;
+	width: 100%;
 }
 
 .feed_icon {
-	float:left;
+	float: left;
 }
 
 .feed_header_small {
@@ -68,7 +66,7 @@
 }
 
 .feed_username {
-
+	
 }
 
 .feed_status {
@@ -83,11 +81,11 @@
 }
 
 .feed_more {
-  float: right;
+	float: right;
 }
 
 .feed_message {
-
+	
 }
 
 .feed_details {
@@ -95,6 +93,15 @@
 	display: none;
 	position: relative;
 	margin-left: 50px;
+}
+
+.feed_data_name {
+	font-size: 11px;
+	margin-left: -5px;
+}
+
+.feed_data_nb_files {
+	color: #999;
 }
 
 /* CSS applied in the PHP because of JQUERY slide */

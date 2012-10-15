@@ -157,6 +157,7 @@ class FeedV implements ObjectViewInterface {
         $data_name[] = $dataResult['Data'][0]->name;
         $data_real_id[] = $dataResult['Data'][0]->unique_id;
         $data_time = $dataResult['Data'][0]->time;
+        $data_nb_files[] = $dataResult['Data'][0]->nb_files;
         $feed_percent += $data_status[$key];
         // get patient information
         if($patient_name == ''){
@@ -226,6 +227,7 @@ class FeedV implements ObjectViewInterface {
         $d -> replace('VISIBILITY', 'none');
       }
       $d -> replace('DATA', $value);
+      $d -> replace('NB_FILES', $data_nb_files[$key]);
       $d -> replace('FULL_ID', str_replace ('.', '_', $data_real_id[$key]));
       $feed_details .= $d;
     }
