@@ -211,6 +211,25 @@ _FEED_.setupPreview = function() {
         _DATA_.startPreview();
       });
 }
+_FEED_.setupSelect = function() {
+  
+  jQuery(document).on(
+      'click',
+      '.feed_select',
+      function(e) {
+        
+        e.stopPropagation();
+        
+        var full_id = jQuery(this).attr('id');
+        var id = full_id.substring(0, full_id.length - 6);
+        _CART_.SelectSeries = id.replace(/\_/g, ".");
+        // get sth else
+        _CART_.SeriesDesc = jQuery(this).closest('.data').find('.feed_data_name').html();
+        
+        _CART_.select(e.clientX, e.clientY);
+      });
+  
+}
 _FEED_.setupLocation = function() {
 
   jQuery(".feed_location").on('mouseenter', function(e) {
@@ -252,5 +271,6 @@ jQuery(document).ready(function() {
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
   _FEED_.setupPreview();
+  _FEED_.setupSelect();
   _FEED_.setupLocation();
 });
