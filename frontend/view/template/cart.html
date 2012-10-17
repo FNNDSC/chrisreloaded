@@ -1,77 +1,76 @@
 
 <!-- The Cart -->
 <div class='cart'>
-	<div class='cart_title'>
-		<span style="font-size: 16px; font-weight: bold;">Processing
-			Cart</span>
-	</div>
-	<div class='cart_content'>
-		<div style='height: 150px'>
-			<!-- PIPELINES -->
-			<div style='width: 250px; float: left;'>
-				<span style='font-size: 14px'>Pipeline</span><br />
-				<div id="pipelines" class="carousel slide"
-					style='width: 200px; margin-left: 20px;'>
-					<!-- Carousel items -->
-					<div class="carousel-inner">
-						<div class="active item">
-							<img src="view/gfx/fetal_moco.png" class="img-rounded">
-						</div>
-						<div class="item">
-							<img src="view/gfx/fetal_moco.png" class="img-rounded">
-						</div>
-						<div class="item">
-							<img src="view/gfx/fetal_moco.png" class="img-rounded">
-						</div>
-					</div>
-					<!-- Carousel nav -->
-					<a class="cart-carousel-control cart-carousel-control-left left"
-						href="#pipelines" data-slide="prev">&lsaquo;</a> <a
-						class="cart-carousel-control cart-carousel-control-right right"
-						href="#pipelines" data-slide="next">&rsaquo;</a>
-				</div>
-			</div>
-			<!-- PARAMETERS -->
-			<div id='parameters' style='width: 350px; float: right;'>
-				<span style='font-size: 14px'>Parameters</span><br />
-				<form style='margin-left: 20px'>
-					<table>
-						<tr>
-							<td align='center'><input type="text"
-								class="input-small" id='iterations' value='9'
-								style='font-size: 11px; height: 13px; width: 10px;margin:0px;'></td>
-							<td>&nbsp;</td>
-							<td>Number of registration-reconstruction iterations.</td>
-						</tr>
-            <tr>
-              <td align='center'><input type="text"
-                class="input-small" id='smoothing' value='3'
-                style='font-size: 11px; height: 13px; width: 10px;margin:0px;'></td>
-              <td>&nbsp;</td>
-              <td>Multiresolution smooting with given number of levels.</td>
-            </tr>						
-						<tr>
-							<td align='center'><input id='debug' type="checkbox" style='margin:0px;'></td>
-							<td>&nbsp;</td>
-							<td>Debug mode - save intermediate results.</td>
-						</tr>
-					</table>
+ <div class='cart_title'>
+  <span style="font-size: 16px; font-weight: bold;">Processing
+   Cart</span>
+ </div>
+ <div class='cart_content'>
+  <!-- PIPELINES -->
+  <div>
+   <span style='font-size: 14px'>Pipeline</span><br />
+   <div id="pipelines" class="carousel slide"
+    style='width: 200px; margin-left: 20px;'>
+    <!-- Carousel items -->
+    <div class="carousel-inner">
+     <div class="active item">
+      <img src="view/gfx/fetal_moco.png" class="img-rounded">
+     </div>
+     <div class="item">
+      <img src="view/gfx/fetal_moco.png" class="img-rounded">
+     </div>
+     <div class="item">
+      <img src="view/gfx/fetal_moco.png" class="img-rounded">
+     </div>
+    </div>
+    <!-- Carousel nav -->
+    <a class="cart-carousel-control cart-carousel-control-left left"
+     href="#pipelines" data-slide="prev">&lsaquo;</a> <a
+     class="cart-carousel-control cart-carousel-control-right right"
+     href="#pipelines" data-slide="next">&rsaquo;</a>
+   </div>
+  </div>
+  <!-- PARAMETERS -->
+  <div id='parameters'>
+   <span style='font-size: 14px'>Parameters</span><br />
+   <form style='margin-left: 20px'>
+    <table>
+     <tr>
+      <td align='center'><input type="text" class="input-small"
+       id='iterations' value='9'
+       style='font-size: 11px; height: 13px; width: 10px; margin: 0px;'></td>
+      <td>&nbsp;</td>
+      <td>iterations of registration-reconstruction.</td>
+     </tr>
+     <tr>
+      <td align='center'><input type="text" class="input-small"
+       id='smoothing' value='3'
+       style='font-size: 11px; height: 13px; width: 10px; margin: 0px;'></td>
+      <td>&nbsp;</td>
+      <td>levels of multiresolution smoothing.</td>
+     </tr>
+     <tr>
+      <td align='center'><input id='debug' type="checkbox"
+       style='margin: 0px;'></td>
+      <td>&nbsp;</td>
+      <td>Debug mode - save intermediate results.</td>
+     </tr>
+    </table>
 
-				</form>
-			</div>
-		</div>
-		<!-- DATA -->
-		<div>
-			<span style='font-size: 14px'>Data</span>
-			<ul id='cart_datalist'></ul>
-		</div>
+   </form>
+  </div>
+  <!-- DATA -->
+  <div>
+   <span style='font-size: 14px'>Data</span>
+   <ul id='cart_datalist'></ul>
+  </div>
 
-	</div>
-	<div class='cart_footer'>
-		<a class="btn btn-danger" href='#' rel="right_tooltip"
-			data-original-title="Cancel.."><i class="icon-remove"></i></a> <a
-			class="btn btn-success pull-right" href='#' rel="right_tooltip"
-			data-original-title="Start the Job!"><i class="icon-play"></i></a>
-	</div>
+ </div>
+ <div class='cart_footer'>
+  <a class="btn btn-danger" href='#' rel="right_tooltip"
+   data-original-title="Cancel.."><i class="icon-remove"></i></a> <a
+   class="btn btn-success pull-right" href='#' rel="right_tooltip"
+   data-original-title="Start the Job!"><i class="icon-play"></i></a>
+ </div>
 
 </div>
