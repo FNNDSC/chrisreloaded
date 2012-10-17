@@ -33,6 +33,10 @@ require_once 'pacs.class.php';
 
 $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 
+// set values to be filtered out after pacs query
+$post_filter = Array();
+$post_filter['PerformedStationAETitle'] = $_POST['PACS_PSAET'];
+
 if($_POST['PACS_LEV'] == 'STUDY'){
   $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
   $pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
@@ -44,7 +48,8 @@ if($_POST['PACS_LEV'] == 'STUDY'){
   $pacs->addParameter('PatientID', $_POST['PACS_MRN']);
   $pacs->addParameter('PatientBirthDate', '');
   $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
-  echo json_encode($pacs->queryStudy());
+  $pacs->addParameter('PerformedStationAETitle', '');
+  echo json_encode(PACS::postFilter("study", $pacs->queryStudy(), $post_filter));
 }
 elseif ($_POST['PACS_LEV'] == 'SERIES'){
   $pacs->addParameter('RetrieveAETitle', '');
@@ -52,6 +57,7 @@ elseif ($_POST['PACS_LEV'] == 'SERIES'){
   $pacs->addParameter('SeriesDescription', $_POST['PACS_SER_DES']);
   $pacs->addParameter('SeriesInstanceUID', '');
   $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
+  $pacs->addParameter('PerformedStationAETitle', '');
   echo json_encode($pacs->querySeries());
 }
 elseif ($_POST['PACS_LEV'] == 'IMAGE'){
@@ -59,6 +65,7 @@ elseif ($_POST['PACS_LEV'] == 'IMAGE'){
   $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
   $pacs->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
   $pacs->addParameter('ProtocolName', '');
+  $pacs->addParameter('PerformedStationAETitle', '');
   echo json_encode($pacs->queryImage());
 }
 else{
@@ -69,17 +76,18 @@ else{
   $study_parameter['StudyDate'] = $_POST['PACS_DAT'];
   $study_parameter['StudyDescription'] = $_POST['PACS_STU_DES'];
   $study_parameter['ModalitiesInStudy'] = $_POST['PACS_MOD'];
+  $study_parameter['PerformedStationAETitle'] = '';
 
   $series_parameter = Array();
   $series_parameter['NumberOfSeriesRelatedInstances'] = '';
   $series_parameter['SeriesDescription'] = '';
-/* 
-  $image_parameter = Array();
+  /*
+   $image_parameter = Array();
   $image_parameter['NumberOfSeriesRelatedInstances'] = '';
   $image_parameter['DeviceSerialNumber']= '';
   $image_parameter['ProtocolName']= '';  */
   //$image_parameter['SOPInstanceUID']= '';
 
-  echo json_encode($pacs->queryAll($study_parameter, $series_parameter, null));
+  echo json_encode(PACS::postFilter("all", $pacs->queryAll($study_parameter, $series_parameter, null), $post_filter));
 }
 ?>

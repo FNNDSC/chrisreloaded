@@ -1,9 +1,12 @@
 <div class="data"
- style="border-top: 1px solid; border-color: lightgrey; margin-top: 5px;">
- <span class="feed_data_name">${DATA}</span> <span class="pull-right"
-  style="display: ${VISIBILITY}"> <span id="${FULL_ID}-feedlt"
-  class="feed_location_text"> Location</span> <i
-  id="${FULL_ID}-feedl" class="icon-search feed_location"></i><i
-  id="${FULL_ID}-feedd" class="icon-eye-open feed_preview"></i><i
-  id="${FULL_ID}-feeds" class="icon-star-empty feed_preview"></i></span>
+	style="border-top: 1px solid; border-color: lightgrey;">
+	<!-- 	<i class='icon-chevron-right' style='margin-top:-0.5px;'></i> -->
+	<ul style='margin-bottom: 0px;'>
+		<li><span class="feed_data_name">${DATA}</span> <span class="feed_data_nb_files">(${NB_FILES} files)</span> <span
+			class="pull-right" style="display: ${VISIBILITY"> <i
+				id="${FULL_ID}-feedd" class="icon-eye-open feed_preview" rel="left_tooltip"
+        data-original-title="Preview"></i>&nbsp;&nbsp;
+				<i id="${FULL_ID}-feeds" class="icon-plus feed_select" rel="right_tooltip"
+				data-original-title="Select for Processing"></i></span></li>
+	</ul>
 </div>

@@ -1,0 +1,34 @@
+.twoDRenderer {
+  position: relative;
+  background-color: #000;
+  top: 0%;
+  height: 451px; 
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -6px;
+}
+
+#sliderZ {
+  width: 100%;
+  margin-left: -1px;
+  margin-right: auto;
+  margin-top: 10px;
+  background: red;
+  height: 6px;
+}
+
+#BR_OVER {
+  position: absolute;
+  color: white;
+  bottom: 0px;
+  right: 0px;
+  padding: 2px;
+}
+
+#TL_OVER {
+  background-color: #000;
+  position: absolute;
+  color: white;
+  margin: auto;
+}

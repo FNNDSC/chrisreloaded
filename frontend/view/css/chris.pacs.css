@@ -61,40 +61,14 @@ table.dataTable th:active {
 	outline: none;
 }
 
-.twoDRenderer {
-	position: relative;
-	background-color: #000;
-	top: 0%;
-	height: 370px;
-	width: 370px;
-	margin-left: auto;
-	margin-right: auto;
+#show_advanced {
+	cursor: pointer;
 }
 
-#sliderZContainer {
-	width: 370px;
-	height: 15px;
-	margin-left: auto;
-	margin-right: auto;
+#S-RESULTS {
+	font-size: x-small;
 }
 
-#sliderZ {
-	width: 370px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
-#BR_OVER {
-	position: absolute;
-	color: white;
-	bottom: 0px;
-	right: 0px;
-	padding: 2px;
-}
-
-#TL_OVER {
-	background-color: #000;
-	position: absolute;
-	color: white;
-	margin: auto;
+.input-append .active, .input-prepend .active {
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }

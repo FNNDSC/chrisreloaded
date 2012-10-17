@@ -9,6 +9,8 @@ _DATA_.startPreview = function() {
   jQuery("#TL_OVER").show();
   jQuery("#SLICE").html('00');
   jQuery("#SLICE_NB").html('00');
+  // show title 'Loading..'
+  jQuery('#myModalLabel').html('Loading..');
   // show modal
   jQuery('#PMODAL').modal();
 }
@@ -29,6 +31,7 @@ _DATA_.preview = function() {
         // set XTK renderer
         _DATA_.volume = new X.volume();
         _DATA_.volume.file = 'http://chris/datadev/' + data.filename[0];
+        _DATA_.volume.reslicing = false; // we don't need to reslice here
         _DATA_.sliceX = new X.renderer2D();
         _DATA_.sliceX.container = 'sliceZ';
         _DATA_.sliceX.orientation = 'Z';
@@ -43,18 +46,20 @@ _DATA_.preview = function() {
           jQuery("#sliderZ").slider({
             min : 1,
             max : dim[2],
-            value : Math.round(_DATA_.volume.indexZ + 1),
+            value : Math.floor(_DATA_.volume.indexZ + 1),
             slide : function(event, ui) {
               _DATA_.volume.indexZ = ui.value - 1;
               jQuery("#SLICE").html(ui.value);
             }
           });
+          // also make sure that the little slider thing is in the middle
+          jQuery('.ui-slider-handle').css('top','-.2em');          
           _DATA_.sliceX.onScroll = function() {
             jQuery('#sliderZ').slider("option", "value",
-                Math.round(_DATA_.volume.indexZ + 1));
-            jQuery("#SLICE").html(Math.round(_DATA_.volume.indexZ + 1));
+                Math.floor(_DATA_.volume.indexZ + 1));
+            jQuery("#SLICE").html(Math.floor(_DATA_.volume.indexZ + 1));
           };
-          jQuery("#SLICE").html(Math.round(_DATA_.volume.indexZ + 1));
+          jQuery("#SLICE").html(Math.floor(_DATA_.volume.indexZ + 1));
           jQuery("#SLICE_NB").html(dim[2]);
         }
       } else {

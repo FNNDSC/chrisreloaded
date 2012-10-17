@@ -51,6 +51,8 @@ interface PACSInterface
   public function moveSeries();
   // method to process result received by the listener
   static public function process($filename);
+  // filter array
+  static public function postFilter($type, $arrayToFilter, $arrayFilter);
 }
 
 /**
@@ -619,6 +621,88 @@ class PACS implements PACSInterface {
     $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
 
     return PACS::_executeAndFormat($command);
+  }
+
+  static public function postFilter($type, $arrayToFilter, $arrayFilter){
+    switch($type){
+      case "study":
+        $output = $arrayToFilter;
+        if($arrayToFilter != null){
+          // if one study contains the value to be filtered, delete it
+          foreach ($arrayFilter as $key => $value){
+            if(array_key_exists($key, $arrayToFilter) && $value !=""){
+              foreach ($arrayToFilter[$key] as $key2 => $value2){
+                // should do regex
+                if(strpos($value2,$value) === false){
+                  // delete this array
+                  foreach ($arrayToFilter as $key3 => $value3){
+                    unset($output[$key3][$key2]);
+                  }
+                }
+              }
+            }
+          }
+          // clean array indices
+          foreach ($output as $key => $value){
+            $output[$key] = array_values($value);
+          }
+        }
+
+        return $output;
+        break;
+      case "series":
+        break;
+      case "image":
+        break;
+      case "all":
+        // only filter on studies for now
+        $output = $arrayToFilter[0];
+        $output1 = $arrayToFilter[1];
+        if($arrayToFilter[0] != null){
+          // if one study contains the value to be filtered, delete it
+          foreach ($arrayFilter as $key => $value){
+            if(array_key_exists($key, $arrayToFilter[0]) && $value !=""){
+              foreach ($arrayToFilter[0][$key] as $key2 => $value2){
+                // should do regex
+                if(strpos($value2,$value) === false){
+                  // get index related series
+                  $index =  array_search($arrayToFilter[0]['StudyInstanceUID'][$key2], $output1['StudyInstanceUID']);
+                  // if relates series exist, delete them
+                  while($index !== false){
+                    foreach ($output1 as $key4 => $value4){
+                      unset($output1[$key4][$index]);
+                    }
+                    $index =  array_search($arrayToFilter[0]['StudyInstanceUID'][$key2], $output1['StudyInstanceUID']);
+                  }
+                  // delete this array
+                  foreach ($arrayToFilter[0] as $key3 => $value3){
+                    unset($output[$key3][$key2]);
+                  }
+                }
+              }
+            }
+          }
+
+          // clean array indices
+          // in study
+          foreach ($output as $key => $value){
+            $output[$key] = array_values($value);
+          }
+          // in series
+          foreach ($output1 as $key => $value){
+            $output1[$key] = array_values($value);
+          }
+        }
+
+        $output2 = Array();
+        $output2[] = $output;
+        $output2[] = $output1;
+
+        return $output2;
+        break;
+      default:
+        break;
+    }
   }
 }
 ?>

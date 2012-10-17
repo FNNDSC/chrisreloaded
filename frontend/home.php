@@ -48,8 +48,9 @@ function homePage() {
   $t -> replace('CSS', 'css.html');
   $t -> replace('USERNAME', $_SESSION['username']);
   $t -> replace('NAVBAR', 'navbar.html');
+  $t -> replace('CART', 'cart.html');
   $t -> replace('DATA_PREVIEW', 'data_preview.html');
-  $t -> replace('FEED_CONTENT', FeedC::getHTML(10));
+  $t -> replace('FEED_CONTENT', FeedC::getHTML(20));
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');
   return $t;

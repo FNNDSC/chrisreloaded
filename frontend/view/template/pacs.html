@@ -13,8 +13,8 @@
   ${DATA_PREVIEW}
   <div class="tabbable well">
    <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab0" data-toggle="tab">Simple</a></li>
-    <li><a href="#tab1" data-toggle="tab">Advanced</a></li>
+    <li class="active"><a href="#tab0" data-toggle="tab">Retrieve
+      data</a></li>
     <li><a href="#tab2" data-toggle="tab">Settings</a></li>
    </ul>
    <div class="tab-content">
@@ -22,74 +22,130 @@
      <div class='row-fluid'>
       <div class='span12'>
        <div class='well'>
-        <h2>Parameters</h2>
-        <form class="form-inline">
+        <h2 style="border-bottom: 1px solid; border-color: lightgrey;">Parameters</h2>
+        <form id="pacs_form" class="form-inline">
          <input id='PACS_MRN' type="text" class="input-small ssearch"
           placeholder="MRN" value=''> <input id='PACS_NAM'
           type="text" class="input-small ssearch" placeholder="Name"
           value=''> <input id='PACS_DAT' type="text"
           class="input-small ssearch" placeholder="Study Date" value=''>
-         <input id='PACS_MOD' type="text" class="input-small ssearch"
-          placeholder="Modality" value='MR'>
-         <button id='S_SEARCH' class='btn btn-primary' type="button">Search</button>
+
+         <button id="SEARCH" class="btn btn-primary">Search</button>
+         <div class="input-append">
+          <div class="btn-group" data-toggle="buttons-radio">
+           <button id="SEARCH_PACS" type="button"
+            class="btn btn-primary active">PACS</button>
+           <button type="button" class="btn btn-primary">CHRIS</button>
+          </div>
+         </div>
+         <!--            query
+         <div class="input-append">
+          <div class='btn-group'>
+           <button id="SEARCH" class="btn btn-primary">Study</button>
+           <button class=" btn btn-primary dropdown-toggle"
+            data-toggle="dropdown" href="#">
+            <span class="caret"></span>
+           </button>
+           <ul class="dropdown-menu pull-right">
+            <li><a id="S_SEARCH" href="#">Study</a></li>
+            <li><a id="A_SEARCH" href="#">Series</a></li>
+           </ul>
+          </div>
+         </div>
+         from
+         <div class="input-append">
+          <div class='btn-group'>
+           <button id="QUERY" class="btn btn-primary">PACS</button>
+           <button class=" btn btn-primary dropdown-toggle"
+            data-toggle="dropdown" href="#">
+            <span class="caret"></span>
+           </button>
+           <ul class="dropdown-menu pull-right">
+            <li><a id="P_QUERY" href="#">PACS</a></li>
+            <li><a id="D_QUERY" href="#">CHRIS</a></li>
+           </ul>
+          </div>
+         </div> -->
+         <div id="show_advanced" style="padding-top: 10px;">
+          <i class="icon-chevron-down"></i><b>Advanced parameters</b>
+         </div>
+         <div id="pacs_advanced"
+          style="display: none; padding-top: 10px; margin-bottom: -15px; border-top: 1px solid; border-color: lightgrey;">
+          <form id="pacs_aform" class="form-inline">
+           <input id='PACS_MOD' type="text" class="input-small ssearch"
+            placeholder="Modality" value='MR'> <input
+            id='PACS_PSAET' type="text" class="input-small asearch"
+            placeholder="StationAETitle" value=''>
+          </form>
+         </div>
         </form>
+
        </div>
       </div>
      </div>
-     <div class='row-fluid'>
+     <div id="PACS-RESULTS" class='row-fluid' style="display: none">
       <div class='span12'>
        <div class='well'>
-        <h2>Results</h2>
+        <h2>
+         Results:
+         <div class="btn-group" data-toggle="buttons-radio">
+          <button id="STUDY_VIEW" type="button"
+           class="btn btn-primary active">Study</button>
+          <button id="SERIES_VIEW" type="button" class="btn btn-primary">Series</button>
+         </div>
+        </h2>
         <div id='SC-RESULTS' class='row-fluid'></div>
        </div>
       </div>
      </div>
     </div>
-    <div class="tab-pane" id="tab1">
-     <div class='row-fluid'>
-      <div class='span12'>
-       <div class='well'>
-        <h2>Advanced Parameters</h2>
-        <form class="form-inline">
-         <input id='PACS_MRN_A' type="text" class="input-small asearch"
-          placeholder="MRN" value=''> <input id='PACS_NAM_A'
-          type="text" class="input-small asearch" placeholder="Name"
-          value=''> <input id='PACS_DAT_A' type="text"
-          class="input-small asearch" placeholder="Study Date" value=''>
-         <input id='PACS_MOD_A' type="text" class="input-small asearch"
-          placeholder="Modality" value='MR'>
-         <button id='A_SEARCH' class='btn btn-primary' type="button">Search</button>
-        </form>
-       </div>
-      </div>
-     </div>
-     <div class='row-fluid'>
-      <div class='span12'>
-       <div class='well'>
-        <h2>Results</h2>
-        <div id='AC-RESULTS' class='row-fluid'></div>
-       </div>
-      </div>
-     </div>
-    </div>
     <div class="tab-pane" id="tab2">
-     <div class='span5 well'>
-      <h1>Client Information</h1>
-      AET Title: <input id='USER_AET' type="text"
-       value='${CHRIS_AETITLE}'>
+
+     <div class='row-fluid'>
+      <div class='span6 well'>
+       <h1 style="border-bottom: 1px solid; border-color: lightgrey;">
+        <img src='view/gfx/jigsoar-icons/dark/48_download.png'
+         class="img-rounded">Download
+       </h1>
+       <div>
+        IP / Host Name: <input id='SERVER_IP' type="text"
+         value='134.174.12.21' />
+       </div>
+       <div>
+        Port: <input id='SERVER_POR' type="text" value='104' />
+       </div>
+       <div>
+        <input class='btn btn-primary pacsPing' type="button"
+         value="Test Connection"> <span id='pacsping'></span>
+       </div>
+      </div>
+      <div class='span6 well'>
+       <h1 style="border-bottom: 1px solid; border-color: lightgrey;">
+        <img src='view/gfx/jigsoar-icons/dark/48_upload.png'
+         class="img-rounded"> Upload
+       </h1>
+
+       <div>
+        IP / Host Name: <input id='SERVER_IP' type="text"
+         value='134.174.12.21' />
+       </div>
+       <div>
+        Port: <input id='SERVER_POR' type="text" value='104' />
+       </div>
+       <div>
+        <input class='btn btn-primary pacsPing' type="button"
+         value="Test Connection"> <span id='pacsping'></span>
+       </div>
+      </div>
      </div>
-     <div class='span5 well'>
-      <h1>Server Information</h1>
-      <div>
-       IP/hotname: <input id='SERVER_IP' type="text"
-        value='134.174.12.21' />
-      </div>
-      <div>
-       Port: <input id='SERVER_POR' type="text" value='104' />
-      </div>
-      <div>
-       <input class='btn btn-primary pacsPing' type="button"
-        value="Test Connection"> <span id='pacsping'></span>
+     <div class='row-fluid'>
+      <div class='span12 well'>
+       <h1 style="border-bottom: 1px solid; border-color: lightgrey;">
+        <img src='view/gfx/jigsoar-icons/dark/48_users.png'
+         class="img-rounded"> User
+       </h1>
+       AE Title: <input id='USER_AET' type="text"
+        value='${CHRIS_AETITLE}'>
       </div>
      </div>
     </div>
