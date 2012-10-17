@@ -16,7 +16,6 @@
 	border-color: grey;
 	display: none;
 	cursor: pointer;
-	background: -moz-linear-gradient(top, #ddd, #ccc);
 	text-align: center;
 }
 
@@ -27,56 +26,82 @@
 	border-bottom: 1px solid;
 	border-color: lightgrey;
 	cursor: pointer;
-	/* 	background: -moz-linear-gradient(top, #fff, #eee); */
+	overflow: hidden;
 	background: #fff;
 }
 
-.feed>.preview {
-	overflow: auto;
+.feed_gradient { /* gradient*/
+	background: #eee; /* for non-css3 browsers */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee',
+		endColorstr='#ffffff' ); /* for IE */
+	background: -webkit-gradient(linear, left top, left bottom, from(#eee),
+		to(#fff) ); /* for webkit browsers */
+	background: -moz-linear-gradient(top, #eee, #fff);
+	/* for firefox 3.6+ */
 }
 
-.feed>.preview>.title {
-	width: 92%;
-	float: right;
-	padding: 2px;
+.feed_header {
+	min-height: 50px;
 }
 
-.feed>.preview>.title>.time {
-	float: right;
-	color: grey;
+.feed_header_line_one {
+	width: 100%;
 }
 
-.feed>.preview>.title>.user {
+.feed_header_line_two {
+	width: 100%;
+}
+
+.feed_icon {
 	float: left;
 }
 
-.feed>.preview>.gfx {
-	float: left;
-	width: 48px;
-	opacity: 0.5;
+.feed_header_small {
+	color: #999;
+	font-size: 11px;
 }
 
-.feed>.preview>.content {
-	width: 92%;
+.feed_type {
+	font-weight: bold;
+}
+
+.feed_username {
+	
+}
+
+.feed_status {
+	color: #000;
+	position: relative;
+	margin-left: 180px;
+}
+
+.feed_time {
+	color: #999;
 	float: right;
-	padding: 2px;
 }
 
-.feed>.preview>.content>.main {
-	float: left;
-}
-
-.feed>.preview>.content>.more {
+.feed_more {
 	float: right;
 }
 
-.feed>.details {
+.feed_message {
+	
+}
+
+.feed_details {
 	overflow: auto;
 	display: none;
+	position: relative;
+	margin-left: 50px;
 }
 
-.feed>.details>.result {
-	
+.feed_data_name {
+	font-size: 11px;
+	margin-left: -5px;
+}
+
+.feed_data_nb_files {
+	color: #999;
 }
 
 /* CSS applied in the PHP because of JQUERY slide */

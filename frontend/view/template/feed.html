@@ -1,20 +1,18 @@
 <div id="${ID}-feed" class="feed ${STATUS}">
- <div class="preview">
-  <div class="gfx">
-   <img src=${IMAGE_SRC} class="img-rounded">
-  </div>
-  <div class="title">
-   <div class="user">
-    <b>${ACTION}</b>
-   </div>
-   <div id="${TIME_FORMATED}" class="time"></div>
-  </div>
-  <div class="content">
-   <div class="main">${USERNAME} ${WHAT}</div>
-   <div class="more">
-    <a>${MORE}</a>
-   </div>
-  </div>
- </div>
- <div class="details">${FEED_DETAILS}</div>
+	<div class='feed_header'>
+		<span class='feed_icon'> <img src=${IMAGE_SRC}
+			class="img-rounded">
+		</span>
+		<div class='feed_header_line_one'>
+			<span class='feed_type'>${ACTION}</span> &nbsp;&nbsp;<span
+				class='feed_username feed_header_small'>${USERNAME}</span> <span
+				class='feed_status feed_header_small'>Status: ${PROGRESS}</span> <span
+				id="${TIME_FORMATED}" class="feed_time feed_header_small">Some
+				time ago..</span>
+		</div>
+		<div class='feed_header_line_two'>
+			<span class='feed_message'>${WHAT}</span> <span class='feed_more feed_header_small'><a>${MORE}</a></span>
+		</div>
+	</div>
+	<div class='feed_details'>${FEED_DETAILS}</div>
 </div>

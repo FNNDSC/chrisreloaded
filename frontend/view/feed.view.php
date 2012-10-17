@@ -133,6 +133,7 @@ class FeedV implements ObjectViewInterface {
     $data_status = array_fill(0, count($data_id) -1, 0);
     $data_name = Array();
     $data_real_id = Array();
+    $data_time = '';
     // requiered feed information
     $feed_status = 'feed_done';
     $feed_image = '';
@@ -155,6 +156,8 @@ class FeedV implements ObjectViewInterface {
       if(count($dataResult['Data']) == 1){
         $data_name[] = $dataResult['Data'][0]->name;
         $data_real_id[] = $dataResult['Data'][0]->unique_id;
+        $data_time = $dataResult['Data'][0]->time;
+        $data_nb_files[] = $dataResult['Data'][0]->nb_files;
         $feed_percent += $data_status[$key];
         // get patient information
         if($patient_name == ''){
@@ -172,14 +175,17 @@ class FeedV implements ObjectViewInterface {
       }
     }
 
-    $feed_image = 'view/gfx/jigsoar-icons/dark/64_download.png';
+    $feed_image = 'view/gfx/jigsoar-icons/dark/48_download.png';
     $feed_action_desc = 'PACS Pull';
     if ($feed_status == 'feed_done'){
-      $feed_what_desc = 'downloaded data from <b>Patient ID '. $patient_id .' <FONT COLOR="GREEN">FINISHED</FONT></b>';
+      $feed_what_desc = 'Data for <b>MRN '. $patient_id .'</b> was added.';
+      $feed_progress = '<font color="green">Done</font>';
     }
     else{
       $feed_percent = round((1 - $feed_percent/(count($data_id)-1))*100);
-      $feed_what_desc = 'started to download data from <b>Patient ID '. $patient_id .' <FONT COLOR="RED">IN PROGRESS <span class="feed_progress_status">'.$feed_percent.'%</span></FONT> </b> ';
+      $feed_what_desc = 'Retrieving data for <b>MRN '. $patient_id .'</b>';
+      $feed_progress = '<font color="red">'.$feed_percent.'%</font>';
+      //$feed_what_desc = 'started to download data from <b>Patient ID '. $patient_id .' <FONT COLOR="RED">IN PROGRESS <span class="feed_progress_status">'.$feed_percent.'%</span></FONT> </b> ';
     }
 
     // create HTML with templates
@@ -192,6 +198,14 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('ACTION', $feed_action_desc);
     $t -> replace('MORE', 'Show details');
     $t -> replace('STATUS', $feed_status);
+    $t -> replace('PROGRESS', $feed_progress);
+
+    // we want to extract the scan date and calculate the age at the time of scan
+    $scan_date_array = explode(' ', $data_time);
+    $scan_date_as_datetime = new DateTime($scan_date_array[0]);
+    $patient_dob_as_datetime = new DateTime($patient_dob);
+    $scan_age = $scan_date_as_datetime -> diff($patient_dob_as_datetime);
+    $scan_age = $scan_age->y.' yr '.$scan_age->m.' m';
 
     // add patient information
     $d = new Template('feed_data_patient.html');
@@ -199,6 +213,8 @@ class FeedV implements ObjectViewInterface {
     $d -> replace('DOB', $patient_dob);
     $d -> replace('SEX', $patient_sex);
     $d -> replace('ID', $patient_id);
+    $d -> replace('SCANDATE', $scan_date_array[0]);
+    $d -> replace('SCANAGE', $scan_age);
     $feed_details .= $d;
 
     // add data information
@@ -211,6 +227,7 @@ class FeedV implements ObjectViewInterface {
         $d -> replace('VISIBILITY', 'none');
       }
       $d -> replace('DATA', $value);
+      $d -> replace('NB_FILES', $data_nb_files[$key]);
       $d -> replace('FULL_ID', str_replace ('.', '_', $data_real_id[$key]));
       $feed_details .= $d;
     }
