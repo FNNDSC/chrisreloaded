@@ -51,7 +51,6 @@ class PluginV implements ObjectViewInterface {
 
     // loop through directories to get all images
     $results = scandir(CHRIS_PLUGINS_FOLDER);
-    $first = true;
 
     foreach ($results as $result) {
       if ($result === '.' or $result === '..') continue;
@@ -60,13 +59,7 @@ class PluginV implements ObjectViewInterface {
         // new template
         $v = new Template('plugin_carousel_item.html');
         $v-> replace('SOURCE', CHRIS_PLUGINS_FOLDER.'/' . $result .'/gfx.png');
-        if($first){
-          $v-> replace('ACTIVE', 'active');
-          $first = false;
-        }
-        else{
-          $v-> replace('ACTIVE', ' ');
-        }
+        $v-> replace('PLUGIN_NAME', $result);
         //code to use if directory
         $plugin_carousel_items .= $v->__toString();
       }
