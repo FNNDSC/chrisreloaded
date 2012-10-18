@@ -2,15 +2,14 @@
 <!-- The Cart -->
 <div class='cart'>
  <div class='cart_title'>
-  <span style="font-size: 16px; font-weight: bold;">Processing
-   Cart</span>
+  <span style="font-size: 16px; font-weight: bold;">Selection
+   Processing</span>
  </div>
  <div class='cart_content'>
   <!-- PIPELINES -->
-  <div>
-   <span style='font-size: 14px'>Pipeline</span><br />
+  <div id="cart_plugins">
    <div id="pipelines" class="carousel slide"
-    style='width: 200px; margin-left: 20px;'>
+    style='width: 200px; margin-bottom: 0px;'>
     <!-- Carousel items -->
     <div class="carousel-inner">
      <div class="active item">
@@ -31,9 +30,9 @@
    </div>
   </div>
   <!-- PARAMETERS -->
-  <div id='parameters'>
+  <div id='cart_parameters'>
    <span style='font-size: 14px'>Parameters</span><br />
-   <form style='margin-left: 20px'>
+   <!--    <form style='margin-left: 20px'>
     <table>
      <tr>
       <td align='center'><input type="text" class="input-small"
@@ -57,11 +56,18 @@
      </tr>
     </table>
 
-   </form>
+   </form> -->
+  </div>
+  <!-- INPUT -->
+  <div id='cart_input' class="placeholder">
+   <span style='font-size: 14px'>Input</span>
+   <!--  <a
+    class="btn btn-primary btn-mini pull-right" href='#'><i
+    class="icon-plus icon-white"></i></a> -->
   </div>
   <!-- DATA -->
-  <div>
-   <span style='font-size: 14px'>Data</span>
+  <div id='cart_selection'>
+   <span style='font-size: 14px'>Selection</span>
    <ul id='cart_datalist'></ul>
   </div>
 

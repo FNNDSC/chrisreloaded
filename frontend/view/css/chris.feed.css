@@ -25,22 +25,23 @@
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 	border-color: lightgrey;
-	cursor: pointer;
 	overflow: hidden;
 	background: #fff;
 }
 
-.feed_gradient { /* gradient*/
+.feed:hover { /* gradient*/
 	background: #eee; /* for non-css3 browsers */
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee',
-		endColorstr='#ffffff' ); /* for IE */
+		endColorstr='#ffffff' );
+	/*for IE*/
 	background: -webkit-gradient(linear, left top, left bottom, from(#eee),
-		to(#fff) ); /* for webkit browsers */
+		to(#fff) ); /*for webkit browsers*/
 	background: -moz-linear-gradient(top, #eee, #fff);
 	/* for firefox 3.6+ */
 }
 
 .feed_header {
+	cursor: pointer;
 	min-height: 50px;
 }
 
@@ -92,7 +93,7 @@
 	overflow: auto;
 	display: none;
 	position: relative;
-	margin-left: 50px;
+/* 	margin-left: 50px; */
 }
 
 .feed_data_name {
@@ -104,19 +105,27 @@
 	color: #999;
 }
 
-/* CSS applied in the PHP because of JQUERY slide */
-.feed>.details>.data { /* 	border-top: 1px solid;
-	border-color: grey;
-	padding-left: 60px; */
-	
+.feed>.feed_details>.data:hover {
+	background: #B5E9FF;
 }
 
-.feed>.details>.data_patient { /*   border-top: 1px solid;
-  border-color: grey;
-  padding-left: 60px; */
-	
+.feed>.feed_details>.data_patient {
+  background: white;
 }
+
 /*  need hierarchy */
 .feed_location_text {
 	display: none;
+}
+
+.feed_preview {
+	cursor: pointer;
+}
+
+.feed_select {
+	cursor: pointer;
+}
+
+.feed_move {
+  cursor: move;
 }
