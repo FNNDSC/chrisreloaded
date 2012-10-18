@@ -2,32 +2,16 @@
 <!-- The Cart -->
 <div class='cart'>
  <div class='cart_title'>
-  <span style="font-size: 16px; font-weight: bold;">Selection
-   Processing</span>
+  <span style="font-size: 16px; font-weight: bold;"><span
+   style="font-weight: bold;">${USERNAME}</span>, </br> what would you like
+   to do?</span>
  </div>
  <div class='cart_content'>
   <!-- PIPELINES -->
-  <div id="cart_plugins">
-   <div id="pipelines" class="carousel slide"
-    style='width: 200px; margin-bottom: 0px;'>
-    <!-- Carousel items -->
-    <div class="carousel-inner">
-     <div class="active item">
-      <img src="view/gfx/fetal_moco.png" class="img-rounded">
-     </div>
-     <div class="item">
-      <img src="view/gfx/fetal_moco.png" class="img-rounded">
-     </div>
-     <div class="item">
-      <img src="view/gfx/fetal_moco.png" class="img-rounded">
-     </div>
-    </div>
-    <!-- Carousel nav -->
-    <a class="cart-carousel-control cart-carousel-control-left left"
-     href="#pipelines" data-slide="prev">&lsaquo;</a> <a
-     class="cart-carousel-control cart-carousel-control-right right"
-     href="#pipelines" data-slide="next">&rsaquo;</a>
-   </div>
+  <div id="cart_plugins">${PLUGIN_CAROUSEL}</div>
+  <!-- DATA -->
+  <div id='cart_selection'>
+   <span style='font-size: 14px'>Selection</span>
   </div>
   <!-- PARAMETERS -->
   <div id='cart_parameters'>
@@ -58,19 +42,6 @@
 
    </form> -->
   </div>
-  <!-- INPUT -->
-  <div id='cart_input' class="placeholder">
-   <span style='font-size: 14px'>Input</span>
-   <!--  <a
-    class="btn btn-primary btn-mini pull-right" href='#'><i
-    class="icon-plus icon-white"></i></a> -->
-  </div>
-  <!-- DATA -->
-  <div id='cart_selection'>
-   <span style='font-size: 14px'>Selection</span>
-   <ul id='cart_datalist'></ul>
-  </div>
-
  </div>
  <div class='cart_footer'>
   <a class="btn btn-danger" href='#' rel="right_tooltip"

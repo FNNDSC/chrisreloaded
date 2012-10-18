@@ -40,7 +40,7 @@ _FEED_.feed_onclick = function() {
  * '.feed', function() { jQuery(this).removeClass('feed_gradient'); }); }
  */
 _FEED_.updateFeedTimeout = function() {
-  timer = setInterval(_FEED_.refresh, 2000);
+  timer = setInterval(_FEED_.refresh, 5000);
 }
 _FEED_.refresh = function() {
   // look for new feeds
