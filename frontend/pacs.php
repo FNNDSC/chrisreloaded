@@ -41,7 +41,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 
 function pacsPage() {
   // create the login page
-  $t = new Template('pacs.html');
+  $t = new Template('pacs2.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
   $t -> replace('DATA_PREVIEW', 'data_preview.html');

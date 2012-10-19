@@ -261,15 +261,8 @@ _PACS_.advancedTable = function() {
   _PACS_.sTable = jQuery('#S-RESULTS')
       .dataTable(
           {
-            "sDom" : "<'row-fluid'<'span6' il ><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'><'span6'p>>",
-            "sPaginationType" : "bootstrap",
-            "oLanguage" : {
-              "sLengthMenu" : " (_MENU_ per page)",
-              "sInfo": "Showing _START_ to _END_ of _TOTAL_ results "
-            },
-            "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
-            iDisplayStart : 0,
-            iDisplayLength : 10,
+            "sDom" : "<'row-fluid'<'span6'><'span6' <'d_filter'> f>r>t",
+            "bPaginate" : false,
             "aoColumnDefs" : [ {
               "bSortable" : false,
               "aTargets" : [ 9, 10 ]
@@ -470,15 +463,8 @@ _PACS_.simpleTable = function() {
   _PACS_.sTable = jQuery('#S-RESULTS')
       .dataTable(
           {
-            "sDom" : "<'row-fluid'<'span6' il><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'><'span6'p>>",
-            "sPaginationType" : "bootstrap",
-            "oLanguage" : {
-              "sLengthMenu" : " (_MENU_ per page)",
-              "sInfo": "Showing _START_ to _END_ of _TOTAL_ results "
-            },
-            "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
-            iDisplayStart : 0,
-            iDisplayLength : 10,
+            "sDom" : "<'row-fluid'<'span6'><'span6' <'d_filter'> f>r>t",
+            "bPaginate" : false,
             "aoColumnDefs" : [ {
               "bSortable" : false,
               "aTargets" : [ 7 ]
