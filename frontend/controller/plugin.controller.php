@@ -25,45 +25,44 @@
  *                        dev@babyMRI.org
  *
  */
-
-// we define a valid entry point
-define('__CHRIS_ENTRY_POINT__', 666);
-
-//define('CHRIS_CONFIG_DEBUG', true);
+// prevent direct calls
+if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
 // include the configuration
-require_once ('config.inc.php');
+require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
-// include the template class
+
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
+
+// include the view
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 
-// init session data
-$_SESSION['username'] = 'Ellen';
-$_SESSION['feed_time'] = '0000-00-00 00:00:00';
-
-function homePage() {
-  $t = new Template('home.html');
-  $t -> replace('CSS', 'css.html');
-  $t -> replace('NAVBAR', 'navbar.html');
-  /**
-   *  @todo plugin view should not be here! - temporary until plugin controller builds
-   *  html widget
-   */
-  $t -> replace('PLUGIN', 'plugin.html');
-  $t -> replace('PLUGIN_CAROUSEL', PluginV::getCarousel());
-  $t -> replace('DATA_PREVIEW', 'data_preview.html');
-  $t -> replace('FEED_CONTENT', FeedC::getHTML(20));
-  $t -> replace('FOOTER', 'footer.html');
-  $t -> replace('JAVASCRIPT', 'javascript.html');
-  $t -> replace('USERNAME', $_SESSION['username']);
-  return $t;
+// interface
+interface PluginControllerInterface
+{
+  // get HTML representation of the plugins widget
+  static public function getHTML();
 }
 
-// execute the test
-echo homePage();
+/**
+ * Feed controller class
+ */
+class PluginC implements PluginControllerInterface {
 
+  /**
+   * Get HTML representation of the plugins widget
+   * @return string
+   */
+  static public function getHTML(){
+    $plugin_content = '';
+    // update caroussel
+    $plugin_content .= PluginV::getCarousel();
+
+    // get content (input and parameters)
+    //foreach
+    // += PluginV::getHTML('plugin');
+    // create all divs
+    return $plugin_content;
+  }
+}
 ?>

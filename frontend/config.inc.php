@@ -39,12 +39,13 @@ define('SQL_PASSWORD', 'YOURPASSWORD');
 define('SQL_DATABASE', 'chrisdev');
 
 // PATH configuration
+// should use relative paths????
 define('CHRIS_WWWROOT', dirname(__FILE__));
-define('CHRIS_MODEL_FOLDER', joinPaths(CHRIS_WWWROOT,'model'));
-define('CHRIS_VIEW_FOLDER', joinPaths(CHRIS_WWWROOT,'view'));
+define('CHRIS_MODEL_FOLDER', 'model');
+define('CHRIS_VIEW_FOLDER', 'view');
 define('CHRIS_TEMPLATE_FOLDER', joinPaths(CHRIS_VIEW_FOLDER,'template'));
-define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
-
+define('CHRIS_CONTROLLER_FOLDER', 'controller');
+define('CHRIS_PLUGINS_FOLDER', 'plugins');
 // PACS
 // folder containing dcmtk binaries
 define('CHRIS_DCMTK', '/usr/bin/');
