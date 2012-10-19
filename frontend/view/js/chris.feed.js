@@ -235,10 +235,11 @@ jQuery(document).ready(function() {
   _FEED_.setupPreview();
   _FEED_.setupSelect();
   _FEED_.setupLocation();
+  
+  // setup draggable item
   jQuery(".feed .feed_details .data").draggable({
     handle : ".feed_move",
     helper : "clone",
-    revert: true,
     appendTo: "body"
   });
 });

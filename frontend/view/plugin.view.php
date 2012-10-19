@@ -38,12 +38,14 @@ require_once ('object.view.php');
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
 /**
- * View class to get different representations of the Feed object.
+ * View class to get different representations of the Plugin object.
  */
 class PluginV implements ObjectViewInterface {
 
+  /**
+   * get HTML representation of the carousel
+   */
   public static function getCarousel(){
-
     // carousel template
     $t = new Template('plugin_carousel.html');
 
@@ -60,7 +62,6 @@ class PluginV implements ObjectViewInterface {
         $v = new Template('plugin_carousel_item.html');
         $v-> replace('SOURCE', CHRIS_PLUGINS_FOLDER.'/' . $result .'/gfx.png');
         $v-> replace('PLUGIN_NAME', $result);
-        //code to use if directory
         $plugin_carousel_items .= $v->__toString();
       }
     }
@@ -69,8 +70,9 @@ class PluginV implements ObjectViewInterface {
 
     return $t-> __toString();
   }
-  public static function getHTML($object){
 
+  public static function getHTML($object){
+    // not implemented
   }
 
   public static function getJSON($object){

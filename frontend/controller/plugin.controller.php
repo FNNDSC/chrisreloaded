@@ -34,12 +34,13 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 
-// include the models
+// include the view
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
 
 // interface
 interface PluginControllerInterface
 {
+  // get HTML representation of the plugins widget
   static public function getHTML();
 }
 
@@ -48,17 +49,20 @@ interface PluginControllerInterface
  */
 class PluginC implements PluginControllerInterface {
 
+  /**
+   * Get HTML representation of the plugins widget
+   * @return string
+   */
   static public function getHTML(){
     $plugin_content = '';
-    // caroussel
+    // update caroussel
     $plugin_content .= PluginV::getCarousel();
-    
+
+    // get content (input and parameters)
     //foreach
     // += PluginV::getHTML('plugin');
-    
     // create all divs
     return $plugin_content;
   }
-
 }
 ?>

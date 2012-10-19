@@ -49,7 +49,10 @@ function homePage() {
   $t = new Template('home.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
-  //echo PluginC::getHTML();
+  /**
+   *  @todo plugin view should not be here! - temporary until plugin controller builds
+   *  html widget
+   */
   $t -> replace('PLUGIN', 'plugin.html');
   $t -> replace('PLUGIN_CAROUSEL', PluginV::getCarousel());
   $t -> replace('DATA_PREVIEW', 'data_preview.html');
