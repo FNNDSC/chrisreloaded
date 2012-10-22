@@ -60,7 +60,7 @@ class PluginV implements ObjectViewInterface {
       if (is_dir(CHRIS_PLUGINS_FOLDER . '/' . $result)) {
         // new template
         $v = new Template('plugin_carousel_item.html');
-        $v-> replace('SOURCE', CHRIS_PLUGINS_FOLDER.'/' . $result .'/gfx.png');
+        $v-> replace('SOURCE', CHRIS_PLUGINS_FOLDER_RELATIVE.'/' . $result .'/gfx.png');
         $v-> replace('PLUGIN_NAME', $result);
         $plugin_carousel_items .= $v->__toString();
       }

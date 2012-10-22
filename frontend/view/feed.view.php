@@ -175,7 +175,7 @@ class FeedV implements ObjectViewInterface {
       }
     }
 
-    $feed_image = CHRIS_VIEW_FOLDER.'/gfx/jigsoar-icons/dark/48_download.png';
+    $feed_image = CHRIS_VIEW_FOLDER_RELATIVE.'/gfx/jigsoar-icons/dark/48_download.png';
     $feed_action_desc = 'PACS Pull';
     if ($feed_status == 'feed_done'){
       $feed_what_desc = 'Data for <b>MRN '. $patient_id .'</b> was added.';
