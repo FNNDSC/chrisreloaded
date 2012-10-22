@@ -42,6 +42,9 @@ interface PluginControllerInterface
 {
   // get HTML representation of the plugins widget
   static public function getHTML();
+
+  // discover all available plugins
+  static public function discover();
 }
 
 /**
@@ -64,5 +67,40 @@ class PluginC implements PluginControllerInterface {
     // create all divs
     return $plugin_content;
   }
+
+  /**
+   * Discover all available plugins and query
+   * them for their logo, parameters etc.
+   */
+  static public function discover(){
+
+    $plugins = array();
+
+    // the names of all plugins which are subfolders
+    // in the plugin folder
+    $plugin_names = scandir(CHRIS_PLUGINS_FOLDER);
+
+    // loop through the names
+    foreach ($plugin_names as $p) {
+      if ($p === '.' or $p === '..') continue;
+
+      $p_folder = CHRIS_PLUGINS_FOLDER . DIRECTORY_SEPARATOR . $p;
+      $p_executable = $p_folder . DIRECTORY_SEPARATOR . $p . '.py';
+
+      if (is_dir($p_folder) && is_file($p_executable)) {
+
+        // plugins are only valid if they are subfolders
+        // and contain a $PLUGINNAME.py file
+
+        // TODO call the executable
+
+        #echo 'Found '.$p;
+
+      }
+
+    }
+
+  }
+
 }
 ?>
