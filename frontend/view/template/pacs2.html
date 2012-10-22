@@ -13,21 +13,18 @@ ${CSS}
 
  <div class="container"
   style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
-
   ${DATA_PREVIEW}
-
   <div id='home' class="row">
    <div class="span4" data-spy="affix">
     <div class='row-fluid'>
      <div class='span12'>
       <div class='well'>
-       <form id="pacs_form" class="form-inline">
-        <input id='PACS_MRN' type="text" class="input-small ssearch"
+       <form id="pacs_form">
+        <input id='PACS_MRN' type="text" class="input ssearch"
          placeholder="MRN" value=''> <input id='PACS_NAM'
-         type="text" class="input-small ssearch" placeholder="Name"
-         value=''> <input id='PACS_DAT' type="text"
-         class="input-small ssearch" placeholder="Study Date" value=''>
-
+         type="text" class="input ssearch" placeholder="Name" value=''>
+        <input id='PACS_DAT' type="text" class="input ssearch"
+         placeholder="Study Date" value=''>
         <button id="SEARCH" class="btn btn-primary">Search</button>
         <div id="show_advanced" style="padding-top: 10px;">
          <i class="icon-chevron-down"></i><b>Advanced parameters</b>
@@ -42,7 +39,6 @@ ${CSS}
          </form>
         </div>
        </form>
-
       </div>
      </div>
     </div>
@@ -96,32 +92,33 @@ ${CSS}
      </div>
     </div>
    </div>
-   <div class="span8 pull-right">
-    <div class="feed_title">
-     <span style="font-size: 16px; font-weight: bold;">PACS Feed</span>
+   <div class="span12" data-spy="affix" style="z-index: 1000;">
+    <div class="span8 pull-right">
+     <div class="feed_title" style="height: 30px;">
+      <span style="font-size: 16px; font-weight: bold;">PACS Feed</span>
+      <div class="input-append pull-right">
+       <input id="pacs_feed_filter" class="span2" id="appendedInput" size="16" type="text"><span
+        class="add-on"><i class="icon-search"></i></span>
+      </div>
+     </div>
     </div>
+   </div>
+   <div class="span8 pull-right">
     <div class="feed_update feed_gradient"></div>
     <div class="feed_content">
 
      <div id="PACS-RESULTS" class='row-fluid' style="display: none">
       <div class='span12'>
-       <div class='well'>
-        <div class="btn-group" data-toggle="buttons-radio">
-         <button id="STUDY_VIEW" type="button"
-          class="btn btn-primary active">Study</button>
-         <button id="SERIES_VIEW" type="button" class="btn btn-primary">Series</button>
-        </div>
-        <div id='SC-RESULTS' class='row-fluid'></div>
-       </div>
+
+       <div id='SC-RESULTS' class='row-fluid' style="margin-top: 50px; background:white;"></div>
+
       </div>
      </div>
 
     </div>
    </div>
-
   </div>
  </div>
-
  ${FOOTER} ${JAVASCRIPT}
 </body>
 </html>

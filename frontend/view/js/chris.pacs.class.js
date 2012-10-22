@@ -11,14 +11,12 @@ jQuery('#pacs_form').submit(function(e) {
     jQuery("#SEARCH").click();
   }
 });
-
 /*
  * _PACS_.studySearch = function() { jQuery("#S_SEARCH").live('click',
  * function(event) { jQuery("#SEARCH").html("Study"); }); } _PACS_.seriesSearch =
  * function() { jQuery("#A_SEARCH").live('click', function(event) {
  * jQuery("#SEARCH").html("Series"); }); }
  */
-
 _PACS_.studyView = function() {
   jQuery("#STUDY_VIEW").live('click', function(event) {
     // new representation of cached data
@@ -48,7 +46,7 @@ _PACS_.pacsAdvanced = function() {
 }
 _PACS_.ajaxSearch = function() {
   jQuery("#SEARCH").live('click', function(event) {
-      _PACS_.ajaxSimple();
+    _PACS_.ajaxSimple();
   });
 }
 /**
@@ -210,17 +208,13 @@ _PACS_.ajaxAdvanced = function() {
  * Handle 'Advanced' AJAX query results.
  */
 _PACS_.ajaxAdvancedResults = function(data, force) {
-  
   // default value for 'force' is false
   if (typeof force == 'undefined') {
-    
     force = false;
-    
   }
-  
   // cache the data
   _PACS_.cachedData = data;
-  if(data[1] == null){
+  if (data[1] == null) {
     _PACS_.ajaxAdvanced();
   }
   if (data[0] != null) {
@@ -258,21 +252,16 @@ _PACS_.advancedTable = function() {
   // update html with table
   jQuery('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
-  _PACS_.sTable = jQuery('#S-RESULTS')
-      .dataTable(
-          {
-            "sDom" : "<'row-fluid'<'span6'><'span6' <'d_filter'> f>r>t",
-            "bPaginate" : false,
-            "aoColumnDefs" : [ {
-              "bSortable" : false,
-              "aTargets" : [ 9, 10 ]
-            } ],
-            "aaSorting" : [ [ 1, 'desc' ] ],
-            "bAutoWidth" :false
-          });
-  jQuery(".d_filter")
-      .html(
-          '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
+  _PACS_.sTable = jQuery('#S-RESULTS').dataTable({
+    "sDom" : "t",
+    "bPaginate" : false,
+    "aoColumnDefs" : [ {
+      "bSortable" : false,
+      "aTargets" : [ 9, 10 ]
+    } ],
+    "aaSorting" : [ [ 1, 'desc' ] ],
+    "bAutoWidth" : false
+  });
 }
 /**
  * Cache data after 'Advanced' AJAX query.
@@ -429,7 +418,8 @@ _PACS_.reformatSimpleResults = function(data) {
  */
 _PACS_.ajaxSimpleResults = function(data, force) {
   // default force value is false
-  if(typeof(force)==='undefined') force = false;
+  if (typeof (force) === 'undefined')
+    force = false;
   // if ajax returns something, process it
   if (data[0] != null) {
     // if no table, create it
@@ -456,25 +446,20 @@ _PACS_.ajaxSimpleResults = function(data, force) {
  */
 _PACS_.simpleTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
-  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
+  content += '<thead ><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   jQuery('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
-  _PACS_.sTable = jQuery('#S-RESULTS')
-      .dataTable(
-          {
-            "sDom" : "<'row-fluid'<'span6'><'span6' <'d_filter'> f>r>t",
-            "bPaginate" : false,
-            "aoColumnDefs" : [ {
-              "bSortable" : false,
-              "aTargets" : [ 7 ]
-            } ],
-            "bAutoWidth" :false,
-            "aaSorting" : [ [ 1, 'desc' ] ],
-          });
-  jQuery(".d_filter")
-      .html(
-          '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
+  _PACS_.sTable = jQuery('#S-RESULTS').dataTable({
+    "sDom" : "t",
+    "bPaginate" : false,
+    "aoColumnDefs" : [ {
+      "bSortable" : false,
+      "aTargets" : [ 7 ]
+    } ],
+    "bAutoWidth" : false,
+    "aaSorting" : [ [ 1, 'desc' ] ],
+  });
 }
 /**
  * Reformat data after 'Advanced' AJAX query to fit the dataTable standard.
@@ -483,7 +468,8 @@ _PACS_.simpleFormat = function(data, i) {
   var stuid = data.StudyInstanceUID[i];
   var sub = Array();
   sub.push('<div  id="' + stuid.replace(/\./g, "_")
-      + '"  class="control"><i class="icon-chevron-down"></i> '+data.PatientName[i].replace(/\^/g, " ")+'</div>');
+      + '"  class="control"><i class="icon-chevron-down"></i> '
+      + data.PatientName[i].replace(/\^/g, " ") + '</div>');
   sub.push(data.PatientID[i]);
   sub.push(data.PatientBirthDate[i]);
   sub
@@ -530,7 +516,8 @@ _PACS_.ajaxSeries = function(studyUID, nTr) {
   if (!j) {
     // set waiting icon
     if (nTr != null) {
-      jQuery('.control i', nTr).removeClass('icon-chevron-down').addClass('icon-refresh').addClass('rotating_class');
+      jQuery('.control i', nTr).removeClass('icon-chevron-down').addClass(
+          'icon-refresh').addClass('rotating_class');
     }
     jQuery.ajax({
       type : "POST",
@@ -548,7 +535,8 @@ _PACS_.ajaxSeries = function(studyUID, nTr) {
       success : function(data) {
         // change icon
         if (nTr != null) {
-          jQuery('.control i', nTr).removeClass('icon-refresh').removeClass('rotating_class').addClass('icon-chevron-up');
+          jQuery('.control i', nTr).removeClass('icon-refresh').removeClass(
+              'rotating_class').addClass('icon-chevron-up');
         }
         // should be inside the results
         // append a status field
@@ -566,7 +554,8 @@ _PACS_.ajaxSeries = function(studyUID, nTr) {
   // if cached
   else {
     if (nTr != null) {
-      jQuery('.control i', nTr).removeClass('icon-chevron-down').addClass('icon-chevron-up');
+      jQuery('.control i', nTr).removeClass('icon-chevron-down').addClass(
+          'icon-chevron-up');
     }
     _PACS_.ajaxSeriesResults(_PACS_.cache[stuid], nTr);
   }
@@ -588,7 +577,7 @@ _PACS_.ajaxSeriesResults = function(data, nTr) {
         "bSortable" : false,
         "aTargets" : [ 2, 3 ]
       } ],
-      "bAutoWidth" :false
+      "bAutoWidth" : false
     });
     jQuery('div.innerDetails', detailRown).slideDown();
     _PACS_.openStudies.push(nTr);
@@ -758,9 +747,9 @@ jQuery(document).ready(function() {
   _PACS_.cacheCount = {};
   _PACS_.cache = {};
   _PACS_.ajaxSearch();
-/*
- * _PACS_.studySearch(); _PACS_.seriesSearch();
- */
+  /*
+   * _PACS_.studySearch(); _PACS_.seriesSearch();
+   */
   _PACS_.studyView();
   _PACS_.seriesView();
   //
@@ -788,5 +777,8 @@ jQuery(document).ready(function() {
   // ping the server
   jQuery(".pacsPing").click(function(event) {
     _PACS_.ajaxPing();
+  });
+  jQuery("#pacs_feed_filter").bind('input', function() {
+    _PACS_.sTable.fnFilter(jQuery(this).val());
   });
 });
