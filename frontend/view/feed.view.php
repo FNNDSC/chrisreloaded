@@ -230,6 +230,7 @@ class FeedV implements ObjectViewInterface {
       }
       $d -> replace('DATA', $value);
       $d -> replace('DATA_ID', $data_db_id[$key]);
+      $d -> replace('PATIENT_ID', $patient_id);
       $d -> replace('NB_FILES', $data_nb_files[$key]);
       $d -> replace('FULL_ID', str_replace ('.', '_', $data_real_id[$key]));
       $feed_details .= $d;

@@ -376,7 +376,7 @@ class Mapper implements MapperInterface {
             $object = new $this->objects[$localid]();
           }
           // update fields
-          $object->$field[0] = $field[1];
+          $object->$field[0] = trim($field[1]);
         }
         // push last object to the right location
         // we only push the object once it has been filled!
