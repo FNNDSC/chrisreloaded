@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Fetal Motion Correction plugin for ChRIS reloaded
+# Fetal MRI Motion Correction plugin for ChRIS reloaded
 #
 #
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
@@ -19,9 +19,9 @@ class Fetal_Moco( Plugin ):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
-  Plugin.TITLE = 'Fetal Motion Correction'
+  Plugin.TITLE = 'Fetal MRI Motion Correction'
   Plugin.CATEGORY = 'Registration'
-  Plugin.DESCRIPTION = 'Fetal Motion Correction based on a method by Oxford University'
+  Plugin.DESCRIPTION = 'Fetal MRI Motion Correction based on a method by Oxford University'
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
@@ -34,6 +34,6 @@ class Fetal_Moco( Plugin ):
 if __name__ == "__main__":
   plugin = Fetal_Moco()
   plugin.add_parameter( Plugin.IMAGE, '--t1_axial', action='store', dest='T1_axial', help='the axial T1 scan' )
-  plugin.add_parameter( Plugin.IMAGE, '--t1_sagital', action='store', dest='T1_sagital', help='the sagital T1 scan' )
+  plugin.add_parameter( Plugin.IMAGE, '--t1_sagittal', action='store', dest='T1_sagittal', help='the sagittal T1 scan' )
   plugin.add_parameter( Plugin.IMAGE, '--t1_coronal', action='store', dest='T1_coronal', help='the coronal T1 scan' )
   plugin.launch( sys.argv )
