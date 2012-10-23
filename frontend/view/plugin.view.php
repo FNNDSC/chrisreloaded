@@ -37,6 +37,8 @@ require_once ('object.view.php');
 
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
+
 /**
  * View class to get different representations of the Plugin object.
  */
@@ -56,7 +58,7 @@ class PluginV implements ObjectViewInterface {
 
       // new template for each plugin
       $v = new Template('plugin_carousel_item.html');
-      $v-> replace('IMAGE', $p['icon']);
+      $v-> replace('IMAGE', PluginC::getIcon($p['name']));
       $v-> replace('PLUGIN_NAME', $p['name']);
       $plugin_carousel_items .= $v;
 

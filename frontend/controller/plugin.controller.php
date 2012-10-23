@@ -45,6 +45,16 @@ interface PluginControllerInterface
 
   // discover all available plugins
   static public function discover();
+
+  // get the UI of a plugin (HTML/JS)
+  static public function getUI($plugin);
+
+  // get the executable path of a plugin
+  static public function getExecutable($plugin);
+
+  // get the icon of a plugin
+  static public function getIcon($plugin);
+
 }
 
 /**
@@ -69,8 +79,9 @@ class PluginC implements PluginControllerInterface {
   }
 
   /**
-   * Discover all available plugins and query
-   * them for their logo, parameters etc.
+   * Discover all available plugins and returns an array of plugin names.
+   *
+   * @return array The discovered plugins.
    */
   static public function discover(){
 
@@ -94,20 +105,9 @@ class PluginC implements PluginControllerInterface {
         // and contain a $PLUGINNAME executable file
         // (can be script or binary)
 
-        // get the path to the plugin icon
-        $p_icon = $p_folder_relative . DIRECTORY_SEPARATOR . 'gfx.png';
-
-        // probe for the ui xml
-        $p_xml = array();
-        // note: we also redirect stderr here to get the full output
-        exec($p_executable.' --xml 2>&1', $p_xml);
-
         // create a plugin entry
         $plugin_entry = array();
         $plugin_entry['name'] = $p;
-        $plugin_entry['executable'] = $p_executable;
-        $plugin_entry['icon'] = $p_icon;
-        $plugin_entry['xml'] = implode($p_xml); // merge the xml to a string
 
         // .. and store it
         $plugins[] = $plugin_entry;
@@ -117,6 +117,65 @@ class PluginC implements PluginControllerInterface {
     } // foreach
 
     return $plugins;
+
+  }
+
+  /**
+   * Get the UI of a given plugin.
+   *
+   * This queries the plugin executable for a XML
+   * representation (Slicer Execution Model) and converts
+   * it to HTML/JS.
+   *
+   * @param string $plugin The plugin name.
+   * @return string The resulting HTML UI representation.
+   */
+  static public function getUI($plugin) {
+
+    $p_executable = PluginC::getExecutable($plugin);
+
+    // probe for the ui xml
+    $p_xml = array();
+    // note: we also redirect stderr here to get the full output
+    exec($p_executable.' --xml 2>&1', $p_xml);
+
+    $p_xml = implode($p_xml);
+
+    // TODO convert to HTML/JS
+
+    return $p_xml;
+
+  }
+
+  /**
+   * Get the executable of a given plugin.
+   *
+   * @param string $plugin The plugin name.
+   * @return string The full path to the plugin executable.
+   */
+  static public function getExecutable($plugin) {
+
+    $p_folder = CHRIS_PLUGINS_FOLDER . DIRECTORY_SEPARATOR . $plugin;
+    $p_executable = $p_folder . DIRECTORY_SEPARATOR . $plugin;
+
+    return $p_executable;
+
+  }
+
+  /**
+   * Get the icon of a given plugin.
+   *
+   * @param unknown $plugin
+   * @return string The relative path to the plugin icon.
+   */
+  static public function getIcon($plugin) {
+
+    $p_folder_relative = CHRIS_PLUGINS_FOLDER_RELATIVE . DIRECTORY_SEPARATOR . $plugin;
+
+    // get the path to the plugin icon
+    $p_icon = $p_folder_relative . DIRECTORY_SEPARATOR . 'gfx.png';
+
+    return $p_icon;
 
   }
 
