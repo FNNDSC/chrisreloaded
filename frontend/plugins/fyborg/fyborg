@@ -18,8 +18,8 @@
 #
 
 # import the plugin.py superclass
-import sys
-sys.path.append( '../' )
+import os, sys
+sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
 class Fyborg( Plugin ):
@@ -32,7 +32,6 @@ class Fyborg( Plugin ):
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
-  Plugin.ICON = 'gfx.png'
 
   def run( self, options ):
     # do whatever

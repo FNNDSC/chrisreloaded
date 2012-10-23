@@ -112,10 +112,8 @@ class Plugin( argparse.ArgumentParser ):
     '''
     This method triggers the parsing of arguments.
     
-    The run() method gets called if none of
+    The run() method gets called if not
      --xml
-     --description
-     --icon
     are specified.
     '''
     options = self.parse_args()
@@ -123,12 +121,6 @@ class Plugin( argparse.ArgumentParser ):
     if ( options.xml ):
       # print the xml
       print( self.xml() )
-    elif ( options.description ):
-      # print the description
-      print( self.description() )
-    elif ( options.icon ):
-      # print the path to the icon
-      print( self.icon() )
     else:
       # run the plugin
       self.run( options )

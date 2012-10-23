@@ -85,20 +85,38 @@ class PluginC implements PluginControllerInterface {
       if ($p === '.' or $p === '..') continue;
 
       $p_folder = CHRIS_PLUGINS_FOLDER . DIRECTORY_SEPARATOR . $p;
-      $p_executable = $p_folder . DIRECTORY_SEPARATOR . $p . '.py';
+      $p_folder_relative = CHRIS_PLUGINS_FOLDER_RELATIVE . DIRECTORY_SEPARATOR . $p;
+      $p_executable = $p_folder . DIRECTORY_SEPARATOR . $p;
 
       if (is_dir($p_folder) && is_file($p_executable)) {
 
         // plugins are only valid if they are subfolders
-        // and contain a $PLUGINNAME.py file
+        // and contain a $PLUGINNAME executable file
+        // (can be script or binary)
 
-        // TODO call the executable
+        // get the path to the plugin icon
+        $p_icon = $p_folder_relative . DIRECTORY_SEPARATOR . 'gfx.png';
 
-        #echo 'Found '.$p;
+        // probe for the ui xml
+        $p_xml = array();
+        // note: we also redirect stderr here to get the full output
+        exec($p_executable.' --xml 2>&1', $p_xml);
+
+        // create a plugin entry
+        $plugin_entry = array();
+        $plugin_entry['name'] = $p;
+        $plugin_entry['executable'] = $p_executable;
+        $plugin_entry['icon'] = $p_icon;
+        $plugin_entry['xml'] = implode($p_xml); // merge the xml to a string
+
+        // .. and store it
+        $plugins[] = $plugin_entry;
 
       }
 
-    }
+    } // foreach
+
+    return $plugins;
 
   }
 

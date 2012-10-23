@@ -46,29 +46,29 @@ class PluginV implements ObjectViewInterface {
    * get HTML representation of the carousel
    */
   public static function getCarousel(){
-    // carousel template
-    $t = new Template('plugin_carousel.html');
 
+    // create the carousel items
     $plugin_carousel_items  = '';
 
-    // loop through directories to get all images
-    $results = scandir(CHRIS_PLUGINS_FOLDER);
+    // by looping through all plugins
+    $plugins = $_SESSION['plugins'];
+    foreach ($plugins as $p) {
 
-    foreach ($results as $result) {
-      if ($result === '.' or $result === '..') continue;
+      // new template for each plugin
+      $v = new Template('plugin_carousel_item.html');
+      $v-> replace('IMAGE', $p['icon']);
+      $v-> replace('PLUGIN_NAME', $p['name']);
+      $plugin_carousel_items .= (string) $v;
 
-      if (is_dir(CHRIS_PLUGINS_FOLDER . '/' . $result)) {
-        // new template
-        $v = new Template('plugin_carousel_item.html');
-        $v-> replace('SOURCE', CHRIS_PLUGINS_FOLDER_RELATIVE.'/' . $result .'/gfx.png');
-        $v-> replace('PLUGIN_NAME', $result);
-        $plugin_carousel_items .= $v->__toString();
-      }
     }
+
+    // carousel template
+    $t = new Template('plugin_carousel.html');
     // replace in template
     $t -> replace('PLUGIN_CAROUSEL_ITEMS', $plugin_carousel_items);
 
-    return $t-> __toString();
+    return $t;
+
   }
 
   public static function getHTML($object){
