@@ -6,8 +6,8 @@ var _PLUGIN_ = _PLUGIN_ || {};
  * Setup the javascript when document is ready (finshed loading)
  */
 jQuery(document).ready(function() {
-  // set default plugin to "fetal_moco"
-  jQuery("#fetal_moco_carousel").addClass("active");
+  // set default plugin to the first one
+  jQuery(".carousel-inner").children(':first').addClass("active");
   // turn off automated rotation
   jQuery('#pipelines').carousel({
     interval : false

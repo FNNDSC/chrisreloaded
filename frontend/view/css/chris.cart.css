@@ -42,11 +42,13 @@
 }
 
 .cart-carousel-control-left {
-	left: 15px;
+	left: -13px;
+	top: 5px;
 }
 
 .cart-carousel-control-right {
-	right: 15px;
+	right: -13px;
+	top: 5px;
 }
 
 .parameter_text {
@@ -66,10 +68,10 @@
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 	border-color: lightgrey;
-	display: -moz-box;
-	-moz-box-orient: vertical;
-	-moz-box-pack: center;
-	-moz-box-align: center;
+}
+
+#pipelines {
+	margin-left: 50px;
 }
 
 #cart_parameters {
