@@ -67,15 +67,10 @@ class PluginC implements PluginControllerInterface {
    * @return string
    */
   static public function getHTML(){
-    $plugin_content = '';
-    // update caroussel
-    $plugin_content .= PluginV::getCarousel();
 
-    // get content (input and parameters)
-    //foreach
-    // += PluginV::getHTML('plugin');
-    // create all divs
-    return $plugin_content;
+    // discover the plugins and create the plugin widget
+    return PluginV::getHTML(PluginC::discover());
+
   }
 
   /**
@@ -141,9 +136,26 @@ class PluginC implements PluginControllerInterface {
 
     $p_xml = implode($p_xml);
 
-    // TODO convert to HTML/JS
+    // thanks to http://www.tonymarston.net/php-mysql/xsl.html
+    // requires sudo apt-get install php5-xsl
 
-    return $p_xml;
+    // we need a XSLT processor
+    $xp = new XSLTProcessor();
+
+    // load the XSL stylesheet
+    $xsl = new DOMDocument;
+    $xsl->load(CHRIS_PLUGINS_FOLDER . DIRECTORY_SEPARATOR . 'sem2html.xsl');
+
+    // attach it to the processor
+    $xp->importStylesheet($xsl);
+
+    // ..transform the XML to HTML
+    $html = $xp->transformToXML(new SimpleXMLElement($p_xml));
+
+    // replace plugin name variable
+    $html = str_replace('${PLUGIN_NAME}', $plugin, $html);
+
+    return $html;
 
   }
 

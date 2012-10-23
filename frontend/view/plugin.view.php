@@ -47,13 +47,12 @@ class PluginV implements ObjectViewInterface {
   /**
    * get HTML representation of the carousel
    */
-  public static function getCarousel(){
+  public static function getCarousel($plugins){
 
     // create the carousel items
     $plugin_carousel_items  = '';
 
     // by looping through all plugins
-    $plugins = $_SESSION['plugins'];
     foreach ($plugins as $p) {
 
       // new template for each plugin
@@ -75,6 +74,22 @@ class PluginV implements ObjectViewInterface {
 
   public static function getHTML($object){
     // not implemented
+
+    $t = new Template('plugin.html');
+    $t -> replace('PLUGIN_CAROUSEL', PluginV::getCarousel($object));
+
+    $plugin_parameters = '';
+    foreach ($object as $p) {
+
+      $plugin_parameters .= PluginC::getUI($p['name']);
+
+    }
+
+    $t -> replace('PLUGIN_PARAMETERS', $plugin_parameters);
+
+
+    return $t;
+
   }
 
   public static function getJSON($object){

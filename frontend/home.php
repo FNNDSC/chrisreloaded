@@ -45,15 +45,11 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 $_SESSION['username'] = 'Ellen';
 $_SESSION['feed_time'] = '0000-00-00 00:00:00';
 
-// detect plugins
-$_SESSION['plugins'] = PluginC::discover();
-
 function homePage() {
   $t = new Template('home.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
-  $t -> replace('PLUGIN', 'plugin.html');
-  $t -> replace('PLUGIN_CAROUSEL', PluginC::getHTML());
+  $t -> replace('PLUGIN', PluginC::getHTML());
   $t -> replace('DATA_PREVIEW', 'data_preview.html');
   $t -> replace('FEED_CONTENT', FeedC::getHTML(20));
   $t -> replace('FOOTER', 'footer.html');
