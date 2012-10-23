@@ -132,6 +132,7 @@ class FeedV implements ObjectViewInterface {
     $data_id = explode(";", $model_id);
     $data_status = array_fill(0, count($data_id) -1, 0);
     $data_name = Array();
+    $data_db_id = Array();
     $data_real_id = Array();
     $data_time = '';
     // requiered feed information
@@ -156,6 +157,7 @@ class FeedV implements ObjectViewInterface {
       if(count($dataResult['Data']) == 1){
         $data_name[] = $dataResult['Data'][0]->name;
         $data_real_id[] = $dataResult['Data'][0]->unique_id;
+        $data_db_id[] = $dataResult['Data'][0]->id;
         $data_time = $dataResult['Data'][0]->time;
         $data_nb_files[] = $dataResult['Data'][0]->nb_files;
         $feed_percent += $data_status[$key];
@@ -227,6 +229,7 @@ class FeedV implements ObjectViewInterface {
         $d -> replace('VISIBILITY', 'none');
       }
       $d -> replace('DATA', $value);
+      $d -> replace('DATA_ID', $data_db_id[$key]);
       $d -> replace('NB_FILES', $data_nb_files[$key]);
       $d -> replace('FULL_ID', str_replace ('.', '_', $data_real_id[$key]));
       $feed_details .= $d;
