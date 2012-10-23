@@ -43,7 +43,24 @@ jQuery(document).ready(function() {
     tolerance : "pointer",
     accept : ":not(.ui-sortable-helper)",
     drop : function(event, ui) {
-      jQuery(this).html(ui.draggable.text());
+      
+      // grab the data name dom element
+      var _data_name = ui.draggable.children('.feed_data_name');
+      
+      // now we can grab the MRN
+      var _mrn = _data_name.attr('data-patient-id');
+      
+      // and create a new representation
+      var _new_span = jQuery('<span></span>');
+      _new_span.html('<b>MRN '+_mrn+'</b> '+_data_name.text());
+      _new_span.attr('data-patient-id', _mrn);
+      _new_span.attr('data-id', _data_name.attr('data-id'));
+      
+      // throw everything old away
+      jQuery(this).empty();
+      // .. and attach the new thingie
+      jQuery(this).append(_new_span);
+      
     }
   });
 });

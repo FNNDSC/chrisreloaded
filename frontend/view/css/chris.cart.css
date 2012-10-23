@@ -117,6 +117,8 @@
 	color: gray;
 	white-space: nowrap;
 	overflow-x: hidden;
+	padding-left: 3px;
+	font-size: 10px;
 }
 
 .parameter_dropzone_active {
