@@ -63,4 +63,44 @@ jQuery(document).ready(function() {
       
     }
   });
+  
+  jQuery('#plugin_cancel').on('click', function(e) {
+    
+    // reset all parameters to default values
+    
+    // prevent scrolling up
+    e.preventDefault();
+    
+    // grab the visible plugin panel
+    var _visible_panel = jQuery('.plugin_panel :visible');
+    
+    _parameter_rows = _visible_panel.children('.parameter_row');
+    
+    // loop through all parameter rows
+    _parameter_rows.each(function(i) {
+       
+      // and restore all inputs to the default values
+      var _input_field = jQuery(_parameter_rows[i]).children('.parameter_input');
+      var _default_value = _input_field.attr('data-default');
+      _input_field.html(_default_value);
+      
+    });
+    
+  });
+  
+  jQuery('#plugin_submit').on('click', function(e){
+    
+    // fire it up!!
+    
+    // prevent scrolling up
+    e.preventDefault();
+    
+    // TODO validate
+    
+    // TODO perform the action
+    
+    alert('Job submitted!');
+    
+  });
+  
 });

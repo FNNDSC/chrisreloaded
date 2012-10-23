@@ -36,7 +36,7 @@
       <span>
         <strong><xsl:value-of select="name"/></strong>
       </span>
-      <div class='parameter_dropzone'> Drag and drop here</div>
+      <span class='parameter_input parameter_dropzone' data-default='Drag and drop here'> Drag and drop here</span>
     </div>
   </xsl:template>
  
