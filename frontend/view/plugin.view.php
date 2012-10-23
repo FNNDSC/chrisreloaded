@@ -58,7 +58,7 @@ class PluginV implements ObjectViewInterface {
       $v = new Template('plugin_carousel_item.html');
       $v-> replace('IMAGE', $p['icon']);
       $v-> replace('PLUGIN_NAME', $p['name']);
-      $plugin_carousel_items .= (string) $v;
+      $plugin_carousel_items .= $v;
 
     }
 
