@@ -223,6 +223,8 @@ class FeedV implements ObjectViewInterface {
 
     $d = new Template('feed_data_browser.html');
     $d -> replace('FOLDER', $patient_id.'-'.$patient_real_id);
+    $d -> replace('PATIENT_ID', $patient_id);
+    $d -> replace('DATA_ID', $data_db_id[0]);
     $feed_details .= $d;
 
     // add data information

@@ -45,10 +45,10 @@ jQuery(document).ready(function() {
     drop : function(event, ui) {
       
       // grab the data name dom element
-      var _data_name = ui.draggable.children('.feed_data_name');
+      var _data_name = ui.draggable;
       
       // now we can grab the MRN
-      var _mrn = _data_name.attr('data-patient-id');
+      var _mrn = _data_name.closest('.file_browser').attr('data-patient-id');
       
       // and create a new representation
       var _new_span = jQuery('<span></span>');
