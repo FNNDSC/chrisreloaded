@@ -63,7 +63,8 @@ class Plugin( argparse.ArgumentParser ):
     Generate the XML user interface for this
     plugin.
     '''
-    xml = '<executable>\n'
+    xml = '<?xml version="1.0" encoding="utf-8"?>\n'
+    xml += '<executable>\n'
     xml += '<category>' + Plugin.CATEGORY + '</category>\n'
     xml += '<title>' + Plugin.TITLE + '</title>\n'
     xml += '<description>' + Plugin.DESCRIPTION + '</description>\n'

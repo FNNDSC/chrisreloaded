@@ -20,7 +20,7 @@
   <!-- Match the 'parameters' element and create the parameter groups -->
   <xsl:template match="parameters">
     <!-- The panel title -->
-    <span>
+    <br/><span>
       <xsl:value-of select="label"/>
     </span><br/>
     
