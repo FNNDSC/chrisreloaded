@@ -49,7 +49,7 @@ function homePage() {
   $t = new Template('home.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
-  $t -> replace('PLUGIN', PluginC::getHTML());
+  //$t -> replace('PLUGIN', PluginC::getHTML());
   $t -> replace('DATA_PREVIEW', 'data_preview.html');
   $t -> replace('FEED_CONTENT', FeedC::getHTML(20));
   $t -> replace('FOOTER', 'footer.html');

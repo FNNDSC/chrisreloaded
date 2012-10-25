@@ -43,7 +43,6 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 // include the models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'result.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 
 /**
@@ -64,7 +63,8 @@ class FeedV implements ObjectViewInterface {
 
     switch($object->action){
       case "data-down":
-        return FeedV::_getHTMLDataDown($username, $object->id, $object->model_id, $time, $object->status);
+        return "Feeds not connected";
+        //return FeedV::_getHTMLDataDown($username, $object->id, $object->model_id, $time, $object->status);
         break;
       case "data-up":
         break;
