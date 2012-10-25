@@ -32,15 +32,17 @@ if( file_exists($root . $_POST['dir']) ) {
 		echo "<ul class=\"jqueryFileTree\" style=\"display: none;\">";
 		// All dirs
 		foreach( $files as $file ) {
-			if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && is_dir($root . $_POST['dir'] . $file) ) {
-				echo "<li class=\"directory collapsed\"><a href=\"#\" class=\"file\" rel=\"" . htmlentities($_POST['dir'] . $file) . "/\">" . htmlentities($file) . "</a></li>";
+		  $fullpath = $root . $_POST['dir'] . $file;
+			if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && is_dir($fullpath) ) {
+				echo "<li class=\"directory collapsed\"><a href=\"#\" class=\"file\" data-full-path=\"".$fullpath."\" rel=\"" . htmlentities($_POST['dir'] . $file) . "/\">" . htmlentities($file) . "</a></li>";
 			}
 		}
 		// All files
 		foreach( $files as $file ) {
-			if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && !is_dir($root . $_POST['dir'] . $file) ) {
+		  $fullpath = $root . $_POST['dir'] . $file;
+			if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && !is_dir($fullpath) ) {
 				$ext = preg_replace('/^.*\./', '', $file);
-				echo "<li class=\"file ext_$ext\"><a href=\"#\" class=\"file\" rel=\"" . htmlentities($_POST['dir'] . $file) . "\">" . htmlentities($file) . "</a></li>";
+				echo "<li class=\"file ext_$ext\"><a href=\"#\" class=\"file\" data-full-path=\"".$fullpath."\" rel=\"" . htmlentities($_POST['dir'] . $file) . "\">" . htmlentities($file) . "</a></li>";
 			}
 		}
 		echo "</ul>";
