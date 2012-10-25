@@ -128,6 +128,7 @@ class FeedV implements ObjectViewInterface {
     $patient_name = '';
     $patient_sex = '';
     $patient_dob = '';
+    $patient_real_id = '';
     // requiered data information
     $data_id = explode(";", $model_id);
     $data_status = array_fill(0, count($data_id) -1, 0);
@@ -168,6 +169,7 @@ class FeedV implements ObjectViewInterface {
           $patientResult = $patientMapper->get();
           // if patient is there, get relevant information
           if(count($patientResult['Patient']) == 1){
+            $patient_real_id = $dataResult['Data'][0]->patient_id;
             $patient_name = $patientResult['Patient'][0]->name;
             $patient_dob = $patientResult['Patient'][0]->dob;
             $patient_sex = $patientResult['Patient'][0]->sex;
@@ -219,6 +221,10 @@ class FeedV implements ObjectViewInterface {
     $d -> replace('SCANAGE', $scan_age);
     $feed_details .= $d;
 
+    $d = new Template('feed_data_browser.html');
+    $d -> replace('FOLDER', $patient_id.'-'.$patient_real_id);
+    $feed_details .= $d;
+
     // add data information
     foreach ($data_name as $key => $value) {
       $d = new Template('feed_data.html');
@@ -233,7 +239,7 @@ class FeedV implements ObjectViewInterface {
       $d -> replace('PATIENT_ID', $patient_id);
       $d -> replace('NB_FILES', $data_nb_files[$key]);
       $d -> replace('FULL_ID', str_replace ('.', '_', $data_real_id[$key]));
-      $feed_details .= $d;
+      //$feed_details .= $d;
     }
 
     $t -> replace('FEED_DETAILS', $feed_details);

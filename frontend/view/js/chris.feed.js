@@ -3,6 +3,7 @@
  */
 var _FEED_ = _FEED_ || {};
 _FEED_.onclick = function(more, details) {
+  
   var hidden = details.is(':hidden');
   if (hidden) {
     more.html('<a>Hide details</a>');
@@ -17,7 +18,9 @@ _FEED_.onclick = function(more, details) {
   }
 }
 _FEED_.feed_more_onclick = function() {
+
   jQuery(document).on('click', '.feed_more', function(e) {
+
     // modify
     e.stopPropagation();
     var details = jQuery(this).closest('.feed').find('.feed_details');
@@ -25,7 +28,9 @@ _FEED_.feed_more_onclick = function() {
   });
 }
 _FEED_.feed_onclick = function() {
+
   jQuery(document).on('click', '.feed_header', function() {
+
     // modify
     // alert('Show details!');
     var more = jQuery(this).parent().find('.feed_more');
@@ -40,21 +45,25 @@ _FEED_.feed_onclick = function() {
  * '.feed', function() { jQuery(this).removeClass('feed_gradient'); }); }
  */
 _FEED_.updateFeedTimeout = function() {
+
   timer = setInterval(_FEED_.refresh, 5000);
 }
 _FEED_.refresh = function() {
+
   // look for new feeds
   _FEED_.ajaxUpdate();
   // update the time stamps
   _FEED_.updateTime();
 }
 _FEED_.ajaxUpdate = function() {
+
   // ajax call
   jQuery.ajax({
-    type : "POST",
-    url : "controller/feed_update.php",
-    dataType : "json",
-    success : function(data) {
+    type: "POST",
+    url: "controller/feed_update.php",
+    dataType: "json",
+    success: function(data) {
+
       var length_done = data['done']['id'].length;
       if (length_done > 0) {
         var i = length_done - 1;
@@ -70,8 +79,8 @@ _FEED_.ajaxUpdate = function() {
           _FEED_.cachedFeeds[0].unshift(data['done']['id'][i]);
           _FEED_.cachedFeeds[1].unshift(data['done']['content'][i]);
           // delete related feeds in progress
-          var element = jQuery('#' + data['done']['id'][i]
-              + '_feed_progress-feed');
+          var element = jQuery('#' + data['done']['id'][i] +
+              '_feed_progress-feed');
           if (element.length) {
             element.hide('blind', 100);
           }
@@ -88,8 +97,8 @@ _FEED_.ajaxUpdate = function() {
       if (length_progress) {
         for ( var i = 0; i < length_progress; i++) {
           // if element is there!
-          var element = jQuery('#' + data['progress']['id'][i]
-              + '_feed_progress-feed');
+          var element = jQuery('#' + data['progress']['id'][i] +
+              '_feed_progress-feed');
           if (element.length) {
             // get %
             var test = data['progress']['content'][i].split("");
@@ -100,16 +109,16 @@ _FEED_.ajaxUpdate = function() {
               if (test[j] == 0) {
                 count++;
                 // show icons for visible elements
-                var string = '#' + data['progress']['id'][i]
-                    + '_feed_progress-feed .details .data';
+                var string = '#' + data['progress']['id'][i] +
+                    '_feed_progress-feed .details .data';
                 var elt = jQuery(string).eq(j).find("span").eq(1);
                 elt.show();
               }
             }
             var percent = Math.round(count / newlength * 100);
             // update percent
-            var _current_feed = jQuery('#' + data['progress']['id'][i]
-                + '_feed_progress-feed');
+            var _current_feed = jQuery('#' + data['progress']['id'][i] +
+                '_feed_progress-feed');
             _current_feed.find('.feed_status').html(
                 'Status: <font color="red">' + percent + '%</font>');
             // Do something
@@ -120,12 +129,14 @@ _FEED_.ajaxUpdate = function() {
   });
 }
 _FEED_.updateTime = function() {
+
   var currentTime = new Date();
   var m = 60 * 1000;
   var h = m * 60;
   var d = h * 24;
   jQuery('.feed_time').each(
       function() {
+
         var dateArray = jQuery(this).attr('id').split('_');
         var feedTime = new Date(dateArray[0], dateArray[1] - 1, dateArray[2],
             dateArray[3], dateArray[4], dateArray[5]);
@@ -145,14 +156,17 @@ _FEED_.updateTime = function() {
       });
 }
 _FEED_.update_onclick = function() {
+
   jQuery(".feed_update").on(
       'click',
       function() {
+
         // update the feeds
         // console.log(_FEED_.cachedFeeds);
         // return;
         jQuery(_FEED_.cachedFeeds[1].join("")).hide()
             .prependTo('.feed_content').slideDown("fast", function() {
+
               // Animation complete.
               _FEED_.cachedFeeds[0] = [];
               _FEED_.cachedFeeds[1] = [];
@@ -163,10 +177,12 @@ _FEED_.update_onclick = function() {
       });
 }
 _FEED_.setupPreview = function() {
+
   jQuery(document).on(
       'click',
       '.feed_preview',
       function(e) {
+
         e.stopPropagation();
         var full_id = jQuery(this).attr('id');
         var id = full_id.substring(0, full_id.length - 6);
@@ -181,10 +197,12 @@ _FEED_.setupPreview = function() {
       });
 }
 _FEED_.setupSelect = function() {
+
   jQuery(document).on(
       'click',
       '.feed_select',
       function(e) {
+
         e.stopPropagation();
         var full_id = jQuery(this).attr('id');
         var id = full_id.substring(0, full_id.length - 6);
@@ -196,7 +214,9 @@ _FEED_.setupSelect = function() {
       });
 }
 _FEED_.setupLocation = function() {
+
   jQuery(".feed_location").on('mouseenter', function(e) {
+
     /*
      * e.stopPropagation(); var full_id = jQuery(this).attr('id'); var id =
      * full_id.substring(0, full_id.length - 6).replace(/\_/g, "."); // ajax
@@ -208,6 +228,7 @@ _FEED_.setupLocation = function() {
      */
   });
   jQuery(".feed_location").on('mouseleaves', function(e) {
+
     /*
      * e.stopPropagation(); var full_id = jQuery(this).attr('id'); var id =
      * full_id.substring(0, full_id.length - 6).replace(/\_/g, "."); var text_id =
@@ -216,10 +237,21 @@ _FEED_.setupLocation = function() {
      */
   });
 }
+_FEED_.activateDraggable = function() {
+
+  // setup draggable items for all file browser elements
+  jQuery(".jqueryFileTree li a").draggable({
+    handle: ".feed_move",
+    helper: "clone",
+    appendTo: "body"
+  });
+  
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
 jQuery(document).ready(function() {
+
   // feed functions
   _FEED_.cachedFeeds = new Array();
   _FEED_.cachedFeeds.push(new Array());
@@ -236,10 +268,25 @@ jQuery(document).ready(function() {
   _FEED_.setupSelect();
   _FEED_.setupLocation();
   
-  // setup draggable item
-  jQuery(".feed .feed_details .data").draggable({
-    handle : ".feed_move",
-    helper : "clone",
-    appendTo: "body"
+  // create file browsers
+  jQuery('.file_browser').each(function(i,d) {
+    
+    var _container = jQuery(d);
+    var _folder = _container.attr('data-folder');
+
+    abcef = _container;
+    
+    // now really create the browser
+    _container.fileTree({
+      // TODO should somehow get the CONFIG value for the data folder
+      root: _folder,
+      script: 'controller/feed.browser.connector.php'
+    }, function(file) {
+
+      alert(file);
+    });
+    
   });
+    
+  
 });
