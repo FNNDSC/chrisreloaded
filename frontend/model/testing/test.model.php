@@ -43,25 +43,16 @@ SimpleTest_Chris::setPreference();
 // include all the tests
 // data related models
 require_once ('test.data.model.php');
-require_once ('test.data_project.model.php');
-// group related models
-require_once ('test.group.model.php');
-require_once ('test.group_data.model.php');
-require_once ('test.group_project.model.php');
-require_once ('test.group_result.model.php');
-// result related models
-require_once ('test.result.model.php');
-require_once ('test.result_data.model.php');
-require_once ('test.result_project.model.php');
+require_once ('test.data_patient.model.php');
 // user related models
 require_once ('test.user.model.php');
 require_once ('test.user_data.model.php');
-require_once ('test.user_group.model.php');
-require_once ('test.user_project.model.php');
-require_once ('test.user_result.model.php');
-//other models
-require_once ('test.patient.model.php');
-require_once ('test.project.model.php');
+// feed related projects
 require_once ('test.feed.model.php');
+require_once ('test.feed_data.model.php');
+//other models
+require_once ('test.meta.model.php');
+require_once ('test.patient.model.php');
+
 
 ?>

@@ -27,41 +27,32 @@
  */
 
 // prevent direct calls
-if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
 // grab the super class for all entities
 require_once 'object.model.php';
 
-
 /**
  *
- * The Result class which describes the Result entity of the database.
+ * The Data_Patient class which describes the Data_Patient entity of the database.
  *
  */
-class Result extends Object {
+class Data_Patient extends Object {
 
   /**
-   * The plugin of this result.
+   * The data unique ID.
+   * We use it to make sure data we will add to the database doesn't already exists.
    *
-   * @var string $plugin
+   * @var int $data_id
    */
-  public $plugin = null;
-  
+  public $data_id = -1;
+
   /**
-   * The status of this result
-   * success, failure, progress:50, progress:70
+   * The patient unique ID.
    *
-   * @var string $status
+   * @var int $patient_id
    */
-  public $status = null;
-  
-  /**
-   * The extra information about this result.
-   * Parameters values, duration
-   *
-   * @var string $meta_information
-   */
-  public $meta_information = null;
+  public $patient_id = -1;
 }
-
 ?>

@@ -26,33 +26,28 @@
  *
  */
 
-// prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  die('Invalid access.');
+// we define a valid entry point
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
-// grab the super class for all entities
-require_once 'object.model.php';
+//define('CHRIS_CONFIG_DEBUG',true);
 
-/**
- *
- * The Result_Project class which describes the Result_Project entity of the database.
- *
- */
-class Result_Project extends Object {
+// include the configuration
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(dirname(__FILE__))).'/config.inc.php');
 
-  /**
-   * The result id
-   *
-   * @var int $result_id
-   */
-  public $result_id = -1;
-  
-  /**
-   * The project id
-   *
-   * @var int $project_id
-   */
-  public $project_id = -1;
+// include the simpletest chris framework
+require_once (SIMPLETEST_CHRIS);
+SimpleTest_Chris::setPreference();
+
+// include the test object class since we derive from that
+require_once('test.object.model.php');
+
+// include the meta class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
+
+class TestMeta extends TestObjectModel {
+
 
 }
+
 ?>

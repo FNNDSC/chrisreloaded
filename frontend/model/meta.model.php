@@ -26,28 +26,62 @@
  *
  */
 
-// we define a valid entry point
-if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+// prevent direct calls
+if (!defined('__CHRIS_ENTRY_POINT__'))
+  die('Invalid access.');
 
-//define('CHRIS_CONFIG_DEBUG',true);
+// grab the super class for all entities
+require_once 'object.model.php';
 
-// include the configuration
-if(!defined('CHRIS_CONFIG_PARSED'))
-  require_once(dirname(dirname(dirname(__FILE__))).'/config.inc.php');
+/**
+ *
+ * The Meta class which describes the Meta entity of the database.
+ *
+ */
+class Meta extends Object {
 
-// include the simpletest chris framework
-require_once (SIMPLETEST_CHRIS);
-SimpleTest_Chris::setPreference();
+  /**
+   * The name of the metadata.
+   *
+   * @var string $name
+   */
+  public $name = '';
 
-// include the test object class since we derive from that
-require_once('test.object.model.php');
+  /**
+   * The value of the metadata.
+   *
+   * @var string $value
+   */
+  public $value = '';
 
-// include the user_result class
-require_once(joinPaths(CHRIS_MODEL_FOLDER, 'user_result.model.php'));
+  /**
+   * The type of the metadata.
+   * simple, advanced, input, etc.
+   *
+   * @var string $type
+   */
+  public $type = '';
 
-class TestUser_ResultModel extends TestObjectModel {
-
-
+  /**
+   * The group of the metadata.
+   * patient, image, plugin, project, etc
+   *
+   * @var string $group
+   */
+  public $group = '';
+  
+  /**
+   * The target id of the metadata.
+   *
+   * @var int $target_id
+   */
+  public $target_id = -1;
+  
+  /**
+   * The target type of the metadata.
+   *
+   * @var string $target_type
+   */
+  public $target_type = '';
 }
-
 ?>

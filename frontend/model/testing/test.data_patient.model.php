@@ -26,32 +26,28 @@
  *
  */
 
-// prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  die('Invalid access.');
+// we define a valid entry point
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
-// grab the super class for all entities
-require_once 'object.model.php';
+//define('CHRIS_CONFIG_DEBUG',true);
 
-/**
- *
- * The Group_Data class which describes the Group_Data entity of the database.
- *
- */
-class Group_Data extends Object {
+// include the configuration
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(dirname(__FILE__))).'/config.inc.php');
 
-  /**
-   * The group ID.
-   *
-   * @var int $group_id
-   */
-  public $group_id = -1;
-  
-  /**
-   * The data ID.
-   *
-   * @var int $data_id
-   */
-  public $data_id = -1;
+// include the simpletest chris framework
+require_once (SIMPLETEST_CHRIS);
+SimpleTest_Chris::setPreference();
+
+// include the test object class since we derive from that
+require_once('test.object.model.php');
+
+// include the data_patient class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
+
+class TestData_PatientModel extends TestObjectModel {
+
+
 }
+
 ?>

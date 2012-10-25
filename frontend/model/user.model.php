@@ -60,13 +60,5 @@ class User extends Object {
    * @var string $email
    */
   public $email = null;
-  
-  /**
-   * Extra information about the user.
-   * background, privacy settings, etc.
-   *
-   * @var string $meta_information
-   */
-  public $meta_information = null;
 }
 ?>

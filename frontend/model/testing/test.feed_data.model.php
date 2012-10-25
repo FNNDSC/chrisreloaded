@@ -42,10 +42,10 @@ SimpleTest_Chris::setPreference();
 // include the test object class since we derive from that
 require_once('test.object.model.php');
 
-// include the group_data class
-require_once(joinPaths(CHRIS_MODEL_FOLDER, 'group_data.model.php'));
+// include the feed_data class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
 
-class TestGroup_DataModel extends TestObjectModel {
+class TestFeed_DataModel extends TestObjectModel {
 
 
 }
