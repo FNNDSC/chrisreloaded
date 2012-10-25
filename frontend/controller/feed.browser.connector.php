@@ -22,6 +22,8 @@ define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration
 require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
+
 $_POST['dir'] = urldecode($_POST['dir']);
 $root = CHRIS_DATA;
 
@@ -34,7 +36,14 @@ if( file_exists($root . $_POST['dir']) ) {
 		foreach( $files as $file ) {
 		  $fullpath = $root . $_POST['dir'] . $file;
 			if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && is_dir($fullpath) ) {
-				echo "<li class=\"directory collapsed\"><a href=\"#\" class=\"file\" data-full-path=\"".$fullpath."\" rel=\"" . htmlentities($_POST['dir'] . $file) . "/\">" . htmlentities($file) . "</a></li>";
+
+			  $t = new Template('feed_data_browser_item.html');
+			  $t->replace('CLASSES', 'directory collapsed');
+			  $t->replace('FULLPATH', $fullpath);
+			  $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file . '/'));
+			  $t->replace('FILENAME', htmlentities($file));
+			  echo $t;
+
 			}
 		}
 		// All files
@@ -42,7 +51,14 @@ if( file_exists($root . $_POST['dir']) ) {
 		  $fullpath = $root . $_POST['dir'] . $file;
 			if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && !is_dir($fullpath) ) {
 				$ext = preg_replace('/^.*\./', '', $file);
-				echo "<li class=\"file ext_$ext\"><a href=\"#\" class=\"file\" data-full-path=\"".$fullpath."\" rel=\"" . htmlentities($_POST['dir'] . $file) . "\">" . htmlentities($file) . "</a></li>";
+
+				$t = new Template('feed_data_browser_item.html');
+				$t->replace('CLASSES', 'file ext_'.$ext);
+				$t->replace('FULLPATH', $fullpath);
+				$t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file));
+				$t->replace('FILENAME', htmlentities($file));
+				echo $t;
+
 			}
 		}
 		echo "</ul>";
