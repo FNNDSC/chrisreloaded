@@ -41,8 +41,8 @@ class Plugin( argparse.ArgumentParser ):
     '''
     super( Plugin, self ).__init__( description=Plugin.DESCRIPTION )
     self.add_argument( '--xml', action='store_true', dest='xml', default=False, help='show xml description of parameters (default: FALSE)' )
-    self.add_argument( '--icon', action='store_true', dest='icon', default=False, help='show the description of this plugin (default: FALSE)' )
-    self.add_argument( '--description', action='store_true', dest='description', default=False, help='show the icon path of this plugin (default: FALSE)' )
+    self.add_argument( '--pre', action='store_true', dest='pre', default=False, help='perform pre processing (default: FALSE)' )
+    self.add_argument( '--post', action='store_true', dest='post', default=False, help='perform post processing (default: FALSE)' )
 
     # the custom parameter list
     self.__parameters = []
@@ -94,6 +94,20 @@ class Plugin( argparse.ArgumentParser ):
     '''
     print( 'No action defined!' )
 
+  def pre( self, options ):
+    '''
+    Execute preprocessing code for this plugin. Access to all
+    passed options is available.
+    '''
+    print( 'No action defined!' )
+
+  def post( self, options ):
+    '''
+    Execute postprocessing code for this plugin. Access to all
+    passed options is available.
+    '''
+    print( 'No action defined!' )
+
   def add_parameter( self, type, *args, **kwargs ):
     '''
     Add a parameter to this plugin. The type let's the
@@ -122,6 +136,10 @@ class Plugin( argparse.ArgumentParser ):
     if ( options.xml ):
       # print the xml
       print( self.xml() )
+    elif ( options.pre ):
+      self.pre( options )
+    elif ( options.post ):
+      self.post( options )
     else:
       # run the plugin
       self.run( options )
