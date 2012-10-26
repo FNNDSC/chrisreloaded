@@ -36,7 +36,7 @@ require_once(dirname(__FILE__).'/controller/_util.inc.php');
 define('SQL_HOST', 'chris');
 define('SQL_USERNAME', 'chris');
 define('SQL_PASSWORD', 'YOURPASSWORD');
-define('SQL_DATABASE', 'chrisdev_old');
+define('SQL_DATABASE', 'chrisdev');
 
 // PATH configuration
 define('CHRIS_WWWROOT', dirname(__FILE__));

@@ -63,12 +63,12 @@ class Meta extends Object {
   public $type = '';
 
   /**
-   * The group of the metadata.
+   * The class of the metadata.
    * patient, image, plugin, project, etc
    *
-   * @var string $group
+   * @var string $class
    */
-  public $group = '';
+  public $class = '';
   
   /**
    * The target id of the metadata.

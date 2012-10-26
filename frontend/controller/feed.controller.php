@@ -38,8 +38,12 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs.class.php'));
 // include the models
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 
 // interface
 interface FeedControllerInterface
@@ -51,7 +55,7 @@ interface FeedControllerInterface
   // update feeds which contain given data_id
   static public function updateDB(&$object, $data_id);
   // create a feed given a user id, an action and the related details
-  static public function create($user, $action, $details);
+  static public function create($user, $plugin);
 }
 
 /**
@@ -156,20 +160,59 @@ class FeedC implements FeedControllerInterface {
    * @param string $action feed action to be created
    * @param string $details details of the feed action to be created
    */
-  static public function create($user, $action, $details){
+
+  static public function addMeta($feed_id, $meta){
+    // parse metadata and update db
+    foreach($meta as $values){
+      $metaObject = new Meta();
+      foreach($values as $key => $value){
+        $metaObject->$key = $value;
+      }
+      $metaObject->target_id = $feed_id;
+      $metaObject->target_type = 'feed';
+
+      $meta_id = Mapper::add($metaObject);
+    }
+  }
+
+  static public function create($user, $plugin){
     // get user id from name or user_id
-    $user_id = FeedC::_GetUserID($user);
+    //$user_id = FeedC::_GetUserID($user);
+
+    // create feed and add it to db
+    $feedObject = new Feed();
+    $feedObject->user_id = $user;
+    //$feedObject->action = $meta;
+    $feedObject->plugin = $plugin;
+    $feedObject->time = date("Y-m-d H:i:s");
+    return Mapper::add($feedObject);
+    // new data
+    /*     $dataObject = new Data();
+    $dataObject->plugin = $plugin;
+    $dataObject->time = date("Y-m-d H:i:s");
+    $data_id = Mapper::add($dataObject); */
+
+    // new link - feed<->data
+
+    // new link - patient<->data
+
+    // new link - user<->data
+
+    // if plugin == pacs_pull, special action
+    // create additional datasets
+
+    // if plugin == drag and drop, check param to create add datasets
 
     // create feed depending on the actions
-    switch($action){
-      case "data-down-mrn":
-        FeedC::_createDataDownMRN($user_id, $details);
-        return $action." sucessfully created";
-        break;
-      default:
-        return "Cannot create feed from unknown action";
-        break;
-    }
+    /*     switch($action){
+    case "data-down-mrn":
+    FeedC::_createDataDownMRN($user_id, $details);
+    return $action." sucessfully created";
+    break;
+    default:
+    return "Cannot create feed from unknown action";
+    break;
+    } */
   }
 
 

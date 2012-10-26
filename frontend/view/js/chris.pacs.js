@@ -2,42 +2,33 @@
  * Define the _PACS_ namespace
  */
 var _PACS_ = _PACS_ || {};
-_PACS_.pull_focus = function() {
-  jQuery('#pacs_pull_mrns').focus(function() {
-    jQuery(this).animate({
-      height : '80px'
-    }, 200);
-    jQuery('#pacs_pull_ui').show();
-  });
-}
-_PACS_.pull_blur = function() {
-  jQuery('#pacs_pull_mrns').blur(function() {
-    if (jQuery('#pacs_pull_mrns').val() == '') {
-      jQuery('#pacs_pull_mrns').animate({
-        height : '19px'
-      }, 200);
-      jQuery('#pacs_pull_ui').hide();
-    }
-  });
-}
+
 _PACS_.pull_click = function() {
   jQuery("#pacs_pull").click(function(event) {
     // if not already querying the pacs
     if (!jQuery("#pacs_pull_mrns").prop("readonly")) {
       var mrn_list = jQuery('#pacs_pull_mrns').val();
+      var meta=new Object();
+      meta.name="MRN";
+      meta.value=mrn_list;
+      meta.type="simple";
+      meta.target_type="feed";
+      
+      var metas = new Array();
+      metas[0] = meta;
       // create feed
       // get all datas unique id to fill the feed
       jQuery.ajax({
         type : "POST",
-        url : "controller/feed_create.php",
+        url : "controller/go.php",
         dataType : "text",
         data : {
-          FEED_USER : 'Nicolas',
-          FEED_ACTION : 'data-down-mrn',
-          FEED_DETAILS : mrn_list
+          FEED_USER : '1',
+          FEED_PLUGIN : 'pacs_pull',
+          FEED_META : metas
         },
         success : function(data) {
-          jQuery.ajax({
+/*          jQuery.ajax({
             type : "POST",
             url : "controller/pacs_move.php",
             dataType : "json",
@@ -54,14 +45,10 @@ _PACS_.pull_click = function() {
               PACS_STU_DES : '',
               PACS_ACC_NUM : ''
             }
-          });
+          });*/
         }
       });
       jQuery('#pacs_pull_mrns').val('');
-      jQuery('#pacs_pull_mrns').animate({
-        height : '19px'
-      }, 200);
-      jQuery('#pacs_pull_ui').hide();
     }
   });
 }
@@ -70,6 +57,4 @@ _PACS_.pull_click = function() {
  */
 jQuery(document).ready(function() {
   _PACS_.pull_click();
-  _PACS_.pull_focus();
-  _PACS_.pull_blur();
 });

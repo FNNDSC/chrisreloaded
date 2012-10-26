@@ -37,12 +37,16 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 
 // include the models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 
 // interface
 interface DataControllerInterface
 {
   // get the relative location of the data on the filesyten, given its series uid.
   static public function getLocation($series_uid);
+
+  static public function create($user);
+  static public function addUser($data_id, $user_id);
 }
 
 /**
@@ -106,6 +110,20 @@ class DataC implements DataControllerInterface {
     }
 
     return $patient_entry.'/'.$data_entry;
+  }
+
+  static public function create($plugin){
+    $dataObject = new Data();
+    $dataObject->plugin = $plugin;
+    $dataObject->time = date("Y-m-d H:i:s");
+    return Mapper::add($dataObject);
+  }
+
+  static public function addUser($data_id, $user_id){
+    $user_dataObject = new User_Data();
+    $user_dataObject->user_id = $user_id;
+    $user_dataObject->data_id = $data_id;
+    Mapper::add($user_dataObject);
   }
 }
 ?>

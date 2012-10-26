@@ -32,10 +32,36 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
 // include the controller
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
-// include the view
-require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 
 // Create a feed given a user id, an action and details about the action.
-FeedC::create($_POST['FEED_USER'], $_POST['FEED_ACTION'], $_POST['FEED_DETAILS']);
-echo "";
+// metadata instead of param?
+$feed_id = FeedC::create($_POST['FEED_USER'], $_POST['FEED_PLUGIN']);
+FeedC::addMeta($feed_id, $_POST['FEED_META']);
+
+// plugin might be duplicate - to be investigated....
+$data_id = DataC::create($_POST['FEED_PLUGIN']);
+DataC::addUser($data_id, $_POST['FEED_USER']);
+//DataC::addMeta() ??
+
+//PluginC::run($feed_id, $data_id);
+// implement here for now....
+// metadata is one line, passed as arguments for preprocess, run, postprocess
+$arguments = '';
+$arguments .= ' --user '.$_POST['FEED_USER'];
+foreach($_POST['FEED_META'] as $key => $value){
+  $arguments .= ' --'.$key.' '.$value;
+}
+
+// blocking process
+// run()
+// plugin . $args
+
+// status 100% for the feed!
+
+// reminder: in feed_update, special case to handle interactive plugins
+// should be flexible (chiran)
+// special php view
+// special js things
 ?>
