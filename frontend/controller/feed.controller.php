@@ -190,7 +190,6 @@ class FeedC implements FeedControllerInterface {
     // create feed and add it to db
     $feedObject = new Feed();
     $feedObject->user_id = $user;
-    //$feedObject->action = $meta;
     $feedObject->plugin = $plugin;
     $feedObject->time = date("Y-m-d H:i:s");
     return Mapper::add($feedObject);

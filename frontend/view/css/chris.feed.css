@@ -43,6 +43,7 @@
 .feed_header {
 	cursor: pointer;
 	min-height: 50px;
+	background: lightgreen;
 }
 
 .feed_header_line_one {
@@ -93,7 +94,9 @@
 	overflow: auto;
 	display: none;
 	position: relative;
-/* 	margin-left: 50px; */
+	background: lightblue;
+	clear:both;
+	/* 	margin-left: 50px; */
 }
 
 .feed_data_name {
@@ -110,7 +113,7 @@
 }
 
 .feed>.feed_details>.data_patient {
-  background: white;
+	background: white;
 }
 
 /*  need hierarchy */
@@ -127,5 +130,5 @@
 }
 
 .feed_move {
-  cursor: move;
+	cursor: move;
 }

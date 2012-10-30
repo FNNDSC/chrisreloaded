@@ -59,5 +59,5 @@ foreach($_POST['FEED_META'] as $key => $value){
 // plugin . $args
 
 // status 100% for the feed!
-FeedC::setStatus($feed_id, 100);
+//FeedC::setStatus($feed_id, 100);
 ?>

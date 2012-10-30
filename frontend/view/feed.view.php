@@ -60,17 +60,38 @@ class FeedV implements ObjectViewInterface {
     $username = FeedV::_getUsername($object->user_id);
     // Format time
     $time = FeedV::_getTime($object->time);
+    // Format simple metadata
+    $metasMapper= new Mapper('Meta');
+    $metasMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
+    $metasResults = $metasMapper->get();
+    $meta_simple = '';
+    
+    foreach($metasResults['Meta'] as $key => $value){
+      $meta_simple .= ' <b>'.$value->name.' :</b> '.$value->value;
+    }
+    // Format advanced metadata
+    $metaaMapper= new Mapper('Meta');
+    $metaaMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
+    $metaaResults = $metaaMapper->get();
+    $meta_advanced = '';
+    
+    foreach($metaaResults['Meta'] as $key => $value){
+      $meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
+    }
+    // Format meta-image input (file browser)
+    $meta_image='';
 
     $t = new Template('feed.html');
     //$t -> replace('ID', $id.'_'.$feed_status);
-    //$t -> replace('IMAGE_SRC', $feed_image);
-    //$t -> replace('USERNAME', $username);
-    //$t -> replace('WHAT', $feed_what_desc);
-    //$t -> replace('TIME_FORMATED', $time);
-    //$t -> replace('ACTION', $feed_action_desc);
-    //$t -> replace('MORE', 'Show details');
-    //$t -> replace('STATUS', $feed_status);
-    //$t -> replace('PROGRESS', '50');
+    $t -> replace('IMAGE_SRC', 'http://placehold.it/64x64');
+    $t -> replace('USERNAME', $username);
+    $t -> replace('META_SIMPLE', $meta_simple);
+    $t -> replace('META_ADVANCED', $meta_advanced);
+    $t -> replace('META_IMAGE', $meta_image);
+    $t -> replace('TIME_FORMATED', $time);
+    $t -> replace('PLUGIN', $object->plugin);
+    $t -> replace('MORE', 'Show details');
+    $t -> replace('STATUS', $object->status);
     return $t;
 
     /*     switch($object->action){
