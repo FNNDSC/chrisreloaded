@@ -59,9 +59,5 @@ foreach($_POST['FEED_META'] as $key => $value){
 // plugin . $args
 
 // status 100% for the feed!
-
-// reminder: in feed_update, special case to handle interactive plugins
-// should be flexible (chiran)
-// special php view
-// special js things
+FeedC::setStatus($feed_id, 100);
 ?>

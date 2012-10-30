@@ -67,5 +67,7 @@ class Feed extends Object {
    * @var string $time
    */
   public $time = '';
+  
+  public $status = 0;
 }
 ?>

@@ -61,19 +61,31 @@ class FeedV implements ObjectViewInterface {
     // Format time
     $time = FeedV::_getTime($object->time);
 
-    switch($object->action){
-      case "data-down":
-        return "Feeds not connected";
-        //return FeedV::_getHTMLDataDown($username, $object->id, $object->model_id, $time, $object->status);
-        break;
-      case "data-up":
-        break;
-      case "results":
-        break;
-      default:
-        return "Unknown feed action";
-        break;
-    }
+    $t = new Template('feed.html');
+    //$t -> replace('ID', $id.'_'.$feed_status);
+    //$t -> replace('IMAGE_SRC', $feed_image);
+    //$t -> replace('USERNAME', $username);
+    //$t -> replace('WHAT', $feed_what_desc);
+    //$t -> replace('TIME_FORMATED', $time);
+    //$t -> replace('ACTION', $feed_action_desc);
+    //$t -> replace('MORE', 'Show details');
+    //$t -> replace('STATUS', $feed_status);
+    //$t -> replace('PROGRESS', '50');
+    return $t;
+
+    /*     switch($object->action){
+     case "data-down":
+    return "Feeds not connected";
+    //return FeedV::_getHTMLDataDown($username, $object->id, $object->model_id, $time, $object->status);
+    break;
+    case "data-up":
+    break;
+    case "results":
+    break;
+    default:
+    return "Unknown feed action";
+    break;
+    } */
 
   }
 

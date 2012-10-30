@@ -33,7 +33,7 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
 
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs.class.php'));
+//require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs.class.php'));
 
 // include the models
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
@@ -140,7 +140,7 @@ class FeedC implements FeedControllerInterface {
 
     // get feeds to be updated
     $feedMapper = new Mapper('Feed');
-    $feedMapper->filter('status != (?)','done');
+    $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
     if(count($feedResult['Feed']) >= 1){
@@ -173,6 +173,14 @@ class FeedC implements FeedControllerInterface {
 
       $meta_id = Mapper::add($metaObject);
     }
+  }
+
+  static public function setStatus($feed_id, $status){
+
+    $feedResult = Mapper::getStatic('Feed', $feed_id);
+    $feedResult['Feed'][0]->status = $status;
+    Mapper::update($feedResult['Feed'][0], $feed_id);
+
   }
 
   static public function create($user, $plugin){
@@ -349,38 +357,7 @@ class FeedC implements FeedControllerInterface {
     }
   }
 
-  /**
-   * Convenience method to get information from the PACS for a give action.
-   * Access patient information without need to download data.
-   * Information such as "NumberOfSeriesRelatedInstances" are only accessible though PACS query.
-   *
-   * @param string $action action name
-   * @param string $details action details
-   * @return array
-   */
-  // get PACS information about this MRN for this action
-  static private function _queryPACS($action, &$details){
-    switch ($action){
-      case "data-down-mrn":
-        // details is mrn in this action
-        // get information from the PACS
-        $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
-        $study_parameter = Array();
-        $study_parameter['PatientID'] = $details;
-        $study_parameter['PatientName'] = '';
-        $study_parameter['PatientBirthDate'] = '';
-        $study_parameter['PatientSex'] = '';
-        $series_parameter = Array();
-        $series_parameter['SeriesDescription'] = '';
-        $series_parameter['NumberOfSeriesRelatedInstances'] = '';
-        return $pacs->queryAll($study_parameter, $series_parameter, null);
-        break;
-      default:
-        return "Cannot query pacs for unknown unknown action";
-        break;
-    }
 
-  }
 
 
   /**
