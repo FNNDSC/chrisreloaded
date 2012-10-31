@@ -55,12 +55,6 @@ _FEED_.feed_onclick = function() {
     _FEED_.onclick(details);
   });
 }
-/*
- * _FEED_.feed_mouseenter = function() { jQuery(document).on('mouseenter',
- * '.feed', function() { jQuery(this).addClass('feed_gradient'); }); }
- * _FEED_.feed_mouseleave = function() { jQuery(document).on('mouseleave',
- * '.feed', function() { jQuery(this).removeClass('feed_gradient'); }); }
- */
 _FEED_.updateFeedTimeout = function() {
   timer = setInterval(_FEED_.refresh, 5000);
 }
@@ -92,9 +86,10 @@ _FEED_.ajaxUpdate = function() {
           _FEED_.cachedFeeds[0].unshift(data['done']['id'][i]);
           _FEED_.cachedFeeds[1].unshift(data['done']['content'][i]);
           // delete related feeds in progress
-          var element = jQuery('#' + data['done']['id'][i]
-              + '_feed_progress-feed');
+          var element = jQuery('div[data-chris-feed_id='
+              + data['done']['id'][i] + ']');
           if (element.length) {
+            window.console.log('element found -- ');
             element.hide('blind', 100);
           }
           i--;
@@ -107,34 +102,17 @@ _FEED_.ajaxUpdate = function() {
         }
       }
       var length_progress = data['progress']['id'].length;
+      // window.console.log(length_progress);
       if (length_progress) {
         for ( var i = 0; i < length_progress; i++) {
           // if element is there!
-          var element = jQuery('#' + data['progress']['id'][i]
-              + '_feed_progress-feed');
+          var element = jQuery('div[data-chris-feed_id='
+              + data['progress']['id'][i] + ']');
           if (element.length) {
-            // get %
-            var test = data['progress']['content'][i].split("");
-            // get number of "0"
-            var newlength = test.length;
-            var count = 0;
-            for ( var j = 0; j < newlength; j++) {
-              if (test[j] == 0) {
-                count++;
-                // show icons for visible elements
-                var string = '#' + data['progress']['id'][i]
-                    + '_feed_progress-feed .details .data';
-                var elt = jQuery(string).eq(j).find("span").eq(1);
-                elt.show();
-              }
-            }
-            var percent = Math.round(count / newlength * 100);
-            // update percent
-            var _current_feed = jQuery('#' + data['progress']['id'][i]
-                + '_feed_progress-feed');
+            var _current_feed = jQuery('div[data-chris-feed_id='
+                + data['progress']['id'][i] + ']');
             _current_feed.find('.feed_status').html(
-                'Status: <font color="red">' + percent + '%</font>');
-            // Do something
+                'Status: ' + data['progress']['content'][i]);
           }
         }
       }
@@ -215,27 +193,6 @@ _FEED_.setupSelect = function() {
         _CART_.select(e.clientX, e.clientY);
       });
 }
-_FEED_.setupLocation = function() {
-  jQuery(".feed_location").on('mouseenter', function(e) {
-    /*
-     * e.stopPropagation(); var full_id = jQuery(this).attr('id'); var id =
-     * full_id.substring(0, full_id.length - 6).replace(/\_/g, "."); // ajax
-     * call jQuery.ajax({ type : "POST", url : "controller/data_location.php",
-     * dataType : "text", data : { DATA_SER_UID : id }, success : function(data) {
-     * if (data) { var text_id = full_id.substring(0, full_id.length - 6) +
-     * '-feedlt'; jQuery("#" + text_id).html(data.replace(/\\/g, ""));
-     * jQuery("#" + text_id).show(); // alert(data.replace(/\\/g, "")); } } });
-     */
-  });
-  jQuery(".feed_location").on('mouseleaves', function(e) {
-    /*
-     * e.stopPropagation(); var full_id = jQuery(this).attr('id'); var id =
-     * full_id.substring(0, full_id.length - 6).replace(/\_/g, "."); var text_id =
-     * full_id.substring(0, full_id.length - 6) + '-feedlt'; jQuery("#" +
-     * text_id).hide();
-     */
-  });
-}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -247,18 +204,8 @@ jQuery(document).ready(function() {
   _FEED_.feed_onclick();
   _FEED_.feed_more_onclick();
   _FEED_.update_onclick();
-  /*
-   * _FEED_.feed_mouseenter(); _FEED_.feed_mouseleave();
-   */
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
   _FEED_.setupPreview();
   _FEED_.setupSelect();
-  _FEED_.setupLocation();
-  // setup draggable item
-  jQuery(".feed .feed_details .data").draggable({
-    handle : ".feed_move",
-    helper : "clone",
-    appendTo : "body"
-  });
 });

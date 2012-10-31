@@ -40,6 +40,8 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 // create folder on file system
 $feed_id = FeedC::create($_POST['FEED_USER'], $_POST['FEED_PLUGIN']);
 FeedC::addMeta($feed_id, $_POST['FEED_META']);
+// feed location on filesystem
+//FeedC::addMeta($feed_id, $_POST['FEED_META']);
 
 // feed <-> data
 $data_id = DataC::create($_POST['FEED_PLUGIN']);

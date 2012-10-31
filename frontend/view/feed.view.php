@@ -101,7 +101,7 @@ class FeedV implements ObjectViewInterface {
 
     $t = new Template('feed.html');
     // set id
-    //$t -> replace('ID', $id.'_'.$feed_status);
+    $t -> replace('ID', $object->id);
     $gfx64 = 'plugins/'.$object->plugin.'/gfx64.png';
     if(!is_file(joinPaths(CHRIS_WWWROOT, $gfx64))){
       $gfx64 = 'http://placehold.it/64x64';
