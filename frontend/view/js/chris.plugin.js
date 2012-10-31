@@ -32,8 +32,9 @@ jQuery(document).ready(function() {
   jQuery('#pipelines').bind('slid', function() {
     // update UI
     var _new_plugin_id = jQuery(".carousel-inner").children('.active').attr('id');
-    // by hiding the old plugin
+    // by showing the new plugin
     jQuery('#panel_'+_new_plugin_id).show();
+    
   });  
   
   // setup droppable item
@@ -109,5 +110,8 @@ jQuery(document).ready(function() {
     alert('Job submitted!');
     
   });
+  
+  jQuery('.panelgroup').accordion({ heightStyle: "content", animate: false  });
+  jQuery('.parameter_spinner').spinner();
   
 });

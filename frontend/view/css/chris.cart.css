@@ -98,8 +98,25 @@
 	padding: 10px;
 }
 
+.panel_title {
+  font-size: 11px;
+}
+
 .parameter_panel {
 	
+}
+
+.parameter_title {
+	width: 80px;
+	position: absolute;
+	overflow-x: hidden;
+	font-weight: bold;
+}
+
+.parameter_title:hover {
+	overflow-x: visible;
+	background-color: whiteSmoke;
+	color: blue;
 }
 
 .parameter_row {
@@ -107,12 +124,13 @@
 	padding-right: 10px;
 	font-size: 11px;
 	height: 30px;
+	line-height: 2;
 }
 
 .parameter_dropzone {
 	border: dashed thin gray;
 	float: right;
-	width: 180px;
+	width: 160px;
 	text-align: center;
 	color: gray;
 	white-space: nowrap;
@@ -120,6 +138,17 @@
 	padding-left: 3px;
 	font-size: 10px;
 }
+
+.parameter_input {
+	margin-left: 80px;
+}
+
+.parameter_spinner {
+	width: 30px;
+	line-height: 10px;
+	float: right;
+}
+
 
 .parameter_dropzone_active {
 	background-color: #D9E7FE;
