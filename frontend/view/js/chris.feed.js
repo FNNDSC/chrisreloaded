@@ -160,39 +160,6 @@ _FEED_.update_onclick = function() {
         _FEED_.updateTime();
       });
 }
-_FEED_.setupPreview = function() {
-  jQuery(document).on(
-      'click',
-      '.feed_preview',
-      function(e) {
-        e.stopPropagation();
-        var full_id = jQuery(this).attr('id');
-        var id = full_id.substring(0, full_id.length - 6);
-        _DATA_.PreviewSeries = id.replace(/\_/g, ".");
-        _DATA_.PreviewNbFiles = '-1';
-        // get sth else
-        _DATA_.PreviewDesc = jQuery(this).closest('.data').find(
-            '.feed_data_name').html();
-        console.log(jQuery(this));
-        abcdef = jQuery(this);
-        _DATA_.startPreview();
-      });
-}
-_FEED_.setupSelect = function() {
-  jQuery(document).on(
-      'click',
-      '.feed_select',
-      function(e) {
-        e.stopPropagation();
-        var full_id = jQuery(this).attr('id');
-        var id = full_id.substring(0, full_id.length - 6);
-        _CART_.SelectSeries = id.replace(/\_/g, ".");
-        // get sth else
-        _CART_.SeriesDesc = jQuery(this).closest('.data').find(
-            '.feed_data_name').html();
-        _CART_.select(e.clientX, e.clientY);
-      });
-}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -206,6 +173,4 @@ jQuery(document).ready(function() {
   _FEED_.update_onclick();
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
-  _FEED_.setupPreview();
-  _FEED_.setupSelect();
 });
