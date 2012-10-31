@@ -37,13 +37,14 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 
 // Create a feed given a user id, an action and details about the action.
 // metadata instead of param?
+// create folder on file system
 $feed_id = FeedC::create($_POST['FEED_USER'], $_POST['FEED_PLUGIN']);
 FeedC::addMeta($feed_id, $_POST['FEED_META']);
 
-// plugin might be duplicate - to be investigated....
+// feed <-> data
 $data_id = DataC::create($_POST['FEED_PLUGIN']);
 DataC::addUser($data_id, $_POST['FEED_USER']);
-//DataC::addMeta() ??
+//DataC::addMeta() -> plugin level
 
 //PluginC::run($feed_id, $data_id);
 // implement here for now....

@@ -134,7 +134,7 @@ class FeedC implements FeedControllerInterface {
           break;
         }
         $feed_update_all['done']['id'][] = $value->id;
-        $feed_update_all['done']['content'][] = FeedV::getHTML($value);
+        $feed_update_all['done']['content'][] = (string)FeedV::getHTML($value);
       }
     }
 

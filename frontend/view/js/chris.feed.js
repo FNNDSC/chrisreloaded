@@ -2,17 +2,25 @@
  * Define the FEED namespace
  */
 var _FEED_ = _FEED_ || {};
-_FEED_.onclick = function(more, details) {
+_FEED_.onclick = function(details, more) {
+  // default value for 'force' is false
+  if (typeof more == 'undefined') {
+    more = false;
+  }
   var hidden = details.is(':hidden');
   if (hidden) {
-    more.html('<a>Hide details</a>');
-    more.closest('.feed').css('margin-top', '10px');
-    more.closest('.feed').css('margin-bottom', '11px');
+    if (more) {
+      more.html('<a>Hide details</a>');
+      more.closest('.feed').css('margin-top', '10px');
+      more.closest('.feed').css('margin-bottom', '11px');
+    }
     details.show('blind', 100);
   } else {
-    more.html('<a>Show details</a>');
-    more.closest('.feed').css('margin-top', '-1px');
-    more.closest('.feed').css('margin-bottom', '0px');
+    if (more) {
+      more.html('<a>Show details</a>');
+      more.closest('.feed').css('margin-top', '-1px');
+      more.closest('.feed').css('margin-bottom', '0px');
+    }
     details.hide('blind', 100);
   }
 }
@@ -21,16 +29,30 @@ _FEED_.feed_more_onclick = function() {
     // modify
     e.stopPropagation();
     var details = jQuery(this).closest('.feed').find('.feed_details');
-    _FEED_.onclick(jQuery(this), details);
+    _FEED_.onclick(details, jQuery(this));
   });
 }
 _FEED_.feed_onclick = function() {
   jQuery(document).on('click', '.feed_header', function() {
-    // modify
-    // alert('Show details!');
     var more = jQuery(this).parent().find('.feed_more');
     var details = jQuery(this).parent().find('.feed_details');
-    _FEED_.onclick(more, details);
+    _FEED_.onclick(details, more);
+  });
+  jQuery(document).on('click', '.feed_meta_header', function() {
+    var details = jQuery(this).parent().find('.feed_meta_content');
+    _FEED_.onclick(details);
+  });
+  jQuery(document).on('click', '.data_meta_header', function() {
+    var details = jQuery(this).parent().find('.data_meta_content');
+    _FEED_.onclick(details);
+  });
+  jQuery(document).on('click', '.html_header', function() {
+    var details = jQuery(this).parent().find('.html_viewer');
+    _FEED_.onclick(details);
+  });
+  jQuery(document).on('click', '.data_browser_header', function() {
+    var details = jQuery(this).parent().find('.data_browser');
+    _FEED_.onclick(details);
   });
 }
 /*
@@ -148,9 +170,7 @@ _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
       'click',
       function() {
-        // update the feeds
-        // console.log(_FEED_.cachedFeeds);
-        // return;
+        window.scrollTo(0, 0);
         jQuery(_FEED_.cachedFeeds[1].join("")).hide()
             .prependTo('.feed_content').slideDown("fast", function() {
               // Animation complete.
@@ -235,11 +255,10 @@ jQuery(document).ready(function() {
   _FEED_.setupPreview();
   _FEED_.setupSelect();
   _FEED_.setupLocation();
-  
   // setup draggable item
   jQuery(".feed .feed_details .data").draggable({
     handle : ".feed_move",
     helper : "clone",
-    appendTo: "body"
+    appendTo : "body"
   });
 });

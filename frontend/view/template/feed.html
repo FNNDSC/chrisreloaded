@@ -1,6 +1,6 @@
 <div id="${ID}-feed" class="feed ${STATUS}">
  <div class='feed_header'>
-  <span class='feed_icon'> <img src=${IMAGE_SRC}
+  <span class='feed_icon'> <img src="${IMAGE_SRC}"
    class="img-rounded">
   </span>
   <div class='feed_header_line_one'>
@@ -11,9 +11,25 @@
     time ago..</span>
   </div>
   <div class='feed_header_line_two'>
-   <span class='feed_message'>${META_SIMPLE}</span> <span
+   <span class='feed_message'>${FEED_META_SIMPLE}</span> <span
     class='feed_more feed_header_small'><a>${MORE}</a></span>
   </div>
  </div>
- <div class='feed_details'>${FEED_DETAILS}</div>
+ <div class='feed_details'>
+  <div class="feed_meta">
+   <div class="feed_meta_header">Feed Meta information</div>
+   <div class="feed_meta_content">${FEED_META_CONTENT}</div>
+  </div>
+
+  <div class="feed_data">
+   <div class="data_meta_header">Data Meta Information</div>
+   <div class="data_meta_content">${DATA_META_CONTENT}</div>
+   <div class="data_browser_header">Data Browser</div>
+   <div class="data_browser">${DATA_BROWSER}</div>
+  </div>
+  <div class="feed_html">
+   <div class="html_header">HTML Viewer</div>
+   <div class="html_viewer">${HTML_VIEWER}</div>
+  </div>
+ </div>
 </div>
