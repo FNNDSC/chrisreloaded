@@ -124,9 +124,9 @@ _FEED_.updateTime = function() {
   var m = 60 * 1000;
   var h = m * 60;
   var d = h * 24;
-  jQuery('.feed_time').each(
+  jQuery('div[data-chris-feed_time]').each(
       function() {
-        var dateArray = jQuery(this).attr('id').split('_');
+        var dateArray = jQuery(this).attr('data-chris-feed_time').split('_');
         var feedTime = new Date(dateArray[0], dateArray[1] - 1, dateArray[2],
             dateArray[3], dateArray[4], dateArray[5]);
         var diff = currentTime.getTime() - feedTime.getTime();
@@ -135,12 +135,12 @@ _FEED_.updateTime = function() {
           var hour = Math.floor((diff % d) / h);
           if (hour == 0) {
             var min = Math.floor(((diff % d) % h) / m);
-            jQuery(this).html(min + ' minutes ago');
+            jQuery(this).find('.feed_time').html(min + ' minutes ago');
           } else {
-            jQuery(this).html(hour + ' hours ago');
+            jQuery(this).find('.feed_time').html(hour + ' hours ago');
           }
         } else {
-          jQuery(this).html(day + ' days ago');
+          jQuery(this).find('.feed_time').html(day + ' days ago');
         }
       });
 }

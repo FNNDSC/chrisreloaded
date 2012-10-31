@@ -61,56 +61,55 @@ class FeedV implements ObjectViewInterface {
     // Format time
     $time = FeedV::_getTime($object->time);
     // Format simple meta feed
-    $metasMapper= new Mapper('Meta');
-    $metasMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
-    $metasResults = $metasMapper->get();
-    $meta_simple = '';
+    $feedMetaSimpleMapper= new Mapper('Meta');
+    $feedMetaSimpleMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
+    $feedMetaSimpleResults = $feedMetaSimpleMapper->get();
+    $feed_meta_simple = '';
 
-    foreach($metasResults['Meta'] as $key => $value){
-      $meta_simple .= ' <b>'.$value->name.' :</b> '.$value->value;
+    foreach($feedMetaSimpleResults['Meta'] as $key => $value){
+      $feed_meta_simple .= ' <b>'.$value->name.' :</b> '.$value->value;
     }
     // Format advanced meta feed
-    $metaaMapper= new Mapper('Meta');
-    $metaaMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
-    $metaaResults = $metaaMapper->get();
-    $meta_advanced = $meta_simple;
+    $feedMetaAdvancedMapper= new Mapper('Meta');
+    $feedMetaAdvancedMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
+    $feedMetaAdvancedResults = $feedMetaAdvancedMapper->get();
+    $feed_meta_advanced = $feed_meta_simple;
 
-    foreach($metaaResults['Meta'] as $key => $value){
-      $meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
+    foreach($feedMetaAdvancedResults['Meta'] as $key => $value){
+      $feed_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
     }
 
     // Format simple meta data
-    $datasMapper= new Mapper('Meta');
-    $datasMapper->ljoin('Data', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
-    $datasResults = $datasMapper->get();
-    $data_simple = '';
+    $dataMetaSimpleMapper= new Mapper('Meta');
+    $dataMetaSimpleMapper->ljoin('Data', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
+    $dataMetaSimpleResults = $dataMetaSimpleMapper->get();
+    $data_meta_simple = '';
 
-    foreach($datasResults['Meta'] as $key => $value){
-      $data_simple .= ' <b>'.$value->name.' :</b> '.$value->value;
+    foreach($dataMetaSimpleResults['Meta'] as $key => $value){
+      $data_meta_simple .= ' <b>'.$value->name.' :</b> '.$value->value;
     }
 
     // Format advanced meta data
-    $dataaMapper= new Mapper('Meta');
-    $dataaMapper->ljoin('Data', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
-    $dataaResults = $dataaMapper->get();
-    $data_advanced = $data_simple;
+    $dataMetaAdvancedMapper= new Mapper('Meta');
+    $dataMetaAdvancedMapper->ljoin('Data', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
+    $dataMetaAdvancedResults = $dataMetaAdvancedMapper->get();
+    $data_meta_advanced = $data_meta_simple;
 
-    foreach($dataaResults['Meta'] as $key => $value){
-      $data_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
+    foreach($dataMetaAdvancedResults['Meta'] as $key => $value){
+      $data_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
     }
 
     $t = new Template('feed.html');
-    // set id
     $t -> replace('ID', $object->id);
-    $gfx64 = 'plugins/'.$object->plugin.'/gfx64.png';
-    if(!is_file(joinPaths(CHRIS_WWWROOT, $gfx64))){
-      $gfx64 = 'http://placehold.it/64x64';
+    $feed_gfx64 = 'plugins/'.$object->plugin.'/gfx64.png';
+    if(!is_file(joinPaths(CHRIS_WWWROOT, $feed_gfx64))){
+      $feed_gfx64 = 'http://placehold.it/64x64';
     }
-    $t -> replace('IMAGE_SRC', $gfx64);
+    $t -> replace('IMAGE_SRC', $feed_gfx64);
     $t -> replace('USERNAME', $username);
-    $t -> replace('FEED_META_SIMPLE', $meta_simple);
-    $t -> replace('FEED_META_CONTENT', $meta_advanced);
-    $t -> replace('DATA_META_CONTENT', $data_advanced);
+    $t -> replace('FEED_META_SIMPLE', $feed_meta_simple);
+    $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
+    $t -> replace('DATA_META_CONTENT', $data_meta_advanced);
     $t -> replace('TIME_FORMATED', $time);
     $t -> replace('PLUGIN', $object->plugin);
     $t -> replace('MORE', 'Show details');
