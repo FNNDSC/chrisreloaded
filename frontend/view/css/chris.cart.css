@@ -109,12 +109,13 @@
 .parameter_title {
 	width: 80px;
 	position: absolute;
-	overflow-x: hidden;
+	overflow: hidden;
 	font-weight: bold;
+	white-space: nowrap;
 }
 
 .parameter_title:hover {
-	overflow-x: visible;
+	overflow: visible;
 	background-color: whiteSmoke;
 	color: blue;
 }
@@ -141,6 +142,7 @@
 
 .parameter_input {
 	margin-left: 80px;
+	float: right;
 }
 
 .parameter_spinner {
@@ -149,6 +151,11 @@
 	float: right;
 }
 
+.parameter_spinner_double {
+  width: 30px;
+  line-height: 10px;
+  float: right;
+}
 
 .parameter_dropzone_active {
 	background-color: #D9E7FE;

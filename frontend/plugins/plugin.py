@@ -88,7 +88,7 @@ class Plugin( argparse.ArgumentParser ):
 
         if p_type == Plugin.IMAGE:
           # this is an image
-          xml += '<image><name>' + parameter[0] + '</name></image>\n'
+          xml += '<image><label>' + parameter[0] + '</label></image>\n'
         elif p_type == Plugin.INTEGER:
           # an integer
           xml += '<integer><name>' + parameter[0] + '</name></integer>\n'

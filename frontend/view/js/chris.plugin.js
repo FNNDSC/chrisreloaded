@@ -113,5 +113,6 @@ jQuery(document).ready(function() {
   
   jQuery('.panelgroup').accordion({ heightStyle: "content", animate: false  });
   jQuery('.parameter_spinner').spinner();
+  jQuery('.parameter_spinner_double').spinner({ numberFormat: "n" });
   
 });

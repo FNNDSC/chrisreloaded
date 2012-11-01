@@ -1,0 +1,3 @@
+EXECUTABLE="ExecutionModelTour_exec"
+DIR=`dirname $0`
+export LD_LIBRARY_PATH=/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.1:/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.1/cli-modules:/chb/arch/Linux64/packages/Slicer4/current/lib/Teem-1.10.0 && $DIR/$EXECUTABLE "$@"

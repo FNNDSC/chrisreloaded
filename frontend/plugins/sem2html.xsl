@@ -29,16 +29,19 @@
     <span></span>
     <!-- All the different input parameters -->
     <xsl:apply-templates select="image"/>
+    <xsl:apply-templates select="file"/>
+    <xsl:apply-templates select="directory"/>
     <xsl:apply-templates select="integer"/>
+    <xsl:apply-templates select="double"/>
     </div>
   </xsl:template>
   
-  <!-- IMAGE parameter -->
-  <xsl:template match="image">
+  <!-- IMAGE/FILE parameter -->
+  <xsl:template match="image | file | directory">
     <div>
       <xsl:attribute name="class">parameter_row</xsl:attribute>
       <span class='parameter_title'>
-        <xsl:value-of select="name"/>
+        <xsl:value-of select="label"/>
       </span>
       <span class='parameter_input parameter_dropzone' data-default='Drag and drop here'> Drag and drop here</span>
     </div>
@@ -49,10 +52,22 @@
     <div>
       <xsl:attribute name="class">parameter_row</xsl:attribute>
       <span class='parameter_title'>
-        <xsl:value-of select="name"/>
+        <xsl:value-of select="label"/>
       </span>
       <span class='parameter_input'><input class='parameter_spinner'/></span>
     </div>
   </xsl:template>
+  
+  <!-- DOUBLE parameter -->
+  <xsl:template match="double">
+    <div>
+      <xsl:attribute name="class">parameter_row</xsl:attribute>
+      <span class='parameter_title'>
+        <xsl:value-of select="label"/>
+      </span>
+      <span class='parameter_input'><input class='parameter_spinner_double'/></span>
+    </div>
+  </xsl:template>
+    
     
 </xsl:stylesheet>
