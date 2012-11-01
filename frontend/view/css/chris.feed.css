@@ -138,6 +138,10 @@
 	cursor: pointer;
 }
 
+.feed>.feed_details>.feed_meta>.feed_meta_header:hover {
+	background: #B5E9FF;
+}
+
 .feed>.feed_details>.feed_meta>.feed_meta_content {
 	display: none;
 }
@@ -146,12 +150,20 @@
 	cursor: pointer;
 }
 
+.feed>.feed_details>.feed_data>.data_meta_header:hover {
+	background: #B5E9FF;
+}
+
 .feed>.feed_details>.feed_data>.data_meta_content {
 	display: none;
 }
 
 .feed>.feed_details>.feed_data>.data_browser_header {
 	cursor: pointer;
+}
+
+.feed>.feed_details>.feed_data>.data_browser_header:hover {
+	background: #B5E9FF;
 }
 
 .feed>.feed_details>.feed_data>.data_browser {

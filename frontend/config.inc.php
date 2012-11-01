@@ -56,6 +56,9 @@ define('CHRIS_AETITLE', 'FNNDSC-CHRISDEV');
 define('PACS_SERVER', '134.174.12.21');
 define('PACS_PORT', '104');
 
+// Cluster OS
+define('CHRIS_CLUSTER', 'mosix');
+
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
 define('SIMPLETEST_HTML_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/html_chris.php'));

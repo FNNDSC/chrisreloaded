@@ -41,26 +41,39 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 $feed_id = FeedC::create($_POST['FEED_USER'], $_POST['FEED_PLUGIN']);
 FeedC::addMeta($feed_id, $_POST['FEED_META']);
 // feed location on filesystem
-//FeedC::addMeta($feed_id, $_POST['FEED_META']);
+// FeedC::addMeta($feed_id, $_POST['FEED_META']);
+
+// get username
+$userMapper= new Mapper('User');
+$userMapper->filter('id=(?)', $_POST['FEED_USER']);
+$userResults = $userMapper->get();
+$username = $userResults['User'][0]->username;
+
+// Create the feed directory
+$feed_path = joinPaths(CHRIS_DATA, $username, $_POST['FEED_PLUGIN'], $feed_id);
+if(!mkdir($feed_path, 0777, true)){
+  return "Couldn't create the feed directory on filesystem: ".$feed_path;
+}
 
 // feed <-> data
 $data_id = DataC::create($_POST['FEED_PLUGIN']);
 DataC::addUser($data_id, $_POST['FEED_USER']);
-//DataC::addMeta() -> plugin level
 
 //PluginC::run($feed_id, $data_id);
 // implement here for now....
 // metadata is one line, passed as arguments for preprocess, run, postprocess
-$arguments = '';
-$arguments .= ' --user '.$_POST['FEED_USER'];
-foreach($_POST['FEED_META'] as $key => $value){
-  $arguments .= ' --'.$key.' '.$value;
-}
-
-// blocking process
-// run()
-// plugin . $args
-
-// status 100% for the feed!
-//FeedC::setStatus($feed_id, 100);
+// create command to run on cluster
+// cd /feed/dir && command
+$arguments = ' -l '.$feed_path;
+$arguments .= ' -c "/bin/touch done.txt"';
+/*$arguments .= joinPaths(CHRIS_PLUGINS_FOLDER,$_POST['FEED_PLUGIN']);
+ foreach($_POST['FEED_META'] as $key => $value){
+  $arguments .= ' --'.$value['name'].' '.$value['value'];
+} */
+//$arguments .= '"';
+// run on cluster and return pid
+$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, CHRIS_CLUSTER.'_run.php '.$arguments);
+$output = shell_exec($process_command);
+echo $output;
+// attach pid to feed
 ?>

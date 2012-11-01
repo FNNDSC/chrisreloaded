@@ -150,13 +150,15 @@ _FEED_.update_onclick = function() {
       function() {
         window.scrollTo(0, 0);
         jQuery(_FEED_.cachedFeeds[1].join("")).hide()
-            .prependTo('.feed_content').slideDown("fast", function() {
-              // Animation complete.
-              _FEED_.cachedFeeds[0] = [];
-              _FEED_.cachedFeeds[1] = [];
-              //
-              jQuery(".feed_update").hide('blind', 100);
-            });
+            .prependTo('.feed_content').slideDown(
+                "fast",
+                function() {
+                  // Animation complete.
+                  _FEED_.cachedFeeds[0] = [];
+                  _FEED_.cachedFeeds[1] = [];
+                  //
+                  jQuery(".feed_update").hide('blind', 100);
+                });
         _FEED_.updateTime();
       });
 }
