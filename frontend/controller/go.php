@@ -35,6 +35,8 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
+
 // Create a feed given a user id, an action and details about the action.
 // metadata instead of param?
 // create folder on file system
@@ -55,27 +57,30 @@ if(!mkdir($feed_path, 0777, true)){
   return "Couldn't create the feed directory on filesystem: ".$feed_path;
 }
 
-// feed <-> data
+// create data
 $data_id = DataC::create($_POST['FEED_PLUGIN']);
 DataC::addUser($data_id, $_POST['FEED_USER']);
 
-//PluginC::run($feed_id, $data_id);
-// implement here for now....
-// metadata is one line, passed as arguments for preprocess, run, postprocess
-// create command to run on cluster
-// cd /feed/dir && command
+// link feed to data
+
+
 $arguments = ' -l '.$feed_path;
 $arguments .= ' -c "/bin/mostestload -t 120"';
 
 //$arguments .= ' -c "/bin/touch done.txt"';
 /*$arguments .= joinPaths(CHRIS_PLUGINS_FOLDER,$_POST['FEED_PLUGIN']);
  foreach($_POST['FEED_META'] as $key => $value){
-  $arguments .= ' --'.$value['name'].' '.$value['value'];
+$arguments .= ' --'.$value['name'].' '.$value['value'];
 } */
 //$arguments .= '"';
 // run on cluster and return pid
 $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, CHRIS_CLUSTER.'_run.php '.$arguments);
 $output = shell_exec($process_command);
-echo $output;
+
 // attach pid to feed
+$metaObject = new Meta();
+$metaObject->name = "pid";
+$metaObject->value = $output;
+FeedC::addMeta($feed_id, Array(0 => $metaObject));
+
 ?>
