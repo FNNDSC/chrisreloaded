@@ -65,7 +65,9 @@ DataC::addUser($data_id, $_POST['FEED_USER']);
 // create command to run on cluster
 // cd /feed/dir && command
 $arguments = ' -l '.$feed_path;
-$arguments .= ' -c "/bin/touch done.txt"';
+$arguments .= ' -c "/bin/mostestload -t 120"';
+
+//$arguments .= ' -c "/bin/touch done.txt"';
 /*$arguments .= joinPaths(CHRIS_PLUGINS_FOLDER,$_POST['FEED_PLUGIN']);
  foreach($_POST['FEED_META'] as $key => $value){
   $arguments .= ' --'.$value['name'].' '.$value['value'];
