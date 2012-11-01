@@ -40,11 +40,6 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
-// include the models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
-
 /**
  * View class to get different representations of the Feed object.
  */
