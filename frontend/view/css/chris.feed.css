@@ -30,8 +30,8 @@
 	background: #fff;
 }
 
- .feed_content {
-  padding-top: 43px;
+.feed_content {
+	padding-top: 43px;
 }
 
 .feed:hover { /* gradient*/
@@ -48,7 +48,7 @@
 .feed_header {
 	cursor: pointer;
 	/* 	min-height: 50px; */
-	background: lightgreen;
+	/* 	background: lightgreen; */
 }
 
 .feed_header_line_one {
@@ -104,7 +104,7 @@
 	overflow: auto;
 	display: none;
 	position: relative;
-	background: lightblue;
+	/* 	background: lightblue; */
 	clear: both;
 	/* 	margin-left: 50px; */
 }
@@ -127,8 +127,11 @@
 }
 
 .feed>.feed_details>.feed_meta {
-	background: lightyellow;
+	background: white;
 	margin: 5px;
+	border: 1px solid;
+	border-color: grey;
+	padding: 5px;
 }
 
 .feed>.feed_details>.feed_meta>.feed_meta_header {
@@ -155,14 +158,20 @@
 	display: none;
 }
 
-.feed>.feed_details>.feed_data {
-	background: lightsalmon;
+.feed>.feed_details>.feed_data { /* 	background: lightsalmon; */
+	background: white;
 	margin: 5px;
+	border: 1px solid;
+	border-color: grey;
+	padding: 5px;
 }
 
-.feed>.feed_details>.feed_html {
-	background: lightsteelblue;
+.feed>.feed_details>.feed_html { /* 	background: lightsteelblue; */
+	background: white;
 	margin: 5px;
+	border: 1px solid;
+	border-color: grey;
+	padding: 5px;
 }
 
 .feed>.feed_details>.feed_html>.html_viewer {

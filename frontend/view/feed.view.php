@@ -104,7 +104,10 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('USERNAME', $username);
     $t -> replace('FEED_META_SIMPLE', $feed_meta_simple);
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
-    $t -> replace('DATA_META_CONTENT', $data_meta_advanced);
+    $t -> replace('DATA_META', $data_meta_advanced);
+    if($data_meta_advanced != ''){
+      $t -> replace('DATA_META_CONTENT', $data_meta_advanced);
+    }
     $t -> replace('TIME_FORMATED', $time);
     $t -> replace('PLUGIN', $object->plugin);
     $t -> replace('MORE', 'Show details');
