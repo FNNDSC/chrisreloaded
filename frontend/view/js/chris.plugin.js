@@ -82,7 +82,7 @@ jQuery(document).ready(function() {
     // grab the visible plugin panel
     var _visible_panel = jQuery('.plugin_panel :visible');
     
-    _parameter_rows = _visible_panel.children('.parameter_row');
+    _parameter_rows = _visible_panel.find('.parameter_row');
     
     // loop through all parameter rows
     _parameter_rows.each(function(i) {
@@ -90,11 +90,14 @@ jQuery(document).ready(function() {
       // and restore all inputs to the default values
       
       // dropzones
-      var _input_field = jQuery(_parameter_rows[i]).children('.parameter_dropzone');
-      var _default_value = _input_field.attr('data-default');
-      _input_field.html(_default_value);
+      var _dropzone_field = jQuery(_parameter_rows[i]).find('.parameter_dropzone');
+      var _default_value = _dropzone_field.attr('data-default');
+      _dropzone_field.html(_default_value);
       
-      
+      // spinners
+      var _spinner = jQuery(_parameter_rows[i]).find('.parameter_spinner');
+      _default_value = _dropzone_field.attr('data-default');
+      _spinner.spinner("value", _default_value);
       
     });
     
