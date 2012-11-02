@@ -88,9 +88,13 @@ jQuery(document).ready(function() {
     _parameter_rows.each(function(i) {
        
       // and restore all inputs to the default values
-      var _input_field = jQuery(_parameter_rows[i]).children('.parameter_input');
+      
+      // dropzones
+      var _input_field = jQuery(_parameter_rows[i]).children('.parameter_dropzone');
       var _default_value = _input_field.attr('data-default');
       _input_field.html(_default_value);
+      
+      
       
     });
     
@@ -112,7 +116,22 @@ jQuery(document).ready(function() {
   });
   
   jQuery('.panelgroup').accordion({ heightStyle: "content", animate: false  });
-  jQuery('.parameter_spinner').spinner();
-  jQuery('.parameter_spinner_double').spinner({ numberFormat: "n" });
+  jQuery('.parameter_spinner').each(function(i,v){
+    
+    var _container = jQuery(v);
+    var _default_value = _container.attr('data-default');
+    var _step = _container.attr('data-step');
+    if (!_step) {
+      _step = 1;
+    }
+    
+    _container.spinner({
+      
+      step: _step
+      
+    });
+    _container.spinner("value", parseFloat(_default_value,10));
+    
+  });
   
 });

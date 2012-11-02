@@ -273,8 +273,6 @@ jQuery(document).ready(function() {
     
     var _container = jQuery(d);
     var _folder = _container.attr('data-folder');
-
-    abcef = _container;
     
     // now really create the browser
     _container.fileTree({
