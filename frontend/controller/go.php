@@ -53,7 +53,7 @@ $username = $userResults['User'][0]->username;
 
 // Create the feed directory
 $feed_path = joinPaths(CHRIS_DATA, $username, $_POST['FEED_PLUGIN'], $feed_id);
-if(!mkdir($feed_path . '/hello', 0777, true)){
+if(!mkdir($feed_path, 0777, true)){
   return "Couldn't create the feed directory on filesystem: ".$feed_path;
 }
 
