@@ -110,11 +110,42 @@ jQuery(document).ready(function() {
     // prevent scrolling up
     e.preventDefault();
     
+    // grab the visible plugin panel
+    var _visible_panel = jQuery('.plugin_panel :visible');
+    _parameter_rows = _visible_panel.find('.parameter_row');
+    
+    var _command = '';
+    
+    // loop through all parameter rows
+    _parameter_rows.each(function(i) {
+      
+      var _flag = jQuery(_parameter_rows[i]).find('.parameter_input').attr('data-flag');
+      // strip possible --
+      _flag = _flag.replace(/-/g,'');
+      // and attach thema gain
+      _flag = '--'+_flag;
+      
+      var _value;
+      
+      // dropzones
+      var _dropzone_field = jQuery(_parameter_rows[i]).find('.parameter_dropzone');
+      _value = _dropzone_field.html();
+      
+      // spinners
+      var _spinner = jQuery(_parameter_rows[i]).find('.parameter_spinner');
+      _value = jQuery(_spinner).spinner("value");
+      
+      _command += _flag + ' ' + new String(_value) + ' ';
+      
+    });
+    
     // TODO validate
     
     // TODO perform the action
     
-    alert('Job submitted!');
+    
+    console.log(_command);
+    alert('Job submitted!\n'+_command);
     
   });
   
