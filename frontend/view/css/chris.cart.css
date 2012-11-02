@@ -106,7 +106,7 @@
 	
 }
 
-.parameter_title {
+.parameter_title_cropped {
 	width: 80px;
 	position: absolute;
 	overflow: hidden;
@@ -114,10 +114,21 @@
 	white-space: nowrap;
 }
 
-.parameter_title:hover {
+.parameter_title_cropped:hover {
 	overflow: visible;
 	background-color: whiteSmoke;
 	color: blue;
+}
+
+.parameter_title {
+  position: absolute;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.parameter_title:hover {
+  background-color: whiteSmoke;
+  color: blue;
 }
 
 .parameter_row {

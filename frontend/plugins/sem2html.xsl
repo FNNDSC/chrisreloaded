@@ -40,34 +40,30 @@
   <xsl:template match="image | file | directory">
     <div>
       <xsl:attribute name="class">parameter_row</xsl:attribute>
-      <span class='parameter_title'>
+      <span class='parameter_title_cropped'>
         <xsl:value-of select="label"/>
       </span>
-      <span class='parameter_input parameter_dropzone' data-default='Drag and drop here'> Drag and drop here</span>
+      <span class='parameter_input parameter_dropzone' data-default='Drag and drop here'>
+        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
+         Drag and drop here</span>
     </div>
   </xsl:template>
   
-  <!-- INTEGER parameter -->
-  <xsl:template match="integer">
+  <!-- INTEGER/DOUBLE parameter -->
+  <xsl:template match="integer | double">
     <div>
       <xsl:attribute name="class">parameter_row</xsl:attribute>
       <span class='parameter_title'>
         <xsl:value-of select="label"/>
       </span>
-      <span class='parameter_input'><input class='parameter_spinner'/></span>
-    </div>
-  </xsl:template>
-  
-  <!-- DOUBLE parameter -->
-  <xsl:template match="double">
-    <div>
-      <xsl:attribute name="class">parameter_row</xsl:attribute>
-      <span class='parameter_title'>
-        <xsl:value-of select="label"/>
+      <span class='parameter_input'>
+        <xsl:attribute name="data-flag">--<xsl:value-of select="longflag"/></xsl:attribute>
+        <input class='parameter_spinner'>
+          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
+          <xsl:attribute name="data-step"><xsl:value-of select="constraints/step"/></xsl:attribute>
+        </input>
       </span>
-      <span class='parameter_input'><input class='parameter_spinner_double'/></span>
     </div>
   </xsl:template>
-    
     
 </xsl:stylesheet>

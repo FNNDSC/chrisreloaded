@@ -33,8 +33,8 @@ class Plugin( argparse.ArgumentParser ):
   '''
   The super class for all valid ChRIS plugins.
   '''
-  IMAGE = 'IMAGE'
-  INTEGER = 'INTEGER'
+  IMAGE = 'image'
+  INTEGER = 'integer'
 
   def __init__( self ):
     '''
@@ -86,12 +86,15 @@ class Plugin( argparse.ArgumentParser ):
       for parameter in parameters:
         p_type = parameter[1]
 
-        if p_type == Plugin.IMAGE:
-          # this is an image
-          xml += '<image><label>' + parameter[0] + '</label></image>\n'
-        elif p_type == Plugin.INTEGER:
-          # an integer
-          xml += '<integer><name>' + parameter[0] + '</name></integer>\n'
+        tag = '<' + p_type + '>'
+        end_tag = '</' + p_type + '>\n'
+
+        xml += tag
+        xml += '<label>' + parameter[0] + '</label>'
+        xml += '<longflag>' + parameter[2] + '</longflag>'
+        if parameter[3]:
+          xml += '<default>' + str( parameter[3] ) + '</default>'
+        xml += end_tag
 
       xml += '</parameters>\n'
 
@@ -120,9 +123,17 @@ class Plugin( argparse.ArgumentParser ):
       self.__panels.append( panel )
       self.__parameters.append( [] )
 
+    # grab the default value
+    default = None
+    if 'default' in kwargs:
+      default = kwargs['default']
+
+    # grab the flag (required)
+    flag = args[0]
+
     # store the parameter internally
     # (FIFO)
-    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type] )
+    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default] )
     # add the argument to the parser
     self.add_argument( *args, **kwargs )
 

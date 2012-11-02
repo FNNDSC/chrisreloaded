@@ -82,15 +82,22 @@ jQuery(document).ready(function() {
     // grab the visible plugin panel
     var _visible_panel = jQuery('.plugin_panel :visible');
     
-    _parameter_rows = _visible_panel.children('.parameter_row');
+    _parameter_rows = _visible_panel.find('.parameter_row');
     
     // loop through all parameter rows
     _parameter_rows.each(function(i) {
        
       // and restore all inputs to the default values
-      var _input_field = jQuery(_parameter_rows[i]).children('.parameter_input');
-      var _default_value = _input_field.attr('data-default');
-      _input_field.html(_default_value);
+      
+      // dropzones
+      var _dropzone_field = jQuery(_parameter_rows[i]).find('.parameter_dropzone');
+      var _default_value = _dropzone_field.attr('data-default');
+      _dropzone_field.html(_default_value);
+      
+      // spinners
+      var _spinner = jQuery(_parameter_rows[i]).find('.parameter_spinner');
+      _default_value = _spinner.attr('data-default');
+      _spinner.spinner("value", _default_value);
       
     });
     
@@ -103,16 +110,62 @@ jQuery(document).ready(function() {
     // prevent scrolling up
     e.preventDefault();
     
+    // grab the visible plugin panel
+    var _visible_panel = jQuery('.plugin_panel :visible');
+    _parameter_rows = _visible_panel.find('.parameter_row');
+    
+    var _command = '';
+    
+    // loop through all parameter rows
+    _parameter_rows.each(function(i) {
+      
+      var _flag = jQuery(_parameter_rows[i]).find('.parameter_input').attr('data-flag');
+      // strip possible --
+      _flag = _flag.replace(/-/g,'');
+      // and attach thema gain
+      _flag = '--'+_flag;
+      
+      var _value;
+      
+      // dropzones
+      var _dropzone_field = jQuery(_parameter_rows[i]).find('.parameter_dropzone');
+      _value = _dropzone_field.html();
+      
+      // spinners
+      var _spinner = jQuery(_parameter_rows[i]).find('.parameter_spinner');
+      _value = jQuery(_spinner).spinner("value");
+      
+      _command += _flag + ' ' + new String(_value) + ' ';
+      
+    });
+    
     // TODO validate
     
     // TODO perform the action
     
-    alert('Job submitted!');
+    
+    console.log(_command);
+    alert('Job submitted!\n'+_command);
     
   });
   
   jQuery('.panelgroup').accordion({ heightStyle: "content", animate: false  });
-  jQuery('.parameter_spinner').spinner();
-  jQuery('.parameter_spinner_double').spinner({ numberFormat: "n" });
+  jQuery('.parameter_spinner').each(function(i,v){
+    
+    var _container = jQuery(v);
+    var _default_value = _container.attr('data-default');
+    var _step = _container.attr('data-step');
+    if (!_step) {
+      _step = 1;
+    }
+    
+    _container.spinner({
+      
+      step: _step
+      
+    });
+    _container.spinner("value", parseFloat(_default_value,10));
+    
+  });
   
 });
