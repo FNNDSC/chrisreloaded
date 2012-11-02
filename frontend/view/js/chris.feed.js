@@ -34,11 +34,21 @@ _FEED_.feed_more_onclick = function() {
 }
 _FEED_.feed_onclick = function() {
   jQuery(document).on('click', '.feed_header', function() {
-    // modify
-    // alert('Show details!');
     var more = jQuery(this).parent().find('.feed_more');
     var details = jQuery(this).parent().find('.feed_details');
     _FEED_.onclick(details, more);
+    // generate the file browser on demand, if doesnt exist already
+    var _file_browser = jQuery(this).parent().find('.file_browser');
+    if (_file_browser.is(':empty')) {
+      var _folder = _file_browser.attr('data-folder');
+      _file_browser.fileTree({
+        // TODO should somehow get the CONFIG value for the data folder
+        root : _folder,
+        script : 'controller/feed.browser.connector.php'
+      }, function(file) {
+        alert(file);
+      });
+    }
   });
   jQuery(document).on('click', '.feed_meta_header', function() {
     var details = jQuery(this).parent().find('.feed_meta_content');
@@ -57,12 +67,6 @@ _FEED_.feed_onclick = function() {
     _FEED_.onclick(details);
   });
 }
-/*
- * _FEED_.feed_mouseenter = function() { jQuery(document).on('mouseenter',
- * '.feed', function() { jQuery(this).addClass('feed_gradient'); }); }
- * _FEED_.feed_mouseleave = function() { jQuery(document).on('mouseleave',
- * '.feed', function() { jQuery(this).removeClass('feed_gradient'); }); }
- */
 _FEED_.updateFeedTimeout = function() {
   timer = setInterval(_FEED_.refresh, 5000);
 }
@@ -166,19 +170,15 @@ _FEED_.update_onclick = function() {
         _FEED_.updateTime();
       });
 }
-
 _FEED_.activateDraggable = function() {
-
   // setup draggable items for all file browser elements
   jQuery(".jqueryFileTree li a").draggable({
-    handle: ".feed_move",
-    helper: "clone",
-    appendTo: "body",
-    zIndex: 2500
+    handle : ".feed_move",
+    helper : "clone",
+    appendTo : "body",
+    zIndex : 2500
   });
-  
 }
-
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -192,18 +192,4 @@ jQuery(document).ready(function() {
   _FEED_.update_onclick();
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
-  // create file browsers
-  // should be done on demand!
-  jQuery('.file_browser').each(function(i, d) {
-    var _container = jQuery(d);
-    var _folder = _container.attr('data-folder');
-    // now really create the browser
-    _container.fileTree({
-      // TODO should somehow get the CONFIG value for the data folder
-      root : _folder,
-      script : 'controller/feed.browser.connector.php'
-    }, function(file) {
-      alert(file);
-    });
-  });
 });
