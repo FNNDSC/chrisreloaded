@@ -28,41 +28,41 @@ $_POST['dir'] = urldecode($_POST['dir']);
 $root = CHRIS_DATA;
 
 if( file_exists($root . $_POST['dir']) ) {
-	$files = scandir($root . $_POST['dir']);
-	natcasesort($files);
-	if( count($files) > 2 ) { /* The 2 accounts for . and .. */
-		echo "<ul class=\"jqueryFileTree\" style=\"display: none;\">";
-		// All dirs
-		foreach( $files as $file ) {
-		  $fullpath = $root . $_POST['dir'] . $file;
-			if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && is_dir($fullpath) ) {
+  $files = scandir($root . $_POST['dir']);
+  natcasesort($files);
+  if( count($files) > 2 ) { /* The 2 accounts for . and .. */
+    echo "<ul class=\"jqueryFileTree\" style=\"display: none;\">";
+    // All dirs
+    foreach( $files as $file ) {
+      $fullpath = $root . $_POST['dir'] . $file;
+      if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && is_dir($fullpath) ) {
 
-			  $t = new Template('feed_data_browser_item.html');
-			  $t->replace('CLASSES', 'directory collapsed');
-			  $t->replace('FULLPATH', $fullpath);
-			  $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file . '/'));
-			  $t->replace('FILENAME', htmlentities($file));
-			  echo $t;
+        $t = new Template('feed_data_browser_item.html');
+        $t->replace('CLASSES', 'directory collapsed');
+        $t->replace('FULLPATH', $fullpath);
+        $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file . '/'));
+        $t->replace('FILENAME', htmlentities($file));
+        echo $t;
 
-			}
-		}
-		// All files
-		foreach( $files as $file ) {
-		  $fullpath = $root . $_POST['dir'] . $file;
-			if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && !is_dir($fullpath) ) {
-				$ext = preg_replace('/^.*\./', '', $file);
+      }
+    }
+    // All files
+    foreach( $files as $file ) {
+      $fullpath = $root . $_POST['dir'] . $file;
+      if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && !is_dir($fullpath) ) {
+        $ext = preg_replace('/^.*\./', '', $file);
 
-				$t = new Template('feed_data_browser_item.html');
-				$t->replace('CLASSES', 'file ext_'.$ext);
-				$t->replace('FULLPATH', $fullpath);
-				$t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file));
-				$t->replace('FILENAME', htmlentities($file));
-				echo $t;
+        $t = new Template('feed_data_browser_item.html');
+        $t->replace('CLASSES', 'file ext_'.$ext);
+        $t->replace('FULLPATH', $fullpath);
+        $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file));
+        $t->replace('FILENAME', htmlentities($file));
+        echo $t;
 
-			}
-		}
-		echo "</ul>";
-	}
+      }
+    }
+    echo "</ul>";
+  }
 }
 
 ?>

@@ -166,6 +166,19 @@ _FEED_.update_onclick = function() {
         _FEED_.updateTime();
       });
 }
+
+_FEED_.activateDraggable = function() {
+
+  // setup draggable items for all file browser elements
+  jQuery(".jqueryFileTree li a").draggable({
+    handle: ".feed_move",
+    helper: "clone",
+    appendTo: "body",
+    zIndex: 2500
+  });
+  
+}
+
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -180,6 +193,7 @@ jQuery(document).ready(function() {
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
   // create file browsers
+  // should be done on demand!
   jQuery('.file_browser').each(function(i, d) {
     var _container = jQuery(d);
     var _folder = _container.attr('data-folder');

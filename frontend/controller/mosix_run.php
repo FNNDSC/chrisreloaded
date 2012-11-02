@@ -38,7 +38,7 @@ $shortopts .= "c:"; // command
 
 $options = getopt($shortopts);
 
-$mosix_command = "ssh chris@rc-drno 'nohup /bin/mosbatch -q -b -E".$options["l"]." ".$options["c"]."  > log.out 2> log.err < /dev/null & echo $!'";
+$mosix_command = "ssh chris@rc-goldfinger 'nohup /bin/mosbatch -q -b -E".$options["l"]." ".$options["c"]."  > log.out 2> log.err < /dev/null & echo $!'";
 
 echo shell_exec($mosix_command);
 ?>
