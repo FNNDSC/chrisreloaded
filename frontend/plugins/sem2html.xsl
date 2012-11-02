@@ -8,6 +8,7 @@
         <!-- attach the id -->
         <xsl:attribute name="id">panel_${PLUGIN_NAME}</xsl:attribute>
         <xsl:attribute name="class">plugin_panel</xsl:attribute>
+        <xsl:attribute name="data-executable">${PLUGIN_EXECUTABLE}</xsl:attribute>
         <!-- and hide it by default -->
         <xsl:attribute name="style">display:none;</xsl:attribute>
         <strong><xsl:value-of select="title"/></strong><br/>

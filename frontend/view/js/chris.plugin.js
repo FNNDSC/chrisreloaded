@@ -132,8 +132,7 @@ jQuery(document).ready(
             // grab the visible plugin panel
             var _visible_panel = jQuery('.plugin_panel :visible');
             _parameter_rows = _visible_panel.find('.parameter_row');
-            
-            var _command = '';
+            var _command = _visible_panel.closest('div').attr('data-executable');
             
             // loop through all parameter rows
             _parameter_rows.each(function(i) {
@@ -167,7 +166,7 @@ jQuery(document).ready(
                 
               }
               
-              _command += _flag + ' ' + _value + ' ';
+              _command += ' ' + _flag + ' ' + _value;
               
             });
             

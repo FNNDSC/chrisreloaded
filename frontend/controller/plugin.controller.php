@@ -154,6 +154,8 @@ class PluginC implements PluginControllerInterface {
 
     // replace plugin name variable
     $html = str_replace('${PLUGIN_NAME}', $plugin, $html);
+    // .. and the executable
+    $html = str_replace('${PLUGIN_EXECUTABLE}', $p_executable, $html);
 
     return $html;
 
