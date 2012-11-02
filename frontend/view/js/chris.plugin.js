@@ -96,7 +96,7 @@ jQuery(document).ready(function() {
       
       // spinners
       var _spinner = jQuery(_parameter_rows[i]).find('.parameter_spinner');
-      _default_value = _dropzone_field.attr('data-default');
+      _default_value = _spinner.attr('data-default');
       _spinner.spinner("value", _default_value);
       
     });

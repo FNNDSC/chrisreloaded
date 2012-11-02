@@ -44,7 +44,7 @@
         <xsl:value-of select="label"/>
       </span>
       <span class='parameter_input parameter_dropzone' data-default='Drag and drop here'>
-        <xsl:attribute name="id"><xsl:value-of select="flag"/></xsl:attribute>
+        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
          Drag and drop here</span>
     </div>
   </xsl:template>
@@ -57,7 +57,7 @@
         <xsl:value-of select="label"/>
       </span>
       <span class='parameter_input'>
-        <xsl:attribute name="id"><xsl:value-of select="flag"/></xsl:attribute>
+        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
         <input class='parameter_spinner'>
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
           <xsl:attribute name="data-step"><xsl:value-of select="constraints/step"/></xsl:attribute>
