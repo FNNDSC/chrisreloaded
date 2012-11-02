@@ -128,14 +128,16 @@
 
 .feed>.feed_details>.feed_meta {
 	background: white;
-	margin: 5px;
-	border: 1px solid;
-	border-color: grey;
-	padding: 5px;
+	margin-top: 5px;
+/* 	border: 1px solid; */
+/* 	border-color: grey; */
+/* 	padding: 5px; */
 }
 
 .feed>.feed_details>.feed_meta>.feed_meta_header {
 	cursor: pointer;
+	font-size: 11px;
+	font-weight: bold;
 }
 
 .feed>.feed_details>.feed_meta>.feed_meta_header:hover {
@@ -144,10 +146,13 @@
 
 .feed>.feed_details>.feed_meta>.feed_meta_content {
 	display: none;
+	font-size: 11px;
 }
 
 .feed>.feed_details>.feed_data>.data_meta_header {
 	cursor: pointer;
+	font-size: 11px;
+  font-weight: bold;	
 }
 
 .feed>.feed_details>.feed_data>.data_meta_header:hover {
@@ -156,10 +161,13 @@
 
 .feed>.feed_details>.feed_data>.data_meta_content {
 	display: none;
+	font-size: 11px;
 }
 
 .feed>.feed_details>.feed_data>.data_browser_header {
-	cursor: pointer;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;  
 }
 
 .feed>.feed_details>.feed_data>.data_browser_header:hover {
@@ -171,11 +179,11 @@
 }
 
 .feed>.feed_details>.feed_data { /* 	background: lightsalmon; */
-	background: white;
-	margin: 5px;
-	border: 1px solid;
-	border-color: grey;
-	padding: 5px;
+/* 	background: white; */
+/* 	margin: 5px; */
+/* 	border: 1px solid; */
+/* 	border-color: grey; */
+/* 	padding: 5px; */
 }
 
 .feed>.feed_details>.feed_html { /* 	background: lightsteelblue; */

@@ -206,4 +206,10 @@ jQuery(document).ready(function() {
       alert(file);
     });
   });
+  
+  jQuery('.feedpanel').accordion({
+    heightStyle: "content",
+    animate: false,
+    active: 1
+  });  
 });
