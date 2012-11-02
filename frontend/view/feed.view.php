@@ -113,6 +113,12 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('MORE', 'Show details');
     $t -> replace('STATUS', $object->status);
     // set data browser
+    $d = new Template('feed_data_browser.html');
+    $d -> replace('FOLDER', $patient_id.'-'.$patient_real_id);
+    $d -> replace('PATIENT_ID', 222);
+    $d -> replace('DATA_ID', 111);
+    $t -> replace('DATA_BROWSER', $d);
+
     // set html viewer if "index.html" exists in username/plugin/feed-id/
     if(is_file(joinPaths(CHRIS_DATA, $username,$object->plugin, $object->id, 'index.html' ))){
       $t -> replace('FEED_HTML', 'feed_html.html');

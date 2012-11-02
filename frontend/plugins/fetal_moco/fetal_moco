@@ -33,7 +33,7 @@ class Fetal_Moco( Plugin ):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = Fetal_Moco()
-  plugin.add_parameter( Plugin.IMAGE, '--t1_axial', action='store', dest='T1_axial', help='the axial T1 scan' )
-  plugin.add_parameter( Plugin.IMAGE, '--t1_sagittal', action='store', dest='T1_sagittal', help='the sagittal T1 scan' )
-  plugin.add_parameter( Plugin.IMAGE, '--t1_coronal', action='store', dest='T1_coronal', help='the coronal T1 scan' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--t1_axial', action='store', dest='T1_axial', help='the axial T1 scan' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--t1_sagittal', action='store', dest='T1_sagittal', help='the sagittal T1 scan' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--t1_coronal', action='store', dest='T1_coronal', help='the coronal T1 scan' )
   plugin.launch( sys.argv )

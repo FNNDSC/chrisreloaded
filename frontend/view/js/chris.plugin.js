@@ -32,8 +32,9 @@ jQuery(document).ready(function() {
   jQuery('#pipelines').bind('slid', function() {
     // update UI
     var _new_plugin_id = jQuery(".carousel-inner").children('.active').attr('id');
-    // by hiding the old plugin
+    // by showing the new plugin
     jQuery('#panel_'+_new_plugin_id).show();
+    
   });  
   
   // setup droppable item
@@ -45,16 +46,23 @@ jQuery(document).ready(function() {
     drop : function(event, ui) {
       
       // grab the data name dom element
-      var _data_name = ui.draggable.children('.feed_data_name');
+      var _data_name = ui.draggable;
       
       // now we can grab the MRN
-      var _mrn = _data_name.attr('data-patient-id');
+      var _mrn = _data_name.closest('.file_browser').attr('data-patient-id');
+      
+      // and the data id
+      var _data_id = _data_name.closest('.file_browser').attr('data-id');
+      
+      // and the full path
+      var _full_path = _data_name.attr('data-full-path');
       
       // and create a new representation
       var _new_span = jQuery('<span></span>');
       _new_span.html('<b>MRN '+_mrn+'</b> '+_data_name.text());
       _new_span.attr('data-patient-id', _mrn);
-      _new_span.attr('data-id', _data_name.attr('data-id'));
+      _new_span.attr('data-id', _data_id);
+      _new_span.attr('data-full-path', _full_path);
       
       // throw everything old away
       jQuery(this).empty();
@@ -102,5 +110,9 @@ jQuery(document).ready(function() {
     alert('Job submitted!');
     
   });
+  
+  jQuery('.panelgroup').accordion({ heightStyle: "content", animate: false  });
+  jQuery('.parameter_spinner').spinner();
+  jQuery('.parameter_spinner_double').spinner({ numberFormat: "n" });
   
 });

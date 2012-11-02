@@ -34,6 +34,7 @@ class Plugin( argparse.ArgumentParser ):
   The super class for all valid ChRIS plugins.
   '''
   IMAGE = 'IMAGE'
+  INTEGER = 'INTEGER'
 
   def __init__( self ):
     '''
@@ -45,6 +46,7 @@ class Plugin( argparse.ArgumentParser ):
     self.add_argument( '--description', action='store_true', dest='description', default=False, help='show the icon path of this plugin (default: FALSE)' )
 
     # the custom parameter list
+    self.__panels = []
     self.__parameters = []
 
   def error( self, message ):
@@ -73,18 +75,28 @@ class Plugin( argparse.ArgumentParser ):
     xml += '<license>' + Plugin.LICENSE + '</license>\n'
     xml += '<contributor>' + Plugin.AUTHORS + '</contributor>\n'
     xml += '<version>' + Plugin.VERSION + '</version>\n'
-    xml += '<parameters>\n'
 
-    # loop through the parameters
-    for i, p in enumerate( self.__parameters ):
-      p_type = p[1]
+    # loop through the panels and their parameters
+    for i, panel in enumerate( self.__panels ):
+      parameters = self.__parameters[i]
 
-      if p_type == Plugin.IMAGE:
-        # this is an image
-        xml += '<image><name>' + p[0] + '</name><index>' + str( i ) + '</index></image>\n'
+      xml += '<parameters>\n'
+      xml += '<label>' + panel + '</label>\n'
 
-    xml += '</parameters>\n'
+      for parameter in parameters:
+        p_type = parameter[1]
+
+        if p_type == Plugin.IMAGE:
+          # this is an image
+          xml += '<image><label>' + parameter[0] + '</label></image>\n'
+        elif p_type == Plugin.INTEGER:
+          # an integer
+          xml += '<integer><name>' + parameter[0] + '</name></integer>\n'
+
+      xml += '</parameters>\n'
+
     xml += '</executable>'
+
     return xml
 
   def run( self, options ):
@@ -94,7 +106,7 @@ class Plugin( argparse.ArgumentParser ):
     '''
     print( 'No action defined!' )
 
-  def add_parameter( self, type, *args, **kwargs ):
+  def add_parameter( self, panel, type, *args, **kwargs ):
     '''
     Add a parameter to this plugin. The type let's the
     XML generator distinguish between different parameter
@@ -103,9 +115,14 @@ class Plugin( argparse.ArgumentParser ):
     Valid types so far:
       Plugin.IMAGE
     '''
+    # store the panel name if it doesn't exist
+    if not panel in self.__panels:
+      self.__panels.append( panel )
+      self.__parameters.append( [] )
+
     # store the parameter internally
     # (FIFO)
-    self.__parameters.append( [kwargs['dest'], type] )
+    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type] )
     # add the argument to the parser
     self.add_argument( *args, **kwargs )
 

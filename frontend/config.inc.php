@@ -45,6 +45,7 @@ define('CHRIS_VIEW_FOLDER', joinPaths(CHRIS_WWWROOT,'view'));
 define('CHRIS_TEMPLATE_FOLDER', joinPaths(CHRIS_VIEW_FOLDER,'template'));
 define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
 define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
+define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
 
 // PACS
 // folder containing dcmtk binaries
