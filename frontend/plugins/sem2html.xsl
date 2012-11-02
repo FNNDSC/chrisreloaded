@@ -8,6 +8,7 @@
         <!-- attach the id -->
         <xsl:attribute name="id">panel_${PLUGIN_NAME}</xsl:attribute>
         <xsl:attribute name="class">plugin_panel</xsl:attribute>
+        <xsl:attribute name="data-executable">${PLUGIN_EXECUTABLE}</xsl:attribute>
         <!-- and hide it by default -->
         <xsl:attribute name="style">display:none;</xsl:attribute>
         <strong><xsl:value-of select="title"/></strong><br/>
@@ -43,7 +44,7 @@
       <span class='parameter_title_cropped'>
         <xsl:value-of select="label"/>
       </span>
-      <span class='parameter_input parameter_dropzone' data-default='Drag and drop here'>
+      <span class='parameter_input parameter_dropzone' data-type='dropzone' data-default='Drag and drop here'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
          Drag and drop here</span>
     </div>
@@ -56,8 +57,8 @@
       <span class='parameter_title'>
         <xsl:value-of select="label"/>
       </span>
-      <span class='parameter_input'>
-        <xsl:attribute name="data-flag">--<xsl:value-of select="longflag"/></xsl:attribute>
+      <span class='parameter_input' data-type='spinner'>
+        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
         <input class='parameter_spinner'>
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
           <xsl:attribute name="data-step"><xsl:value-of select="constraints/step"/></xsl:attribute>

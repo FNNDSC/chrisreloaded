@@ -154,6 +154,8 @@ class PluginC implements PluginControllerInterface {
 
     // replace plugin name variable
     $html = str_replace('${PLUGIN_NAME}', $plugin, $html);
+    // .. and the executable
+    $html = str_replace('${PLUGIN_EXECUTABLE}', $p_executable, $html);
 
     return $html;
 
@@ -185,7 +187,7 @@ class PluginC implements PluginControllerInterface {
     $p_folder_relative = CHRIS_PLUGINS_FOLDER_RELATIVE . DIRECTORY_SEPARATOR . $plugin;
 
     // get the path to the plugin icon
-    $p_icon = $p_folder_relative . DIRECTORY_SEPARATOR . 'gfx.png';
+    $p_icon = $p_folder_relative . DIRECTORY_SEPARATOR . 'plugin.png';
 
     return $p_icon;
 
