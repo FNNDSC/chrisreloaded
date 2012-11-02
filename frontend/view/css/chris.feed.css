@@ -10,12 +10,13 @@
 
 .feed_update {
 	margin-top: -1px;
-	padding: 10px;
+	padding: 4px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 	border-color: grey;
 	display: none;
 	cursor: pointer;
+	background-color: #fff;
 	text-align: center;
 }
 
@@ -27,6 +28,10 @@
 	border-color: lightgrey;
 	overflow: hidden;
 	background: #fff;
+}
+
+.feed_content {
+	padding-top: 43px;
 }
 
 .feed:hover { /* gradient*/
@@ -42,19 +47,25 @@
 
 .feed_header {
 	cursor: pointer;
-	min-height: 50px;
+	/* 	min-height: 50px; */
+	/* 	background: lightgreen; */
 }
 
 .feed_header_line_one {
 	width: 100%;
+	min-height: 32px;
 }
 
 .feed_header_line_two {
 	width: 100%;
+	min-height: 32px;
 }
 
 .feed_icon {
 	float: left;
+	width: 64px;
+	height: 64px;
+	margin-right: 5px;
 }
 
 .feed_header_small {
@@ -93,7 +104,9 @@
 	overflow: auto;
 	display: none;
 	position: relative;
-/* 	margin-left: 50px; */
+	/* 	background: lightblue; */
+	clear: both;
+	/* 	margin-left: 50px; */
 }
 
 .feed_data_name {
@@ -110,7 +123,75 @@
 }
 
 .feed>.feed_details>.data_patient {
-  background: white;
+	background: white;
+}
+
+.feed>.feed_details>.feed_meta {
+	background: white;
+	margin: 5px;
+	border: 1px solid;
+	border-color: grey;
+	padding: 5px;
+}
+
+.feed>.feed_details>.feed_meta>.feed_meta_header {
+	cursor: pointer;
+}
+
+.feed>.feed_details>.feed_meta>.feed_meta_header:hover {
+	background: #B5E9FF;
+}
+
+.feed>.feed_details>.feed_meta>.feed_meta_content {
+	display: none;
+}
+
+.feed>.feed_details>.feed_data>.data_meta_header {
+	cursor: pointer;
+}
+
+.feed>.feed_details>.feed_data>.data_meta_header:hover {
+	background: #B5E9FF;
+}
+
+.feed>.feed_details>.feed_data>.data_meta_content {
+	display: none;
+}
+
+.feed>.feed_details>.feed_data>.data_browser_header {
+	cursor: pointer;
+}
+
+.feed>.feed_details>.feed_data>.data_browser_header:hover {
+	background: #B5E9FF;
+}
+
+.feed>.feed_details>.feed_data>.data_browser {
+	display: none;
+}
+
+.feed>.feed_details>.feed_data { /* 	background: lightsalmon; */
+	background: white;
+	margin: 5px;
+	border: 1px solid;
+	border-color: grey;
+	padding: 5px;
+}
+
+.feed>.feed_details>.feed_html { /* 	background: lightsteelblue; */
+	background: white;
+	margin: 5px;
+	border: 1px solid;
+	border-color: grey;
+	padding: 5px;
+}
+
+.feed>.feed_details>.feed_html>.html_viewer {
+	display: none;
+}
+
+.html_header {
+	cursor: pointer;
 }
 
 /*  need hierarchy */
@@ -127,5 +208,5 @@
 }
 
 .feed_move {
-  cursor: move;
+	cursor: move;
 }

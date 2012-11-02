@@ -1,18 +1,31 @@
-<div id="${ID}-feed" class="feed ${STATUS}">
-	<div class='feed_header'>
-		<span class='feed_icon'> <img src=${IMAGE_SRC}
-			class="img-rounded">
-		</span>
-		<div class='feed_header_line_one'>
-			<span class='feed_type'>${ACTION}</span> &nbsp;&nbsp;<span
-				class='feed_username feed_header_small'>${USERNAME}</span> <span
-				class='feed_status feed_header_small'>Status: ${PROGRESS}</span> <span
-				id="${TIME_FORMATED}" class="feed_time feed_header_small">Some
-				time ago..</span>
-		</div>
-		<div class='feed_header_line_two'>
-			<span class='feed_message'>${WHAT}</span> <span class='feed_more feed_header_small'><a>${MORE}</a></span>
-		</div>
-	</div>
-	<div class='feed_details'>${FEED_DETAILS}</div>
+<div data-chris-feed_id="${ID}" data-chris-feed_status="${STATUS}"
+ data-chris-feed_time="${TIME_FORMATED}" class="feed">
+ <div class='feed_header'>
+  <span class='feed_icon'> <img src="${IMAGE_SRC}"
+   class="img-rounded">
+  </span>
+  <div class='feed_header_line_one'>
+   <span class='feed_type'>${PLUGIN}</span> &nbsp;&nbsp;<span
+    class='feed_username feed_header_small'>${USERNAME}</span> <span
+    class='feed_status feed_header_small'>Status: ${STATUS}</span> <span
+    class="feed_time feed_header_small">Some time ago..</span>
+  </div>
+  <div class='feed_header_line_two'>
+   <span class='feed_message'>${FEED_META_SIMPLE}</span> <span
+    class='feed_more feed_header_small'><a>${MORE}</a></span>
+  </div>
+ </div>
+ <div class='feed_details'>
+  <div class="feed_meta">
+   <div class="feed_meta_header">Feed Meta information</div>
+   <div class="feed_meta_content">${FEED_META_CONTENT}</div>
+  </div>
+
+  <div class="feed_data">
+   <div class="data_meta">${DATA_META}</div>
+   <div class="data_browser_header">Data Browser</div>
+   <div class="data_browser">${DATA_BROWSER}</div>
+  </div>
+  ${FEED_HTML}
+ </div>
 </div>

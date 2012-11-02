@@ -41,19 +41,12 @@ require_once 'object.model.php';
 class Data extends Object {
 
   /**
-   * The patient_id of this scan.
-   *
-   * @var int $patient_id
-   */
-  public $patient_id = -1;
-
-  /**
    * The data unique ID.
    * We use it to make sure data we will add to the database doesn't already exists.
    *
-   * @var string $unique_id
+   * @var string $uid
    */
-  public $unique_id = null;
+  public $uid = '';
 
   /**
    * The name of the data.
@@ -61,14 +54,14 @@ class Data extends Object {
    *
    * @var string $name
    */
-  public $name = null;
+  public $name = '';
 
   /**
    * The time of the data creation.
    *
    * @var string $time
    */
-  public $time = null;
+  public $time = '';
   
   /**
    * The number of files in this data.
@@ -78,11 +71,17 @@ class Data extends Object {
   public $nb_files = -1;
 
   /**
-   * Extra information for this data. (spacing, size...)
+   * The status of this dataset
    *
-   * @var string $meta_information
+   * @var string $status
    */
-  public $meta_information = null;
+  public $status = '';
 
+  /**
+   * The plugin which introduced this dataset
+   *
+   * @var string $plugin
+   */
+  public $plugin = '';
 }
 ?>

@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -25,34 +26,19 @@
  *                        dev@babyMRI.org
  *
  */
-
 // we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+// include the configuration file
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
-//define('CHRIS_CONFIG_DEBUG',true);
+$shortopts = "";
+$shortopts .= "l:"; // location
+$shortopts .= "c:"; // command
 
-// include the configuration
+$options = getopt($shortopts);
 
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once (dirname(dirname(dirname(__FILE__))).'/config.inc.php');
-// include the simpletest chris framework
-require_once (SIMPLETEST_CHRIS);
-SimpleTest_Chris::setPreference();
+$mosix_command = "ssh chris@rc-goldfinger 'nohup /bin/mosbatch -q -b -E".$options["l"]." ".$options["c"]."  > log.out 2> log.err < /dev/null & echo $!'";
 
-// include all the tests
-// data related models
-require_once ('test.data.model.php');
-require_once ('test.data_patient.model.php');
-// user related models
-require_once ('test.user.model.php');
-require_once ('test.user_data.model.php');
-// feed related projects
-require_once ('test.feed.model.php');
-require_once ('test.feed_data.model.php');
-//other models
-require_once ('test.meta.model.php');
-require_once ('test.patient.model.php');
-
-
+echo shell_exec($mosix_command);
 ?>

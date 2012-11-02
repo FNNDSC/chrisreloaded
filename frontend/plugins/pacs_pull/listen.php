@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -18,41 +19,24 @@
  *
  *                     R  E  L  O  A  D  E  D
  *
- * (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+ * (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center4352490
  *                   Boston Children's Hospital
  *
  *              http://childrenshospital.org/FNNDSC/
  *                        dev@babyMRI.org
  *
  */
-
 // we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+// include the configuration file
+ if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
-//define('CHRIS_CONFIG_DEBUG',true);
-
-// include the configuration
-
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once (dirname(dirname(dirname(__FILE__))).'/config.inc.php');
-// include the simpletest chris framework
-require_once (SIMPLETEST_CHRIS);
-SimpleTest_Chris::setPreference();
-
-// include all the tests
-// data related models
-require_once ('test.data.model.php');
-require_once ('test.data_patient.model.php');
-// user related models
-require_once ('test.user.model.php');
-require_once ('test.user_data.model.php');
-// feed related projects
-require_once ('test.feed.model.php');
-require_once ('test.feed_data.model.php');
-//other models
-require_once ('test.meta.model.php');
-require_once ('test.patient.model.php');
-
-
+// build the storescp command
+// storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"
+// then each incoming data is processed by $process_command
+/* $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php -p #p -f #f'); */
+$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php -p #p -f #f');
+$listen_command = '/usr/bin/storescp -id -od ' . CHRIS_TMP . ' -pm -xcr  \'' . $process_command . '\' -ss RX -tos 120';
+exec($listen_command);
 ?>

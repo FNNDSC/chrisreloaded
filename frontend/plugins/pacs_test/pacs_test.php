@@ -25,34 +25,12 @@
  *                        dev@babyMRI.org
  *
  */
-
-// we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
-
-//define('CHRIS_CONFIG_DEBUG',true);
+define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
+require_once (dirname(dirname(__FILE__)).'/config.inc.php');
+require_once 'pacs.class.php';
 
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once (dirname(dirname(dirname(__FILE__))).'/config.inc.php');
-// include the simpletest chris framework
-require_once (SIMPLETEST_CHRIS);
-SimpleTest_Chris::setPreference();
-
-// include all the tests
-// data related models
-require_once ('test.data.model.php');
-require_once ('test.data_patient.model.php');
-// user related models
-require_once ('test.user.model.php');
-require_once ('test.user_data.model.php');
-// feed related projects
-require_once ('test.feed.model.php');
-require_once ('test.feed_data.model.php');
-//other models
-require_once ('test.meta.model.php');
-require_once ('test.patient.model.php');
-
-
+$pacs_query = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR']);
+echo json_encode($pacs_query->ping());
 ?>

@@ -65,9 +65,9 @@ class Patient extends Object {
   /**
    * The patient_id of this patient. This is also known as the MRN.
    *
-   * @var string $patient_id
+   * @var string $uid
    */
-  public $patient_id = null;
+  public $uid = null;
 
 }
 

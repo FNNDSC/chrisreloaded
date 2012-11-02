@@ -27,32 +27,27 @@
  */
 
 // we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(dirname(__FILE__))).'/config.inc.php');
 
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once (dirname(dirname(dirname(__FILE__))).'/config.inc.php');
 // include the simpletest chris framework
 require_once (SIMPLETEST_CHRIS);
 SimpleTest_Chris::setPreference();
 
-// include all the tests
-// data related models
-require_once ('test.data.model.php');
-require_once ('test.data_patient.model.php');
-// user related models
-require_once ('test.user.model.php');
-require_once ('test.user_data.model.php');
-// feed related projects
-require_once ('test.feed.model.php');
-require_once ('test.feed_data.model.php');
-//other models
-require_once ('test.meta.model.php');
-require_once ('test.patient.model.php');
+// include the test object class since we derive from that
+require_once('test.object.model.php');
 
+// include the feed_data class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
+
+class TestFeed_DataModel extends TestObjectModel {
+
+
+}
 
 ?>

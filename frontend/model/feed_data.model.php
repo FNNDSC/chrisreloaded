@@ -26,33 +26,32 @@
  *
  */
 
-// we define a valid entry point
+// prevent direct calls
 if (!defined('__CHRIS_ENTRY_POINT__'))
-  define('__CHRIS_ENTRY_POINT__', 666);
+  die('Invalid access.');
 
-//define('CHRIS_CONFIG_DEBUG',true);
+// grab the super class for all entities
+require_once 'object.model.php';
 
-// include the configuration
+/**
+ *
+ * The Feed_Data class which describes the Feed_Data entity of the database.
+ *
+ */
+class Feed_Data extends Object {
 
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once (dirname(dirname(dirname(__FILE__))).'/config.inc.php');
-// include the simpletest chris framework
-require_once (SIMPLETEST_CHRIS);
-SimpleTest_Chris::setPreference();
+  /**
+   * The feed unique ID.
+   *
+   * @var int $feed_id
+   */
+  public $feed_id = -1;
 
-// include all the tests
-// data related models
-require_once ('test.data.model.php');
-require_once ('test.data_patient.model.php');
-// user related models
-require_once ('test.user.model.php');
-require_once ('test.user_data.model.php');
-// feed related projects
-require_once ('test.feed.model.php');
-require_once ('test.feed_data.model.php');
-//other models
-require_once ('test.meta.model.php');
-require_once ('test.patient.model.php');
-
-
+  /**
+   * The data unique ID.
+   *
+   * @var int $data_id
+   */
+  public $data_id = -1;
+}
 ?>

@@ -36,7 +36,7 @@ require_once(dirname(__FILE__).'/controller/_util.inc.php');
 define('SQL_HOST', 'chris');
 define('SQL_USERNAME', 'chris');
 define('SQL_PASSWORD', 'YOURPASSWORD');
-define('SQL_DATABASE', 'chrisdev_old');
+define('SQL_DATABASE', 'chrisdev');
 
 // PATH configuration
 define('CHRIS_WWWROOT', dirname(__FILE__));
@@ -45,8 +45,6 @@ define('CHRIS_VIEW_FOLDER', joinPaths(CHRIS_WWWROOT,'view'));
 define('CHRIS_TEMPLATE_FOLDER', joinPaths(CHRIS_VIEW_FOLDER,'template'));
 define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
 define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
-// need relative paths for images sources
-define('CHRIS_VIEW_FOLDER_RELATIVE', 'view');
 define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
 
 // PACS
@@ -58,6 +56,9 @@ define('CHRIS_TMP', '/chb/users/chris/dev/tmp/');
 define('CHRIS_AETITLE', 'FNNDSC-CHRISDEV');
 define('PACS_SERVER', '134.174.12.21');
 define('PACS_PORT', '104');
+
+// Cluster OS
+define('CHRIS_CLUSTER', 'mosix');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));

@@ -52,21 +52,14 @@ class Feed extends Object {
    *
    * @var string $action
    */
-  public $action = null;
+  public $action = '';
 
   /**
-   * The model the feed is related to.
+   * The plugin that generated the feed.
    *
-   * @var string $model
+   * @var string $plugin
    */
-  public $model = null;
-
-  /**
-   * The model id the feed is related to.
-   *
-   * @var string $model_id
-   */
-  public $model_id = '';
+  public $plugin = '';
 
   /**
    * The time of the feed creation
@@ -74,14 +67,7 @@ class Feed extends Object {
    * @var string $time
    */
   public $time = '';
-
-  /**
-   * The status of the feed: 0-100
-   * -1: failure
-   *
-   * @var int $status
-   */
+  
   public $status = 0;
-
 }
 ?>
