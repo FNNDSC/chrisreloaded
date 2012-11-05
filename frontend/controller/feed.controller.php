@@ -31,7 +31,6 @@ if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 // include the configuration
 require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
-
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 //require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs.class.php'));
 
@@ -183,13 +182,13 @@ class FeedC implements FeedControllerInterface {
 
   }
 
-  static public function create($user, $plugin){
+  static public function create($user_id, $plugin){
     // get user id from name or user_id
     //$user_id = FeedC::_GetUserID($user);
 
     // create feed and add it to db
     $feedObject = new Feed();
-    $feedObject->user_id = $user;
+    $feedObject->user_id = $user_id;
     $feedObject->plugin = $plugin;
     $feedObject->time = date("Y-m-d H:i:s");
     return Mapper::add($feedObject);

@@ -29,6 +29,7 @@ define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
 require_once (dirname(dirname(__FILE__)).'/config.inc.php');
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 
 // include the controller
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
@@ -40,16 +41,14 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 // Create a feed given a user id, an action and details about the action.
 // metadata instead of param?
 // create folder on file system
-$feed_id = FeedC::create($_POST['FEED_USER'], $_POST['FEED_PLUGIN']);
+
+$username = $_SESSION['username'];
+$userid = $_SESSION['userid'];
+
+$feed_id = FeedC::create($userid, $_POST['FEED_PLUGIN']);
 FeedC::addMeta($feed_id, $_POST['FEED_META']);
 // feed location on filesystem
 // FeedC::addMeta($feed_id, $_POST['FEED_META']);
-
-// get username
-$userMapper= new Mapper('User');
-$userMapper->filter('id=(?)', $_POST['FEED_USER']);
-$userResults = $userMapper->get();
-$username = $userResults['User'][0]->username;
 
 // Create the feed directory
 $feed_path = joinPaths(CHRIS_DATA, $username, $_POST['FEED_PLUGIN'], $feed_id);
@@ -59,7 +58,7 @@ if(!mkdir($feed_path, 0777, true)){
 
 // create data
 $data_id = DataC::create($_POST['FEED_PLUGIN']);
-DataC::addUser($data_id, $_POST['FEED_USER']);
+DataC::addUser($data_id, $userid);
 
 // link feed to data
 
