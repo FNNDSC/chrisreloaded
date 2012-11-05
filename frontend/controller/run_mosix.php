@@ -32,11 +32,7 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 if(!defined('CHRIS_CONFIG_PARSED'))
   require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
-$shortopts = "";
-$shortopts .= "l:"; // location
-$shortopts .= "c:"; // command
-
-$options = getopt($shortopts);
+$options = include('run.php');
 
 $mosix_command = "ssh chris@rc-goldfinger 'nohup /bin/mosbatch -q -b -E".$options["l"]." ".$options["c"]."  > log.out 2> log.err < /dev/null & echo $!'";
 
