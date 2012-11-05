@@ -52,6 +52,7 @@ $userid = $_SESSION['userid'];
 $feed_name = sanitize($_POST['FEED_NAME']);
 $feed_id = FeedC::create($userid, $_POST['FEED_PLUGIN'], $feed_name);
 FeedC::addMeta($feed_id, $_POST['FEED_PARAM']);
+FeedC::addMeta($feed_id, $_POST['FEED_OUTPUT']);
 
 // Create the feed directory
 $feed_path = joinPaths(CHRIS_DATA, $username, $_POST['FEED_PLUGIN'], $feed_name.'-'.$feed_id);
