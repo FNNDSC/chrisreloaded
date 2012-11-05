@@ -13,11 +13,12 @@
 	padding: 4px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: grey;
+	border-color: lightgray;
 	display: none;
 	cursor: pointer;
 	background-color: #fff;
 	text-align: center;
+	font-weight: bold;
 }
 
 .feed {

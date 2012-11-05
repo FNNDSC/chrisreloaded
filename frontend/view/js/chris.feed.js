@@ -34,6 +34,7 @@ _FEED_.feed_more_onclick = function() {
 }
 _FEED_.feed_onclick = function() {
   jQuery(document).on('click', '.feed_header', function() {
+    
     var more = jQuery(this).parent().find('.feed_more');
     var details = jQuery(this).parent().find('.feed_details');
     _FEED_.onclick(details, more);
@@ -49,6 +50,22 @@ _FEED_.feed_onclick = function() {
         alert(file);
       });
     }
+    
+    // also create the multi accordion
+    // if it doesn't exist
+    var accordionpanel = details.children('.feedpanel');
+    if (!accordionpanel.hasClass('ui-accordion')) {
+      
+      var _last_div_index = accordionpanel.children('div').length-1;
+      
+      accordionpanel.multiAccordion({
+        heightStyle: "content",
+        animate: false,
+        active: _last_div_index
+      });  
+      
+    }
+    
   });
   jQuery(document).on('click', '.feed_meta_header', function() {
     var details = jQuery(this).parent().find('.feed_meta_content');
@@ -179,6 +196,9 @@ _FEED_.activateDraggable = function() {
     zIndex : 2500
   });
 }
+_FEED_.createFeedDetails = function() {
+
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -193,10 +213,6 @@ jQuery(document).ready(function() {
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
   
-  jQuery('.feedpanel').accordion({
-    heightStyle: "content",
-    animate: false,
-    active: 1
-  });  
+
 
 });
