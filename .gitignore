@@ -10,3 +10,6 @@
 
 # eclipse files
 .settings
+
+# mac specific nfs files
+*DS_Store
