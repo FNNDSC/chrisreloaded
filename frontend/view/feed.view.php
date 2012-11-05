@@ -56,19 +56,17 @@ class FeedV implements ObjectViewInterface {
     // Format time
     $time = FeedV::_getTime($object->time);
     // Format simple meta feed
-    $feedMetaSimpleMapper= new Mapper('Meta');
-    $feedMetaSimpleMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
+    $feedMetaSimpleMapper= new Mapper('Feed');
+    $feedMetaSimpleMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
     $feedMetaSimpleResults = $feedMetaSimpleMapper->get();
     $feed_meta_simple = '';
-    
-    print_r($feedMetaSimpleResults['Meta']);
-    
+
     foreach($feedMetaSimpleResults['Meta'] as $key => $value){
       $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value;
     }
     // Format advanced meta feed
-    $feedMetaAdvancedMapper= new Mapper('Meta');
-    $feedMetaAdvancedMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
+    $feedMetaAdvancedMapper= new Mapper('Feed');
+    $feedMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
     $feedMetaAdvancedResults = $feedMetaAdvancedMapper->get();
     $feed_meta_advanced = $feed_meta_simple;
 
@@ -77,8 +75,8 @@ class FeedV implements ObjectViewInterface {
     }
 
     // Format simple meta data
-    $dataMetaSimpleMapper= new Mapper('Meta');
-    $dataMetaSimpleMapper->ljoin('Data', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
+    $dataMetaSimpleMapper= new Mapper('Data');
+    $dataMetaSimpleMapper->ljoin('Meta', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
     $dataMetaSimpleResults = $dataMetaSimpleMapper->get();
     $data_meta_simple = '';
 
@@ -87,8 +85,8 @@ class FeedV implements ObjectViewInterface {
     }
 
     // Format advanced meta data
-    $dataMetaAdvancedMapper= new Mapper('Meta');
-    $dataMetaAdvancedMapper->ljoin('Data', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
+    $dataMetaAdvancedMapper= new Mapper('Data');
+    $dataMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
     $dataMetaAdvancedResults = $dataMetaAdvancedMapper->get();
     $data_meta_advanced = $data_meta_simple;
 
