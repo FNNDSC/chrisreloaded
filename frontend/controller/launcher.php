@@ -42,16 +42,22 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 // metadata instead of param?
 // create folder on file system
 
+/* FEED_PLUGIN : 'pacs_pull',
+FEED_NAME : 'name of the feed',
+FEED_PARAM : metas,
+FEED_OUTPUT: metas */
+
 $username = $_SESSION['username'];
 $userid = $_SESSION['userid'];
 
 $feed_id = FeedC::create($userid, $_POST['FEED_PLUGIN']);
-FeedC::addMeta($feed_id, $_POST['FEED_META']);
+FeedC::addMeta($feed_id, $_POST['FEED_PARAM']);
+FeedC::addName($feed_id, $_POST['FEED_NAME']);
 // feed location on filesystem
 // FeedC::addMeta($feed_id, $_POST['FEED_META']);
 
 // Create the feed directory
-$feed_path = joinPaths(CHRIS_DATA, $username, $_POST['FEED_PLUGIN'], $feed_id);
+$feed_path = joinPaths(CHRIS_DATA, $username, $_POST['FEED_PLUGIN'], $_POST['FEED_NAME'].'-'.$feed_id);
 if(!mkdir($feed_path, 0777, true)){
   return "Couldn't create the feed directory on filesystem: ".$feed_path;
 }

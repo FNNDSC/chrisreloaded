@@ -48,11 +48,11 @@ class Feed extends Object {
   public $user_id = -1;
 
   /**
-   * The action which describes the feed
+   * The name of the feed
    *
-   * @var string $action
+   * @var string $name
    */
-  public $action = '';
+  public $name = '';
 
   /**
    * The plugin that generated the feed.
