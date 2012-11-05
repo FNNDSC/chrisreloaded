@@ -60,9 +60,11 @@ class FeedV implements ObjectViewInterface {
     $feedMetaSimpleMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
     $feedMetaSimpleResults = $feedMetaSimpleMapper->get();
     $feed_meta_simple = '';
-
+    
+    print_r($feedMetaSimpleResults['Meta']);
+    
     foreach($feedMetaSimpleResults['Meta'] as $key => $value){
-      $feed_meta_simple .= ' <b>'.$value->name.' :</b> '.$value->value;
+      $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value;
     }
     // Format advanced meta feed
     $feedMetaAdvancedMapper= new Mapper('Meta');
@@ -102,7 +104,7 @@ class FeedV implements ObjectViewInterface {
     }
     $t -> replace('IMAGE_SRC', $feed_gfx64);
     $t -> replace('USERNAME', $username);
-    $t -> replace('FEED_META_SIMPLE', $feed_meta_simple);
+    $t -> replace('FEED_META_SIMPLE', $object->name);
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
     $t -> replace('DATA_META', $data_meta_advanced);
     if($data_meta_advanced != ''){
