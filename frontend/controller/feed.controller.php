@@ -54,7 +54,7 @@ interface FeedControllerInterface
   // update feeds which contain given data_id
   static public function updateDB(&$object, $data_id);
   // create a feed given a user id, an action and the related details
-  static public function create($user, $plugin);
+  static public function create($user, $plugin, $name);
 }
 
 /**
@@ -182,13 +182,14 @@ class FeedC implements FeedControllerInterface {
 
   }
 
-  static public function create($user_id, $plugin){
+  static public function create($user_id, $plugin, $name){
     // get user id from name or user_id
     //$user_id = FeedC::_GetUserID($user);
 
     // create feed and add it to db
     $feedObject = new Feed();
     $feedObject->user_id = $user_id;
+    $feedObject->name = $name;
     $feedObject->plugin = $plugin;
     $feedObject->time = date("Y-m-d H:i:s");
     return Mapper::add($feedObject);

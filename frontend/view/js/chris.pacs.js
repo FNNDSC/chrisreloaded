@@ -20,12 +20,13 @@ _PACS_.pull_click = function() {
       // get all datas unique id to fill the feed
       jQuery.ajax({
         type : "POST",
-        url : "controller/go.php",
+        url : "controller/launcher.php",
         dataType : "text",
         data : {
-          FEED_USER : '1',
           FEED_PLUGIN : 'pacs_pull',
-          FEED_META : metas
+          FEED_NAME : 'name of the feed',
+          FEED_PARAM : metas,
+          FEED_OUTPUT: metas
         },
         success : function(data) {
 /*          jQuery.ajax({

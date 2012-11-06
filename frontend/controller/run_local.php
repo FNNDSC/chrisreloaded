@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -25,49 +26,13 @@
  *                        dev@babyMRI.org
  *
  */
+// we define a valid entry point
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+// include the configuration file
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
-// prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  die('Invalid access.');
+$options = include('run.php');
 
-// grab the super class for all entities
-require_once 'object.model.php';
-
-/**
- *
- * The Feed class which describes the Feed entity of the database.
- *
- */
-class Feed extends Object {
-
-  /**
-   * The user_id who owns this feed.
-   *
-   * @var int $user_id
-   */
-  public $user_id = -1;
-
-  /**
-   * The name of the feed
-   *
-   * @var string $name
-   */
-  public $name = '';
-
-  /**
-   * The plugin that generated the feed.
-   *
-   * @var string $plugin
-   */
-  public $plugin = '';
-
-  /**
-   * The time of the feed creation
-   *
-   * @var string $time
-   */
-  public $time = '';
-  
-  public $status = 0;
-}
+echo 'NOT_IMPLEMENTED';
 ?>

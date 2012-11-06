@@ -26,48 +26,11 @@
  *
  */
 
-// prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__'))
-  die('Invalid access.');
+$shortopts = "";
+// location: from where should the script be started
+$shortopts .= "l:";
+// command: command to be executed
+$shortopts .= "c:";
 
-// grab the super class for all entities
-require_once 'object.model.php';
-
-/**
- *
- * The Feed class which describes the Feed entity of the database.
- *
- */
-class Feed extends Object {
-
-  /**
-   * The user_id who owns this feed.
-   *
-   * @var int $user_id
-   */
-  public $user_id = -1;
-
-  /**
-   * The name of the feed
-   *
-   * @var string $name
-   */
-  public $name = '';
-
-  /**
-   * The plugin that generated the feed.
-   *
-   * @var string $plugin
-   */
-  public $plugin = '';
-
-  /**
-   * The time of the feed creation
-   *
-   * @var string $time
-   */
-  public $time = '';
-  
-  public $status = 0;
-}
+return getopt($shortopts);
 ?>
