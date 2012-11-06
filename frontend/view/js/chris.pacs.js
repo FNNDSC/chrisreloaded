@@ -8,14 +8,24 @@ _PACS_.pull_click = function() {
     // if not already querying the pacs
     if (!jQuery("#pacs_pull_mrns").prop("readonly")) {
       var mrn_list = jQuery('#pacs_pull_mrns').val();
-      var meta=new Object();
-      meta.name="MRN";
-      meta.value=mrn_list;
-      meta.type="simple";
-      meta.target_type="feed";
+      var metaS =new Object();
+      metaS.name="MRN";
+      metaS.value=mrn_list;
+      metaS.type="simple";
+      metaS.target_type="feed";
       
-      var metas = new Array();
-      metas[0] = meta;
+      var metasS = new Array();
+      metasS[0] = metaS;
+      
+      var metaO=new Object();
+      metaO.name="Output image";
+      metaO.value='image_location';
+      metaO.type="simple";
+      metaO.target_type="feed";
+      
+      var metasO = new Array();
+      metasO[0] = metaO;
+      
       // create feed
       // get all datas unique id to fill the feed
       jQuery.ajax({
@@ -25,8 +35,8 @@ _PACS_.pull_click = function() {
         data : {
           FEED_PLUGIN : 'pacs_pull',
           FEED_NAME : 'name of the feed',
-          FEED_PARAM : metas,
-          FEED_OUTPUT: metas
+          FEED_PARAM : metasS,
+          FEED_OUTPUT: metasO
         },
         success : function(data) {
 /*          jQuery.ajax({
