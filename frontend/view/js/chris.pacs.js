@@ -30,7 +30,7 @@ _PACS_.pull_click = function() {
       // get all datas unique id to fill the feed
       jQuery.ajax({
         type : "POST",
-        url : "controller/launcher.php",
+        url : "controller/launcher-web.php",
         dataType : "text",
         data : {
           FEED_PLUGIN : 'pacs_pull',
