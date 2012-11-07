@@ -103,8 +103,6 @@ $plugin_name = end($plugin_name_array);
 array_shift($plugin_command_array);
 $parameters = implode(' ', $plugin_command_array);
 
-//echo $parameters;
-
 // get user if from username
 $userid = UserC::getID($username);
 
@@ -123,56 +121,12 @@ $format_parameters = str_replace("{OUTPUT}", $feed_path , $parameters);
 // add meta information to the feed
 FeedC::addMetaS($feed_id, 'parameters', $format_parameters, 'simple');
 
-// crun
-
-// update the feed if crun returned sth
-
-//return print_r($options);
-
-// Create a feed given a user id, an action and details about the action.
-// metadata instead of param?
-// create folder on file system
-
-/* FEED_PLUGIN : 'pacs_pull',
- FEED_NAME : 'name of the feed',
-FEED_PARAM : metas,
-FEED_OUTPUT: metas */
-/*
- $username = $_SESSION['username'];
-$userid = $_SESSION['userid'];
-$feed_name = sanitize($_POST['FEED_NAME']);
-$feed_id = FeedC::create($userid, $_POST['FEED_PLUGIN'], $feed_name);
-FeedC::addMeta($feed_id, $_POST['FEED_PARAM']);
-FeedC::addMeta($feed_id, $_POST['FEED_OUTPUT']);
-
-// Create the feed directory
-$feed_path = joinPaths(CHRIS_DATA, $username, $_POST['FEED_PLUGIN'], $feed_name.'-'.$feed_id);
-if(!mkdir($feed_path, 0777, true)){
-return "Couldn't create the feed directory on filesystem: ".$feed_path;
-}
-
-// create data
-$data_id = DataC::create($_POST['FEED_PLUGIN']);
-DataC::addUser($data_id, $userid);
-
-// link feed to data
-
-
+// run dummy mosix script - should use crun
 $arguments = ' -l '.$feed_path;
 $arguments .= ' -c "/bin/mostestload -t 60"';
-*/
-//$arguments .= ' -c "/bin/touch done.txt"';
-// format parameters command
-/*$arguments .= joinPaths(CHRIS_PLUGINS_FOLDER,$_POST['FEED_PLUGIN']);
- foreach($_POST['FEED_META'] as $key => $value){
-$arguments .= ' --'.$value['name'].' '.$value['value'];
-} */
-// format output command
-// ...
-/*
- //$arguments .= '"';
+//$arguments .= ' -c "'.$command.'"';
 // run on cluster and return pid
-$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_'.CHRIS_CLUSTER.'.php '.$arguments);
+$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
 $output = shell_exec($process_command);
 
 // attach pid to feed
@@ -180,5 +134,4 @@ $metaObject = new Meta();
 $metaObject->name = "pid";
 $metaObject->value = $output;
 FeedC::addMeta($feed_id, Array(0 => $metaObject));
-*/
 ?>
