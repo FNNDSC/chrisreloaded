@@ -68,7 +68,7 @@ DataC::addUser($data_id, $userid);
 
 
 $arguments = ' -l '.$feed_path;
-$arguments .= ' -c "/bin/mostestload -t 120"';
+$arguments .= ' -c "/bin/mostestload -t 60"';
 
 //$arguments .= ' -c "/bin/touch done.txt"';
 // format parameters command

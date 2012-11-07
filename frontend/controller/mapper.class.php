@@ -483,15 +483,19 @@ class Mapper implements MapperInterface {
       }
     }
 
-    // does object we want to add exists in database?
+    /**
+     * @todo create issues for some reason... race condition if too many updates - probably not relevant anyway...
+     */
+    /*
+     // does object we want to add exists in database?
     $exists = DB::getInstance()->execute('SELECT id FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where), $preparedValue);
 
     // return the id of the object if it already exists in the database
     if(!empty($exists) )
     {
-      return $exists[0][0][1];
+    return $exists[0][0][1];
     }
-
+    */
     // build sql query with prepared statements
     $insertcolumn = '('.$insertcolumn.')';
     $inservalue = '('.$inservalue.')';
@@ -548,15 +552,18 @@ class Mapper implements MapperInterface {
       }
     }
 
-
-    // After update, will the object be the same as one which currently exists
+    /**
+     * @todo create issues for some reason... race condition if too many updates - probably not relevant anyway...
+     */
+    /*
+     // After update, will the object be the same as one which currently exists
     $exists = DB::getInstance()->execute('SELECT id FROM '.strtolower(get_class($object)).' WHERE '.strtolower($where), $preparedValue);
 
     // Return the id of the same object. Do not perform any update.
     if(!empty($exists) )
     {
-      return $exists[0][0][1];
-    }
+    return $exists[0][0][1];
+    } */
 
     $preparedValue[] = $objectid;
     $exists = DB::getInstance()->execute('UPDATE '.strtolower(get_class($object)).' SET '.strtolower($set).' WHERE id=?', $preparedValue);

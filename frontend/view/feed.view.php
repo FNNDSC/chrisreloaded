@@ -64,6 +64,7 @@ class FeedV implements ObjectViewInterface {
     foreach($feedMetaSimpleResults['Meta'] as $key => $value){
       $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value;
     }
+
     // Format advanced meta feed
     $feedMetaAdvancedMapper= new Mapper('Feed');
     $feedMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
