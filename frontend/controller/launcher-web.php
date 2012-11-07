@@ -41,11 +41,11 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 // format session variables and post variable into a command line format
 // launcher.php compliant
 
-$launch_command = 'launcher.php ';
+$launch_command = './launcher.php ';
 // user?
-$launch_command .= '--username "'.$_SESSION['username'].'" ';
+$launch_command .= '--username="'.$_SESSION['username'].'" ';
 // feed name?
-$launch_command .= '--feed-name "'.sanitize($_POST['FEED_NAME']).'" ';
+$launch_command .= '--feedname="'.sanitize($_POST['FEED_NAME']).'" ';
 // plugin name?
 $command = CHRIS_PLUGINS_FOLDER.'/'.sanitize($_POST['FEED_PLUGIN']).'/'.sanitize($_POST['FEED_PLUGIN']);
 // parameters?
@@ -54,10 +54,10 @@ foreach($_POST['FEED_PARAM'] as $key => $value){
 }
 // output?
 foreach($_POST['FEED_OUTPUT'] as $key => $value){
-  $command .= ' --'.sanitize($value['name']).' {OUTPUT}'.sanitize($value['value']);
+  $command .= ' --'.sanitize($value['name']).' {OUTPUT}/'.sanitize($value['value']);
 }
 $launch_command .= '--command "'.$command.'" ';
 
 // return output
-echo $launch_command;
+echo shell_exec($launch_command);
 ?>
