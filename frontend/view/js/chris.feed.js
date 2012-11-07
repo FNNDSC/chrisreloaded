@@ -3,6 +3,36 @@
  */
 var _FEED_ = _FEED_ || {};
 _FEED_.onclick = function(details, more) {
+  
+  // generate the file browser on demand, if doesnt exist already
+  var _file_browser = details.find('.file_browser');
+  if (_file_browser.is(':empty')) {
+    var _folder = _file_browser.attr('data-folder');
+    _file_browser.fileTree({
+      // TODO should somehow get the CONFIG value for the data folder
+      root : _folder,
+      script : 'controller/feed.browser.connector.php'
+    }, function(file) {
+      alert(file);
+    });
+  }
+  
+  // also create the multi accordion
+  // if it doesn't exist
+  var accordionpanel = details.children('.feedpanel');
+  if (!accordionpanel.hasClass('ui-accordion')) {
+    
+    var _last_div_index = accordionpanel.children('div').length-1;
+    
+    accordionpanel.multiAccordion({
+      heightStyle: "content",
+      animate: false,
+      active: _last_div_index
+    });  
+    
+  }
+  
+  
   // default value for 'force' is false
   if (typeof more == 'undefined') {
     more = false;
@@ -23,6 +53,7 @@ _FEED_.onclick = function(details, more) {
     }
     details.hide('blind', 100);
   }
+  
 }
 _FEED_.feed_more_onclick = function() {
   jQuery(document).on('click', '.feed_more', function(e) {
@@ -37,34 +68,8 @@ _FEED_.feed_onclick = function() {
     
     var more = jQuery(this).parent().find('.feed_more');
     var details = jQuery(this).parent().find('.feed_details');
-    _FEED_.onclick(details, more);
-    // generate the file browser on demand, if doesnt exist already
-    var _file_browser = jQuery(this).parent().find('.file_browser');
-    if (_file_browser.is(':empty')) {
-      var _folder = _file_browser.attr('data-folder');
-      _file_browser.fileTree({
-        // TODO should somehow get the CONFIG value for the data folder
-        root : _folder,
-        script : 'controller/feed.browser.connector.php'
-      }, function(file) {
-        alert(file);
-      });
-    }
     
-    // also create the multi accordion
-    // if it doesn't exist
-    var accordionpanel = details.children('.feedpanel');
-    if (!accordionpanel.hasClass('ui-accordion')) {
-      
-      var _last_div_index = accordionpanel.children('div').length-1;
-      
-      accordionpanel.multiAccordion({
-        heightStyle: "content",
-        animate: false,
-        active: _last_div_index
-      });  
-      
-    }
+    _FEED_.onclick(details, more);
     
   });
   jQuery(document).on('click', '.feed_meta_header', function() {
