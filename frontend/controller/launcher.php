@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -38,6 +39,13 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 
+$shortopts = "";
+$shortopts .= "username:";
+$shortopts .= "feedname:";
+$shortopts .= "command:";
+
+$options = getopt($shortopts);
+
 // Create a feed given a user id, an action and details about the action.
 // metadata instead of param?
 // create folder on file system
@@ -46,7 +54,7 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
  FEED_NAME : 'name of the feed',
 FEED_PARAM : metas,
 FEED_OUTPUT: metas */
-
+/*
 $username = $_SESSION['username'];
 $userid = $_SESSION['userid'];
 $feed_name = sanitize($_POST['FEED_NAME']);
@@ -69,7 +77,7 @@ DataC::addUser($data_id, $userid);
 
 $arguments = ' -l '.$feed_path;
 $arguments .= ' -c "/bin/mostestload -t 60"';
-
+*/
 //$arguments .= ' -c "/bin/touch done.txt"';
 // format parameters command
 /*$arguments .= joinPaths(CHRIS_PLUGINS_FOLDER,$_POST['FEED_PLUGIN']);
@@ -78,7 +86,7 @@ $arguments .= ' --'.$value['name'].' '.$value['value'];
 } */
 // format output command
 // ...
-
+/*
 //$arguments .= '"';
 // run on cluster and return pid
 $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_'.CHRIS_CLUSTER.'.php '.$arguments);
@@ -89,5 +97,5 @@ $metaObject = new Meta();
 $metaObject->name = "pid";
 $metaObject->value = $output;
 FeedC::addMeta($feed_id, Array(0 => $metaObject));
-
+*/
 ?>

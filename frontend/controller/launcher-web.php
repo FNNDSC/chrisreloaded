@@ -45,7 +45,7 @@ $launch_command = 'launcher.php ';
 // user?
 $launch_command .= '--username "'.$_SESSION['username'].'" ';
 // feed name?
-$launch_command .= '--feed-name "'.sanitize($_POST['FEED_NAME']).'" ';
+$launch_command .= '--feedname "'.sanitize($_POST['FEED_NAME']).'" ';
 // plugin name?
 $command = CHRIS_PLUGINS_FOLDER.'/'.sanitize($_POST['FEED_PLUGIN']).'/'.sanitize($_POST['FEED_PLUGIN']);
 // parameters?
