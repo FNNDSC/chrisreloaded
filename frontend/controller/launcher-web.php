@@ -59,5 +59,5 @@ foreach($_POST['FEED_OUTPUT'] as $key => $value){
 $launch_command .= '--command "'.$command.'" ';
 
 // return output
-echo $launch_command;
+echo shell_exec($launch_command);
 ?>
