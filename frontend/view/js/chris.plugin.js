@@ -200,4 +200,17 @@ jQuery(document).ready(
         
       });
       
+
+      // hide output panels
+      jQuery('.panel_content').each(function(i,v) {
+        
+        // check if this is an output only panel
+        var _only_output = (jQuery(v).find('.parameter_row').length == 0);
+        if (_only_output) {
+          // hide this panel
+          jQuery(v).prev().hide();
+        }
+        
+      });      
+      
     });

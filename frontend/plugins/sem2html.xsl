@@ -26,28 +26,44 @@
     <h3 class='panel_title'>
       <xsl:value-of select="label"/>
     </h3>
-    <div>
+    <div class='panel_content'>
     <span></span>
     <!-- All the different input parameters -->
     <xsl:apply-templates select="image"/>
     <xsl:apply-templates select="file"/>
     <xsl:apply-templates select="directory"/>
+    <xsl:apply-templates select="transform"/>
     <xsl:apply-templates select="integer"/>
     <xsl:apply-templates select="double"/>
     </div>
   </xsl:template>
   
-  <!-- IMAGE/FILE parameter -->
-  <xsl:template match="image | file | directory">
-    <div>
-      <xsl:attribute name="class">parameter_row</xsl:attribute>
-      <span class='parameter_title_cropped'>
-        <xsl:value-of select="label"/>
-      </span>
-      <span class='parameter_input parameter_dropzone' data-type='dropzone' data-default='Drag and drop here'>
-        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
-         Drag and drop here</span>
-    </div>
+  <!-- IMAGE/FILE/DIRECTORY/TRANSFORM parameter -->
+  <xsl:template match="image | file | directory | transform">
+    <xsl:variable name="channel" select="channel"/>
+    <xsl:choose>
+      <xsl:when test="$channel = 'output'">
+        <!-- OUTPUT CHANNEL -->
+        <div>
+          <xsl:attribute name="class">output_row</xsl:attribute>
+          <span class='parameter_output' data-type='output'>
+            <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
+          </span>
+        </div>
+      </xsl:when>
+      <xsl:otherwise>
+        <!-- INPUT CHANNEL -->
+        <div>
+          <xsl:attribute name="class">parameter_row</xsl:attribute>
+          <span class='parameter_title_cropped'>
+            <xsl:value-of select="label"/>
+          </span>
+          <span class='parameter_input parameter_dropzone' data-type='dropzone' data-default='Drag and drop here'>
+            <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
+            Drag and drop here</span>
+        </div>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   
   <!-- INTEGER/DOUBLE parameter -->
