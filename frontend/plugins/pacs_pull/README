@@ -1,0 +1,4 @@
+# EDIT CONFIGURATION FILE TO FIT YOUR INFRASCTRUCTURE
+
+# xinet.d to listen to port where data is sent by PACS
+# point to listener.php
