@@ -25,9 +25,6 @@
  *                        dev@babyMRI.org
  *
  */
-// prevent direct calls
-if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
-
 // interface
 interface PACSInterface
 {
@@ -556,14 +553,15 @@ class PACS implements PACSInterface {
         $query .= ' --aetitle '.$this->user_aet;
         $query .= ' --move '.$this->user_aet;
         $query .= ' --study ';
-        $query .= ' -k "QueryRetrieveLevel=STUDY"';
-        $query .= ' -k "StudyInstanceUID='.$value.'"';
+        $query .= ' -k QueryRetrieveLevel=STUDY';
+        $query .= ' -k StudyInstanceUID='.$value;
         $query .= ' '.$this->server_ip;
         $query .= ' '.$this->server_port;
         $query .= ' 2>&1';
 
         // execute query
-        $output .= shell_exec($query);
+        $output .= $query;
+        //$output .= shell_exec($query);
       }
       return $output;
     }
@@ -586,9 +584,9 @@ class PACS implements PACSInterface {
       $command = $this->movescu.' -S';
       $command .= ' --aetitle '.$this->user_aet;
       $command .= ' --move '.$this->user_aet;
-      $command .= ' -k "QueryRetrieveLevel=SERIES"';
-      $command .= ' -k "StudyInstanceUID='.$this->command_param['StudyInstanceUID'].'"';
-      $command .= ' -k "SeriesInstanceUID='.$this->command_param['SeriesInstanceUID'].'"';
+      $command .= ' -k QueryRetrieveLevel=SERIES';
+      $command .= ' -k StudyInstanceUID='.$this->command_param['StudyInstanceUID'];
+      $command .= ' -k SeriesInstanceUID='.$this->command_param['SeriesInstanceUID'];
       $command .= ' '.$this->server_ip;
       $command .= ' '.$this->server_port;
       $command .= ' 2>&1';

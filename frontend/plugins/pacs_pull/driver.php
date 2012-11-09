@@ -26,9 +26,17 @@
  *
  */
 
-define('CHRIS_DCMTK', '/usr/bin/');
-define('PACS_AETITLE', 'FNNDSC-CHRISDEV');
-define('PACS_SERVER', '134.174.12.21');
-define('PACS_PORT', '104');
+// preprocess!!
+// create data tables!
+// create patient!
+
+
+// and process!!
+// ask pacs to move data!
+
+
+// postprocess
+// listen.php ->postprocess.php
+// xinet.d daemon listening to incoming data from the pacs
 
 ?>
