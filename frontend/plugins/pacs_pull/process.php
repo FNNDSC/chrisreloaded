@@ -89,7 +89,12 @@ $pacs_mrn = '4524909';
 $pacs_birthday = '';
 $pacs_study_uid = '';
 $pacs_serie_uid = '';
-$output
+
+// not needed
+// 1- create data
+// 2- attach it to feed
+// 3- from data we can retrieve feed location on listener side
+//$output
 
 $pacs = new PACS(PACS_SERVER, PACS_PORT, PACS_AETITLE);
 
