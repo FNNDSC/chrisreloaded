@@ -35,6 +35,7 @@ class Plugin( argparse.ArgumentParser ):
   '''
   IMAGE = 'image'
   INTEGER = 'integer'
+  BOOLEAN = 'boolean'
 
   def __init__( self ):
     '''

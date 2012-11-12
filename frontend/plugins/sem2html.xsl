@@ -108,12 +108,15 @@
       <span class='parameter_input' data-type='checkbox'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
         <input type='checkbox' class='parameter_checkbox'>
-          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
           <xsl:variable name="default" select="default"/>
           <xsl:choose>
-            <xsl:when test="$default = 'true'">
+            <xsl:when test="$default = 'true' or $default = 'True'">
               <xsl:attribute name="checked"/>
+              <xsl:attribute name="data-default">true</xsl:attribute>
             </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="data-default">false</xsl:attribute>
+            </xsl:otherwise>
           </xsl:choose>
         </input>
       </span>
