@@ -26,32 +26,9 @@
  *
  */
 
-// we define a valid entry point
-define('__CHRIS_ENTRY_POINT__', 666);
-
-//define('CHRIS_CONFIG_DEBUG', true);
-
-// include the configuration
-require_once ('config.inc.php');
-
-// include the template class
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
-
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
-
-function pacsPage() {
-  // create the login page
-  $t = new Template('pacs2.html');
-  $t -> replace('CSS', 'css.html');
-  $t -> replace('NAVBAR', 'navbar.html');
-  $t -> replace('DATA_PREVIEW', 'data_preview.html');
-  $t -> replace('CHRIS_AETITLE', CHRIS_AETITLE);
-  $t -> replace('FOOTER', 'footer.html');
-  $t -> replace('JAVASCRIPT', 'javascript.html');
-  return $t;
-}
-
-// execute the test
-echo pacsPage();
+define('CHRIS_DCMTK', '/usr/bin/');
+define('PACS_AETITLE', 'FNNDSC-CHRISDEV');
+define('PACS_SERVER', '134.174.12.21');
+define('PACS_PORT', '104');
 
 ?>

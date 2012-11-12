@@ -2,15 +2,6 @@
  * Define the _PACS_ namespace
  */
 var _PACS_ = _PACS_ || {};
-/**
- * Bind the simple search input field to the simple search button.
- */
-jQuery('#pacs_form').submit(function(e) {
-  e.preventDefault();
-  if (e.which == 13) {
-    jQuery("#SEARCH").click();
-  }
-});
 /*
  * _PACS_.studySearch = function() { jQuery("#S_SEARCH").live('click',
  * function(event) { jQuery("#SEARCH").html("Study"); }); } _PACS_.seriesSearch =
@@ -775,10 +766,31 @@ jQuery(document).ready(function() {
   // settings
   //
   // ping the server
-  jQuery(".pacsPing").click(function(event) {
-    _PACS_.ajaxPing();
-  });
+  /*
+   * jQuery(".pacsPing").click(function(event) { _PACS_.ajaxPing(); });
+   */
   jQuery("#pacs_feed_filter").bind('input', function() {
     _PACS_.sTable.fnFilter(jQuery(this).val());
+  });
+  jQuery.ajax({
+    type : "POST",
+    url : "http://chris/nicolas/api/file.php",
+    dataType : "json",
+    data : {
+      FEED_DIRECTORY : '',
+      FEED_PLUGIN : 'pacs_query',
+      FILENAME : 'study.json',
+      TYPE : 'JSON'
+    },
+    success : function(data) {
+      jQuery("#PACS-RESULTS").show();
+      // jQuery("#PACS-RESULTS").show('blind', 100);
+      // reformat data in 2 arrays
+      data = _PACS_.reformatSimpleResults(data);
+      _PACS_.cachedData = data;
+      // data simple visualization
+      _PACS_.ajaxSimpleResults(data);
+      // 
+    }
   });
 });

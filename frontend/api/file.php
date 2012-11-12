@@ -25,18 +25,31 @@
  *                        dev@babyMRI.org
  *
  */
+define('__CHRIS_ENTRY_POINT__', 666);
 
-// preprocess!!
-// create data tables!
-// create patient!
+// include the configuration
+require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
+/* // get location
+// feedname-feedid
+$feed_directory = $_POST['FEED_DIRECTORY'];
+// plugin name
+$feed_plugin =  $_POST['FEED_PLUGIN'];
+// file name
+$name = $_POST['FILENAME'];
 
-// and process!!
-// ask pacs to move data!
+//$location = joinPaths(CHRIS_DATA_FOLDER, $_SESSION['username'], $feed_plugin, $feed_directory, $name);
+$location = '/chb/users/nicolas.rannou/gitroot/chrisreloaded/frontend/plugins/pacs_query/study.json';
+ */
+// location:
 
-
-// postprocess
-// listen.php ->postprocess.php
-// xinet.d daemon listening to incoming data from the pacs
-
+// return required type (JSON, RAW, etc.)
+/* if($_POST['TYPE'] == 'JSON'){
+  echo $location;
+}
+else{
+  echo 'unknown type';
+} */
+//$json_data = file_get_contents('data.txt');
+echo file_get_contents('/chb/users/nicolas.rannou/gitroot/chrisreloaded/frontend/plugins/pacs_query/study.json');
 ?>

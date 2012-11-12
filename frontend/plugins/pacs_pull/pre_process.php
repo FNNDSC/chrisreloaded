@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -27,8 +28,10 @@
  */
 
 $user_id = '';
+$feed_chris_id = '';
 $details = '';
 
+// get all information related to a patient
 $pacs = new PACS(PACS_SERVER, PACS_PORT, PACS_AETITLE);
 $study_parameter = Array();
 $study_parameter['PatientID'] = $details;
@@ -43,7 +46,7 @@ $results = $pacs->queryAll($study_parameter, $series_parameter, null);
 // if no data available, return null
 if(count($results[1]) == 0)
 {
-  return "No data available from pacs for: data-down-mrn - ".$details;
+  return "No data available from pacs for: MRN - ".$details;
 }
 
 // LOCK DB Patient on write so no patient will be added in the meanwhile
@@ -65,7 +68,7 @@ if(count($patientResult['Patient']) == 0)
   $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
   $patientObject->dob = $datetime;
   $patientObject->sex = $results[0]['PatientSex'][0];
-  $patientObject->patient_id = $results[0]['PatientID'][0];
+  $patientObject->uid = $results[0]['PatientID'][0];
   // add the patient model and get its id
   $patient_chris_id = Mapper::add($patientObject);
 }
@@ -78,9 +81,10 @@ else{
 $db->unlock();
 
 // loop through all data to be downloaded
-// if data not there, create rown in the data db table
+// if data not there, create row in the data db table
 // update the feed ids and status
-$feed_ids = '';
+
+$data_chris_id = -1;
 $feed_status = '';
 foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   // lock data db so no data added in the meanwhile
@@ -89,35 +93,35 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
 
   // retrieve the data
   $dataMapper = new Mapper('Data');
-  $dataMapper->filter('unique_id = (?)',$value);
+  $dataMapper->filter('uid = (?)',$value);
   $dataResult = $dataMapper->get();
   // if nothing in DB yet, add it
   if(count($dataResult['Data']) == 0)
   {
     // add data and get its id
     $dataObject = new Data();
-    $dataObject->unique_id = $value;
+    $dataObject->uid = $value;
     $dataObject->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
-    // set series description
-    // check if available...
-    $dataObject->patient_id = $patient_chris_id;
-    $dataObject->name = '';
+    $dataObject->name = sanitize($results[1]['SeriesDescription'][$key]);
+    $data_chris_id = Mapper::add($dataObject);
 
-    // make sure all fiels are provided
-    $series_description = sanitize($results[1]['SeriesDescription'][$key]);
-    $dataObject->name .= $series_description;
-    $dataObject->time = '';
-    $dataObject->meta_information = '';
-    // add data in db
-    $feed_ids .= Mapper::add($dataObject) . ';';
+    // MAP DATA TO PATIENT
+    $dataPatientObject = new Data_Patient();
+    $dataPatientObject->data_id = $data_chris_id;
+    $dataPatientObject->patient_id = $patient_chris_id;
+    Mapper::add($dataPatientObject);
   }
   // else get its id
   else{
-    $feed_ids .= $dataResult['Data'][0]->id . ';';
+    $data_chris_id = = $dataResult['Data'][0]->id;
   }
-  $feed_status .= '1';
+  
   $db->unlock();
+  
+  // MAP DATA TO FEED
+  $feedDataObject = new Feed_Data();
+  $feedDataObject->feed_id = $feed_chris_id;
+  $feedDataObject->data_id = $data_chris_id;
+  Mapper::add($feedDataObject);
 }
-
-// MAP FEED TO DATA!
 ?>
