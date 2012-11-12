@@ -80,7 +80,10 @@ class Plugin( argparse.ArgumentParser ):
     for i, panel in enumerate( self.__panels ):
       parameters = self.__parameters[i]
 
-      xml += '<parameters>\n'
+      if panel.upper().find( 'ADVANCED' ) != -1:
+        xml += '<parameters advanced="true">\n'
+      else:
+        xml += '<parameters>\n'
       xml += '<label>' + panel + '</label>\n'
 
       for parameter in parameters:

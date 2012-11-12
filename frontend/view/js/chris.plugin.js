@@ -132,7 +132,8 @@ jQuery(document).ready(
             // grab the visible plugin panel
             var _visible_panel = jQuery('.plugin_panel :visible');
             _parameter_rows = _visible_panel.find('.parameter_row');
-            var _command = _visible_panel.closest('div').attr('data-executable');
+            var _command = _visible_panel.closest('div')
+                .attr('data-executable');
             
             // loop through all parameter rows
             _parameter_rows.each(function(i) {
@@ -154,7 +155,8 @@ jQuery(document).ready(
                 var _dropzone_field = jQuery(_parameter_rows[i]).find(
                     '.parameter_dropzone');
                 
-                _value = _dropzone_field.children('span').attr('data-full-path');
+                _value = _dropzone_field.children('span')
+                    .attr('data-full-path');
                 
               } else if (_type == 'spinner') {
                 
@@ -173,14 +175,18 @@ jQuery(document).ready(
             // TODO validate
             
             // TODO perform the action
-
+            
             alert('Job submitted!\n' + _command);
             
           });
       
       jQuery('.panelgroup').multiAccordion({
         heightStyle: "content",
-        animate: false
+        animate: false,
+        
+        // collapse all panels by default (they later get shown again if
+        // they are not advanced panels)
+        active: 'none'
       });
       jQuery('.parameter_spinner').each(function(i, v) {
 
@@ -200,17 +206,47 @@ jQuery(document).ready(
         
       });
       
-
-      // hide output panels
-      jQuery('.panel_content').each(function(i,v) {
+      // show non-advanced panels
+      jQuery('.panelgroup').each(function(i,v) {
         
-        // check if this is an output only panel
-        var _only_output = (jQuery(v).find('.parameter_row').length == 0);
-        if (_only_output) {
-          // hide this panel
-          jQuery(v).prev().hide();
-        }
+        var _accordion = jQuery(v);
         
-      });      
+        var _activeTabs = _accordion.multiAccordion('getActiveTabs');
+        
+        if ((_activeTabs.length == 1) && (_activeTabs[0] == -1)) {
+          
+          // no tabs active yet
+          _activeTabs = [];
+          
+        }        
       
+        // grab the current panels of this accordion
+        jQuery(v).children('.panel_content').each(function(j,w){
+          
+          // check if this is an advanced panel
+          var _advanced_panel = (jQuery(w).attr('data-advanced') == 'true');
+          
+          // check if this is an output only panel
+          var _only_output = (jQuery(w).find('.parameter_row').length == 0);
+          
+          if (_only_output) {
+            // hide this panel
+            jQuery(w).prev().hide();
+            
+            // and never add it to the active tabs
+            return;
+          }
+          if (!_advanced_panel) {
+            // this is not an advanced panel
+            _activeTabs.push(j);
+            
+          }
+          
+        });
+        
+        // now show all non-advanced panels
+        _accordion.multiAccordion('option', 'active', _activeTabs);
+        
+      });
+            
     });
