@@ -108,6 +108,7 @@
       <span class='parameter_input' data-type='checkbox'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
         <input type='checkbox'>
+          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
         </input>
       </span>
     </div>
