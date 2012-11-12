@@ -116,6 +116,12 @@ jQuery(document).ready(
               _default_value = _spinner.attr('data-default');
               _spinner.spinner("value", _default_value);
               
+              // checkboxes
+              var _checkbox = jQuery(_parameter_rows[i]).find(
+                  '.parameter_checkbox');
+              _default_value = _checkbox.attr('data-default');
+              _checkbox.prop('checked', (_default_value == 'true'));
+              
             });
             
           });
