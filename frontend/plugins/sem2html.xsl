@@ -29,14 +29,32 @@
     <div class='panel_content'>
     <span></span>
     <!-- All the different input parameters -->
-    <xsl:apply-templates select="image"/>
-    <xsl:apply-templates select="file"/>
-    <xsl:apply-templates select="directory"/>
-    <xsl:apply-templates select="transform"/>
-    <xsl:apply-templates select="integer"/>
-    <xsl:apply-templates select="double"/>
+    <xsl:apply-templates/>
     </div>
   </xsl:template>
+  
+  <!-- CREATE THE PARAMETER TITLE BASED ON LABEL OR LONGFLAG -->
+  <xsl:template match="text()" />
+  <xsl:template name="create_label">
+    <span class='parameter_title'>
+      <xsl:variable name="label" select="label"/>
+      <xsl:variable name="name" select="name"/>
+      <xsl:choose>
+        <xsl:when test="$label != ''">
+          <xsl:value-of select="label"/>
+        </xsl:when>
+        <xsl:when test="$name != ''">
+          <xsl:value-of select="name"/>
+        </xsl:when>        
+        <xsl:otherwise>
+          <xsl:value-of select="longflag"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </span>
+  </xsl:template>
+  
+  
+  <!-- PARAMETERS -->
   
   <!-- IMAGE/FILE/DIRECTORY/TRANSFORM parameter -->
   <xsl:template match="image | file | directory | transform">
@@ -70,14 +88,25 @@
   <xsl:template match="integer | double">
     <div>
       <xsl:attribute name="class">parameter_row</xsl:attribute>
-      <span class='parameter_title'>
-        <xsl:value-of select="label"/>
-      </span>
+      <xsl:call-template name="create_label"/>
       <span class='parameter_input' data-type='spinner'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
         <input class='parameter_spinner'>
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
           <xsl:attribute name="data-step"><xsl:value-of select="constraints/step"/></xsl:attribute>
+        </input>
+      </span>
+    </div>
+  </xsl:template>
+  
+  <!-- BOOLEAN parameter -->
+  <xsl:template match="boolean">
+    <div>
+      <xsl:attribute name="class">parameter_row</xsl:attribute>
+      <xsl:call-template name="create_label"/>
+      <span class='parameter_input' data-type='checkbox'>
+        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
+        <input type='checkbox'>
         </input>
       </span>
     </div>
