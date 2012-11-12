@@ -47,20 +47,16 @@ define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
 define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
 
-// PACS
-// folder containing dcmtk binaries
-define('CHRIS_DCMTK', '/usr/bin/');
 // chris file system
 define('CHRIS_DATA', '/chb/users/chris/dev/data/');
 define('CHRIS_TMP', '/chb/users/chris/dev/tmp/');
+
+// PACS
+// folder containing dcmtk binaries
+define('CHRIS_DCMTK', '/usr/bin/');
 define('CHRIS_AETITLE', 'FNNDSC-CHRISDEV');
 define('PACS_SERVER', '134.174.12.21');
 define('PACS_PORT', '104');
-
-// Cluster
-define('CHRIS_CLUSTER_NAME', 'mosix');
-define('CHRIS_CLUSTER_VERSION', '3.3.1');
-define('CHRIS_CLUSTER_SSH', 'true');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));

@@ -174,6 +174,18 @@ class FeedC implements FeedControllerInterface {
     }
   }
 
+  static public function addMetaS($feed_id, $name, $value, $type){
+    // parse metadata and update db
+    $metaObject = new Meta();
+    $metaObject->name = $name;
+    $metaObject->value = $value;
+    $metaObject->type = $type;
+    $metaObject->target_id = $feed_id;
+    $metaObject->target_type = 'feed';
+
+    Mapper::add($metaObject);
+  }
+
   static public function setStatus($feed_id, $status){
 
     $feedResult = Mapper::getStatic('Feed', $feed_id);
