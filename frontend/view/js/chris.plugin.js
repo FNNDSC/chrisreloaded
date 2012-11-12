@@ -178,7 +178,7 @@ jQuery(document).ready(
             
           });
       
-      jQuery('.panelgroup').accordion({
+      jQuery('.panelgroup').multiAccordion({
         heightStyle: "content",
         animate: false
       });
