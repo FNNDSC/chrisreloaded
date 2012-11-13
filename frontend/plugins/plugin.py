@@ -35,6 +35,7 @@ class Plugin( argparse.ArgumentParser ):
   '''
   IMAGE = 'image'
   INTEGER = 'integer'
+  BOOLEAN = 'boolean'
 
   def __init__( self ):
     '''
@@ -44,6 +45,7 @@ class Plugin( argparse.ArgumentParser ):
     self.add_argument( '--xml', action='store_true', dest='xml', default=False, help='show xml description of parameters (default: FALSE)' )
     self.add_argument( '--icon', action='store_true', dest='icon', default=False, help='show the description of this plugin (default: FALSE)' )
     self.add_argument( '--description', action='store_true', dest='description', default=False, help='show the icon path of this plugin (default: FALSE)' )
+    self.add_argument( '--output', action='store', dest='output', help='the output directory' )
 
     # the custom parameter list
     self.__panels = []
@@ -76,11 +78,25 @@ class Plugin( argparse.ArgumentParser ):
     xml += '<contributor>' + Plugin.AUTHORS + '</contributor>\n'
     xml += '<version>' + Plugin.VERSION + '</version>\n'
 
+    # create the output channel
+    xml += '<parameters>\n'
+    xml += '<label>Output Parameters</label>\n'
+    xml += '<directory>\n'
+    xml += '<channel>output</channel>\n'
+    xml += '<longflag>output</longflag>\n'
+    xml += '<label>The output folder</label>\n'
+    xml += '<description>The output folder</description>\n'
+    xml += '</directory>\n'
+    xml += '</parameters>\n'
+
     # loop through the panels and their parameters
     for i, panel in enumerate( self.__panels ):
       parameters = self.__parameters[i]
 
-      xml += '<parameters>\n'
+      if panel.upper().find( 'ADVANCED' ) != -1:
+        xml += '<parameters advanced="true">\n'
+      else:
+        xml += '<parameters>\n'
       xml += '<label>' + panel + '</label>\n'
 
       for parameter in parameters:
@@ -94,6 +110,8 @@ class Plugin( argparse.ArgumentParser ):
         xml += '<longflag>' + parameter[2] + '</longflag>'
         if parameter[3]:
           xml += '<default>' + str( parameter[3] ) + '</default>'
+        if parameter[4]:
+          xml += '<description>' + str( parameter[4] ) + '</description>'
         xml += end_tag
 
       xml += '</parameters>\n'
@@ -125,15 +143,18 @@ class Plugin( argparse.ArgumentParser ):
 
     # grab the default value
     default = None
+    _help = None
     if 'default' in kwargs:
       default = kwargs['default']
+    if 'help' in kwargs:
+      _help = kwargs['help']
 
     # grab the flag (required)
     flag = args[0]
 
     # store the parameter internally
     # (FIFO)
-    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default] )
+    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default, _help] )
     # add the argument to the parser
     self.add_argument( *args, **kwargs )
 

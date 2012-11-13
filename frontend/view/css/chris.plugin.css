@@ -118,6 +118,7 @@
 	overflow: visible;
 	background-color: whiteSmoke;
 	color: blue;
+  z-index: 3000;	
 }
 
 .parameter_title {
@@ -129,6 +130,7 @@
 .parameter_title:hover {
   background-color: whiteSmoke;
   color: blue;
+  z-index: 3000;
 }
 
 .parameter_row {

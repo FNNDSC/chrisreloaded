@@ -117,14 +117,15 @@ if(!mkdir($feed_path, 0777, true)){
 
 // replace ${OUTPUT} pattern in the command
 $format_parameters = str_replace("{OUTPUT}", $feed_path , $parameters);
+$command = str_replace("{OUTPUT}", $feed_path, $command);
 
 // add meta information to the feed
 FeedC::addMetaS($feed_id, 'parameters', $format_parameters, 'simple');
 
 // run dummy mosix script - should use crun
 $arguments = ' -l '.$feed_path;
-$arguments .= ' -c "/bin/mostestload -t 60"';
-//$arguments .= ' -c "'.$command.'"';
+//$arguments .= ' -c "/bin/mostestload -t 60"';
+$arguments .= ' -c "'.$command.'"';
 // run on cluster and return pid
 $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
 $output = shell_exec($process_command);
