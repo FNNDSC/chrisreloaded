@@ -47,7 +47,7 @@ $launch_command .= '--username="'.$_SESSION['username'].'" ';
 // feed name?
 $launch_command .= '--feedname="'.sanitize($_POST['FEED_NAME']).'" ';
 // plugin name?
-$command = CHRIS_PLUGINS_FOLDER.'/'.sanitize($_POST['FEED_PLUGIN']).'/'.sanitize($_POST['FEED_PLUGIN']);
+$command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
 // parameters?
 foreach($_POST['FEED_PARAM'] as $key => $value){
   $command .= ' --'.sanitize($value['name']).' '.sanitize($value['value']);
@@ -60,4 +60,5 @@ $launch_command .= '--command "'.$command.'" ';
 
 // return output
 echo shell_exec($launch_command);
+
 ?>

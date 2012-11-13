@@ -64,7 +64,7 @@
       <xsl:when test="$channel = 'output'">
         <!-- OUTPUT CHANNEL -->
         <div class='output_row'>
-          <span class='parameter_output' data-type='output'>
+          <span class='parameter_output' data-type='{local-name()}'>
             <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
           </span>
         </div>

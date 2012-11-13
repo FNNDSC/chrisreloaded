@@ -45,6 +45,7 @@ class Plugin( argparse.ArgumentParser ):
     self.add_argument( '--xml', action='store_true', dest='xml', default=False, help='show xml description of parameters (default: FALSE)' )
     self.add_argument( '--icon', action='store_true', dest='icon', default=False, help='show the description of this plugin (default: FALSE)' )
     self.add_argument( '--description', action='store_true', dest='description', default=False, help='show the icon path of this plugin (default: FALSE)' )
+    self.add_argument( '--output', action='store', dest='output', help='the output directory' )
 
     # the custom parameter list
     self.__panels = []
@@ -76,6 +77,17 @@ class Plugin( argparse.ArgumentParser ):
     xml += '<license>' + Plugin.LICENSE + '</license>\n'
     xml += '<contributor>' + Plugin.AUTHORS + '</contributor>\n'
     xml += '<version>' + Plugin.VERSION + '</version>\n'
+
+    # create the output channel
+    xml += '<parameters>\n'
+    xml += '<label>Output Parameters</label>\n'
+    xml += '<directory>\n'
+    xml += '<channel>output</channel>\n'
+    xml += '<longflag>output</longflag>\n'
+    xml += '<label>The output folder</label>\n'
+    xml += '<description>The output folder</description>\n'
+    xml += '</directory>\n'
+    xml += '</parameters>\n'
 
     # loop through the panels and their parameters
     for i, panel in enumerate( self.__panels ):
