@@ -37,47 +37,21 @@ require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 // include chris data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 
-// include the pacs pull configuration
-require_once ('config.inc.php');
 // include pacs helper
 require_once 'pacs.class.php';
 
-/*
-// define the options
-$shortopts = "c:u::f::h";
+$shortopts = "m:s:p:a:h";
 $longopts  = array(
-    "command:",     // Required value
-    "username::",    // Optional value
-    "feedname::",    // Optional value
-    "help",    // Optional value
+    "user:",    // Required value
+    "feed:",    // Required value
+    "mrn:",     // Required value
+    "server:",  // Required value
+    "port:",    // Required value
+    "aetitle:", // Required value
+    "help",     // No value
 );
 
 $options = getopt($shortopts, $longopts);
-
-//print help if required
-if( array_key_exists('h', $options) || array_key_exists('help', $options))
-{
-  echo "this is the help!";
-  echo "\n";
-  return;
-}
-
-//if no command provided, exit
-$command = '';
-if( array_key_exists('c', $options))
-{
-  $command = $options['c'];
-}
-elseif (array_key_exists('command', $options))
-{
-  $command = $options['command'];
-}
-else{
-  echo "no command provided!";
-  echo "\n";
-  return;
-}
-*/
 
 $pacs_level = 'STUDY';
 $pacs_study_date = '';
@@ -85,23 +59,24 @@ $pacs_accession_number = '';
 $pacs_modality = 'MR';
 $pacs_study_description = '';
 $pacs_name = '';
-$pacs_mrn = '4524909';
+$pacs_mrn = $options['m'];
 $pacs_birthday = '';
 $pacs_study_uid = '';
 $pacs_serie_uid = '';
 
-// not needed
-// 1- create data
-// 2- attach it to feed
-// 3- from data we can retrieve feed location on listener side
-//$output
+$server = $options['s'];
+$port = $options['p'];
+$aet = $options['a'];
 
-$pacs = new PACS(PACS_SERVER, PACS_PORT, PACS_AETITLE);
+define('CHRIS_DCMTK', '/usr/bin/');
+echo "in process.php";
+
+$pacs = new PACS($server, $port, $aet);
 
 if($pacs_level == 'STUDY'){
   $pacs->addParameter('StudyDate', $pacs_study_date);
   $pacs->addParameter('AccessionNumber', $pacs_accession_number);
-  $pacs->addParameter('RetrieveAETitle', PACS_AETITLE);
+  $pacs->addParameter('RetrieveAETitle', $aet);
   $pacs->addParameter('ModalitiesInStudy', $pacs_modality);
   $pacs->addParameter('StudyDescription', $pacs_study_description);
   $pacs->addParameter('PatientName', $pacs_name);

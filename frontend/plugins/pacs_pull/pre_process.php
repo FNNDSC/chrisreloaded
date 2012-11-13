@@ -26,6 +26,25 @@
  *                        dev@babyMRI.org
  *
  */
+define('__CHRIS_ENTRY_POINT__', 666);
+
+// include the chris configuration
+require_once ('../../config.inc.php');
+// include chris db interface
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
+// include chris mapper interface
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
+// include chris data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+// include chris patient models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
+// include chris data_patient models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
+// include chris feed_data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
+
+// include pacs helper
+require_once 'pacs.class.php';
 
 // define the options
 $shortopts = "u:f:m:s:p:a:h";
@@ -42,35 +61,41 @@ $longopts  = array(
 $options = getopt($shortopts, $longopts);
 
 //print help if required
-if( array_key_exists('h', $options) || array_key_exists('help', $options))
-{
-  echo "this is the help!";
-  echo "\n";
-  return;
+/* if( array_key_exists('h', $options) || array_key_exists('help', $options))
+ {
+echo "this is the help!";
+echo "\n";
+return;
 }
 
 //if no command provided, exit
 $command = '';
 if( array_key_exists('c', $options))
 {
-  $command = $options['c'];
+$command = $options['c'];
 }
 elseif (array_key_exists('command', $options))
 {
-  $command = $options['command'];
+$command = $options['command'];
 }
 else{
-  echo "no command provided!";
-  echo "\n";
-  return;
-}
+echo "no command provided!";
+echo "\n";
+return;
+} */
 
-$user_id = '';
-$feed_chris_id = '';
-$details = '';
+define('CHRIS_DCMTK', '/usr/bin/');
+echo "in pre_process.php";
+
+$user_id = $options['u'];
+$feed_chris_id = $options['f'];
+$details = $options['m'];
+$server = $options['s'];
+$port = $options['p'];
+$aetitle = $options['a'];
 
 // get all information related to a patient
-$pacs = new PACS(PACS_SERVER, PACS_PORT, PACS_AETITLE);
+$pacs = new PACS($server, $port, $aetitle);
 $study_parameter = Array();
 $study_parameter['PatientID'] = $details;
 $study_parameter['PatientName'] = '';
@@ -93,7 +118,7 @@ $db->lock('patient', 'WRITE');
 
 // look for the patient
 $patientMapper = new Mapper('Patient');
-$patientMapper->filter('patient_id = (?)',$results[0]['PatientID'][0]);
+$patientMapper->filter('uid = (?)',$results[0]['PatientID'][0]);
 $patientResult = $patientMapper->get();
 $patient_chris_id = -1;
 // create patient if doesn't exist
@@ -128,6 +153,7 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   // lock data db so no data added in the meanwhile
   $db = DB::getInstance();
   $db->lock('data', 'WRITE');
+  $map = false;
 
   // retrieve the data
   $dataMapper = new Mapper('Data');
@@ -142,19 +168,21 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
     $dataObject->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
     $dataObject->name = sanitize($results[1]['SeriesDescription'][$key]);
     $data_chris_id = Mapper::add($dataObject);
+    $map = true;
+  }
+  // else get its id
+  else{
+    $data_chris_id = $dataResult['Data'][0]->id;
+  }
+  $db->unlock();
 
+  if($map){
     // MAP DATA TO PATIENT
     $dataPatientObject = new Data_Patient();
     $dataPatientObject->data_id = $data_chris_id;
     $dataPatientObject->patient_id = $patient_chris_id;
     Mapper::add($dataPatientObject);
   }
-  // else get its id
-  else{
-    $data_chris_id = $dataResult['Data'][0]->id;
-  }
-
-  $db->unlock();
 
   // MAP DATA TO FEED
   $feedDataObject = new Feed_Data();

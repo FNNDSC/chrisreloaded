@@ -47,9 +47,9 @@ class PACS_Pull(Plugin):
     print config.aet
     print config.server
     print config.port
-    feed_id = '1234';
+    feed_id = '790';
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    print current_dir
+    #print current_dir
     # preprocess!!
     
     print 'preprocessing...'
@@ -57,13 +57,23 @@ class PACS_Pull(Plugin):
     # create data tables!
     # create patient!
     #    p = subprocess.Popen(["ls", "-als", "/"], stdout=subprocess.PIPE, cwd='/tmp')
-    p = subprocess.Popen([current_dir+"/pre_process.php"], stdout=subprocess.PIPE, cwd=current_dir)
-    result = p.communicate()[0]
+    #    $user_id = $options['u'];
+    #$feed_chris_id = $options['f'];
+    #$details = $options['m'];
+    #$server = $options['s'];
+    #$port = $options['p'];
+    #$aetitle = $options['a'];
+    pre = subprocess.Popen(["pre_process.php", "-u Ellen", "-f 790", "-m 4524909 ", "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
+    pre_result = pre.communicate()[0]
     
-    print result
+    #print result
 
     # and process!!
     print 'processing...'
+    pro = subprocess.Popen(["process.php", "-m 4524909 ", "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
+    pro_result = pro.communicate()[0]
+    
+    print pro_result;
     # generic process to support pacs_pull and dicom_dir_send!
     # ask pacs to move data!
 
