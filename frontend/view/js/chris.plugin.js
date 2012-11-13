@@ -137,9 +137,48 @@ jQuery(document).ready(
             
             // grab the visible plugin panel
             var _visible_panel = jQuery('.plugin_panel :visible');
-            _parameter_rows = _visible_panel.find('.parameter_row');
-            var _command = _visible_panel.closest('div')
-                .attr('data-executable');
+            var _plugin_name = _visible_panel.parent().attr('id').replace('panel_', '');
+            var _parameter_rows = _visible_panel.find('.parameter_row');
+            var _output_rows = _visible_panel.find('.output_row');
+            
+            var _parameters = [];
+            var _outputs = [];
+            
+            // loop through all output rows
+            _output_rows.each(function(i) {
+
+              var _parameter_output = jQuery(_output_rows[i]).find(
+                  '.parameter_output');
+              var _flag = _parameter_output.attr('data-flag');
+              var _type = _parameter_output.attr('data-type');
+              
+              var _output = null;
+              
+              // strip possible --
+              _flag = _flag.replace(/-/g, '');
+              
+              var _value;
+              
+              if (_type == 'directory') {
+                _value = '';
+              } else if (_type == 'image') {
+                _value = _flag + '.nii';
+              } else if (_type == 'file') {
+                _value = _flag + '.file';
+              } else if (_type == 'transform') {
+                _value = _flag + '.mat';
+              }
+              
+              // push the output
+              _outputs.push({
+                name: _flag,
+                value: _value,
+                type: 'simple',
+                target_type: 'feed'
+              });
+              
+
+            });
             
             // loop through all parameter rows
             _parameter_rows.each(function(i) {
@@ -149,10 +188,10 @@ jQuery(document).ready(
               var _flag = _parameter_input.attr('data-flag');
               var _type = _parameter_input.attr('data-type');
               
+              var _parameter = null;
+              
               // strip possible --
               _flag = _flag.replace(/-/g, '');
-              // and attach thema gain
-              _flag = '--' + _flag;
               
               var _value;
               
@@ -172,17 +211,57 @@ jQuery(document).ready(
                 
                 _value = jQuery(_spinner).spinner("value");
                 
+              } else if (_type == 'checkbox') {
+                
+                // checkboxes
+                var _checkbox = jQuery(_parameter_rows[i]).find(
+                    '.parameter_checkbox');
+                
+                if (jQuery(_checkbox).prop('checked')) {
+                  
+                  // checkbox active, so add the flag
+                  _value = '';
+                  
+                } else {
+                  return;
+                }
+                
               }
               
-              _command += ' ' + _flag + ' ' + _value;
+              // push the parameter
+              _parameters.push({
+                name: _flag,
+                value: _value,
+                type: 'simple',
+                target_type: 'feed'
+              });
               
             });
             
             // TODO validate
             
-            // TODO perform the action
+            console.log(_parameters);
+            console.log(_outputs);
             
-            alert('Job submitted!\n' + _command);
+            
+            // send to the launcher
+            jQuery.ajax({
+              type: "POST",
+              url: "controller/launcher-web.php",
+              dataType: "text",
+              data: {
+                FEED_PLUGIN: _plugin_name,
+                FEED_NAME: 'name of the feed',
+                FEED_PARAM: _parameters,
+                FEED_OUTPUT: _outputs
+              },
+              success: function(data) {
+
+                console.log(data);
+                
+                alert('Job submitted!\n',data);
+              }
+            });
             
           });
       
@@ -213,8 +292,8 @@ jQuery(document).ready(
       });
       
       // show non-advanced panels
-      jQuery('.panelgroup').each(function(i,v) {
-        
+      jQuery('.panelgroup').each(function(i, v) {
+
         var _accordion = jQuery(v);
         
         var _activeTabs = _accordion.multiAccordion('getActiveTabs');
@@ -224,11 +303,11 @@ jQuery(document).ready(
           // no tabs active yet
           _activeTabs = [];
           
-        }        
-      
+        }
+        
         // grab the current panels of this accordion
-        jQuery(v).children('.panel_content').each(function(j,w){
-          
+        jQuery(v).children('.panel_content').each(function(j, w) {
+
           // check if this is an advanced panel
           var _advanced_panel = (jQuery(w).attr('data-advanced') == 'true');
           
@@ -254,5 +333,5 @@ jQuery(document).ready(
         _accordion.multiAccordion('option', 'active', _activeTabs);
         
       });
-            
+      
     });

@@ -60,4 +60,5 @@ $launch_command .= '--command "'.$command.'" ';
 
 // return output
 echo shell_exec($launch_command);
+
 ?>
