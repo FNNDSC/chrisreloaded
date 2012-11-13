@@ -24,6 +24,8 @@ from plugin import Plugin
 
 # import subprocess
 import subprocess
+# import logging
+import logging
 # import PACS_Pull configuration file
 import config
 
@@ -39,20 +41,17 @@ class PACS_Pull(Plugin):
   Plugin.VERSION = '0.1'
 
   def run(self, options):
-    # do whatever
-    print 'running pacs pull...'
-    # parse args
-    print 'parsing arguments...'
-    print config.dcmtk
-    print config.aet
-    print config.server
-    print config.port
+    logging.basicConfig(filename='pacs_pull.log',level=logging.DEBUG, format='%(asctime)s %(message)s')
+
+    logging.debug('running pacs pull...')
+    logging.debug('parsing args...')
+    logging.debug('MRN: '+options.MRN)
     feed_id = '790';
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    #print current_dir
-    # preprocess!!
     
-    print 'preprocessing...'
+    # preprocess!!
+    logging.debug('pre_processing...')
+    
     # FEED ID IS AN ARGUMENT!
     # create data tables!
     # create patient!
@@ -63,31 +62,30 @@ class PACS_Pull(Plugin):
     #$server = $options['s'];
     #$port = $options['p'];
     #$aetitle = $options['a'];
-    pre = subprocess.Popen(["pre_process.php", "-u Ellen", "-f 790", "-m 4524909 ", "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
+    pre = subprocess.Popen(["pre_process.php", "-u Ellen", "-f 790", "-m "+options.MRN, "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
     pre_result = pre.communicate()[0]
+    
+    print 'preprocessed!'
+    
+    logging.debug('hello!')
     
     #print result
 
     # and process!!
-    print 'processing...'
-    pro = subprocess.Popen(["process.php", "-m 4524909 ", "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
+    logging.debug('processing...')
+    pro = subprocess.Popen(["process.php", "-m "+options.MRN, "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
     pro_result = pro.communicate()[0]
     
-    print pro_result;
+    logging.debug(pro_result)
     # generic process to support pacs_pull and dicom_dir_send!
     # ask pacs to move data!
 
     # postprocess
-    print 'finished processing...'
-    print 'should receive data from PACS shortly...'
-    # FEED ID IS AN ARGUMENT!
-    # listen.php ->postprocess.php
-    # xinet.d daemon listening to incoming data from the pacs
+    logging.debug('finished processing...')
+    logging.debug('should receive data from PACS shortly...')
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = PACS_Pull()
-  plugin.add_parameter('Input', Plugin.IMAGE, '--t1', action='store', dest='T1', help='the T1 scan')
-  plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='DTI', help='the DTI scan')
-  plugin.add_parameter('Advanced', Plugin.INTEGER, '--radius', action='store', default=3, dest='Radius', help='the look-around Radius')
+  plugin.add_parameter('Input', Plugin.INTEGER, '--mrn', action='store', default=4524909, dest='MRN', help='MRN to be pulled')
   plugin.launch(sys.argv)
