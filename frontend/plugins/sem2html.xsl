@@ -63,8 +63,7 @@
     <xsl:choose>
       <xsl:when test="$channel = 'output'">
         <!-- OUTPUT CHANNEL -->
-        <div>
-          <xsl:attribute name="class">output_row</xsl:attribute>
+        <div class='output_row'>
           <span class='parameter_output' data-type='output'>
             <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
           </span>
@@ -72,8 +71,8 @@
       </xsl:when>
       <xsl:otherwise>
         <!-- INPUT CHANNEL -->
-        <div>
-          <xsl:attribute name="class">parameter_row</xsl:attribute>
+        <div rel='left_tooltip' class='parameter_row'>
+          <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
           <span class='parameter_title_cropped'>
             <xsl:value-of select="label"/>
           </span>
@@ -87,12 +86,12 @@
   
   <!-- INTEGER/DOUBLE parameter -->
   <xsl:template match="integer | double">
-    <div>
-      <xsl:attribute name="class">parameter_row</xsl:attribute>
+    <div rel='left_tooltip' class='parameter_row'>
+      <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
       <xsl:call-template name="create_label"/>
       <span class='parameter_input' data-type='spinner'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
-        <input class='parameter_spinner'>
+        <input class='parameter_spinner'>  
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
           <xsl:attribute name="data-step"><xsl:value-of select="constraints/step"/></xsl:attribute>
         </input>
@@ -102,8 +101,8 @@
   
   <!-- BOOLEAN parameter -->
   <xsl:template match="boolean">
-    <div>
-      <xsl:attribute name="class">parameter_row</xsl:attribute>
+    <div rel='left_tooltip' class='parameter_row'>
+      <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>     
       <xsl:call-template name="create_label"/>
       <span class='parameter_input' data-type='checkbox'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>

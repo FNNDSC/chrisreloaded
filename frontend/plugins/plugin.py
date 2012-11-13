@@ -98,6 +98,8 @@ class Plugin( argparse.ArgumentParser ):
         xml += '<longflag>' + parameter[2] + '</longflag>'
         if parameter[3]:
           xml += '<default>' + str( parameter[3] ) + '</default>'
+        if parameter[4]:
+          xml += '<description>' + str( parameter[4] ) + '</description>'
         xml += end_tag
 
       xml += '</parameters>\n'
@@ -129,15 +131,18 @@ class Plugin( argparse.ArgumentParser ):
 
     # grab the default value
     default = None
+    _help = None
     if 'default' in kwargs:
       default = kwargs['default']
+    if 'help' in kwargs:
+      _help = kwargs['help']
 
     # grab the flag (required)
     flag = args[0]
 
     # store the parameter internally
     # (FIFO)
-    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default] )
+    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default, _help] )
     # add the argument to the parser
     self.add_argument( *args, **kwargs )
 
