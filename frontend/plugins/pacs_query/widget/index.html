@@ -23,12 +23,20 @@ look for study.json
   </div> -->
   <div id="PACS-RESULTS" class='row-fluid' style="display: none">
    <div class='span12'>
-
-    <div id='SC-RESULTS' class='row-fluid'
-     style="margin-top: 50px; background: white;">HELLO</div>
-
+    <div class='well'>
+     <h2>
+      Results:
+      <div class="btn-group" data-toggle="buttons-radio">
+       <button id="STUDY_VIEW" type="button"
+        class="btn btn-primary active">Study</button>
+       <button id="SERIES_VIEW" type="button" class="btn btn-primary">Series</button>
+      </div>
+     </h2>
+     <div id='SC-RESULTS' class='row-fluid'></div>
+    </div>
    </div>
   </div>
+ </div>
  </div>
 
  <script type="text/javascript" src="lib/jquery.min.js"></script>

@@ -2,6 +2,15 @@
  * Define the _PACS_ namespace
  */
 var _PACS_ = _PACS_ || {};
+/**
+ * Bind the simple search input field to the simple search button.
+ */
+jQuery('#pacs_form').submit(function(e) {
+  e.preventDefault();
+  if (e.which == 13) {
+    jQuery("#SEARCH").click();
+  }
+});
 /*
  * _PACS_.studySearch = function() { jQuery("#S_SEARCH").live('click',
  * function(event) { jQuery("#SEARCH").html("Study"); }); } _PACS_.seriesSearch =
@@ -243,16 +252,28 @@ _PACS_.advancedTable = function() {
   // update html with table
   jQuery('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
-  _PACS_.sTable = jQuery('#S-RESULTS').dataTable({
-    "sDom" : "t",
-    "bPaginate" : false,
-    "aoColumnDefs" : [ {
-      "bSortable" : false,
-      "aTargets" : [ 9, 10 ]
-    } ],
-    "aaSorting" : [ [ 1, 'desc' ] ],
-    "bAutoWidth" : false
-  });
+  _PACS_.sTable = jQuery('#S-RESULTS')
+      .dataTable(
+          {
+            "sDom" : "<'row-fluid'<'span6' il ><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'><'span6'p>>",
+            "sPaginationType" : "bootstrap",
+            "oLanguage" : {
+              "sLengthMenu" : " (_MENU_ per page)",
+              "sInfo" : "Showing _START_ to _END_ of _TOTAL_ results "
+            },
+            "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
+            iDisplayStart : 0,
+            iDisplayLength : 10,
+            "aoColumnDefs" : [ {
+              "bSortable" : false,
+              "aTargets" : [ 9, 10 ]
+            } ],
+            "aaSorting" : [ [ 1, 'desc' ] ],
+            "bAutoWidth" : false
+          });
+  jQuery(".d_filter")
+      .html(
+          '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
 }
 /**
  * Cache data after 'Advanced' AJAX query.
@@ -316,7 +337,7 @@ _PACS_.advancedFormat = function(data, i) {
   sub
       .push('<button id="'
           + id
-          + '-ap"  class="btn btn-info p_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
+          + '-ap" class="btn btn-info p_series " type="button"><i class="icon-eye-open icon-white"></i></button>');
   // update download icon based on its status
   var status = 0;
   var cached_study = stuid in _PACS_.cache;
@@ -437,20 +458,32 @@ _PACS_.ajaxSimpleResults = function(data, force) {
  */
 _PACS_.simpleTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
-  content += '<thead ><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
+  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   jQuery('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
-  _PACS_.sTable = jQuery('#S-RESULTS').dataTable({
-    "sDom" : "t",
-    "bPaginate" : false,
-    "aoColumnDefs" : [ {
-      "bSortable" : false,
-      "aTargets" : [ 7 ]
-    } ],
-    "bAutoWidth" : false,
-    "aaSorting" : [ [ 1, 'desc' ] ],
-  });
+  _PACS_.sTable = jQuery('#S-RESULTS')
+      .dataTable(
+          {
+            "sDom" : "<'row-fluid'<'span6' il><'span6' <'d_filter'> f>r>t<'row-fluid'<'span6'><'span6'p>>",
+            "sPaginationType" : "bootstrap",
+            "oLanguage" : {
+              "sLengthMenu" : " (_MENU_ per page)",
+              "sInfo" : "Showing _START_ to _END_ of _TOTAL_ results "
+            },
+            "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
+            iDisplayStart : 0,
+            iDisplayLength : 10,
+            "aoColumnDefs" : [ {
+              "bSortable" : false,
+              "aTargets" : [ 7 ]
+            } ],
+            "bAutoWidth" : false,
+            "aaSorting" : [ [ 1, 'desc' ] ],
+          });
+  jQuery(".d_filter")
+      .html(
+          '<button class="btn btn-primary pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
 }
 /**
  * Reformat data after 'Advanced' AJAX query to fit the dataTable standard.
@@ -458,8 +491,8 @@ _PACS_.simpleTable = function() {
 _PACS_.simpleFormat = function(data, i) {
   var stuid = data.StudyInstanceUID[i];
   var sub = Array();
-  sub.push('<div  id="' + stuid.replace(/\./g, "_")
-      + '"  class="control"><i class="icon-chevron-down"></i> '
+  sub.push('<div id="' + stuid.replace(/\./g, "_")
+      + '" class="control"><i class="icon-chevron-down"></i> '
       + data.PatientName[i].replace(/\^/g, " ") + '</div>');
   sub.push(data.PatientID[i]);
   sub.push(data.PatientBirthDate[i]);
@@ -481,17 +514,17 @@ _PACS_.simpleFormat = function(data, i) {
   }
   if (status == 0) {
     sub
-        .push('<button  id="'
+        .push('<button id="'
             + data.StudyInstanceUID[i].replace(/\./g, "_")
             + '-std" class="btn btn-primary d_study pull-right" type="button"><i class="icon-circle-arrow-down icon-white"></i></button>');
   } else if (status == 1) {
     sub
-        .push('<button  id="'
+        .push('<button id="'
             + data.StudyInstanceUID[i].replace(/\./g, "_")
             + '-std" class="btn btn-warning pull-right" type="button"><i class="icon-refresh rotating_class"></button>');
   } else if (status == 2) {
     sub
-        .push('<button  id="'
+        .push('<button id="'
             + data.StudyInstanceUID[i].replace(/\./g, "_")
             + '-std" class="btn btn-success pull-right" type="button"><i class="icon-ok icon-white"></button>');
   }
@@ -766,11 +799,8 @@ jQuery(document).ready(function() {
   // settings
   //
   // ping the server
-  /*
-   * jQuery(".pacsPing").click(function(event) { _PACS_.ajaxPing(); });
-   */
-  jQuery("#pacs_feed_filter").bind('input', function() {
-    _PACS_.sTable.fnFilter(jQuery(this).val());
+  jQuery(".pacsPing").click(function(event) {
+    _PACS_.ajaxPing();
   });
   jQuery.ajax({
     type : "POST",

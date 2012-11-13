@@ -173,6 +173,8 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   // else get its id
   else{
     $data_chris_id = $dataResult['Data'][0]->id;
+    // update the links if data is already there!
+    // HERE!
   }
   $db->unlock();
 

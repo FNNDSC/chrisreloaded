@@ -93,6 +93,7 @@ else{
   $dataResult = $dataMapper->get();
 
   // if data already there, do not do anything!
+  // should update the links!
   if(count($dataResult['Data']) > 0)
   {
     echo json_encode('Data already there');
