@@ -232,7 +232,7 @@ jQuery(document).ready(
               _parameters.push({
                 name: _flag,
                 value: _value,
-                type: 'simple',
+                type: _type,
                 target_type: 'feed'
               });
               

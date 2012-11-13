@@ -50,7 +50,7 @@ $launch_command .= '--feedname="'.sanitize($_POST['FEED_NAME']).'" ';
 $command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
 // parameters?
 foreach($_POST['FEED_PARAM'] as $key => $value){
-  $command .= ' --'.sanitize($value['name']).' '.sanitize($value['value']);
+  $command .= ' --'.$value['name'].' '.$value['value'];
 }
 // output?
 foreach($_POST['FEED_OUTPUT'] as $key => $value){
