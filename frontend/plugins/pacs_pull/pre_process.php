@@ -27,6 +27,44 @@
  *
  */
 
+// define the options
+$shortopts = "u:f:m:s:p:a:h";
+$longopts  = array(
+    "user:",    // Required value
+    "feed:",    // Required value
+    "mrn:",     // Required value
+    "server:",  // Required value
+    "port:",    // Required value
+    "aetitle:", // Required value
+    "help",     // No value
+);
+
+$options = getopt($shortopts, $longopts);
+
+//print help if required
+if( array_key_exists('h', $options) || array_key_exists('help', $options))
+{
+  echo "this is the help!";
+  echo "\n";
+  return;
+}
+
+//if no command provided, exit
+$command = '';
+if( array_key_exists('c', $options))
+{
+  $command = $options['c'];
+}
+elseif (array_key_exists('command', $options))
+{
+  $command = $options['command'];
+}
+else{
+  echo "no command provided!";
+  echo "\n";
+  return;
+}
+
 $user_id = '';
 $feed_chris_id = '';
 $details = '';
@@ -113,11 +151,11 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   }
   // else get its id
   else{
-    $data_chris_id = = $dataResult['Data'][0]->id;
+    $data_chris_id = $dataResult['Data'][0]->id;
   }
-  
+
   $db->unlock();
-  
+
   // MAP DATA TO FEED
   $feedDataObject = new Feed_Data();
   $feedDataObject->feed_id = $feed_chris_id;
