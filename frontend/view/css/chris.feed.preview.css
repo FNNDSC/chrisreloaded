@@ -1,4 +1,4 @@
-.twoDRenderer {
+.previewRenderer {
   position: relative;
   background-color: #000;
   top: 0%;
@@ -9,13 +9,14 @@
   margin-top: -6px;
 }
 
-#sliderZ {
+#PREVIEWSLIDER {
   width: 100%;
   margin-left: -1px;
   margin-right: auto;
   margin-top: 10px;
   background: red;
   height: 6px;
+  display: none;
 }
 
 #BR_OVER {
@@ -24,6 +25,7 @@
   bottom: 0px;
   right: 0px;
   padding: 2px;
+  display:none;
 }
 
 #TL_OVER {

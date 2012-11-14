@@ -9,11 +9,50 @@ _FEED_.onclick = function(details, more) {
   if (_file_browser.is(':empty')) {
     var _folder = _file_browser.attr('data-folder');
     _file_browser.fileTree({
-      // TODO should somehow get the CONFIG value for the data folder
       root : _folder,
       script : 'controller/feed.browser.connector.php'
     }, function(file) {
-      alert(file);
+      // grab the file extension
+      
+      // grab the file extension
+      var extension = file.split('.').pop().toUpperCase();
+      
+      // support no extensions
+      if (extension == file.toUpperCase()) {
+        
+        // this means no extension
+        extension = '';
+        
+      }
+      
+      switch(extension) {
+      
+      case 'NII':
+      case 'MGH':
+      case 'MGZ':
+      case 'DCM':
+      case 'DICOM':
+      case 'NII':
+      case 'GZ':
+      case 'NRRD':
+        _PREVIEW_.start('2D','volume',file);
+        break;
+      case 'TRK':
+        _PREVIEW_.start('3D','fibers',file);
+        break;
+      case 'FSM':
+      case 'SMOOTHWM':
+      case 'PIAL':
+      case 'INFLATED':
+      case 'SPHERE':
+      case 'ORIG':
+      case 'VTK':
+      case 'STL':
+        _PREVIEW_.start('3D','mesh',file);
+        break;
+      }
+      
+      
     });
   }
   

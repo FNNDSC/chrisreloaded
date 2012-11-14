@@ -51,8 +51,8 @@ function homePage() {
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
   $t -> replace('PLUGIN', PluginC::getHTML());
-  $t -> replace('DATA_PREVIEW', 'data_preview.html');
   $t -> replace('FEED_CONTENT', FeedC::getHTML(20));
+  $t -> replace('FEED_DATA_PREVIEW', 'feed_data_preview.html');
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');
   $t -> replace('USERNAME', $_SESSION['username']);
