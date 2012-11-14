@@ -34,10 +34,17 @@ class Fyborg( Plugin ):
   Plugin.VERSION = '0.1'
 
   def run( self, options ):
-    # do whatever
-    print 'running fyborg'
-    with open(options.output + '/test.txt', 'w') as f:
-      f.write('hanswurst')
+    # copy input and dti to one temp folder
+    # and run fyborg on it
+    import tempfile, shutil, subprocess
+    tempdir = tempfile.mkdtemp('fy','borg','/chb/tmp')
+    shutil.copytree(options.T1, tempdir+'/T1')
+    shutil.copytree(options.DTI, tempdir+'/DTI')
+    cmd = ''
+    cmd += '/chb/arch/scripts/fyborg.py -i '+tempdir+' -o '+options.output+' -r '+options.Radius+' --overwrite --verbose'
+    #sp = subprocess.Popen( ["/bin/bash", "-i", "-c", cmd], stdout=sys.stdout )
+    #sp.communicate()
+    os.system(cmd);    
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -45,5 +52,4 @@ if __name__ == "__main__":
   plugin.add_parameter( 'Input', Plugin.IMAGE, '--t1', action='store', dest='T1', help='the T1 scan' )
   plugin.add_parameter( 'Input', Plugin.IMAGE, '--dti', action='store', dest='DTI', help='the DTI scan' )
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--radius', action='store', default=3, dest='Radius', help='the look-around Radius' )
-  plugin.add_parameter( 'Advanced', Plugin.BOOLEAN, '--dti2', action='store_true', default=True, dest='DTI2', help='the DTI scan' )
   plugin.launch( sys.argv )
