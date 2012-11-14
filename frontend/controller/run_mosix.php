@@ -34,7 +34,7 @@ if(!defined('CHRIS_CONFIG_PARSED'))
 
 $options = include('run.php');
 
-$mosix_command = "ssh chris@rc-goldfinger 'nohup /bin/mosbatch -q -b -E".$options["l"]." ".$options["c"]."  > log.out 2> log.err < /dev/null & echo $!'";
+$mosix_command = "ssh chris@rc-goldfinger 'nohup /bin/mosbatch -q -b ".$options["c"]."  > log.out 2> log.err < /dev/null & echo $!'";
 
 echo shell_exec($mosix_command);
 ?>

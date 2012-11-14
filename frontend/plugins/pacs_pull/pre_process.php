@@ -26,6 +26,7 @@
  *                        dev@babyMRI.org
  *
  */
+
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the chris configuration
@@ -44,7 +45,7 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
 
 // include pacs helper
-require_once 'pacs.class.php';
+require_once '/chb/users/nicolas.rannou/gitroot/chrisreloaded/frontend/plugins/pacs_pull/pacs.class.php';
 
 // define the options
 $shortopts = "u:f:m:s:p:a:h";
@@ -59,30 +60,6 @@ $longopts  = array(
 );
 
 $options = getopt($shortopts, $longopts);
-
-//print help if required
-/* if( array_key_exists('h', $options) || array_key_exists('help', $options))
- {
-echo "this is the help!";
-echo "\n";
-return;
-}
-
-//if no command provided, exit
-$command = '';
-if( array_key_exists('c', $options))
-{
-$command = $options['c'];
-}
-elseif (array_key_exists('command', $options))
-{
-$command = $options['command'];
-}
-else{
-echo "no command provided!";
-echo "\n";
-return;
-} */
 
 define('CHRIS_DCMTK', '/usr/bin/');
 echo "in pre_process.php";

@@ -41,7 +41,7 @@ class PACS_Pull(Plugin):
   Plugin.VERSION = '0.1'
 
   def run(self, options):
-    logging.basicConfig(filename='pacs_pull.log',level=logging.DEBUG, format='%(asctime)s %(message)s')
+    logging.basicConfig(filename=options.output+'pacs_pull.log',level=logging.DEBUG, format='%(asctime)s %(message)s')
 
     logging.debug('running pacs pull...')
     logging.debug('parsing args...')
@@ -62,21 +62,33 @@ class PACS_Pull(Plugin):
     #$server = $options['s'];
     #$port = $options['p'];
     #$aetitle = $options['a'];
-    pre = subprocess.Popen(["pre_process.php", "-u Ellen", "-f 790", "-m "+options.MRN, "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
-    pre_result = pre.communicate()[0]
+    #with open("test.txt", "w") as myfile:
+    #  myfile.write("appended text")
+      
+    #print current_dir+"/pre_process.php"
+    #os.system("cd "+current_dir+" && ./pre_process.php -u Ellen -f 790 -m "+options.MRN +"-s " + config.server + "-p " + config.port + "-a " + config.aet);
+    os.system(current_dir+"/pre_process.php -u Ellen -f 790 -m "+options.MRN +" -s " + config.server + " -p " + config.port + " -a " + config.aet)
+    #pre = subprocess.Popen(["pre_process.php", "-u",  "Ellen", "-f","790", "-m",options.MRN, "-s", config.server, "-p",config.port,"-a ",config.aet], stdout=subprocess.PIPE, cwd=current_dir, shell=True)
+    #out, err = pre.communicate()
     
-    print 'preprocessed!'
+    #with open("test2.txt", "w") as myfile:
+    #  myfile.write(out)
+
+    #logging.debug(pre.communicate()[0])
+        
     
-    logging.debug('hello!')
+    #print 'preprocessed!'
+    
+    logging.debug('preprocessed!')
     
     #print result
 
     # and process!!
     logging.debug('processing...')
-    pro = subprocess.Popen(["process.php", "-m "+options.MRN, "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
-    pro_result = pro.communicate()[0]
+    #pro = subprocess.Popen(["process.php", "-m "+options.MRN, "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
+    #pro_result = pro.communicate()[0]
     
-    logging.debug(pro_result)
+    #logging.debug(pro_result)
     # generic process to support pacs_pull and dicom_dir_send!
     # ask pacs to move data!
 
