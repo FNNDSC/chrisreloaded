@@ -15,11 +15,10 @@
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	color: #eee;
-	padding-top: 20px;
-	padding-bottom: 20px;
+	padding-top: 6px;
+	padding-bottom: 6px;
 	padding-left: 6px;
 	padding-right: 6px;
-	font-family: lucida Grande;
 	font-size: 12px;
 	border: 2px solid #999;
 	display: block;
