@@ -9,7 +9,6 @@ _FEED_.onclick = function(details, more) {
   if (_file_browser.is(':empty')) {
     var _folder = _file_browser.attr('data-folder');
     _file_browser.fileTree({
-      // TODO should somehow get the CONFIG value for the data folder
       root : _folder,
       script : 'controller/feed.browser.connector.php'
     }, function(file) {
