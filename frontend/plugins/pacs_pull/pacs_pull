@@ -26,8 +26,6 @@ from plugin import Plugin
 import subprocess
 # import logging
 import logging
-# import PACS_Pull configuration file
-import config
 
 class PACS_Pull(Plugin):
   '''
@@ -67,7 +65,9 @@ class PACS_Pull(Plugin):
       
     #print current_dir+"/pre_process.php"
     #os.system("cd "+current_dir+" && ./pre_process.php -u Ellen -f 790 -m "+options.MRN +"-s " + config.server + "-p " + config.port + "-a " + config.aet);
-    os.system(current_dir+"/pre_process.php -u Ellen -f 790 -m "+options.MRN +" -s " + config.server + " -p " + config.port + " -a " + config.aet)
+    command = current_dir+"/pre_process.php -u "+ options.USER_ID +" -f "+ options.FEED_ID +" -m "+options.MRN +" -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
+    print command
+    os.system(command)
     #pre = subprocess.Popen(["pre_process.php", "-u",  "Ellen", "-f","790", "-m",options.MRN, "-s", config.server, "-p",config.port,"-a ",config.aet], stdout=subprocess.PIPE, cwd=current_dir, shell=True)
     #out, err = pre.communicate()
     
@@ -100,6 +100,10 @@ class PACS_Pull(Plugin):
 if __name__ == "__main__":
   plugin = PACS_Pull()
   plugin.add_parameter('Input', Plugin.INTEGER, '--mrn', action='store', default=4524909, dest='MRN', help='MRN to be pulled')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--aet', action='store', default='FNNDSC-CHRISDEV', dest='USER_AET', help='User AETitle')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--serverport', action='store', default='104', dest='SERVER_PORT', help='Server Port')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--dcmtk', action='store', default='/usr/bin', dest='DCMTK', help='DCMTK base directory')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--userid', action='store', default="{USER_ID}", dest='USER_ID', help='User ID')
   plugin.launch(sys.argv)

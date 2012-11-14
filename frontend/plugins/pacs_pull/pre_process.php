@@ -30,7 +30,7 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the chris configuration
-require_once ('../../config.inc.php');
+require_once (dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
 // include chris db interface
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 // include chris mapper interface
@@ -43,9 +43,11 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 // include chris feed_data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
+// include chris user_data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 
 // include pacs helper
-require_once '/chb/users/nicolas.rannou/gitroot/chrisreloaded/frontend/plugins/pacs_pull/pacs.class.php';
+require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
 // define the options
 $shortopts = "u:f:m:s:p:a:h";
@@ -168,5 +170,11 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   $feedDataObject->feed_id = $feed_chris_id;
   $feedDataObject->data_id = $data_chris_id;
   Mapper::add($feedDataObject);
+
+  // MAP USER TO DATA
+  $userDataObject = new User_Data();
+  $userDataObject->user_id = $user_id;
+  $userDataObject->data_id = $data_chris_id;
+  Mapper::add($userDataObject);
 }
 ?>
