@@ -226,11 +226,11 @@ jQuery(document).ready(
                   return;
                 }
                 
-              } else if (_type == 'text') {
+              } else if (_type == 'string') {
                 
                 // text_input
                 var text_input = jQuery(_parameter_rows[i]).find(
-                    '.parameter_text');
+                    '.parameter_string');
                 
                 _value = text_input.val();
                 

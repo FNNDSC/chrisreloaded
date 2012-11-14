@@ -124,13 +124,13 @@
   </xsl:template>
   
   <!-- STRING parameter -->
-  <xsl:template match="text">
+  <xsl:template match="string">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
       <xsl:call-template name="create_label"/>
-      <span class='parameter_input' data-type='text'>
+      <span class='parameter_input' data-type='string'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
-        <input type='text' class='parameter_text'>  
+        <input type='text' class='parameter_string'>  
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
           <xsl:attribute name="value"><xsl:value-of select="default"/></xsl:attribute>
         </input>
