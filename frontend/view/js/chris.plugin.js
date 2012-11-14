@@ -137,7 +137,8 @@ jQuery(document).ready(
             
             // grab the visible plugin panel
             var _visible_panel = jQuery('.plugin_panel :visible');
-            var _plugin_name = _visible_panel.parent().attr('id').replace('panel_', '');
+            var _plugin_name = _visible_panel.parent().attr('id').replace(
+                'panel_', '');
             var _parameter_rows = _visible_panel.find('.parameter_row');
             var _output_rows = _visible_panel.find('.output_row');
             
@@ -240,27 +241,43 @@ jQuery(document).ready(
             
             // TODO validate
             
-            console.log(_parameters);
-            console.log(_outputs);
-            
-            
-            // send to the launcher
-            jQuery.ajax({
-              type: "POST",
-              url: "controller/launcher-web.php",
-              dataType: "text",
-              data: {
-                FEED_PLUGIN: _plugin_name,
-                FEED_NAME: 'name of the feed',
-                FEED_PARAM: _parameters,
-                FEED_OUTPUT: _outputs
-              },
-              success: function(data) {
-
-                console.log(data);
+            apprise('<h5>Please name this job!</h5>', {'input':new Date()}, function(r) {
+              
+              if (r) {
                 
-                alert('Job submitted!\n',data);
+                // 
+                var _feed_name = r;
+
+                // send to the launcher
+                jQuery.ajax({
+                  type: "POST",
+                  url: "controller/launcher-web.php",
+                  dataType: "text",
+                  data: {
+                    FEED_PLUGIN: _plugin_name,
+                    FEED_NAME: _feed_name,
+                    FEED_PARAM: _parameters,
+                    FEED_OUTPUT: _outputs
+                  },
+                  success: function(data) {
+                    
+                    jQuery().toastmessage('showSuccessToast',
+                        '<h5>Job started.</h5>'
+                        +'Plugin: <b>'+_plugin_name+'</b><br>'
+                        +'Name: <b>'+_feed_name+'</b>');
+
+                  }
+                });                
+                
+                
+              } else {
+                
+                jQuery().toastmessage('showErrorToast',
+                    '<h5>Submission failed.</h5>'
+                    +'Please enter a name!');
+                
               }
+              
             });
             
           });
