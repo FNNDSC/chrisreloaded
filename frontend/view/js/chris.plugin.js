@@ -311,6 +311,17 @@ jQuery(document).ready(
           // check if this is an advanced panel
           var _advanced_panel = (jQuery(w).attr('data-advanced') == 'true');
           
+          // check if this is an hidden panel
+          var _hidden_panel = (jQuery(w).attr('hidden-panel') == 'true');
+          
+          if (_hidden_panel) {
+            // hide this panel
+            jQuery(w).prev().hide();
+            
+            // and never add it to the active tabs
+            return;
+          }
+          
           // check if this is an output only panel
           var _only_output = (jQuery(w).find('.parameter_row').length == 0);
           

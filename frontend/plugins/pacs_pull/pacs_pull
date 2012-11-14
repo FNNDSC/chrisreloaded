@@ -100,4 +100,5 @@ class PACS_Pull(Plugin):
 if __name__ == "__main__":
   plugin = PACS_Pull()
   plugin.add_parameter('Input', Plugin.INTEGER, '--mrn', action='store', default=4524909, dest='MRN', help='MRN to be pulled')
+  plugin.add_parameter('HIDDEN', Plugin.INTEGER, '--feed-id', action='store', default=12345, dest='FEED_ID', help='Feed ID')
   plugin.launch(sys.argv)

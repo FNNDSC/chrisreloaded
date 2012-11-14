@@ -28,6 +28,7 @@
     </h3>
     <div class='panel_content'>
     <xsl:attribute name="data-advanced"><xsl:value-of select="@advanced"/></xsl:attribute>
+    <xsl:attribute name="hidden-panel"><xsl:value-of select="@hidden"/></xsl:attribute>
     <span></span>
     <!-- All the different input parameters -->
     <xsl:apply-templates/>

@@ -95,6 +95,8 @@ class Plugin( argparse.ArgumentParser ):
 
       if panel.upper().find( 'ADVANCED' ) != -1:
         xml += '<parameters advanced="true">\n'
+      elif panel.upper().find( 'HIDDEN' ) != -1:
+        xml += '<parameters hidden="true">\n'
       else:
         xml += '<parameters>\n'
       xml += '<label>' + panel + '</label>\n'
