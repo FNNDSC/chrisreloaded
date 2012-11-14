@@ -40,10 +40,11 @@ class Fyborg( Plugin ):
     tempdir = tempfile.mkdtemp('fy','borg','/chb/tmp')
     shutil.copytree(options.T1, tempdir+'/T1')
     shutil.copytree(options.DTI, tempdir+'/DTI')
-    cmd = 'ss;'
-    cmd += 'fyborg.py -i '+tempdir+' -o '+options.output+' -r '+options.Radius+' --overwrite --verbose'
-    sp = subprocess.Popen( ["/bin/bash", "-i", "-c", cmd], stdout=sys.stdout )
-    sp.communicate()    
+    cmd = ''
+    cmd += '/chb/arch/scripts/fyborg.py -i '+tempdir+' -o '+options.output+' -r '+options.Radius+' --overwrite --verbose'
+    #sp = subprocess.Popen( ["/bin/bash", "-i", "-c", cmd], stdout=sys.stdout )
+    #sp.communicate()
+    os.system(cmd);    
 
 # ENTRYPOINT
 if __name__ == "__main__":
