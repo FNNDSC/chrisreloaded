@@ -226,6 +226,14 @@ jQuery(document).ready(
                   return;
                 }
                 
+              } else if (_type == 'text') {
+                
+                // text_input
+                var text_input = jQuery(_parameter_rows[i]).find(
+                    '.parameter_text');
+                
+                _value = text_input.val();
+                
               }
               
               // push the parameter

@@ -122,5 +122,20 @@
       </span>
     </div>
   </xsl:template>
+  
+  <!-- STRING parameter -->
+  <xsl:template match="text">
+    <div rel='left_tooltip' class='parameter_row'>
+      <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
+      <xsl:call-template name="create_label"/>
+      <span class='parameter_input' data-type='text'>
+        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
+        <input type='text' class='parameter_text'>  
+          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
+          <xsl:attribute name="value"><xsl:value-of select="default"/></xsl:attribute>
+        </input>
+      </span>
+    </div>
+  </xsl:template>
     
 </xsl:stylesheet>
