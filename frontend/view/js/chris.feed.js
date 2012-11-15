@@ -182,8 +182,15 @@ _FEED_.ajaxUpdate = function() {
           if (element.length) {
             var _current_feed = jQuery('div[data-chris-feed_id='
                 + data['progress']['id'][i] + ']');
+            
+            var _status_text = '<font color=red>Running</font>';
+            var _status = data['progress']['content'][i];
+            if (_status == 100) {
+              _status_text = '<font color=green>Done</font>';
+            }
+            
             _current_feed.find('.feed_status').html(
-                'Status: ' + data['progress']['content'][i]);
+                'Status: ' + _status_text);
           }
         }
       }
