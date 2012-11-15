@@ -1,3 +1,4 @@
+#!/usr/bin/php
 <?php
 /**
  *
@@ -27,56 +28,77 @@
  */
 define('__CHRIS_ENTRY_POINT__', 666);
 
-// include the configuration
-require_once (dirname(dirname(__FILE__)).'/config.inc.php');
+// include the chris configuration
+require_once ('../../config.inc.php');
+// include chris db interface
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
+// include chris mapper interface
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
+
+// include the pacs pull configuration
+require_once ('config.inc.php');
+// include pacs helper
 require_once 'pacs.class.php';
 
-$pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
+$pacs_level = 'STUDY';
+$pacs_study_date = '';
+$pacs_accession_number = '';
+$pacs_modality = 'MR';
+$pacs_study_description = '';
+$pacs_series_description = '';
+$pacs_name = '';
+$pacs_mrn = '4524909';
+$pacs_birthday = '';
+$pacs_study_uid = '';
+$pacs_serie_uid = '';
+$chris_json = '';
+$chris_performed_station_aet = '';
+
+$pacs = new PACS(PACS_SERVER, PACS_PORT, PACS_AETITLE);
 
 // set values to be filtered out after pacs query
 $post_filter = Array();
-$post_filter['PerformedStationAETitle'] = $_POST['PACS_PSAET'];
+$post_filter['PerformedStationAETitle'] = $chris_performed_station_aet;
 
-if($_POST['PACS_LEV'] == 'STUDY'){
-  $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
-  $pacs->addParameter('AccessionNumber', $_POST['PACS_ACC_NUM']);
-  $pacs->addParameter('RetrieveAETitle', $_POST['USER_AET']);
-  $pacs->addParameter('ModalitiesInStudy', $_POST['PACS_MOD']);
-  $pacs->addParameter('StudyDescription', $_POST['PACS_STU_DES']);
-  $pacs->addParameter('StudyDate', $_POST['PACS_DAT']);
-  $pacs->addParameter('PatientName', $_POST['PACS_NAM']);
-  $pacs->addParameter('PatientID', $_POST['PACS_MRN']);
-  $pacs->addParameter('PatientBirthDate', '');
-  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
-  $pacs->addParameter('PerformedStationAETitle', '');
-  echo json_encode(PACS::postFilter("study", $pacs->queryStudy(), $post_filter));
+if($pacs_level == 'STUDY'){
+  $pacs->addParameter('StudyDate', $pacs_study_date);
+  $pacs->addParameter('AccessionNumber', $pacs_accession_number);
+  $pacs->addParameter('RetrieveAETitle', PACS_AETITLE);
+  $pacs->addParameter('ModalitiesInStudy', $pacs_modality);
+  $pacs->addParameter('StudyDescription', $pacs_study_description);
+  $pacs->addParameter('PatientName', $pacs_name);
+  $pacs->addParameter('PatientID', $pacs_mrn);
+  $pacs->addParameter('PatientBirthDate', $pacs_birthday);
+  $pacs->addParameter('StudyInstanceUID', $pacs_study_uid);
+  $pacs->addParameter('PerformedStationAETitle', $chris_performed_station_aet);
+  $chris_json .= json_encode(PACS::postFilter("study", $pacs->queryStudy(), $post_filter));
 }
-elseif ($_POST['PACS_LEV'] == 'SERIES'){
-  $pacs->addParameter('RetrieveAETitle', '');
-  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
-  $pacs->addParameter('SeriesDescription', $_POST['PACS_SER_DES']);
-  $pacs->addParameter('SeriesInstanceUID', '');
+elseif ($pacs_level == 'SERIES'){
+  $pacs->addParameter('RetrieveAETitle', PACS_AETITLE);
+  $pacs->addParameter('StudyInstanceUID', $pacs_study_uid);
+  $pacs->addParameter('SeriesDescription', $pacs_series_description);
+  $pacs->addParameter('SeriesInstanceUID', $pacs_serie_uid);
   $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
-  $pacs->addParameter('PerformedStationAETitle', '');
-  echo json_encode($pacs->querySeries());
+  $pacs->addParameter('PerformedStationAETitle', $chris_performed_station_aet);
+  $chris_json .= json_encode($pacs->querySeries());
 }
-elseif ($_POST['PACS_LEV'] == 'IMAGE'){
-  $pacs->addParameter('RetrieveAETitle', '');
-  $pacs->addParameter('StudyInstanceUID', $_POST['PACS_STU_UID']);
-  $pacs->addParameter('SeriesInstanceUID', $_POST['PACS_SER_UID']);
+elseif ($pacs_level == 'IMAGE'){
+  $pacs->addParameter('RetrieveAETitle', PACS_AETITLE);
+  $pacs->addParameter('StudyInstanceUID', $pacs_study_uid);
+  $pacs->addParameter('SeriesInstanceUID', $pacs_serie_uid);
   $pacs->addParameter('ProtocolName', '');
-  $pacs->addParameter('PerformedStationAETitle', '');
-  echo json_encode($pacs->queryImage());
+  $pacs->addParameter('PerformedStationAETitle', $chris_performed_station_aet);
+  $chris_json .= json_encode($pacs->queryImage());
 }
 else{
   $study_parameter = Array();
-  $study_parameter['PatientID'] = $_POST['PACS_MRN'];
-  $study_parameter['PatientName'] = $_POST['PACS_NAM'];
-  $study_parameter['PatientBirthDate'] = '';
-  $study_parameter['StudyDate'] = $_POST['PACS_DAT'];
-  $study_parameter['StudyDescription'] = $_POST['PACS_STU_DES'];
-  $study_parameter['ModalitiesInStudy'] = $_POST['PACS_MOD'];
-  $study_parameter['PerformedStationAETitle'] = '';
+  $study_parameter['PatientID'] = $pacs_mrn;
+  $study_parameter['PatientName'] = $pacs_name;
+  $study_parameter['PatientBirthDate'] = $pacs_birthday;
+  $study_parameter['StudyDate'] = $pacs_study_date;
+  $study_parameter['StudyDescription'] = $pacs_study_description;
+  $study_parameter['ModalitiesInStudy'] = $pacs_modality;
+  $study_parameter['PerformedStationAETitle'] = $chris_performed_station_aet;
 
   $series_parameter = Array();
   $series_parameter['NumberOfSeriesRelatedInstances'] = '';
@@ -88,6 +110,12 @@ else{
   $image_parameter['ProtocolName']= '';  */
   //$image_parameter['SOPInstanceUID']= '';
 
-  echo json_encode(PACS::postFilter("all", $pacs->queryAll($study_parameter, $series_parameter, null), $post_filter));
+  $chris_json .= json_encode(PACS::postFilter("all", $pacs->queryAll($study_parameter, $series_parameter, null), $post_filter));
 }
+
+// need full path!
+$myFile = "study.json";
+$fh = fopen($myFile, 'w') or die("can't open file");
+fwrite($fh, $chris_json);
+fclose($fh);
 ?>

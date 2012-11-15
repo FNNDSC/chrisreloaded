@@ -75,26 +75,6 @@ class FeedV implements ObjectViewInterface {
       $feed_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
     }
 
-    // Format simple meta data
-    $dataMetaSimpleMapper= new Mapper('Data');
-    $dataMetaSimpleMapper->ljoin('Meta', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
-    $dataMetaSimpleResults = $dataMetaSimpleMapper->get();
-    $data_meta_simple = '';
-
-    foreach($dataMetaSimpleResults['Meta'] as $key => $value){
-      $data_meta_simple .= ' <b>'.$value->name.' :</b> '.$value->value;
-    }
-
-    // Format advanced meta data
-    $dataMetaAdvancedMapper= new Mapper('Data');
-    $dataMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = data.id')->filter('meta.target_type=(?)', 'data')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
-    $dataMetaAdvancedResults = $dataMetaAdvancedMapper->get();
-    $data_meta_advanced = $data_meta_simple;
-
-    foreach($dataMetaAdvancedResults['Meta'] as $key => $value){
-      $data_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
-    }
-
     // create the status text
     $status_text = '<font color=red>Running</font>';
     if ($object->status == 100) {
@@ -111,10 +91,6 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('USERNAME', $username);
     $t -> replace('FEED_META_SIMPLE', $object->name);
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
-    $t -> replace('DATA_META', $data_meta_advanced);
-    if($data_meta_advanced != ''){
-      $t -> replace('DATA_META_CONTENT', $data_meta_advanced);
-    }
     $t -> replace('TIME_FORMATED', $time);
     $t -> replace('PLUGIN', $object->plugin);
     $t -> replace('MORE', 'Show details');

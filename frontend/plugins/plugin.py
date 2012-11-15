@@ -36,6 +36,7 @@ class Plugin( argparse.ArgumentParser ):
   IMAGE = 'image'
   INTEGER = 'integer'
   BOOLEAN = 'boolean'
+  STRING = 'string'
 
   def __init__( self ):
     '''
@@ -95,6 +96,8 @@ class Plugin( argparse.ArgumentParser ):
 
       if panel.upper().find( 'ADVANCED' ) != -1:
         xml += '<parameters advanced="true">\n'
+      elif panel.upper().find( 'HIDDEN' ) != -1:
+        xml += '<parameters hidden="true">\n'
       else:
         xml += '<parameters>\n'
       xml += '<label>' + panel + '</label>\n'

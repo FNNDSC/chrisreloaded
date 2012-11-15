@@ -104,10 +104,10 @@ array_shift($plugin_command_array);
 $parameters = implode(' ', $plugin_command_array);
 
 // get user if from username
-$userid = UserC::getID($username);
+$user_id = UserC::getID($username);
 
 // create the feed
-$feed_id = FeedC::create($userid, $plugin_name, $feedname);
+$feed_id = FeedC::create($user_id, $plugin_name, $feedname);
 
 // create the feed directory
 $feed_path = joinPaths(CHRIS_DATA, $username, $plugin_name, $feedname.'-'.$feed_id);
@@ -116,11 +116,15 @@ if(!mkdir($feed_path, 0777, true)){
 }
 
 // replace ${OUTPUT} pattern in the command
-$format_parameters = str_replace("{OUTPUT}", $feed_path , $parameters);
+$parameters = str_replace("{OUTPUT}", $feed_path , $parameters);
+$parameters = str_replace("{FEED_ID}", $feed_id , $parameters);
+$parameters = str_replace("{USER_ID}", $user_id , $parameters);
 $command = str_replace("{OUTPUT}", $feed_path, $command);
+$command = str_replace("{FEED_ID}", $feed_id, $command);
+$command = str_replace("{USER_ID}", $user_id, $command);
 
 // add meta information to the feed
-FeedC::addMetaS($feed_id, 'parameters', $format_parameters, 'simple');
+FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
 
 // run dummy mosix script - should use crun
 $arguments = ' -l '.$feed_path;

@@ -26,22 +26,29 @@
  *                        dev@babyMRI.org
  *
  */
-// we define a valid entry point
-if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
-// include the configuration file
-if(!defined('CHRIS_CONFIG_PARSED'))
-  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
-// include the controller classes
-require_once 'db.class.php';
-require_once 'mapper.class.php';
-require_once 'pacs.class.php';
-require_once 'feed.controller.php';
+define('__CHRIS_ENTRY_POINT__', 666);
+
+// include the chris configuration
+require_once ('../../config.inc.php');
+// include chris db interface
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
+// include chris mapper interface
+require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
+// include chris data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+// include chris patient models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
+// include chris data_patient models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
+// include chris feed_data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
 
 // include the model classes
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 
+define('CHRIS_DCMTK', '/usr/bin/');
 
 // define command line arguments
 $shortopts = "";
@@ -118,7 +125,7 @@ if (array_key_exists('SeriesInstanceUID',$result))
   // does data (series) exist??
   $dataMapper = new Mapper('Data');
   $value = $result['SeriesInstanceUID'][0];
-  $dataMapper->filter('unique_id = (?)',$value );
+  $dataMapper->filter('uid = (?)',$value );
   $dataResult = $dataMapper->get();
 
   // if doesnt exist, add data
@@ -208,8 +215,11 @@ $files = scandir($p);
 if(count($files) <= 2){
   rmdir($p);
 }
+// if data fully there, update links for interested people
 
-$files = scandir($datadirname);
+// 2- link to *ALL* relevant people in relevant dir (PACS pull, dicom dir send)
+
+/* $files = scandir($datadirname);
 // if all files arrived
 // 1- create the nifti file
 // 2- update the feeds in progress
@@ -220,12 +230,12 @@ if (count($files) == $data_nb_files + 2)
   exec($convert_command);
 }
 
-$files = scandir($datadirname);
+$files = scandir($datadirname); */
 // if all files arrived
 // 1- create the nifti file
 // 2- update the feeds in progress
 // issue: sometimes dcm2nii create more than 1 file (>= instead of ==)
-if (count($files) >= $data_nb_files + 3)
+/*if (count($files) >= $data_nb_files + 3)
 {
   $db = DB::getInstance();
   $db->lock('feed', 'WRITE');
@@ -238,5 +248,5 @@ if (count($files) >= $data_nb_files + 3)
     FeedC::updateDB($value, $data_chris_id);
   }
   $db->unlock();
-}
+}*/
 ?>

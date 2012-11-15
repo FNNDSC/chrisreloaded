@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 /**
  *
@@ -19,24 +18,17 @@
  *
  *                     R  E  L  O  A  D  E  D
  *
- * (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center4352490
+ * (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
  *                   Boston Children's Hospital
  *
  *              http://childrenshospital.org/FNNDSC/
  *                        dev@babyMRI.org
  *
  */
-// we define a valid entry point
-if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
-// include the configuration file
- if(!defined('CHRIS_CONFIG_PARSED'))
-  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
-// build the storescp command
-// storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"
-// then each incoming data is processed by $process_command
-/* $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php -p #p -f #f'); */
-$process_command = joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/post_process.php -p #p -f #f');
-$listen_command = '/usr/bin/storescp -id -od ' . CHRIS_TMP . ' -pm -xcr  \'' . $process_command . '\' -ss RX -tos 120';
-exec($listen_command);
+define('CHRIS_DCMTK', '/usr/bin/');
+define('PACS_AETITLE', 'FNNDSC-CHRISDEV');
+define('PACS_SERVER', '134.174.12.21');
+define('PACS_PORT', '104');
+
 ?>
