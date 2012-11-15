@@ -30,7 +30,7 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the chris configuration
-require_once ('../../config.inc.php');
+require_once (dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
 // include chris db interface
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 // include chris mapper interface
@@ -48,6 +48,9 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 
+// include pacs helper
+require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
+
 define('CHRIS_DCMTK', '/usr/bin/');
 
 // define command line arguments
@@ -59,8 +62,8 @@ $options = getopt($shortopts);
 
 $p = $options['p'];
 $f = $options['f'];
-/*$p = '/chb/users/chris/data/a26220be92a460b8a8386c8bfe69c287-452/SWI____t2_fl3d_tra_p2_-12251';
- $f = '1.dcm';*/
+//$p = '/chb/users/chris/data/4524909-476/T1_COR__POST_FS-2529';
+//$f = '2.dcm';
 $tmpfile = $p.'/'.$f;
 
 $result = PACS::process($tmpfile);
@@ -80,7 +83,7 @@ if (array_key_exists('PatientName',$result) && array_key_exists('PatientID',$res
 {
   $patientMapper = new Mapper('Patient');
   $patientMapper->filter('name = (?)',$result['PatientName'][0]);
-  $patientMapper->filter('patient_id = (?)',$result['PatientID'][0]);
+  $patientMapper->filter('uid = (?)',$result['PatientID'][0]);
   $patientResult = $patientMapper->get();
 
   if(count($patientResult['Patient']) == 0)
@@ -98,7 +101,7 @@ if (array_key_exists('PatientName',$result) && array_key_exists('PatientID',$res
       $patientObject->dob = '0000-00-00';
     }
     $patientObject->sex = $result['PatientSex'][0];
-    $patientObject->patient_id = $result['PatientID'][0];
+    $patientObject->uid = $result['PatientID'][0];
 
     // add the patient model and get its id
     $patient_chris_id = Mapper::add($patientObject);
@@ -134,8 +137,7 @@ if (array_key_exists('SeriesInstanceUID',$result))
     // create object
     // create data model
     $dataObject = new Data();
-    $dataObject->patient_id = $patient_chris_id;
-    $dataObject->unique_id = $result['SeriesInstanceUID'][0];
+    $dataObject->uid = $result['SeriesInstanceUID'][0];
     // remove potential white spaces
     if(array_key_exists('SeriesDescription',$result))
     {
@@ -208,13 +210,13 @@ if(!is_file($filename)){
 }
 
 // delete tmp file
-unlink($tmpfile);
+//unlink($tmpfile);
 
 // delete tmp dir if dir is empty when all files have arrived
-$files = scandir($p);
-if(count($files) <= 2){
-  rmdir($p);
-}
+//$files = scandir($p);
+//if(count($files) <= 2){
+//  rmdir($p);
+//}
 // if data fully there, update links for interested people
 
 // 2- link to *ALL* relevant people in relevant dir (PACS pull, dicom dir send)

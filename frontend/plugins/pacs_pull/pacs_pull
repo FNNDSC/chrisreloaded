@@ -44,7 +44,6 @@ class PACS_Pull(Plugin):
     logging.debug('running pacs pull...')
     logging.debug('parsing args...')
     logging.debug('MRN: '+options.MRN)
-    feed_id = '790';
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     # preprocess!!

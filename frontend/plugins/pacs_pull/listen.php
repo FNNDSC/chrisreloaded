@@ -30,7 +30,7 @@
 if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration file
  if(!defined('CHRIS_CONFIG_PARSED'))
-  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
+  require_once(dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
 
 // build the storescp command
 // storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"
