@@ -66,3 +66,7 @@ body,html {
 select, textarea, .btn {
 	font-size: 12px;
 }
+
+#action_ui {
+	display: none;
+}

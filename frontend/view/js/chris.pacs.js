@@ -4,7 +4,7 @@
 var _PACS_ = _PACS_ || {};
 
 _PACS_.pull_click = function() {
-  jQuery("#pacs_pull").click(function(event) {
+  jQuery("#action_run").click(function(event) {
     // if not already querying the pacs
     if (!jQuery("#pacs_pull_mrns").prop("readonly")) {
       var mrn_list = jQuery('#pacs_pull_mrns').val();
