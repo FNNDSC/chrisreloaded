@@ -6,7 +6,7 @@ parser.add_argument('--output', help='foo help', dest='output')
 args = parser.parse_args()
 
 cmd = 'ss;chb-fsstable;'
-cmd += '/chb/arch/scripts/dcm2trk.bash -v 10 -f -d /chb/users/dicom/files/4170752_DTI-005Y-TrioTim-35201-20120417-130136-202000/667000-000009-000001.dcm -g /chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/diffusion/mgh-dti-seqpack/gradient_mgh_dti30.gdt  --m1 DWI --m1-lower-threshold 0.0 --m1-upper-threshold 1.0 --angle-threshold 35 -O '+args.output
+cmd += '/chb/arch/scripts/dcm2trk.bash -v 10 -f -t 1345 -d /chb/users/dicom/files/4170752_DTI-005Y-TrioTim-35201-20120417-130136-202000/667000-000009-000001.dcm -g /chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/diffusion/mgh-dti-seqpack/gradient_mgh_dti30.gdt  --m1 DWI --m1-lower-threshold 0.0 --m1-upper-threshold 1.0 --angle-threshold 35 -O '+args.output
 
 p = subprocess.Popen(["/bin/bash", "-i", "-c", cmd], stdout=subprocess.PIPE)
 
