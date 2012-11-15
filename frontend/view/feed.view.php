@@ -75,6 +75,12 @@ class FeedV implements ObjectViewInterface {
       $feed_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
     }
 
+    // create the status text
+    $status_text = '<font color=red>Running</font>';
+    if ($object->status == 100) {
+      $status_text = '<font color=green>Done</font>';
+    }
+
     $t = new Template('feed.html');
     $t -> replace('ID', $object->id);
     $feed_gfx64 = 'plugins/'.$object->plugin.'/feed.png';
@@ -89,6 +95,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('PLUGIN', $object->plugin);
     $t -> replace('MORE', 'Show details');
     $t -> replace('STATUS', $object->status);
+    $t -> replace('STATUS_TEXT', $status_text);
     // set data browser
     $d = new Template('feed_data_browser.html');
     $d -> replace('FOLDER', '/'.$username.'/'.$object->plugin.'/'.$object->name.'-'.$object->id);
