@@ -73,8 +73,6 @@ class PluginV implements ObjectViewInterface {
   }
 
   public static function getHTML($object){
-    // not implemented
-
     $t = new Template('plugin.html');
     $t -> replace('PLUGIN_CAROUSEL', PluginV::getCarousel($object));
 

@@ -25,33 +25,31 @@
  *                        dev@babyMRI.org
  *
  */
-
-// we define a valid entry point
 define('__CHRIS_ENTRY_POINT__', 666);
 
-//define('CHRIS_CONFIG_DEBUG', true);
-
 // include the configuration
-require_once ('config.inc.php');
+require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
-// include the template class
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
+/* // get location
+// feedname-feedid
+$feed_directory = $_POST['FEED_DIRECTORY'];
+// plugin name
+$feed_plugin =  $_POST['FEED_PLUGIN'];
+// file name
+$name = $_POST['FILENAME'];
 
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
+//$location = joinPaths(CHRIS_DATA_FOLDER, $_SESSION['username'], $feed_plugin, $feed_directory, $name);
+$location = '/chb/users/nicolas.rannou/gitroot/chrisreloaded/frontend/plugins/pacs_query/study.json';
+ */
+// location:
 
-function pacsPage() {
-  // create the login page
-  $t = new Template('pacs2.html');
-  $t -> replace('CSS', 'css.html');
-  $t -> replace('NAVBAR', 'navbar.html');
-  $t -> replace('DATA_PREVIEW', 'data_preview.html');
-  $t -> replace('CHRIS_AETITLE', CHRIS_AETITLE);
-  $t -> replace('FOOTER', 'footer.html');
-  $t -> replace('JAVASCRIPT', 'javascript.html');
-  return $t;
+// return required type (JSON, RAW, etc.)
+/* if($_POST['TYPE'] == 'JSON'){
+  echo $location;
 }
-
-// execute the test
-echo pacsPage();
-
+else{
+  echo 'unknown type';
+} */
+//$json_data = file_get_contents('data.txt');
+echo file_get_contents('/chb/users/nicolas.rannou/gitroot/chrisreloaded/frontend/plugins/pacs_query/study.json');
 ?>

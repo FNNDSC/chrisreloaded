@@ -1,0 +1,49 @@
+# NOTE DOESNT WORK EVERYWHERE
+# NOT RESPONSIBLE FOR MISUSAGE
+# NO WARRANTY
+
+# the PACS PULL plugin requires some setup:
+
+# 1- Update the configuration file
+* setup the AETITLE
+* PACS IP
+* PACS Port
+
+NOTE: contact your PACS administrators to know where the data will be pushed
+after retrieve from the AETITLE
+
+# 2- Setup the DICOM listener
+We typically use xinetd to listen for incoming data from the PACS.
+Here is an example of setup on the listening machine.
+In this case, the PACS will push data to port 10502 on our listening machine.
+
+toor@chris:~ $>cat /etc/xinetd.d/christestlistener 
+service christestlistener
+{
+   socket_type         = stream
+   wait                = no
+   user                = chris
+   group               = ellengp
+   log_on_success      = HOST DURATION
+   log_on_failure      = HOST
+   server              = /chb/users/chris/src/chrisreloaded/frontend/plugins/plugin/pacs_pull/listen.php
+   disable             = no
+   port                = 10502
+}
+
+toor@chris:~ $>cat /etc/services
+...
+...
+
+fido   60177/tcp     # fidonet EMSI over telnet
+fido    60179/tcp     # fidonet EMSI over TCP
+
+# Local services
+christestlistener      10502/tcp   # DICOM - CHRIS TEST listener
+christestlistener      10502/udp   # DICOM - CHRIS TEST listener
+
+toor@chris:~ $>service xinetd restart
+
+Enjoy the PACS PULL plugin.
+
+See the PACS plugin suite for PACS query tools and PACS ping tools.
