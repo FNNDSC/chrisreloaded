@@ -6,7 +6,7 @@ _FEED_.onclick = function(details, more) {
   
   // generate the file browser on demand, if doesnt exist already
   var _file_browser = details.find('.file_browser');
-  if (_file_browser.is(':empty')) {
+  //if (_file_browser.is(':empty')) {
     var _folder = _file_browser.attr('data-folder');
     _file_browser.fileTree({
       root : _folder,
@@ -54,7 +54,7 @@ _FEED_.onclick = function(details, more) {
       
       
     });
-  }
+  //}
   
   // also create the multi accordion
   // if it doesn't exist
