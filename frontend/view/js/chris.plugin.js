@@ -48,42 +48,54 @@ jQuery(document).ready(
           });
       
       // setup droppable item
-      jQuery(".parameter_dropzone").droppable(
-          {
-            activeClass: "parameter_dropzone_active",
-            hoverClass: "parameter_dropzone_hover",
-            tolerance: "pointer",
-            accept: ":not(.ui-sortable-helper)",
-            drop: function(event, ui) {
+      jQuery(".parameter_dropzone").droppable({
+        activeClass: "parameter_dropzone_active",
+        hoverClass: "parameter_dropzone_hover",
+        tolerance: "pointer",
+        accept: ":not(.ui-sortable-helper)",
+        drop: function(event, ui) {
 
-              // grab the data name dom element
-              var _data_name = ui.draggable;
-              
-              // now we can grab the MRN
-              var _mrn = _data_name.closest('.file_browser').attr(
-                  'data-patient-id');
-              
-              // and the data id
-              var _data_id = _data_name.closest('.file_browser')
-                  .attr('data-id');
-              
-              // and the full path
-              var _full_path = _data_name.attr('data-full-path');
-              
-              // and create a new representation
-              var _new_span = jQuery('<span></span>');
-              _new_span.html('<b>MRN ' + _mrn + '</b> ' + _data_name.text());
-              _new_span.attr('data-patient-id', _mrn);
-              _new_span.attr('data-id', _data_id);
-              _new_span.attr('data-full-path', _full_path);
-              
-              // throw everything old away
-              jQuery(this).empty();
-              // .. and attach the new thingie
-              jQuery(this).append(_new_span);
-              
-            }
-          });
+          // grab the data name dom element
+          var _data_name = ui.draggable;
+          
+          var _file_browser = null;
+          var _full_path = null;
+          
+          if (jQuery(_data_name[0]).hasClass('feed_icon')) {
+            abceef = jQuery(_data_name[0]);
+            // a feed icon was dropped
+            var _feed_content = jQuery(_data_name[0]).closest('.feed');
+            _file_browser = jQuery(_feed_content).find('.file_browser');
+            _full_path = _file_browser.attr('data-folder');
+
+          } else {
+            
+            // a file browser entry was dropped
+            _file_browser = _data_name.closest('.file_browser');
+            _full_path = _data_name.attr('rel');
+            
+          }
+          
+          // now we can grab the MRN
+          var _mrn = _file_browser.attr('data-patient-id');
+          
+          // and the data id
+          var _data_id = _file_browser.attr('data-id');
+          
+          // and create a new representation
+          var _new_span = jQuery('<span></span>');
+          _new_span.html('<b>MRN ' + _mrn + '</b> ' + _data_name.text());
+          _new_span.attr('data-patient-id', _mrn);
+          _new_span.attr('data-id', _data_id);
+          _new_span.attr('data-full-path', _full_path);
+          
+          // throw everything old away
+          jQuery(this).empty();
+          // .. and attach the new thingie
+          jQuery(this).append(_new_span);
+          
+        }
+      });
       
       jQuery('#plugin_cancel').on(
           'click',
@@ -241,13 +253,15 @@ jQuery(document).ready(
             
             // TODO validate
             
-            apprise('<h5>Please name this job!</h5>', {'input':new Date()}, function(r) {
-              
+            apprise('<h5>Please name this job!</h5>', {
+              'input': new Date()
+            }, function(r) {
+
               if (r) {
                 
                 // 
                 var _feed_name = r;
-
+                
                 // send to the launcher
                 jQuery.ajax({
                   type: "POST",
@@ -260,21 +274,20 @@ jQuery(document).ready(
                     FEED_OUTPUT: _outputs
                   },
                   success: function(data) {
-                    
-                    jQuery().toastmessage('showSuccessToast',
-                        '<h5>Job started.</h5>'
-                        +'Plugin: <b>'+_plugin_name+'</b><br>'
-                        +'Name: <b>'+_feed_name+'</b>');
 
+                    jQuery().toastmessage(
+                        'showSuccessToast',
+                        '<h5>Job started.</h5>' + 'Plugin: <b>' + _plugin_name +
+                            '</b><br>' + 'Name: <b>' + _feed_name + '</b>');
+                    
                   }
-                });                
+                });
                 
-                
+
               } else {
                 
                 jQuery().toastmessage('showErrorToast',
-                    '<h5>Submission failed.</h5>'
-                    +'Please enter a name!');
+                    '<h5>Submission failed.</h5>' + 'Please enter a name!');
                 
               }
               

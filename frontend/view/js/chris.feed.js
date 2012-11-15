@@ -264,6 +264,13 @@ jQuery(document).ready(function() {
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
   
+  jQuery('.feed_icon').draggable({
+    handle : ".feed_move",
+    helper : "clone",
+    appendTo : "body",
+    zIndex : 2500
+  });
+  
 
 
 });

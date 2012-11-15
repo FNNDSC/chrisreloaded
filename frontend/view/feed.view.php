@@ -122,7 +122,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('STATUS_TEXT', $status_text);
     // set data browser
     $d = new Template('feed_data_browser.html');
-    $d -> replace('FOLDER', '/'.$username.'/'.$object->plugin.'/'.$object->name.'-'.$object->id);
+    $d -> replace('FOLDER', joinPaths($username,$object->plugin, $object->name.'-'.$object->id));
     $d -> replace('PATIENT_ID', 'fake_patient_id');
     $d -> replace('DATA_ID', 'fake_data_id');
     $t -> replace('DATA_BROWSER', $d);
