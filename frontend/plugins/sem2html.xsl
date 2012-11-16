@@ -2,15 +2,11 @@
 
   <!-- start matching at 'executable' element -->
   <xsl:template match="executable">
-    <xsl:variable name="moduleTitle"><xsl:value-of select="title"/></xsl:variable>
-
-      <div>
+      <div class='plugin_panel' style='display:none'>
         <!-- attach the id -->
         <xsl:attribute name="id">panel_${PLUGIN_NAME}</xsl:attribute>
-        <xsl:attribute name="class">plugin_panel</xsl:attribute>
+        <xsl:attribute name="data-category"><xsl:value-of select="category"/></xsl:attribute>
         <xsl:attribute name="data-executable">${PLUGIN_EXECUTABLE}</xsl:attribute>
-        <!-- and hide it by default -->
-        <xsl:attribute name="style">display:none;</xsl:attribute>
         <strong><xsl:value-of select="title"/></strong><br/>
         <!-- process the parameters blocks -->
         <div class='panelgroup'>

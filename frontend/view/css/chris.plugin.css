@@ -12,6 +12,14 @@
 	background-color: whiteSmoke;
 }
 
+#cart_categories {
+	height: 20px;
+	line-height: 22px;
+	width: 140px;
+	margin-bottom: 0px;
+	font-size: 11px;
+}
+
 .cart_content {
 	background-color: whiteSmoke;
 }
@@ -37,7 +45,7 @@
 	font-size: 30px;
 	font-weight: 200;
 	line-height: 20px;
-/* 	color: white; */
+	/* 	color: white; */
 	text-align: left;
 }
 
@@ -99,7 +107,7 @@
 }
 
 .panel_title {
-  font-size: 11px;
+	font-size: 11px;
 }
 
 .parameter_panel {
@@ -118,19 +126,19 @@
 	overflow: visible;
 	background-color: whiteSmoke;
 	color: blue;
-  z-index: 3000;	
+	z-index: 3000;
 }
 
 .parameter_title {
-  position: absolute;
-  font-weight: bold;
-  white-space: nowrap;
+	position: absolute;
+	font-weight: bold;
+	white-space: nowrap;
 }
 
 .parameter_title:hover {
-  background-color: whiteSmoke;
-  color: blue;
-  z-index: 3000;
+	background-color: whiteSmoke;
+	color: blue;
+	z-index: 3000;
 }
 
 .parameter_row {
@@ -165,15 +173,15 @@
 }
 
 .parameter_spinner_double {
-  width: 30px;
-  line-height: 10px;
-  float: right;
+	width: 30px;
+	line-height: 10px;
+	float: right;
 }
 
 .parameter_string {
-  float: right;
-  width: 150px;	
-  padding-left: 3px;
+	float: right;
+	width: 150px;
+	padding-left: 3px;
 }
 
 .parameter_dropzone_active {

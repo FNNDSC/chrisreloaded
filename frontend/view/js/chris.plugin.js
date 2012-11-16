@@ -8,6 +8,82 @@ var _PLUGIN_ = _PLUGIN_ || {};
 jQuery(document).ready(
     function() {
 
+      // parse all categories
+      _PLUGIN_.categories = ['-- Show all --'];
+      jQuery('.plugin_panel').each(function (i,v) {
+        
+        var _category = jQuery(v).attr('data-category');
+        
+        // propagate all categories to the carousel items
+        var _id = jQuery(v).attr('id').replace('panel_','');
+        jQuery('#'+_id).attr('data-category', _category);
+        
+        if (_PLUGIN_.categories.indexOf(_category) == -1) {
+          _PLUGIN_.categories.push(_category);
+        }
+        
+      });
+      _PLUGIN_.categories.sort(); // order alphabetically
+      
+      // and also store all plugins
+      jQuery('.carousel-inner').children().clone().appendTo('#cart_storage');
+      
+      // fill the category combobox
+      var _categorieslength = _PLUGIN_.categories.length;
+      for (var p=0;p<_categorieslength;p++) {
+        
+        jQuery('#cart_categories').append('<option>'+_PLUGIN_.categories[p]+'</option>');
+        
+      }
+      
+      // configure the category callback
+      jQuery('#cart_categories').bind('change', function() {
+        
+        var _new_category = jQuery('#cart_categories').val();
+        
+        // remove all 
+        jQuery('.carousel-inner').empty();
+        
+        // configure the selector
+        var _selector = '[data-category="'+_new_category+'"]';
+        
+        // and a special case for show all
+        if (_new_category == '-- Show all --') {
+          
+          // this means, show all :)
+          _selector = '';
+          
+        }
+          
+        // now move all the matching ones back
+        jQuery('#cart_storage').children(_selector).clone().appendTo('.carousel-inner');
+                
+        // remove all the active classes
+        jQuery('.carousel-inner').children('.active').removeClass('active');
+        
+        // and activate the first one
+        jQuery('.carousel-inner').children().first().addClass('active');
+        
+        // for only one matching plugin, remove the arrows to avoid a deadlock in the carousel stack
+        if (jQuery('.carousel-inner').children().length == 1) {
+          
+          jQuery('.cart-carousel-control').hide();
+          
+        } else {
+          
+          jQuery('.cart-carousel-control').show();
+          
+        }
+        
+        // and show the proper UI
+        jQuery('.plugin_panel').hide();
+        jQuery('#panel_'+jQuery('.carousel-inner').children().first().attr('id')).show();
+        
+        
+        
+        
+      });
+      
       // set default plugin to the first one
       var _first_plugin = jQuery(".carousel-inner").children(':first');
       var _first_plugin_id = _first_plugin.attr('id');
@@ -20,6 +96,7 @@ jQuery(document).ready(
       jQuery('#pipelines').carousel({
         interval: false
       });
+      
       
       // show/hide panels on sliding of the carousel
       
@@ -38,7 +115,7 @@ jQuery(document).ready(
       jQuery('#pipelines').bind(
           'slid',
           function() {
-
+            
             // update UI
             var _new_plugin_id = jQuery(".carousel-inner").children('.active')
                 .attr('id');
