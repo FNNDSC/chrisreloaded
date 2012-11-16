@@ -127,10 +127,12 @@
   <xsl:template match="string">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
-      <xsl:call-template name="create_label"/>
+      <span class='parameter_title_cropped'>
+        <xsl:value-of select="label"/>
+      </span>
       <span class='parameter_input' data-type='string'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
-        <input type='text' class='parameter_string'>  
+        <input type='text' class='parameter_string' style='height:12px;line-height:10px;margin-bottom:0px;'>  
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
           <xsl:attribute name="value"><xsl:value-of select="default"/></xsl:attribute>
         </input>

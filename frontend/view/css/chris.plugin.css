@@ -170,6 +170,12 @@
   float: right;
 }
 
+.parameter_string {
+  float: right;
+  width: 150px;	
+  padding-left: 3px;
+}
+
 .parameter_dropzone_active {
 	background-color: #D9E7FE;
 }
