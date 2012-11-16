@@ -76,6 +76,8 @@ if ($handle = opendir($study_directory)) {
                 
                 // +1 increase data status
                 
+                // create nifti??
+                
                 // delete file
                 unlink($study_directory.'/'.$entry.'/'.$sub_entry);
               }

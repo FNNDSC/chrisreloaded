@@ -85,41 +85,7 @@ $series_parameter['SeriesDescription'] = '';
 $series_parameter['NumberOfSeriesRelatedInstances'] = '';
 $results = $pacs->queryAll($study_parameter, $series_parameter, null);
 
-// first step is to clean up the tmp directory
-// loop through CHRIS_TMP directory
-if ($handle = opendir(CHRIS_TMP)) {
-  while (false !== ($entry = readdir($handle))) {
-    if($entry != "." && $entry != ".."){
-      if (is_dir(CHRIS_TMP.$entry)) {
-        // loop through subdirectory
-        if ($sub_handle = opendir(CHRIS_TMP.$entry)) {
-          while (false !== ($sub_entry = readdir($sub_handle))) {
-            if($sub_entry != "." && $sub_entry != ".." && is_file(CHRIS_TMP.$entry.'/'.$sub_entry)){
-              $process_file = PACS::process(CHRIS_TMP.$entry.'/'.$sub_entry);
-              // do we have a match?
-              $match = true;
-              if($match){
-                // move file at good location
-                
-                // create links for current user
-                
-                // delete file
-              }
-              else{
-                // go to next tmp subdirectory
-                return;
-              }
-            }
-          }
-          closedir($sub_handle);
-        }
-      }
-    }
-  }
-  closedir($handle);
-}
-
-// extra loop to delete empty dirs
+// create directories and soft link data over
 
 
 //$pacs = new PACS($server, $port, $aet);
