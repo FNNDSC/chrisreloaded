@@ -46,20 +46,26 @@ class PACS_Pull(Plugin):
     logging.debug('MRN: ' + options.MRN)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
+    # loop through mrns
+    
     # preprocess!!
-    logging.debug('pre_processing...')
-    command = current_dir + "/pre_process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
-    os.system(command)
+    logging.debug('pre processing...')
+    pre_command = current_dir + "/pre_process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
+    logging.debug(pre_command)
+    os.system(pre_command)
 
-    # and process!!
+    # process
     logging.debug('processing...')
-    process_command = current_dir + "/process.php" + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
-    process_output = os.system(process_command)
+    pro_command = current_dir + "/process.php -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
+    logging.debug(pro_command)
+    process_output = os.system(pro_command)
     logging.debug(process_output)
     
     # postprocess
-    # look in tmp directory if any directory contains what we are looking for
-    # if data is there, move it around in a good way
+    logging.debug('post processing...')
+    post_command = current_dir + "/post_process.php -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
+    logging.debug(post_command)
+    os.system(post_command)
 
 
 # ENTRYPOINT

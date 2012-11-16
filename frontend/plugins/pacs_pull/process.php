@@ -53,23 +53,23 @@ $longopts  = array(
 
 $options = getopt($shortopts, $longopts);
 
-$pacs_level = 'STUDY';
-$pacs_study_date = '';
-$pacs_accession_number = '';
-$pacs_modality = 'MR';
-$pacs_study_description = '';
-$pacs_name = '';
 $pacs_mrn = $options['m'];
-$pacs_birthday = '';
-$pacs_study_uid = '';
-$pacs_serie_uid = '';
-
 $server = $options['s'];
 $port = $options['p'];
 $aet = $options['a'];
 
+$pacs_level = 'STUDY';
+$pacs_modality = 'MR';
+
+$pacs_study_date = '';
+$pacs_accession_number = '';
+$pacs_study_description = '';
+$pacs_name = '';
+$pacs_birthday = '';
+$pacs_study_uid = '';
+$pacs_serie_uid = '';
+
 define('CHRIS_DCMTK', '/usr/bin/');
-echo "in process.php";
 
 $pacs = new PACS($server, $port, $aet);
 
@@ -86,7 +86,8 @@ if($pacs_level == 'STUDY'){
   echo $pacs->moveStudy();
 }
 else{
-  // check if series already there
+  /*
+   // check if series already there
   // retrieve the data
   $dataMapper = new Mapper('Data');
   $dataMapper->filter('uid = (?)',$pacs_serie_uid);
@@ -96,12 +97,12 @@ else{
   // should update the links!
   if(count($dataResult['Data']) > 0)
   {
-    echo json_encode('Data already there');
-    return;
+  echo json_encode('Data already there');
+  return;
   }
 
   $pacs->addParameter('StudyInstanceUID', $pacs_study_uid);
   $pacs->addParameter('SeriesInstanceUID', $pacs_serie_uid);
-  echo $pacs->moveSeries();
+  echo $pacs->moveSeries();*/
 }
 ?>

@@ -171,6 +171,9 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   $feedDataObject->data_id = $data_chris_id;
   Mapper::add($feedDataObject);
 
+  /**
+   * @todo should only map user to data if not already mapped
+   */
   // MAP USER TO DATA
   $userDataObject = new User_Data();
   $userDataObject->user_id = $user_id;
