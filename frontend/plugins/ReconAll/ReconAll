@@ -29,7 +29,12 @@ class ReconAll( Plugin ):
   def run( self, options ):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    os.system(current_dir + '/reconall.wrapper --input ' + options.input + '--output ' + options.output)
+    
+    # grab the first dicom input file
+    firstDicomFile = os.listdir(options.input)[0]
+    
+    # launch recon-all
+    os.system(current_dir + '/reconall.wrapper -subject ' + os.path.join(options.output, 'Freesurfer') + ' -i ' + firstDicomFile)
 
 # ENTRYPOINT
 if __name__ == "__main__":

@@ -1,1 +1,3 @@
 #!/bin/bash
+chb-fsdev
+recon-all $@
