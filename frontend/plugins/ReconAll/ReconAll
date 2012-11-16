@@ -31,10 +31,12 @@ class ReconAll( Plugin ):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     # grab the first dicom input file
-    firstDicomFile = os.listdir(options.input)[0]
+    firstDicomFile = os.listdir(options.MRI)[0]
     
     # launch recon-all
-    os.system(current_dir + '/reconall.wrapper -subject ' + os.path.join(options.output, 'Freesurfer') + ' -i ' + firstDicomFile)
+    cmd = 'cd ' + options.output +';' + current_dir + '/reconall.wrapper -subject Freesurfer -i ' + os.path.join(options.MRI, firstDicomFile) + ' -all'
+    print cmd
+    os.system(cmd)
 
 # ENTRYPOINT
 if __name__ == "__main__":
