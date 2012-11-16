@@ -36,20 +36,29 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 // storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"
 // then each incoming data is processed by $process_command
 /* $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php -p #p -f #f'); */
-$process_command = joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/post_process.php -p #p -f #f');
-$listen_command = '/usr/bin/storescp -id -od ' . CHRIS_TMP . ' -pm -xcr  \'' . $process_command . '\' -ss RX -tos 120';
+//$process_command = joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/move.php -p #p -f #f');
+$listen_command = '/usr/bin/storescp -id -od ' . CHRIS_TMP . ' -pm -ss RX -tos 120';
 
 // open log file
 $logFile = joinPaths(CHRIS_LOG, 'pacs_pull_listen.log');
 $fh = fopen($logFile, 'a')  or die("can't open file");
+$startReportPretty = "=========================================". PHP_EOL;
+$report = date('Y-m-d h:i:s'). ' ---> Start receiving data...'. PHP_EOL;
+$startReportPretty .= $report;
+$startReportPretty .= "=========================================". PHP_EOL;
 //write date
-fwrite($fh, "=========================================". PHP_EOL);
-fwrite($fh, date('D, F d Y - h:i:s A'). PHP_EOL);
-//write command
-fwrite($fh, $listen_command. PHP_EOL);
+fwrite($fh, $startReportPretty);
+fclose($fh);
+
 // execute the command
-$stringOutput = exec($listen_command);
-// write output
-fwrite($fh, $stringOutput. PHP_EOL);
+exec($listen_command);
+
+$fh = fopen($logFile, 'a')  or die("can't open file");
+$finishReportPretty = "******************************************". PHP_EOL;
+$report .= $listen_command. PHP_EOL;
+$report .= date('Y-m-d h:i:s'). ' ---> Stop receiving data...'. PHP_EOL;
+$finishReportPretty .= $report;
+$finishReportPretty .= "******************************************". PHP_EOL;
+fwrite($fh, $finishReportPretty);
 fclose($fh);
 ?>

@@ -210,45 +210,11 @@ if(!is_file($filename)){
 }
 
 // delete tmp file
-//unlink($tmpfile);
+unlink($tmpfile);
 
 // delete tmp dir if dir is empty when all files have arrived
-//$files = scandir($p);
-//if(count($files) <= 2){
-//  rmdir($p);
-//}
-// if data fully there, update links for interested people
-
-// 2- link to *ALL* relevant people in relevant dir (PACS pull, dicom dir send)
-
-/* $files = scandir($datadirname);
-// if all files arrived
-// 1- create the nifti file
-// 2- update the feeds in progress
-if (count($files) == $data_nb_files + 2)
-{
-  // use mricron to convert
-  $convert_command = '/usr/bin/dcm2nii -a y -g n '.$datadirname;
-  exec($convert_command);
+$files = scandir($p);
+if(count($files) <= 2){
+  rmdir($p);
 }
-
-$files = scandir($datadirname); */
-// if all files arrived
-// 1- create the nifti file
-// 2- update the feeds in progress
-// issue: sometimes dcm2nii create more than 1 file (>= instead of ==)
-/*if (count($files) >= $data_nb_files + 3)
-{
-  $db = DB::getInstance();
-  $db->lock('feed', 'WRITE');
-  // update the feeds in progress
-  $feedMapper = new Mapper('Feed');
-  $feedMapper->filter('status != (?)','done');
-  $feedResult = $feedMapper->get();
-  // update in progress results
-  foreach ($feedResult['Feed'] as $key => $value) {
-    FeedC::updateDB($value, $data_chris_id);
-  }
-  $db->unlock();
-}*/
 ?>
