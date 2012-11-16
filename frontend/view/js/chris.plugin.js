@@ -8,6 +8,21 @@ var _PLUGIN_ = _PLUGIN_ || {};
 jQuery(document).ready(
     function() {
 
+      // parse all categories
+      _PLUGIN_.categories = ['-- Show all --'];
+      jQuery('.plugin_panel').each(function (i,v) {
+        
+        var _category = jQuery(v).attr('data-category');
+        
+        if (_PLUGIN_.categories.indexOf(_category) == -1) {
+          _PLUGIN_.categories.push(_category);
+        }
+        
+      });
+      _PLUGIN_.categories.sort();
+      
+      
+      
       // set default plugin to the first one
       var _first_plugin = jQuery(".carousel-inner").children(':first');
       var _first_plugin_id = _first_plugin.attr('id');
