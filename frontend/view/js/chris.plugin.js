@@ -19,9 +19,23 @@ jQuery(document).ready(
         }
         
       });
-      _PLUGIN_.categories.sort();
+      _PLUGIN_.categories.sort(); // order alphabetically
       
+      // fill the category combobox
+      var _categorieslength = _PLUGIN_.categories.length;
+      for (var p=0;p<_categorieslength;p++) {
+        
+        jQuery('#cart_categories').append('<option>'+_PLUGIN_.categories[p]+'</option>');
+        
+      }
       
+      // configure the category callback
+      jQuery('#cart_categories').bind('change', function() {
+        
+        var _new_category = jQuery('#cart_categories').val();
+        console.log(_new_category);
+        
+      });
       
       // set default plugin to the first one
       var _first_plugin = jQuery(".carousel-inner").children(':first');
@@ -35,6 +49,7 @@ jQuery(document).ready(
       jQuery('#pipelines').carousel({
         interval: false
       });
+      
       
       // show/hide panels on sliding of the carousel
       
