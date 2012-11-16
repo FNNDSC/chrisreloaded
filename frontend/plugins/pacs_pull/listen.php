@@ -34,6 +34,7 @@ if(!defined('CHRIS_CONFIG_PARSED'))
 
 // open log file
 $logFile = joinPaths(CHRIS_LOG, 'pacs_pull_listen.log');
+$fullReport = '';
 
 // CREATE UNIQUE DIRECTORY
 $tmpdirname = CHRIS_TMP.date('Ymdhis');
@@ -56,7 +57,7 @@ fclose($fh);
 
 
 // we now have a unique directory to be processed
-$listen_command = '/usr/bin/storescp -id -od "' . CHRIS_TMP . '" -pm -ss RX -tos 120';
+$listen_command = '/usr/bin/storescp -id -od "' . CHRIS_TMP . '" -pm -ss RX';
 //write log
 $startReportPretty = "=========================================". PHP_EOL;
 $report = date('Y-m-d h:i:s'). ' ---> Start receiving data...'. PHP_EOL;

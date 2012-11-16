@@ -77,7 +77,7 @@ if ($handle = opendir($study_directory)) {
                 // +1 increase data status
                 
                 // delete file
-                //unlink($study_directory.'/'.$entry.'/'.$sub_entry);
+                unlink($study_directory.'/'.$entry.'/'.$sub_entry);
               }
               else{
                 // add to log
@@ -87,14 +87,14 @@ if ($handle = opendir($study_directory)) {
           }
           closedir($sub_handle);
           // delete directory
-          //rmdir($study_directory.'/'.$entry);
+          rmdir($study_directory.'/'.$entry);
         }
       }
     }
   }
   closedir($handle);
   // delete directory
-  //rmdir($study_directory);
+  rmdir($study_directory);
 }
 
 fclose($fh); 
