@@ -29,7 +29,7 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the chris configuration
-require_once ('../../config.inc.php');
+require_once (dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
 // include chris db interface
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 // include chris mapper interface

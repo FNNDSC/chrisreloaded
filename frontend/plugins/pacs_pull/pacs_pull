@@ -39,11 +39,11 @@ class PACS_Pull(Plugin):
   Plugin.VERSION = '0.1'
 
   def run(self, options):
-    logging.basicConfig(filename=options.output+'pacs_pull.log',level=logging.DEBUG, format='%(asctime)s %(message)s')
+    logging.basicConfig(filename=options.output + 'pacs_pull.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
 
     logging.debug('running pacs pull...')
     logging.debug('parsing args...')
-    logging.debug('MRN: '+options.MRN)
+    logging.debug('MRN: ' + options.MRN)
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     # preprocess!!
@@ -64,7 +64,7 @@ class PACS_Pull(Plugin):
       
     #print current_dir+"/pre_process.php"
     #os.system("cd "+current_dir+" && ./pre_process.php -u Ellen -f 790 -m "+options.MRN +"-s " + config.server + "-p " + config.port + "-a " + config.aet);
-    command = current_dir+"/pre_process.php -u "+ options.USER_ID +" -f "+ options.FEED_ID +" -m "+options.MRN +" -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
+    command = current_dir + "/pre_process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
     print command
     os.system(command)
     #pre = subprocess.Popen(["pre_process.php", "-u",  "Ellen", "-f","790", "-m",options.MRN, "-s", config.server, "-p",config.port,"-a ",config.aet], stdout=subprocess.PIPE, cwd=current_dir, shell=True)
@@ -84,13 +84,13 @@ class PACS_Pull(Plugin):
 
     # and process!!
     logging.debug('processing...')
-    #pro = subprocess.Popen(["process.php", "-m "+options.MRN, "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
-    #pro_result = pro.communicate()[0]
-    
-    #logging.debug(pro_result)
+    #pro = subprocess.Popen(["process.php", "-m "+options.MRN, "-s " + options.SERVER_IP, "-p " + options.SERVER_PORT, "-a " + options.USER_AET], stdout=subprocess.PIPE, cwd=current_dir)
+    process_command = current_dir + "/process.php" + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
+    print process_command
+    process_output = os.system(process_command)
+    logging.debug(process_output)
     # generic process to support pacs_pull and dicom_dir_send!
     # ask pacs to move data!
-
     # postprocess
     logging.debug('finished processing...')
     logging.debug('should receive data from PACS shortly...')

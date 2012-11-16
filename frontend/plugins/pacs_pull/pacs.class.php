@@ -560,8 +560,8 @@ class PACS implements PACSInterface {
         $query .= ' 2>&1';
 
         // execute query
-        $output .= $query;
-        //$output .= shell_exec($query);
+        $output .= $query. ' ';
+        $output .= shell_exec($query);
       }
       return $output;
     }
