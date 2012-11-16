@@ -33,10 +33,7 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
   require_once(dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
 
 // build the storescp command
-// storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"
-// then each incoming data is processed by $process_command
-/* $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php -p #p -f #f'); */
-//$process_command = joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/move.php -p #p -f #f');
+// storescp will move incoming files to temp directory "CHRIS_TMP"
 $listen_command = '/usr/bin/storescp -id -od ' . CHRIS_TMP . ' -pm -ss RX -tos 120';
 
 // open log file
