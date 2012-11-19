@@ -19,12 +19,16 @@ _PREVIEW_.start = function(renderertype, filetype, filepath) {
     
     // text preview
     jQuery('#PREVIEWSLIDER').show();
+    jQuery('#AUTOREFRESH').show();
+    jQuery('#AUTOREFRESH').toggleButtons('setState', true);
     jQuery('#BR_OVER').hide();
     jQuery('#PREVIEWMODAL').addClass('largePreview');
     
   } else {
     
     // XTK preview
+    
+    jQuery('#AUTOREFRESH').hide();
     
     if (_PREVIEW_.filetype == 'volume') {
       
@@ -41,7 +45,8 @@ _PREVIEW_.start = function(renderertype, filetype, filepath) {
   }
   
   // always center the modal
-  jQuery('#PREVIEWMODAL').css('margin-left',jQuery('#PREVIEWMODAL').outerWidth()/2*-1);
+  jQuery('#PREVIEWMODAL').css('margin-left',
+      jQuery('#PREVIEWMODAL').outerWidth() / 2 * -1);
   
   // Top Left overlay
   jQuery("#TL_OVER").html(
@@ -69,11 +74,29 @@ _PREVIEW_.preview = function() {
     // grab the text file
     jQuery.ajax({
       url: 'http://chris/datadev/' + _PREVIEW_.filepath
-    }).done(function ( data ) {
-      jQuery('#PREVIEW').append('<pre id="textPreview">'+data+'</pre>');
+    }).done(function(data) {
+
+      jQuery('#PREVIEW').append('<pre id="textPreview">' + data + '</pre>');
     });
     
+    // refresh the log every 500 ms
+    _PREVIEW_.refresher = setInterval(function() {
+      
+      if (!jQuery('#AUTOREFRESHCHECKBOX').prop('checked')) return;
+      
+      jQuery.ajax({
+        url: 'http://chris/datadev/' + _PREVIEW_.filepath
+      }).done(function(data) {
+
+        jQuery('#textPreview').html(data);
+        jQuery('#textPreview').scrollTop(jQuery("#textPreview")[0].scrollHeight);
+        
+      });
+      
+    },500);
     
+    
+
   } else {
     
     jQuery("#TL_OVER").html('Creating visualization...');
@@ -137,6 +160,14 @@ _PREVIEW_.preview = function() {
 }
 jQuery(document).ready(function() {
 
+  jQuery('#AUTOREFRESH').toggleButtons({
+    height: 10,
+    width: 60,
+    font: {
+      'font-size': '11px'
+    }
+  });
+  
   // XTK variables
   _PREVIEW_.renderer = null;
   _PREVIEW_.renderertype = null;
@@ -177,6 +208,7 @@ jQuery(document).ready(function() {
     // remove the text class
     jQuery('#PREVIEWMODAL').removeClass('largePreview');
     jQuery('#textPreview').remove();
+    clearInterval(_PREVIEW_.refresher);
     
   });
 });
