@@ -702,5 +702,160 @@ class PACS implements PACSInterface {
         break;
     }
   }
+
+  static public function AddPatient(&$db, &$process_file, &$patient_chris_id){
+    $db->lock('patient', 'WRITE');
+
+    if (array_key_exists('PatientID',$process_file))
+    {
+      $patientMapper = new Mapper('Patient');
+      $patientMapper->filter('uid = (?)',$process_file['PatientID'][0]);
+      $patientResult = $patientMapper->get();
+
+      if(count($patientResult['Patient']) == 0)
+      {
+        // create patient model
+        $patientObject = new Patient();
+        //
+        // get patient name
+        //
+        if(array_key_exists('PatientName',$process_file))
+        {
+          $patientObject->name = $process_file['PatientName'][0];
+        }
+        else{
+          $patientObject->name = 'NoName';
+        }
+        //
+        // get patient dob
+        //
+        if(array_key_exists('PatientBirthDate',$process_file))
+        {
+          $date = $result['PatientBirthDate'][0];
+          $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
+          $patientObject->dob = $datetime;
+        }
+        else{
+          $patientObject->dob = '0000-00-00';
+        }
+        //
+        // get patient sex
+        //
+        if(array_key_exists('PatientSex',$process_file))
+        {
+          $patientObject->sex = $process_file['PatientSex'][0];
+        }
+        else{
+          $patientObject->sex = 'NoSex';
+        }
+        //
+        // get patient uid
+        //
+        $patientObject->uid = $process_file['PatientID'][0];
+
+        // add the patient model and get its id
+        $patient_chris_id = Mapper::add($patientObject);
+      }
+      else {
+        // get patient id
+        $patient_chris_id = $patientResult['Patient'][0]->id;
+      }
+    }
+    else {
+      fwrite($fh, 'Patient MRN not provided in DICOM file'.PHP_EOL);
+      // finish patient table lock
+      $db->unlock();
+      return 0;
+    }
+    // finish patient table lock
+    $db->unlock();
+    return 1;
+  }
+
+  static public function AddData(&$db, &$process_file, &$data_chris_id, &$series_description){
+    $db->lock('data', 'WRITE');
+    // Does data exist: SeriesInstanceUID
+    if (array_key_exists('SeriesInstanceUID',$result))
+    {
+      // does data (series) exist??
+      $dataMapper = new Mapper('Data');
+      $dataMapper->filter('uid = (?)',$process_file['SeriesInstanceUID'][0] );
+      $dataResult = $dataMapper->get();
+
+      // if doesnt exist, add data
+      if(count($dataResult['Data']) == 0)
+      {
+        // create object
+        // create data model
+        $dataObject = new Data();
+        //
+        // get data uid
+        //
+        $dataObject->uid = $process_file['SeriesInstanceUID'][0];
+        //
+        // get data name (series description)
+        //
+        if(array_key_exists('SeriesDescription',$process_file))
+        {
+          $dataObject->name = sanitize($process_file['SeriesDescription'][0]);
+        }
+        else{
+          $dataObject->name = 'NoSeriesDescription';
+        }
+
+        $series_description = $dataObject->name;
+        //
+        // get data time ContentDate-ContentTime
+        //
+        // date
+        $date = '';
+        if(array_key_exists('ContentDate',$process_file))
+        {
+          $raw_date = $process_file['ContentDate'][0];
+          $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
+        }
+        else{
+          $date .= '0000-00-00';
+        }
+        //time
+        $time = '';
+        if(array_key_exists('ContentTime',$process_file))
+        {
+          $raw_time = $process_file['ContentTime'][0];
+          $time .=  substr($raw_time, 0, 2).':'.substr($raw_time, 2, 2).':'.substr($raw_time, 4, 2);
+        }
+        else{
+          $time .= '00:00:00';
+        }
+        $dataObject->time = $date.' '. $time;
+        // get nb of files in data - only accessible through
+        // findscu query
+        /*         $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
+         $pacs->addParameter('RetrieveAETitle', '');
+        $pacs->addParameter('StudyInstanceUID', $result['StudyInstanceUID'][0]);
+        $pacs->addParameter('SeriesInstanceUID', $result['SeriesInstanceUID'][0]);
+        $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
+        $all_results = $pacs->querySeries();
+        $dataObject->nb_files = $all_results['NumberOfSeriesRelatedInstances'][0]; */
+        //
+        // add the data model to db and get its id
+        //
+        $data_chris_id = Mapper::add($dataObject);
+      }
+      else{
+        $data_chris_id = $patientResult['Data'][0]->id;
+        $series_description = $patientResult['Data'][0]->name;
+      }
+    }
+    else {
+      fwrite($fh, 'Data UID not provided in DICOM file'.PHP_EOL);
+      // finish data table lock
+      $db->unlock();
+      return 0;
+    }
+    // finish data table lock
+    $db->unlock();
+    return 1;
+  }
 }
 ?>

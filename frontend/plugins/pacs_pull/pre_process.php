@@ -152,11 +152,23 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   // else get its id
   else{
     $data_chris_id = $dataResult['Data'][0]->id;
-    // update the links if data is already there!
-    // HERE!
+    // if no nb_files provided, update this field in db
+    if($dataResult['Data'][0]->nb_files == 0){
+      // get a patient by id
+      $dataObject = new Data();
+      $dataObject->uid = $dataResult['Data'][0]->uid;
+      $dataObject->name = $dataResult['Data'][0]->name;
+      $dataObject->time = $dataResult['Data'][0]->time;
+      $dataObject->nb_files = $dataResult['Data'][0]->nb_files;
+      $dataObject->status = $dataResult['Data'][0]->status;
+      $dataObject->plugin = $dataResult['Data'][0]->plugin;
+      // Update database and get object
+      Mapper::update($dataObject, $data_chris_id);
+    }
   }
   $db->unlock();
 
+  // Map data to patient if it is anew data set
   if($map){
     // MAP DATA TO PATIENT
     $dataPatientObject = new Data_Patient();
@@ -171,13 +183,18 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   $feedDataObject->data_id = $data_chris_id;
   Mapper::add($feedDataObject);
 
-  /**
-   * @todo should only map user to data if not already mapped
-   */
+  // map data to user if this data hasn't already been mapper to this user
   // MAP USER TO DATA
-  $userDataObject = new User_Data();
-  $userDataObject->user_id = $user_id;
-  $userDataObject->data_id = $data_chris_id;
-  Mapper::add($userDataObject);
+  $userDataMapper = new Mapper('User_Data');
+  $userDataMapper->filter('user_id = (?)',$user_id);
+  $userDataMapper->filter('data_id = (?)',$data_chris_id);
+  $userDataResult = $userDataMapper->get();
+  if(count($userDataResult['User_Data']) == 0)
+  {
+    $userDataObject = new User_Data();
+    $userDataObject->user_id = $user_id;
+    $userDataObject->data_id = $data_chris_id;
+    Mapper::add($userDataObject);
+  }
 }
 ?>

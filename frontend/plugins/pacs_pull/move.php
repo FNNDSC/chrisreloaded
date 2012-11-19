@@ -36,6 +36,8 @@ require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 // include chris data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+// include chris patient models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 
 // include pacs helper
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
@@ -61,43 +63,88 @@ if ($handle = opendir($study_directory)) {
           while (false !== ($sub_entry = readdir($sub_handle))) {
             if($sub_entry != "." && $sub_entry != ".." && is_file($study_directory.'/'.$entry.'/'.$sub_entry)){
               $process_file = PACS::process($study_directory.'/'.$entry.'/'.$sub_entry);
-              
+
+              $db = DB::getInstance();
+
               //get patient id
+              $patient_chris_id = -1;
+              //$db, $process_file, $patient_chris_id
+              $p_success = PACS::AddPatient($db, $process_file, $patient_chris_id);
+              if($p_success == 0){
+                return;
+              }
+              
+              fwrite($fh, 'patient id: '.$patient_chris_id.PHP_EOL);
               
               //get data id
+              $data_chris_id = -1;
+              $series_description = '';
+              $d_success = PACS::AddData($db, $process_file, $data_chris_id, $series_description);
+              if($d_success == 0){
+                return;
+              }
               
-              // do we have a match? (patient AND data exist)
-              $match = true;
-              if($match){
-                fwrite($fh, 'got one match! '.PHP_EOL);
-                fwrite($fh, $study_directory.'/'.$entry.'/'.$sub_entry.PHP_EOL);
-                // move file at good location
-                // CHRIS_DATA/MRN-UID/SERIESDESC-UID/index.dcm
-                
+              fwrite($fh, 'data id: '.$data_chris_id.PHP_EOL);
+
+              // FILESYSTEM Processing
+              //
+              // Create the patient directory
+              //
+              $patientdirname = CHRIS_DATA.$process_file['PatientID'][0].'-'.$patient_chris_id;
+              // create folder if doesnt exists
+              if(!is_dir($patientdirname)){
+                mkdir($patientdirname);
+              }
+
+              //
+              // Create the data directory
+              //
+              $datadirname = $patientdirname.'/'.$series_description.'-'.$data_chris_id;
+
+              // create folder if doesnt exists
+              if(!is_dir($datadirname)){
+                mkdir($datadirname);
+              }
+
+              // move file at good location
+              // CHRIS_DATA/MRN-UID/SERIESDESC-UID/index.dcm
+              // cp file over if doesnt exist
+              $filenum = $process_file['InstanceNumber'][0];
+              $filename = $datadirname .'/'.$filenum.'.dcm';
+              if(!is_file($filename)){
+                copy($tmpfile, $filename);
+                // if file doesnt exist, +1 status
                 // +1 increase data status
+                $dataMapper = new Mapper('Data');
+                $dataMapper->filter('id = (?)',$data_chris_id);
+                $dataResult = $dataMapper->get();
                 
-                // create nifti??
-                
-                // delete file
-                unlink($study_directory.'/'.$entry.'/'.$sub_entry);
+                $dataObject = new Data();
+                $dataObject->uid = $dataResult['Data'][0]->uid;
+                $dataObject->name = $dataResult['Data'][0]->name;
+                $dataObject->time = $dataResult['Data'][0]->time;
+                $dataObject->nb_files = $dataResult['Data'][0]->nb_files + 1;
+                $dataObject->status = $dataResult['Data'][0]->status;
+                $dataObject->plugin = $dataResult['Data'][0]->plugin;
+                // Update database and get object
+                Mapper::update($dataObject, $data_chris_id);
               }
-              else{
-                // add to log
-                // go to next tmp subdirectory
-              }
+
+              // delete file
+              //unlink($study_directory.'/'.$entry.'/'.$sub_entry);
             }
           }
           closedir($sub_handle);
           // delete directory
-          rmdir($study_directory.'/'.$entry);
+          //rmdir($study_directory.'/'.$entry);
         }
       }
     }
   }
   closedir($handle);
   // delete directory
-  rmdir($study_directory);
+  //rmdir($study_directory);
 }
 
-fclose($fh); 
+fclose($fh);
 ?>
