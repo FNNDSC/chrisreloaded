@@ -63,7 +63,7 @@ class PACS_Pull(Plugin):
     
     # postprocess
     logging.debug('post processing...')
-    post_command = current_dir + "/post_process.php -f " + options.FEED_ID
+    post_command = current_dir + "/post_process.php -f " + options.FEED_ID + " -o " + options.output
     logging.debug(post_command)
     os.system(post_command)
 

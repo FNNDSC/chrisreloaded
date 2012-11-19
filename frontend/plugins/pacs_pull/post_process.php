@@ -38,13 +38,16 @@ require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 
 // include pacs helper
 require_once 'pacs.class.php';
 
-$shortopts = "f:";
+$shortopts = "f:o:";
 $longopts  = array(
-    "feed:"
+    "feed:",
+    "output:"
 );
 
 $options = getopt($shortopts, $longopts);
@@ -74,18 +77,44 @@ while($waiting){
 
   foreach($loop_array as $key){
     // check if *ALL* data is there
-    $feed_dataMapper = new Mapper('Data');
-    $feed_dataMapper->filter('id = (?)',$key->data_id);
-    $feed_dataMapper->filter('nb_files = status','');
-    $feedDataResult = $feed_dataMapper->get();
-    if(count($feedDataResult['Data']) == 0){
+    $dataMapper = new Mapper('Data');
+    $dataMapper->filter('id = (?)',$key->data_id);
+    $dataMapper->filter('nb_files = status','');
+    $dataResult = $dataMapper->get();
+    if(count($dataResult['Data']) == 0){
       $tmp_array[] = $key;
     }
     else{
-      // create the links
-      //echo $feedDataResult['Data'][0]->nb_files.' - '. $feedDataResult['Data'][0]->status.PHP_EOL;
-      
-      // update feed status
+      // get feed
+      $feedMapper = new Mapper('Feed');
+      $feedMapper->filter('id = (?)',$key->feed_id);
+      $feedResult = $feedMapper->get();
+
+      // get patient
+      $patientMapper = new Mapper('Data_Patient');
+      $patientMapper->ljoin('Patient','Patient.id = Data_Patient.patient_id');
+      $patientMapper->filter('data_id = (?)', $key->data_id);
+      $patientResult = $patientMapper->get();
+
+      // create patient directories
+      // mkdir if dir doesn't exist
+      // create folder if doesnt exists
+      $datadirname = $options['o'].'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      //print_r($patientResult);
+      //echo $datadirname;
+      if(!is_dir($datadirname)){
+        mkdir($datadirname);
+      }
+
+      // create data soft links
+      $targetbase = CHRIS_DATA.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      $seriesdirnametarget = $targetbase .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      $seriesdirnamelink = $datadirname .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      if(!is_link($seriesdirnamelink)){
+        // create sof link
+        symlink($seriesdirnametarget, $seriesdirnamelink);
+      }
+      // update feed status?
     }
   }
 
