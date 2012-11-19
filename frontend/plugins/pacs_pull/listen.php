@@ -82,7 +82,18 @@ $fh = fopen($logFile, 'a')  or die("can't open file");
 fwrite($fh, $startReportPretty);
 fclose($fh);
 // execute the command
-$output2 = exec($move_command);
+$moveArray = Array();
+exec($move_command, $moveArray);
+$output2 = implode(PHP_EOL, $moveArray);
+// write log
+$startReportPretty = "=========================================". PHP_EOL;
+$report = date('Y-m-d h:i:s'). ' ---> Moving log...'. PHP_EOL;
+$report .= $output2. PHP_EOL;
+$fullReport .= $report;
+$startReportPretty .= $report;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $startReportPretty);
+fclose($fh);
 
 // finish listening
 // write log

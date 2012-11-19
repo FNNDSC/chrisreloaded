@@ -38,6 +38,8 @@ require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 // include chris patient models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
+// include chris user_data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 
 // include pacs helper
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
@@ -49,8 +51,7 @@ $options = getopt($shortopts);
 $study_directory = $options['d'];
 
 // open log file
-$logFile = joinPaths(CHRIS_LOG, 'pacs_pull_listen_test.log');
-$fh = fopen($logFile, 'a')  or die("can't open file");
+$logFile = '';
 
 // move all files from this directory to centralized data
 // 1 file of 1 serie at once
@@ -67,24 +68,41 @@ if ($handle = opendir($study_directory)) {
               $db = DB::getInstance();
 
               //get patient id
+              $logFile .= 'getting patient id...'.PHP_EOL;
               $patient_chris_id = -1;
               //$db, $process_file, $patient_chris_id
               $p_success = PACS::AddPatient($db, $process_file, $patient_chris_id);
               if($p_success == 0){
+                echo $logFile;
                 return;
               }
-              
-              fwrite($fh, 'patient id: '.$patient_chris_id.PHP_EOL);
-              
+
+              $logFile .= 'patient id: '.$patient_chris_id.PHP_EOL;
+
               //get data id
               $data_chris_id = -1;
               $series_description = '';
               $d_success = PACS::AddData($db, $process_file, $data_chris_id, $series_description);
               if($d_success == 0){
+                echo $logFile;
                 return;
               }
-              
-              fwrite($fh, 'data id: '.$data_chris_id.PHP_EOL);
+
+              $logFile .= 'data id: '.$data_chris_id.PHP_EOL;
+
+              // map data to user if this data hasn't already been mapper to this user
+              // MAP USER TO DATA
+              $dataPatientMapper = new Mapper('Data_Patient');
+              $dataPatientMapper->filter('patient_id = (?)',$patient_chris_id);
+              $dataPatientMapper->filter('data_id = (?)',$data_chris_id);
+              $dataPatientResult = $dataPatientMapper->get();
+              if(count($dataPatientResult['Data_Patient']) == 0)
+              {
+                $dataPatientObject = new Data_Patient();
+                $dataPatientObject->patient_id = $patient_chris_id;
+                $dataPatientObject->data_id = $data_chris_id;
+                Mapper::add($dataPatientObject);
+              }
 
               // FILESYSTEM Processing
               //
@@ -112,13 +130,13 @@ if ($handle = opendir($study_directory)) {
               $filenum = $process_file['InstanceNumber'][0];
               $filename = $datadirname .'/'.$filenum.'.dcm';
               if(!is_file($filename)){
-                copy($tmpfile, $filename);
+                copy($study_directory.'/'.$entry.'/'.$sub_entry, $filename);
                 // if file doesnt exist, +1 status
                 // +1 increase data status
                 $dataMapper = new Mapper('Data');
                 $dataMapper->filter('id = (?)',$data_chris_id);
                 $dataResult = $dataMapper->get();
-                
+
                 $dataObject = new Data();
                 $dataObject->uid = $dataResult['Data'][0]->uid;
                 $dataObject->name = $dataResult['Data'][0]->name;
@@ -146,5 +164,6 @@ if ($handle = opendir($study_directory)) {
   //rmdir($study_directory);
 }
 
-fclose($fh);
+echo $logFile;
+return;
 ?>

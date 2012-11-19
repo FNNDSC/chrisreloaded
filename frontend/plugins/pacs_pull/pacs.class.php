@@ -114,8 +114,8 @@ class PACS implements PACSInterface {
     $this->server_ip = $server_ip;
     $this->server_port = $server_port;
     $this->user_aet = $user_aet;
-    $this->findscu = joinPaths(CHRIS_DCMTK, 'findscu');
-    $this->movescu = joinPaths(CHRIS_DCMTK, 'movescu');
+    $this->findscu = '/usr/bin/findscu';
+    $this->movescu = '/usr/bin/movescu';
   }
 
   /**
@@ -616,7 +616,7 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P PatientSex';
     $requiered_fields .= ' +P PatientID';
 
-    $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
+    $command = '/usr/bin/dcmdump '.$requiered_fields.' '.$filename;
 
     return PACS::_executeAndFormat($command);
   }
@@ -731,7 +731,7 @@ class PACS implements PACSInterface {
         //
         if(array_key_exists('PatientBirthDate',$process_file))
         {
-          $date = $result['PatientBirthDate'][0];
+          $date = $process_file['PatientBirthDate'][0];
           $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
           $patientObject->dob = $datetime;
         }
@@ -775,7 +775,7 @@ class PACS implements PACSInterface {
   static public function AddData(&$db, &$process_file, &$data_chris_id, &$series_description){
     $db->lock('data', 'WRITE');
     // Does data exist: SeriesInstanceUID
-    if (array_key_exists('SeriesInstanceUID',$result))
+    if (array_key_exists('SeriesInstanceUID',$process_file))
     {
       // does data (series) exist??
       $dataMapper = new Mapper('Data');
@@ -843,8 +843,8 @@ class PACS implements PACSInterface {
         $data_chris_id = Mapper::add($dataObject);
       }
       else{
-        $data_chris_id = $patientResult['Data'][0]->id;
-        $series_description = $patientResult['Data'][0]->name;
+        $data_chris_id = $dataResult['Data'][0]->id;
+        $series_description = $dataResult['Data'][0]->name;
       }
     }
     else {
