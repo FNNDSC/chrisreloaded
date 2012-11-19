@@ -64,7 +64,6 @@ $longopts  = array(
 $options = getopt($shortopts, $longopts);
 
 define('CHRIS_DCMTK', '/usr/bin/');
-echo "in pre_process.php";
 
 $user_id = $options['u'];
 $feed_chris_id = $options['f'];
@@ -128,9 +127,9 @@ $db->unlock();
 
 $data_chris_id = -1;
 $feed_status = '';
+
 foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   // lock data db so no data added in the meanwhile
-  $db = DB::getInstance();
   $db->lock('data', 'WRITE');
   $map = false;
 
@@ -146,6 +145,8 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
     $dataObject->uid = $value;
     $dataObject->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
     $dataObject->name = sanitize($results[1]['SeriesDescription'][$key]);
+
+    $dataObject->plugin = 'pacs_pull';
     $data_chris_id = Mapper::add($dataObject);
     $map = true;
   }
@@ -177,11 +178,19 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
     Mapper::add($dataPatientObject);
   }
 
+  // map data to feed if this data hasn't already been mapper to this feed
   // MAP DATA TO FEED
-  $feedDataObject = new Feed_Data();
-  $feedDataObject->feed_id = $feed_chris_id;
-  $feedDataObject->data_id = $data_chris_id;
-  Mapper::add($feedDataObject);
+  $feedDataMapper = new Mapper('Feed_Data');
+  $feedDataMapper->filter('feed_id = (?)',$feed_chris_id);
+  $feedDataMapper->filter('data_id = (?)',$data_chris_id);
+  $feedDataResult = $feedDataMapper->get();
+  if(count($feedDataResult['Feed_Data']) == 0)
+  {
+    $feedDataObject = new Feed_Data();
+    $feedDataObject->feed_id = $feed_chris_id;
+    $feedDataObject->data_id = $data_chris_id;
+    Mapper::add($feedDataObject);
+  }
 
   // map data to user if this data hasn't already been mapper to this user
   // MAP USER TO DATA

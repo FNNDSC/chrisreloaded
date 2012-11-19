@@ -59,7 +59,7 @@ $port = $options['p'];
 $aet = $options['a'];
 
 $pacs_level = 'STUDY';
-$pacs_modality = 'MR';
+$pacs_modality = '';
 
 $pacs_study_date = '';
 $pacs_accession_number = '';

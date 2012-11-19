@@ -35,110 +35,87 @@ require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 // include chris mapper interface
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 // include chris data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 
 // include pacs helper
 require_once 'pacs.class.php';
 
-$shortopts = "m:s:p:a:h";
+$shortopts = "f:";
 $longopts  = array(
-    "user:",    // Required value
-    "feed:",    // Required value
-    "mrn:",     // Required value
-    "server:",  // Required value
-    "port:",    // Required value
-    "aetitle:", // Required value
-    "help",     // No value
+    "feed:"
 );
 
 $options = getopt($shortopts, $longopts);
 
-$pacs_mrn = $options['m'];
-$server = $options['s'];
-$port = $options['p'];
-$aet = $options['a'];
+$feed_id = $options['f'];
 
-$pacs_level = 'STUDY';
-$pacs_modality = 'MR';
+// get all data_id to be linked
+// look for the patient
+$feed_dataMapper = new Mapper('Feed_Data');
+$feed_dataMapper->filter('feed_id = (?)',$feed_id);
+$feedDataResult = $feed_dataMapper->get();
 
-$pacs_study_date = '';
-$pacs_accession_number = '';
-$pacs_study_description = '';
-$pacs_name = '';
-$pacs_birthday = '';
-$pacs_study_uid = '';
-$pacs_serie_uid = '';
+//print_r($feedDataResult);
 
-define('CHRIS_DCMTK', '/usr/bin/');
+//echo $feedDataResult['Feed_Data'][0]->id;
+// init array
+//while not done
+// copy array for loop
+// delete array
+$waiting = true;
+$tmp_array = $feedDataResult['Feed_Data'];
 
-// all data should be in tm directory
+while($waiting){
+  $loop_array = $tmp_array;
+  unset($tmp_array);
+  $tmp_array = Array();
 
-// retrieve patient information
-$pacs = new PACS($server, $port, $aet);
-$study_parameter = Array();
-$study_parameter['PatientID'] = $pacs_mrn;
-$study_parameter['PatientName'] = '';
-$study_parameter['PatientBirthDate'] = '';
-$study_parameter['PatientSex'] = '';
-$series_parameter = Array();
-$series_parameter['SeriesDescription'] = '';
-$series_parameter['NumberOfSeriesRelatedInstances'] = '';
-$results = $pacs->queryAll($study_parameter, $series_parameter, null);
-
-// create directories and soft link data over
-
-
-//$pacs = new PACS($server, $port, $aet);
-if($pacs_level == 'STUDY'){
-  /*
-   $pacs->addParameter('StudyDate', $pacs_study_date);
-  $pacs->addParameter('AccessionNumber', $pacs_accession_number);
-  $pacs->addParameter('RetrieveAETitle', $aet);
-  $pacs->addParameter('ModalitiesInStudy', $pacs_modality);
-  $pacs->addParameter('StudyDescription', $pacs_study_description);
-  $pacs->addParameter('PatientName', $pacs_name);
-  $pacs->addParameter('PatientID', $pacs_mrn);
-  $pacs->addParameter('PatientBirthDate', $pacs_birthday);
-  $pacs->addParameter('StudyInstanceUID', $pacs_study_uid);
-  echo $pacs->moveStudy();*/
-}
-else{
-  /*
-   // check if series already there
-  // retrieve the data
-  $dataMapper = new Mapper('Data');
-  $dataMapper->filter('uid = (?)',$pacs_serie_uid);
-  $dataResult = $dataMapper->get();
-
-  // if data already there, do not do anything!
-  // should update the links!
-  if(count($dataResult['Data']) > 0)
-  {
-  echo json_encode('Data already there');
-  return;
+  foreach($loop_array as $key){
+    // check if *ALL* data is there
+    $feed_dataMapper = new Mapper('Data');
+    $feed_dataMapper->filter('id = (?)',$key->data_id);
+    $feed_dataMapper->filter('nb_files = status','');
+    $feedDataResult = $feed_dataMapper->get();
+    if(count($feedDataResult['Data']) == 0){
+      $tmp_array[] = $key;
+    }
+    else{
+      // create the links
+      //echo $feedDataResult['Data'][0]->nb_files.' - '. $feedDataResult['Data'][0]->status.PHP_EOL;
+      
+      // update feed status
+    }
   }
 
-  $pacs->addParameter('StudyInstanceUID', $pacs_study_uid);
-  $pacs->addParameter('SeriesInstanceUID', $pacs_serie_uid);
-  echo $pacs->moveSeries();*/
+  if(empty($tmp_array)){
+    $waiting = false;
+  }
+  else{
+    sleep(1);
+  }
 }
+// create patient if doesn't exist
+/* if(count($feedDataResult['Patient']) == 0)
+ {
+// create patient model
+$patientObject = new Patient();
+$patientObject->name = $results[0]['PatientName'][0];
+$date = $results[0]['PatientBirthDate'][0];
+$datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
+$patientObject->dob = $datetime;
+$patientObject->sex = $results[0]['PatientSex'][0];
+$patientObject->uid = $results[0]['PatientID'][0];
+// add the patient model and get its id
+$patient_chris_id = Mapper::add($patientObject);
+}
+// else get its id
+else{
+$patient_chris_id = $patientResult['Patient'][0]->id;
+} */
 
-
-// define command line arguments
-$shortopts = "";
-$shortopts .= "p:"; // Incoming file location
-$shortopts .= "f:"; // Incoming file name
-
-$options = getopt($shortopts);
-
-$p = $options['p'];
-$f = $options['f'];
-//$p = '/chb/users/chris/data/4524909-476/T1_COR__POST_FS-2529';
-//$f = '2.dcm';
-$tmpfile = $p.'/'.$f;
-
-$result = PACS::process($tmpfile);
-
-
+// link series we are expecting when status == nb of files
+//   // MAP DATA TO FEED
 
 ?>

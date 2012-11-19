@@ -220,7 +220,6 @@ class PACS implements PACSInterface {
       PACS::_parseParam($this->command_param, $command);
 
       $this->_finishCommand($command);
-
       // execute the command, format it into a nice json and return it
       return $this->_executeAndFormat($command);
     }
@@ -325,6 +324,7 @@ class PACS implements PACSInterface {
       $this->addParameter($key, $value);
     }
     $resultquery = $this->queryStudy();
+
     $this->_appendResults($result[0], $resultquery);
 
     // loop though studies
@@ -339,6 +339,7 @@ class PACS implements PACSInterface {
         $this->addParameter('StudyInstanceUID', $studyvalue);
 
         $resultseries = $this->querySeries();
+
         $this->_appendResults($result[1], $resultseries);
 
         // loop though images
@@ -561,6 +562,7 @@ class PACS implements PACSInterface {
 
         // execute query
         $output .= $query. ' ';
+        
         $output .= shell_exec($query);
       }
       return $output;
@@ -762,7 +764,7 @@ class PACS implements PACSInterface {
       }
     }
     else {
-      fwrite($fh, 'Patient MRN not provided in DICOM file'.PHP_EOL);
+      echo 'Patient MRN not provided in DICOM file';
       // finish patient table lock
       $db->unlock();
       return 0;
@@ -808,26 +810,7 @@ class PACS implements PACSInterface {
         // get data time ContentDate-ContentTime
         //
         // date
-        $date = '';
-        if(array_key_exists('ContentDate',$process_file))
-        {
-          $raw_date = $process_file['ContentDate'][0];
-          $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
-        }
-        else{
-          $date .= '0000-00-00';
-        }
-        //time
-        $time = '';
-        if(array_key_exists('ContentTime',$process_file))
-        {
-          $raw_time = $process_file['ContentTime'][0];
-          $time .=  substr($raw_time, 0, 2).':'.substr($raw_time, 2, 2).':'.substr($raw_time, 4, 2);
-        }
-        else{
-          $time .= '00:00:00';
-        }
-        $dataObject->time = $date.' '. $time;
+        $dataObject->time = PACS::getTime($process_file);
         // get nb of files in data - only accessible through
         // findscu query
         /*         $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
@@ -848,7 +831,7 @@ class PACS implements PACSInterface {
       }
     }
     else {
-      fwrite($fh, 'Data UID not provided in DICOM file'.PHP_EOL);
+      echo 'Data UID not provided in DICOM file'.PHP_EOL;
       // finish data table lock
       $db->unlock();
       return 0;
@@ -856,6 +839,30 @@ class PACS implements PACSInterface {
     // finish data table lock
     $db->unlock();
     return 1;
+  }
+
+  static public function getTime($process_file){
+    $date = '';
+    if(array_key_exists('ContentDate',$process_file))
+    {
+      $raw_date = $process_file['ContentDate'][0];
+      $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
+    }
+    else{
+      $date .= '0000-00-00';
+    }
+    //time
+    $time = '';
+    if(array_key_exists('ContentTime',$process_file))
+    {
+      $raw_time = $process_file['ContentTime'][0];
+      $time .=  substr($raw_time, 0, 2).':'.substr($raw_time, 2, 2).':'.substr($raw_time, 4, 2);
+    }
+    else{
+      $time .= '00:00:00';
+    }
+
+    return $date.' '. $time;
   }
 }
 ?>
