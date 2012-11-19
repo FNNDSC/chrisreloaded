@@ -50,6 +50,12 @@ _FEED_.onclick = function(details, more) {
       case 'STL':
         _PREVIEW_.start('3D','mesh',file);
         break;
+      case 'TXT':
+      case 'LOG':
+      case 'ERR':
+      case 'JS':
+        _PREVIEW_.start('text',null,file);
+        break;
       }
       
       

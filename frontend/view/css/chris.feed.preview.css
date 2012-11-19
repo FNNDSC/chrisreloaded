@@ -1,36 +1,48 @@
 .previewRenderer {
-  position: relative;
-  background-color: #000;
-  top: 0%;
-  height: 451px; 
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: -6px;
+	position: relative;
+	background-color: #000;
+	top: 0%;
+	height: 451px;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: -6px;
 }
 
 #PREVIEWSLIDER {
-  width: 100%;
-  margin-left: -1px;
-  margin-right: auto;
-  margin-top: 10px;
-  background: red;
-  height: 6px;
-  display: none;
+	width: 100%;
+	margin-left: -1px;
+	margin-right: auto;
+	margin-top: 10px;
+	background: red;
+	height: 6px;
+	display: none;
 }
 
 #BR_OVER {
-  position: absolute;
-  color: white;
-  bottom: 0px;
-  right: 0px;
-  padding: 2px;
-  display:none;
+	position: absolute;
+	color: white;
+	bottom: 0px;
+	right: 0px;
+	padding: 2px;
+	display: none;
 }
 
 #TL_OVER {
-  background-color: #000;
-  position: absolute;
-  color: white;
-  margin: auto;
+	background-color: #000;
+	position: absolute;
+	color: white;
+	margin: auto;
+}
+
+.largePreview {
+	width: 900px;
+}
+
+#textPreview {
+	background-color: black;
+	color: white;
+	overflow: scroll;
+	height: 100%;
+	font-size: 11px;
 }
