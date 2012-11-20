@@ -142,6 +142,7 @@ _FEED_.refresh = function() {
   _FEED_.ajaxUpdate();
   // update the time stamps
   _FEED_.updateTime();
+  
 }
 _FEED_.ajaxUpdate = function() {
   // ajax call
@@ -242,6 +243,10 @@ _FEED_.update_onclick = function() {
               jQuery(".feed_update").hide('blind', 100);
             });
         _FEED_.updateTime();
+        
+        // re-activate draggable for all feed icons
+        _FEED_.activateDraggableIcons();        
+        
       });
 }
 _FEED_.activateDraggable = function() {
@@ -252,6 +257,14 @@ _FEED_.activateDraggable = function() {
     appendTo : "body",
     zIndex : 2500
   });
+}
+_FEED_.activateDraggableIcons = function() {
+  jQuery('.feed_icon').draggable({
+    handle : ".feed_move",
+    helper : "clone",
+    appendTo : "body",
+    zIndex : 2500
+  });  
 }
 _FEED_.createFeedDetails = function() {
 
@@ -269,14 +282,6 @@ jQuery(document).ready(function() {
   _FEED_.update_onclick();
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
-  
-  jQuery('.feed_icon').draggable({
-    handle : ".feed_move",
-    helper : "clone",
-    appendTo : "body",
-    zIndex : 2500
-  });
-  
-
+  _FEED_.activateDraggableIcons();
 
 });
