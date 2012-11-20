@@ -55,6 +55,10 @@ interface FeedControllerInterface
   static public function updateDB(&$object, $data_id);
   // create a feed given a user id, an action and the related details
   static public function create($user, $plugin, $name);
+  // return the number of feeds for a user
+  static public function getCount($userid);
+  // return the number of running jobs for a user
+  static public function getRunningCount($userid);
 }
 
 /**
@@ -394,5 +398,28 @@ class FeedC implements FeedControllerInterface {
       Mapper::update($object,  $object->id);
     }
   }
+
+  /**
+   * Return the number of feeds for a user.
+   *
+   * @param string $userid The user id.
+   */
+  static public function getCount($userid) {
+
+    return 0;
+
+  }
+
+  /**
+   * Return the number of running jobs for a user.
+   *
+   * @param string $userid The user id.
+   */
+  static public function getRunningCount($userid) {
+
+    return 0;
+
+  }
+
 }
 ?>
