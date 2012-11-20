@@ -52,7 +52,7 @@ $result = array(
 
 // TODO here the session has to be verified, actually this should happen in _session.inc.php
 // right now, we just check if the session contains a username
-if (!$_SESSION['username']) {
+if (!isset($_SESSION['username'])) {
 
   $result['status'] = 'access denied';
 
@@ -62,62 +62,73 @@ if (!$_SESSION['username']) {
   $result['username'] = $_SESSION['username'];
   $result['userid'] = $_SESSION['userid'];
 
-}
 
-//
-// API FUNCTIONS
-//
-if (isset($_GET['action'])){
-  $action = $_GET['action'];
-} else if (isset($_POST['action'])) {
-  $action = $_POST['action'];
-} else {
-  $action = 'ping';
-}
-
-if (isset($_GET['what'])){
-  $what = $_GET['what'];
-} else if (isset($_POST['what'])) {
-  $what = $_POST['what'];
-} else {
-  $what = 'dont_know';
-}
-
-// validate inputs, we need at least action + what
-if ($action != 'ping' && $action != 'help' && $what == 'dont_know') {
-
-  // this is an error
-  $result['status'] = 'error';
-  $result['result'] = 'parameter "what" required';
-
-} else {
-
-  // valid minimal parameters
-
-  // check actions
-  switch($action) {
-    case "count":
-      $result['result'] = 'Not implemented';
-      break;
-    case "get":
-      $result['result'] = 'Not implemented.';
-      break;
-    case "help":
-      $result['result'] = 'Perform actions on ChRIS.. Examples: COUNT: ?action=count&what=feed --- GET: ?action=get&what=feed&id=3 --- All parameters can be GET or POST.';
-      break;
-    case "ping":
-    default:
-      // this is a ping
-      $result['result'] = 'Up and running.';
+  //
+  // API FUNCTIONS
+  //
+  if (isset($_GET['action'])){
+    $action = $_GET['action'];
+  } else if (isset($_POST['action'])) {
+    $action = $_POST['action'];
+  } else {
+    $action = 'ping';
   }
 
+  if (isset($_GET['what'])){
+    $what = $_GET['what'];
+  } else if (isset($_POST['what'])) {
+    $what = $_POST['what'];
+  } else {
+    $what = 'dont_know';
+  }
+
+  if (isset($_GET['id'])){
+    $id = $_GET['id'];
+  } else if (isset($_POST['id'])) {
+    $id = $_POST['id'];
+  } else {
+    $id = 'dont_know';
+  }
+
+  // validate inputs, we need at least action + what
+  if ($action != 'ping' && $action != 'help' && $what == 'dont_know') {
+
+    // this is an error
+    $result['status'] = 'error';
+    $result['result'] = 'parameter "what" required';
+
+  } else {
+
+    // valid minimal parameters
+
+    // check actions
+    switch($action) {
+      case "count":
+        $result['result'] = 'Not implemented yet.';
+        break;
+      case "get":
+        $result['result'] = 'Not implemented yet.';
+        break;
+      case "help":
+        $result['result'] = 'Perform actions on ChRIS.. Examples: COUNT: ?action=count&what=feed --- GET: ?action=get&what=feed&id=3 --- All parameters can be GET or POST.';
+        break;
+      case "ping":
+      default:
+        // this is a ping
+        $result['result'] = 'Up and running.';
+    }
+
+  }
+
+  $result['action'] = $action;
+  $result['what'] = $what;
+  $result['id'] = $id;
+
 }
+
 
 
 // return the results
-$result['action'] = $action;
-$result['what'] = $what;
-$result['id'] = $id;
 $end_time = new DateTime();
 $execution_time = $end_time->diff($start_time);
 $result['timestamp'] = $end_time->format('Y-m-d H:i:s');
