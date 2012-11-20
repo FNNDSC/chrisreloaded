@@ -2,15 +2,11 @@
 
   <!-- start matching at 'executable' element -->
   <xsl:template match="executable">
-    <xsl:variable name="moduleTitle"><xsl:value-of select="title"/></xsl:variable>
-
-      <div>
+      <div class='plugin_panel' style='display:none'>
         <!-- attach the id -->
         <xsl:attribute name="id">panel_${PLUGIN_NAME}</xsl:attribute>
-        <xsl:attribute name="class">plugin_panel</xsl:attribute>
+        <xsl:attribute name="data-category"><xsl:value-of select="category"/></xsl:attribute>
         <xsl:attribute name="data-executable">${PLUGIN_EXECUTABLE}</xsl:attribute>
-        <!-- and hide it by default -->
-        <xsl:attribute name="style">display:none;</xsl:attribute>
         <strong><xsl:value-of select="title"/></strong><br/>
         <!-- process the parameters blocks -->
         <div class='panelgroup'>
@@ -127,10 +123,12 @@
   <xsl:template match="string">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
-      <xsl:call-template name="create_label"/>
+      <span class='parameter_title_cropped'>
+        <xsl:value-of select="label"/>
+      </span>
       <span class='parameter_input' data-type='string'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
-        <input type='text' class='parameter_string'>  
+        <input type='text' class='parameter_string' style='height:12px;line-height:10px;margin-bottom:0px;'>  
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
           <xsl:attribute name="value"><xsl:value-of select="default"/></xsl:attribute>
         </input>

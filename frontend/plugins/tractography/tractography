@@ -20,7 +20,7 @@ import os, sys
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class Fyborg( Plugin ):
+class Tractography( Plugin ):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -38,6 +38,6 @@ class Fyborg( Plugin ):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = Fyborg()
+  plugin = Tractography()
   plugin.add_parameter( 'Input', Plugin.IMAGE, '--dti', action='store', dest='DTI', help='the dti scan' )
   plugin.launch( sys.argv )

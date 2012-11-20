@@ -23,13 +23,14 @@ ${CSS}
      <!-- STATISTICS -->
      <ul class="nav nav-pills"
       style="margin-top: 6px; margin-left: -20px; margin-right: -20px; border: 1px solid #e8e8e8">
-      <li style="padding: 6px 20px;"><b>0</b> <br> <span
+      <li style="padding: 6px 20px;"><b>${DATA_COUNT}</b> <br> <span
        style="color: #999; font-size: 10px;">DATA</span></li>
       <li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;">
-       <b>0</b><br> <span style="color: #999; font-size: 10px;">RESULTS</span>
+       <b>${FEED_COUNT}</b><br> <span style="color: #999; font-size: 10px;">FEEDS</span>
       </li>
-      <li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;"><b>0</b><br>
-       <span style="color: #999; font-size: 10px;">PROJECTS</span></li>
+      <li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;"><b>${RUNNING_COUNT}</b><br>
+       <span style="color: #999; font-size: 10px;">RUNNING JOBS</span>
+       </li>
      </ul>
 
      <!-- PACS PULL -->
@@ -50,9 +51,9 @@ ${CSS}
       <span style="font-size: 16px; font-weight: bold;">Activity
        Feed</span> <sub>( <a href="#">Me</a> / <b>All </b>)
       </sub>
-      <div class="pull-right" style="margin-top: -4px">
-       <input type="text" placeholder="Search something...">
-      </div>
+      <span class="pull-right">
+       <input type="text" placeholder="Filter feed.." style='height: 10px; line-height:12px;width:135px;font-size:11px'>
+      </span>
      </div>
      <div class="feed_update feed_gradient"></div>
     </div>
@@ -66,6 +67,8 @@ ${CSS}
 
   </div>
  </div>
+
+ <div style='display:none' id='cart_storage'></div>
 
  ${FOOTER} ${JAVASCRIPT}
 </body>

@@ -8,6 +8,82 @@ var _PLUGIN_ = _PLUGIN_ || {};
 jQuery(document).ready(
     function() {
 
+      // parse all categories
+      _PLUGIN_.categories = ['-- Show all --'];
+      jQuery('.plugin_panel').each(function (i,v) {
+        
+        var _category = jQuery(v).attr('data-category');
+        
+        // propagate all categories to the carousel items
+        var _id = jQuery(v).attr('id').replace('panel_','');
+        jQuery('#'+_id).attr('data-category', _category);
+        
+        if (_PLUGIN_.categories.indexOf(_category) == -1) {
+          _PLUGIN_.categories.push(_category);
+        }
+        
+      });
+      _PLUGIN_.categories.sort(); // order alphabetically
+      
+      // and also store all plugins
+      jQuery('.carousel-inner').children().clone().appendTo('#cart_storage');
+      
+      // fill the category combobox
+      var _categorieslength = _PLUGIN_.categories.length;
+      for (var p=0;p<_categorieslength;p++) {
+        
+        jQuery('#cart_categories').append('<option>'+_PLUGIN_.categories[p]+'</option>');
+        
+      }
+      
+      // configure the category callback
+      jQuery('#cart_categories').bind('change', function() {
+        
+        var _new_category = jQuery('#cart_categories').val();
+        
+        // remove all 
+        jQuery('.carousel-inner').empty();
+        
+        // configure the selector
+        var _selector = '[data-category="'+_new_category+'"]';
+        
+        // and a special case for show all
+        if (_new_category == '-- Show all --') {
+          
+          // this means, show all :)
+          _selector = '';
+          
+        }
+          
+        // now move all the matching ones back
+        jQuery('#cart_storage').children(_selector).clone().appendTo('.carousel-inner');
+                
+        // remove all the active classes
+        jQuery('.carousel-inner').children('.active').removeClass('active');
+        
+        // and activate the first one
+        jQuery('.carousel-inner').children().first().addClass('active');
+        
+        // for only one matching plugin, remove the arrows to avoid a deadlock in the carousel stack
+        if (jQuery('.carousel-inner').children().length == 1) {
+          
+          jQuery('.cart-carousel-control').hide();
+          
+        } else {
+          
+          jQuery('.cart-carousel-control').show();
+          
+        }
+        
+        // and show the proper UI
+        jQuery('.plugin_panel').hide();
+        jQuery('#panel_'+jQuery('.carousel-inner').children().first().attr('id')).show();
+        
+        
+        
+        
+      });
+      
       // set default plugin to the first one
       var _first_plugin = jQuery(".carousel-inner").children(':first');
       var _first_plugin_id = _first_plugin.attr('id');
@@ -20,6 +96,7 @@ jQuery(document).ready(
       jQuery('#pipelines').carousel({
         interval: false
       });
+      
       
       // show/hide panels on sliding of the carousel
       
@@ -38,7 +115,7 @@ jQuery(document).ready(
       jQuery('#pipelines').bind(
           'slid',
           function() {
-
+            
             // update UI
             var _new_plugin_id = jQuery(".carousel-inner").children('.active')
                 .attr('id');
@@ -48,42 +125,54 @@ jQuery(document).ready(
           });
       
       // setup droppable item
-      jQuery(".parameter_dropzone").droppable(
-          {
-            activeClass: "parameter_dropzone_active",
-            hoverClass: "parameter_dropzone_hover",
-            tolerance: "pointer",
-            accept: ":not(.ui-sortable-helper)",
-            drop: function(event, ui) {
+      jQuery(".parameter_dropzone").droppable({
+        activeClass: "parameter_dropzone_active",
+        hoverClass: "parameter_dropzone_hover",
+        tolerance: "pointer",
+        accept: ":not(.ui-sortable-helper)",
+        drop: function(event, ui) {
 
-              // grab the data name dom element
-              var _data_name = ui.draggable;
-              
-              // now we can grab the MRN
-              var _mrn = _data_name.closest('.file_browser').attr(
-                  'data-patient-id');
-              
-              // and the data id
-              var _data_id = _data_name.closest('.file_browser')
-                  .attr('data-id');
-              
-              // and the full path
-              var _full_path = _data_name.attr('data-full-path');
-              
-              // and create a new representation
-              var _new_span = jQuery('<span></span>');
-              _new_span.html('<b>MRN ' + _mrn + '</b> ' + _data_name.text());
-              _new_span.attr('data-patient-id', _mrn);
-              _new_span.attr('data-id', _data_id);
-              _new_span.attr('data-full-path', _full_path);
-              
-              // throw everything old away
-              jQuery(this).empty();
-              // .. and attach the new thingie
-              jQuery(this).append(_new_span);
-              
-            }
-          });
+          // grab the data name dom element
+          var _data_name = ui.draggable;
+          
+          var _file_browser = null;
+          var _full_path = null;
+          
+          if (jQuery(_data_name[0]).hasClass('feed_icon')) {
+            abceef = jQuery(_data_name[0]);
+            // a feed icon was dropped
+            var _feed_content = jQuery(_data_name[0]).closest('.feed');
+            _file_browser = jQuery(_feed_content).find('.file_browser');
+            _full_path = _file_browser.attr('data-folder');
+
+          } else {
+            
+            // a file browser entry was dropped
+            _file_browser = _data_name.closest('.file_browser');
+            _full_path = _data_name.attr('rel');
+            
+          }
+          
+          // now we can grab the MRN
+          var _mrn = _file_browser.attr('data-patient-id');
+          
+          // and the data id
+          var _data_id = _file_browser.attr('data-id');
+          
+          // and create a new representation
+          var _new_span = jQuery('<span></span>');
+          _new_span.html('<b>MRN ' + _mrn + '</b> ' + _data_name.text());
+          _new_span.attr('data-patient-id', _mrn);
+          _new_span.attr('data-id', _data_id);
+          _new_span.attr('data-full-path', _full_path);
+          
+          // throw everything old away
+          jQuery(this).empty();
+          // .. and attach the new thingie
+          jQuery(this).append(_new_span);
+          
+        }
+      });
       
       jQuery('#plugin_cancel').on(
           'click',
@@ -249,13 +338,15 @@ jQuery(document).ready(
             
             // TODO validate
             
-            apprise('<h5>Please name this job!</h5>', {'input':new Date()}, function(r) {
-              
+            apprise('<h5>Please name this job!</h5>', {
+              'input': new Date()
+            }, function(r) {
+
               if (r) {
                 
                 // 
                 var _feed_name = r;
-
+                
                 // send to the launcher
                 jQuery.ajax({
                   type: "POST",
@@ -268,21 +359,20 @@ jQuery(document).ready(
                     FEED_OUTPUT: _outputs
                   },
                   success: function(data) {
-                    
-                    jQuery().toastmessage('showSuccessToast',
-                        '<h5>Job started.</h5>'
-                        +'Plugin: <b>'+_plugin_name+'</b><br>'
-                        +'Name: <b>'+_feed_name+'</b>');
 
+                    jQuery().toastmessage(
+                        'showSuccessToast',
+                        '<h5>Job started.</h5>' + 'Plugin: <b>' + _plugin_name +
+                            '</b><br>' + 'Name: <b>' + _feed_name + '</b>');
+                    
                   }
-                });                
+                });
                 
-                
+
               } else {
                 
                 jQuery().toastmessage('showErrorToast',
-                    '<h5>Submission failed.</h5>'
-                    +'Please enter a name!');
+                    '<h5>Submission failed.</h5>' + 'Please enter a name!');
                 
               }
               

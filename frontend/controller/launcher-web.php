@@ -50,6 +50,13 @@ $launch_command .= '--feedname="'.sanitize($_POST['FEED_NAME']).'" ';
 $command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
 // parameters?
 foreach($_POST['FEED_PARAM'] as $key => $value){
+
+  if ($value['type'] == 'dropzone' && $value['value'] != '') {
+
+    $value['value'] = joinPaths(CHRIS_DATA, $value['value']);
+
+  }
+
   $command .= ' --'.$value['name'].' '.$value['value'];
 }
 // output?

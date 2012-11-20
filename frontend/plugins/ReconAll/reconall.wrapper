@@ -1,0 +1,3 @@
+#!/bin/bash
+source /chb/arch/scripts/chb-fsdev
+recon-all $@
