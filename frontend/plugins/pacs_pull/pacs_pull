@@ -41,16 +41,17 @@ class PACS_Pull(Plugin):
     pre_command = current_dir + "/pre_process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
     print pre_command
     pre_output = os.system(pre_command)
+    print pre_output
     
     # evaluate pre_processing step
-    if pre_output != '0':
+    if pre_output == 0:
         print 'pre_processing: SUCCESS'
-        print '(see pre_processing.log for more information)'
+        print '(see pre_process.log for more information)'
     else:
         print 'pre_processing: FAILURE'
         print 'EXIT pacs_pull plugin NOW'
-        print '(see pre_processing.log for more information)'
-        os._exit(1)
+        print '(see pre_process.log for more information)'
+        return
         
     # should return 0, if not, an issue occured, do not go to the next step
 
@@ -72,8 +73,8 @@ class PACS_Pull(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = PACS_Pull()
-  plugin.add_parameter('Input', Plugin.STRING, '--mrn', action='store', default='', dest='MRN', help='MRN to be pulled')
-  plugin.add_parameter('Input', Plugin.STRING, '--aet', action='store', default='', dest='USER_AET', help='User AETitle')
+  plugin.add_parameter('Input', Plugin.STRING, '--mrn', action='store', default='MRN', dest='MRN', help='MRN to be pulled')
+  plugin.add_parameter('Input', Plugin.STRING, '--aet', action='store', default='AETITLE', dest='USER_AET', help='User AETitle')
   plugin.add_parameter('Advanced', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')
   plugin.add_parameter('Advanced', Plugin.STRING, '--serverport', action='store', default='104', dest='SERVER_PORT', help='Server Port')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
