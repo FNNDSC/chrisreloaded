@@ -47,6 +47,10 @@ interface DataControllerInterface
 
   static public function create($user);
   static public function addUser($data_id, $user_id);
+
+  // return the number of data sets
+  static public function getCount();
+
 }
 
 /**
@@ -125,5 +129,18 @@ class DataC implements DataControllerInterface {
     $user_dataObject->data_id = $data_id;
     Mapper::add($user_dataObject);
   }
+
+  /**
+   * Return the number of data available.
+   */
+  static public function getCount() {
+
+
+    $results = DB::getInstance()->execute('SELECT COUNT(*) FROM data');
+
+    return $results[0][0][1];
+
+  }
+
 }
 ?>
