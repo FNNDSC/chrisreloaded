@@ -89,7 +89,7 @@ if (!isset($_SESSION['username'])) {
   } else if (isset($_POST['id'])) {
     $id = $_POST['id'];
   } else {
-    $id = 'dont_know';
+    $id = '*';
   }
 
   // validate inputs, we need at least action + what
@@ -129,6 +129,8 @@ if (!isset($_SESSION['username'])) {
   $result['action'] = $action;
   $result['what'] = $what;
   $result['id'] = $id;
+
+  $result['status'] = 'done';
 
 }
 
