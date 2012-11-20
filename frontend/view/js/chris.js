@@ -1,3 +1,48 @@
+/**
+ * Define the CHRIS namespace
+ */
+var _CHRIS_ = _CHRIS_ || {};
+
+_CHRIS_.updateStatistics = function() {
+  
+  jQuery.ajax({
+    type : "GET",
+    url : "api.php?action=count&what=running",
+    dataType : "json",
+    success : function(data) {
+      
+      // update running count
+      jQuery('#running_count').html(data['result']);
+      
+    }
+  });
+  
+  jQuery.ajax({
+    type : "GET",
+    url : "api.php?action=count&what=feed",
+    dataType : "json",
+    success : function(data) {
+      
+      // update feed count
+      jQuery('#feed_count').html(data['result']);
+      
+    }
+  });
+  
+  jQuery.ajax({
+    type : "GET",
+    url : "api.php?action=count&what=data",
+    dataType : "json",
+    success : function(data) {
+      
+      // update data count
+      jQuery('#data_count').html(data['result']);
+      
+    }
+  });  
+  
+}
+
 jQuery(document).ready(function() {
   jQuery('.dropdown-toggle').dropdown();
   jQuery("[rel=bottom_tooltip]").tooltip({
@@ -36,6 +81,9 @@ jQuery(document).ready(function() {
     jQuery('#action_ui').hide();
     
   });
+  
+  // activate polling of new statistics
+  setInterval(_CHRIS_.updateStatistics, 1000);
   
   
 });
