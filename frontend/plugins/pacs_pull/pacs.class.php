@@ -91,16 +91,23 @@ class PACS implements PACSInterface {
   /**
    * DCMTK FindSCU binary location.
    *
-   * @var string $command_findscu
+   * @var string $findscu
    */
-  private $command_findscu = null;
+  private $findscu = null;
 
   /**
    * DCMTK MoveSCU binary location.
    *
-   * @var string $command_movescu
+   * @var string $movescu
    */
-  private $command_movescu = null;
+  private $movescu = null;
+  
+  /**
+   * DCMTK EchoSCU binary location.
+   *
+   * @var string $echoscu
+   */
+  private $echoscu = null;
 
   /**
    * The constructor.
@@ -116,6 +123,7 @@ class PACS implements PACSInterface {
     $this->user_aet = $user_aet;
     $this->findscu = '/usr/bin/findscu';
     $this->movescu = '/usr/bin/movescu';
+    $this->echoscu = '/usr/bin/echoscu';
   }
 
   /**
@@ -128,21 +136,12 @@ class PACS implements PACSInterface {
    *
    * @snippet test.pacs.class.php testPing()
    */
-  public function ping($timeout = 1){
-    $server_name = gethostbyaddr($this->server_ip);
+  public function ping($timeout = 5){
+      $command = $this->echoscu.' -to '.$timeout.' ';
 
-    // initiate a socket connnection to the PACS
-    // @ to silence the warnings
-    if ($fp = @fsockopen($server_name,$this->server_port, $errCode,$errStr,$timeout)) {
-      //success
-      return 1;
-      fclose($fp);
-    }
-    else{
-      // failure
-      return 0;
-      //return $errStr;
-    }
+      $this->_finishCommand($command);
+      // execute the command, format it into a nice json and return it
+      return $this->_executeAndFormat($command);
   }
 
   /**

@@ -22,11 +22,6 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
 
-# import subprocess
-import subprocess
-# import logging
-import logging
-
 class PACS_Pull(Plugin):
   '''
   '''
@@ -39,33 +34,39 @@ class PACS_Pull(Plugin):
   Plugin.VERSION = '0.1'
 
   def run(self, options):
-    logging.basicConfig(filename=options.output + 'pacs_pull.log', level=logging.DEBUG, format='%(asctime)s %(message)s')
-
-    logging.debug('running pacs pull...')
-    logging.debug('parsing args...')
-    logging.debug('MRN: ' + options.MRN)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # loop through mrns
-    
+
     # preprocess!!
-    logging.debug('pre processing...')
-    pre_command = current_dir + "/pre_process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
-    logging.debug(pre_command)
-    os.system(pre_command)
+    print 'pre processing...'
+    pre_command = current_dir + "/pre_process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
+    print pre_command
+    pre_output = os.system(pre_command)
+    
+    # evaluate pre_processing step
+    if pre_output != '0':
+        print 'pre_processing: SUCCESS'
+        print '(see pre_processing.log for more information)'
+    else:
+        print 'pre_processing: FAILURE'
+        print 'EXIT pacs_pull plugin NOW'
+        print '(see pre_processing.log for more information)'
+        os._exit(1)
+        
+    # should return 0, if not, an issue occured, do not go to the next step
 
     # process
-    logging.debug('processing...')
+    print 'processing...'
     pro_command = current_dir + "/process.php -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
-    logging.debug(pro_command)
+    print pro_command
     process_output = os.system(pro_command)
-    logging.debug(process_output)
+    print process_output
     
     # postprocess
-    logging.debug('post processing...')
+    print 'post processing...'
     post_command = current_dir + "/post_process.php -f " + options.FEED_ID + " -o " + options.output
-    logging.debug(post_command)
-    os.system(post_command)
+    print post_command
+    post_output = os.system(post_command)
+    print post_output
 
 
 # ENTRYPOINT
