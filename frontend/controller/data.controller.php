@@ -134,7 +134,12 @@ class DataC implements DataControllerInterface {
    * Return the number of data available.
    */
   static public function getCount() {
-    return 0;
+
+
+    $results = DB::getInstance()->execute('SELECT COUNT(*) FROM data');
+
+    return $results[0][0][1];
+
   }
 
 }

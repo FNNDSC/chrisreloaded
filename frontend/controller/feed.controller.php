@@ -406,7 +406,9 @@ class FeedC implements FeedControllerInterface {
    */
   static public function getCount($userid) {
 
-    return 0;
+    $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?)',Array($userid));
+
+    return $results[0][0][1];
 
   }
 
@@ -417,7 +419,9 @@ class FeedC implements FeedControllerInterface {
    */
   static public function getRunningCount($userid) {
 
-    return 0;
+    $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?) AND status=(?)',Array($userid,'0'));
+
+    return $results[0][0][1];
 
   }
 
