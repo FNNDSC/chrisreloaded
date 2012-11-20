@@ -36,6 +36,8 @@ require_once ('config.inc.php');
 
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 
 // return values
 $start_time = new DateTime();
@@ -104,7 +106,11 @@ if (!isset($_SESSION['username'])) {
     // check actions
     switch($action) {
       case "count":
-        $result['result'] = 'Not implemented yet.';
+        if ($what == 'feed') {
+          $result['result'] = FeedC::getCount($_SESSION['userid']);
+        } else if ($what == 'data') {
+          $result['result'] = DataC::getCount();
+        }
         break;
       case "get":
         $result['result'] = 'Not implemented yet.';
