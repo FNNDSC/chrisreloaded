@@ -39,6 +39,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 
 // init session data
@@ -50,6 +51,9 @@ function homePage() {
   $t = new Template('home.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
+  $t -> replace('DATA_COUNT', DataC::getCount());
+  $t -> replace('FEED_COUNT', FeedC::getCount($_SESSION['userid']));
+  $t -> replace('RUNNING_COUNT', FeedC::getRunningCount($_SESSION['userid']));
   $t -> replace('PLUGIN', PluginC::getHTML());
   $t -> replace('FEED_CONTENT', FeedC::getHTML(20));
   $t -> replace('FEED_DATA_PREVIEW', 'feed_data_preview.html');

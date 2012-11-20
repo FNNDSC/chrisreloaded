@@ -44,5 +44,7 @@
 	color: white;
 	overflow: scroll;
 	height: 100%;
+	margin: 0px;
+	padding: 2px;
 	font-size: 11px;
 }
