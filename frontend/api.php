@@ -81,7 +81,7 @@ if (!isset($_SESSION['username'])) {
   } else if (isset($_POST['what'])) {
     $what = $_POST['what'];
   } else {
-    $what = 'dont_know';
+    $what = '*';
   }
 
   if (isset($_GET['id'])){
