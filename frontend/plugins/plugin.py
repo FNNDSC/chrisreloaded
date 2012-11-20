@@ -37,6 +37,7 @@ class Plugin( argparse.ArgumentParser ):
   INTEGER = 'integer'
   BOOLEAN = 'boolean'
   STRING = 'string'
+  TEXTAREA = 'textarea'
 
   def __init__( self ):
     '''

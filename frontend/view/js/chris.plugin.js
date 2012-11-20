@@ -324,6 +324,14 @@ jQuery(document).ready(
                 
                 _value = text_input.val();
                 
+              } else if (_type == 'textarea') {
+                  
+                  // text_input
+                  var text_input = jQuery(_parameter_rows[i]).find(
+                      '.parameter_textarea');
+                  
+                  _value = text_input.val();
+                  
               }
               
               // push the parameter

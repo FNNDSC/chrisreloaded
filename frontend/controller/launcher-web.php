@@ -43,9 +43,9 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 
 $launch_command = './launcher.php ';
 // user?
-$launch_command .= '--username="'.$_SESSION['username'].'" ';
+$launch_command .= '--username=\''.$_SESSION['username'].'\' ';
 // feed name?
-$launch_command .= '--feedname="'.sanitize($_POST['FEED_NAME']).'" ';
+$launch_command .= '--feedname=\''.sanitize($_POST['FEED_NAME']).'\' ';
 // plugin name?
 $command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
 // parameters?
@@ -57,15 +57,16 @@ foreach($_POST['FEED_PARAM'] as $key => $value){
 
   }
 
-  $command .= ' --'.$value['name'].' '.$value['value'];
+  $command .= ' --'.$value['name'].' \"'.$value['value'].'\"';
 }
 // output?
 foreach($_POST['FEED_OUTPUT'] as $key => $value){
   $command .= ' --'.sanitize($value['name']).' {OUTPUT}/'.sanitize($value['value']);
 }
-$launch_command .= '--command "'.$command.'" ';
+$launch_command .= '--command \''.$command.'\' ';
 
 // return output
+echo $launch_command;
 echo shell_exec($launch_command);
 
 ?>
