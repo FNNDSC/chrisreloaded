@@ -96,7 +96,7 @@ while($waiting){
       $patientMapper->filter('data_id = (?)', $key->data_id);
       $patientResult = $patientMapper->get();
 
-      // create patient directories
+      // create feed patient directories
       // mkdir if dir doesn't exist
       // create folder if doesnt exists
       $datadirname = $options['o'].'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
@@ -114,6 +114,26 @@ while($waiting){
         // create sof link
         symlink($seriesdirnametarget, $seriesdirnamelink);
       }
+      
+      // create user patient directory
+      $patientdirname = $options['o'].'/../../data';
+      if(!is_dir($patientdirname)){
+        mkdir($patientdirname);
+      }
+      
+      $padidirname = $patientdirname.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      if(!is_dir($padidirname)){
+        mkdir($padidirname);
+      }
+      
+      $padidirnamelink = $padidirname.'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      if(!is_link($padidirnamelink)){
+        // create sof link
+        symlink($seriesdirnametarget, $padidirnamelink);
+      }
+      //.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      // create data directory
+      
       // update feed status?
     }
   }

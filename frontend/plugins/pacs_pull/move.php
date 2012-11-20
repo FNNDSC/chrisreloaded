@@ -147,8 +147,12 @@ if ($handle = opendir($study_directory)) {
               // move file at good location
               // CHRIS_DATA/MRN-UID/SERIESDESC-UID/index.dcm
               // cp file over if doesnt exist
-              $filenum = $process_file['InstanceNumber'][0];
-              $filename = $datadirname .'/'.$filenum.'.dcm';
+              // it happens than some dicom file have more than 1 instance number
+              // it appears to be 0 and the real instance number
+              //$intanceNumber = max($process_file['InstanceNumber']);
+              // different naming based on 
+              $intanceNumber = $process_file['SOPInstanceUID'][0];
+              $filename = $datadirname .'/'.$intanceNumber.'.dcm';
               if(!is_file($filename)){
                 copy($study_directory.'/'.$entry.'/'.$sub_entry, $filename);
                 $logFile .= 'COPY: '.$filename.PHP_EOL;
