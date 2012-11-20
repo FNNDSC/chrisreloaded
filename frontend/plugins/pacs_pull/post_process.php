@@ -131,9 +131,10 @@ while($waiting){
         // create sof link
         symlink($seriesdirnametarget, $padidirnamelink);
       }
-      //.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
-      // create data directory
       
+      /**
+       * @todo Update the feed status
+       */
       // update feed status?
     }
   }
