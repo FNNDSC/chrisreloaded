@@ -73,7 +73,8 @@ _PREVIEW_.preview = function() {
     
     // grab the text file
     jQuery.ajax({
-      url: 'http://chris/datadev/' + _PREVIEW_.filepath
+      url: 'http://chris/datadev/' + _PREVIEW_.filepath,
+      dataType: "text"
     }).done(function(data) {
 
       jQuery('#PREVIEW').append('<pre id="textPreview">' + data + '</pre>');
@@ -85,7 +86,8 @@ _PREVIEW_.preview = function() {
       if (!jQuery('#AUTOREFRESHCHECKBOX').prop('checked')) return;
       
       jQuery.ajax({
-        url: 'http://chris/datadev/' + _PREVIEW_.filepath
+        url: 'http://chris/datadev/' + _PREVIEW_.filepath,
+        dataType: "text"
       }).done(function(data) {
 
         jQuery('#textPreview').html(data);
