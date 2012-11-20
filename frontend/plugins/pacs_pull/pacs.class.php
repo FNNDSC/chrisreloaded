@@ -552,7 +552,7 @@ class PACS implements PACSInterface {
       foreach($target['StudyInstanceUID'] as $value){
         $query = $this->movescu;
         $query .= ' --aetitle '.$this->user_aet;
-        $query .= ' --move '.$this->user_aet;
+        $query .= ' --move FNNDSC-CHRISDEV';
         $query .= ' --study ';
         $query .= ' -k QueryRetrieveLevel=STUDY';
         $query .= ' -k StudyInstanceUID='.$value;
