@@ -8,8 +8,6 @@
 # | .__/ \__,_|\___|___/ | .__/ \__,_|_|_|
 # |_|                    |_|              
 #
-#
-#
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
 #                   Boston Children's Hospital
 #
@@ -30,7 +28,7 @@ class PACS_Pull(Plugin):
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
   Plugin.TITLE = 'PACS_pull'
   Plugin.CATEGORY = 'PACS'
-  Plugin.DESCRIPTION = 'Pull data from your PACS'
+  Plugin.DESCRIPTION = 'Pull data from your PACS to our ChRIS server.'
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'

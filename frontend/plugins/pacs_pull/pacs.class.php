@@ -577,7 +577,7 @@ class PACS implements PACSInterface {
    *
    * @snippet test.pacs.class.php testMoveStudy()
    *
-   * @return string null if success or error message if failure
+   * @return array containing command which have been executed.
    */
   public function moveSeries(){
     if ((array_key_exists('StudyInstanceUID',$this->command_param) && $this->command_param['StudyInstanceUID'] != null) && (array_key_exists('SeriesInstanceUID',$this->command_param) && $this->command_param['SeriesInstanceUID'] != null) && $this->user_aet != null)
@@ -596,7 +596,7 @@ class PACS implements PACSInterface {
       $output = shell_exec($command);
       return $output;
     }
-    return 'MoveSeries: Missing parameters (Requieres: StudyInstanceUID, SeriesInstanceUID, User AE Title)';
+    return Array('MoveSeries: Missing parameters (Requieres: StudyInstanceUID, SeriesInstanceUID, User AE Title)');
   }
 
   // process data once something has been received by the listener
