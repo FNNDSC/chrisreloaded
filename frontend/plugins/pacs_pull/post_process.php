@@ -45,28 +45,46 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 require_once 'pacs.class.php';
 
 $shortopts = "f:o:";
-$longopts  = array(
-    "feed:",
-    "output:"
-);
 
-$options = getopt($shortopts, $longopts);
+$options = getopt($shortopts);
 
 $feed_id = $options['f'];
+$output_dir = $options['o'];
 
-// get all data_id to be linked
-// look for the patient
+//
+// 1- CREATE POST-PROCESS LOG FILE
+//
+$logFile = $output_dir.'post_process.log';
+
+//
+// 2- GET ALL DATA LINKED TO OUR FEED
+//
+$feedDataLog = '======================================='.PHP_EOL;
+$feedDataLog .= date('Y-m-d h:i:s'). ' ---> Get data linked to our feed...'.PHP_EOL;
+$feedDataLog .= 'DB Table: Feed_Data'.PHP_EOL;
+$feedDataLog .= 'Feed_id: '.$feed_id.PHP_EOL;
+
 $feed_dataMapper = new Mapper('Feed_Data');
 $feed_dataMapper->filter('feed_id = (?)',$feed_id);
 $feedDataResult = $feed_dataMapper->get();
 
-//print_r($feedDataResult);
+// check if there is anny match
+// if not, we have a problem...
+if(count($feedDataResult['Feed_Data']) == 0){
+  $feedDataLog .= "No match in DB".PHP_EOL;
+  $feedDataLog .= "Stopping post_process.php Line: ".__LINE__.PHP_EOL;
+  $feedDataLog .= "EXIT CODE 1".PHP_EOL;
+  $fh = fopen($logFile, 'a')  or die("can't open file");
+  fwrite($fh, $feedDataLog);
+  fclose($fh);
+  exit(1);
+}
 
-//echo $feedDataResult['Feed_Data'][0]->id;
-// init array
-//while not done
-// copy array for loop
-// delete array
+$feedDataLog .= count($feedDataResult['Feed_Data'])." match(es) in DB".PHP_EOL;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $feedDataLog);
+fclose($fh);
+
 $waiting = true;
 $tmp_array = $feedDataResult['Feed_Data'];
 
@@ -85,21 +103,41 @@ while($waiting){
       $tmp_array[] = $key;
     }
     else{
-      // get feed
-      $feedMapper = new Mapper('Feed');
-      $feedMapper->filter('id = (?)',$key->feed_id);
-      $feedResult = $feedMapper->get();
+      //
+      // DATA HAS ARRIVED
+      //
+      $dataLog = '======================================='.PHP_EOL;
+      $dataLog .= date('Y-m-d h:i:s'). ' ---> New data has arrived...'.PHP_EOL;
 
       // get patient
       $patientMapper = new Mapper('Data_Patient');
       $patientMapper->ljoin('Patient','Patient.id = Data_Patient.patient_id');
-      $patientMapper->filter('data_id = (?)', $key->data_id);
+      $patientMapper->filter('Data_Patient.data_id = (?)', $key->data_id);
       $patientResult = $patientMapper->get();
 
       // create feed patient directories
       // mkdir if dir doesn't exist
       // create folder if doesnt exists
-      $datadirname = $options['o'].'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      if(count($patientResult['Patient']) == 0){
+        $dataLog .= "Could find patient related to the data...".PHP_EOL;
+        $dataLog .= "Data_id: ".$key->data_id;
+        $dataLog .= "Stopping post_process.php Line: ".__LINE__.PHP_EOL;
+        $dataLog .= "EXIT CODE 1".PHP_EOL;
+        $fh = fopen($logFile, 'a')  or die("can't open file");
+        fwrite($fh, $dataLog);
+        fclose($fh);
+        exit(1);
+      }
+
+      $dataLog .= count($patientResult['Patient'])." patient(s) related to the data found...".PHP_EOL;
+      $dataLog .= "-- Patient information --".PHP_EOL;
+      $dataLog .= "Patient UID: ".$patientResult['Patient'][0]->uid.PHP_EOL;
+      $dataLog .= "Patient CHRIS ID: ".$patientResult['Patient'][0]->id.PHP_EOL;
+      $dataLog .= "-- Data information --".PHP_EOL;
+      $dataLog .= "Data name: ".$dataResult['Data'][0]->name.PHP_EOL;
+      $dataLog .= "Data CHRIS ID: ".$key->data_id.PHP_EOL;
+
+      $datadirname = $output_dir.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
       //print_r($patientResult);
       //echo $datadirname;
       if(!is_dir($datadirname)){
@@ -114,28 +152,31 @@ while($waiting){
         // create sof link
         symlink($seriesdirnametarget, $seriesdirnamelink);
       }
-      
+
       // create user patient directory
-      $patientdirname = $options['o'].'/../../data';
+      $patientdirname = $output_dir.'/../../data';
       if(!is_dir($patientdirname)){
         mkdir($patientdirname);
       }
-      
+
       $padidirname = $patientdirname.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
       if(!is_dir($padidirname)){
         mkdir($padidirname);
       }
-      
+
       $padidirnamelink = $padidirname.'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
       if(!is_link($padidirnamelink)){
         // create sof link
         symlink($seriesdirnametarget, $padidirnamelink);
       }
-      
+
       /**
        * @todo Update the feed status
        */
       // update feed status?
+      $fh = fopen($logFile, 'a')  or die("can't open file");
+      fwrite($fh, $dataLog);
+      fclose($fh);
     }
   }
 
@@ -143,29 +184,15 @@ while($waiting){
     $waiting = false;
   }
   else{
-    sleep(1);
+    sleep(2);
   }
 }
-// create patient if doesn't exist
-/* if(count($feedDataResult['Patient']) == 0)
- {
-// create patient model
-$patientObject = new Patient();
-$patientObject->name = $results[0]['PatientName'][0];
-$date = $results[0]['PatientBirthDate'][0];
-$datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
-$patientObject->dob = $datetime;
-$patientObject->sex = $results[0]['PatientSex'][0];
-$patientObject->uid = $results[0]['PatientID'][0];
-// add the patient model and get its id
-$patient_chris_id = Mapper::add($patientObject);
-}
-// else get its id
-else{
-$patient_chris_id = $patientResult['Patient'][0]->id;
-} */
 
-// link series we are expecting when status == nb of files
-//   // MAP DATA TO FEED
+$finishLog = '======================================='.PHP_EOL;
+$finishLog .= date('Y-m-d h:i:s'). ' ---> All data has arrived...'.PHP_EOL;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $finishLog);
+fclose($fh);
 
+exit(0);
 ?>

@@ -547,7 +547,7 @@ class PACS implements PACSInterface {
     // Retrieve all Studies by StudyUID
     if ($target != null)
     {
-      $output = '';
+      $output = Array();
       foreach($target['StudyInstanceUID'] as $value){
         $query = $this->movescu;
         $query .= ' --aetitle '.$this->user_aet;
@@ -560,9 +560,9 @@ class PACS implements PACSInterface {
         $query .= ' 2>&1';
 
         // execute query
-        $output .= $query. ' ';
+        $output[] = $query;
         
-        $output .= shell_exec($query);
+        shell_exec($query);
       }
       return $output;
     }
