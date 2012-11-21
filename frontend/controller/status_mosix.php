@@ -64,7 +64,7 @@ foreach($feedResult['Meta'] as $key0 => $value0){
   // if no match, job has finished => update feed status!
   if($found == false){
     $feedResult['Feed'][$key0]->status = 100;
-    $feedResult['Feed'][$key0]->time = date("Y-m-d H:i:s");
+    $feedResult['Feed'][$key0]->end = date("Y-m-d H:i:s");
     Mapper::update($feedResult['Feed'][$key0],  $feedResult['Feed'][$key0]->id);
   }
 }
