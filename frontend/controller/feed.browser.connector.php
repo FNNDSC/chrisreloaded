@@ -25,7 +25,7 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
 $_POST['dir'] = urldecode($_POST['dir']);
-$root = CHRIS_DATA;
+$root = CHRIS_USERS;
 
 if( file_exists($root . $_POST['dir']) ) {
   $files = scandir($root . $_POST['dir']);
