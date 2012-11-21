@@ -35,6 +35,9 @@ class PACS_Pull(Plugin):
 
   def run(self, options):
     current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    print Plugin.TITLE
+    print Plugin.VERSION
 
     # preprocess!!
     print '======================================='
