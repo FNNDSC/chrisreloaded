@@ -110,7 +110,7 @@ $user_id = UserC::getID($username);
 $feed_id = FeedC::create($user_id, $plugin_name, $feedname);
 
 // create the feed directory
-$feed_path = joinPaths(CHRIS_DATA, $username, $plugin_name, $feedname.'-'.$feed_id);
+$feed_path = joinPaths(CHRIS_USERS, $username, $plugin_name, $feedname.'-'.$feed_id);
 if(!mkdir($feed_path, 0777, true)){
   return "Couldn't create the feed directory on filesystem: ".$feed_path;
 }

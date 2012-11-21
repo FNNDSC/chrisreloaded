@@ -73,7 +73,7 @@ _PREVIEW_.preview = function() {
     
     // grab the text file
     jQuery.ajax({
-      url: 'http://chris/datadev/' + _PREVIEW_.filepath,
+      url: 'http://chris/usersdev/' + _PREVIEW_.filepath,
       dataType: "text"
     }).done(function(data) {
 
@@ -86,7 +86,7 @@ _PREVIEW_.preview = function() {
       if (!jQuery('#AUTOREFRESHCHECKBOX').prop('checked')) return;
       
       jQuery.ajax({
-        url: 'http://chris/datadev/' + _PREVIEW_.filepath,
+        url: 'http://chris/usersdev/' + _PREVIEW_.filepath,
         dataType: "text"
       }).done(function(data) {
 
@@ -105,7 +105,7 @@ _PREVIEW_.preview = function() {
     
     // set XTK renderer
     _PREVIEW_.object = eval('new X.' + _PREVIEW_.filetype + '()');
-    _PREVIEW_.object.file = 'http://chris/datadev/' + _PREVIEW_.filepath;
+    _PREVIEW_.object.file = 'http://chris/usersdev/' + _PREVIEW_.filepath;
     _PREVIEW_.object.reslicing = false; // we don't need to reslice here
     _PREVIEW_.renderer = eval('new X.renderer' + _PREVIEW_.renderertype + '()');
     _PREVIEW_.renderer.container = 'PREVIEW';
