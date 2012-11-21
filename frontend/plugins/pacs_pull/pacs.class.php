@@ -91,16 +91,23 @@ class PACS implements PACSInterface {
   /**
    * DCMTK FindSCU binary location.
    *
-   * @var string $command_findscu
+   * @var string $findscu
    */
-  private $command_findscu = null;
+  private $findscu = null;
 
   /**
    * DCMTK MoveSCU binary location.
    *
-   * @var string $command_movescu
+   * @var string $movescu
    */
-  private $command_movescu = null;
+  private $movescu = null;
+  
+  /**
+   * DCMTK EchoSCU binary location.
+   *
+   * @var string $echoscu
+   */
+  private $echoscu = null;
 
   /**
    * The constructor.
@@ -114,8 +121,9 @@ class PACS implements PACSInterface {
     $this->server_ip = $server_ip;
     $this->server_port = $server_port;
     $this->user_aet = $user_aet;
-    $this->findscu = joinPaths(CHRIS_DCMTK, 'findscu');
-    $this->movescu = joinPaths(CHRIS_DCMTK, 'movescu');
+    $this->findscu = '/usr/bin/findscu';
+    $this->movescu = '/usr/bin/movescu';
+    $this->echoscu = '/usr/bin/echoscu';
   }
 
   /**
@@ -128,21 +136,12 @@ class PACS implements PACSInterface {
    *
    * @snippet test.pacs.class.php testPing()
    */
-  public function ping($timeout = 1){
-    $server_name = gethostbyaddr($this->server_ip);
+  public function ping($timeout = 5){
+      $command = $this->echoscu.' -to '.$timeout.' ';
 
-    // initiate a socket connnection to the PACS
-    // @ to silence the warnings
-    if ($fp = @fsockopen($server_name,$this->server_port, $errCode,$errStr,$timeout)) {
-      //success
-      return 1;
-      fclose($fp);
-    }
-    else{
-      // failure
-      return 0;
-      //return $errStr;
-    }
+      $this->_finishCommand($command);
+      // execute the command, format it into a nice json and return it
+      return $this->_executeAndFormat($command);
   }
 
   /**
@@ -220,7 +219,6 @@ class PACS implements PACSInterface {
       PACS::_parseParam($this->command_param, $command);
 
       $this->_finishCommand($command);
-
       // execute the command, format it into a nice json and return it
       return $this->_executeAndFormat($command);
     }
@@ -325,6 +323,7 @@ class PACS implements PACSInterface {
       $this->addParameter($key, $value);
     }
     $resultquery = $this->queryStudy();
+
     $this->_appendResults($result[0], $resultquery);
 
     // loop though studies
@@ -339,6 +338,7 @@ class PACS implements PACSInterface {
         $this->addParameter('StudyInstanceUID', $studyvalue);
 
         $resultseries = $this->querySeries();
+
         $this->_appendResults($result[1], $resultseries);
 
         // loop though images
@@ -547,11 +547,11 @@ class PACS implements PACSInterface {
     // Retrieve all Studies by StudyUID
     if ($target != null)
     {
-      $output = '';
+      $output = Array();
       foreach($target['StudyInstanceUID'] as $value){
         $query = $this->movescu;
         $query .= ' --aetitle '.$this->user_aet;
-        $query .= ' --move '.$this->user_aet;
+        $query .= ' --move FNNDSC-CHRISDEV';
         $query .= ' --study ';
         $query .= ' -k QueryRetrieveLevel=STUDY';
         $query .= ' -k StudyInstanceUID='.$value;
@@ -560,8 +560,9 @@ class PACS implements PACSInterface {
         $query .= ' 2>&1';
 
         // execute query
-        $output .= $query;
-        //$output .= shell_exec($query);
+        $output[] = $query;
+        
+        shell_exec($query);
       }
       return $output;
     }
@@ -576,7 +577,7 @@ class PACS implements PACSInterface {
    *
    * @snippet test.pacs.class.php testMoveStudy()
    *
-   * @return string null if success or error message if failure
+   * @return array containing command which have been executed.
    */
   public function moveSeries(){
     if ((array_key_exists('StudyInstanceUID',$this->command_param) && $this->command_param['StudyInstanceUID'] != null) && (array_key_exists('SeriesInstanceUID',$this->command_param) && $this->command_param['SeriesInstanceUID'] != null) && $this->user_aet != null)
@@ -595,7 +596,7 @@ class PACS implements PACSInterface {
       $output = shell_exec($command);
       return $output;
     }
-    return 'MoveSeries: Missing parameters (Requieres: StudyInstanceUID, SeriesInstanceUID, User AE Title)';
+    return Array('MoveSeries: Missing parameters (Requieres: StudyInstanceUID, SeriesInstanceUID, User AE Title)');
   }
 
   // process data once something has been received by the listener
@@ -616,7 +617,7 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P PatientSex';
     $requiered_fields .= ' +P PatientID';
 
-    $command = CHRIS_DCMTK.'dcmdump '.$requiered_fields.' '.$filename;
+    $command = '/usr/bin/dcmdump '.$requiered_fields.' '.$filename;
 
     return PACS::_executeAndFormat($command);
   }
@@ -701,6 +702,166 @@ class PACS implements PACSInterface {
       default:
         break;
     }
+  }
+
+  static public function AddPatient(&$db, &$process_file, &$patient_chris_id){
+    $db->lock('patient', 'WRITE');
+
+    if (array_key_exists('PatientID',$process_file))
+    {
+      $patientMapper = new Mapper('Patient');
+      $patientMapper->filter('uid = (?)',$process_file['PatientID'][0]);
+      $patientResult = $patientMapper->get();
+
+      if(count($patientResult['Patient']) == 0)
+      {
+        // create patient model
+        $patientObject = new Patient();
+        //
+        // get patient name
+        //
+        if(array_key_exists('PatientName',$process_file))
+        {
+          $patientObject->name = $process_file['PatientName'][0];
+        }
+        else{
+          $patientObject->name = 'NoName';
+        }
+        //
+        // get patient dob
+        //
+        if(array_key_exists('PatientBirthDate',$process_file))
+        {
+          $date = $process_file['PatientBirthDate'][0];
+          $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
+          $patientObject->dob = $datetime;
+        }
+        else{
+          $patientObject->dob = '0000-00-00';
+        }
+        //
+        // get patient sex
+        //
+        if(array_key_exists('PatientSex',$process_file))
+        {
+          $patientObject->sex = $process_file['PatientSex'][0];
+        }
+        else{
+          $patientObject->sex = 'NoSex';
+        }
+        //
+        // get patient uid
+        //
+        $patientObject->uid = $process_file['PatientID'][0];
+
+        // add the patient model and get its id
+        $patient_chris_id = Mapper::add($patientObject);
+      }
+      else {
+        // get patient id
+        $patient_chris_id = $patientResult['Patient'][0]->id;
+      }
+    }
+    else {
+      echo 'Patient MRN not provided in DICOM file';
+      // finish patient table lock
+      $db->unlock();
+      return 0;
+    }
+    // finish patient table lock
+    $db->unlock();
+    return 1;
+  }
+
+  static public function AddData(&$db, &$process_file, &$data_chris_id, &$series_description){
+    $db->lock('data', 'WRITE');
+    // Does data exist: SeriesInstanceUID
+    if (array_key_exists('SeriesInstanceUID',$process_file))
+    {
+      // does data (series) exist??
+      $dataMapper = new Mapper('Data');
+      $dataMapper->filter('uid = (?)',$process_file['SeriesInstanceUID'][0] );
+      $dataResult = $dataMapper->get();
+
+      // if doesnt exist, add data
+      if(count($dataResult['Data']) == 0)
+      {
+        // create object
+        // create data model
+        $dataObject = new Data();
+        //
+        // get data uid
+        //
+        $dataObject->uid = $process_file['SeriesInstanceUID'][0];
+        //
+        // get data name (series description)
+        //
+        if(array_key_exists('SeriesDescription',$process_file))
+        {
+          $dataObject->name = sanitize($process_file['SeriesDescription'][0]);
+        }
+        else{
+          $dataObject->name = 'NoSeriesDescription';
+        }
+
+        $series_description = $dataObject->name;
+        //
+        // get data time ContentDate-ContentTime
+        //
+        // date
+        $dataObject->time = PACS::getTime($process_file);
+        // get nb of files in data - only accessible through
+        // findscu query
+        /*         $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
+         $pacs->addParameter('RetrieveAETitle', '');
+        $pacs->addParameter('StudyInstanceUID', $result['StudyInstanceUID'][0]);
+        $pacs->addParameter('SeriesInstanceUID', $result['SeriesInstanceUID'][0]);
+        $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
+        $all_results = $pacs->querySeries();
+        $dataObject->nb_files = $all_results['NumberOfSeriesRelatedInstances'][0]; */
+        //
+        // add the data model to db and get its id
+        //
+        $data_chris_id = Mapper::add($dataObject);
+      }
+      else{
+        $data_chris_id = $dataResult['Data'][0]->id;
+        $series_description = $dataResult['Data'][0]->name;
+      }
+    }
+    else {
+      echo 'Data UID not provided in DICOM file'.PHP_EOL;
+      // finish data table lock
+      $db->unlock();
+      return 0;
+    }
+    // finish data table lock
+    $db->unlock();
+    return 1;
+  }
+
+  static public function getTime($process_file){
+    $date = '';
+    if(array_key_exists('ContentDate',$process_file))
+    {
+      $raw_date = $process_file['ContentDate'][0];
+      $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
+    }
+    else{
+      $date .= '0000-00-00';
+    }
+    //time
+    $time = '';
+    if(array_key_exists('ContentTime',$process_file))
+    {
+      $raw_time = $process_file['ContentTime'][0];
+      $time .=  substr($raw_time, 0, 2).':'.substr($raw_time, 2, 2).':'.substr($raw_time, 4, 2);
+    }
+    else{
+      $time .= '00:00:00';
+    }
+
+    return $date.' '. $time;
   }
 }
 ?>

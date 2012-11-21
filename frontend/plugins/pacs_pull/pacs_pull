@@ -8,8 +8,6 @@
 # | .__/ \__,_|\___|___/ | .__/ \__,_|_|_|
 # |_|                    |_|              
 #
-#
-#
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
 #                   Boston Children's Hospital
 #
@@ -22,10 +20,7 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
 
-# import subprocess
-import subprocess
-# import logging
-import logging
+import datetime as d
 
 class PACS_Pull(Plugin):
   '''
@@ -33,77 +28,87 @@ class PACS_Pull(Plugin):
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
   Plugin.TITLE = 'PACS_pull'
   Plugin.CATEGORY = 'PACS'
-  Plugin.DESCRIPTION = 'Pull data from your PACS'
+  Plugin.DESCRIPTION = 'Pull data from your PACS to our ChRIS server.'
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
   def run(self, options):
-    logging.basicConfig(filename=options.output+'pacs_pull.log',level=logging.DEBUG, format='%(asctime)s %(message)s')
-
-    logging.debug('running pacs pull...')
-    logging.debug('parsing args...')
-    logging.debug('MRN: '+options.MRN)
-    feed_id = '790';
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
+    print Plugin.TITLE
+    print Plugin.VERSION
+
     # preprocess!!
-    logging.debug('pre_processing...')
+    print '======================================='
+    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pre_processing...'
+    pre_command = current_dir + "/pre_process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
+    print 'command:'
+    print pre_command
+    pre_output = os.system(pre_command)
+    print 'output:'
+    print pre_output
     
-    # FEED ID IS AN ARGUMENT!
-    # create data tables!
-    # create patient!
-    #    p = subprocess.Popen(["ls", "-als", "/"], stdout=subprocess.PIPE, cwd='/tmp')
-    #    $user_id = $options['u'];
-    #$feed_chris_id = $options['f'];
-    #$details = $options['m'];
-    #$server = $options['s'];
-    #$port = $options['p'];
-    #$aetitle = $options['a'];
-    #with open("test.txt", "w") as myfile:
-    #  myfile.write("appended text")
-      
-    #print current_dir+"/pre_process.php"
-    #os.system("cd "+current_dir+" && ./pre_process.php -u Ellen -f 790 -m "+options.MRN +"-s " + config.server + "-p " + config.port + "-a " + config.aet);
-    command = current_dir+"/pre_process.php -u "+ options.USER_ID +" -f "+ options.FEED_ID +" -m "+options.MRN +" -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET
-    print command
-    os.system(command)
-    #pre = subprocess.Popen(["pre_process.php", "-u",  "Ellen", "-f","790", "-m",options.MRN, "-s", config.server, "-p",config.port,"-a ",config.aet], stdout=subprocess.PIPE, cwd=current_dir, shell=True)
-    #out, err = pre.communicate()
-    
-    #with open("test2.txt", "w") as myfile:
-    #  myfile.write(out)
-
-    #logging.debug(pre.communicate()[0])
+    # evaluate pre_processing step
+    if pre_output == 0:
+        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Pre_processing: SUCCESS'
+        print '(see pre_process.log for more information)'
+    else:
+        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Pre_processing: FAILURE'
+        print 'EXIT pacs_pull plugin NOW'
+        print '(see pre_process.log for more information)'
+        return
         
-    
-    #print 'preprocessed!'
-    
-    logging.debug('preprocessed!')
-    
-    #print result
+    # should return 0, if not, an issue occured, do not go to the next step
 
-    # and process!!
-    logging.debug('processing...')
-    #pro = subprocess.Popen(["process.php", "-m "+options.MRN, "-s " + config.server, "-p " + config.port, "-a " + config.aet], stdout=subprocess.PIPE, cwd=current_dir)
-    #pro_result = pro.communicate()[0]
+    # process
+    print '======================================='
+    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
+    pro_command = current_dir + "/process.php -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
+    print 'command:'
+    print pro_command
+    pro_output = os.system(pro_command)
+    print 'output:'
+    print pro_output
     
-    #logging.debug(pro_result)
-    # generic process to support pacs_pull and dicom_dir_send!
-    # ask pacs to move data!
-
+    # evaluate processing step
+    if pro_output == 0:
+        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
+        print '(see process.log for more information)'
+    else:
+        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
+        print 'EXIT pacs_pull plugin NOW'
+        print '(see process.log for more information)'
+        return
+    
     # postprocess
-    logging.debug('finished processing...')
-    logging.debug('should receive data from PACS shortly...')
+    print '======================================='
+    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start post_processing...'
+    post_command = current_dir + "/post_process.php -f " + options.FEED_ID + " -o " + options.output
+    print 'command:'
+    print post_command
+    post_output = os.system(post_command)
+    print 'output:'
+    print post_output
+    
+    # evaluate post_processing step
+    if post_output == 0:
+        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Post_processing: SUCCESS'
+        print '(see post_process.log for more information)'
+    else:
+        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Post_processing: FAILURE'
+        print 'EXIT pacs_pull plugin NOW'
+        print '(see post_process.log for more information)'
+        return
+
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = PACS_Pull()
-  plugin.add_parameter('Input', Plugin.INTEGER, '--mrn', action='store', default=4524909, dest='MRN', help='MRN to be pulled')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--aet', action='store', default='FNNDSC-CHRISDEV', dest='USER_AET', help='User AETitle')
+  plugin.add_parameter('Input', Plugin.STRING, '--mrn', action='store', default='MRN', dest='MRN', help='MRN to be pulled')
+  plugin.add_parameter('Input', Plugin.STRING, '--aet', action='store', default='AETITLE', dest='USER_AET', help='User AETitle')
   plugin.add_parameter('Advanced', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')
   plugin.add_parameter('Advanced', Plugin.STRING, '--serverport', action='store', default='104', dest='SERVER_PORT', help='Server Port')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--dcmtk', action='store', default='/usr/bin', dest='DCMTK', help='DCMTK base directory')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--userid', action='store', default="{USER_ID}", dest='USER_ID', help='User ID')
   plugin.launch(sys.argv)

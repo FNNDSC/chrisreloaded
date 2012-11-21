@@ -29,14 +29,80 @@
 // we define a valid entry point
 if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration file
- if(!defined('CHRIS_CONFIG_PARSED'))
-  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
 
-// build the storescp command
-// storescp will move incoming files to temp directory "CHRIS_INCOMINGDATA"
-// then each incoming data is processed by $process_command
-/* $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs_process.php -p #p -f #f'); */
-$process_command = joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/post_process.php -p #p -f #f');
-$listen_command = '/usr/bin/storescp -id -od ' . CHRIS_TMP . ' -pm -xcr  \'' . $process_command . '\' -ss RX -tos 120';
-exec($listen_command);
+// open log file
+$logFile = joinPaths(CHRIS_LOG, 'pacs_pull_listen.log');
+$fullReport = '';
+
+// CREATE UNIQUE DIRECTORY
+$tmpdirname = CHRIS_TMP.date('Ymdhis');
+
+while(!is_dir($tmpdirname)){
+  if(mkdir($tmpdirname)){
+    break;
+  }
+  $tmpdirname .= date('s');
+}
+//write log
+$startReportPretty = "=========================================". PHP_EOL;
+$report = date('Y-m-d h:i:s'). ' ---> Create unique tmp directory...'. PHP_EOL;
+$report .= $tmpdirname. PHP_EOL;
+$fullReport .= $report;
+$startReportPretty .= $report;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $startReportPretty);
+fclose($fh);
+
+
+// we now have a unique directory to be processed
+// create tmp file #a.aet to know who is the owner of the file
+$listen_command = '/usr/bin/storescp -id -od "' . $tmpdirname . '" -pm -ss RX';
+//write log
+$startReportPretty = "=========================================". PHP_EOL;
+$report = date('Y-m-d h:i:s'). ' ---> Start receiving data...'. PHP_EOL;
+$report .= $listen_command. PHP_EOL;
+$fullReport .= $report;
+$startReportPretty .= $report;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $startReportPretty);
+fclose($fh);
+// execute the command
+$output = exec($listen_command);
+
+// move data from output directory!
+$move_command = dirname ( __FILE__ ).'/move.php -d '.$tmpdirname;
+// write log
+$startReportPretty = "=========================================". PHP_EOL;
+$report = date('Y-m-d h:i:s'). ' ---> Start moving data...'. PHP_EOL;
+$report .= $move_command. PHP_EOL;
+$fullReport .= $report;
+$startReportPretty .= $report;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $startReportPretty);
+fclose($fh);
+// execute the command
+$moveArray = Array();
+exec($move_command, $moveArray);
+$output2 = implode(PHP_EOL, $moveArray);
+// write log
+$startReportPretty = "=========================================". PHP_EOL;
+$report = date('Y-m-d h:i:s'). ' ---> Moving log...'. PHP_EOL;
+$report .= $output2. PHP_EOL;
+$fullReport .= $report;
+$startReportPretty .= $report;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $startReportPretty);
+fclose($fh);
+
+// finish listening
+// write log
+$startReportPretty = "************************************************". PHP_EOL;
+$fullReport .= date('Y-m-d h:i:s'). ' ---> Finish moving data...'. PHP_EOL;
+$startReportPretty .= $fullReport;
+$startReportPretty .= "************************************************". PHP_EOL;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $startReportPretty);
+fclose($fh);
 ?>

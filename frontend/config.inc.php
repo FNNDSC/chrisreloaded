@@ -50,6 +50,8 @@ define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
 // chris file system
 define('CHRIS_DATA', '/chb/users/chris/dev/data/');
 define('CHRIS_TMP', '/chb/users/chris/dev/tmp/');
+define('CHRIS_USERS', '/chb/users/chris/dev/users/');
+define('CHRIS_LOG', '/chb/users/chris/dev/log/');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));

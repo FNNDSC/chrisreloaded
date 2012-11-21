@@ -73,9 +73,9 @@ class Data extends Object {
   /**
    * The status of this dataset
    *
-   * @var string $status
+   * @var int $status
    */
-  public $status = '';
+  public $status = 0;
 
   /**
    * The plugin which introduced this dataset

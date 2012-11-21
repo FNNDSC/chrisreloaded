@@ -26,227 +26,173 @@
  *                        dev@babyMRI.org
  *
  */
-
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the chris configuration
-require_once ('../../config.inc.php');
+require_once (dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
 // include chris db interface
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 // include chris mapper interface
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 // include chris data models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
-// include chris patient models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
-// include chris data_patient models
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
-// include chris feed_data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
-
-// include the model classes
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 
-define('CHRIS_DCMTK', '/usr/bin/');
+// include pacs helper
+require_once 'pacs.class.php';
 
-// define command line arguments
-$shortopts = "";
-$shortopts .= "p:"; // Incoming file location
-$shortopts .= "f:"; // Incoming file name
+$shortopts = "f:o:";
 
 $options = getopt($shortopts);
 
-$p = $options['p'];
-$f = $options['f'];
-/*$p = '/chb/users/chris/data/a26220be92a460b8a8386c8bfe69c287-452/SWI____t2_fl3d_tra_p2_-12251';
- $f = '1.dcm';*/
-$tmpfile = $p.'/'.$f;
+$feed_id = $options['f'];
+$output_dir = $options['o'];
 
-$result = PACS::process($tmpfile);
+//
+// 1- CREATE POST-PROCESS LOG FILE
+//
+$logFile = $output_dir.'post_process.log';
 
-// initiate variables
-$patient_chris_id = -1;
-$data_chris_id = -1;
-$data_nb_files = -1;
-$image_chris_id = -1;
-$series_description = 'NoSeriesDescription';
+//
+// 2- GET ALL DATA LINKED TO OUR FEED
+//
+$feedDataLog = '======================================='.PHP_EOL;
+$feedDataLog .= date('Y-m-d h:i:s'). ' ---> Get data linked to our feed...'.PHP_EOL;
+$feedDataLog .= 'DB Table: Feed_Data'.PHP_EOL;
+$feedDataLog .= 'Feed_id: '.$feed_id.PHP_EOL;
 
-// start patient table lock
-$db = DB::getInstance();
-$db->lock('patient', 'WRITE');
+$feed_dataMapper = new Mapper('Feed_Data');
+$feed_dataMapper->filter('feed_id = (?)',$feed_id);
+$feedDataResult = $feed_dataMapper->get();
 
-if (array_key_exists('PatientName',$result) && array_key_exists('PatientID',$result))
-{
-  $patientMapper = new Mapper('Patient');
-  $patientMapper->filter('name = (?)',$result['PatientName'][0]);
-  $patientMapper->filter('patient_id = (?)',$result['PatientID'][0]);
-  $patientResult = $patientMapper->get();
+// check if there is anny match
+// if not, we have a problem...
+if(count($feedDataResult['Feed_Data']) == 0){
+  $feedDataLog .= "No match in DB".PHP_EOL;
+  $feedDataLog .= "Stopping post_process.php Line: ".__LINE__.PHP_EOL;
+  $feedDataLog .= "EXIT CODE 1".PHP_EOL;
+  $fh = fopen($logFile, 'a')  or die("can't open file");
+  fwrite($fh, $feedDataLog);
+  fclose($fh);
+  exit(1);
+}
 
-  if(count($patientResult['Patient']) == 0)
-  {
-    // create patient model
-    $patientObject = new Patient();
-    $patientObject->name = $result['PatientName'][0];
-    if(array_key_exists('PatientBirthDate',$result))
-    {
-      $date = $result['PatientBirthDate'][0];
-      $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
-      $patientObject->dob = $datetime;
+$feedDataLog .= count($feedDataResult['Feed_Data'])." match(es) in DB".PHP_EOL;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $feedDataLog);
+fclose($fh);
+
+$waiting = true;
+$tmp_array = $feedDataResult['Feed_Data'];
+
+while($waiting){
+  $loop_array = $tmp_array;
+  unset($tmp_array);
+  $tmp_array = Array();
+
+  foreach($loop_array as $key){
+    // check if *ALL* data is there
+    $dataMapper = new Mapper('Data');
+    $dataMapper->filter('id = (?)',$key->data_id);
+    $dataMapper->filter('nb_files = status','');
+    $dataResult = $dataMapper->get();
+    if(count($dataResult['Data']) == 0){
+      $tmp_array[] = $key;
     }
     else{
-      $patientObject->dob = '0000-00-00';
+      //
+      // DATA HAS ARRIVED
+      //
+      $dataLog = '======================================='.PHP_EOL;
+      $dataLog .= date('Y-m-d h:i:s'). ' ---> New data has arrived...'.PHP_EOL;
+
+      // get patient
+      $patientMapper = new Mapper('Data_Patient');
+      $patientMapper->ljoin('Patient','Patient.id = Data_Patient.patient_id');
+      $patientMapper->filter('Data_Patient.data_id = (?)', $key->data_id);
+      $patientResult = $patientMapper->get();
+
+      // create feed patient directories
+      // mkdir if dir doesn't exist
+      // create folder if doesnt exists
+      if(count($patientResult['Patient']) == 0){
+        $dataLog .= "Could find patient related to the data...".PHP_EOL;
+        $dataLog .= "Data_id: ".$key->data_id;
+        $dataLog .= "Stopping post_process.php Line: ".__LINE__.PHP_EOL;
+        $dataLog .= "EXIT CODE 1".PHP_EOL;
+        $fh = fopen($logFile, 'a')  or die("can't open file");
+        fwrite($fh, $dataLog);
+        fclose($fh);
+        exit(1);
+      }
+
+      $dataLog .= count($patientResult['Patient'])." patient(s) related to the data found...".PHP_EOL;
+      $dataLog .= "-- Patient information --".PHP_EOL;
+      $dataLog .= "Patient UID: ".$patientResult['Patient'][0]->uid.PHP_EOL;
+      $dataLog .= "Patient CHRIS ID: ".$patientResult['Patient'][0]->id.PHP_EOL;
+      $dataLog .= "-- Data information --".PHP_EOL;
+      $dataLog .= "Data name: ".$dataResult['Data'][0]->name.PHP_EOL;
+      $dataLog .= "Data CHRIS ID: ".$key->data_id.PHP_EOL;
+
+      $datadirname = $output_dir.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      //print_r($patientResult);
+      //echo $datadirname;
+      if(!is_dir($datadirname)){
+        mkdir($datadirname);
+      }
+
+      // create data soft links
+      $targetbase = CHRIS_DATA.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      $seriesdirnametarget = $targetbase .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      $seriesdirnamelink = $datadirname .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      if(!is_link($seriesdirnamelink)){
+        // create sof link
+        symlink($seriesdirnametarget, $seriesdirnamelink);
+      }
+
+      // create user patient directory
+      $patientdirname = $output_dir.'/../../data';
+      if(!is_dir($patientdirname)){
+        mkdir($patientdirname);
+      }
+
+      $padidirname = $patientdirname.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      if(!is_dir($padidirname)){
+        mkdir($padidirname);
+      }
+
+      $padidirnamelink = $padidirname.'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      if(!is_link($padidirnamelink)){
+        // create sof link
+        symlink($seriesdirnametarget, $padidirnamelink);
+      }
+
+      /**
+       * @todo Update the feed status
+       */
+      // update feed status?
+      $fh = fopen($logFile, 'a')  or die("can't open file");
+      fwrite($fh, $dataLog);
+      fclose($fh);
     }
-    $patientObject->sex = $result['PatientSex'][0];
-    $patientObject->patient_id = $result['PatientID'][0];
-
-    // add the patient model and get its id
-    $patient_chris_id = Mapper::add($patientObject);
   }
-  else {
-    // get patient id
-    $patient_chris_id = $patientResult['Patient'][0]->id;
-  }
-}
-else {
-  echo 'PatientName or PatientMRN not there';
-  // finish patient table lock
-  $db->unlock();
-  return;
-}
-// finish patient table lock
-$db->unlock();
 
-// start data table lock
-$db->lock('data', 'WRITE');
-// Does data exist: SeriesInstanceUID
-if (array_key_exists('SeriesInstanceUID',$result))
-{
-  // does data (series) exist??
-  $dataMapper = new Mapper('Data');
-  $value = $result['SeriesInstanceUID'][0];
-  $dataMapper->filter('uid = (?)',$value );
-  $dataResult = $dataMapper->get();
-
-  // if doesnt exist, add data
-  if(count($dataResult['Data']) == 0)
-  {
-    // create object
-    // create data model
-    $dataObject = new Data();
-    $dataObject->patient_id = $patient_chris_id;
-    $dataObject->unique_id = $result['SeriesInstanceUID'][0];
-    // remove potential white spaces
-    if(array_key_exists('SeriesDescription',$result))
-    {
-      $series_description = sanitize($result['SeriesDescription'][0]);
-    }
-    $dataObject->name = $series_description;
-    $date = $result['ContentDate'][0];
-    $datemysql =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
-    $time = $result['ContentTime'][0];
-    $timemysql = substr($time, 0, 2).':'.substr($time, 2, 2).':'.substr($time, 4, 2);
-    $datetimemysql = $datemysql.' '. $timemysql;
-    $dataObject->time = $datetimemysql;
-    $dataObject->meta_information = '';
-    // get nb of files in data
-    $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
-    $pacs->addParameter('RetrieveAETitle', '');
-    $pacs->addParameter('StudyInstanceUID', $result['StudyInstanceUID'][0]);
-    $pacs->addParameter('SeriesInstanceUID', $result['SeriesInstanceUID'][0]);
-    $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
-    $all_results = $pacs->querySeries();
-    $dataObject->nb_files = $all_results['NumberOfSeriesRelatedInstances'][0];
-    // add the data model and get its id
-    $data_chris_id = Mapper::add($dataObject);
-    $data_nb_files = $dataObject->nb_files;
+  if(empty($tmp_array)){
+    $waiting = false;
   }
-  // else update data
   else{
-    // date not accessible from pacs so can't be created with feed
-    $date = $result['ContentDate'][0];
-    $datemysql =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
-    $time = $result['ContentTime'][0];
-    $timemysql = substr($time, 0, 2).':'.substr($time, 2, 2).':'.substr($time, 4, 2);
-    $datetimemysql = $datemysql.' '. $timemysql;
-    $dataResult['Data'][0]->time = $datetimemysql;
-    Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
-    // update it
-    $series_description = $dataResult['Data'][0]->name;
-    $data_chris_id = $dataResult['Data'][0]->id;
-    $data_nb_files = $dataResult['Data'][0]->nb_files;
+    sleep(2);
   }
 }
-else {
-  echo 'SOPInstanceUID or SeriesInstanceUID not there';
-  // finish data table lock
-  $db->unlock();
-  return;
-}
-// finish data table lock
-$db->unlock();
 
-// FILESYSTEM Processing
-$patientdirname = CHRIS_DATA.$result['PatientID'][0].'-'.$patient_chris_id;
-// create folder if doesnt exists
-if(!is_dir($patientdirname)){
-  mkdir($patientdirname);
-}
+$finishLog = '======================================='.PHP_EOL;
+$finishLog .= date('Y-m-d h:i:s'). ' ---> All data has arrived...'.PHP_EOL;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $finishLog);
+fclose($fh);
 
-$datadirname = $patientdirname.'/'.$series_description.'-'.$data_chris_id;
-
-// create folder if doesnt exists
-if(!is_dir($datadirname)){
-  mkdir($datadirname);
-}
-
-// cp file over if doesnt exist
-$filenum = $result['InstanceNumber'][0];
-$filename = $datadirname .'/'.$filenum.'.dcm';
-if(!is_file($filename)){
-  copy($tmpfile, $filename);
-}
-
-// delete tmp file
-unlink($tmpfile);
-
-// delete tmp dir if dir is empty when all files have arrived
-$files = scandir($p);
-if(count($files) <= 2){
-  rmdir($p);
-}
-// if data fully there, update links for interested people
-
-// 2- link to *ALL* relevant people in relevant dir (PACS pull, dicom dir send)
-
-/* $files = scandir($datadirname);
-// if all files arrived
-// 1- create the nifti file
-// 2- update the feeds in progress
-if (count($files) == $data_nb_files + 2)
-{
-  // use mricron to convert
-  $convert_command = '/usr/bin/dcm2nii -a y -g n '.$datadirname;
-  exec($convert_command);
-}
-
-$files = scandir($datadirname); */
-// if all files arrived
-// 1- create the nifti file
-// 2- update the feeds in progress
-// issue: sometimes dcm2nii create more than 1 file (>= instead of ==)
-/*if (count($files) >= $data_nb_files + 3)
-{
-  $db = DB::getInstance();
-  $db->lock('feed', 'WRITE');
-  // update the feeds in progress
-  $feedMapper = new Mapper('Feed');
-  $feedMapper->filter('status != (?)','done');
-  $feedResult = $feedMapper->get();
-  // update in progress results
-  foreach ($feedResult['Feed'] as $key => $value) {
-    FeedC::updateDB($value, $data_chris_id);
-  }
-  $db->unlock();
-}*/
+exit(0);
 ?>
