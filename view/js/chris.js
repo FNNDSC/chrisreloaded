@@ -44,6 +44,7 @@ _CHRIS_.updateStatistics = function() {
 }
 
 jQuery(document).ready(function() {
+  
   jQuery('.dropdown-toggle').dropdown();
   jQuery("[rel=bottom_tooltip]").tooltip({
     placement : 'bottom'
