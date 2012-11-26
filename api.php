@@ -35,7 +35,7 @@ define('__CHRIS_ENTRY_POINT__', 666);
 require_once ('config.inc.php');
 
 // include the template class
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 
