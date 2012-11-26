@@ -45,7 +45,9 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 // init session data
 $_SESSION['username'] = 'Ellen';
 $_SESSION['userid'] = '4';
-$_SESSION['feed_time'] = '0000-00-00 00:00:00';
+$_SESSION['feed_fin'] = '0000-00-00 00:00:00';
+$_SESSION['feed_run'] = '0000-00-00 00:00:00';
+$_SESSION['feed_fav'] = '0000-00-00 00:00:00';
 
 function homePage() {
   $t = new Template('home.html');
@@ -55,7 +57,9 @@ function homePage() {
   $t -> replace('FEED_COUNT', FeedC::getCount($_SESSION['userid']));
   $t -> replace('RUNNING_COUNT', FeedC::getRunningCount($_SESSION['userid']));
   $t -> replace('PLUGIN', PluginC::getHTML());
-  $t -> replace('FEED_CONTENT', FeedC::getHTML(20));
+  $t -> replace('FEED_FAV', FeedC::getHTML('favorites'));
+  $t -> replace('FEED_RUN', FeedC::getHTML('running'));
+  $t -> replace('FEED_FIN', FeedC::getHTML('finished',20));
   $t -> replace('FEED_DATA_PREVIEW', 'feed_data_preview.html');
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT', 'javascript.html');

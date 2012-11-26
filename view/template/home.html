@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-${CSS}
+<head>${CSS}
 </head>
 
 <body>
@@ -23,14 +22,15 @@ ${CSS}
      <!-- STATISTICS -->
      <ul class="nav nav-pills"
       style="margin-top: 6px; margin-left: -20px; margin-right: -20px; border: 1px solid #e8e8e8">
-      <li style="padding: 6px 20px;"><b id='data_count'>${DATA_COUNT}</b> <br> <span
-       style="color: #999; font-size: 10px;">DATA</span></li>
+      <li style="padding: 6px 20px;"><b id='data_count'>${DATA_COUNT}</b>
+       <br> <span style="color: #999; font-size: 10px;">DATA</span></li>
       <li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;">
-       <b id='feed_count'>${FEED_COUNT}</b><br> <span style="color: #999; font-size: 10px;">FEEDS</span>
+       <b id='feed_count'>${FEED_COUNT}</b><br> <span
+       style="color: #999; font-size: 10px;">FEEDS</span>
       </li>
-      <li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;"><b id='running_count'>${RUNNING_COUNT}</b><br>
-       <span style="color: #999; font-size: 10px;">RUNNING JOBS</span>
-       </li>
+      <li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;"><b
+       id='running_count'>${RUNNING_COUNT}</b><br> <span
+       style="color: #999; font-size: 10px;">RUNNING JOBS</span></li>
      </ul>
 
      <!-- PACS PULL -->
@@ -50,10 +50,21 @@ ${CSS}
      <div class="feed_title">
       <span style="font-size: 16px; font-weight: bold;">Activity
        Feed</span> <sub>( <a href="#">Me</a> / <b>All </b>)
-      </sub>
-      <span class="pull-right">
-       <input type="text" placeholder="Filter feed.." style='height: 10px; line-height:12px;width:135px;font-size:11px'>
+      </sub> <span class="pull-right"> <input type="text"
+       placeholder="Search..."
+       style='height: 10px; line-height: 12px; width: 135px; font-size: 11px'>
       </span>
+     </div>
+     <div class="feed_advanced feed_gradient">
+      <div>
+       <label class="checkbox inline"> <input type="checkbox"
+        class="feed_fav_check" value="1" checked> Favorites
+       </label> <label class="checkbox inline"> <input type="checkbox"
+        class="feed_run_check" value="1" checked> Running
+       </label> <label class="checkbox inline"> <input type="checkbox"
+        class="feed_fin_check" value="1" checked> Finished
+       </label>
+      </div>
      </div>
      <div class="feed_update feed_gradient"></div>
     </div>
@@ -62,13 +73,17 @@ ${CSS}
     style="z-index: 500; margin-top: -20px; height: 40px; background: #66CCFF">
    </div> -->
    <div class="span8 pull-right">
-    <div class="feed_content">${FEED_CONTENT}</div>
+    <div class="feed_content">
+     <div class="feed_fav">${FEED_FAV}</div>
+     <div class="feed_run">${FEED_RUN}</div>
+     <div class="feed_fin">${FEED_FIN}</div>
+    </div>
    </div>
 
   </div>
  </div>
 
- <div style='display:none' id='cart_storage'></div>
+ <div style='display: none' id='cart_storage'></div>
 
  ${FOOTER} ${JAVASCRIPT}
 </body>

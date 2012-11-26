@@ -69,23 +69,51 @@ class FeedC implements FeedControllerInterface {
    * @param int $nb_feeds number of html feeds to be returned
    * @return string
    */
-  static public function getHTML($nb_feeds){
+  static public function getHTML($type, $nb_feeds = -1){
     $feed_content = '';
 
     // get feeds objects ordered by creation time
     $feedMapper = new Mapper('Feed');
+
+    // different conditions depending on filter type
+    switch ($type){
+      case "favorites":
+        $feedMapper->filter('favorite = (?)', '1');
+        break;
+      case "running":
+        $feedMapper->filter('status != (?)', '100');
+        break;
+      case "finished":
+        $feedMapper->filter('status = (?)', '100');
+        break;
+      default:
+        break;
+    }
+
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
+    switch ($type){
+      case "favorites":
+        $_SESSION['feed_fav'] = $feedResult['Feed'][0]->time;
+        break;
+      case "running":
+        $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
+        break;
+      case "finished":
+        $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
+        break;
+      default:
+        break;
+    }
+
     // if some feeds are available, loop through them
     if(count($feedResult['Feed']) >= 1){
-      // store creation date of the most up to date feed
-      $_SESSION['feed_time'] = $feedResult['Feed'][0]->time;
       // get html for the last $nb_feeds
       $i = 0;
       foreach ($feedResult['Feed'] as $key => $value) {
         // exist the loop once we have the required nb of feeds
-        if($i >= $nb_feeds){
+        if($i >= $nb_feeds && $nb_feeds >= 0){
           break;
         }
         // get HTML representation of a feed object with the view class
@@ -109,47 +137,99 @@ class FeedC implements FeedControllerInterface {
    */
   static public function updateClient(){
     $feed_update_all = Array();
-    $feed_update_all['done']['id'] = Array();
-    $feed_update_all['done']['content'] = Array();
-    $feed_update_all['progress']['id'] = Array();
-    $feed_update_all['progress']['content'] = Array();
+    $feed_update_all['fav']['id'] = Array();
+    $feed_update_all['fav']['content'] = Array();
+    $feed_update_all['run']['new'] = Array();
+    $feed_update_all['run']['new']['id'] = Array();
+    $feed_update_all['run']['new']['content'] = Array();
+    $feed_update_all['run']['update'] = Array();
+    $feed_update_all['run']['update']['id'] = Array();
+    $feed_update_all['run']['update']['content'] = Array();
+    $feed_update_all['fin']['id'] = Array();
+    $feed_update_all['fin']['content'] = Array();
 
-    // get the value of the last uploaded feed
-    $feed_time = $_SESSION['feed_time'];
+    // get the value of the last finished feed
+    $feed_fin = $_SESSION['feed_fin'];
     $feed_content = '';
 
     // get last feed objects order by creation date
     $feedMapper = new Mapper('Feed');
+    $feedMapper->filter('status = (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
     // get new feeds
-    if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_time)){
+    if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_fin)){
       // store latest feed updated at this point
-      $old_time = $feed_time;
+      $old_time = $feed_fin;
       // store latest feed updated after this function returns
-      $_SESSION['feed_time'] = $feedResult['Feed'][0]->time;
+      $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
       // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
         if(strtotime($value->time) <= strtotime($old_time)){
           break;
         }
-        $feed_update_all['done']['id'][] = $value->id;
-        $feed_update_all['done']['content'][] = (string)FeedV::getHTML($value);
+        $feed_update_all['fin']['id'][] = $value->id;
+        $feed_update_all['fin']['content'][] = (string)FeedV::getHTML($value);
       }
     }
 
-    // get feeds to be updated
+    // get favorites feeds
+    // get the value of the last uploaded fav feed
+    $feed_run = $_SESSION['feed_run'];
+    $feed_content = '';
+
+    // get running feeds
     $feedMapper = new Mapper('Feed');
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
+    // get new feeds
     if(count($feedResult['Feed']) >= 1){
+      // store latest feed updated at this point
+      $old_time = $feed_run;
+      // store latest feed updated after this function returns
+      $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
+      // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
-        $feed_update_all['progress']['id'][] = $value->id;
-        $feed_update_all['progress']['content'][] = $value->status;
+        if(strtotime($value->time) <= strtotime($old_time)){
+          $feed_update_all['run']['update']['id'][] = $value->id;
+          $feed_update_all['run']['update']['content'][] = $value->status;
+        }
+        else{
+          $feed_update_all['run']['new']['id'][] = $value->id;
+          $feed_update_all['run']['new']['content'][] = (string)FeedV::getHTML($value);
+        }
       }
     }
+
+    // get favorites feeds
+    // get the value of the last uploaded fav feed
+    $feed_fav = $_SESSION['feed_fav'];
+    $feed_content = '';
+
+    // get last feed objects order by creation date
+    $feedMapper = new Mapper('Feed');
+    $feedMapper->filter('favorite = (?)','1');
+    $feedMapper->order('time');
+    $feedResult = $feedMapper->get();
+
+    // get new feeds
+    if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_fav)){
+      // store latest feed updated at this point
+      $old_time = $feed_fav;
+      // store latest feed updated after this function returns
+      $_SESSION['feed_fav'] = $feedResult['Feed'][0]->time;
+      // get all feeds which have been created since last upload
+      foreach ($feedResult['Feed'] as $key => $value) {
+        if(strtotime($value->time) <= strtotime($old_time)){
+          break;
+        }
+        $feed_update_all['fav']['id'][] = $value->id;
+        $feed_update_all['fav']['content'][] = (string)FeedV::getHTML($value);
+      }
+    }
+
 
     return $feed_update_all;
   }
