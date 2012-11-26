@@ -6,13 +6,20 @@ jQuery(document).ready(
         
         var _command = location.href.match(/(\?)(\w*.\w*)*/)[0];
         _command = _command.replace('?', '').replace('/', ''); // replace any ?
-                                                                // or /
+        // or /
         
         if (_command == 'sorry') {
           
           jQuery().toastmessage('showErrorToast',
               '<h5>Login failed.</h5>' + 'Invalid credentials!');
           
+        } else if (_command == 'logged_out') {
+          
+
+          jQuery().toastmessage('showSuccessToast',
+              '<h5>Logged out.</h5>' + 'Sayonara!');
+          
+
         } else {
           
           // some easteregg

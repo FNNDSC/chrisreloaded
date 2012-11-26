@@ -29,8 +29,18 @@
 // prevent direct calls
 if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
-
 // start the session
 session_start();
+
+// check if a logout was requested
+if (isset($_GET['logout'])) {
+
+  // destroy the session
+  session_destroy();
+  header("Location: index.php?logged_out");
+  exit();
+
+}
+
 
 ?>

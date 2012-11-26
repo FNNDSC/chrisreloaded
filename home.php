@@ -46,6 +46,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
 // try to login
 $username = null;
 $password = null;
+
 if (isset($_SESSION['username'])) {
   // a session is active
   $username = $_SESSION['username'];
@@ -65,12 +66,8 @@ if ($user_id == -1) {
 
 }
 
+echo 'logged in';
 exit();
-
-// init session data
-$_SESSION['username'] = 'Ellen';
-$_SESSION['userid'] = '4';
-$_SESSION['feed_time'] = '0000-00-00 00:00:00';
 
 function homePage() {
   $t = new Template('home.html');
