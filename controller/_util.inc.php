@@ -67,6 +67,7 @@ function sanitize($dirty){
   $clean = str_replace (')', '_', $clean);
   $clean = str_replace (',', '_', $clean);
   $clean = str_replace ('+', '_', $clean);
+  $clean = str_replace ('*', '_', $clean);
 
   return $clean;
 }
