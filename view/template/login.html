@@ -21,9 +21,9 @@
 			</div>
 			<div class="span4">
 				<form class="well-large" style="background-color: #000"
-					action="./home.php">
-					<input type="text" class="span3" placeholder="Username"><input
-						type="text" class="span2" placeholder="Password">
+					action="" method='POST'>
+					<input type="text" class="span3" name='username' placeholder="Username"><input
+						type="text" class="span2" name='password' placeholder="Password">
 					<button type="submit" class="btn btn-warning"
 						style="margin-bottom: 8px; margin-left: 12px;">Sign in</button>
 				</form>
@@ -42,7 +42,7 @@
 		</div>
 	</div>
 
-	${FOOTER} ${JAVASCRIPT}
-
+	${FOOTER} ${JAVASCRIPT_LIBS}
+<script type="text/javascript" src="view/js/chris.login.js"></script>
 </body>
 </html>

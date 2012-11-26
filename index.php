@@ -34,10 +34,13 @@ define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration
 require_once ('config.inc.php');
 
-// include the template class
+// include the classes
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
-
-session_start();
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
+require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 
 // create the login page
 function loginPage() {
@@ -45,11 +48,52 @@ function loginPage() {
   $t = new Template('login.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('FOOTER', 'footer.html');
-  $t -> replace('JAVASCRIPT', 'javascript.html');
+  $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.html');
   return $t;
 }
 
-// execute the test
+// create the homepage
+function homePage() {
+  $t = new Template('home.html');
+  $t -> replace('CSS', 'css.html');
+  $t -> replace('NAVBAR', 'navbar.html');
+  $t -> replace('DATA_COUNT', DataC::getCount());
+  $t -> replace('FEED_COUNT', FeedC::getCount($_SESSION['userid']));
+  $t -> replace('RUNNING_COUNT', FeedC::getRunningCount($_SESSION['userid']));
+  $t -> replace('PLUGIN', PluginC::getHTML());
+  $t -> replace('FEED_CONTENT', FeedC::getHTML(20));
+  $t -> replace('FEED_DATA_PREVIEW', 'feed_data_preview.html');
+  $t -> replace('FOOTER', 'footer.html');
+  $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.html');
+  $t -> replace('JAVASCRIPT_CHRIS', 'javascript.chris.html');
+  $t -> replace('USERNAME', $_SESSION['username']);
+  return $t;
+}
+
+// check if this is a logout attempt
+if (SecurityC::logout_attempt()) {
+
+  // perform the logout
+  SecurityC::logout();
+  exit();
+
+}
+
+// check if this is a login attempt
+if (SecurityC::login_attempt()) {
+
+  // login could be requested using a session or a post request
+
+  // perform the login
+  SecurityC::login();
+
+  // show the homepage
+  echo homePage();
+  exit();
+
+}
+
+// otherwise show the login screen
 echo loginPage();
 
 ?>

@@ -29,7 +29,7 @@ define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
 require_once (dirname(dirname(__FILE__)).'/config.inc.php');
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 
 // include the controller
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));

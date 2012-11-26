@@ -33,5 +33,5 @@ if(!defined('CHRIS_CONFIG_PARSED'))
   require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
 return 'NOT IMPLEMENTED';
-}
+
 ?>

@@ -22,6 +22,7 @@ define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration
 require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
 $_POST['dir'] = urldecode($_POST['dir']);
