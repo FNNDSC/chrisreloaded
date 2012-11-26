@@ -39,8 +39,12 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 // interface
 interface UserControllerInterface
 {
-  // get HTML representation of the plugins widget
+  // Get the User ID for a username
   static public function getID($username);
+  // Hash a cleartext password
+  static public function hashPassword($cleartext);
+  // Login
+  static public function login($username, $password);
 }
 
 /**
@@ -52,7 +56,7 @@ class UserC implements UserControllerInterface {
    * Get user id from username. Returns -1 if no match.
    * @return int
    */
-  static public function getID($username){
+  static public function getID($username) {
     $userMapper = new Mapper('User');
     $userMapper->filter('username=(?)', $username);
     $userResults = $userMapper->get();
@@ -62,6 +66,40 @@ class UserC implements UserControllerInterface {
     }
 
     return -1;
+  }
+
+  /**
+   * Hash a clear text password.
+   *
+   * @param string $cleartext The cleartext password.
+   */
+  static public function hashPassword($cleartext) {
+
+    return crypt($cleartext);
+
+  }
+
+  /**
+   * Try to login a user using a username and a cleartext password.
+   *
+   * @param string $username The username.
+   * @param string $password The password in cleartext.
+   * @return number The user ID of the user or -1 on failure.
+   */
+  static public function login($username, $password) {
+
+    $userMapper = new Mapper('User');
+    $userMapper->filter('username=(?)', $username);
+    $userMapper->filter('password=(?)', UserC::hashPassword($password));
+    $userResults = $userMapper->get();
+
+    if(isset($userResults['User'][0])) {
+      // valid user
+      return $userResults['User'][0]->id;
+    }
+
+    return -1;
+
   }
 
 }
