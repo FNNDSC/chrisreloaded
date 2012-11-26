@@ -90,7 +90,7 @@ class SecurityC implements SecurityControllerInterface {
       // destroy the session
       session_destroy();
       // .. and forward to the sorry page
-      header('Location: index.php?sorry');
+      header('Location: ?sorry');
       exit();
 
     }
@@ -110,7 +110,7 @@ class SecurityC implements SecurityControllerInterface {
     // destroy the session
     session_destroy();
     // .. and forward to the logged out page
-    header('Location: index.php?logged_out');
+    header('Location: ?logged_out');
     exit();
 
   }
