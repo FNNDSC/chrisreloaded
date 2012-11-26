@@ -63,8 +63,12 @@ foreach($feedResult['Meta'] as $key0 => $value0){
 
   // if no match, job has finished => update feed status!
   if($found == false){
+    $startTime = strtotime($feedResult['Feed'][$key0]->time);
+    $endTime = date("Y-m-d H:i:s");
+    $duration = strtotime($endTime) - $startTime;
     $feedResult['Feed'][$key0]->status = 100;
-    $feedResult['Feed'][$key0]->time = date("Y-m-d H:i:s");
+    $feedResult['Feed'][$key0]->time = $endTime;
+    $feedResult['Feed'][$key0]->duration = $duration;
     Mapper::update($feedResult['Feed'][$key0],  $feedResult['Feed'][$key0]->id);
   }
 }
