@@ -3,81 +3,66 @@
  */
 var _FEED_ = _FEED_ || {};
 _FEED_.onclick = function(details, more) {
-  
   // generate the file browser on demand, if doesnt exist already
   var _file_browser = details.find('.file_browser');
-  //if (_file_browser.is(':empty')) {
-    var _folder = _file_browser.attr('data-folder');
-    _file_browser.fileTree({
-      root : _folder,
-      script : 'controller/feed.browser.connector.php'
-    }, function(file) {
-      // grab the file extension
-      
-      // grab the file extension
-      var extension = file.split('.').pop().toUpperCase();
-      
-      // support no extensions
-      if (extension == file.toUpperCase()) {
-        
-        // this means no extension
-        extension = '';
-        
-      }
-      
-      switch(extension) {
-      
-      case 'NII':
-      case 'MGH':
-      case 'MGZ':
-      case 'DCM':
-      case 'DICOM':
-      case 'NII':
-      case 'GZ':
-      case 'NRRD':
-        _PREVIEW_.start('2D','volume',file);
-        break;
-      case 'TRK':
-        _PREVIEW_.start('3D','fibers',file);
-        break;
-      case 'FSM':
-      case 'SMOOTHWM':
-      case 'PIAL':
-      case 'INFLATED':
-      case 'SPHERE':
-      case 'ORIG':
-      case 'VTK':
-      case 'STL':
-        _PREVIEW_.start('3D','mesh',file);
-        break;
-      case 'TXT':
-      case 'LOG':
-      case 'ERR':
-      case 'JS':
-        _PREVIEW_.start('text',null,file);
-        break;
-      }
-      
-      
-    });
-  //}
-  
+  // if (_file_browser.is(':empty')) {
+  var _folder = _file_browser.attr('data-folder');
+  _file_browser.fileTree({
+    root : _folder,
+    script : 'controller/feed.browser.connector.php'
+  }, function(file) {
+    // grab the file extension
+    // grab the file extension
+    var extension = file.split('.').pop().toUpperCase();
+    // support no extensions
+    if (extension == file.toUpperCase()) {
+      // this means no extension
+      extension = '';
+    }
+    switch (extension) {
+    case 'NII':
+    case 'MGH':
+    case 'MGZ':
+    case 'DCM':
+    case 'DICOM':
+    case 'NII':
+    case 'GZ':
+    case 'NRRD':
+      _PREVIEW_.start('2D', 'volume', file);
+      break;
+    case 'TRK':
+      _PREVIEW_.start('3D', 'fibers', file);
+      break;
+    case 'FSM':
+    case 'SMOOTHWM':
+    case 'PIAL':
+    case 'INFLATED':
+    case 'SPHERE':
+    case 'ORIG':
+    case 'VTK':
+    case 'STL':
+      _PREVIEW_.start('3D', 'mesh', file);
+      break;
+    case 'TXT':
+    case 'LOG':
+    case 'ERR':
+    case 'JS':
+      _PREVIEW_.start('text', null, file);
+      break;
+    }
+  });
+  // }
   // also create the multi accordion
   // if it doesn't exist
   var accordionpanel = details.children('.feedpanel');
   if (!accordionpanel.hasClass('ui-accordion')) {
-    
-    var _last_div_index = accordionpanel.children('div').length-1;
-    
+    var _last_div_index = accordionpanel.children('div').length - 1;
     accordionpanel.multiAccordion({
-      heightStyle: "content",
-      animate: false,
-      active: _last_div_index
-    });  
-    
+      heightStyle : "content",
+      animate : false,
+      active : _last_div_index
+    });
   }
-  
-  
   // default value for 'force' is false
   if (typeof more == 'undefined') {
     more = false;
@@ -98,7 +83,12 @@ _FEED_.onclick = function(details, more) {
     }
     details.hide('blind', 100);
   }
-  
+}
+_FEED_.feed_title_onclick = function() {
+  jQuery(document).on('click', '.feed_title', function() {
+    var advanced = jQuery(this).parent().find('.feed_advanced');
+    _FEED_.onclick(advanced);
+  });
 }
 _FEED_.feed_more_onclick = function() {
   jQuery(document).on('click', '.feed_more', function(e) {
@@ -110,12 +100,9 @@ _FEED_.feed_more_onclick = function() {
 }
 _FEED_.feed_onclick = function() {
   jQuery(document).on('click', '.feed_header', function() {
-    
     var more = jQuery(this).parent().find('.feed_more');
     var details = jQuery(this).parent().find('.feed_details');
-    
     _FEED_.onclick(details, more);
-    
   });
   jQuery(document).on('click', '.feed_meta_header', function() {
     var details = jQuery(this).parent().find('.feed_meta_content');
@@ -142,7 +129,6 @@ _FEED_.refresh = function() {
   _FEED_.ajaxUpdate();
   // update the time stamps
   _FEED_.updateTime();
-  
 }
 _FEED_.ajaxUpdate = function() {
   // ajax call
@@ -151,9 +137,7 @@ _FEED_.ajaxUpdate = function() {
     url : "api.php?action=get&what=feed_updates",
     dataType : "json",
     success : function(data) {
-      
       data = data['result'];
-      
       var length_done = data['done']['id'].length;
       if (length_done > 0) {
         var i = length_done - 1;
@@ -192,15 +176,12 @@ _FEED_.ajaxUpdate = function() {
           if (element.length) {
             var _current_feed = jQuery('div[data-chris-feed_id='
                 + data['progress']['id'][i] + ']');
-            
             var _status_text = '<font color=red>Running</font>';
             var _status = data['progress']['content'][i];
             if (_status == 100) {
               _status_text = '<font color=green>Done</font>';
             }
-            
-            _current_feed.find('.feed_status').html(
-                'Status: ' + _status_text);
+            _current_feed.find('.feed_status').html('Status: ' + _status_text);
           }
         }
       }
@@ -246,10 +227,8 @@ _FEED_.update_onclick = function() {
               jQuery(".feed_update").hide('blind', 100);
             });
         _FEED_.updateTime();
-        
         // re-activate draggable for all feed icons
-        _FEED_.activateDraggableIcons();        
-        
+        _FEED_.activateDraggableIcons();
       });
 }
 _FEED_.activateDraggable = function() {
@@ -267,10 +246,9 @@ _FEED_.activateDraggableIcons = function() {
     helper : "clone",
     appendTo : "body",
     zIndex : 2500
-  });  
+  });
 }
 _FEED_.createFeedDetails = function() {
-
 }
 /**
  * Setup the javascript when document is ready (finshed loading)
@@ -281,10 +259,10 @@ jQuery(document).ready(function() {
   _FEED_.cachedFeeds.push(new Array());
   _FEED_.cachedFeeds.push(new Array());
   _FEED_.feed_onclick();
+  _FEED_.feed_title_onclick();
   _FEED_.feed_more_onclick();
   _FEED_.update_onclick();
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
   _FEED_.activateDraggableIcons();
-
 });
