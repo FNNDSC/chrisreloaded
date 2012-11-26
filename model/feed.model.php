@@ -71,9 +71,9 @@ class Feed extends Object {
   /**
    * The time of the feed termination
    *
-   * @var string $end
+   * @var int $duration
    */
-  public $duration = '';
+  public $duration = -1;
   
   public $status = 0;
   
