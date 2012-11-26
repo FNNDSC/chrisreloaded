@@ -45,7 +45,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 // init session data
 $_SESSION['username'] = 'Ellen';
 $_SESSION['userid'] = '4';
-$_SESSION['feed_start'] = '0000-00-00 00:00:00';
+$_SESSION['feed_time'] = '0000-00-00 00:00:00';
 
 function homePage() {
   $t = new Template('home.html');

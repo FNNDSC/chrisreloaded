@@ -54,7 +54,7 @@ class FeedV implements ObjectViewInterface {
     // Format username
     $username = FeedV::_getUsername($object->user_id);
     // Format time
-    $time = FeedV::_getTime($object->start);
+    $time = FeedV::_getTime($object->time);
     // Format simple meta feed
     $feedMetaSimpleMapper= new Mapper('Feed');
     $feedMetaSimpleMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
