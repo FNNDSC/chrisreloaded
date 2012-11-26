@@ -31,9 +31,6 @@ if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 // include the configuration
 require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
-
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
-
 // include the view
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
 

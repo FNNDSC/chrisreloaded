@@ -31,9 +31,6 @@ if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 // include the configuration
 require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
-
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, '_session.inc.php'));
-
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 
 // interface
@@ -41,8 +38,6 @@ interface UserControllerInterface
 {
   // Get the User ID for a username
   static public function getID($username);
-  // Hash a cleartext password
-  static public function hashPassword($cleartext);
   // Login
   static public function login($username, $password);
 }
@@ -69,17 +64,6 @@ class UserC implements UserControllerInterface {
   }
 
   /**
-   * Hash a clear text password.
-   *
-   * @param string $cleartext The cleartext password.
-   */
-  static public function hashPassword($cleartext) {
-
-    return crypt($cleartext);
-
-  }
-
-  /**
    * Try to login a user using a username and a cleartext password.
    *
    * @param string $username The username.
@@ -92,12 +76,18 @@ class UserC implements UserControllerInterface {
 
     $userMapper = new Mapper('User');
     $userMapper->filter('username=(?)', $username);
-    $userMapper->filter('password=(?)', UserC::hashPassword($password));
+    //$userMapper->filter('password=(?)', UserC::hashPassword($password));
     $userResults = $userMapper->get();
 
     if(isset($userResults['User'][0])) {
-      // valid user
-      return $userResults['User'][0]->id;
+
+      if (crypt($password, $userResults['User'][0]->password) == $userResults['User'][0]->password) {
+
+        // valid user
+        return $userResults['User'][0]->id;
+
+      }
+
     }
 
     return -1;
