@@ -46,6 +46,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 $_SESSION['username'] = 'Ellen';
 $_SESSION['userid'] = '4';
 $_SESSION['feed_fin'] = '0000-00-00 00:00:00';
+$_SESSION['feed_run'] = '0000-00-00 00:00:00';
 $_SESSION['feed_fav'] = '0000-00-00 00:00:00';
 
 function homePage() {

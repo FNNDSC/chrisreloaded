@@ -88,8 +88,9 @@ _FEED_.feed_title_onclick = function() {
   jQuery(document).on('click', '.feed_title', function() {
     var advanced = jQuery(this).parent().find('.feed_advanced');
     _FEED_.onclick(advanced);
-    
-    // push css down
+    /**
+     * @todo push feed css down?
+     */
   });
 }
 _FEED_.feed_fav_onclick = function() {
@@ -158,10 +159,10 @@ _FEED_.ajaxUpdate = function() {
     dataType : "json",
     success : function(data) {
       data = data['result'];
+      // update FINISHED feeds
       var length_done = data['fin']['id'].length;
       if (length_done > 0) {
         var i = length_done - 1;
-        var duplicates = 0;
         while (i >= 0) {
           // if id there, delete it!
           var index = _FEED_.finFeeds[0].indexOf(data['fin']['id'][i]);
@@ -173,36 +174,75 @@ _FEED_.ajaxUpdate = function() {
           _FEED_.finFeeds[0].unshift(data['fin']['id'][i]);
           _FEED_.finFeeds[1].unshift(data['fin']['content'][i]);
           // delete related RUNNING feeds
-          var element = jQuery('div[data-chris-feed_id=' + data['run']['id'][i]
+          var element = jQuery('div[data-chris-feed_id=' + data['fin']['id'][i]
               + ']');
           if (element.length) {
             element.hide('blind', 100);
           }
           i--;
         }
-        // update "Update" button
-/*        jQuery('.feed_update').html('More feeds available');
-        if (!jQuery('.feed_update').is(':visible')) {
-          jQuery('.feed_update').show('blind', 100);
-        }*/
       }
-      // update RUNNING feeds
-      var length_progress = data['run']['id'].length;
+      // update FAVORITES feeds
+      var length_done = data['fav']['id'].length;
+      if (length_done > 0) {
+        var i = length_done - 1;
+        while (i >= 0) {
+          // if id there, delete it!
+          var index = _FEED_.favFeeds[0].indexOf(data['fav']['id'][i]);
+          if (index >= 0) {
+            // delete elements
+            _FEED_.favFeeds[0].splice(index, 1);
+            _FEED_.favFeeds[1].splice(index, 1);
+          }
+          _FEED_.favFeeds[0].unshift(data['fav']['id'][i]);
+          _FEED_.favFeeds[1].unshift(data['fav']['content'][i]);
+          i--;
+        }
+      }
+      // update NEW RUNNING feeds
+      var length_done = data['run']['new']['id'].length;
+      if (length_done > 0) {
+        var i = length_done - 1;
+        while (i >= 0) {
+          // if id there, delete it!
+          var index = _FEED_.runFeeds[0].indexOf(data['run']['new']['id'][i]);
+          if (index >= 0) {
+            // delete elements
+            _FEED_.runFeeds[0].splice(index, 1);
+            _FEED_.runFeeds[1].splice(index, 1);
+          }
+          _FEED_.runFeeds[0].unshift(data['run']['new']['id'][i]);
+          _FEED_.runFeeds[1].unshift(data['run']['new']['content'][i]);
+          i--;
+        }
+      }
+      // update UPDATE RUNNING feeds
+      var length_progress = data['run']['update']['id'].length;
       if (length_progress) {
         for ( var i = 0; i < length_progress; i++) {
           // if element is there!
-          var element = jQuery('div[data-chris-feed_id=' + data['run']['id'][i]
-              + ']');
+          var element = jQuery('div[data-chris-feed_id='
+              + data['run']['update']['id'][i] + ']');
           if (element.length) {
             var _current_feed = jQuery('div[data-chris-feed_id='
-                + data['run']['id'][i] + ']');
+                + data['run']['update']['id'][i] + ']');
             var _status_text = '<font color=red>Running</font>';
-            var _status = data['run']['content'][i];
+            var _status = data['run']['update']['content'][i];
             if (_status == 100) {
               _status_text = '<font color=green>Done</font>';
             }
             _current_feed.find('.feed_status').html('Status: ' + _status_text);
           }
+        }
+      }
+      // update UPDATE button
+      $newFeeds = _FEED_.favFeeds[0].length + _FEED_.finFeeds[0].length
+          + _FEED_.runFeeds[0].length;
+      if ($newFeeds > 0) {
+        jQuery('.feed_update').html(
+            '<b>' + $newFeeds + ' </b>More feeds available');
+        if (!jQuery('.feed_update').is(':visible')) {
+          jQuery('.feed_update').show('blind', 100);
         }
       }
     }
@@ -234,21 +274,34 @@ _FEED_.updateTime = function() {
       });
 }
 _FEED_.update_onclick = function() {
-  jQuery(".feed_update").on('click', function() {
-    /*
-     * window.scrollTo(0, 0); // update running feeds
-     * jQuery(_FEED_.finFeeds[1].join("")).hide().prependTo('.feed_run')
-     * .slideDown("fast", function() { // Animation complete. _FEED_.finFeeds[0] =
-     * []; _FEED_.finFeeds[1] = []; // jQuery(".feed_update").hide('blind',
-     * 100); });
-     */
-    // update finished feeds
-    // to be implemented
-    //
-    _FEED_.updateTime();
-    // re-activate draggable for all feed icons
-    _FEED_.activateDraggableIcons();
-  });
+  jQuery(".feed_update").on(
+      'click',
+      function() {
+        window.scrollTo(0, 0);
+        // update FINISHED feeds
+        jQuery(_FEED_.finFeeds[1].join("")).hide().prependTo('.feed_fin')
+            .slideDown("fast", function() { // Animation complete.
+              _FEED_.finFeeds[0] = [];
+              _FEED_.finFeeds[1] = [];
+            });
+        // update RUNNING feeds
+        jQuery(_FEED_.runFeeds[1].join("")).hide().prependTo('.feed_run')
+            .slideDown("fast", function() { // Animation complete.
+              _FEED_.runFeeds[0] = [];
+              _FEED_.runFeeds[1] = [];
+            });
+        // update FAVORITES feeds
+        jQuery(_FEED_.favFeeds[1].join("")).hide().prependTo('.feed_fav')
+            .slideDown("fast", function() { // Animation complete.
+              _FEED_.favFeeds[0] = [];
+              _FEED_.favFeeds[1] = [];
+            });
+        // Hide feed update button
+        jQuery(".feed_update").hide('blind', 100);
+        _FEED_.updateTime();
+        // re-activate draggable for all feed icons
+        _FEED_.activateDraggableIcons();
+      });
 }
 _FEED_.activateDraggable = function() {
   // setup draggable items for all file browser elements
@@ -286,6 +339,7 @@ jQuery(document).ready(function() {
   _FEED_.favFeeds = new Array();
   _FEED_.favFeeds.push(new Array());
   _FEED_.favFeeds.push(new Array());
+  // on click callbacks
   _FEED_.feed_onclick();
   _FEED_.feed_title_onclick();
   _FEED_.feed_fav_onclick();

@@ -97,6 +97,9 @@ class FeedC implements FeedControllerInterface {
       case "favorites":
         $_SESSION['feed_fav'] = $feedResult['Feed'][0]->time;
         break;
+      case "running":
+        $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
+        break;
       case "finished":
         $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
         break;
@@ -136,8 +139,12 @@ class FeedC implements FeedControllerInterface {
     $feed_update_all = Array();
     $feed_update_all['fav']['id'] = Array();
     $feed_update_all['fav']['content'] = Array();
-    $feed_update_all['run']['id'] = Array();
-    $feed_update_all['run']['content'] = Array();
+    $feed_update_all['run']['new'] = Array();
+    $feed_update_all['run']['new']['id'] = Array();
+    $feed_update_all['run']['new']['content'] = Array();
+    $feed_update_all['run']['update'] = Array();
+    $feed_update_all['run']['update']['id'] = Array();
+    $feed_update_all['run']['update']['content'] = Array();
     $feed_update_all['fin']['id'] = Array();
     $feed_update_all['fin']['content'] = Array();
 
@@ -167,15 +174,32 @@ class FeedC implements FeedControllerInterface {
       }
     }
 
+    // get favorites feeds
+    // get the value of the last uploaded fav feed
+    $feed_run = $_SESSION['feed_run'];
+    $feed_content = '';
+
     // get running feeds
     $feedMapper = new Mapper('Feed');
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
+    // get new feeds
     if(count($feedResult['Feed']) >= 1){
+      // store latest feed updated at this point
+      $old_time = $feed_run;
+      // store latest feed updated after this function returns
+      $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
+      // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
-        $feed_update_all['run']['id'][] = $value->id;
-        $feed_update_all['run']['content'][] = $value->status;
+        if(strtotime($value->time) <= strtotime($old_time)){
+          $feed_update_all['run']['update']['id'][] = $value->id;
+          $feed_update_all['run']['update']['content'][] = $value->status;
+        }
+        else{
+          $feed_update_all['run']['new']['id'][] = $value->id;
+          $feed_update_all['run']['new']['content'][] = (string)FeedV::getHTML($value);
+        }
       }
     }
 
@@ -183,13 +207,13 @@ class FeedC implements FeedControllerInterface {
     // get the value of the last uploaded fav feed
     $feed_fav = $_SESSION['feed_fav'];
     $feed_content = '';
-    
+
     // get last feed objects order by creation date
     $feedMapper = new Mapper('Feed');
     $feedMapper->filter('favorite = (?)','1');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
-    
+
     // get new feeds
     if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_fav)){
       // store latest feed updated at this point
@@ -205,7 +229,7 @@ class FeedC implements FeedControllerInterface {
         $feed_update_all['fav']['content'][] = (string)FeedV::getHTML($value);
       }
     }
-    
+
 
     return $feed_update_all;
   }
