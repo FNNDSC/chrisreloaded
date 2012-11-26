@@ -53,7 +53,7 @@ foreach($_POST['FEED_PARAM'] as $key => $value){
 
   if ($value['type'] == 'dropzone' && $value['value'] != '') {
 
-    $value['value'] = joinPaths(CHRIS_DATA, $value['value']);
+    $value['value'] = joinPaths(CHRIS_USERS, $value['value']);
 
   }
 
