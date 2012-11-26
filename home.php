@@ -41,6 +41,31 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
+
+// try to login
+$username = null;
+$password = null;
+if (isset($_SESSION['username'])) {
+  // a session is active
+  $username = $_SESSION['username'];
+  $password = $_SESSION['password'];
+} else if (isset($_POST['username'])) {
+  // a login is requested via HTTP POST
+  $username = $_POST['username'];
+  $password = $_POST['password'];
+}
+
+$user_id = UserC::login($username, $password);
+if ($user_id == -1) {
+
+  // access denied
+  header('Location: index.php?sorry');
+  exit();
+
+}
+
+exit();
 
 // init session data
 $_SESSION['username'] = 'Ellen';
@@ -58,7 +83,8 @@ function homePage() {
   $t -> replace('FEED_CONTENT', FeedC::getHTML(20));
   $t -> replace('FEED_DATA_PREVIEW', 'feed_data_preview.html');
   $t -> replace('FOOTER', 'footer.html');
-  $t -> replace('JAVASCRIPT', 'javascript.html');
+  $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.html');
+  $t -> replace('JAVASCRIPT_CHRIS', 'javascript.chris.html');
   $t -> replace('USERNAME', $_SESSION['username']);
   return $t;
 }
