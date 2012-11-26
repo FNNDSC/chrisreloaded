@@ -56,18 +56,8 @@ function joinPaths($args) {
  */
 function sanitize($dirty){
 
-  $clean = str_replace (' ', '_', $dirty);
-  $clean = str_replace ('/', '_', $clean);
-  $clean = str_replace ('?', '_', $clean);
-  $clean = str_replace ('&', '_', $clean);
-  $clean = str_replace ('#', '_', $clean);
-  $clean = str_replace ('\\', '_', $clean);
-  $clean = str_replace ('%', '_', $clean);
-  $clean = str_replace ('(', '_', $clean);
-  $clean = str_replace (')', '_', $clean);
-  $clean = str_replace (',', '_', $clean);
-  $clean = str_replace ('+', '_', $clean);
-  $clean = str_replace ('*', '_', $clean);
+  $dangerous_characters = array(' ', '/', '?', '&', '#', '\\', '%', '(', ')', ',', '+', '*');
+  $clean = str_replace ($dangerous_characters, '_', $clean);
 
   return $clean;
 }
