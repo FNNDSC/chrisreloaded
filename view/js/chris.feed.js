@@ -273,6 +273,22 @@ _FEED_.updateTime = function() {
         }
       });
 }
+_FEED_.feed_favorite_onclick = function(){
+  jQuery(".feed_favorite").on(
+      'click',
+      function(e) {
+        // modify
+        e.stopPropagation();
+        // get feed id
+        $feedID = jQuery(this).parents().eq(2).attr('data-chris-feed_id');
+        // ajax add to favorites
+        // update env var as well
+        
+        // js to add to container
+
+      });
+  
+}
 _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
       'click',
@@ -341,6 +357,7 @@ jQuery(document).ready(function() {
   _FEED_.favFeeds.push(new Array());
   // on click callbacks
   _FEED_.feed_onclick();
+  _FEED_.feed_favorite_onclick();
   _FEED_.feed_title_onclick();
   _FEED_.feed_fav_onclick();
   _FEED_.feed_run_onclick();
