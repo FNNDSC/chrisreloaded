@@ -66,15 +66,17 @@ class Feed extends Object {
    *
    * @var string $start
    */
-  public $start = '';
+  public $time = '';
   
   /**
    * The time of the feed termination
    *
    * @var string $end
    */
-  public $end = '';
+  public $duration = '';
   
   public $status = 0;
+  
+  public $star = false;
 }
 ?>

@@ -74,13 +74,13 @@ class FeedC implements FeedControllerInterface {
 
     // get feeds objects ordered by creation time
     $feedMapper = new Mapper('Feed');
-    $feedMapper->order('start');
+    $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
     // if some feeds are available, loop through them
     if(count($feedResult['Feed']) >= 1){
       // store creation date of the most up to date feed
-      $_SESSION['feed_start'] = $feedResult['Feed'][0]->start;
+      $_SESSION['feed_time'] = $feedResult['Feed'][0]->time;
       // get html for the last $nb_feeds
       $i = 0;
       foreach ($feedResult['Feed'] as $key => $value) {
@@ -115,23 +115,23 @@ class FeedC implements FeedControllerInterface {
     $feed_update_all['progress']['content'] = Array();
 
     // get the value of the last uploaded feed
-    $feed_start = $_SESSION['feed_start'];
+    $feed_time = $_SESSION['feed_time'];
     $feed_content = '';
 
     // get last feed objects order by creation date
     $feedMapper = new Mapper('Feed');
-    $feedMapper->order('start');
+    $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
     // get new feeds
-    if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->start) > strtotime($feed_start)){
+    if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_time)){
       // store latest feed updated at this point
-      $old_time = $feed_start;
+      $old_time = $feed_time;
       // store latest feed updated after this function returns
-      $_SESSION['feed_start'] = $feedResult['Feed'][0]->start;
+      $_SESSION['feed_time'] = $feedResult['Feed'][0]->time;
       // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
-        if(strtotime($value->start) <= strtotime($old_time)){
+        if(strtotime($value->time) <= strtotime($old_time)){
           break;
         }
         $feed_update_all['done']['id'][] = $value->id;
@@ -142,7 +142,7 @@ class FeedC implements FeedControllerInterface {
     // get feeds to be updated
     $feedMapper = new Mapper('Feed');
     $feedMapper->filter('status != (?)','100');
-    $feedMapper->order('start');
+    $feedMapper->order('time');
     $feedResult = $feedMapper->get();
     if(count($feedResult['Feed']) >= 1){
       foreach ($feedResult['Feed'] as $key => $value) {
@@ -205,7 +205,7 @@ class FeedC implements FeedControllerInterface {
     $feedObject->user_id = $user_id;
     $feedObject->name = $name;
     $feedObject->plugin = $plugin;
-    $feedObject->start = date("Y-m-d H:i:s");
+    $feedObject->time = date("Y-m-d H:i:s");
     return Mapper::add($feedObject);
     // new data
     /*     $dataObject = new Data();
