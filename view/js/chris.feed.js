@@ -148,9 +148,12 @@ _FEED_.ajaxUpdate = function() {
   // ajax call
   jQuery.ajax({
     type : "POST",
-    url : "controller/feed_update.php",
+    url : "api.php?action=get&what=feed_updates",
     dataType : "json",
     success : function(data) {
+      
+      data = data['result'];
+      
       var length_done = data['done']['id'].length;
       if (length_done > 0) {
         var i = length_done - 1;
