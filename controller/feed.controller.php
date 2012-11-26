@@ -69,11 +69,27 @@ class FeedC implements FeedControllerInterface {
    * @param int $nb_feeds number of html feeds to be returned
    * @return string
    */
-  static public function getHTML($nb_feeds){
+  static public function getHTML($type, $nb_feeds = -1){
     $feed_content = '';
 
     // get feeds objects ordered by creation time
     $feedMapper = new Mapper('Feed');
+    
+    // different conditions depending on filter type
+    switch ($type){
+      case "favorites":
+        $feedMapper->filter('favorite=(?)', '1');
+        break;
+      case "running":
+        $feedMapper->filter('status!=(?)', '100');
+        break;
+      case "finished":
+        $feedMapper->filter('status=(?)', '100');
+        break;
+      default:
+        break;
+    }
+    
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
@@ -85,7 +101,7 @@ class FeedC implements FeedControllerInterface {
       $i = 0;
       foreach ($feedResult['Feed'] as $key => $value) {
         // exist the loop once we have the required nb of feeds
-        if($i >= $nb_feeds){
+        if($i >= $nb_feeds && $nb_feeds >= 0){
           break;
         }
         // get HTML representation of a feed object with the view class
