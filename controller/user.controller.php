@@ -88,6 +88,8 @@ class UserC implements UserControllerInterface {
    */
   static public function login($username, $password) {
 
+    if (!isset($username) || !isset($password)) return -1;
+
     $userMapper = new Mapper('User');
     $userMapper->filter('username=(?)', $username);
     $userMapper->filter('password=(?)', UserC::hashPassword($password));
