@@ -77,6 +77,6 @@ class Feed extends Object {
   
   public $status = 0;
   
-  public $star = false;
+  public $favorite = false;
 }
 ?>

@@ -7,6 +7,18 @@
 	border-top-left-radius: 4px;
 	background-color: #fff;
 }
+.feed_advanced {
+  margin-top: -1px;
+  padding: 4px;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  border-color: lightgray;
+  display: none;
+  cursor: pointer;
+  background-color: #fff;
+  text-align: center;
+  font-weight: bold;
+}
 
 .feed_update {
 	margin-top: -1px;
@@ -46,6 +58,12 @@
 	/* for firefox 3.6+ */
 }
 
+.feed_title {
+	cursor: pointer;
+	/*  min-height: 50px; */
+	/*  background: lightgreen; */
+}
+
 .feed_header {
 	cursor: pointer;
 	/* 	min-height: 50px; */
@@ -54,12 +72,12 @@
 
 .feed_header_line_one {
 	width: 100%;
-/* 	min-height: 24px; */
+	/* 	min-height: 24px; */
 }
 
 .feed_header_line_two {
 	width: 100%;
-/* 	min-height: 24px; */
+	/* 	min-height: 24px; */
 }
 
 .feed_icon {
@@ -130,9 +148,9 @@
 .feed>.feed_details>.feed_meta {
 	background: white;
 	margin-top: 5px;
-/* 	border: 1px solid; */
-/* 	border-color: grey; */
-/* 	padding: 5px; */
+	/* 	border: 1px solid; */
+	/* 	border-color: grey; */
+	/* 	padding: 5px; */
 }
 
 .feed>.feed_details>.feed_meta>.feed_meta_header {
@@ -153,7 +171,7 @@
 .feed>.feed_details>.feed_data>.data_meta_header {
 	cursor: pointer;
 	font-size: 11px;
-  font-weight: bold;	
+	font-weight: bold;
 }
 
 .feed>.feed_details>.feed_data>.data_meta_header:hover {
@@ -166,9 +184,9 @@
 }
 
 .feed>.feed_details>.feed_data>.data_browser_header {
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: bold;  
+	cursor: pointer;
+	font-size: 11px;
+	font-weight: bold;
 }
 
 .feed>.feed_details>.feed_data>.data_browser_header:hover {
@@ -180,11 +198,12 @@
 }
 
 .feed>.feed_details>.feed_data { /* 	background: lightsalmon; */
-/* 	background: white; */
-/* 	margin: 5px; */
-/* 	border: 1px solid; */
-/* 	border-color: grey; */
-/* 	padding: 5px; */
+	/* 	background: white; */
+	/* 	margin: 5px; */
+	/* 	border: 1px solid; */
+	/* 	border-color: grey; */
+	/* 	padding: 5px; */
+	
 }
 
 .feed>.feed_details>.feed_html { /* 	background: lightsteelblue; */
