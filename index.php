@@ -45,7 +45,7 @@ function loginPage() {
   $t = new Template('login.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('FOOTER', 'footer.html');
-  $t -> replace('JAVASCRIPT', 'javascript.html');
+  $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.html');
   return $t;
 }
 
