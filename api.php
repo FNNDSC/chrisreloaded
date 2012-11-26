@@ -115,7 +115,9 @@ if (!isset($_SESSION['username'])) {
         }
         break;
       case "get":
-        $result['result'] = 'Not implemented yet.';
+        if ($what == 'feed_updates') {
+          $result['result'] = FeedC::updateClient();
+        }
         break;
       case "help":
         $result['result'] = 'Perform actions on ChRIS.. Examples: COUNT: ?action=count&what=feed --- GET: ?action=get&what=feed&id=3 --- All parameters can be GET or POST.';
