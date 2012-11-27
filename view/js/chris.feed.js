@@ -171,13 +171,21 @@ _FEED_.ajaxUpdate = function() {
             _FEED_.finFeeds[0].splice(index, 1);
             _FEED_.finFeeds[1].splice(index, 1);
           }
-          _FEED_.finFeeds[0].unshift(data['fin']['id'][i]);
-          _FEED_.finFeeds[1].unshift(data['fin']['content'][i]);
-          // delete related RUNNING feeds
+          // find element
           var element = jQuery('div[data-chris-feed_id=' + data['fin']['id'][i]
               + ']');
-          if (element.length) {
-            element.hide('blind', 100);
+          // if starred, do not do anything
+          // if not starred, add in list and delete related running element
+          if (!element.find('i').hasClass('icon-star')) {
+            _FEED_.finFeeds[0].unshift(data['fin']['id'][i]);
+            _FEED_.finFeeds[1].unshift(data['fin']['content'][i]);
+            if (element.length) {
+              element.hide('blind', 'slow');
+            }
+          }
+          else{
+            element.attr('data-chris-feed_status', '100');
+            element.find('.feed_status').html('Status: <font color=green>Done</font>');
           }
           i--;
         }
