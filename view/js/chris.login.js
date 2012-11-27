@@ -15,9 +15,11 @@ jQuery(document).ready(
           
         } else if (_command == 'logged_out') {
           
-
+          var _goodbye = ['See ya', 'Sayonara', 'Au revoir', 'Auf wiedersehen', 'Vaarwel', 'Adios', 'Joi gin', 'Arrivederci', 'Chao', 'Adeus', 'Doviduvanje'];
+          
+          
           jQuery().toastmessage('showSuccessToast',
-              '<h5>Logged out.</h5>' + 'Sayonara!');
+              '<h5>Logged out.</h5>' + _goodbye[Math.floor(Math.random()*_goodbye.length)] + '!');
           
 
         } else {
