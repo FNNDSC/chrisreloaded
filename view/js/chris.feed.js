@@ -182,23 +182,16 @@ _FEED_.ajaxUpdate = function() {
           i--;
         }
       }
-      // update FAVORITES feeds
-      var length_done = data['fav']['id'].length;
-      if (length_done > 0) {
-        var i = length_done - 1;
-        while (i >= 0) {
-          // if id there, delete it!
-          var index = _FEED_.favFeeds[0].indexOf(data['fav']['id'][i]);
-          if (index >= 0) {
-            // delete elements
-            _FEED_.favFeeds[0].splice(index, 1);
-            _FEED_.favFeeds[1].splice(index, 1);
-          }
-          _FEED_.favFeeds[0].unshift(data['fav']['id'][i]);
-          _FEED_.favFeeds[1].unshift(data['fav']['content'][i]);
-          i--;
-        }
-      }
+      /*
+       * // update FAVORITES feeds var length_done = data['fav']['id'].length;
+       * if (length_done > 0) { var i = length_done - 1; while (i >= 0) { // if
+       * id there, delete it! var index =
+       * _FEED_.favFeeds[0].indexOf(data['fav']['id'][i]); if (index >= 0) { //
+       * delete elements _FEED_.favFeeds[0].splice(index, 1);
+       * _FEED_.favFeeds[1].splice(index, 1); }
+       * _FEED_.favFeeds[0].unshift(data['fav']['id'][i]);
+       * _FEED_.favFeeds[1].unshift(data['fav']['content'][i]); i--; } }
+       */
       // update NEW RUNNING feeds
       var length_done = data['run']['new']['id'].length;
       if (length_done > 0) {
@@ -236,7 +229,7 @@ _FEED_.ajaxUpdate = function() {
         }
       }
       // update UPDATE button
-      $newFeeds = _FEED_.favFeeds[0].length + _FEED_.finFeeds[0].length
+      $newFeeds = /* _FEED_.favFeeds[0].length + */_FEED_.finFeeds[0].length
           + _FEED_.runFeeds[0].length;
       if ($newFeeds > 0) {
         jQuery('.feed_update').html(
@@ -273,21 +266,42 @@ _FEED_.updateTime = function() {
         }
       });
 }
-_FEED_.feed_favorite_onclick = function(){
+_FEED_.feed_favorite_onclick = function() {
   jQuery(".feed_favorite").on(
       'click',
       function(e) {
         // modify
         e.stopPropagation();
         // get feed id
-        $feedID = jQuery(this).parents().eq(2).attr('data-chris-feed_id');
-        // ajax add to favorites
-        // update env var as well
-        
+        $feedElt = jQuery(this).parents().eq(2);
+        $feedID = $feedElt.attr('data-chris-feed_id');
+        // api.php add to favorites
+        jQuery.ajax({
+          type : "POST",
+          url : "api.php?action=set&what=feed_favorite&id=" + $feedID,
+          dataType : "json",
+          success : function(data) {
+            window.console.log(data);
+            if (data['result'] == true) {
+              // if true add top of favorites
+              jQuery($feedElt).hide().prependTo('.feed_fav').slideDown(
+                  "fast");
+              // add good star
+              
+              // remove from where it is
+              $feedElt.parent().html("");
+            } else {
+              // if false, remove from favorites
+              $feedElt.parent().html('');
+              // modify star
+              
+              // add at to of finished/running
+            }
+          }
+        });
+        // feed_favorite
         // js to add to container
-
       });
-  
 }
 _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
@@ -307,11 +321,11 @@ _FEED_.update_onclick = function() {
               _FEED_.runFeeds[1] = [];
             });
         // update FAVORITES feeds
-        jQuery(_FEED_.favFeeds[1].join("")).hide().prependTo('.feed_fav')
-            .slideDown("fast", function() { // Animation complete.
-              _FEED_.favFeeds[0] = [];
-              _FEED_.favFeeds[1] = [];
-            });
+        /*
+         * jQuery(_FEED_.favFeeds[1].join("")).hide().prependTo('.feed_fav')
+         * .slideDown("fast", function() { // Animation complete.
+         * _FEED_.favFeeds[0] = []; _FEED_.favFeeds[1] = []; });
+         */
         // Hide feed update button
         jQuery(".feed_update").hide('blind', 100);
         _FEED_.updateTime();
@@ -352,13 +366,14 @@ jQuery(document).ready(function() {
   _FEED_.runFeeds.push(new Array());
   _FEED_.runFeeds.push(new Array());
   // favorite feeds
-  _FEED_.favFeeds = new Array();
-  _FEED_.favFeeds.push(new Array());
-  _FEED_.favFeeds.push(new Array());
+  /*
+   * _FEED_.favFeeds = new Array(); _FEED_.favFeeds.push(new Array());
+   * _FEED_.favFeeds.push(new Array());
+   */
   // on click callbacks
   _FEED_.feed_onclick();
   _FEED_.feed_favorite_onclick();
-  _FEED_.feed_title_onclick();
+  // _FEED_.feed_title_onclick();
   _FEED_.feed_fav_onclick();
   _FEED_.feed_run_onclick();
   _FEED_.feed_fin_onclick();
