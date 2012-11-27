@@ -78,11 +78,9 @@ class FeedC implements FeedControllerInterface {
         $feedMapper->filter('favorite = (?)', '1');
         break;
       case "running":
-        $feedMapper->filter('favorite != (?)', '1');
         $feedMapper->filter('status != (?)', '100');
         break;
       case "finished":
-        $feedMapper->filter('favorite != (?)', '1');
         $feedMapper->filter('status = (?)', '100');
         break;
       default:
@@ -95,9 +93,6 @@ class FeedC implements FeedControllerInterface {
     // if some feeds are available, loop through them
     if(count($feedResult['Feed']) >= 1){
       switch ($type){
-        case "favorites":
-          $_SESSION['feed_fav'] = $feedResult['Feed'][0]->time;
-          break;
         case "running":
           $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
           break;
@@ -114,8 +109,16 @@ class FeedC implements FeedControllerInterface {
         if($i >= $nb_feeds && $nb_feeds >= 0){
           break;
         }
-        // get HTML representation of a feed object with the view class
-        $feed_content .= FeedV::getHTML($value);
+        // get only feeds that are not favorites if in "running" or "finished"
+        if($type != "favorites"){
+          if($value->favorite == 0){
+            $feed_content .= FeedV::getHTML($value);
+          }
+        }
+        else{
+          // get HTML representation of a feed object with the view class
+          $feed_content .= FeedV::getHTML($value);
+        }
         $i++;
       }
     }
@@ -152,7 +155,6 @@ class FeedC implements FeedControllerInterface {
 
     // get last feed objects order by creation date
     $feedMapper = new Mapper('Feed');
-    $feedMapper->filter('favorite != (?)','1');
     $feedMapper->filter('status = (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -180,7 +182,6 @@ class FeedC implements FeedControllerInterface {
 
     // get running feeds
     $feedMapper = new Mapper('Feed');
-    $feedMapper->filter('favorite != (?)', '1');
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
