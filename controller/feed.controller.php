@@ -92,22 +92,21 @@ class FeedC implements FeedControllerInterface {
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
-    switch ($type){
-      case "favorites":
-        $_SESSION['feed_fav'] = $feedResult['Feed'][0]->time;
-        break;
-      case "running":
-        $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
-        break;
-      case "finished":
-        $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
-        break;
-      default:
-        break;
-    }
-
     // if some feeds are available, loop through them
     if(count($feedResult['Feed']) >= 1){
+      switch ($type){
+        case "favorites":
+          $_SESSION['feed_fav'] = $feedResult['Feed'][0]->time;
+          break;
+        case "running":
+          $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
+          break;
+        case "finished":
+          $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
+          break;
+        default:
+          break;
+      }
       // get html for the last $nb_feeds
       $i = 0;
       foreach ($feedResult['Feed'] as $key => $value) {
@@ -282,7 +281,7 @@ class FeedC implements FeedControllerInterface {
     $feedResult = Mapper::getStatic('Feed', $feed_id);
     $invert = (int)!$feedResult['Feed'][0]->favorite;
     $feedResult['Feed'][0]->favorite = $invert;
-    Mapper::update($feedResult['Feed'][0], $feed_id); 
+    Mapper::update($feedResult['Feed'][0], $feed_id);
     return $invert;
 
   }

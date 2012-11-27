@@ -74,14 +74,14 @@ _FEED_.onclick = function(details, more) {
       more.closest('.feed').css('margin-top', '10px');
       more.closest('.feed').css('margin-bottom', '11px');
     }
-    details.show('blind', 100);
+    details.show('blind', 'slow');
   } else {
     if (more) {
       more.html('<a>Show details</a>');
       more.closest('.feed').css('margin-top', '-1px');
       more.closest('.feed').css('margin-bottom', '0px');
     }
-    details.hide('blind', 100);
+    details.hide('blind', 'slow');
   }
 }
 _FEED_.feed_title_onclick = function() {
