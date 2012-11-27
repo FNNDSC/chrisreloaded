@@ -267,41 +267,37 @@ _FEED_.updateTime = function() {
       });
 }
 _FEED_.feed_favorite_onclick = function() {
-  jQuery(".feed_favorite").on(
-      'click',
-      function(e) {
-        // modify
-        e.stopPropagation();
-        // get feed id
-        $feedElt = jQuery(this).parents().eq(2);
-        $feedID = $feedElt.attr('data-chris-feed_id');
-        // api.php add to favorites
-        jQuery.ajax({
-          type : "POST",
-          url : "api.php?action=set&what=feed_favorite&id=" + $feedID,
-          dataType : "json",
-          success : function(data) {
-            window.console.log(data);
-            if (data['result'] == true) {
-              // if true add top of favorites
-              jQuery($feedElt).hide().prependTo('.feed_fav').slideDown(
-                  "fast");
-              // add good star
-              
-              // remove from where it is
-              $feedElt.parent().html("");
-            } else {
-              // if false, remove from favorites
-              $feedElt.parent().html('');
-              // modify star
-              
-              // add at to of finished/running
-            }
+  jQuery(".feed_favorite").on('click', function(e) {
+    // modify
+    e.stopPropagation();
+    // get feed id
+    $feedElt = jQuery(this).parents().eq(2);
+    $feedID = $feedElt.attr('data-chris-feed_id');
+    // api.php add to favorites
+    jQuery.ajax({
+      type : "POST",
+      url : "api.php?action=set&what=feed_favorite&id=" + $feedID,
+      dataType : "json",
+      success : function(data) {
+        // window.console.log(data);
+        if (data['result'] == "1") {
+          // if true add top of favorites
+          // add good star
+          jQuery($feedElt).find('.feed_favorite').html('<i class="icon-star">');
+          jQuery($feedElt).hide().prependTo('.feed_fav').slideDown("fast");
+        } else {
+          jQuery($feedElt).find('.feed_favorite').html('<i class="icon-star-empty">');
+          if ($feedElt.attr('data-chris-feed_status') != 100) {
+            jQuery($feedElt).hide().prependTo('.feed_run').slideDown("fast");
+          } else {
+            jQuery($feedElt).hide().prependTo('.feed_fin').slideDown("fast");
           }
-        });
-        // feed_favorite
-        // js to add to container
-      });
+        }
+      }
+    });
+    // feed_favorite
+    // js to add to container
+  });
 }
 _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
