@@ -267,35 +267,58 @@ _FEED_.updateTime = function() {
       });
 }
 _FEED_.feed_favorite_onclick = function() {
-  jQuery(".feed_favorite").on('click', function(e) {
-    // get feed id
-    $feedElt = jQuery(this).parents().eq(2);
-    $feedID = $feedElt.attr('data-chris-feed_id');
-    // api.php add to favorites
-    jQuery.ajax({
-      type : "POST",
-      url : "api.php?action=set&what=feed_favorite&id=" + $feedID,
-      dataType : "json",
-      success : function(data) {
-        // window.console.log(data);
-        if (data['result'] == "1") {
-          // if true add top of favorites
-          // add good star
-          jQuery($feedElt).find('.feed_favorite').html('<i class="icon-star">');
-          jQuery($feedElt).hide('blind', 'slow').prependTo('.feed_fav').slideDown('slow');
-        } else {
-          jQuery($feedElt).find('.feed_favorite').html('<i class="icon-star-empty">');
-          if ($feedElt.attr('data-chris-feed_status') != 100) {
-            jQuery($feedElt).hide('blind', 'slow').prependTo('.feed_run').slideDown('slow');
-          } else {
-            jQuery($feedElt).hide('blind', 'slow').prependTo('.feed_fin').slideDown('slow');
+  jQuery(".feed_favorite").on(
+      'click',
+      function(e) {
+        // get feed id
+        $feedElt = jQuery(this).parents().eq(2);
+        $feedID = $feedElt.attr('data-chris-feed_id');
+        // api.php add to favorites
+        jQuery.ajax({
+          type : "POST",
+          url : "api.php?action=set&what=feed_favorite&id=" + $feedID,
+          dataType : "json",
+          success : function(data) {
+            // window.console.log(data);
+            if (data['result'] == "1") {
+              jQuery($feedElt).hide(
+                  'blind',
+                  'slow',
+                  function() {
+                    jQuery($feedElt).find('.feed_favorite').html(
+                        '<i class="icon-star">');
+                    jQuery($feedElt).prependTo('.feed_fav').slideDown('slow');
+                  });
+            } else {
+              if ($feedElt.attr('data-chris-feed_status') != 100) {
+                jQuery($feedElt)
+                    .hide(
+                        'blind',
+                        'slow',
+                        function() {
+                          jQuery($feedElt).find('.feed_favorite').html(
+                              '<i class="icon-star-empty">');
+                          jQuery($feedElt).prependTo('.feed_run').slideDown(
+                              'slow');
+                        });
+              } else {
+                jQuery($feedElt)
+                    .hide(
+                        'blind',
+                        'slow',
+                        function() {
+                          jQuery($feedElt).find('.feed_favorite').html(
+                              '<i class="icon-star-empty">');
+                          jQuery($feedElt).prependTo('.feed_fin').slideDown(
+                              'slow');
+                        });
+              }
+            }
           }
-        }
-      }
-    });
-    // modify
-    e.stopPropagation();
-  });
+        });
+        // modify
+        e.stopPropagation();
+      });
 }
 _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
