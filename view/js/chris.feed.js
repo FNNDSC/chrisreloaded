@@ -188,10 +188,10 @@ _FEED_.ajaxUpdate = function() {
             if (element.length) {
               element.hide('blind', 'slow');
             }
-          }
-          else{
+          } else {
             element.attr('data-chris-feed_status', '100');
-            element.find('.feed_status').html('Status: <font color=green>Done</font>');
+            element.find('.feed_status').html(
+                'Status: <font color=green>Done</font>');
           }
           i--;
         }
@@ -351,7 +351,6 @@ _FEED_.update_onclick = function() {
               _FEED_.runFeeds[0] = [];
               _FEED_.runFeeds[1] = [];
             });
-        // update FAVORITES feeds
         /*
          * jQuery(_FEED_.favFeeds[1].join("")).hide().prependTo('.feed_fav')
          * .slideDown("fast", function() { // Animation complete.
