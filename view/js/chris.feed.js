@@ -268,8 +268,6 @@ _FEED_.updateTime = function() {
 }
 _FEED_.feed_favorite_onclick = function() {
   jQuery(".feed_favorite").on('click', function(e) {
-    // modify
-    e.stopPropagation();
     // get feed id
     $feedElt = jQuery(this).parents().eq(2);
     $feedID = $feedElt.attr('data-chris-feed_id');
@@ -284,19 +282,19 @@ _FEED_.feed_favorite_onclick = function() {
           // if true add top of favorites
           // add good star
           jQuery($feedElt).find('.feed_favorite').html('<i class="icon-star">');
-          jQuery($feedElt).hide().prependTo('.feed_fav').slideDown("fast");
+          jQuery($feedElt).hide('blind', 'slow').prependTo('.feed_fav').slideDown('slow');
         } else {
           jQuery($feedElt).find('.feed_favorite').html('<i class="icon-star-empty">');
           if ($feedElt.attr('data-chris-feed_status') != 100) {
-            jQuery($feedElt).hide().prependTo('.feed_run').slideDown("fast");
+            jQuery($feedElt).hide('blind', 'slow').prependTo('.feed_run').slideDown('slow');
           } else {
-            jQuery($feedElt).hide().prependTo('.feed_fin').slideDown("fast");
+            jQuery($feedElt).hide('blind', 'slow').prependTo('.feed_fin').slideDown('slow');
           }
         }
       }
     });
-    // feed_favorite
-    // js to add to container
+    // modify
+    e.stopPropagation();
   });
 }
 _FEED_.update_onclick = function() {
