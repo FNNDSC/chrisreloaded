@@ -171,6 +171,12 @@ _FEED_.ajaxUpdate = function() {
             _FEED_.finFeeds[0].splice(index, 1);
             _FEED_.finFeeds[1].splice(index, 1);
           }
+          index = _FEED_.runFeeds[0].indexOf(data['fin']['id'][i]);
+          if (index >= 0) {
+            // delete elements
+            _FEED_.runFeeds[0].splice(index, 1);
+            _FEED_.runFeeds[1].splice(index, 1);
+          }
           // find element
           var element = jQuery('div[data-chris-feed_id=' + data['fin']['id'][i]
               + ']');
