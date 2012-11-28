@@ -71,7 +71,9 @@ class FeedC implements FeedControllerInterface {
 
     // get feeds objects ordered by creation time
     $feedMapper = new Mapper('Feed');
-
+    if($_SESSION['userid']){
+      $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
+    }
     // different conditions depending on filter type
     switch ($type){
       case "favorites":
@@ -155,6 +157,9 @@ class FeedC implements FeedControllerInterface {
 
     // get last feed objects order by creation date
     $feedMapper = new Mapper('Feed');
+    if($_SESSION['userid']){
+      $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
+    }
     $feedMapper->filter('status = (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -182,6 +187,9 @@ class FeedC implements FeedControllerInterface {
 
     // get running feeds
     $feedMapper = new Mapper('Feed');
+    if($_SESSION['userid']){
+      $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
+    }
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -203,35 +211,6 @@ class FeedC implements FeedControllerInterface {
         }
       }
     }
-
-    /*     // get favorites feeds
-     // get the value of the last uploaded fav feed
-    $feed_fav = $_SESSION['feed_fav'];
-    $feed_content = '';
-
-    // get last feed objects order by creation date
-    $feedMapper = new Mapper('Feed');
-    $feedMapper->filter('favorite = (?)','1');
-    $feedMapper->order('time');
-    $feedResult = $feedMapper->get();
-
-    // get new feeds
-    if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_fav)){
-    // store latest feed updated at this point
-    $old_time = $feed_fav;
-    // store latest feed updated after this function returns
-    $_SESSION['feed_fav'] = $feedResult['Feed'][0]->time;
-    // get all feeds which have been created since last upload
-    foreach ($feedResult['Feed'] as $key => $value) {
-    if(strtotime($value->time) <= strtotime($old_time)){
-    break;
-    }
-    $feed_update_all['fav']['id'][] = $value->id;
-    $feed_update_all['fav']['content'][] = (string)FeedV::getHTML($value);
-    }
-    } */
-
-
     return $feed_update_all;
   }
 
