@@ -50,22 +50,20 @@
      <div class="feed_title">
       <span style="font-size: 16px; font-weight: bold;">Activity
        Feed</span> <sub>( <a href="#">Me</a> / <b>All </b>)
-      </sub> <span class="pull-right"> <input type="text"
+      </sub> <label class="checkbox inline"> <input type="checkbox"
+       class="feed_run_check" value="1" checked> Running
+      </label> <label class="checkbox inline"> <input type="checkbox"
+       class="feed_fav_check" value="1" checked> Favorites
+      </label> <label class="checkbox inline"> <input type="checkbox"
+       class="feed_fin_check" value="1" checked> Finished
+      </label> <span class="pull-right"> <input type="text"
        placeholder="Search..."
        style='height: 10px; line-height: 12px; width: 135px; font-size: 11px'>
       </span>
      </div>
-     <div class="feed_advanced feed_gradient">
-      <div>
-       <label class="checkbox inline"> <input type="checkbox"
-        class="feed_fav_check" value="1" checked> Favorites
-       </label> <label class="checkbox inline"> <input type="checkbox"
-        class="feed_run_check" value="1" checked> Running
-       </label> <label class="checkbox inline"> <input type="checkbox"
-        class="feed_fin_check" value="1" checked> Finished
-       </label>
-      </div>
-     </div>
+     <!--      <div class="feed_advanced feed_gradient">
+      <div></div>
+     </div> -->
      <div class="feed_update feed_gradient"></div>
     </div>
    </div>
@@ -74,8 +72,8 @@
    </div> -->
    <div class="span8 pull-right">
     <div class="feed_content">
-     <div class="feed_fav">${FEED_FAV}</div>
      <div class="feed_run">${FEED_RUN}</div>
+     <div class="feed_fav">${FEED_FAV}</div>
      <div class="feed_fin">${FEED_FIN}</div>
     </div>
    </div>

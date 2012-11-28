@@ -96,6 +96,14 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('MORE', 'Show details');
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
+    // set favorite icon
+    $favorite = $object->favorite;
+    if($favorite == 1){
+      $t -> replace('FAVORITE', 'icon-star');
+    }
+    else{
+      $t -> replace('FAVORITE', 'icon-star-empty');
+    }
     // set data browser
     $d = new Template('feed_data_browser.html');
     $d -> replace('FOLDER', joinPaths($username,$object->plugin, $object->name.'-'.$object->id));

@@ -71,7 +71,9 @@ class FeedC implements FeedControllerInterface {
 
     // get feeds objects ordered by creation time
     $feedMapper = new Mapper('Feed');
-
+    if($_SESSION['userid']){
+      $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
+    }
     // different conditions depending on filter type
     switch ($type){
       case "favorites":
@@ -90,22 +92,18 @@ class FeedC implements FeedControllerInterface {
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
-    switch ($type){
-      case "favorites":
-        $_SESSION['feed_fav'] = $feedResult['Feed'][0]->time;
-        break;
-      case "running":
-        $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
-        break;
-      case "finished":
-        $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
-        break;
-      default:
-        break;
-    }
-
     // if some feeds are available, loop through them
     if(count($feedResult['Feed']) >= 1){
+      switch ($type){
+        case "running":
+          $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
+          break;
+        case "finished":
+          $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
+          break;
+        default:
+          break;
+      }
       // get html for the last $nb_feeds
       $i = 0;
       foreach ($feedResult['Feed'] as $key => $value) {
@@ -113,13 +111,21 @@ class FeedC implements FeedControllerInterface {
         if($i >= $nb_feeds && $nb_feeds >= 0){
           break;
         }
-        // get HTML representation of a feed object with the view class
-        $feed_content .= FeedV::getHTML($value);
+        // get only feeds that are not favorites if in "running" or "finished"
+        if($type != "favorites"){
+          if($value->favorite == 0){
+            $feed_content .= FeedV::getHTML($value);
+          }
+        }
+        else{
+          // get HTML representation of a feed object with the view class
+          $feed_content .= FeedV::getHTML($value);
+        }
         $i++;
       }
     }
     else{
-      $feed_content .= 'No feed available.';
+      $feed_content .= '';
     }
     return $feed_content;
   }
@@ -134,8 +140,8 @@ class FeedC implements FeedControllerInterface {
    */
   static public function updateClient(){
     $feed_update_all = Array();
-    $feed_update_all['fav']['id'] = Array();
-    $feed_update_all['fav']['content'] = Array();
+    /*     $feed_update_all['fav']['id'] = Array();
+     $feed_update_all['fav']['content'] = Array(); */
     $feed_update_all['run']['new'] = Array();
     $feed_update_all['run']['new']['id'] = Array();
     $feed_update_all['run']['new']['content'] = Array();
@@ -151,6 +157,9 @@ class FeedC implements FeedControllerInterface {
 
     // get last feed objects order by creation date
     $feedMapper = new Mapper('Feed');
+    if($_SESSION['userid']){
+      $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
+    }
     $feedMapper->filter('status = (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -178,6 +187,9 @@ class FeedC implements FeedControllerInterface {
 
     // get running feeds
     $feedMapper = new Mapper('Feed');
+    if($_SESSION['userid']){
+      $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
+    }
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -199,35 +211,6 @@ class FeedC implements FeedControllerInterface {
         }
       }
     }
-
-    // get favorites feeds
-    // get the value of the last uploaded fav feed
-    $feed_fav = $_SESSION['feed_fav'];
-    $feed_content = '';
-
-    // get last feed objects order by creation date
-    $feedMapper = new Mapper('Feed');
-    $feedMapper->filter('favorite = (?)','1');
-    $feedMapper->order('time');
-    $feedResult = $feedMapper->get();
-
-    // get new feeds
-    if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_fav)){
-      // store latest feed updated at this point
-      $old_time = $feed_fav;
-      // store latest feed updated after this function returns
-      $_SESSION['feed_fav'] = $feedResult['Feed'][0]->time;
-      // get all feeds which have been created since last upload
-      foreach ($feedResult['Feed'] as $key => $value) {
-        if(strtotime($value->time) <= strtotime($old_time)){
-          break;
-        }
-        $feed_update_all['fav']['id'][] = $value->id;
-        $feed_update_all['fav']['content'][] = (string)FeedV::getHTML($value);
-      }
-    }
-
-
     return $feed_update_all;
   }
 
@@ -262,14 +245,24 @@ class FeedC implements FeedControllerInterface {
     $metaObject->target_id = $feed_id;
     $metaObject->target_type = 'feed';
 
-    Mapper::add($metaObject);
+    return Mapper::add($metaObject);
   }
 
   static public function setStatus($feed_id, $status){
 
     $feedResult = Mapper::getStatic('Feed', $feed_id);
     $feedResult['Feed'][0]->status = $status;
+    return Mapper::update($feedResult['Feed'][0], $feed_id);
+
+  }
+
+  static public function setFavorite($feed_id, $favorite="1"){
+
+    $feedResult = Mapper::getStatic('Feed', $feed_id);
+    $invert = (int)!$feedResult['Feed'][0]->favorite;
+    $feedResult['Feed'][0]->favorite = $invert;
     Mapper::update($feedResult['Feed'][0], $feed_id);
+    return $invert;
 
   }
 
