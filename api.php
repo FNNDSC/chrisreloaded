@@ -109,7 +109,7 @@ if (!isset($_SESSION['username'])) {
         if ($what == 'feed') {
           $result['result'] = FeedC::getCount($_SESSION['userid']);
         } else if ($what == 'data') {
-          $result['result'] = DataC::getCount();
+          $result['result'] = DataC::getCount($_SESSION['userid']);
         } else if ($what == 'running') {
           $result['result'] = FeedC::getRunningCount($_SESSION['userid']);
         }

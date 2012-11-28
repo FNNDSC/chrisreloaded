@@ -57,7 +57,7 @@ function homePage() {
   $t = new Template('home.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
-  $t -> replace('DATA_COUNT', DataC::getCount());
+  $t -> replace('DATA_COUNT', DataC::getCount($_SESSION['userid']));
   $t -> replace('FEED_COUNT', FeedC::getCount($_SESSION['userid']));
   $t -> replace('RUNNING_COUNT', FeedC::getRunningCount($_SESSION['userid']));
   $t -> replace('PLUGIN', PluginC::getHTML());

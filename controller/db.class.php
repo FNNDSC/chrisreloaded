@@ -138,7 +138,6 @@ class DB {
    */
   public function execute($query, $variables=null) {
 
-    //echo $query;
     $link = $this->link;
 
     // prepare the query
