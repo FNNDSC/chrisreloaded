@@ -42,15 +42,15 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 // return values
 $start_time = new DateTime();
 $result = array(
-        'status' => 'not-processed',
-        'username' => 'unknown',
-        'userid' => -1,
-        'timestamp' => '',
-        'execution_time' => 0,
-        'action' => null,
-        'what' => null,
-        'id' => null,
-        'result' => null);
+    'status' => 'not-processed',
+    'username' => 'unknown',
+    'userid' => -1,
+    'timestamp' => '',
+    'execution_time' => 0,
+    'action' => null,
+    'what' => null,
+    'id' => null,
+    'result' => null);
 
 // TODO here the session has to be verified, actually this should happen in _session.inc.php
 // right now, we just check if the session contains a username
@@ -112,6 +112,11 @@ if (!isset($_SESSION['username'])) {
           $result['result'] = DataC::getCount();
         } else if ($what == 'running') {
           $result['result'] = FeedC::getRunningCount($_SESSION['userid']);
+        }
+        break;
+      case "set":
+        if ($what == 'feed_favorite') {
+          $result['result'] = FeedC::setFavorite($id);
         }
         break;
       case "get":
