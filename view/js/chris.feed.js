@@ -281,8 +281,9 @@ _FEED_.updateTime = function() {
       });
 }
 _FEED_.feed_favorite_onclick = function() {
-  jQuery(".feed_favorite").on(
+  jQuery(document).on(
       'click',
+      '.feed_favorite',
       function(e) {
         // get feed id
         $feedElt = jQuery(this).parents().eq(2);
@@ -341,23 +342,18 @@ _FEED_.update_onclick = function() {
         window.scrollTo(0, 0);
         // update FINISHED feeds
         jQuery(_FEED_.finFeeds[1].join("")).hide().prependTo('.feed_fin')
-            .slideDown("fast", function() { // Animation complete.
+            .slideDown("slow", function() { // Animation complete.
               _FEED_.finFeeds[0] = [];
               _FEED_.finFeeds[1] = [];
             });
         // update RUNNING feeds
         jQuery(_FEED_.runFeeds[1].join("")).hide().prependTo('.feed_run')
-            .slideDown("fast", function() { // Animation complete.
+            .slideDown("slow", function() { // Animation complete.
               _FEED_.runFeeds[0] = [];
               _FEED_.runFeeds[1] = [];
             });
-        /*
-         * jQuery(_FEED_.favFeeds[1].join("")).hide().prependTo('.feed_fav')
-         * .slideDown("fast", function() { // Animation complete.
-         * _FEED_.favFeeds[0] = []; _FEED_.favFeeds[1] = []; });
-         */
         // Hide feed update button
-        jQuery(".feed_update").hide('blind', 100);
+        jQuery(".feed_update").hide('blind', 'slow');
         _FEED_.updateTime();
         // re-activate draggable for all feed icons
         _FEED_.activateDraggableIcons();
@@ -395,11 +391,6 @@ jQuery(document).ready(function() {
   _FEED_.runFeeds = new Array();
   _FEED_.runFeeds.push(new Array());
   _FEED_.runFeeds.push(new Array());
-  // favorite feeds
-  /*
-   * _FEED_.favFeeds = new Array(); _FEED_.favFeeds.push(new Array());
-   * _FEED_.favFeeds.push(new Array());
-   */
   // on click callbacks
   _FEED_.feed_onclick();
   _FEED_.feed_favorite_onclick();
