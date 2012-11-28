@@ -8,20 +8,20 @@
 	${NAVBAR}
 
 	<div class="container"
-		style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
+		style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);min-height:700px;">
 
 		${FEED_DATA_PREVIEW}
 
 		<div id='home' class="row">
 			<div class="span4" data-spy="affix" style="z-index: 1000;">
 
-				<div class="well">
+				<div class="well" style='padding-top: 10px;padding-bottom: 12px;'>
 					<!-- GREETING -->
-					Welcome back, <span style="font-weight: bold;">${USERNAME}</span>!
+					<span style='font-size: 14px; margin-left: -10px;'>Welcome back, <span style="font-weight: bold;">${USERNAME}</span>!</span>
 
 					<!-- STATISTICS -->
 					<ul class="nav nav-pills"
-						style="margin-top: 6px; margin-left: -20px; margin-right: -20px; border: 1px solid #e8e8e8">
+						style="margin-top: 11px; margin-left: -20px; margin-right: -20px; border: 1px solid #e8e8e8">
 						<li style="padding: 6px 20px;"><b id='data_count'>${DATA_COUNT}</b>
 							<br> <span style="color: #999; font-size: 10px;">DATA</span></li>
 						<li style="padding: 6px 20px; border-left: 1px solid #E8E8E8;">
@@ -35,7 +35,7 @@
 
 					<!-- PACS PULL -->
 					<textarea id="action_command" placeholder="Action"
-						style="width: 100%; height: 19px; overflow: hidden; padding-bottom: 5px; margin-top: 0px; margin-bottom: 0px; margin-left: -7px; max-width: 100%;"></textarea>
+						style="width: 100%; height: 19px; overflow: hidden; padding-bottom: 5px; margin-top: -7px; margin-bottom: 0px; margin-left: -7px; max-width: 100%;"></textarea>
 					<div id="action_ui">
 						<a id='action_run' class="btn btn-warning"
 							style="margin-top: 6px; float: right"><i
@@ -76,6 +76,7 @@
    </div> -->
 			<div class="span8 pull-right">
 				<div class="feed_content">
+				  <div class="feed_empty" style="display:none;height:300px;background-color:white;text-align:center;padding-top:250px;">No activity yet.</div>
 					<div class="feed_run">${FEED_RUN}</div>
 					<div class="feed_fav">${FEED_FAV}</div>
 					<div class="feed_fin">${FEED_FIN}</div>

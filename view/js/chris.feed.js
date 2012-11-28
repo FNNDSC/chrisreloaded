@@ -339,6 +339,10 @@ _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
       'click',
       function() {
+        
+        // hide the placeholder
+        jQuery('.feed_empty').hide();
+        
         window.scrollTo(0, 0);
         // update FINISHED feeds
         jQuery(_FEED_.finFeeds[1].join("")).hide().prependTo('.feed_fin')
@@ -384,13 +388,9 @@ _FEED_.createFeedDetails = function() {
 jQuery(document).ready(function() {
   // feed functions
   // finished feeds
-  _FEED_.finFeeds = new Array();
-  _FEED_.finFeeds.push(new Array());
-  _FEED_.finFeeds.push(new Array());
+  _FEED_.finFeeds = [[],[]];
   // running feeds
-  _FEED_.runFeeds = new Array();
-  _FEED_.runFeeds.push(new Array());
-  _FEED_.runFeeds.push(new Array());
+  _FEED_.runFeeds = [[],[]];
   // on click callbacks
   _FEED_.feed_onclick();
   _FEED_.feed_favorite_onclick();
@@ -403,4 +403,10 @@ jQuery(document).ready(function() {
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
   _FEED_.activateDraggableIcons();
+  
+  // show placeholder when there are no feeds
+  if (jQuery('#feed_count').html() == "0") {
+    jQuery('.feed_empty').show();
+  }
+  
 });

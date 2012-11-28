@@ -2,10 +2,11 @@
 	padding: 10px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: lightgrey;
+	border-color: #e3e3e3;
 	border-top-right-radius: 4px;
 	border-top-left-radius: 4px;
 	background-color: #fff;
+	cursor: pointer;
 }
 .feed_advanced {
   margin-top: -1px;
@@ -56,12 +57,6 @@
 		to(#fff) ); /*for webkit browsers*/
 	background: -moz-linear-gradient(top, #eee, #fff);
 	/* for firefox 3.6+ */
-}
-
-.feed_title {
-	cursor: pointer;
-	/*  min-height: 50px; */
-	/*  background: lightgreen; */
 }
 
 .feed_header {

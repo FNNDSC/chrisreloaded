@@ -6,7 +6,7 @@
 	padding: 10px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: lightgrey;
+	border-color: #e3e3e3;
 	border-top-right-radius: 4px;
 	border-top-left-radius: 4px;
 	background-color: whiteSmoke;
@@ -33,7 +33,7 @@
 	margin-top: -1px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: lightgrey;
+	border-color: #e3e3e3;
 	height: 30px;
 }
 
@@ -71,7 +71,7 @@
 	padding-bottom: 5px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: lightgrey;
+	border-color: #e3e3e3;
 }
 
 #pipelines {
@@ -83,7 +83,7 @@
 	padding: 5px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: lightgrey;
+	border-color: #e3e3e3;
 }
 
 #cart_input {
@@ -91,7 +91,7 @@
 	padding: 5px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: lightgrey;
+	border-color: #e3e3e3;
 }
 
 #cart_selection {
@@ -99,7 +99,7 @@
 	padding: 5px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: lightgrey;
+	border-color: #e3e3e3;
 }
 
 .plugin_panel {
