@@ -68,7 +68,7 @@ function homePage() {
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.html');
   $t -> replace('JAVASCRIPT_CHRIS', 'javascript.chris.html');
-  $t -> replace('USERNAME', $_SESSION['username']);
+  $t -> replace('USERNAME', ucfirst($_SESSION['username']));
   return $t;
 }
 
