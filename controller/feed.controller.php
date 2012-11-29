@@ -94,16 +94,10 @@ class FeedC implements FeedControllerInterface {
 
     // if some feeds are available, loop through them
     if(count($feedResult['Feed']) >= 1){
-      switch ($type){
-        case "running":
-          $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
-          break;
-        case "finished":
-          $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
-          break;
-        default:
-          break;
+      if($feedResult['Feed'][0]->time > $_SESSION['feed_new']){
+        $_SESSION['feed_new'] = $feedResult['Feed'][0]->time;
       }
+
       // get html for the last $nb_feeds
       $i = 0;
       foreach ($feedResult['Feed'] as $key => $value) {
@@ -115,6 +109,11 @@ class FeedC implements FeedControllerInterface {
         if($type != "favorites"){
           if($value->favorite == 0){
             $feed_content .= FeedV::getHTML($value);
+            if($type == "finished"){
+              if($value->time < $_SESSION['feed_old']){
+                $_SESSION['feed_old'] = $value->time;
+              }
+            }
           }
         }
         else{
@@ -139,53 +138,48 @@ class FeedC implements FeedControllerInterface {
    * @todo update to support "result" feed, need a "type subarray in progress"
    */
   static public function updateClient(){
-    $feed_update_all = Array();
-    /*     $feed_update_all['fav']['id'] = Array();
-     $feed_update_all['fav']['content'] = Array(); */
-    $feed_update_all['run']['new'] = Array();
-    $feed_update_all['run']['new']['id'] = Array();
-    $feed_update_all['run']['new']['content'] = Array();
-    $feed_update_all['run']['update'] = Array();
-    $feed_update_all['run']['update']['id'] = Array();
-    $feed_update_all['run']['update']['content'] = Array();
-    $feed_update_all['fin']['id'] = Array();
-    $feed_update_all['fin']['content'] = Array();
+    $feed_update = Array();
+    $feed_update['new'] = Array();
+    $feed_update['new']['id'] = Array();
+    $feed_update['new']['content'] = Array();
+    $feed_update['new']['status'] = Array();
 
-    // get the value of the last finished feed
-    $feed_fin = $_SESSION['feed_fin'];
-    $feed_content = '';
+    // get new time stamps
+    // get full html
+    $feed_new = $_SESSION['feed_new'];
+    $new_ids = Array();
 
-    // get last feed objects order by creation date
     $feedMapper = new Mapper('Feed');
     if($_SESSION['userid']){
       $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
     }
-    $feedMapper->filter('status = (?)','100');
+    $feedMapper->filter('time > (?)',$feed_new);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
-    // get new feeds
-    if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->time > $feed_fin){
+    if(count($feedResult['Feed']) >= 1){
       // store latest feed updated at this point
-      $old_time = $feed_fin;
+      $old_time = $feed_new;
       // store latest feed updated after this function returns
-      $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
+      $_SESSION['feed_new'] = $feedResult['Feed'][0]->time;
       // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
         if($value->time <= $old_time){
           break;
         }
-        $feed_update_all['fin']['id'][] = $value->id;
-        $feed_update_all['fin']['content'][] = (string)FeedV::getHTML($value);
+        $feed_update['new']['id'][] = $value->id;
+        $feed_update['new']['content'][] = (string)FeedV::getHTML($value);
+        $feed_update['new']['status'][] = $value->status;
+        $new_ids[] = $value->id;
       }
     }
 
-    // get favorites feeds
-    // get the value of the last uploaded fav feed
-    $feed_run = $_SESSION['feed_run'];
-    $feed_content = '';
+    // get running feed
+    // get status
+    $feed_update['running'] = Array();
+    $feed_update['running']['id'] = Array();
+    $feed_update['running']['content'] = Array();
 
-    // get running feeds
     $feedMapper = new Mapper('Feed');
     if($_SESSION['userid']){
       $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
@@ -193,26 +187,20 @@ class FeedC implements FeedControllerInterface {
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
-    // get new feeds
+
     if(count($feedResult['Feed']) >= 1){
-      // store latest feed updated at this point
-      $old_time = $feed_run;
-      // store latest feed updated after this function returns
-      $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
-      // get all feeds which have been created since last upload
+      // get all feeds that are still running and that are not new
       foreach ($feedResult['Feed'] as $key => $value) {
-        if($value->time <= $old_time){
-          $feed_update_all['run']['update']['id'][] = $value->id;
-          $feed_update_all['run']['update']['content'][] = $value->status;
-        }
-        else{
-          $feed_update_all['run']['new']['id'][] = $value->id;
-          $feed_update_all['run']['new']['content'][] = (string)FeedV::getHTML($value);
+        // check id to make sure this is not a new feed
+        if(! in_array($value->id, $new_ids)){
+          $feed_update['running']['id'][] = $value->id;
+          $feed_update['running']['content'][] = $value->status;
+          $new_ids[] = $value->id;
         }
       }
     }
-    return $feed_update_all;
-    
+
+    return $feed_update;
   }
 
 

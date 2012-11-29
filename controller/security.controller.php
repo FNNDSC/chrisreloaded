@@ -101,6 +101,9 @@ class SecurityC implements SecurityControllerInterface {
     $_SESSION['password'] = $password;
     $_SESSION['userid'] = $user_id;
 
+    $_SESSION['feed_new'] = '00.00';
+    $_SESSION['feed_old'] = microtime(true);
+    
     return true;
 
   }
