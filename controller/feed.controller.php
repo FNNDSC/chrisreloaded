@@ -165,14 +165,14 @@ class FeedC implements FeedControllerInterface {
     $feedResult = $feedMapper->get();
 
     // get new feeds
-    if(count($feedResult['Feed']) >= 1 && strtotime($feedResult['Feed'][0]->time) > strtotime($feed_fin)){
+    if(count($feedResult['Feed']) >= 1 && $feedResult['Feed'][0]->time > $feed_fin){
       // store latest feed updated at this point
       $old_time = $feed_fin;
       // store latest feed updated after this function returns
       $_SESSION['feed_fin'] = $feedResult['Feed'][0]->time;
       // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
-        if(strtotime($value->time) <= strtotime($old_time)){
+        if($value->time <= $old_time){
           break;
         }
         $feed_update_all['fin']['id'][] = $value->id;
@@ -201,7 +201,7 @@ class FeedC implements FeedControllerInterface {
       $_SESSION['feed_run'] = $feedResult['Feed'][0]->time;
       // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
-        if(strtotime($value->time) <= strtotime($old_time)){
+        if($value->time <= $old_time){
           $feed_update_all['run']['update']['id'][] = $value->id;
           $feed_update_all['run']['update']['content'][] = $value->status;
         }
@@ -212,6 +212,7 @@ class FeedC implements FeedControllerInterface {
       }
     }
     return $feed_update_all;
+    
   }
 
 
@@ -275,7 +276,7 @@ class FeedC implements FeedControllerInterface {
     $feedObject->user_id = $user_id;
     $feedObject->name = $name;
     $feedObject->plugin = $plugin;
-    $feedObject->time = date("Y-m-d H:i:s");
+    $feedObject->time = microtime(true);
     return Mapper::add($feedObject);
     // new data
     /*     $dataObject = new Data();

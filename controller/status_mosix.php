@@ -52,7 +52,6 @@ foreach($feedResult['Meta'] as $key0 => $value0){
   $found = false;
   foreach($lines as $key => $value){
     $pid = explode(' ', $value);
-    //print_r($pid);
     if(isset($pid[0]) && $pid[0] != ''){
       if($value0->value == $pid[0]){
         $found = true;
@@ -60,16 +59,16 @@ foreach($feedResult['Meta'] as $key0 => $value0){
       }
     }
   }
-
+  
   // if no match, job has finished => update feed status!
   if($found == false){
-    $startTime = strtotime($feedResult['Feed'][$key0]->time);
-    $endTime = date("Y-m-d H:i:s");
-    $duration = strtotime($endTime) - $startTime;
+    $startTime = $feedResult['Feed'][$key0]->time;
+    $endTime = microtime(true);
+    $duration = $endTime - $startTime;
     $feedResult['Feed'][$key0]->status = 100;
     $feedResult['Feed'][$key0]->time = $endTime;
-    $feedResult['Feed'][$key0]->duration = $duration;
-    Mapper::update($feedResult['Feed'][$key0],  $feedResult['Feed'][$key0]->id);
+    $feedResult['Feed'][$key0]->duration = (int)$duration;
+    echo Mapper::update($feedResult['Feed'][$key0],  $feedResult['Feed'][$key0]->id);
   }
 }
 ?>
