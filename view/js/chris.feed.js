@@ -175,8 +175,8 @@ _FEED_.ajaxUpdate = function() {
           index = _FEED_.runFeeds[0].indexOf(data['new']['id'][i]);
           if (index >= 0) {
             // delete elements
-            _FEED_.finFeeds[0].splice(index, 1);
-            _FEED_.finFeeds[1].splice(index, 1);
+            _FEED_.runFeeds[0].splice(index, 1);
+            _FEED_.runFeeds[1].splice(index, 1);
           }
           var element = jQuery('div[data-chris-feed_id=' + data['new']['id'][i]
               + ']');
