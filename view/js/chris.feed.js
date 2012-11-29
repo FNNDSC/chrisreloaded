@@ -160,91 +160,48 @@ _FEED_.ajaxUpdate = function() {
     success : function(data) {
       data = data['result'];
       // update FINISHED feeds
-      var length_done = data['fin']['id'].length;
+      var length_done = data['new']['id'].length;
       if (length_done > 0) {
         var i = length_done - 1;
         while (i >= 0) {
-          // if id there, delete it!
-          var index = _FEED_.finFeeds[0].indexOf(data['fin']['id'][i]);
+          // if id in new delete it!
+          var index = _FEED_.finFeeds[0].indexOf(data['new']['id'][i]);
           if (index >= 0) {
             // delete elements
             _FEED_.finFeeds[0].splice(index, 1);
             _FEED_.finFeeds[1].splice(index, 1);
           }
-          index = _FEED_.runFeeds[0].indexOf(data['fin']['id'][i]);
+          // if id in running delete it
+          index = _FEED_.runFeeds[0].indexOf(data['new']['id'][i]);
           if (index >= 0) {
             // delete elements
-            _FEED_.runFeeds[0].splice(index, 1);
-            _FEED_.runFeeds[1].splice(index, 1);
+            _FEED_.finFeeds[0].splice(index, 1);
+            _FEED_.finFeeds[1].splice(index, 1);
           }
-          // find element
-          var element = jQuery('div[data-chris-feed_id=' + data['fin']['id'][i]
+          var element = jQuery('div[data-chris-feed_id=' + data['new']['id'][i]
               + ']');
-          // if starred, do not do anything
-          // if not starred, add in list and delete related running element
-          if (!element.find('i').hasClass('icon-star')) {
-            _FEED_.finFeeds[0].unshift(data['fin']['id'][i]);
-            _FEED_.finFeeds[1].unshift(data['fin']['content'][i]);
-            if (element.length) {
-              element.hide('blind', 'slow');
-            }
-          } else {
+          // hide element if exists
+          if (element.length && element.find('i').hasClass('icon-star')) {
+            // and if not favorite
+            // update its status to 100%
             element.attr('data-chris-feed_status', '100');
-            element.find('.feed_status').html(
-                'Status: <font color=green>Done</font>');
-          }
-          i--;
-        }
-      }
-      /*
-       * // update FAVORITES feeds var length_done = data['fav']['id'].length;
-       * if (length_done > 0) { var i = length_done - 1; while (i >= 0) { // if
-       * id there, delete it! var index =
-       * _FEED_.favFeeds[0].indexOf(data['fav']['id'][i]); if (index >= 0) { //
-       * delete elements _FEED_.favFeeds[0].splice(index, 1);
-       * _FEED_.favFeeds[1].splice(index, 1); }
-       * _FEED_.favFeeds[0].unshift(data['fav']['id'][i]);
-       * _FEED_.favFeeds[1].unshift(data['fav']['content'][i]); i--; } }
-       */
-      // update NEW RUNNING feeds
-      var length_done = data['run']['new']['id'].length;
-      if (length_done > 0) {
-        var i = length_done - 1;
-        while (i >= 0) {
-          // if id there, delete it!
-          var index = _FEED_.runFeeds[0].indexOf(data['run']['new']['id'][i]);
-          if (index >= 0) {
-            // delete elements
-            _FEED_.runFeeds[0].splice(index, 1);
-            _FEED_.runFeeds[1].splice(index, 1);
-          }
-          _FEED_.runFeeds[0].unshift(data['run']['new']['id'][i]);
-          _FEED_.runFeeds[1].unshift(data['run']['new']['content'][i]);
-          i--;
-        }
-      }
-      // update UPDATE RUNNING feeds
-      var length_progress = data['run']['update']['id'].length;
-      if (length_progress) {
-        for ( var i = 0; i < length_progress; i++) {
-          // if element is there!
-          var element = jQuery('div[data-chris-feed_id='
-              + data['run']['update']['id'][i] + ']');
-          if (element.length) {
-            var _current_feed = jQuery('div[data-chris-feed_id='
-                + data['run']['update']['id'][i] + ']');
-            var _status_text = '<font color=red>Running</font>';
-            var _status = data['run']['update']['content'][i];
-            if (_status == 100) {
-              _status_text = '<font color=green>Done</font>';
+            element.find('.feed_status').html('Status: <font color=green>Done</font>');
+            
+          } else {
+            element.hide('blind', 'slow');
+            // hide element to relevant list based on status
+            if (data['new']['status'][i] == '100') {
+              _FEED_.finFeeds[0].unshift(data['new']['id'][i]);
+              _FEED_.finFeeds[1].unshift(data['new']['content'][i]);
+            } else {
+              _FEED_.runFeeds[0].unshift(data['new']['id'][i]);
+              _FEED_.runFeeds[1].unshift(data['new']['content'][i]);
             }
-            _current_feed.find('.feed_status').html('Status: ' + _status_text);
           }
+          i--;
         }
       }
-      // update UPDATE button
-      $newFeeds = /* _FEED_.favFeeds[0].length + */_FEED_.finFeeds[0].length
-          + _FEED_.runFeeds[0].length;
+      var $newFeeds = _FEED_.finFeeds[0].length + _FEED_.runFeeds[0].length;
       if ($newFeeds > 0) {
         jQuery('.feed_update').html(
             '<b>' + $newFeeds + ' </b>More feeds available');
@@ -339,10 +296,8 @@ _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
       'click',
       function() {
-        
         // hide the placeholder
         jQuery('.feed_empty').hide();
-        
         window.scrollTo(0, 0);
         // update FINISHED feeds
         jQuery(_FEED_.finFeeds[1].join("")).hide().prependTo('.feed_fin')
@@ -388,9 +343,9 @@ _FEED_.createFeedDetails = function() {
 jQuery(document).ready(function() {
   // feed functions
   // finished feeds
-  _FEED_.finFeeds = [[],[]];
+  _FEED_.finFeeds = [ [], [] ];
   // running feeds
-  _FEED_.runFeeds = [[],[]];
+  _FEED_.runFeeds = [ [], [] ];
   // on click callbacks
   _FEED_.feed_onclick();
   _FEED_.feed_favorite_onclick();
@@ -403,10 +358,8 @@ jQuery(document).ready(function() {
   _FEED_.updateFeedTimeout();
   _FEED_.updateTime();
   _FEED_.activateDraggableIcons();
-  
   // show placeholder when there are no feeds
   if (jQuery('#feed_count').html() == "0") {
     jQuery('.feed_empty').show();
   }
-  
 });
