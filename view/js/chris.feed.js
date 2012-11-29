@@ -185,8 +185,8 @@ _FEED_.ajaxUpdate = function() {
             // and if not favorite
             // update its status to 100%
             element.attr('data-chris-feed_status', '100');
-            element.find('.feed_status').html('Status: <font color=green>Done</font>');
-            
+            element.find('.feed_status').html(
+                'Status: <font color=green>Done</font>');
           } else {
             element.hide('blind', 'slow');
             // hide element to relevant list based on status
@@ -197,6 +197,22 @@ _FEED_.ajaxUpdate = function() {
               _FEED_.runFeeds[0].unshift(data['new']['id'][i]);
               _FEED_.runFeeds[1].unshift(data['new']['content'][i]);
             }
+          }
+          i--;
+        }
+      }
+      // update RUNNING feeds
+      // issue: doesnt update feed is not visible
+      var length_done = data['running']['id'].length;
+      if (length_done > 0) {
+        var i = length_done - 1;
+        while (i >= 0) {
+          var element = jQuery('div[data-chris-feed_id=' + data['running']['id'][i]
+              + ']');
+          // hide element if exists
+          if (element.length) {
+            element.find('.feed_status').html(
+                'Status: <font color=red>Running ('+data['running']['content'][i]+'%)</font>');
           }
           i--;
         }

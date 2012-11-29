@@ -76,7 +76,7 @@ class FeedV implements ObjectViewInterface {
     }
 
     // create the status text
-    $status_text = '<font color=red>Running</font>';
+    $status_text = '<font color=red>Running ('.$object->status.'%)</font>';
     if ($object->status == 100) {
       $status_text = '<font color=green>Done</font>';
     }
