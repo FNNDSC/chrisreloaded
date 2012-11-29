@@ -194,5 +194,12 @@ $fh = fopen($logFile, 'a')  or die("can't open file");
 fwrite($fh, $finishLog);
 fclose($fh);
 
+// update feed status in db
+$feedMapper = new Mapper('Feed');
+$feedMapper->filter('id = (?)',$feed_id);
+$feedResult = $feedMapper->get();
+$feedResult['Feed'][0]->status = 99;
+Mapper::update($feedResult['Feed'][0],  $feedResult['Feed'][0]->id);
+
 exit(0);
 ?>
