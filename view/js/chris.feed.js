@@ -314,7 +314,7 @@ _FEED_.update_onclick = function() {
       function() {
         // hide the placeholder
         jQuery('.feed_empty').hide();
-        window.scrollTo(0, 0);
+        jQuery('.feed_content').scrollTop();
         // update FINISHED feeds
         jQuery(_FEED_.finFeeds[1].join("")).hide().prependTo('.feed_fin')
             .slideDown("slow", function() { // Animation complete.
