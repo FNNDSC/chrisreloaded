@@ -99,7 +99,7 @@ jQuery(document).ready(function() {
   });
   
   // activate polling of new statistics
-  setInterval(_CHRIS_.updateStatistics, 1000);
+  //setInterval(_CHRIS_.updateStatistics, 1000);
   
   
 });
