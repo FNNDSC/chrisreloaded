@@ -37,7 +37,6 @@ class Plugin( argparse.ArgumentParser ):
   INTEGER = 'integer'
   BOOLEAN = 'boolean'
   STRING = 'string'
-  TEXTAREA = 'textarea'
 
   def __init__( self ):
     '''
@@ -112,8 +111,13 @@ class Plugin( argparse.ArgumentParser ):
         xml += tag
         xml += '<label>' + parameter[0] + '</label>'
         xml += '<longflag>' + parameter[2] + '</longflag>'
+
         if parameter[3]:
           xml += '<default>' + str( parameter[3] ) + '</default>'
+        elif p_type == self.STRING:
+          # we need a default for strings
+          xml += '<default>_CHRIS_DEFAULT</default>'
+
         if parameter[4]:
           xml += '<description>' + str( parameter[4] ) + '</description>'
         xml += end_tag

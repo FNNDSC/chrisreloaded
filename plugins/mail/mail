@@ -65,5 +65,5 @@ if __name__ == "__main__":
   plugin.add_parameter( 'To', Plugin.STRING, '--to', action='store', dest='To', help='recipient' )
   plugin.add_parameter( 'From', Plugin.STRING, '--from', action='store', dest='From', help='sender', default=_str_sender )
   plugin.add_parameter( 'Subject', Plugin.STRING, '--subj', action='store', dest='Subject', help='subject' )
-  plugin.add_parameter( 'Message', Plugin.TEXTAREA, '--msg', default='Email body', action='store', dest='Body', help='email body' )
+  plugin.add_parameter( 'Message', Plugin.STRING, '--msg', default='Email body', action='store', dest='Body', help='email body' )
   plugin.launch( sys.argv )
