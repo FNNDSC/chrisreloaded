@@ -47,5 +47,5 @@ class FileBrowser( Plugin ):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = FileBrowser()
-  plugin.add_parameter( 'Note', Plugin.TEXTAREA, '--textBox', default='Enter some html here.', action='store', dest='noteHtml', help='add some html notes' )
+  plugin.add_parameter( 'Note', Plugin.STRING, '--textBox', default='Enter some html here.', action='store', dest='noteHtml', help='add some html notes' )
   plugin.launch( sys.argv )

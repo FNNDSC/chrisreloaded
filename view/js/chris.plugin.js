@@ -211,6 +211,12 @@ jQuery(document).ready(
               _default_value = _checkbox.attr('data-default');
               _checkbox.prop('checked', (_default_value == 'true'));
               
+              // strings
+              var _string = jQuery(_parameter_rows[i]).find(
+              '.parameter_string');
+              _default_value = _string.attr('data-default');
+              _string.val(_default_value);
+              
             });
             
           });
@@ -324,14 +330,6 @@ jQuery(document).ready(
                 
                 _value = text_input.val();
                 
-              } else if (_type == 'textarea') {
-                  
-                  // text_input
-                  var text_input = jQuery(_parameter_rows[i]).find(
-                      '.parameter_textarea');
-                  
-                  _value = text_input.val();
-                  
               }
               
               // push the parameter
@@ -467,5 +465,24 @@ jQuery(document).ready(
         _accordion.multiAccordion('option', 'active', _activeTabs);
         
       });
+      
+      // replace the default values for string parameters
+      jQuery('.parameter_string').each(function(i,v) {
+        
+        if (jQuery(v).html() == '_CHRIS_DEFAULT') {
+          jQuery(v).html('');
+          jQuery(v).attr('data-default','')
+        }
+        
+      });
+      
+      // register keypress for string parameters
+      jQuery('.parameter_string').keypress(function(e) {
+        if (e.which == '13') {
+          // on return, adjust the size
+          jQuery(this).css('height', parseInt(jQuery(this).css('height'),10)+parseInt(jQuery(this).css('line-height'),10));
+        }
+      })
+      
       
     });

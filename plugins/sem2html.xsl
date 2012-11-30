@@ -128,27 +128,8 @@
       </span>
       <span class='parameter_input' data-type='string'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
-        <input type='text' class='parameter_string' style='height:12px;line-height:10px;margin-bottom:0px;'>  
-          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
-          <xsl:attribute name="value"><xsl:value-of select="default"/></xsl:attribute>
-        </input>
-      </span>
-    </div>
-  </xsl:template>
-
-  <!-- TEXTAREA parameter -->
-<!--   NB! The textarea box *must* have a 'defaut="xxx"' kwarg in the plugin init -->
-  <xsl:template match="textarea">
-    <div rel='left_tooltip' class='parameter_row'>
-      <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
-      <span class='parameter_title_cropped'>
-        <xsl:value-of select="label"/>
-      </span>
-      <span class='parameter_input' data-type='textarea'>
-        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
-        <textarea class='parameter_textarea' cols="45" rows="10" style='width:180px'>  
-          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
-          <xsl:attribute name="value"><xsl:value-of select="default"/></xsl:attribute>
+        <textarea class='parameter_string'>
+          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>       
           <xsl:value-of select="default"/>
         </textarea>
       </span>
