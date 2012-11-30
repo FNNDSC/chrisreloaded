@@ -155,10 +155,12 @@ _FEED_.ajaxUpdate = function() {
   // ajax call
   jQuery.ajax({
     type : "POST",
-    url : "api.php?action=get&what=feed_updates",
+    url : "api.php?action=get&what=feed_updates&parameters[]=" + _FEED_.newest,
     dataType : "json",
     success : function(data) {
       data = data['result'];
+      // update newest feed
+      _FEED_.newest = data['feed_new'];
       // update FINISHED feeds
       var length_done = data['new']['id'].length;
       if (length_done > 0) {
@@ -207,12 +209,13 @@ _FEED_.ajaxUpdate = function() {
       if (length_done > 0) {
         var i = length_done - 1;
         while (i >= 0) {
-          var element = jQuery('div[data-chris-feed_id=' + data['running']['id'][i]
-              + ']');
+          var element = jQuery('div[data-chris-feed_id='
+              + data['running']['id'][i] + ']');
           // hide element if exists
           if (element.length) {
             element.find('.feed_status').html(
-                'Status: <font color=red>Running ('+data['running']['content'][i]+'%)</font>');
+                'Status: <font color=red>Running ('
+                    + data['running']['content'][i] + '%)</font>');
           }
           i--;
         }
@@ -378,4 +381,7 @@ jQuery(document).ready(function() {
   if (jQuery('#feed_count').html() == "0") {
     jQuery('.feed_empty').show();
   }
+  // get newest feed value
+  // first run or first finished
+  _FEED_.newest = '0000.00';
 });
