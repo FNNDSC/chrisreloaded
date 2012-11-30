@@ -48,9 +48,10 @@ _CHRIS_.scalePanels = function() {
   // configure screen size related parameters
   var _pluginpanelsize = jQuery(window).height()-500;
   var _opaquesize = jQuery(window).height()-95;
+  var _feedcontentsize = jQuery(window).height()-139;
   jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
   jQuery('#opaqueoverlay').css('min-height', _opaquesize);
-  
+  jQuery('.feed_content').css('max-height', _feedcontentsize);
 };
 
 jQuery(document).ready(function() {
