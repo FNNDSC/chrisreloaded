@@ -47,9 +47,24 @@ _CHRIS_.scalePanels = function() {
 
   // configure screen size related parameters
   var _pluginpanelsize = jQuery(window).height()-490;
-  var _feedcontentsize = jQuery(window).height()-129;
+  var _feedcontentsize = jQuery(window).height()-129;  
+  
+  if (jQuery(window).height() <= 600) {
+    // hide the statistics panel
+    jQuery('#information').hide();
+    _pluginpanelsize += 173;
+  } else {
+    // show it
+    jQuery('#information').show();
+  }
+  
+  jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
+  jQuery('.plugin_panel').css('height', _pluginpanelsize);
   jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
+  jQuery('.feed_content').css('min-height', _feedcontentsize);
+  jQuery('.feed_content').css('height', _feedcontentsize);
   jQuery('.feed_content').css('max-height', _feedcontentsize);
+  
 };
 
 jQuery(document).ready(function() {
