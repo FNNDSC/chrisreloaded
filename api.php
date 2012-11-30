@@ -50,6 +50,7 @@ $result = array(
     'action' => null,
     'what' => null,
     'id' => null,
+    'parameters' => null,
     'result' => null);
 
 // TODO here the session has to be verified, actually this should happen in _session.inc.php
@@ -91,6 +92,14 @@ if (!isset($_SESSION['username'])) {
   } else {
     $id = '*';
   }
+  
+  if (isset($_GET['parameters'])){
+    $parameters = $_GET['parameters'];
+  } else if (isset($_POST['parameters'])) {
+    $parameters = $_POST['parameters'];
+  } else {
+    $parameters = Array();
+  }
 
   // validate inputs, we need at least action + what
   if ($action != 'ping' && $action != 'help' && $what == 'dont_know') {
@@ -121,7 +130,7 @@ if (!isset($_SESSION['username'])) {
         break;
       case "get":
         if ($what == 'feed_updates') {
-          $result['result'] = FeedC::updateClient();
+          $result['result'] = FeedC::updateClient($_SESSION['userid'], $parameters[0]);
         }
         break;
       case "help":

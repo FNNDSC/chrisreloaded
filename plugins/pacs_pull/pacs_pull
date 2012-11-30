@@ -64,7 +64,7 @@ class PACS_Pull(Plugin):
     # process
     print '======================================='
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
-    pro_command = current_dir + "/process.php -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
+    pro_command = current_dir + "/process.php -m " + options.MRN + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
     print 'command:'
     print pro_command
     pro_output = os.system(pro_command)

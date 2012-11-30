@@ -155,10 +155,12 @@ _FEED_.ajaxUpdate = function() {
   // ajax call
   jQuery.ajax({
     type : "POST",
-    url : "api.php?action=get&what=feed_updates",
+    url : "api.php?action=get&what=feed_updates&parameters[]=" + _FEED_.newest,
     dataType : "json",
     success : function(data) {
       data = data['result'];
+      // update newest feed
+      _FEED_.newest = data['feed_new'];
       // update FINISHED feeds
       var length_done = data['new']['id'].length;
       if (length_done > 0) {
@@ -207,12 +209,13 @@ _FEED_.ajaxUpdate = function() {
       if (length_done > 0) {
         var i = length_done - 1;
         while (i >= 0) {
-          var element = jQuery('div[data-chris-feed_id=' + data['running']['id'][i]
-              + ']');
+          var element = jQuery('div[data-chris-feed_id='
+              + data['running']['id'][i] + ']');
           // hide element if exists
           if (element.length) {
             element.find('.feed_status').html(
-                'Status: <font color=red>Running ('+data['running']['content'][i]+'%)</font>');
+                'Status: <font color=red>Running ('
+                    + data['running']['content'][i] + '%)</font>');
           }
           i--;
         }
@@ -235,9 +238,7 @@ _FEED_.updateTime = function() {
   var d = h * 24;
   jQuery('div[data-chris-feed_time]').each(
       function() {
-        var dateArray = jQuery(this).attr('data-chris-feed_time').split('_');
-        var feedTime = new Date(dateArray[0], dateArray[1] - 1, dateArray[2],
-            dateArray[3], dateArray[4], dateArray[5]);
+        var feedTime = new Date(jQuery(this).attr('data-chris-feed_time') * 1000 );
         var diff = currentTime.getTime() - feedTime.getTime();
         var day = Math.floor(diff / d);
         if (day == 0) {
@@ -378,4 +379,21 @@ jQuery(document).ready(function() {
   if (jQuery('#feed_count').html() == "0") {
     jQuery('.feed_empty').show();
   }
+  // get newest feed value
+  // first run or first finished
+  _FEED_.newest = '9999999999.00';
+  var newest = '';
+  var elt = jQuery(".feed_run > .feed");
+  if (elt.length) {
+    newest = jQuery(elt[0]).attr('data-chris-feed_time');
+  }
+  // feed_fin
+  elt = jQuery(".feed_fin > .feed");
+  if (elt.length) {
+    if (jQuery(elt[0]).attr('data-chris-feed_time') > newest) {
+      newest = jQuery(elt[0]).attr('data-chris-feed_time');
+    }
+  }
+  // get first element
+  _FEED_.newest = newest;
 });

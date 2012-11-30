@@ -36,11 +36,12 @@ require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 // include chris data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 
 // include pacs helper
 require_once 'pacs.class.php';
 
-$shortopts = "m:s:p:a:o:";
+$shortopts = "m:s:p:a:o:f:";
 
 $options = getopt($shortopts);
 
@@ -49,6 +50,7 @@ $server = $options['s'];
 $port = $options['p'];
 $aetitle = $options['a'];
 $ouput_dir = $options['o'];
+$feed_chris_id = $options['f'];
 
 //
 // 1- CREATE PROCESS LOG FILE
@@ -115,6 +117,12 @@ $finishMoveLog .= date('Y-m-d h:i:s'). ' ---> Finish moving all studies...'.PHP_
 $fh = fopen($logFile, 'a')  or die("can't open file");
 fwrite($fh, $finishMoveLog);
 fclose($fh);
+
+$feedMapper = new Mapper('Feed');
+$feedMapper->filter('id = (?)',$feed_chris_id);
+$feedResult = $feedMapper->get();
+$feedResult['Feed'][0]->status = 66;
+Mapper::update($feedResult['Feed'][0],  $feedResult['Feed'][0]->id);
 
 exit(0);
 

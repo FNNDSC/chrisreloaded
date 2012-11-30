@@ -46,6 +46,8 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
 // include chris user_data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
+
 // include pacs helper
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
@@ -311,6 +313,13 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
 $fh = fopen($logFile, 'a')  or die("can't open file");
 fwrite($fh, $addDataLog);
 fclose($fh);
+
+// update feed status in db
+$feedMapper = new Mapper('Feed');
+$feedMapper->filter('id = (?)',$feed_chris_id);
+$feedResult = $feedMapper->get();
+$feedResult['Feed'][0]->status = 33;
+Mapper::update($feedResult['Feed'][0],  $feedResult['Feed'][0]->id);
 
 exit(0);
 ?>
