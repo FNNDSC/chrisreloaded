@@ -69,8 +69,8 @@
       <xsl:otherwise>
         <!-- INPUT CHANNEL -->
         <div rel='left_tooltip' class='parameter_row'>
-          <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
-          <span class='parameter_title_cropped'>
+          <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>   
+          <span class='parameter_title' style='width:65px'>
             <xsl:value-of select="label"/>
           </span>
           <span class='parameter_input parameter_dropzone' data-type='dropzone' data-default='Drag and drop here'>
@@ -123,7 +123,7 @@
   <xsl:template match="string">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
-      <span class='parameter_title_cropped'>
+      <span class='parameter_title' style='width:65px;'>
         <xsl:value-of select="label"/>
       </span>
       <span class='parameter_input' data-type='string'>
