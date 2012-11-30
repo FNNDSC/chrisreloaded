@@ -43,7 +43,22 @@ _CHRIS_.updateStatistics = function() {
   
 }
 
+_CHRIS_.scalePanels = function() {
+
+  // configure screen size related parameters
+  var _pluginpanelsize = jQuery(window).height()-500;
+  var _opaquesize = jQuery(window).height()-95;
+  jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
+  jQuery('#opaqueoverlay').css('min-height', _opaquesize);
+  
+};
+
 jQuery(document).ready(function() {
+  
+  // watch for the resize event
+  jQuery(window).resize(function() {_CHRIS_.scalePanels()});
+  // also call it once
+  _CHRIS_.scalePanels();
   
   jQuery('.dropdown-toggle').dropdown();
   jQuery("[rel=bottom_tooltip]").tooltip({

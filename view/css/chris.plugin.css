@@ -104,6 +104,8 @@
 
 .plugin_panel {
 	padding: 10px;
+	overflow-y: scroll;
+	max-height: 290px;
 }
 
 .panel_title {
@@ -114,28 +116,18 @@
 	
 }
 
-.parameter_title_cropped {
-	width: 80px;
-	position: absolute;
-	overflow: hidden;
-	font-weight: bold;
-	white-space: nowrap;
-}
-
-.parameter_title_cropped:hover {
-	overflow: visible;
-	background-color: whiteSmoke;
-	color: blue;
-	z-index: 3000;
-}
-
 .parameter_title {
-	position: absolute;
+	width: 165px;
+	overflow: hidden;
+	float: left;
+	text-overflow: ellipsis;
 	font-weight: bold;
 	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .parameter_title:hover {
+	overflow: visible;
 	background-color: whiteSmoke;
 	color: blue;
 	z-index: 3000;
@@ -159,10 +151,10 @@
 	overflow-x: hidden;
 	padding-left: 3px;
 	font-size: 10px;
+	text-overflow: ellipsis;
 }
 
-.parameter_input {
-	margin-left: 80px;
+.parameter_input { /* 	margin-left: 80px; */
 	float: right;
 }
 
