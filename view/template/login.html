@@ -6,43 +6,46 @@
 
 <body style='overflow: hidden;'>
 
-	<div class="navbar navbar-fixed-top navbar-inverse">
-		<div class="navbar-inner">
-			<div class="container">
-				<img src="view/gfx/bch_logo.png" style="margin-top: 4px">
-			</div>
-		</div>
-	</div>
-	<div class="container" style="margin-top: 200px;">
-		<div class="row">
-			<div class="span8">
-				<div class="well-large"
-					style="height: 348px; background: url('view/gfx/spoiler3.png'); background-repeat: no-repeat; background-color: #000"></div>
-			</div>
-			<div class="span4">
-				<form class="well-large" style="background-color: #000"
-					action="?" method='POST'>
-					<input type="text" class="span3" name='username' placeholder="Username"><input
-						type="password" class="span2" name='password' placeholder="Password">
-					<button type="submit" class="btn btn-warning"
-						style="margin-bottom: 8px; margin-left: 12px;">Sign in</button>
-				</form>
-				<form class="well-large" style="background-color: #000">
-					<img src="view/gfx/slicedrop_transparent.png"><br> <br>
-					<span style="color: white;">Instantly view medical imaging
-						data in 3D.<br>Drop files here or <a
-						class="btn btn-primary btn-mini">Select files</a>
-					</span>
-				</form>
-				<form class="well-large"
-					style="background-color: #000;">
-					<a href="mailto:dev@babymri.org">Request access ?</a>
-				</form>
-			</div>
-		</div>
-	</div>
-
-	${FOOTER} ${JAVASCRIPT_LIBS}
-<script type="text/javascript" src="view/js/chris.login.js"></script>
+ <div class="navbar navbar-fixed-top navbar-inverse">
+  <div class="navbar-inner">
+   <div class="container">
+    <img src="view/gfx/bch_logo.png" style="margin-top: 4px">
+   </div>
+  </div>
+ </div>
+ <div class="container" style="margin-top: 200px;">
+  <div class="row">
+   <div class="span8">
+    <div class="well-large"
+     style="height: 348px; background: url('view/gfx/spoiler3.png'); background-repeat: no-repeat; background-color: #000"></div>
+   </div>
+   <div class="span4">
+    <form class="well-large" style="background-color: #000" action="?"
+     method='POST'>
+     <input type="text" class="span3" name='username'
+      placeholder="Username"><input type="password"
+      class="span2" name='password' placeholder="Password">
+     <button type="submit" class="btn btn-warning"
+      style="margin-bottom: 8px; margin-left: 12px;">Sign in</button>
+    </form>
+    <form class="well-large" style="background-color: #000">
+     <img src="view/gfx/slicedrop_transparent.png"><br> <br>
+     <span style="color: white;">Instantly view medical imaging
+      data in 3D.<br>Drop files here or <a
+      class="btn btn-primary btn-mini">Select files</a>
+     </span>
+    </form>
+    <form class="well-large" style="background-color: #000;">
+     <a href="mailto:dev@babymri.org">Request access ?</a>
+    </form>
+   </div>\
+   <div class="container"
+    style="margin-bottom: 0px; font-size: 0.8em; margin-left: 180px;">&copy;
+    Fetal-Neonatal Neuroimaging & Developmental Science Center, Boston
+    Children's Hospital 2012</div>
+  </div>
+ </div>
+ ${JAVASCRIPT_LIBS}
+ <script type="text/javascript" src="view/js/chris.login.js"></script>
 </body>
 </html>
