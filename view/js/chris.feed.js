@@ -236,23 +236,22 @@ _FEED_.updateTime = function() {
   var m = 60 * 1000;
   var h = m * 60;
   var d = h * 24;
-  jQuery('div[data-chris-feed_time]').each(
-      function() {
-        var feedTime = new Date(jQuery(this).attr('data-chris-feed_time') * 1000 );
-        var diff = currentTime.getTime() - feedTime.getTime();
-        var day = Math.floor(diff / d);
-        if (day == 0) {
-          var hour = Math.floor((diff % d) / h);
-          if (hour == 0) {
-            var min = Math.floor(((diff % d) % h) / m);
-            jQuery(this).find('.feed_time').html(min + ' minutes ago');
-          } else {
-            jQuery(this).find('.feed_time').html(hour + ' hours ago');
-          }
-        } else {
-          jQuery(this).find('.feed_time').html(day + ' days ago');
-        }
-      });
+  jQuery('div[data-chris-feed_time]').each(function() {
+    var feedTime = new Date(jQuery(this).attr('data-chris-feed_time') * 1000);
+    var diff = currentTime.getTime() - feedTime.getTime();
+    var day = Math.floor(diff / d);
+    if (day == 0) {
+      var hour = Math.floor((diff % d) / h);
+      if (hour == 0) {
+        var min = Math.floor(((diff % d) % h) / m);
+        jQuery(this).find('.feed_time').html(min + ' minutes ago');
+      } else {
+        jQuery(this).find('.feed_time').html(hour + ' hours ago');
+      }
+    } else {
+      jQuery(this).find('.feed_time').html(day + ' days ago');
+    }
+  });
 }
 _FEED_.feed_favorite_onclick = function() {
   jQuery(document).on(
@@ -358,6 +357,23 @@ _FEED_.createFeedDetails = function() {
  * Setup the javascript when document is ready (finshed loading)
  */
 jQuery(document).ready(function() {
+  // get newest feed value
+  // first run or first finished
+  _FEED_.newest = '9999999999.00';
+  var newest = '';
+  var elt = jQuery(".feed_run > .feed");
+  if (elt.length) {
+    newest = jQuery(elt[0]).attr('data-chris-feed_time');
+  }
+  // feed_fin
+  elt = jQuery(".feed_fin > .feed");
+  if (elt.length) {
+    if (jQuery(elt[0]).attr('data-chris-feed_time') > newest) {
+      newest = jQuery(elt[0]).attr('data-chris-feed_time');
+    }
+  }
+  // get first element
+  _FEED_.newest = newest;
   // feed functions
   // finished feeds
   _FEED_.finFeeds = [ [], [] ];
@@ -379,21 +395,4 @@ jQuery(document).ready(function() {
   if (jQuery('#feed_count').html() == "0") {
     jQuery('.feed_empty').show();
   }
-  // get newest feed value
-  // first run or first finished
-  _FEED_.newest = '9999999999.00';
-  var newest = '';
-  var elt = jQuery(".feed_run > .feed");
-  if (elt.length) {
-    newest = jQuery(elt[0]).attr('data-chris-feed_time');
-  }
-  // feed_fin
-  elt = jQuery(".feed_fin > .feed");
-  if (elt.length) {
-    if (jQuery(elt[0]).attr('data-chris-feed_time') > newest) {
-      newest = jQuery(elt[0]).attr('data-chris-feed_time');
-    }
-  }
-  // get first element
-  _FEED_.newest = newest;
 });
