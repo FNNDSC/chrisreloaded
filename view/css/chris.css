@@ -1,11 +1,11 @@
-body,html {
-/* 	background: url( */
-/* 	 '../gfx/background1.jpg'); */
-/* 	background-repeat: no-repeat; */
-/* 	background-size: 100% 100%; */
-/* 	background-attachment: fixed; */
+body,html { /* 	background: url( */
+	/* 	 '../gfx/background1.jpg'); */
+	/* 	background-repeat: no-repeat; */
+	/* 	background-size: 100% 100%; */
+	/* 	background-attachment: fixed; */
 	height: 100%;
 	font-size: 12px;
+	overflow: hidden !important;
 }
 
 .navbar-fixed-top,.navbar-fixed-bottom {
@@ -30,24 +30,39 @@ body,html {
 }
 
 .tooltip.left .tooltip-arrow {
-  border-left: 5px solid black;
+	border-left: 5px solid black;
 }
 
-@-moz-keyframes rotate {
-	from { -moz-transform:rotate(0deg); }
-	to { -moz-transform: rotate(360deg); }
+@
+-moz-keyframes rotate {from { -moz-transform:rotate(0deg);
+	
 }
 
-@-webkit-keyframes rotate {
-	from { -webkit-transform:rotate(0deg); }
-  to { -webkit-transform: rotate(360deg); }
+to {
+	-moz-transform: rotate(360deg);
 }
 
-@-ms-keyframes rotate {
-	from { -ms-transform:rotate(0deg); }
-  to { -ms-transform: rotate(360deg); }
+}
+@
+-webkit-keyframes rotate {from { -webkit-transform:rotate(0deg);
+	
 }
 
+to {
+	-webkit-transform: rotate(360deg);
+}
+
+}
+@
+-ms-keyframes rotate {from { -ms-transform:rotate(0deg);
+	
+}
+
+to {
+	-ms-transform: rotate(360deg);
+}
+
+}
 .rotating_class {
 	-moz-animation-name: rotate;
 	-moz-animation-duration: 0.5s;
@@ -63,7 +78,7 @@ body,html {
 	-ms-animation-timing-function: linear;
 }
 
-select, textarea, .btn {
+select,textarea,.btn {
 	font-size: 12px;
 }
 
