@@ -396,5 +396,4 @@ jQuery(document).ready(function() {
   }
   // get first element
   _FEED_.newest = newest;
-  window.console.log(_FEED_.newest);
 });
