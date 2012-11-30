@@ -45,9 +45,9 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 interface FeedControllerInterface
 {
   // get HTML representation of the nth last feeds
-  static public function getHTML($nb_feeds);
+  static public function getHTML($user_id, $nb_feeds);
   // probe database to return new feeds to the client
-  static public function updateClient();
+  static public function updateClient($user_id, $feed_new);
   // create a feed given a user id, an action and the related details
   static public function create($user, $plugin, $name);
   // return the number of feeds for a user
@@ -66,13 +66,21 @@ class FeedC implements FeedControllerInterface {
    * @param int $nb_feeds number of html feeds to be returned
    * @return string
    */
-  static public function getHTML($type, $nb_feeds = -1){
+  static public function getAllHTML($user_id){
+    $t = new Template('feed_all.html');
+    $t -> replace('FEED_FAV', FeedC::getHTML($user_id, 'favorites'));
+    $t -> replace('FEED_RUN', FeedC::getHTML($user_id, 'running'));
+    $t -> replace('FEED_FIN', FeedC::getHTML($user_id, 'finished', 20));
+    return $t;
+  }
+
+  static public function getHTML($user_id, $type, $nb_feeds = -1){
     $feed_content = '';
 
     // get feeds objects ordered by creation time
     $feedMapper = new Mapper('Feed');
-    if($_SESSION['userid']){
-      $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
+    if($user_id){
+      $feedMapper->filter('user_id = (?)', $user_id);
     }
     // different conditions depending on filter type
     switch ($type){
@@ -94,10 +102,6 @@ class FeedC implements FeedControllerInterface {
 
     // if some feeds are available, loop through them
     if(count($feedResult['Feed']) >= 1){
-      if($feedResult['Feed'][0]->time > $_SESSION['feed_new']){
-        $_SESSION['feed_new'] = $feedResult['Feed'][0]->time;
-      }
-
       // get html for the last $nb_feeds
       $i = 0;
       foreach ($feedResult['Feed'] as $key => $value) {
@@ -109,11 +113,6 @@ class FeedC implements FeedControllerInterface {
         if($type != "favorites"){
           if($value->favorite == 0){
             $feed_content .= FeedV::getHTML($value);
-            if($type == "finished"){
-              if($value->time < $_SESSION['feed_old']){
-                $_SESSION['feed_old'] = $value->time;
-              }
-            }
           }
         }
         else{
@@ -137,7 +136,7 @@ class FeedC implements FeedControllerInterface {
    * to be updated.
    * @todo update to support "result" feed, need a "type subarray in progress"
    */
-  static public function updateClient(){
+  static public function updateClient($user_id, $feed_new){
     $feed_update = Array();
     $feed_update['new'] = Array();
     $feed_update['new']['id'] = Array();
@@ -146,12 +145,11 @@ class FeedC implements FeedControllerInterface {
 
     // get new time stamps
     // get full html
-    $feed_new = $_SESSION['feed_new'];
     $new_ids = Array();
 
     $feedMapper = new Mapper('Feed');
-    if($_SESSION['userid']){
-      $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
+    if($user_id){
+      $feedMapper->filter('user_id = (?)', $user_id);
     }
     $feedMapper->filter('time > (?)',$feed_new);
     $feedMapper->order('time');
@@ -161,7 +159,7 @@ class FeedC implements FeedControllerInterface {
       // store latest feed updated at this point
       $old_time = $feed_new;
       // store latest feed updated after this function returns
-      $_SESSION['feed_new'] = $feedResult['Feed'][0]->time;
+      $feed_new = $feedResult['Feed'][0]->time;
       // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
         if($value->time <= $old_time){
@@ -181,8 +179,8 @@ class FeedC implements FeedControllerInterface {
     $feed_update['running']['content'] = Array();
 
     $feedMapper = new Mapper('Feed');
-    if($_SESSION['userid']){
-      $feedMapper->filter('user_id = (?)', $_SESSION['userid']);
+    if($user_id){
+      $feedMapper->filter('user_id = (?)', $user_id);
     }
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
@@ -199,6 +197,8 @@ class FeedC implements FeedControllerInterface {
         }
       }
     }
+
+    $feed_update['feed_new'] = $feed_new;
 
     return $feed_update;
   }
