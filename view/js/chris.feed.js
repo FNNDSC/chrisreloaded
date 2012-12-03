@@ -334,6 +334,38 @@ _FEED_.update_onclick = function() {
         _FEED_.activateDraggableIcons();
       });
 }
+_FEED_.scrollBottom = function() {
+  jQuery('.feed_content').scroll(
+      function() {
+        if ($(this)[0].scrollHeight - $(this).scrollTop() <= $(this).height()) {
+          // ajax call
+          jQuery.ajax({
+            type : "POST",
+            url : "api.php?action=get&what=feed_previous&parameters[]="
+                + _FEED_.oldest,
+            dataType : "json",
+            success : function(data) {
+              data = data['result'];
+              // update oldest feed
+              _FEED_.oldest = data['feed_old'];
+              old_Feeds = '';
+              var length_done = data['content'].length;
+              if (length_done > 0) {
+                var i = 0;
+                while (i <= length_done - 1) {
+                  // if id in new delete it!
+                  old_Feeds += data['content'][i];
+                  i++;
+                }
+              }
+              jQuery('.feed_fin').append(old_Feeds);
+              _FEED_.updateTime();
+              jQuery('.feed_content').bind('scroll');
+            }
+          });
+        }
+      });
+}
 _FEED_.activateDraggable = function() {
   // setup draggable items for all file browser elements
   jQuery(".jqueryFileTree li a").draggable({
@@ -357,13 +389,17 @@ _FEED_.createFeedDetails = function() {
  * Setup the javascript when document is ready (finshed loading)
  */
 jQuery(document).ready(function() {
-  // get newest feed value
-  // first run or first finished
+  // get oldest and newest feed value
+  _FEED_.oldest = '00.00';
   _FEED_.newest = '9999999999.00';
+  // first run or first finished
   var newest = '';
+  var oldest = '';
+  //
   var elt = jQuery(".feed_run > .feed");
   if (elt.length) {
     newest = jQuery(elt[0]).attr('data-chris-feed_time');
+    oldest = jQuery(elt[elt.length - 1]).attr('data-chris-feed_time');
   }
   // feed_fin
   elt = jQuery(".feed_fin > .feed");
@@ -371,8 +407,12 @@ jQuery(document).ready(function() {
     if (jQuery(elt[0]).attr('data-chris-feed_time') > newest) {
       newest = jQuery(elt[0]).attr('data-chris-feed_time');
     }
+    if (jQuery(elt[elt.length - 1]).attr('data-chris-feed_time') > oldest) {
+      oldest = jQuery(elt[elt.length - 1]).attr('data-chris-feed_time');
+    }
   }
   // get first element
+  _FEED_.oldest = oldest;
   _FEED_.newest = newest;
   // feed functions
   // finished feeds
@@ -395,4 +435,5 @@ jQuery(document).ready(function() {
   if (jQuery('#feed_count').html() == "0") {
     jQuery('.feed_empty').show();
   }
+  _FEED_.scrollBottom();
 });

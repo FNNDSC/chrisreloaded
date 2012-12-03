@@ -203,6 +203,42 @@ class FeedC implements FeedControllerInterface {
     return $feed_update;
   }
 
+  static public function scrollClient($user_id, $feed_old, $nb_feeds = -1){
+    $feed_update = Array();
+    $feed_update['content'] = Array();
+
+    // get new time stamps
+    // get full html
+    $count = 0;
+
+    $feedMapper = new Mapper('Feed');
+    if($user_id){
+      $feedMapper->filter('user_id = (?)', $user_id);
+    }
+    $feedMapper->filter('time < (?)',$feed_old);
+    $feedMapper->order('time');
+    $feedResult = $feedMapper->get();
+
+    if(count($feedResult['Feed']) >= 1){
+      // get all feeds which have been created since last upload
+      foreach ($feedResult['Feed'] as $key => $value) {
+        if($nb_feeds >= 0 && $count >= $nb_feeds){
+          break;
+        }
+        $feed_update['content'][] = (string)FeedV::getHTML($value);
+
+        // store latest feed updated after this function returns
+        $feed_old = $value->time;
+
+        $count++;
+      }
+    }
+
+    $feed_update['feed_old'] = $feed_old;
+
+    return $feed_update;
+  }
+
 
   /**
    * Create a feed given a user id, an action and the related details

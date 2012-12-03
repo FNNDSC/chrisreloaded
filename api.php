@@ -131,6 +131,8 @@ if (!isset($_SESSION['username'])) {
       case "get":
         if ($what == 'feed_updates') {
           $result['result'] = FeedC::updateClient($_SESSION['userid'], $parameters[0]);
+        } else if($what == 'feed_previous'){
+          $result['result'] = FeedC::scrollClient($_SESSION['userid'], $parameters[0], 5);
         }
         break;
       case "help":
