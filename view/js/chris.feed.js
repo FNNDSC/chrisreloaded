@@ -273,7 +273,6 @@ _FEED_.feed_favorite_onclick = function() {
           url : "api.php?action=set&what=feed_favorite&id=" + $feedID,
           dataType : "json",
           success : function(data) {
-            // window.console.log(data);
             if (data['result'] == "1") {
               jQuery($feedElt).hide(
                   'blind',
