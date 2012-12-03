@@ -238,6 +238,29 @@ class FeedC implements FeedControllerInterface {
 
     return $feed_update;
   }
+  
+  static public function searchClient($user_id, $pattern){
+    $feed_update = Array();
+    $feed_update['content'] = Array();
+  
+    $feedMapper = new Mapper('Feed');
+    $feedMapper->filter('', '', 0, 'AND');
+    $feedMapper->filter('user_id = (?)', $user_id, 1);
+    $feedMapper->filter('plugin LIKE CONCAT("%",?,"%")', $pattern, 2, 'OR');
+    $feedMapper->filter('name LIKE CONCAT("%",?,"%")', $pattern, 2, 'OR');
+    $feedMapper->filter('status LIKE CONCAT("%",?,"%")', $pattern, 2, 'OR');
+    $feedMapper->order('time');
+    $feedResult = $feedMapper->get();
+  
+    if(count($feedResult['Feed']) >= 1){
+      // get all feeds which have been created since last upload
+      foreach ($feedResult['Feed'] as $key => $value) {
+        $feed_update['content'][] = (string)FeedV::getHTML($value);
+      }
+    }
+    
+    return $feed_update;
+  }
 
 
   /**

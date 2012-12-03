@@ -134,6 +134,9 @@ if (!isset($_SESSION['username'])) {
         } else if($what == 'feed_previous'){
           $result['result'] = FeedC::scrollClient($_SESSION['userid'], $parameters[0], 5);
         }
+        else if($what == 'feed_search'){
+          $result['result'] = FeedC::searchClient($_SESSION['userid'], $parameters[0]);
+        }
         break;
       case "help":
         $result['result'] = 'Perform actions on ChRIS.. Examples: COUNT: ?action=count&what=feed --- GET: ?action=get&what=feed&id=3 --- All parameters can be GET or POST.';
