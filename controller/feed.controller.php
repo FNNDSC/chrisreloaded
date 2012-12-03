@@ -238,27 +238,38 @@ class FeedC implements FeedControllerInterface {
 
     return $feed_update;
   }
-  
-  static public function searchClient($user_id, $pattern){
+
+  static public function searchClient($user_id, $searchString, $type="OR"){
     $feed_update = Array();
     $feed_update['content'] = Array();
-  
+
+    $pattern = explode(' ', $searchString);
+    $fields = Array();
+    $fields[] = 'plugin';
+    $fields[] = 'name';
+    $fields[] = 'status';
+
     $feedMapper = new Mapper('Feed');
-    $feedMapper->filter('', '', 0, 'AND');
-    $feedMapper->filter('user_id = (?)', $user_id, 1);
-    $feedMapper->filter('plugin LIKE CONCAT("%",?,"%")', $pattern, 2, 'OR');
-    $feedMapper->filter('name LIKE CONCAT("%",?,"%")', $pattern, 2, 'OR');
-    $feedMapper->filter('status LIKE CONCAT("%",?,"%")', $pattern, 2, 'OR');
-    $feedMapper->order('time');
+    $feedMapper->filter('', '', 0, $type);
+
+    $count = 1;
+    foreach($fields as $k0 => $v0){
+      foreach($pattern as $k1 =>$v1){
+        $feedMapper->filter('user_id = (?)', $user_id, $count);
+        $feedMapper->filter($v0.' LIKE CONCAT("%",?,"%")', $v1, $count);
+        $count++;
+      }
+    }
+    $feedMapper->order('plugin');
     $feedResult = $feedMapper->get();
-  
+
     if(count($feedResult['Feed']) >= 1){
       // get all feeds which have been created since last upload
       foreach ($feedResult['Feed'] as $key => $value) {
         $feed_update['content'][] = (string)FeedV::getHTML($value);
       }
     }
-    
+
     return $feed_update;
   }
 

@@ -384,7 +384,7 @@ _FEED_.search = function() {
           if (!jQuery('.feed_sea_check').attr('checked')) {
             jQuery('.feed_sea_check').click();
           }
-/*          // uncheck checkbox
+          // uncheck checkbox
           if (jQuery('.feed_fav_check').attr('checked')) {
             jQuery('.feed_fav_check').click();
           }
@@ -395,7 +395,7 @@ _FEED_.search = function() {
           // uncheck checkbox
           if (jQuery('.feed_fin_check').attr('checked')) {
             jQuery('.feed_fin_check').click();
-          }*/
+          }
           // ajax call
           jQuery.ajax({
             type : "POST",
@@ -415,7 +415,7 @@ _FEED_.search = function() {
                 }
               }
               jQuery('.feed_sea').html(old_Feeds);
-              //jQuery('.feed_sea').find('.feed').addClass('feed_search');
+              // jQuery('.feed_sea').find('.feed').addClass('feed_search');
               _FEED_.updateTime();
             }
           });
@@ -424,7 +424,7 @@ _FEED_.search = function() {
           if (jQuery('.feed_sea_check').attr('checked')) {
             jQuery('.feed_sea_check').click();
           }
-/*          if (!jQuery('.feed_fav_check').attr('checked')) {
+          if (!jQuery('.feed_fav_check').attr('checked')) {
             jQuery('.feed_fav_check').click();
           }
           if (!jQuery('.feed_run_check').attr('checked')) {
@@ -432,7 +432,7 @@ _FEED_.search = function() {
           }
           if (!jQuery('.feed_fin_check').attr('checked')) {
             jQuery('.feed_fin_check').click();
-          }*/
+          }
         }
       });
 }
