@@ -111,6 +111,12 @@ _FEED_.feed_fin_onclick = function() {
     _FEED_.onclick(advanced);
   });
 }
+_FEED_.feed_sea_onclick = function() {
+  jQuery(document).on('click', '.feed_sea_check', function() {
+    var advanced = jQuery(this).parents().eq(5).find('.feed_sea');
+    _FEED_.onclick(advanced);
+  });
+}
 _FEED_.feed_more_onclick = function() {
   jQuery(document).on('click', '.feed_more', function(e) {
     // modify
@@ -267,7 +273,6 @@ _FEED_.feed_favorite_onclick = function() {
           url : "api.php?action=set&what=feed_favorite&id=" + $feedID,
           dataType : "json",
           success : function(data) {
-            // window.console.log(data);
             if (data['result'] == "1") {
               jQuery($feedElt).hide(
                   'blind',
@@ -366,6 +371,70 @@ _FEED_.scrollBottom = function() {
         }
       });
 }
+_FEED_.search = function() {
+  jQuery('.feed_search_input').keyup(
+      function(event) {
+        if (event.which == 13) {
+          event.preventDefault();
+        }
+        // if value not empty, ajax call
+        if (jQuery(this).val() != '') {
+          // check checkbox
+          if (!jQuery('.feed_sea_check').attr('checked')) {
+            jQuery('.feed_sea_check').click();
+          }
+          // uncheck checkbox
+          if (jQuery('.feed_fav_check').attr('checked')) {
+            jQuery('.feed_fav_check').click();
+          }
+          // uncheck checkbox
+          if (jQuery('.feed_run_check').attr('checked')) {
+            jQuery('.feed_run_check').click();
+          }
+          // uncheck checkbox
+          if (jQuery('.feed_fin_check').attr('checked')) {
+            jQuery('.feed_fin_check').click();
+          }
+          // ajax call
+          jQuery.ajax({
+            type : "POST",
+            url : "api.php?action=get&what=feed_search&parameters[]="
+                + jQuery(this).val(),
+            dataType : "json",
+            success : function(data) {
+              data = data['result'];
+              old_Feeds = '';
+              var length_done = data['content'].length;
+              if (length_done > 0) {
+                var i = 0;
+                while (i <= length_done - 1) {
+                  // if id in new delete it!
+                  old_Feeds += data['content'][i];
+                  i++;
+                }
+              }
+              jQuery('.feed_sea').html(old_Feeds);
+              // jQuery('.feed_sea').find('.feed').addClass('feed_search');
+              _FEED_.updateTime();
+            }
+          });
+        } else {
+          // check checkbox
+          if (jQuery('.feed_sea_check').attr('checked')) {
+            jQuery('.feed_sea_check').click();
+          }
+          if (!jQuery('.feed_fav_check').attr('checked')) {
+            jQuery('.feed_fav_check').click();
+          }
+          if (!jQuery('.feed_run_check').attr('checked')) {
+            jQuery('.feed_run_check').click();
+          }
+          if (!jQuery('.feed_fin_check').attr('checked')) {
+            jQuery('.feed_fin_check').click();
+          }
+        }
+      });
+}
 _FEED_.activateDraggable = function() {
   // setup draggable items for all file browser elements
   jQuery(".jqueryFileTree li a").draggable({
@@ -426,6 +495,7 @@ jQuery(document).ready(function() {
   _FEED_.feed_fav_onclick();
   _FEED_.feed_run_onclick();
   _FEED_.feed_fin_onclick();
+  _FEED_.feed_sea_onclick();
   _FEED_.feed_more_onclick();
   _FEED_.update_onclick();
   _FEED_.updateFeedTimeout();
@@ -436,4 +506,5 @@ jQuery(document).ready(function() {
     jQuery('.feed_empty').show();
   }
   _FEED_.scrollBottom();
+  _FEED_.search();
 });
