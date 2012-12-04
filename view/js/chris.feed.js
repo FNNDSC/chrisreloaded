@@ -265,12 +265,12 @@ _FEED_.feed_favorite_onclick = function() {
       '.feed_favorite',
       function(e) {
         // get feed id
-        $feedElt = jQuery(this).parents().eq(2);
-        $feedID = $feedElt.attr('data-chris-feed_id');
+        var feedElt = jQuery(this).parents().eq(2);
+        var feedID = feedElt.attr('data-chris-feed_id');
         // api.php add to favorites
         jQuery.ajax({
           type : "POST",
-          url : "api.php?action=set&what=feed_favorite&id=" + $feedID,
+          url : "api.php?action=set&what=feed_favorite&id=" + feedID,
           dataType : "json",
           success : function(data) {
             if (data['result'] == "1") {
@@ -307,6 +307,42 @@ _FEED_.feed_favorite_onclick = function() {
                         });
               }
             }
+          }
+        });
+        // modify
+        e.stopPropagation();
+      });
+}
+_FEED_.feed_share_onclick = function() {
+  jQuery(document).on(
+      'click',
+      '.feed_share',
+      function(e) {
+        // get feed id
+        var feedElt = jQuery(this).parents().eq(2);
+        var feedID = feedElt.attr('data-chris-feed_id');
+        apprise('<h5>Which user do you want to share this feed with?</h5>', {
+          'input' : new Date()
+        }, function(r) {
+          if (r) {
+            // 
+            var _user_name = r;
+            // send to the launcher
+            jQuery.ajax({
+              type : "POST",
+              url : "api.php?action=set&what=feed_share&id=" + feedID
+                  + "&parameters[]=" + _user_name,
+              dataType : "json",
+              success : function(data) {
+                jQuery().toastmessage(
+                    'showSuccessToast',
+                    '<h5>Feed Shared</h5>' + 'With: <b>' + _user_name
+                        + '</b><br>');
+              }
+            });
+          } else {
+            jQuery().toastmessage('showErrorToast',
+                '<h5>Sharing cancelled.</h5>' + 'Please enter a name!');
           }
         });
         // modify
@@ -491,6 +527,7 @@ jQuery(document).ready(function() {
   // on click callbacks
   _FEED_.feed_onclick();
   _FEED_.feed_favorite_onclick();
+  _FEED_.feed_share_onclick();
   // _FEED_.feed_title_onclick();
   _FEED_.feed_fav_onclick();
   _FEED_.feed_run_onclick();

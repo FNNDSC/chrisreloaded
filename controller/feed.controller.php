@@ -273,6 +273,48 @@ class FeedC implements FeedControllerInterface {
     return $feed_update;
   }
 
+  static public function share($feed_id, $ownername, $targetname){
+    // get target user id
+    $userMapper = new Mapper('User');
+    $userMapper->filter('username = (?)', $targetname);
+    $userResult = $userMapper->get();
+
+    if(count($userResult['User']) >= 1){
+      // get feed to be shared
+      $feedMapper = new Mapper('Feed');
+      $feedMapper->filter('id = (?)', $feed_id);
+      $feedResult = $feedMapper->get();
+
+      if(count($feedResult['Feed']) >= 1){
+        $feedResult['Feed'][0]->user_id = $userResult['User'][0]->id;
+        $feedResult['Feed'][0]->time = microtime(true);
+        $new_id = Mapper::add($feedResult['Feed'][0]);
+
+        // copy files on file system
+        $targetDirectory = CHRIS_USERS.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id;
+
+        $destinationDirectory = CHRIS_USERS.$targetname.'/'.$feedResult['Feed'][0]->plugin;
+        if(!is_dir($destinationDirectory)){
+          mkdir($destinationDirectory);
+        }
+
+        $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
+
+        if(!is_dir($destinationDirectory)){
+          echo $destinationDirectory.PHP_EOL;
+          recurse_copy($targetDirectory, $destinationDirectory);
+        }
+      }
+      else{
+        return "Invalid feed id: ". $feed_id;
+      }
+
+      return '';
+    }
+    else{
+      return "Invalid target name: ". $targetname;
+    }
+  }
 
   /**
    * Create a feed given a user id, an action and the related details

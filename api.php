@@ -92,7 +92,7 @@ if (!isset($_SESSION['username'])) {
   } else {
     $id = '*';
   }
-  
+
   if (isset($_GET['parameters'])){
     $parameters = $_GET['parameters'];
   } else if (isset($_POST['parameters'])) {
@@ -126,6 +126,9 @@ if (!isset($_SESSION['username'])) {
       case "set":
         if ($what == 'feed_favorite') {
           $result['result'] = FeedC::setFavorite($id);
+        }
+        else if($what == 'feed_share'){
+          $result['result'] = FeedC::share($id, $result['username'], $parameters[0]);
         }
         break;
       case "get":
