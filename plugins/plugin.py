@@ -109,7 +109,7 @@ class Plugin( argparse.ArgumentParser ):
         end_tag = '</' + p_type + '>\n'
 
         xml += tag
-        xml += '<label>' + parameter[0] + '</label>'
+        xml += '<label>' + parameter[0].replace( '_', ' ' ) + '</label>'
         xml += '<longflag>' + parameter[2] + '</longflag>'
 
         if parameter[3]:
@@ -163,6 +163,7 @@ class Plugin( argparse.ArgumentParser ):
     # store the parameter internally
     # (FIFO)
     self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default, _help] )
+
     # add the argument to the parser
     self.add_argument( *args, **kwargs )
 
