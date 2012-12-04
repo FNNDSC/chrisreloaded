@@ -332,8 +332,18 @@ _FEED_.feed_share_onclick = function() {
                       + "&parameters[]=" + _user_name,
                   dataType : "json",
                   success : function(data) {
-                    jQuery().toastmessage('showSuccessToast',
-                        '<h5>Feed Shared with <b>' + _user_name + '</b></h5>');
+                    if (data['result'] == '') {
+                      jQuery()
+                          .toastmessage(
+                              'showSuccessToast',
+                              '<h5>Feed Shared with <b>' + _user_name
+                                  + '</b></h5>');
+                    } else {
+                      jQuery().toastmessage(
+                          'showErrorToast',
+                          '<h5>Feed not shared</h5><br><b>' + data['result']
+                              + '</b>');
+                    }
                   }
                 });
               } else {
