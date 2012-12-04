@@ -301,14 +301,12 @@ class FeedC implements FeedControllerInterface {
         $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
 
         if(!is_dir($destinationDirectory)){
-          echo $destinationDirectory.PHP_EOL;
           recurse_copy($targetDirectory, $destinationDirectory);
         }
       }
       else{
         return "Invalid feed id: ". $feed_id;
       }
-
       return '';
     }
     else{

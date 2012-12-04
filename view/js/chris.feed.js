@@ -274,37 +274,33 @@ _FEED_.feed_favorite_onclick = function() {
           dataType : "json",
           success : function(data) {
             if (data['result'] == "1") {
-              jQuery($feedElt).hide(
+              jQuery(feedElt).hide(
                   'blind',
                   'slow',
                   function() {
-                    jQuery($feedElt).find('.feed_favorite').html(
+                    jQuery(feedElt).find('.feed_favorite').html(
                         '<i class="icon-star">');
-                    jQuery($feedElt).prependTo('.feed_fav').slideDown('slow');
+                    jQuery(feedElt).prependTo('.feed_fav').slideDown('slow');
                   });
             } else {
-              if ($feedElt.attr('data-chris-feed_status') != 100) {
-                jQuery($feedElt)
-                    .hide(
-                        'blind',
-                        'slow',
-                        function() {
-                          jQuery($feedElt).find('.feed_favorite').html(
-                              '<i class="icon-star-empty">');
-                          jQuery($feedElt).prependTo('.feed_run').slideDown(
-                              'slow');
-                        });
+              if (feedElt.attr('data-chris-feed_status') != 100) {
+                jQuery(feedElt).hide(
+                    'blind',
+                    'slow',
+                    function() {
+                      jQuery(feedElt).find('.feed_favorite').html(
+                          '<i class="icon-star-empty">');
+                      jQuery(feedElt).prependTo('.feed_run').slideDown('slow');
+                    });
               } else {
-                jQuery($feedElt)
-                    .hide(
-                        'blind',
-                        'slow',
-                        function() {
-                          jQuery($feedElt).find('.feed_favorite').html(
-                              '<i class="icon-star-empty">');
-                          jQuery($feedElt).prependTo('.feed_fin').slideDown(
-                              'slow');
-                        });
+                jQuery(feedElt).hide(
+                    'blind',
+                    'slow',
+                    function() {
+                      jQuery(feedElt).find('.feed_favorite').html(
+                          '<i class="icon-star-empty">');
+                      jQuery(feedElt).prependTo('.feed_fin').slideDown('slow');
+                    });
               }
             }
           }
@@ -323,28 +319,27 @@ _FEED_.feed_share_onclick = function() {
         var feedID = feedElt.attr('data-chris-feed_id');
         apprise('<h5>Which user do you want to share this feed with?</h5>', {
           'input' : new Date()
-        }, function(r) {
-          if (r) {
-            // 
-            var _user_name = r;
-            // send to the launcher
-            jQuery.ajax({
-              type : "POST",
-              url : "api.php?action=set&what=feed_share&id=" + feedID
-                  + "&parameters[]=" + _user_name,
-              dataType : "json",
-              success : function(data) {
-                jQuery().toastmessage(
-                    'showSuccessToast',
-                    '<h5>Feed Shared</h5>' + 'With: <b>' + _user_name
-                        + '</b><br>');
+        },
+            function(r) {
+              if (r) {
+                // 
+                var _user_name = r;
+                // send to the launcher
+                jQuery.ajax({
+                  type : "POST",
+                  url : "api.php?action=set&what=feed_share&id=" + feedID
+                      + "&parameters[]=" + _user_name,
+                  dataType : "json",
+                  success : function(data) {
+                    jQuery().toastmessage('showSuccessToast',
+                        '<h5>Feed Shared with <b>' + _user_name + '</b></h5>');
+                  }
+                });
+              } else {
+                jQuery().toastmessage('showErrorToast',
+                    '<h5>Feed not shared</h5>');
               }
             });
-          } else {
-            jQuery().toastmessage('showErrorToast',
-                '<h5>Sharing cancelled.</h5>' + 'Please enter a name!');
-          }
-        });
         // modify
         e.stopPropagation();
       });
