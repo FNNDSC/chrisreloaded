@@ -288,6 +288,7 @@ class FeedC implements FeedControllerInterface {
       if(count($feedResult['Feed']) >= 1){
         $feedResult['Feed'][0]->user_id = $userResult['User'][0]->id;
         $feedResult['Feed'][0]->time = microtime(true);
+        $feedResult['Feed'][0]->favorite = 0;
         $new_id = Mapper::add($feedResult['Feed'][0]);
 
         // copy files on file system
