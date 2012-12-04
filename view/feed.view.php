@@ -77,8 +77,10 @@ class FeedV implements ObjectViewInterface {
 
     // create the status text
     $status_text = '<font color=red>Running ('.$object->status.'%)</font>';
+    $share_text = '';
     if ($object->status == 100) {
       $status_text = '<font color=green>Done</font>';
+      $share_text = '<i class="icon-share"></i>';
     }
 
     $t = new Template('feed.html');
@@ -96,6 +98,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('MORE', 'Show details');
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
+    $t -> replace('SHARE_TEXT', $share_text);
     // set favorite icon
     $favorite = $object->favorite;
     if($favorite == 1){

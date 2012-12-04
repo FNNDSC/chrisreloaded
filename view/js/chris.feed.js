@@ -195,6 +195,7 @@ _FEED_.ajaxUpdate = function() {
             element.attr('data-chris-feed_status', '100');
             element.find('.feed_status').html(
                 'Status: <font color=green>Done</font>');
+            element.find('.feed_share').html('<i class="icon-share"></i>');
           } else {
             element.hide('blind', 'slow');
             // hide element to relevant list based on status
