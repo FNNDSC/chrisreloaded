@@ -195,6 +195,7 @@ _FEED_.ajaxUpdate = function() {
             element.attr('data-chris-feed_status', '100');
             element.find('.feed_status').html(
                 'Status: <font color=green>Done</font>');
+            element.find('.feed_share').html('<i class="icon-share"></i>');
           } else {
             element.hide('blind', 'slow');
             // hide element to relevant list based on status
@@ -265,50 +266,91 @@ _FEED_.feed_favorite_onclick = function() {
       '.feed_favorite',
       function(e) {
         // get feed id
-        $feedElt = jQuery(this).parents().eq(2);
-        $feedID = $feedElt.attr('data-chris-feed_id');
+        var feedElt = jQuery(this).parents().eq(2);
+        var feedID = feedElt.attr('data-chris-feed_id');
         // api.php add to favorites
         jQuery.ajax({
           type : "POST",
-          url : "api.php?action=set&what=feed_favorite&id=" + $feedID,
+          url : "api.php?action=set&what=feed_favorite&id=" + feedID,
           dataType : "json",
           success : function(data) {
             if (data['result'] == "1") {
-              jQuery($feedElt).hide(
+              jQuery(feedElt).hide(
                   'blind',
                   'slow',
                   function() {
-                    jQuery($feedElt).find('.feed_favorite').html(
+                    jQuery(feedElt).find('.feed_favorite').html(
                         '<i class="icon-star">');
-                    jQuery($feedElt).prependTo('.feed_fav').slideDown('slow');
+                    jQuery(feedElt).prependTo('.feed_fav').slideDown('slow');
                   });
             } else {
-              if ($feedElt.attr('data-chris-feed_status') != 100) {
-                jQuery($feedElt)
-                    .hide(
-                        'blind',
-                        'slow',
-                        function() {
-                          jQuery($feedElt).find('.feed_favorite').html(
-                              '<i class="icon-star-empty">');
-                          jQuery($feedElt).prependTo('.feed_run').slideDown(
-                              'slow');
-                        });
+              if (feedElt.attr('data-chris-feed_status') != 100) {
+                jQuery(feedElt).hide(
+                    'blind',
+                    'slow',
+                    function() {
+                      jQuery(feedElt).find('.feed_favorite').html(
+                          '<i class="icon-star-empty">');
+                      jQuery(feedElt).prependTo('.feed_run').slideDown('slow');
+                    });
               } else {
-                jQuery($feedElt)
-                    .hide(
-                        'blind',
-                        'slow',
-                        function() {
-                          jQuery($feedElt).find('.feed_favorite').html(
-                              '<i class="icon-star-empty">');
-                          jQuery($feedElt).prependTo('.feed_fin').slideDown(
-                              'slow');
-                        });
+                jQuery(feedElt).hide(
+                    'blind',
+                    'slow',
+                    function() {
+                      jQuery(feedElt).find('.feed_favorite').html(
+                          '<i class="icon-star-empty">');
+                      jQuery(feedElt).prependTo('.feed_fin').slideDown('slow');
+                    });
               }
             }
           }
         });
+        // modify
+        e.stopPropagation();
+      });
+}
+_FEED_.feed_share_onclick = function() {
+  jQuery(document).on(
+      'click',
+      '.feed_share',
+      function(e) {
+        // get feed id
+        var feedElt = jQuery(this).parents().eq(2);
+        var feedID = feedElt.attr('data-chris-feed_id');
+        apprise('<h5>Which user do you want to share this feed with?</h5>', {
+          'input' : new Date()
+        },
+            function(r) {
+              if (r) {
+                // 
+                var _user_name = r;
+                // send to the launcher
+                jQuery.ajax({
+                  type : "POST",
+                  url : "api.php?action=set&what=feed_share&id=" + feedID
+                      + "&parameters[]=" + _user_name,
+                  dataType : "json",
+                  success : function(data) {
+                    if (data['result'] == '') {
+                      jQuery()
+                          .toastmessage(
+                              'showSuccessToast',
+                              '<h5>Feed Shared with <b>' + _user_name
+                                  + '</b></h5>');
+                    } else {
+                      jQuery().toastmessage(
+                          'showErrorToast',
+                          '<h5>Feed not shared</h5><br><b>' + data['result']
+                              + '</b>');
+                    }
+                  }
+                });
+              } else {
+                jQuery().toastmessage('showErrorToast',
+                    '<h5>Feed not shared</h5>');
+              }
+            });
         // modify
         e.stopPropagation();
       });
@@ -491,6 +533,7 @@ jQuery(document).ready(function() {
   // on click callbacks
   _FEED_.feed_onclick();
   _FEED_.feed_favorite_onclick();
+  _FEED_.feed_share_onclick();
   // _FEED_.feed_title_onclick();
   _FEED_.feed_fav_onclick();
   _FEED_.feed_run_onclick();
