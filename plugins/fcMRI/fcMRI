@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+#
+#                                                            _           
+# 
+# Author: Mathieu Dehaes, PhD (mathieu <dot> dehaes <at> childrens <dot> harvard <dot> edu)
+#
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+from plugin import Plugin
+
+class fcMRI( Plugin ):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC - Mathieu Dehaes, PhD'
+  Plugin.TITLE = 'Customize ICA'
+  Plugin.CATEGORY = 'Resting State Network Analysis'
+  Plugin.DESCRIPTION = 'Perform ICA'
+  Plugin.DOCUMENTATION = 'http://durban.tch.harvard.edu/wiki/index.php/FcMRI'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.1'
+
+  def run( self, options ):
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    os.system('cd ' + options.output +';' + current_dir + '/fcMRI.wrapper '+ options.Functional + ' ' + options.Timeseries_to_skip + ' ' + options.Anatomical + ' ' + options.BET_parameter + ' ' + options.Results_Folder)
+
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = fcMRI()
+  plugin.add_parameter( 'Input Data', Plugin.IMAGE, '--Functional', action='store', dest='Functional', help='Functional fcMRI dataset to convert' )
+  plugin.add_parameter( 'Input Data', Plugin.INTEGER, '--Timeseries_to_skip', default = 4, action='store', dest='Timeseries to skip', help='Functional 4D time-serie to skip (default 4)' )
+  plugin.add_parameter( 'Input Data', Plugin.IMAGE, '--Anatomical', action='store', dest='Anatomical', help='Anatomical 3D volume to convert' )
+  plugin.add_parameter( 'Input Data', Plugin.STRING, '--BET_parameter', default = '0.5', action='store', dest='BET parameter', help='Adjust FSL bet parameter between 0 and 1 (smaller value gives larger brain contour estimate)' )
+  plugin.add_parameter( 'Input Data', Plugin.STRING, '--Results_Folder', default = 'ICA_Results', action='store', dest='Results Folder', help='Specify a folder where ICA results are written' )
+  plugin.launch( sys.argv )
