@@ -188,16 +188,30 @@ _FEED_.ajaxUpdate = function() {
           }
           var element = jQuery('div[data-chris-feed_id=' + data['new']['id'][i]
               + ']');
-          // hide element if exists
-          if (element.length && element.find('i').hasClass('icon-star')) {
-            // and if not favorite
-            // update its status to 100%
-            element.attr('data-chris-feed_status', '100');
-            element.find('.feed_status').html(
-                'Status: <font color=green>Done</font>');
-            element.find('.feed_share').html('<i class="icon-share"></i>');
+          if (element.length) {
+            jQuery(element).each(
+                function() {
+                  var elt = jQuery(this);
+                  if (elt.find('i').hasClass('icon-star')
+                      || !elt.parent().hasClass('feed_sea')) {
+                    // update its status to 100%
+                    jQuery(this).attr('data-chris-feed_status', '100');
+                    jQuery(this).find('.feed_status').html(
+                        'Status: <font color=green>Done</font>');
+                    jQuery(this).find('.feed_share').html(
+                        '<i class="icon-share"></i>');
+                  } else {
+                    elt.hide('blind', 'slow');
+                    if (data['new']['status'][i] == '100') {
+                      _FEED_.finFeeds[0].unshift(data['new']['id'][i]);
+                      _FEED_.finFeeds[1].unshift(data['new']['content'][i]);
+                    } else {
+                      _FEED_.runFeeds[0].unshift(data['new']['id'][i]);
+                      _FEED_.runFeeds[1].unshift(data['new']['content'][i]);
+                    }
+                  }
+                });
           } else {
-            element.hide('blind', 'slow');
             // hide element to relevant list based on status
             if (data['new']['status'][i] == '100') {
               _FEED_.finFeeds[0].unshift(data['new']['id'][i]);
@@ -220,9 +234,12 @@ _FEED_.ajaxUpdate = function() {
               + data['running']['id'][i] + ']');
           // hide element if exists
           if (element.length) {
-            element.find('.feed_status').html(
-                'Status: <font color=red>Running ('
-                    + data['running']['content'][i] + '%)</font>');
+            jQuery(element).each(
+                function() {
+                  jQuery(this).find('.feed_status').html(
+                      'Status: <font color=red>Running ('
+                          + data['running']['content'][i] + '%)</font>');
+                });
           }
           i--;
         }
@@ -265,49 +282,67 @@ _FEED_.feed_favorite_onclick = function() {
       'click',
       '.feed_favorite',
       function(e) {
+        // modify
+        e.stopPropagation();
         // get feed id
         var feedElt = jQuery(this).parents().eq(2);
         var feedID = feedElt.attr('data-chris-feed_id');
+        var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
         // api.php add to favorites
         jQuery.ajax({
           type : "POST",
           url : "api.php?action=set&what=feed_favorite&id=" + feedID,
           dataType : "json",
           success : function(data) {
-            if (data['result'] == "1") {
-              jQuery(feedElt).hide(
-                  'blind',
-                  'slow',
-                  function() {
-                    jQuery(feedElt).find('.feed_favorite').html(
-                        '<i class="icon-star">');
-                    jQuery(feedElt).prependTo('.feed_fav').slideDown('slow');
-                  });
-            } else {
-              if (feedElt.attr('data-chris-feed_status') != 100) {
-                jQuery(feedElt).hide(
-                    'blind',
-                    'slow',
-                    function() {
-                      jQuery(feedElt).find('.feed_favorite').html(
-                          '<i class="icon-star-empty">');
-                      jQuery(feedElt).prependTo('.feed_run').slideDown('slow');
-                    });
-              } else {
-                jQuery(feedElt).hide(
-                    'blind',
-                    'slow',
-                    function() {
-                      jQuery(feedElt).find('.feed_favorite').html(
-                          '<i class="icon-star-empty">');
-                      jQuery(feedElt).prependTo('.feed_fin').slideDown('slow');
-                    });
-              }
-            }
+            jQuery(allElts).each(
+                function() {
+                  var elt = jQuery(this);
+                  if (!elt.parent().hasClass('feed_sea')) {
+                    if (data['result'] == "1") {
+                      jQuery(elt).hide(
+                          'blind',
+                          'slow',
+                          function() {
+                            jQuery(elt).find('.feed_favorite').html(
+                                '<i class="icon-star">');
+                            jQuery(elt).prependTo('.feed_fav')
+                                .slideDown('slow');
+                          });
+                    } else {
+                      if (elt.attr('data-chris-feed_status') != 100) {
+                        jQuery(elt).hide(
+                            'blind',
+                            'slow',
+                            function() {
+                              jQuery(elt).find('.feed_favorite').html(
+                                  '<i class="icon-star-empty">');
+                              jQuery(elt).prependTo('.feed_run').slideDown(
+                                  'slow');
+                            });
+                      } else {
+                        jQuery(elt).hide(
+                            'blind',
+                            'slow',
+                            function() {
+                              jQuery(elt).find('.feed_favorite').html(
+                                  '<i class="icon-star-empty">');
+                              jQuery(elt).prependTo('.feed_fin').slideDown(
+                                  'slow');
+                            });
+                      }
+                    }
+                  } else {
+                    if (data['result'] == "1") {
+                      jQuery(elt).find('.feed_favorite').html(
+                          '<i class="icon-star">');
+                    } else {
+                      jQuery(elt).find('.feed_favorite').html(
+                      '<i class="icon-star-empty">');
+                    }
+                  }
+                });
           }
         });
-        // modify
-        e.stopPropagation();
       });
 }
 _FEED_.feed_share_onclick = function() {
