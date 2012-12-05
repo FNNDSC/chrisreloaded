@@ -282,6 +282,8 @@ _FEED_.feed_favorite_onclick = function() {
       'click',
       '.feed_favorite',
       function(e) {
+        // modify
+        e.stopPropagation();
         // get feed id
         var feedElt = jQuery(this).parents().eq(2);
         var feedID = feedElt.attr('data-chris-feed_id');
@@ -292,40 +294,55 @@ _FEED_.feed_favorite_onclick = function() {
           url : "api.php?action=set&what=feed_favorite&id=" + feedID,
           dataType : "json",
           success : function(data) {
-            if (data['result'] == "1") {
-              jQuery(feedElt).hide(
-                  'blind',
-                  'slow',
-                  function() {
-                    jQuery(feedElt).find('.feed_favorite').html(
-                        '<i class="icon-star">');
-                    jQuery(feedElt).prependTo('.feed_fav').slideDown('slow');
-                  });
-            } else {
-              if (feedElt.attr('data-chris-feed_status') != 100) {
-                jQuery(feedElt).hide(
-                    'blind',
-                    'slow',
-                    function() {
-                      jQuery(feedElt).find('.feed_favorite').html(
-                          '<i class="icon-star-empty">');
-                      jQuery(feedElt).prependTo('.feed_run').slideDown('slow');
-                    });
-              } else {
-                jQuery(feedElt).hide(
-                    'blind',
-                    'slow',
-                    function() {
-                      jQuery(feedElt).find('.feed_favorite').html(
-                          '<i class="icon-star-empty">');
-                      jQuery(feedElt).prependTo('.feed_fin').slideDown('slow');
-                    });
-              }
-            }
+            jQuery(allElts).each(
+                function() {
+                  var elt = jQuery(this);
+                  if (!elt.parent().hasClass('feed_sea')) {
+                    if (data['result'] == "1") {
+                      jQuery(elt).hide(
+                          'blind',
+                          'slow',
+                          function() {
+                            jQuery(elt).find('.feed_favorite').html(
+                                '<i class="icon-star">');
+                            jQuery(elt).prependTo('.feed_fav')
+                                .slideDown('slow');
+                          });
+                    } else {
+                      if (elt.attr('data-chris-feed_status') != 100) {
+                        jQuery(elt).hide(
+                            'blind',
+                            'slow',
+                            function() {
+                              jQuery(elt).find('.feed_favorite').html(
+                                  '<i class="icon-star-empty">');
+                              jQuery(elt).prependTo('.feed_run').slideDown(
+                                  'slow');
+                            });
+                      } else {
+                        jQuery(elt).hide(
+                            'blind',
+                            'slow',
+                            function() {
+                              jQuery(elt).find('.feed_favorite').html(
+                                  '<i class="icon-star-empty">');
+                              jQuery(elt).prependTo('.feed_fin').slideDown(
+                                  'slow');
+                            });
+                      }
+                    }
+                  } else {
+                    if (data['result'] == "1") {
+                      jQuery(elt).find('.feed_favorite').html(
+                          '<i class="icon-star">');
+                    } else {
+                      jQuery(elt).find('.feed_favorite').html(
+                      '<i class="icon-star-empty">');
+                    }
+                  }
+                });
           }
         });
-        // modify
-        e.stopPropagation();
       });
 }
 _FEED_.feed_share_onclick = function() {
