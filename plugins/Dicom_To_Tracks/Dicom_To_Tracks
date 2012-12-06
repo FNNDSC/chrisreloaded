@@ -50,7 +50,7 @@ class Dicom_To_Tracks(Plugin):
     if options.stage5:
       stages += '5'
       
-    os.system(current_dir + '/dcm2trk.wrapper --output ' + options.output + ' --dti ' + os.path.join(options.DTI, firstDicomFile) + ' --stages ' + stages + ' --m1 ' + options.m1 + ' --m1-lower-threshold ' + options.m1 - lower - threshold + ' --m1-upper-threshold ' + options.m1 - upper - threshold + ' --angle-threshold ' + options.angle - threshold)
+    os.system(current_dir + '/dcm2trk.wrapper --output ' + options.output + ' --dti ' + os.path.join(options.DTI, firstDicomFile) + ' --stages ' + stages + ' --m1 ' + options.m1 + ' --m1lowerthreshold ' + options.m1 - lower - threshold + ' --m1upperthreshold ' + options.m1 - upper - threshold + ' --anglethreshold ' + options.angle - threshold)
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -67,8 +67,8 @@ if __name__ == "__main__":
   
     #other advanced parameters
   plugin.add_parameter('Advanced', Plugin.STRING, '--m1', default='DWI', action='store', dest='m1', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.INTEGER, '--m1-lower-threshold', default = '0', action='store', dest='m1-lower-threshold', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.INTEGER, '--m1-upper-threshold', default = '1', action='store', dest='m1-upper-threshold', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.INTEGER, '--angle-threshold', default = '35', action='store', dest='angle-threshold', help='Run stage 1')
+  plugin.add_parameter('Advanced', Plugin.INTEGER, '--m1lowerthreshold', default = '0', action='store', dest='m1lowerthreshold', help='Run stage 1')
+  plugin.add_parameter('Advanced', Plugin.INTEGER, '--m1upperthreshold', default = '1', action='store', dest='m1upperthreshold', help='Run stage 1')
+  plugin.add_parameter('Advanced', Plugin.INTEGER, '--anglethreshold', default = '35', action='store', dest='anglethreshold', help='Run stage 1')
   
   plugin.launch(sys.argv)
