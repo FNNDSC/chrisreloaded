@@ -22,7 +22,7 @@ class hello_world( Plugin ):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
-  Plugin.TITLE = 'Hello World'
+  Plugin.TITLE = 'Hello World Plugin'
   Plugin.CATEGORY = 'Tutorial'
   Plugin.DESCRIPTION = 'Write text to HTML output'
   Plugin.DOCUMENTATION = 'http://wiki'
@@ -35,22 +35,15 @@ class hello_world( Plugin ):
     destination = options.output
 
     # text input from the user interface
-    text = options.TEXT
+    text = options.Text_Input
 
     # create index.html file and fill its content
     f = open('%s/index.html' % destination, 'w')
-    f.write("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""")
-    f.write("\n\n\n")
-    f.write("<head><body>")
-    f.write("\n")
     f.write("%s" % text)
-    f.write("\n")
-    f.write("</boby></head>")
     f.close()
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = hello_world()
-  plugin.add_parameter( 'Text Label', Plugin.STRING, '--input_text', default='Enter some text here.', action='store', dest='TEXT', help='Add some text' )
+  plugin.add_parameter( 'Parameter category', Plugin.STRING, '--input_text', default='Enter some text here.', action='store', dest='Text_Inpt', help='Add some text' )
   plugin.launch( sys.argv )
