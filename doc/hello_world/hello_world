@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+# _           _ _                            _     _ 
+#| |         | | |                          | |   | |
+#| | _   ____| | | ___     _ _ _  ___   ____| | _ | |
+#| || \ / _  ) | |/ _ \   | | | |/ _ \ / ___) |/ || |
+#| | | ( (/ /| | | |_| |  | | | | |_| | |   | ( (_| |
+#|_| |_|\____)_|_|\___/    \____|\___/|_|   |_|\____|
+#                                                    
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+from plugin import Plugin
+
+class hello_world( Plugin ):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  Plugin.TITLE = 'Hello World'
+  Plugin.CATEGORY = 'Tutorial'
+  Plugin.DESCRIPTION = 'Write text to HTML output'
+  Plugin.DOCUMENTATION = 'http://wiki'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.1'
+
+  def run( self, options ):
+
+    # directory where the file will be created
+    destination = options.output
+
+    # text input from the user interface
+    text = options.TEXT
+
+    # create index.html file and fill its content
+    f = open('%s/index.html' % destination, 'w')
+    f.write("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""")
+    f.write("\n\n\n")
+    f.write("<head><body>")
+    f.write("\n")
+    f.write("%s" % text)
+    f.write("\n")
+    f.write("</boby></head>")
+    f.close()
+
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = hello_world()
+  plugin.add_parameter( 'Text Label', Plugin.STRING, '--input_text', default='Enter some text here.', action='store', dest='TEXT', help='Add some text' )
+  plugin.launch( sys.argv )
