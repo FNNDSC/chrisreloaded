@@ -181,6 +181,10 @@ jQuery(document).ready(
         accept: ":not(.ui-sortable-helper)",
         activate: function(event, ui) {
           
+          if (!jQuery(this).is(":visible")) {
+            return;
+          }
+          
           var _dropzone_field = jQuery(this);
           var _default_value = _dropzone_field.attr('data-default');
           var _current_value = jQuery.trim(_dropzone_field.html());          
@@ -190,6 +194,8 @@ jQuery(document).ready(
             // nothing was dropped here before
             
           } else {
+            
+            console.log(_default_value, _current_value);
             
             // something was already dropped, so show the parameter_batchdrop
             _PLUGIN_.showBatchDrop();
