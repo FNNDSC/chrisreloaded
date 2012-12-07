@@ -57,7 +57,7 @@ foreach($_POST['FEED_PARAM'] as $key => $value){
 
   }
 
-  $command .= ' --'.$value['name'].' \"'.$value['value'].'\"';
+  $command .= ' --'.$value['name'].' '.$value['value'];
 }
 // output?
 foreach($_POST['FEED_OUTPUT'] as $key => $value){
