@@ -36,7 +36,7 @@ class Dicom_To_Tracks(Plugin):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     # grab the first dicom input file
-    firstDicomFile = os.listdir(options.DTI)[0]
+    firstDicomFile = os.listdir(options.dti)[0]
     # get stages to run
     stages = '';
     if options.stage1:
@@ -44,26 +44,28 @@ class Dicom_To_Tracks(Plugin):
     if options.stage2:
       stages += '2'
     if options.stage3:
-      stages += '4'
+      stages += '3'
     if options.stage4:
       stages += '4'
     if options.stage5:
       stages += '5'
       
-    os.system(current_dir + '/dcm2trk.wrapper --output ' + options.output + ' --dti ' + os.path.join(options.DTI, firstDicomFile) + ' --stages ' + stages + ' --m1 ' + options.m1 + ' --m1lowerthreshold ' + options.m1 - lower - threshold + ' --m1upperthreshold ' + options.m1 - upper - threshold + ' --anglethreshold ' + options.angle - threshold)
+    command = current_dir + '/dcm2trk.wrapper --output ' + options.output + ' --dti ' + os.path.join(options.dti, firstDicomFile) + ' --stages ' + stages + ' --m1 ' + options.m1 + ' --m1lowerthreshold ' + options.m1lowerthreshold + ' --m1upperthreshold ' + options.m1upperthreshold + ' --anglethreshold ' + options.anglethreshold
+    print command
+    os.system(command)
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = Dicom_To_Tracks()
   #inputs
-  plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='DTI', help='the dti scan')
+  plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='dti', help='the dti scan')
   
   #stages to be run
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage1', default = 'true', action='store', dest='stage1', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage2', default = 'true', action='store', dest='stage2', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage3', default = 'true', action='store', dest='stage3', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage4', default = 'true', action='store', dest='stage4', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage5', default = 'true', action='store', dest='stage5', help='Run stage 1')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage1', default = 'TRUE', action='store_true', dest='stage1', help='Run stage 1')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage2', default = 'TRUE', action='store_true', dest='stage2', help='Run stage 2')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage3', default = 'TRUE', action='store_true', dest='stage3', help='Run stage 3')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage4', default = 'TRUE', action='store_true', dest='stage4', help='Run stage 4')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage5', default = 'TRUE', action='store_true', dest='stage5', help='Run stage 5')
   
     #other advanced parameters
   plugin.add_parameter('Advanced', Plugin.STRING, '--m1', default='DWI', action='store', dest='m1', help='Run stage 1')

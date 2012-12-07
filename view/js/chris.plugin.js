@@ -328,7 +328,7 @@ jQuery(document).ready(
                 var text_input = jQuery(_parameter_rows[i]).find(
                     '.parameter_string');
                 
-                _value = text_input.val();
+                _value = '\"' + text_input.val() + '\"';
                 
               }
               

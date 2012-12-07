@@ -3,16 +3,16 @@ import subprocess
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--output', help='foo help', dest='output')
-parser.add_argument('--dti', help='foo help', dest='input')
+parser.add_argument('--dti', help='foo help', dest='dti')
 parser.add_argument('--stages', help='foo help', dest='stages')
 parser.add_argument('--m1', help='foo help', dest='m1')
-parser.add_argument('--m1-lower-threshold', help='foo help', dest='m1-lower-threshold')
-parser.add_argument('--m1-upper-threshold', help='foo help', dest='m1-upper-threshold')
-parser.add_argument('--angle-threshold', help='foo help', dest='angle-threshold')
+parser.add_argument('--m1lowerthreshold', help='foo help', dest='m1lowerthreshold')
+parser.add_argument('--m1upperthreshold', help='foo help', dest='m1upperthreshold')
+parser.add_argument('--anglethreshold', help='foo help', dest='anglethreshold')
 args = parser.parse_args()
 
 cmd = 'ss;chb-fsstable;'
-cmd += '/chb/arch/scripts/dcm2trk.bash -v 10 -f -t ' + parser.stages + ' -d ' + parser.dti + ' -g /chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/diffusion/mgh-dti-seqpack/gradient_mgh_dti30.gdt  --m1 ' + parser.m1 + ' --m1-lower-threshold ' + paser.m1-lower-threshold + ' --m1-upper-threshold ' + paser.m1-upper-threshold + ' --angle-threshold ' + paser.angle-threshold + ' -O '+args.output
+cmd += '/chb/arch/scripts/dcm2trk.bash -v 10 -f -t ' + args.stages + ' -d ' + args.dti + ' -g /chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/diffusion/mgh-dti-seqpack/gradient_mgh_dti30.gdt  --m1 ' + args.m1 + ' --m1-lower-threshold ' + args.m1lowerthreshold + ' --m1-upper-threshold ' + args.m1upperthreshold + ' --angle-threshold ' + args.anglethreshold + ' -O '+args.output
 
 p = subprocess.Popen(["/bin/bash", "-i", "-c", cmd], stdout=subprocess.PIPE)
 
