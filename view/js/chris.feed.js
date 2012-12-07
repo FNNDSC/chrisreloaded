@@ -536,11 +536,11 @@ _FEED_.createFeedDetails = function() {
  */
 jQuery(document).ready(function() {
   // get oldest and newest feed value
-  _FEED_.oldest = '00.00';
-  _FEED_.newest = '9999999999.00';
+  _FEED_.oldest = '9999999999';
+  _FEED_.newest = '00.00';
   // first run or first finished
-  var newest = '';
-  var oldest = '';
+  var newest = '00.00';
+  var oldest = '9999999999';
   //
   var elt = jQuery(".feed_run > .feed");
   if (elt.length) {
