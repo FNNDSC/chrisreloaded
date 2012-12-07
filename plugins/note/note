@@ -32,7 +32,6 @@ class FileBrowser( Plugin ):
 
   def run( self, options ):
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
     f = open('%s/index.html' % options.output, 'w')
     f.write("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""")
