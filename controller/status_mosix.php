@@ -51,7 +51,7 @@ $lines = explode("\n", $output);
 foreach($feedResult['Meta'] as $key0 => $value0){
   $found = false;
   foreach($lines as $key => $value){
-    $pid = explode(' ', $value);
+    $pid = explode(' ', trim($value));
     if(isset($pid[0]) && $pid[0] != ''){
       if($value0->value == $pid[0]){
         $found = true;
@@ -59,7 +59,7 @@ foreach($feedResult['Meta'] as $key0 => $value0){
       }
     }
   }
-  
+
   // if no match, job has finished => update feed status!
   if($found == false){
     $startTime = $feedResult['Feed'][$key0]->time;
