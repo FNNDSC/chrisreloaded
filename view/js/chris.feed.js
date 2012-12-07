@@ -337,7 +337,7 @@ _FEED_.feed_favorite_onclick = function() {
                           '<i class="icon-star">');
                     } else {
                       jQuery(elt).find('.feed_favorite').html(
-                      '<i class="icon-star-empty">');
+                          '<i class="icon-star-empty">');
                     }
                   }
                 });
@@ -534,55 +534,69 @@ _FEED_.createFeedDetails = function() {
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
-jQuery(document).ready(function() {
-  // get oldest and newest feed value
-  _FEED_.oldest = '9999999999';
-  _FEED_.newest = '00.00';
-  // first run or first finished
-  var newest = '00.00';
-  var oldest = '9999999999';
-  //
-  var elt = jQuery(".feed_run > .feed");
-  if (elt.length) {
-    newest = jQuery(elt[0]).attr('data-chris-feed_time');
-    oldest = jQuery(elt[elt.length - 1]).attr('data-chris-feed_time');
-  }
-  // feed_fin
-  elt = jQuery(".feed_fin > .feed");
-  if (elt.length) {
-    if (jQuery(elt[0]).attr('data-chris-feed_time') > newest) {
-      newest = jQuery(elt[0]).attr('data-chris-feed_time');
-    }
-    if (jQuery(elt[elt.length - 1]).attr('data-chris-feed_time') > oldest) {
-      oldest = jQuery(elt[elt.length - 1]).attr('data-chris-feed_time');
-    }
-  }
-  // get first element
-  _FEED_.oldest = oldest;
-  _FEED_.newest = newest;
-  // feed functions
-  // finished feeds
-  _FEED_.finFeeds = [ [], [] ];
-  // running feeds
-  _FEED_.runFeeds = [ [], [] ];
-  // on click callbacks
-  _FEED_.feed_onclick();
-  _FEED_.feed_favorite_onclick();
-  _FEED_.feed_share_onclick();
-  // _FEED_.feed_title_onclick();
-  _FEED_.feed_fav_onclick();
-  _FEED_.feed_run_onclick();
-  _FEED_.feed_fin_onclick();
-  _FEED_.feed_sea_onclick();
-  _FEED_.feed_more_onclick();
-  _FEED_.update_onclick();
-  _FEED_.updateFeedTimeout();
-  _FEED_.updateTime();
-  _FEED_.activateDraggableIcons();
-  // show placeholder when there are no feeds
-  if (jQuery('#feed_count').html() == "0") {
-    jQuery('.feed_empty').show();
-  }
-  _FEED_.scrollBottom();
-  _FEED_.search();
-});
+jQuery(document)
+    .ready(
+        function() {
+          // get oldest and newest feed value
+          _FEED_.oldest = Number.MAX_VALUE;
+          _FEED_.newest = Number.MIN_VALUE;
+          // look into favorites
+          var elt = jQuery(".feed_fav > .feed");
+          if (elt.length) {
+            if (jQuery(elt[0]).attr('data-chris-feed_time') > _FEED_.newest) {
+              _FEED_.newest = jQuery(elt[0]).attr('data-chris-feed_time');
+            }
+            if (jQuery(elt[elt.length - 1]).attr('data-chris-feed_time') < _FEED_.oldest) {
+              _FEED_.oldest = jQuery(elt[elt.length - 1]).attr(
+                  'data-chris-feed_time');
+            }
+          }
+          
+          // look into running
+          elt = jQuery(".feed_run > .feed");
+          if (elt.length) {
+            if (jQuery(elt[0]).attr('data-chris-feed_time') > _FEED_.newest) {
+              _FEED_.newest = jQuery(elt[0]).attr('data-chris-feed_time');
+            }
+            if (jQuery(elt[elt.length - 1]).attr('data-chris-feed_time') < _FEED_.oldest) {
+              _FEED_.oldest = jQuery(elt[elt.length - 1]).attr(
+                  'data-chris-feed_time');
+            }
+          }
+          // look into finished
+          elt = jQuery(".feed_fin > .feed");
+          if (elt.length) {
+            if (jQuery(elt[0]).attr('data-chris-feed_time') > _FEED_.newest) {
+              _FEED_.newest = jQuery(elt[0]).attr('data-chris-feed_time');
+            }
+            if (jQuery(elt[elt.length - 1]).attr('data-chris-feed_time') < _FEED_.oldest) {
+              _FEED_.oldest = jQuery(elt[elt.length - 1]).attr(
+                  'data-chris-feed_time');
+            }
+          }
+          // feed functions
+          // finished feeds
+          _FEED_.finFeeds = [ [], [] ];
+          // running feeds
+          _FEED_.runFeeds = [ [], [] ];
+          // on click callbacks
+          _FEED_.feed_onclick();
+          _FEED_.feed_favorite_onclick();
+          _FEED_.feed_share_onclick();
+          // _FEED_.feed_title_onclick();
+          _FEED_.feed_fav_onclick();
+          _FEED_.feed_run_onclick();
+          _FEED_.feed_fin_onclick();
+          _FEED_.feed_sea_onclick();
+          _FEED_.feed_more_onclick();
+          _FEED_.update_onclick();
+          _FEED_.updateFeedTimeout();
+          _FEED_.updateTime();
+          _FEED_.activateDraggableIcons();
+          // show placeholder when there are no feeds
+          if (jQuery('#feed_count').html() == "0") {
+            jQuery('.feed_empty').show();
+          }
+          _FEED_.scrollBottom();
+          _FEED_.search();
+        });
