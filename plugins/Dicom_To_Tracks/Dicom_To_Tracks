@@ -61,11 +61,11 @@ if __name__ == "__main__":
   plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='dti', help='the dti scan')
   
   #stages to be run
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage1', default = 'TRUE', action='store_true', dest='stage1', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage2', default = 'TRUE', action='store_true', dest='stage2', help='Run stage 2')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage3', default = 'TRUE', action='store_true', dest='stage3', help='Run stage 3')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage4', default = 'TRUE', action='store_true', dest='stage4', help='Run stage 4')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage5', default = 'TRUE', action='store_true', dest='stage5', help='Run stage 5')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage1', default = True, action='store_true', dest='stage1', help='Run stage 1')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage2', default = True, action='store_true', dest='stage2', help='Run stage 2')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage3', default = True, action='store_true', dest='stage3', help='Run stage 3')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage4', default = True, action='store_true', dest='stage4', help='Run stage 4')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage5', default = True, action='store_true', dest='stage5', help='Run stage 5')
   
     #other advanced parameters
   plugin.add_parameter('Advanced', Plugin.STRING, '--m1', default='DWI', action='store', dest='m1', help='Run stage 1')
