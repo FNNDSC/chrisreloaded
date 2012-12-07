@@ -2,6 +2,54 @@
  * Define the PLUGIN namespace
  */
 var _PLUGIN_ = _PLUGIN_ || {};
+
+_PLUGIN_.showBatchMenu = function() {
+  
+  // grab the visible plugin panel
+  var _visible_panel = jQuery('.plugin_panel :visible');
+  var _plugin_name = _visible_panel.parent().attr('id').replace(
+      'panel_', '');  
+  
+  jQuery('#batch_'+_plugin_name).html('<i class="batchicon icon-arrow-left"></i>1/1<i class="batchicon icon-arrow-right"></i>&nbsp;&nbsp;&nbsp;&nbsp;<i class="batchicon icon-remove-circle" rel="bottom_tooltip" title="Remove current job"></i>');
+  
+}
+
+_PLUGIN_.showBatchDrop = function() {
+  
+  // grab the visible plugin panel
+  var _visible_panel = jQuery('.plugin_panel :visible');
+  var _plugin_name = _visible_panel.parent().attr('id').replace(
+      'panel_', '');  
+  
+  _visible_panel.find('.parameter_dropzone').width(125);
+  _visible_panel.find('.parameter_batchdrop').html('<i class="icon-plus" style="vertical-align:sub;"/>')
+  _visible_panel.find('.parameter_batchdrop').show();
+  
+  // setup droppable item
+  jQuery(".parameter_batchdrop").droppable({
+    hoverClass: "parameter_batchdrop_hover",
+    tolerance: "pointer",
+    drop: function(event, ui) {
+      _PLUGIN_.showBatchMenu();
+    }
+  });  
+  
+}
+
+_PLUGIN_.hideBatchDrop = function() {
+  
+  // grab the visible plugin panel
+  var _visible_panel = jQuery('.plugin_panel :visible');
+  var _plugin_name = _visible_panel.parent().attr('id').replace(
+      'panel_', '');  
+  
+  _visible_panel.find('.parameter_dropzone').width(160);
+  //_visible_panel.find('.parameter_batchdrop').html('<i class="icon-plus" style="vertical-align:sub;"/>')
+  _visible_panel.find('.parameter_batchdrop').hide();
+  
+}
+
+
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -124,12 +172,36 @@ jQuery(document).ready(
             
           });
       
-      // setup droppable item
+
+      
       jQuery(".parameter_dropzone").droppable({
         activeClass: "parameter_dropzone_active",
         hoverClass: "parameter_dropzone_hover",
         tolerance: "pointer",
         accept: ":not(.ui-sortable-helper)",
+        activate: function(event, ui) {
+          
+          var _dropzone_field = jQuery(this);
+          var _default_value = _dropzone_field.attr('data-default');
+          var _current_value = jQuery.trim(_dropzone_field.html());          
+          
+          if (_default_value == _current_value) {
+            
+            // nothing was dropped here before
+            
+          } else {
+            
+            // something was already dropped, so show the parameter_batchdrop
+            _PLUGIN_.showBatchDrop();
+            
+          }
+          
+        },
+        deactivate: function(event, ui) {
+          
+          _PLUGIN_.hideBatchDrop();
+          
+        },
         drop: function(event, ui) {
 
           // grab the data name dom element
