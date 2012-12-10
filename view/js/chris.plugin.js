@@ -2,6 +2,42 @@
  * Define the PLUGIN namespace
  */
 var _PLUGIN_ = _PLUGIN_ || {};
+
+_PLUGIN_.showBatchDrop = function() {
+  
+  // grab the visible plugin panel
+  var _visible_panel = jQuery('.plugin_panel :visible');
+  var _plugin_name = _visible_panel.parent().attr('id').replace(
+      'panel_', '');  
+  
+  _visible_panel.find('.parameter_dropzone').width(125);
+  _visible_panel.find('.parameter_batchdrop').html('<i class="icon-plus" style="vertical-align:sub;"/>')
+  _visible_panel.find('.parameter_batchdrop').show();
+  
+  // setup droppable item
+  jQuery(".parameter_batchdrop").droppable({
+    hoverClass: "parameter_batchdrop_hover",
+    tolerance: "pointer",
+    drop: _BATCH_.drop
+  });  
+  
+}
+
+_PLUGIN_.hideBatchDrop = function() {
+  
+  // grab the visible plugin panel
+  var _visible_panel = jQuery('.plugin_panel :visible');
+  var _plugin_name = _visible_panel.parent().attr('id').replace(
+      'panel_', '');  
+  
+  _visible_panel.find('.parameter_dropzone').width(160);
+  // _visible_panel.find('.parameter_batchdrop').html('<i class="icon-plus"
+  // style="vertical-align:sub;"/>')
+  _visible_panel.find('.parameter_batchdrop').hide();
+  
+}
+
+
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -41,7 +77,7 @@ jQuery(document).ready(
         
         var _new_category = jQuery('#cart_categories').val();
         
-        // remove all 
+        // remove all
         jQuery('.carousel-inner').empty();
         
         // configure the selector
@@ -64,7 +100,8 @@ jQuery(document).ready(
         // and activate the first one
         jQuery('.carousel-inner').children().first().addClass('active');
         
-        // for only one matching plugin, remove the arrows to avoid a deadlock in the carousel stack
+        // for only one matching plugin, remove the arrows to avoid a deadlock
+        // in the carousel stack
         if (jQuery('.carousel-inner').children().length == 1) {
           
           jQuery('.cart-carousel-control').hide();
@@ -76,10 +113,15 @@ jQuery(document).ready(
         }
         
         // and show the proper UI
+        
+        // reset to default
+        jQuery('#plugin_cancel').click();        
+        
         jQuery('.plugin_panel').hide();
         jQuery('#panel_'+jQuery('.carousel-inner').children().first().attr('id')).show();
         
-        
+        // now reset all jobs
+        _BATCH_.reset();
         
         
       });
@@ -105,11 +147,17 @@ jQuery(document).ready(
           'slide',
           function() {
 
+            // reset to default
+            jQuery('#plugin_cancel').click();            
+            
             // update UI
             var _old_plugin_id = jQuery(".carousel-inner").children('.active')
                 .attr('id');
             // by hiding the old plugin
             jQuery('#panel_' + _old_plugin_id).hide();
+            
+
+            
           });
       // the new one
       jQuery('#pipelines').bind(
@@ -122,56 +170,46 @@ jQuery(document).ready(
             // by showing the new plugin
             jQuery('#panel_' + _new_plugin_id).show();
             
+            // now reset all jobs
+            _BATCH_.reset();
+            
           });
       
-      // setup droppable item
+
+      
       jQuery(".parameter_dropzone").droppable({
         activeClass: "parameter_dropzone_active",
         hoverClass: "parameter_dropzone_hover",
         tolerance: "pointer",
         accept: ":not(.ui-sortable-helper)",
-        drop: function(event, ui) {
-
-          // grab the data name dom element
-          var _data_name = ui.draggable;
+        activate: function(event, ui) {
           
-          var _file_browser = null;
-          var _full_path = null;
+          if (!jQuery(this).is(":visible")) {
+            return;
+          }
           
-          if (jQuery(_data_name[0]).hasClass('feed_icon')) {
-            abceef = jQuery(_data_name[0]);
-            // a feed icon was dropped
-            var _feed_content = jQuery(_data_name[0]).closest('.feed');
-            _file_browser = jQuery(_feed_content).find('.file_browser');
-            _full_path = _file_browser.attr('data-folder');
-
+          var _dropzone_field = jQuery(this);
+          var _default_value = _dropzone_field.attr('data-default');
+          var _current_value = jQuery.trim(_dropzone_field.html());          
+          
+          if (_default_value == _current_value) {
+            
+            // nothing was dropped here before
+            
           } else {
             
-            // a file browser entry was dropped
-            _file_browser = _data_name.closest('.file_browser');
-            _full_path = _data_name.attr('rel');
+            // something was already dropped, so show the parameter_batchdrop
+            _PLUGIN_.showBatchDrop();
             
           }
           
-          // now we can grab the MRN
-          var _mrn = _file_browser.attr('data-patient-id');
+        },
+        deactivate: function(event, ui) {
           
-          // and the data id
-          var _data_id = _file_browser.attr('data-id');
+          _PLUGIN_.hideBatchDrop();
           
-          // and create a new representation
-          var _new_span = jQuery('<span></span>');
-          _new_span.html('<b>MRN ' + _mrn + '</b> ' + _data_name.text());
-          _new_span.attr('data-patient-id', _mrn);
-          _new_span.attr('data-id', _data_id);
-          _new_span.attr('data-full-path', _full_path);
-          
-          // throw everything old away
-          jQuery(this).empty();
-          // .. and attach the new thingie
-          jQuery(this).append(_new_span);
-          
-        }
+        },
+        drop: _BATCH_.drop
       });
       
       jQuery('#plugin_cancel').on(
@@ -218,6 +256,9 @@ jQuery(document).ready(
               _string.val(_default_value);
               
             });
+            
+            // reset all jobs
+            _BATCH_.reset();
             
           });
       

@@ -7,7 +7,12 @@
         <xsl:attribute name="id">panel_${PLUGIN_NAME}</xsl:attribute>
         <xsl:attribute name="data-category"><xsl:value-of select="category"/></xsl:attribute>
         <xsl:attribute name="data-executable">${PLUGIN_EXECUTABLE}</xsl:attribute>
-        <strong><xsl:value-of select="title"/></strong><br/>
+        <span>
+          <strong><xsl:value-of select="title"/></strong>
+          <span style="float:right;line-height:20px;">
+            <xsl:attribute name="id">batch_${PLUGIN_NAME}</xsl:attribute>
+          </span>
+        </span><br/>
         <!-- process the parameters blocks -->
         <div class='panelgroup'>
           <xsl:apply-templates select="parameters"/>
@@ -73,9 +78,12 @@
           <span class='parameter_title' style='width:65px'>
             <xsl:value-of select="label"/>
           </span>
+          <span class='parameter_batchdrop' data-type='batchdrop' style='display:none;'>
+            <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>X
+          </span>
           <span class='parameter_input parameter_dropzone' data-type='dropzone' data-default='Drag and drop here'>
             <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
-            Drag and drop here</span>
+            Drag and drop here</span>            
         </div>
       </xsl:otherwise>
     </xsl:choose>
