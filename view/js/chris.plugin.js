@@ -285,8 +285,6 @@ jQuery(document).ready(
               
               var job = _BATCH_.jobs[j];
               
-              console.log('job',job);
-              
               var _parameters = [];
               var _outputs = [];              
               
@@ -417,10 +415,6 @@ jQuery(document).ready(
               
             }
             
-
-            console.log(_jobs);
-            console.log(_jobsOutputs);
-            return;
             
             // TODO validate
             
