@@ -278,110 +278,149 @@ jQuery(document).ready(
             var _parameter_rows = _visible_panel.find('.parameter_row');
             var _output_rows = _visible_panel.find('.output_row');
             
-            var _parameters = [];
-            var _outputs = [];
+            var _jobs = [];
+            var _jobsOutputs = [];
             
-            // loop through all output rows
-            _output_rows.each(function(i) {
-
-              var _parameter_output = jQuery(_output_rows[i]).find(
-                  '.parameter_output');
-              var _flag = _parameter_output.attr('data-flag');
-              var _type = _parameter_output.attr('data-type');
+            for (var j=0; j<_BATCH_.jobs.length;++j) {
               
-              var _output = null;
+              var job = _BATCH_.jobs[j];
               
-              // strip possible --
-              _flag = _flag.replace(/-/g, '');
+              console.log('job',job);
               
-              var _value;
+              var _parameters = [];
+              var _outputs = [];              
               
-              if (_type == 'directory') {
-                _value = '';
-              } else if (_type == 'image') {
-                _value = _flag + '.nii';
-              } else if (_type == 'file') {
-                _value = _flag + '.file';
-              } else if (_type == 'transform') {
-                _value = _flag + '.mat';
+              // grab all input dropzones
+              for (flag in job) {
+                
+                var fullpath = job[flag]._fullpath;
+                
+                // strip possible --
+                flag = flag.replace(/-/g, '');
+                                
+                _parameters.push({
+                  name: flag,
+                  value: fullpath,
+                  type: 'dropzone',
+                  target_type: 'feed'
+                });                
+                
               }
               
-              // push the output
-              _outputs.push({
-                name: _flag,
-                value: _value,
-                type: 'simple',
-                target_type: 'feed'
-              });
-              
 
-            });
-            
-            // loop through all parameter rows
-            _parameter_rows.each(function(i) {
+              // loop through all output rows
+              _output_rows.each(function(i) {
 
-              var _parameter_input = jQuery(_parameter_rows[i]).find(
-                  '.parameter_input');
-              var _flag = _parameter_input.attr('data-flag');
-              var _type = _parameter_input.attr('data-type');
-              
-              var _parameter = null;
-              
-              // strip possible --
-              _flag = _flag.replace(/-/g, '');
-              
-              var _value;
-              
-              if (_type == 'dropzone') {
-                // dropzones
-                var _dropzone_field = jQuery(_parameter_rows[i]).find(
-                    '.parameter_dropzone');
+                var _parameter_output = jQuery(_output_rows[i]).find(
+                    '.parameter_output');
+                var _flag = _parameter_output.attr('data-flag');
+                var _type = _parameter_output.attr('data-type');
                 
-                _value = _dropzone_field.children('span')
-                    .attr('data-full-path');
+                var _output = null;
                 
-              } else if (_type == 'spinner') {
+                // strip possible --
+                _flag = _flag.replace(/-/g, '');
                 
-                // spinners
-                var _spinner = jQuery(_parameter_rows[i]).find(
-                    '.parameter_spinner');
+                var _value;
                 
-                _value = jQuery(_spinner).spinner("value");
-                
-              } else if (_type == 'checkbox') {
-                
-                // checkboxes
-                var _checkbox = jQuery(_parameter_rows[i]).find(
-                    '.parameter_checkbox');
-                
-                if (jQuery(_checkbox).prop('checked')) {
-                  
-                  // checkbox active, so add the flag
+                if (_type == 'directory') {
                   _value = '';
-                  
-                } else {
-                  return;
+                } else if (_type == 'image') {
+                  _value = _flag + '.nii';
+                } else if (_type == 'file') {
+                  _value = _flag + '.file';
+                } else if (_type == 'transform') {
+                  _value = _flag + '.mat';
                 }
                 
-              } else if (_type == 'string') {
+                // push the output
+                _outputs.push({
+                  name: _flag,
+                  value: _value,
+                  type: 'simple',
+                  target_type: 'feed'
+                });
                 
-                // text_input
-                var text_input = jQuery(_parameter_rows[i]).find(
-                    '.parameter_string');
-                
-                _value = '\"' + text_input.val() + '\"';
-                
-              }
-              
-              // push the parameter
-              _parameters.push({
-                name: _flag,
-                value: _value,
-                type: _type,
-                target_type: 'feed'
               });
               
-            });
+              // loop through all parameter rows
+              _parameter_rows.each(function(i) {
+
+                var _parameter_input = jQuery(_parameter_rows[i]).find(
+                    '.parameter_input');
+                var _flag = _parameter_input.attr('data-flag');
+                var _type = _parameter_input.attr('data-type');
+                
+                var _parameter = null;
+                
+                // strip possible --
+                _flag = _flag.replace(/-/g, '');
+                
+                var _value;
+                
+                if (_type == 'dropzone'){
+                  
+                  // we already took care of dropzones
+                  return;
+                  
+                } else if (_type == 'spinner') {
+                  
+                  // spinners
+                  var _spinner = jQuery(_parameter_rows[i]).find(
+                      '.parameter_spinner');
+                  
+                  _value = jQuery(_spinner).spinner("value");
+                  
+                } else if (_type == 'checkbox') {
+                  
+                  // checkboxes
+                  var _checkbox = jQuery(_parameter_rows[i]).find(
+                      '.parameter_checkbox');
+                  
+                  if (jQuery(_checkbox).prop('checked')) {
+                    
+                    // checkbox active, so add the flag
+                    _value = '';
+                    
+                  } else {
+                    return;
+                  }
+                  
+                } else if (_type == 'string') {
+                  
+                  // text_input
+                  var text_input = jQuery(_parameter_rows[i]).find(
+                      '.parameter_string');
+                  
+                  // return parameter if string is not empty
+                  if(text_input.val() != ""){
+                  _value = '\\\"' + text_input.val() + '\\\"';
+                  }
+                  else{
+                    return;
+                  }
+                  
+                }
+                
+                // push the parameter
+                _parameters.push({
+                  name: _flag,
+                  value: _value,
+                  type: _type,
+                  target_type: 'feed'
+                });
+                
+              });
+              
+              _jobs.push(_parameters);
+              _jobsOutputs.push(_outputs);
+              
+            }
+            
+
+            console.log(_jobs);
+            console.log(_jobsOutputs);
+            return;
             
             // TODO validate
             
@@ -402,8 +441,8 @@ jQuery(document).ready(
                   data: {
                     FEED_PLUGIN: _plugin_name,
                     FEED_NAME: _feed_name,
-                    FEED_PARAM: _parameters,
-                    FEED_OUTPUT: _outputs
+                    FEED_PARAM: _jobs,
+                    FEED_OUTPUT: _jobsOutputs
                   },
                   success: function(data) {
 
