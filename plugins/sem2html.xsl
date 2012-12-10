@@ -78,7 +78,9 @@
           <span class='parameter_title' style='width:65px'>
             <xsl:value-of select="label"/>
           </span>
-          <span class='parameter_batchdrop' data-type='batchdrop' style='display:none;'>X</span>
+          <span class='parameter_batchdrop' data-type='batchdrop' style='display:none;'>
+            <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>X
+          </span>
           <span class='parameter_input parameter_dropzone' data-type='dropzone' data-default='Drag and drop here'>
             <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
             Drag and drop here</span>            
