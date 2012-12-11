@@ -62,7 +62,7 @@ class FeedV implements ObjectViewInterface {
     $feed_meta_simple = '';
 
     foreach($feedMetaSimpleResults['Meta'] as $key => $value){
-      $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value;
+      $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value. '</br>';
     }
 
     // Format advanced meta feed
