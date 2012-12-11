@@ -40,17 +40,18 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 
 // define the options
-$shortopts = "c:u::f::h";
+$shortopts = "c:u::f::i::j::h";
 $longopts  = array(
     "command:",     // Required value
     "username::",    // Optional value
     "feedname::",    // Optional value
+    "feedid::",    // Optional value
+    "jobid::",    // Optional value
     "help",    // Optional value
 );
 
 $options = getopt($shortopts, $longopts);
 
-//print help if required
 if( array_key_exists('h', $options) || array_key_exists('help', $options))
 {
   echo "this is the help!";
@@ -95,6 +96,16 @@ elseif (array_key_exists('feedname', $options))
 {
   $feedname = sanitize($options['feedname']);
 }
+// is there a job id
+$jobid = '';
+if( array_key_exists('j', $options))
+{
+  $jobid = $options['j'];
+}
+elseif (array_key_exists('jobid', $options))
+{
+  $jobid = $options['jobid'];
+}
 
 // get the name of the executable as plugin name
 $plugin_command_array = explode ( ' ' , $command );
@@ -106,20 +117,25 @@ $parameters = implode(' ', $plugin_command_array);
 // get user if from username
 $user_id = UserC::getID($username);
 
-// create the feed
-$feed_id = FeedC::create($user_id, $plugin_name, $feedname);
+// create the feed if first batch job
+$feed_id = $options['feedid'];
+if($feed_id == -1){
+  $feed_id = FeedC::create($user_id, $plugin_name, $feedname);
+}
 
 // create the feed directory
 $feed_path = joinPaths(CHRIS_USERS, $username, $plugin_name, $feedname.'-'.$feed_id);
-if(!mkdir($feed_path, 0777, true)){
-  return "Couldn't create the feed directory on filesystem: ".$feed_path;
+mkdir($feed_path, 0777, true);
+
+// create job directory
+$job_path = $feed_path;
+if($jobid != ''){
+  $job_path .= '/'.$jobid;
+  mkdir($job_path, 0777, true);
 }
 
 // replace ${OUTPUT} pattern in the command
-$parameters = str_replace("{OUTPUT}", $feed_path , $parameters);
-$parameters = str_replace("{FEED_ID}", $feed_id , $parameters);
-$parameters = str_replace("{USER_ID}", $user_id , $parameters);
-$command = str_replace("{OUTPUT}", $feed_path, $command);
+$command = str_replace("{OUTPUT}", $job_path, $command);
 $command = str_replace("{FEED_ID}", $feed_id, $command);
 $command = str_replace("{USER_ID}", $user_id, $command);
 
@@ -127,8 +143,7 @@ $command = str_replace("{USER_ID}", $user_id, $command);
 FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
 
 // run dummy mosix script - should use crun
-$arguments = ' -l '.$feed_path;
-//$arguments .= ' -c "/bin/mostestload -t 60"';
+$arguments = ' -l '.$job_path;
 $arguments .= ' -c "'.$command.'"';
 // run on cluster and return pid
 $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
@@ -139,4 +154,6 @@ $metaObject = new Meta();
 $metaObject->name = "pid";
 $metaObject->value = $output;
 FeedC::addMeta($feed_id, Array(0 => $metaObject));
+
+echo $feed_id;
 ?>
