@@ -70,7 +70,6 @@ foreach($parameters as $k0 => $v0){
     $command .= ' --'.$value['name'].' '.$value['value'];
   }
   // output?
-  // based on nb of batch jobs and current Job ID
   $output = ' {OUTPUT}/';
 
   foreach($_POST['FEED_OUTPUT'][$k0] as $key => $value){
