@@ -20,7 +20,7 @@ class fcMRI( Plugin ):
   '''
   Plugin.AUTHORS = 'FNNDSC - Mathieu Dehaes, PhD'
   Plugin.TITLE = 'Resting State Connectivity Analysis'
-  Plugin.CATEGORY = 'Connectivity'
+  Plugin.CATEGORY = 'fMRI'
   Plugin.DESCRIPTION = 'Resting State based-ICA'
   Plugin.DOCUMENTATION = 'http://durban.tch.harvard.edu/wiki/index.php/FcMRI'
   Plugin.LICENSE = 'Opensource (MIT)'
