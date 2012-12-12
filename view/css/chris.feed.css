@@ -243,6 +243,7 @@
 
 .feed_move {
 	cursor: move;
+	opacity: 0.1;
 }
 
 .feed_search {

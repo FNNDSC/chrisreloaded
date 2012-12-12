@@ -515,6 +515,7 @@ _FEED_.search = function() {
 _FEED_.activateDraggable = function() {
   // setup draggable items for all file browser elements
   jQuery(".jqueryFileTree li a").draggable({
+    cursor: "move",
     handle : ".feed_move",
     helper : "clone",
     appendTo : "body",
@@ -523,7 +524,9 @@ _FEED_.activateDraggable = function() {
 }
 _FEED_.activateDraggableIcons = function() {
   jQuery('.feed_icon').draggable({
+    cursor: "move",
     handle : ".feed_move",
+    opacity: 0.5,
     helper : "clone",
     appendTo : "body",
     zIndex : 2500
