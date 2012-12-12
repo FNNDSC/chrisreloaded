@@ -388,7 +388,7 @@ class FeedC implements FeedControllerInterface {
 
   }
 
-  static public function setFavorite($feed_id, $favorite="1"){
+  static public function favorite($feed_id){
 
     $feedResult = Mapper::getStatic('Feed', $feed_id);
     $invert = (int)!$feedResult['Feed'][0]->favorite;
@@ -396,6 +396,16 @@ class FeedC implements FeedControllerInterface {
     Mapper::update($feedResult['Feed'][0], $feed_id);
     return $invert;
 
+  }
+  
+  static public function archive($feed_id){
+  
+    $feedResult = Mapper::getStatic('Feed', $feed_id);
+    $invert = (int)!$feedResult['Feed'][0]->archive;
+    $feedResult['Feed'][0]->favorite = $invert;
+    Mapper::update($feedResult['Feed'][0], $feed_id);
+    return $invert;
+  
   }
 
   static public function create($user_id, $plugin, $name){

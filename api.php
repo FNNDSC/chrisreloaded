@@ -124,10 +124,13 @@ if (!isset($_SESSION['username'])) {
         break;
       case "set":
         if ($what == 'feed_favorite') {
-          $result['result'] = FeedC::setFavorite($id);
+          $result['result'] = FeedC::favorite($id);
         }
         else if($what == 'feed_share'){
           $result['result'] = FeedC::share($id, $result['userid'], $result['username'], $parameters[0]);
+        }
+        else if($what == 'feed_archive'){
+          $result['result'] = FeedC::archive($id);
         }
         break;
       case "get":
