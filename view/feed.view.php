@@ -65,7 +65,7 @@ class FeedV implements ObjectViewInterface {
     foreach($feedMetaSimpleResults['Meta'] as $key => $value){
       $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value. '</br>';
       if($value->name == "sharer_id"){
-        $username_displayed = 'Shared by: '.FeedV::_getUsername($object->user_id);
+        $username_displayed = 'Shared by: '.FeedV::_getUsername($value->value);
       }
     }
 
