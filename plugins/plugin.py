@@ -35,6 +35,7 @@ class Plugin( argparse.ArgumentParser ):
   '''
   IMAGE = 'image'
   INTEGER = 'integer'
+  DOUBLE = 'double'
   BOOLEAN = 'boolean'
   STRING = 'string'
 
@@ -111,6 +112,9 @@ class Plugin( argparse.ArgumentParser ):
         xml += tag
         xml += '<label>' + parameter[0].replace( '_', ' ' ) + '</label>'
         xml += '<longflag>' + parameter[2] + '</longflag>'
+
+        if p_type == self.DOUBLE:
+          xml += '<constraints><step>0.1</step></constraints>'
 
         if parameter[3]:
           xml += '<default>' + str( parameter[3] ) + '</default>'

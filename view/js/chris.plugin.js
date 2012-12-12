@@ -378,13 +378,16 @@ jQuery(document)
             var _container = jQuery(v);
             var _default_value = _container.attr('data-default');
             var _step = _container.attr('data-step');
+
             if (!_step) {
-              _step = 1;
+             _step = 1;
             }
+            
             _container.spinner({
-              step: _step
+              step: _step,
+              numberFormat: "n"
             });
-            _container.spinner("value", parseFloat(_default_value, 10));
+            _container.spinner("value", _default_value);
           });
           // show non-advanced panels
           jQuery('.panelgroup')
