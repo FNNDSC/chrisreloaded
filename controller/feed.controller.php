@@ -273,7 +273,7 @@ class FeedC implements FeedControllerInterface {
     return $feed_update;
   }
 
-  static public function share($feed_id, $ownername, $targetname){
+  static public function share($feed_id, $ownerid, $ownername, $targetname){
     // get target user id
     $userMapper = new Mapper('User');
     $userMapper->filter('username = (?)', $targetname);
@@ -291,7 +291,32 @@ class FeedC implements FeedControllerInterface {
         $feedResult['Feed'][0]->favorite = 0;
         $new_id = Mapper::add($feedResult['Feed'][0]);
 
-        // copy files on file system
+        // get parameters, owner meta information
+        $metaMapper = new Mapper('Meta');
+        // OR confiton between all filters
+        $metaMapper->filter('', '', 0, 'OR');
+        // first filters
+        $metaMapper->filter('name = (?)', 'owner_id', 1);
+        $metaMapper->filter('target_id = (?)', $feed_id, 1);
+        $metaMapper->filter('target_type = (?)', 'feed', 1);
+        // second filters
+        $metaMapper->filter('name = (?)', 'parameters', 2);
+        $metaMapper->filter('target_id = (?)', $feed_id, 2);
+        $metaMapper->filter('target_type = (?)', 'feed', 2);
+        // get results
+        $metaResult = $metaMapper->get();
+        // for earch result, create same meta with different target id
+        if(count($metaResult['Meta']) >= 1){
+          foreach($metaResult['Meta'] as $k0 => $v0){
+            $v0->target_id = $new_id;
+            Mapper::add($v0);
+          }
+        }
+
+        // add sharer
+        FeedC::addMetaS($new_id, 'sharer_id', (string)$ownerid, 'simple');
+
+        // link files on file system
         $targetDirectory = CHRIS_USERS.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id;
 
         $destinationDirectory = CHRIS_USERS.$targetname.'/'.$feedResult['Feed'][0]->plugin;
@@ -301,9 +326,12 @@ class FeedC implements FeedControllerInterface {
 
         $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
 
-        if(!is_dir($destinationDirectory)){
-          recurse_copy($targetDirectory, $destinationDirectory);
-        }
+        // just a link?
+        symlink($targetDirectory, $destinationDirectory);
+
+        //if(!is_dir($destinationDirectory)){
+        //  recurse_copy($targetDirectory, $destinationDirectory);
+        //}
       }
       else{
         return "Invalid feed id: ". $feed_id;
