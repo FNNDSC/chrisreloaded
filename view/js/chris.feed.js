@@ -366,15 +366,15 @@ _FEED_.feed_archive_onclick = function() {
                 .each(
                     function() {
                       var elt = jQuery(this);
-                      if (!elt.parent().hasClass('feed_sea')) {
+                      if (elt.parent().hasClass('feed_sea')) {
                         if (data['result'] == "1") {
                           jQuery(elt).find('.feed_archive').html(
-                              '<i class="icon-plus-sign">');
+                              '<i class="icon-plus">');
                         } else {
                           jQuery(elt).find('.feed_archive').html(
-                              '<i class="icon-remove-sign">');
+                              '<i class="icon-remove">');
                           // clone and put at good location!
-                          clone = elt.clone();
+                          clone = elt.clone().hide();
                           // if favorite, push it in the favorites
                           if (elt.find('.feed_favorite > .i').hasClass(
                               'icon-star')) {
@@ -393,7 +393,9 @@ _FEED_.feed_archive_onclick = function() {
                       } else {
                         // remove
                         if (data['result'] == "1") {
-                          jQuery(elt).remove();
+                          jQuery(elt).hide('blind', 'slow', function() {
+                            jQuery(this).remove();
+                          });
                         }
                       }
                     });

@@ -87,9 +87,9 @@ class FeedV implements ObjectViewInterface {
       $share_text = '<i class="icon-share-alt"></i>';
     }
     
-    $archive_text = '<i class="icon-remove-sign"></i>';
+    $archive_text = '<i class="icon-remove"></i>';
     if ($object->archive == '1') {
-      $archive_text = '<i class="icon-plus-sign"></i>';
+      $archive_text = '<i class="icon-plus"></i>';
     }
     
     $favorite_text = '<i class="icon-star-empty"></i>';

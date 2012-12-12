@@ -402,7 +402,7 @@ class FeedC implements FeedControllerInterface {
   
     $feedResult = Mapper::getStatic('Feed', $feed_id);
     $invert = (int)!$feedResult['Feed'][0]->archive;
-    $feedResult['Feed'][0]->favorite = $invert;
+    $feedResult['Feed'][0]->archive = $invert;
     Mapper::update($feedResult['Feed'][0], $feed_id);
     return $invert;
   
