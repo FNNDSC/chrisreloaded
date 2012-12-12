@@ -38,6 +38,7 @@ class Plugin( argparse.ArgumentParser ):
   DOUBLE = 'double'
   BOOLEAN = 'boolean'
   STRING = 'string'
+  COMBOBOX = 'string-enumeration'
 
   def __init__( self ):
     '''
@@ -124,6 +125,12 @@ class Plugin( argparse.ArgumentParser ):
 
         if parameter[4]:
           xml += '<description>' + str( parameter[4] ) + '</description>'
+
+        if p_type == self.COMBOBOX and parameter[5]:
+          # create element entries
+          for e in parameter[5]:
+            xml += '<element>' + str( e ) + '</element>'
+
         xml += end_tag
 
       xml += '</parameters>\n'
@@ -164,9 +171,15 @@ class Plugin( argparse.ArgumentParser ):
     # grab the flag (required)
     flag = args[0]
 
+    # check if we have values set (for a collection of choices)
+    values = None
+    if 'values' in kwargs:
+      values = kwargs['values']
+      del kwargs['values']
+
     # store the parameter internally
     # (FIFO)
-    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default, _help] )
+    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default, _help, values] )
 
     # add the argument to the parser
     self.add_argument( *args, **kwargs )
