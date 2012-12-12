@@ -81,6 +81,7 @@ class FeedC implements FeedControllerInterface {
     $feedMapper = new Mapper('Feed');
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
+      $feedMapper->filter('archive = (?)', '0');
     }
     // different conditions depending on filter type
     switch ($type){
@@ -151,6 +152,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('time > (?)',$feed_new);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -182,6 +184,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -215,6 +218,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('time < (?)',$feed_old);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -384,7 +388,7 @@ class FeedC implements FeedControllerInterface {
 
   }
 
-  static public function setFavorite($feed_id, $favorite="1"){
+  static public function favorite($feed_id){
 
     $feedResult = Mapper::getStatic('Feed', $feed_id);
     $invert = (int)!$feedResult['Feed'][0]->favorite;
@@ -392,6 +396,16 @@ class FeedC implements FeedControllerInterface {
     Mapper::update($feedResult['Feed'][0], $feed_id);
     return $invert;
 
+  }
+  
+  static public function archive($feed_id){
+  
+    $feedResult = Mapper::getStatic('Feed', $feed_id);
+    $invert = (int)!$feedResult['Feed'][0]->archive;
+    $feedResult['Feed'][0]->archive = $invert;
+    Mapper::update($feedResult['Feed'][0], $feed_id);
+    return $invert;
+  
   }
 
   static public function create($user_id, $plugin, $name){

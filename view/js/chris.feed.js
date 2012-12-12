@@ -345,6 +345,64 @@ _FEED_.feed_favorite_onclick = function() {
         });
       });
 }
+_FEED_.feed_archive_onclick = function() {
+  jQuery(document).on(
+      'click',
+      '.feed_archive',
+      function(e) {
+        // modify
+        e.stopPropagation();
+        // get feed id
+        var feedElt = jQuery(this).parents().eq(2);
+        var feedID = feedElt.attr('data-chris-feed_id');
+        var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
+        // api.php add to favorites
+        jQuery.ajax({
+          type : "POST",
+          url : "api.php?action=set&what=feed_archive&id=" + feedID,
+          dataType : "json",
+          success : function(data) {
+            jQuery(allElts)
+                .each(
+                    function() {
+                      var elt = jQuery(this);
+                      if (elt.parent().hasClass('feed_sea')) {
+                        if (data['result'] == "1") {
+                          jQuery(elt).find('.feed_archive').html(
+                              '<i class="icon-plus">');
+                        } else {
+                          jQuery(elt).find('.feed_archive').html(
+                              '<i class="icon-remove">');
+                          // clone and put at good location!
+                          clone = elt.clone().hide();
+                          // if favorite, push it in the favorites
+                          if (elt.find('.feed_favorite > .i').hasClass(
+                              'icon-star')) {
+                            jQuery(clone).prependTo('.feed_fav').slideDown(
+                                'slow');
+                          } else {
+                            if (elt.attr('data-chris-feed_status') != 100) {
+                              jQuery(clone).prependTo('.feed_run').slideDown(
+                                  'slow');
+                            } else {
+                              jQuery(clone).prependTo('.feed_fin').slideDown(
+                                  'slow');
+                            }
+                          }
+                        }
+                      } else {
+                        // remove
+                        if (data['result'] == "1") {
+                          jQuery(elt).hide('blind', 'slow', function() {
+                            jQuery(this).remove();
+                          });
+                        }
+                      }
+                    });
+          }
+        });
+      });
+}
 _FEED_.feed_share_onclick = function() {
   jQuery(document).on(
       'click',
@@ -515,7 +573,7 @@ _FEED_.search = function() {
 _FEED_.activateDraggable = function() {
   // setup draggable items for all file browser elements
   jQuery(".jqueryFileTree li a").draggable({
-    cursor: "move",
+    cursor : "move",
     handle : ".feed_move",
     helper : "clone",
     appendTo : "body",
@@ -524,9 +582,9 @@ _FEED_.activateDraggable = function() {
 }
 _FEED_.activateDraggableIcons = function() {
   jQuery('.feed_icon').draggable({
-    cursor: "move",
+    cursor : "move",
     handle : ".feed_move",
-    opacity: 0.5,
+    opacity : 0.5,
     helper : "clone",
     appendTo : "body",
     zIndex : 2500
@@ -554,7 +612,6 @@ jQuery(document)
                   'data-chris-feed_time');
             }
           }
-          
           // look into running
           elt = jQuery(".feed_run > .feed");
           if (elt.length) {
@@ -586,6 +643,7 @@ jQuery(document)
           _FEED_.feed_onclick();
           _FEED_.feed_favorite_onclick();
           _FEED_.feed_share_onclick();
+          _FEED_.feed_archive_onclick();
           // _FEED_.feed_title_onclick();
           _FEED_.feed_fav_onclick();
           _FEED_.feed_run_onclick();
