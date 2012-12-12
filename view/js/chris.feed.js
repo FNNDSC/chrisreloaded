@@ -501,6 +501,7 @@ _FEED_.scrollBottom = function() {
               jQuery('.feed_fin').append(old_Feeds);
               _FEED_.updateTime();
               jQuery('.feed_content').bind('scroll');
+              _FEED_.activateDraggableIcons();
             }
           });
         }
@@ -551,6 +552,7 @@ _FEED_.search = function() {
               jQuery('.feed_sea').html(old_Feeds);
               // jQuery('.feed_sea').find('.feed').addClass('feed_search');
               _FEED_.updateTime();
+              _FEED_.activateDraggableIcons();
             }
           });
         } else {
