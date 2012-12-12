@@ -86,6 +86,16 @@ class FeedV implements ObjectViewInterface {
       $status_text = '<font color=green>Done</font>';
       $share_text = '<i class="icon-share-alt"></i>';
     }
+    
+    $archive_text = '<i class="icon-remove-sign"></i>';
+    if ($object->archive == '1') {
+      $archive_text = '<i class="icon-plus-sign"></i>';
+    }
+    
+    $favorite_text = '<i class="icon-star-empty"></i>';
+    if ($object->favorite == '1') {
+      $favorite_text = '<i class="icon-star"></i>';
+    }
 
     $t = new Template('feed.html');
     $t -> replace('ID', $object->id);
@@ -103,14 +113,8 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
     $t -> replace('SHARE_TEXT', $share_text);
-    // set favorite icon
-    $favorite = $object->favorite;
-    if($favorite == 1){
-      $t -> replace('FAVORITE', 'icon-star');
-    }
-    else{
-      $t -> replace('FAVORITE', 'icon-star-empty');
-    }
+    $t -> replace('ARCHIVE_TEXT', $archive_text);
+    $t -> replace('FAVORITE_TEXT', $favorite_text);
     // set data browser
     $d = new Template('feed_data_browser.html');
     $d -> replace('FOLDER', joinPaths($username,$object->plugin, $object->name.'-'.$object->id));
