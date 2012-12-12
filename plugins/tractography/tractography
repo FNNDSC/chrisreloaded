@@ -1,0 +1,135 @@
+#!/usr/bin/env python
+#
+#                                                            _           
+#   _                       _                               | |          
+# _| |_  ____ _____  ____ _| |_ ___   ____  ____ _____ ____ | |__  _   _ 
+#(_   _)/ ___|____ |/ ___|_   _) _ \ / _  |/ ___|____ |  _ \|  _ \| | | |
+#  | |_| |   / ___ ( (___  | || |_| ( (_| | |   / ___ | |_| | | | | |_| |
+#   \__)_|   \_____|\____)  \__)___/ \___ |_|   \_____|  __/|_| |_|\__  |
+#                                   (_____|           |_|         (____/ 
+#
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+from plugin import Plugin
+
+class tractography(Plugin):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  Plugin.TITLE = 'Tractography'
+  Plugin.CATEGORY = 'Diffusion'
+  Plugin.DESCRIPTION = 'Generate .trk file from DTI images'
+  Plugin.DOCUMENTATION = 'http://wiki'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.1'
+
+  def run(self, options):
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    
+    #base command
+    command = ' \'/chb/arch/scripts/dcm2trk.bash -v 10 -f';
+    
+    #output
+    command += ' -O ' + options.output
+    
+    # grab the first dicom input file
+    firstDicomFile = os.listdir(options.dti)[0]
+    # dicom file
+    command += ' -d ' + os.path.join(options.dti, firstDicomFile)
+    
+    # stages
+    command += ' -t ';
+    if options.stage1:
+      command += '1'
+    if options.stage2:
+      command += '2'
+    if options.stage3:
+      command += '3'
+    if options.stage4:
+      command += '4'
+    if options.stage5:
+      command += '5'
+    
+    #mask1
+    command += ' --m1 ' + options.m1 + ' --m1-lower-threshold ' + options.m1lowerthreshold + ' --m1-upper-threshold ' + options.m1upperthreshold
+    
+    #mask2
+    if options.usem2:
+      command += ' --m2 ' + options.m2 + ' --m2-lower-threshold ' + options.m2lowerthreshold + ' --m2-upper-threshold ' + options.m2upperthreshold
+        
+    #angle threshold
+    command += ' --angle-threshold ' + options.anglethreshold
+    
+    #recon algo
+    command += ' -A ' + options.recalgo
+        
+    #image model
+    command += ' -I ' + options.immodel
+    
+    if options.usegradient:
+      command += ' -g ' + options.gradient
+      
+    if options.useb0:
+      command += ' -B ' + options.b0
+      
+    if options.invertx:
+      command += ' -X'
+    if options.inverty:
+      command += ' -Y'
+    if options.invertz:
+      command += ' -Z'
+     
+    command = current_dir + '/dcm2trk.wrapper ' + command + '\''
+    print command
+    os.system(command)
+
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = tractography()
+  #inputs
+  plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='dti', help='the dti scan')
+  
+  #stages to be run
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage1', default=True, action='store_true', dest='stage1', help='Run stage 1 (MRI Convert)')
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage2', default=True, action='store_true', dest='stage2', help='Run stage 2 (Eddy Correct)')
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage3', default=True, action='store_true', dest='stage3', help='Run stage 3 (DTI Recon)')
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage4', default=True, action='store_true', dest='stage4', help='Run stage 4 (ODF Recon)')
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage5', default=True, action='store_true', dest='stage5', help='Run stage 5 (Spline Filter)')
+  
+  #Mask Filter
+  plugin.add_parameter('1st Mask Filter', Plugin.STRING, '--m1', default='DWI', action='store', dest='m1', help='Volume to be used as 1st mask filter')
+  plugin.add_parameter('1st Mask Filter', Plugin.DOUBLE, '--m1lowerthreshold', default='0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
+  plugin.add_parameter('1st Mask Filter', Plugin.DOUBLE, '--m1upperthreshold', default='1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
+  
+  #2nd Mask Filter
+  plugin.add_parameter('2nd Mask Filter', Plugin.BOOLEAN, '--usem2', default=False, action='store_true', dest='usem2', help='Use 2nd mask filter')
+  plugin.add_parameter('2nd Mask Filter', Plugin.STRING, '--m2', default='DWI', action='store', dest='m2', help='Volume to be used as 2nd mask filter')
+  plugin.add_parameter('2nd Mask Filter', Plugin.DOUBLE, '--m2lowerthreshold', default='0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
+  plugin.add_parameter('2nd Mask Filter', Plugin.DOUBLE, '--m2upperthreshold', default='1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
+  
+  # gradients
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--usegradient', default=False, action='store_true', dest='usegradient', help='Manually upload gradient')
+  plugin.add_parameter('Gradient', Plugin.IMAGE, '--gradient', action='store', dest='gradient', help='Gradient file')
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--useb0', default=False, action='store_true', dest='useb0', help='Manually specify number of B0 volumes')
+  plugin.add_parameter('Gradient', Plugin.INTEGER, '--b0', default='1', action='store', dest='b0', help='Number of B0 volumes')
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--invertx', default=False, action='store_true', dest='invertx', help='Invert X gradient')
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--inverty', default=False, action='store_true', dest='inverty', help='Invert Y gradient')
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--invertz', default=False, action='store_true', dest='invertz', help='Invert Z gradient')
+  
+  #advanced
+  plugin.add_parameter('Advanced', Plugin.INTEGER, '--anglethreshold', default='35', action='store', dest='anglethreshold', help='Angle threshold filtering')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--recalgo', default='FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--immodel', default='DTI', action='store', dest='immodel', help='Image Model')
+  
+  #-A rk2 -I hardi --m1 FA --m1-lower-threshold 0.0 --m1-upper-threshold 1.0 --m2 DWI --m2-lower-threshold 0.0 --m2-upper-threshold 1.0 --angle-threshold 35 -g "/chb/users/dicom/postproc/gradient_tables/20121212-121620/uploaded_gradient_file.txt" -B 76 -Y -Z -v 10 -c -C 
+  
+  plugin.launch(sys.argv)
