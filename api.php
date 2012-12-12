@@ -64,8 +64,7 @@ if (!isset($_SESSION['username'])) {
   // propagate user attributes
   $result['username'] = $_SESSION['username'];
   $result['userid'] = $_SESSION['userid'];
-
-
+  
   //
   // API FUNCTIONS
   //
@@ -128,7 +127,7 @@ if (!isset($_SESSION['username'])) {
           $result['result'] = FeedC::setFavorite($id);
         }
         else if($what == 'feed_share'){
-          $result['result'] = FeedC::share($id, $result['username'], $parameters[0]);
+          $result['result'] = FeedC::share($id, $result['userid'], $result['username'], $parameters[0]);
         }
         break;
       case "get":

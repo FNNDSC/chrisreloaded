@@ -134,13 +134,18 @@ if($jobid != ''){
   mkdir($job_path, 0777, true);
 }
 
-// replace ${OUTPUT} pattern in the command
+// replace ${OUTPUT} pattern in the command and in the parameters
 $command = str_replace("{OUTPUT}", $job_path, $command);
 $command = str_replace("{FEED_ID}", $feed_id, $command);
 $command = str_replace("{USER_ID}", $user_id, $command);
+$parameters = str_replace("{OUTPUT}", $job_path, $parameters);
+$parameters = str_replace("{FEED_ID}", $feed_id, $parameters);
+$parameters = str_replace("{USER_ID}", $user_id, $parameters);
 
 // add meta information to the feed
 FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
+// add owner
+FeedC::addMetaS($feed_id, 'owner_id', (string)$user_id, 'simple');
 
 // run dummy mosix script - should use crun
 $arguments = ' -l '.$job_path;
