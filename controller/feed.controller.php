@@ -81,6 +81,7 @@ class FeedC implements FeedControllerInterface {
     $feedMapper = new Mapper('Feed');
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
+      $feedMapper->filter('archive = (?)', '0');
     }
     // different conditions depending on filter type
     switch ($type){
@@ -151,6 +152,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('time > (?)',$feed_new);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -182,6 +184,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -215,6 +218,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('time < (?)',$feed_old);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
