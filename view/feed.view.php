@@ -80,7 +80,7 @@ class FeedV implements ObjectViewInterface {
     $share_text = '';
     if ($object->status == 100) {
       $status_text = '<font color=green>Done</font>';
-      $share_text = '<i class="icon-share"></i>';
+      $share_text = '<i class="icon-share-alt"></i>';
     }
 
     $t = new Template('feed.html');
