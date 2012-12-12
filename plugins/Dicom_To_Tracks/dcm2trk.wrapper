@@ -2,4 +2,4 @@
 source ~/.bash_profile
 ss
 source chb-fsstable
-/chb/arch/scripts/dcm2trk.bash -v 10 -f $1
+$1

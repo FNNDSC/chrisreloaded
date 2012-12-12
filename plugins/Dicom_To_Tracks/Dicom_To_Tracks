@@ -35,28 +35,29 @@ class Dicom_To_Tracks(Plugin):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
-    command = '';
+    #base command
+    command = ' \'/chb/arch/scripts/dcm2trk.bash -v 10 -f';
     
     #output
-    command += '-O ' + options.output
+    command += ' -O ' + options.output
     
     # grab the first dicom input file
     firstDicomFile = os.listdir(options.dti)[0]
     # dicom file
-    command += '-d ' + os.path.join(options.dti, firstDicomFile)
+    command += ' -d ' + os.path.join(options.dti, firstDicomFile)
     
     # stages
     command += ' -t ';
     if options.stage1:
-      stages += '1'
+      command += '1'
     if options.stage2:
-      stages += '2'
+      command += '2'
     if options.stage3:
-      stages += '3'
+      command += '3'
     if options.stage4:
-      stages += '4'
+      command += '4'
     if options.stage5:
-      stages += '5'
+      command += '5'
     
     #mask1
     command += ' --m1 ' + options.m1 + ' --m1-lower-threshold ' + options.m1lowerthreshold + ' --m1-upper-threshold ' + options.m1upperthreshold
@@ -87,7 +88,7 @@ class Dicom_To_Tracks(Plugin):
     if options.invertz:
       command += ' -Z'
      
-    command = current_dir + '/dcm2trk.wrapper ' + command
+    command = current_dir + '/dcm2trk.wrapper ' + command + '\''
     print command
     os.system(command)
 
@@ -127,7 +128,7 @@ if __name__ == "__main__":
   #advanced
   plugin.add_parameter('Advanced', Plugin.INTEGER, '--anglethreshold', default='35', action='store', dest='anglethreshold', help='Angle threshold filtering')
   plugin.add_parameter('Advanced', Plugin.STRING, '--recalgo', default='FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
-  plugin.add_parameter('Advanced', Plugin.INTEGER, '--immodel', default='DTI', action='store', dest='immodel', help='Image Model')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--immodel', default='DTI', action='store', dest='immodel', help='Image Model')
   
   #-A rk2 -I hardi --m1 FA --m1-lower-threshold 0.0 --m1-upper-threshold 1.0 --m2 DWI --m2-lower-threshold 0.0 --m2-upper-threshold 1.0 --angle-threshold 35 -g "/chb/users/dicom/postproc/gradient_tables/20121212-121620/uploaded_gradient_file.txt" -B 76 -Y -Z -v 10 -c -C 
   
