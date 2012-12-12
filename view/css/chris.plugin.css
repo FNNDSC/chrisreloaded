@@ -210,3 +210,10 @@
 .parameter_batchdrop_hover {
 	background-color: seaGreen;
 }
+
+.parameter_combobox {
+	height: 23px;
+	line-height: 22px;
+	width: 140px;
+	font-size: 11px;
+}

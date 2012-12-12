@@ -144,4 +144,25 @@
     </div>
   </xsl:template>
     
+    
+  <!-- STRING-ENUMERATION parameter -->
+  <xsl:template match="string-enumeration">
+    <div rel='left_tooltip' class='parameter_row'>
+      <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
+      <span class='parameter_title' style='width:85px;'>
+        <xsl:value-of select="label"/>
+      </span>
+      <span class='parameter_input' data-type='combobox'>
+        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
+        <select class='parameter_combobox'>
+          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
+          <xsl:for-each select="element">
+            <option><xsl:value-of select="."/></option>
+          </xsl:for-each>
+        </select>        
+      </span>
+    </div>
+  </xsl:template>
+      
+  
 </xsl:stylesheet>

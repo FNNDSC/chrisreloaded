@@ -208,6 +208,12 @@ jQuery(document)
                       '.parameter_string');
                   _default_value = _string.attr('data-default');
                   _string.val(_default_value);
+                  // comboboxes
+                  var _combobox = jQuery(_parameter_rows[i]).find(
+                      '.parameter_combobox');
+                  _default_value = _combobox.attr('data-default');
+                  _combobox.val(_default_value);
+                  
                 });
                 // reset all jobs
                 _BATCH_.reset();
@@ -317,6 +323,11 @@ jQuery(document)
                       } else {
                         return;
                       }
+                    } else if (_type == 'combobox') {
+                      // comboboxes
+                      var _combobox = jQuery(_parameter_rows[i]).find(
+                          '.parameter_combobox');
+                      _value = jQuery(_combobox).val();
                     }
                     // push the parameter
                     _parameters.push({
@@ -378,9 +389,9 @@ jQuery(document)
             var _container = jQuery(v);
             var _default_value = _container.attr('data-default');
             var _step = _container.attr('data-step');
-
+            
             if (!_step) {
-             _step = 1;
+              _step = 1;
             }
             
             _container.spinner({
@@ -389,6 +400,16 @@ jQuery(document)
             });
             _container.spinner("value", _default_value);
           });
+          jQuery('.parameter_combobox').each(function(i, v) {
+
+            var _container = jQuery(v);
+            
+            var _default_value = _container.attr('data-default');
+            
+            _container.val(_default_value);
+            
+          });
+          
           // show non-advanced panels
           jQuery('.panelgroup')
               .each(
