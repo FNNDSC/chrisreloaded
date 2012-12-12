@@ -53,6 +53,7 @@ class FeedV implements ObjectViewInterface {
   public static function getHTML($object){
     // Format username
     $username = FeedV::_getUsername($object->user_id);
+    $username_displayed = $username;
     // Format time
     //$time = FeedV::_getTime(date("Y-m-d H:i:s", $object->time));
     // Format simple meta feed
@@ -63,6 +64,9 @@ class FeedV implements ObjectViewInterface {
 
     foreach($feedMetaSimpleResults['Meta'] as $key => $value){
       $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value. '</br>';
+      if($value->name == "sharer_id"){
+        $username_displayed = 'Shared by: '.FeedV::_getUsername($object->user_id);
+      }
     }
 
     // Format advanced meta feed
@@ -82,6 +86,16 @@ class FeedV implements ObjectViewInterface {
       $status_text = '<font color=green>Done</font>';
       $share_text = '<i class="icon-share-alt"></i>';
     }
+    
+    $archive_text = '<i class="icon-remove"></i>';
+    if ($object->archive == '1') {
+      $archive_text = '<i class="icon-plus"></i>';
+    }
+    
+    $favorite_text = '<i class="icon-star-empty"></i>';
+    if ($object->favorite == '1') {
+      $favorite_text = '<i class="icon-star"></i>';
+    }
 
     $t = new Template('feed.html');
     $t -> replace('ID', $object->id);
@@ -90,7 +104,7 @@ class FeedV implements ObjectViewInterface {
       $feed_gfx64 = 'http://placehold.it/48x48';
     }
     $t -> replace('IMAGE_SRC', $feed_gfx64);
-    $t -> replace('USERNAME', $username);
+    $t -> replace('USERNAME', $username_displayed);
     $t -> replace('FEED_META_SIMPLE', $object->name);
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
     $t -> replace('TIME_FORMATED', $object->time);
@@ -99,14 +113,8 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
     $t -> replace('SHARE_TEXT', $share_text);
-    // set favorite icon
-    $favorite = $object->favorite;
-    if($favorite == 1){
-      $t -> replace('FAVORITE', 'icon-star');
-    }
-    else{
-      $t -> replace('FAVORITE', 'icon-star-empty');
-    }
+    $t -> replace('ARCHIVE_TEXT', $archive_text);
+    $t -> replace('FAVORITE_TEXT', $favorite_text);
     // set data browser
     $d = new Template('feed_data_browser.html');
     $d -> replace('FOLDER', joinPaths($username,$object->plugin, $object->name.'-'.$object->id));

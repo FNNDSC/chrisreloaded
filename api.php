@@ -64,8 +64,7 @@ if (!isset($_SESSION['username'])) {
   // propagate user attributes
   $result['username'] = $_SESSION['username'];
   $result['userid'] = $_SESSION['userid'];
-
-
+  
   //
   // API FUNCTIONS
   //
@@ -125,10 +124,13 @@ if (!isset($_SESSION['username'])) {
         break;
       case "set":
         if ($what == 'feed_favorite') {
-          $result['result'] = FeedC::setFavorite($id);
+          $result['result'] = FeedC::favorite($id);
         }
         else if($what == 'feed_share'){
-          $result['result'] = FeedC::share($id, $result['username'], $parameters[0]);
+          $result['result'] = FeedC::share($id, $result['userid'], $result['username'], $parameters[0]);
+        }
+        else if($what == 'feed_archive'){
+          $result['result'] = FeedC::archive($id);
         }
         break;
       case "get":

@@ -81,6 +81,7 @@ class FeedC implements FeedControllerInterface {
     $feedMapper = new Mapper('Feed');
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
+      $feedMapper->filter('archive = (?)', '0');
     }
     // different conditions depending on filter type
     switch ($type){
@@ -151,6 +152,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('time > (?)',$feed_new);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -182,6 +184,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -215,6 +218,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('time < (?)',$feed_old);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -273,7 +277,7 @@ class FeedC implements FeedControllerInterface {
     return $feed_update;
   }
 
-  static public function share($feed_id, $ownername, $targetname){
+  static public function share($feed_id, $ownerid, $ownername, $targetname){
     // get target user id
     $userMapper = new Mapper('User');
     $userMapper->filter('username = (?)', $targetname);
@@ -291,7 +295,32 @@ class FeedC implements FeedControllerInterface {
         $feedResult['Feed'][0]->favorite = 0;
         $new_id = Mapper::add($feedResult['Feed'][0]);
 
-        // copy files on file system
+        // get parameters, owner meta information
+        $metaMapper = new Mapper('Meta');
+        // OR confiton between all filters
+        $metaMapper->filter('', '', 0, 'OR');
+        // first filters
+        $metaMapper->filter('name = (?)', 'owner_id', 1);
+        $metaMapper->filter('target_id = (?)', $feed_id, 1);
+        $metaMapper->filter('target_type = (?)', 'feed', 1);
+        // second filters
+        $metaMapper->filter('name = (?)', 'parameters', 2);
+        $metaMapper->filter('target_id = (?)', $feed_id, 2);
+        $metaMapper->filter('target_type = (?)', 'feed', 2);
+        // get results
+        $metaResult = $metaMapper->get();
+        // for earch result, create same meta with different target id
+        if(count($metaResult['Meta']) >= 1){
+          foreach($metaResult['Meta'] as $k0 => $v0){
+            $v0->target_id = $new_id;
+            Mapper::add($v0);
+          }
+        }
+
+        // add sharer
+        FeedC::addMetaS($new_id, 'sharer_id', (string)$ownerid, 'simple');
+
+        // link files on file system
         $targetDirectory = CHRIS_USERS.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id;
 
         $destinationDirectory = CHRIS_USERS.$targetname.'/'.$feedResult['Feed'][0]->plugin;
@@ -301,9 +330,12 @@ class FeedC implements FeedControllerInterface {
 
         $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
 
-        if(!is_dir($destinationDirectory)){
-          recurse_copy($targetDirectory, $destinationDirectory);
-        }
+        // just a link?
+        symlink($targetDirectory, $destinationDirectory);
+
+        //if(!is_dir($destinationDirectory)){
+        //  recurse_copy($targetDirectory, $destinationDirectory);
+        //}
       }
       else{
         return "Invalid feed id: ". $feed_id;
@@ -356,7 +388,7 @@ class FeedC implements FeedControllerInterface {
 
   }
 
-  static public function setFavorite($feed_id, $favorite="1"){
+  static public function favorite($feed_id){
 
     $feedResult = Mapper::getStatic('Feed', $feed_id);
     $invert = (int)!$feedResult['Feed'][0]->favorite;
@@ -364,6 +396,16 @@ class FeedC implements FeedControllerInterface {
     Mapper::update($feedResult['Feed'][0], $feed_id);
     return $invert;
 
+  }
+  
+  static public function archive($feed_id){
+  
+    $feedResult = Mapper::getStatic('Feed', $feed_id);
+    $invert = (int)!$feedResult['Feed'][0]->archive;
+    $feedResult['Feed'][0]->archive = $invert;
+    Mapper::update($feedResult['Feed'][0], $feed_id);
+    return $invert;
+  
   }
 
   static public function create($user_id, $plugin, $name){
