@@ -61,16 +61,38 @@ if __name__ == "__main__":
   plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='dti', help='the dti scan')
   
   #stages to be run
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage1', default = True, action='store_true', dest='stage1', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage2', default = True, action='store_true', dest='stage2', help='Run stage 2')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage3', default = True, action='store_true', dest='stage3', help='Run stage 3')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage4', default = True, action='store_true', dest='stage4', help='Run stage 4')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--stage5', default = True, action='store_true', dest='stage5', help='Run stage 5')
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage1', default = True, action='store_true', dest='stage1', help='Run stage 1')
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage2', default = True, action='store_true', dest='stage2', help='Run stage 2')
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage3', default = True, action='store_true', dest='stage3', help='Run stage 3')
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage4', default = True, action='store_true', dest='stage4', help='Run stage 4')
+  plugin.add_parameter('Stages', Plugin.BOOLEAN, '--stage5', default = True, action='store_true', dest='stage5', help='Run stage 5')
   
-    #other advanced parameters
-  plugin.add_parameter('Advanced', Plugin.STRING, '--m1', default='DWI', action='store', dest='m1', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.INTEGER, '--m1lowerthreshold', default = '0', action='store', dest='m1lowerthreshold', help='Run stage 1')
-  plugin.add_parameter('Advanced', Plugin.INTEGER, '--m1upperthreshold', default = '1', action='store', dest='m1upperthreshold', help='Run stage 1')
+  #Mask Filter
+  plugin.add_parameter('1st Mask Filter', Plugin.STRING, '--m1', default='DWI', action='store', dest='m1', help='Volume to be used as 1st mask filter')
+  plugin.add_parameter('1st Mask Filter', Plugin.DOUBLE, '--m1lowerthreshold', default = '0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
+  plugin.add_parameter('1st Mask Filter', Plugin.DOUBLE, '--m1upperthreshold', default = '1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
+  
+  #2nd Mask Filter
+  plugin.add_parameter('2nd Mask Filter', Plugin.BOOLEAN, '--usem2', default=False, action='store_true', dest='usem2', help='Use 2nd mask filter')
+  plugin.add_parameter('2nd Mask Filter', Plugin.STRING, '--m2', default='DWI', action='store', dest='m2', help='Volume to be used as 2nd mask filter')
+  plugin.add_parameter('2nd Mask Filter', Plugin.DOUBLE, '--m2lowerthreshold', default = '0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
+  plugin.add_parameter('2nd Mask Filter', Plugin.DOUBLE, '--m2upperthreshold', default = '1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
+  
+  # gradients
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--usegradient', default=False, action='store_true', dest='usegradient', help='Manually upload gradient')
+  plugin.add_parameter('Gradient', Plugin.IMAGE, '--gradient', action='store', dest='gradient', help='Gradient file')
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--useb0', default = False, action='store_true', dest='useb0', help='Manually specify number of B0 volumes')
+  plugin.add_parameter('Gradient', Plugin.INTEGER, '--b0', default = '1', action='store', dest='b0', help='Number of B0 volumes')
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--invertx', default = False, action='store_true', dest='invertx', help='Invert X gradient')
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--inverty', default = False, action='store_true', dest='inverty', help='Invert Y gradient')
+  plugin.add_parameter('Gradient', Plugin.BOOLEAN, '--invertz', default = False, action='store_true', dest='invertz', help='Invert Z gradient')
+  
+  #advanced
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--ecc', default=True, action='store_true', dest='ecc', help='Run stage 1')
   plugin.add_parameter('Advanced', Plugin.INTEGER, '--anglethreshold', default = '35', action='store', dest='anglethreshold', help='Run stage 1')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--recalgo', default = 'FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
+  plugin.add_parameter('Advanced', Plugin.INTEGER, '--immodel', default = 'DTI', action='store', dest='immodel', help='Image Model')
+  
+  #-t 12 -A rk2 -I hardi --m1 FA --m1-lower-threshold 0.0 --m1-upper-threshold 1.0 --m2 DWI --m2-lower-threshold 0.0 --m2-upper-threshold 1.0 --angle-threshold 35 -g "/chb/users/dicom/postproc/gradient_tables/20121212-121620/uploaded_gradient_file.txt" -B 76 -Y -Z -v 10 -c -C 
   
   plugin.launch(sys.argv)
