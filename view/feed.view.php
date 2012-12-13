@@ -53,7 +53,7 @@ class FeedV implements ObjectViewInterface {
   public static function getHTML($object){
     // Format username
     $username = FeedV::_getUsername($object->user_id);
-    $username_displayed = $username;
+    $username_displayed = ucwords($username);
     // Format time
     //$time = FeedV::_getTime(date("Y-m-d H:i:s", $object->time));
     // Format simple meta feed
@@ -65,7 +65,7 @@ class FeedV implements ObjectViewInterface {
     foreach($feedMetaSimpleResults['Meta'] as $key => $value){
       $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value. '</br>';
       if($value->name == "sharer_id"){
-        $username_displayed = 'Shared by '.FeedV::_getUsername($value->value);
+        $username_displayed = 'Shared by '.ucwords(FeedV::_getUsername($value->value));
       }
     }
 
