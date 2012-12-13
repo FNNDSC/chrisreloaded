@@ -300,7 +300,7 @@ class FeedC implements FeedControllerInterface {
         // OR confiton between all filters
         $metaMapper->filter('', '', 0, 'OR');
         // first filters
-        $metaMapper->filter('name = (?)', 'owner_id', 1);
+        $metaMapper->filter('name = (?)', 'root_id', 1);
         $metaMapper->filter('target_id = (?)', $feed_id, 1);
         $metaMapper->filter('target_type = (?)', 'feed', 1);
         // second filters

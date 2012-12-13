@@ -145,7 +145,7 @@ $parameters = str_replace("{USER_ID}", $user_id, $parameters);
 // add meta information to the feed
 FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
 // add owner
-FeedC::addMetaS($feed_id, 'owner_id', (string)$user_id, 'simple');
+FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 
 // run dummy mosix script - should use crun
 $arguments = ' -l '.$job_path;
