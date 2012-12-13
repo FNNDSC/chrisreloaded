@@ -52,7 +52,7 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
 // define the options
-$shortopts = "t:o:n:d:i:s:";
+$shortopts = "o:n:d:i:s:";
 
 $options = getopt($shortopts);
 
@@ -74,7 +74,7 @@ if(isset($options['s'])){
 //
 // 1- CREATE PRE-PROCESS LOG FILE
 //
-$type = 'Patient'
+$type = 'Patient';
 $logFile = $output_dir.'search.log';
 
 //
