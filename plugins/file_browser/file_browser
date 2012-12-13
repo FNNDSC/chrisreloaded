@@ -19,7 +19,7 @@ import os, sys
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class FileBrowser( Plugin ):
+class file_browser( Plugin ):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -37,6 +37,6 @@ class FileBrowser( Plugin ):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = FileBrowser()
+  plugin = file_browser()
   plugin.add_parameter( 'Input', Plugin.STRING, '--dir', action='store', dest='DIR', help='directory to browse' )
   plugin.launch( sys.argv )

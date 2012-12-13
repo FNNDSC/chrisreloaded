@@ -15,7 +15,7 @@ import os, sys
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class ReconAll( Plugin ):
+class recon_all( Plugin ):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -40,6 +40,6 @@ class ReconAll( Plugin ):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = ReconAll()
+  plugin = recon_all()
   plugin.add_parameter( 'Input', Plugin.IMAGE, '--mri', action='store', dest='MRI', help='the mri scan to reconstruct' )
   plugin.launch( sys.argv )
