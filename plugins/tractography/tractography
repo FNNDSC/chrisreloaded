@@ -70,17 +70,26 @@ class tractography(Plugin):
     command += ' --angle-threshold ' + options.anglethreshold
     
     #recon algo
-    command += ' -A ' + options.recalgo
-        
+    if options.recalgo ==  '2nd_Order_Runga_Hutta':
+      command += ' -A rk2'
+    elif options.recalgo == 'Interpolated_Streamline':
+      command += ' -A sl'
+    elif options.recalgo == 'Tensorline':
+      command += ' -A tl'
+
     #image model
-    command += ' -I ' + options.immodel
+    if options.immodel ==  'HARDY':
+      command += ' -I hardy'
     
+    #gradient image
     if options.usegradient:
       command += ' -g ' + options.gradient
       
+    #b0 value
     if options.useb0:
       command += ' -B ' + options.b0
-      
+    
+    #invert gradients
     if options.invertx:
       command += ' -X'
     if options.inverty:
@@ -100,8 +109,8 @@ if __name__ == "__main__":
   
   #general
   plugin.add_parameter('General', Plugin.INTEGER, '--anglethreshold', default='35', action='store', dest='anglethreshold', help='Angle threshold filtering')
-  plugin.add_parameter('General', Plugin.STRING, '--recalgo', default='FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
-  plugin.add_parameter('General', Plugin.STRING, '--immodel', default='DTI', action='store', dest='immodel', help='Image Model')
+  plugin.add_parameter('General', Plugin.COMBOBOX, '--recalgo', values=['FACT', '2nd_Order_Runga_Hutta', 'Interpolated_Streamline', 'Tensorline'], default='FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
+  plugin.add_parameter('General', Plugin.COMBOBOX, '--immodel', values=['DTI', 'HARDY'], default='DTI', action='store', dest='immodel', help='Image Model')
   
   #stages to be run
   plugin.add_parameter('Stages (Advanced)', Plugin.BOOLEAN, '--stage1', default=True, action='store_true', dest='stage1', help='Run stage 1 (MRI Convert)')
@@ -111,13 +120,13 @@ if __name__ == "__main__":
   plugin.add_parameter('Stages (Advanced)', Plugin.BOOLEAN, '--stage5', default=True, action='store_true', dest='stage5', help='Run stage 5 (Spline Filter)')
   
   #Mask Filter
-  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.STRING, '--m1', default='DWI', action='store', dest='m1', help='Volume to be used as 1st mask filter')
+  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.COMBOBOX, '--m1', values=['DWI', 'FA', 'ADC'], default='DWI', action='store', dest='m1', help='Volume to be used as 1st mask filter')
   plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.DOUBLE, '--m1lowerthreshold', default='0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
   plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.DOUBLE, '--m1upperthreshold', default='1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
   
   #2nd Mask Filter
   plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.BOOLEAN, '--usem2', default=False, action='store_true', dest='usem2', help='Use 2nd mask filter')
-  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.STRING, '--m2', default='DWI', action='store', dest='m2', help='Volume to be used as 2nd mask filter')
+  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.COMBOBOX, '--m2', values=['DWI', 'FA', 'ADC'], default='FA', action='store', dest='m2', help='Volume to be used as 2nd mask filter')
   plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.DOUBLE, '--m2lowerthreshold', default='0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
   plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.DOUBLE, '--m2upperthreshold', default='1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
   
