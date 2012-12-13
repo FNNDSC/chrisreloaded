@@ -35,8 +35,24 @@ class connectome(Plugin):
     #base command
     command = ' \'/chb/arch/scripts/connectome_meta.bash -v 10 -f';
     
+
+        
+    # grab the first dti dicom input file
+    firstDTIDicomFile = os.listdir(options.dti)[0]
+    # dti dicom file
+    command += ' -D ' + options.dti
+    command += ' -d ' + os.path.join(options.dti, firstDTIDicomFile)
+    
+    # grab the first t1 dicom input file
+    firstT1DicomFile = os.listdir(options.t1)[0]
+    # t1 dicom file
+    command += ' -1 ' + os.path.join(options.t1, firstT1DicomFile)
+    
     #output
     command += ' -O ' + options.output
+    
+    #log dir
+    command += ' -L ' + options.output
     
     #all freesurfer args
     command += ' -F '
@@ -52,16 +68,6 @@ class connectome(Plugin):
       command += ''
     else:
       command += ' -notailarach '
-    
-    # grab the first dti dicom input file
-    firstDTIDicomFile = os.listdir(options.dti)[0]
-    # dti dicom file
-    command += ' -d ' + os.path.join(options.dti, firstDTIDicomFile)
-    
-    # grab the first t1 dicom input file
-    firstT1DicomFile = os.listdir(options.t1)[0]
-    # t1 dicom file
-    command += ' -1 ' + os.path.join(options.t1, firstT1DicomFile)
     
     # stages
     command += ' --tract-meta-stages ';
