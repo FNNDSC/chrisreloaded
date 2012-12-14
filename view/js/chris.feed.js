@@ -193,7 +193,7 @@ _FEED_.ajaxUpdate = function() {
                 function() {
                   var elt = jQuery(this);
                   if (elt.find('i').hasClass('icon-star')
-                      || !elt.parent().hasClass('feed_sea_content')) {
+                      || elt.parent().hasClass('feed_sea_content')) {
                     // update its status to 100%
                     jQuery(this).attr('data-chris-feed_status', '100');
                     jQuery(this).find('.feed_status').html(
@@ -237,8 +237,8 @@ _FEED_.ajaxUpdate = function() {
             jQuery(element).each(
                 function() {
                   jQuery(this).find('.feed_status').html(
-                      'Status: <font color=red>Running ('
-                          + data['running']['content'][i] + '%)</font>');
+                      'Status: <font color=red>Running <i class="icon-refresh rotating_class"></i></font>');
+                  //  ('+ data['running']['content'][i] + '%)
                 });
           }
           i--;
