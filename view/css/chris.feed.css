@@ -259,3 +259,23 @@
 	background: -moz-linear-gradient(top, #F5F5F5, #8FBC8F);
 	/* for firefox 3.6+ */
 }
+
+.feed_sea {
+	 display: none;
+}
+
+.feed_sea_header {
+   background: #CCFFFF;
+}
+
+.feed_fav_header {
+   background: #FFFFCC;
+}
+
+.feed_run_header {
+   background: #FFCCCC;
+}
+
+.feed_fin_header {
+   background: #CCFFCC;
+}
