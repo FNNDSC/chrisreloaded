@@ -27,10 +27,10 @@
 	padding: 4px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: #e3e3e3;
+	border-color: #777;
 	display: none;
 	cursor: pointer;
-	background-color: whiteSmoke;
+	background-color: #DFE9FA;
 	text-align: center;
 	font-weight: bold;
 }
@@ -278,8 +278,4 @@
 
 .feed_fin_header {
    background: #CCFFCC;
-}
-
-.feed_dark {
-  background: Silver;
 }
