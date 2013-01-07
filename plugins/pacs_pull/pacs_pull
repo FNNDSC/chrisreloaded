@@ -60,46 +60,46 @@ class PACS_Pull(Plugin):
         return
         
     # should return 0, if not, an issue occured, do not go to the next step
-
-    # process
-    print '======================================='
-    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
-    pro_command = current_dir + "/process.php -m " + options.MRN + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
-    print 'command:'
-    print pro_command
-    pro_output = os.system(pro_command)
-    print 'output:'
-    print pro_output
-    
-    # evaluate processing step
-    if pro_output == 0:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
-        print '(see process.log for more information)'
-    else:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
-        print 'EXIT pacs_pull plugin NOW'
-        print '(see process.log for more information)'
-        return
-    
-    # postprocess
-    print '======================================='
-    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start post_processing...'
-    post_command = current_dir + "/post_process.php -f " + options.FEED_ID + " -o " + options.output
-    print 'command:'
-    print post_command
-    post_output = os.system(post_command)
-    print 'output:'
-    print post_output
-    
-    # evaluate post_processing step
-    if post_output == 0:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Post_processing: SUCCESS'
-        print '(see post_process.log for more information)'
-    else:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Post_processing: FAILURE'
-        print 'EXIT pacs_pull plugin NOW'
-        print '(see post_process.log for more information)'
-        return
+#
+#    # process
+#    print '======================================='
+#    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
+#    pro_command = current_dir + "/process.php -m " + options.MRN + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
+#    print 'command:'
+#    print pro_command
+#    pro_output = os.system(pro_command)
+#    print 'output:'
+#    print pro_output
+#    
+#    # evaluate processing step
+#    if pro_output == 0:
+#        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
+#        print '(see process.log for more information)'
+#    else:
+#        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
+#        print 'EXIT pacs_pull plugin NOW'
+#        print '(see process.log for more information)'
+#        return
+#    
+#    # postprocess
+#    print '======================================='
+#    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start post_processing...'
+#    post_command = current_dir + "/post_process.php -f " + options.FEED_ID + " -o " + options.output
+#    print 'command:'
+#    print post_command
+#    post_output = os.system(post_command)
+#    print 'output:'
+#    print post_output
+#    
+#    # evaluate post_processing step
+#    if post_output == 0:
+#        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Post_processing: SUCCESS'
+#        print '(see post_process.log for more information)'
+#    else:
+#        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Post_processing: FAILURE'
+#        print 'EXIT pacs_pull plugin NOW'
+#        print '(see post_process.log for more information)'
+#        return
 
 
 # ENTRYPOINT

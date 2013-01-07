@@ -37,10 +37,14 @@ require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 // include chris data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+// include chris study models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'study.model.php'));
 // include chris patient models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 // include chris data_patient models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
+// include chris data_study models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_study.model.php'));
 // include chris feed_data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
 // include chris user_data models
@@ -70,12 +74,12 @@ $details = $options['m'];
 $server = $options['s'];
 $port = $options['p'];
 $aetitle = $options['a'];
-$ouput_dir = $options['o'];
+$output_dir = $options['o'];
 
 //
 // 1- CREATE PRE-PROCESS LOG FILE
 //
-$logFile = $ouput_dir.'pre_process.log';
+$logFile = $output_dir.'pre_process.log';
 
 //
 // 3- INSTANTIATE PACS CLASS
@@ -131,6 +135,7 @@ $study_parameter['PatientBirthDate'] = '';
 $study_parameter['PatientSex'] = '';
 $series_parameter = Array();
 $series_parameter['SeriesDescription'] = '';
+$series_parameter['StudyDescription'] = '';
 $series_parameter['NumberOfSeriesRelatedInstances'] = '';
 $results = $pacs->queryAll($study_parameter, $series_parameter, null);
 
@@ -214,6 +219,9 @@ $addDataLog .= date('Y-m-d h:i:s'). ' ---> Add data to DB...'.PHP_EOL;
 $data_chris_id = -1;
 $feed_status = '';
 
+$counter = 1;
+$total = count($results[1]['SeriesInstanceUID']);
+
 foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   // lock data db so no data added in the meanwhile
   $db->lock('data', 'WRITE');
@@ -222,6 +230,7 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   $addDataLog .= '********'.PHP_EOL;
   $addDataLog .= 'Data table locked on WRITE...'.PHP_EOL;
   $addDataLog .= 'Data uid: '.$value.PHP_EOL;
+  $addDataLog .= 'Study uid: '.$results[1]['StudyInstanceUID'][$key].PHP_EOL;
 
   // retrieve the data
   $dataMapper = new Mapper('Data');
@@ -308,6 +317,151 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
     Mapper::add($userDataObject);
     $addDataLog .= 'Map user to its data...'.PHP_EOL;
   }
+
+  // CREATE STUDY IF DOESNT EXIST
+  $study_chris_id = 0;
+
+  $studyMapper = new Mapper('Study');
+  $studyMapper->filter('uid = (?)',$results[1]['StudyInstanceUID'][$key]);
+  $studyResult = $studyMapper->get();
+  if(count($studyResult['Study']) == 0)
+  {
+    $studyObject = new Study();
+    $studyObject->uid = $results[1]['StudyInstanceUID'][$key];
+    $study_chris_id = Mapper::add($studyObject);
+    $addDataLog .= 'Study created..'.PHP_EOL;
+  }
+  else{
+    $study_chris_id = $studyResult['Study'][0]->id;
+    $addDataLog .= 'Study already exists..'.PHP_EOL;
+  }
+
+  // MAP DATA TO STUDY
+  $dataStudyMapper = new Mapper('Data_Study');
+  $dataStudyMapper->filter('data_id = (?)',$data_chris_id);
+  $dataStudyMapper->filter('study_id = (?)',$study_chris_id);
+  $dataStudyResult = $dataStudyMapper->get();
+  if(count($dataStudyResult['Data_Study']) == 0)
+  {
+    $dataStudyObject = new Data_Study();
+    $dataStudyObject->data_id = $data_chris_id;
+    $dataStudyObject->study_id = $study_chris_id;
+    Mapper::add($dataStudyObject);
+    $addDataLog .= 'Map data to its study...'.PHP_EOL;
+  }
+
+  // move series (data)
+  $pacs2 = new PACS($server, $port, $aetitle);
+  echo $server.PHP_EOL;
+  echo $port.PHP_EOL;
+  echo $aetitle.PHP_EOL;
+  $pacs2->addParameter('StudyInstanceUID', $results[1]['StudyInstanceUID'][$key]);
+  $pacs2->addParameter('SeriesInstanceUID', $results[1]['SeriesInstanceUID'][$key]);
+  $pacs2->moveSeries();
+
+  // process series (data)
+  // wait for all files to be received
+  $waiting = true;
+  while($waiting){
+    echo 'waiting....'.PHP_EOL;
+    // check if *ALL* data is there
+    $dataMapper = new Mapper('Data');
+    $dataMapper->filter('id = (?)',$data_chris_id);
+    $dataMapper->filter('nb_files = status','');
+    $dataResult = $dataMapper->get();
+    if(count($dataResult['Data']) > 0){
+      //
+      // DATA HAS ARRIVED
+      //
+      $dataLog = '======================================='.PHP_EOL;
+      $dataLog .= date('Y-m-d h:i:s'). ' ---> New data has arrived... ('.$counter.'/'.$total.')'.PHP_EOL;
+
+      // get patient
+      $patientMapper = new Mapper('Data_Patient');
+      $patientMapper->ljoin('Patient','Patient.id = Data_Patient.patient_id');
+      $patientMapper->filter('Data_Patient.data_id = (?)', $data_chris_id);
+      $patientResult = $patientMapper->get();
+
+      // create feed patient directories
+      // mkdir if dir doesn't exist
+      // create folder if doesnt exists
+      if(count($patientResult['Patient']) == 0){
+        $dataLog .= "Could find patient related to the data...".PHP_EOL;
+        $dataLog .= "Data_id: ".$data_chris_id;
+        $dataLog .= "Stopping post_process.php Line: ".__LINE__.PHP_EOL;
+        $dataLog .= "EXIT CODE 1".PHP_EOL;
+        $fh = fopen($logFile, 'a')  or die("can't open file");
+        fwrite($fh, $dataLog);
+        fclose($fh);
+        exit(1);
+      }
+
+      $dataLog .= count($patientResult['Patient'])." patient(s) related to the data found...".PHP_EOL;
+      $dataLog .= "-- Patient information --".PHP_EOL;
+      $dataLog .= "Patient UID: ".$patientResult['Patient'][0]->uid.PHP_EOL;
+      $dataLog .= "Patient CHRIS ID: ".$patientResult['Patient'][0]->id.PHP_EOL;
+      $dataLog .= "-- Data information --".PHP_EOL;
+      $dataLog .= "Data name: ".$dataResult['Data'][0]->name.PHP_EOL;
+      $dataLog .= "Data CHRIS ID: ".$data_chris_id.PHP_EOL;
+
+      $datadirname = $output_dir.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      //print_r($patientResult);
+      //echo $datadirname;
+      if(!is_dir($datadirname)){
+        mkdir($datadirname);
+      }
+
+      // study directory
+      $studydirname = $datadirname.'/'.$study_chris_id;
+      if(!is_dir($studydirname)){
+        mkdir($studydirname);
+      }
+
+      // create data soft links
+      $targetbase = CHRIS_DATA.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      $seriesdirnametarget = $targetbase .'/'.$study_chris_id .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      $seriesdirnamelink = $datadirname .'/'.$study_chris_id .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      if(!is_link($seriesdirnamelink)){
+        // create sof link
+        symlink($seriesdirnametarget, $seriesdirnamelink);
+      }
+      
+      
+      /*
+       // create user patient directory
+      $patientdirname = $output_dir.'/../../data';
+      if(!is_dir($patientdirname)){
+      mkdir($patientdirname);
+      }
+
+      $padidirname = $patientdirname.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+      if(!is_dir($padidirname)){
+      mkdir($padidirname);
+      }
+
+      $padidirnamelink = $padidirname.'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      if(!is_link($padidirnamelink)){
+      // create sof link
+      symlink($seriesdirnametarget, $padidirnamelink);
+      }*/
+
+      /**
+       * @todo Update the feed status
+       */
+      // update feed status?
+      $fh = fopen($logFile, 'a')  or die("can't open file");
+      fwrite($fh, $dataLog);
+      fclose($fh);
+
+      $waiting = false;
+    }
+    else{
+      sleep(2);
+    }
+  }
+
+  // update status
+  $counter++;
 }
 
 $fh = fopen($logFile, 'a')  or die("can't open file");
@@ -318,7 +472,7 @@ fclose($fh);
 $feedMapper = new Mapper('Feed');
 $feedMapper->filter('id = (?)',$feed_chris_id);
 $feedResult = $feedMapper->get();
-$feedResult['Feed'][0]->status = 33;
+$feedResult['Feed'][0]->status = 99;
 Mapper::update($feedResult['Feed'][0],  $feedResult['Feed'][0]->id);
 
 exit(0);

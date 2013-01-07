@@ -36,6 +36,8 @@ require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 // include chris data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
+// include chris data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'study.model.php'));
 // include chris patient models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 // include chris user_data models
@@ -52,6 +54,9 @@ $study_directory = $options['d'];
 
 // open log file
 $logFile = '';
+
+// keep track of dataset received
+$received = Array();
 
 // move all files from this directory to centralized data
 // 1 file of 1 serie at once
@@ -91,10 +96,31 @@ if ($handle = opendir($study_directory)) {
                 echo $logFile;
                 return;
               }
+              
+              //
+              if(!in_array($data_chris_id, $received)){
+                array_push($received, $data_chris_id);
+              }
 
               $logFile .= 'data success: '.$d_success.PHP_EOL;
               $logFile .= 'data id: '.$data_chris_id.PHP_EOL;
-
+              
+              // get study id
+              $studyMapper = new Mapper('Study');
+              $studyMapper->filter('uid = (?)',$process_file['StudyInstanceUID'][0] );
+              $studyResult = $studyMapper->get();
+              
+              // if doesnt exist, add data
+              $study_chris_id = -1;
+              if(count($studyResult['Study']) == 0)
+              {
+                echo $logFile;
+                return;
+              }
+              else{
+                $study_chris_id = $studyResult['Study'][0]->id;
+              }
+              
               // MAP PATIENT TO DATA
               $dataPatientMapper = new Mapper('Data_Patient');
               $dataPatientMapper->filter('patient_id = (?)',$patient_chris_id);
@@ -129,6 +155,18 @@ if ($handle = opendir($study_directory)) {
               else{
                 $logFile .= $patientdirname.' already exists'.PHP_EOL;
               }
+              
+              //
+              // Create the study directory
+              //
+              $patientdirname .= '/'.$study_chris_id;
+              if(!is_dir($patientdirname)){
+                mkdir($patientdirname);
+                $logFile .= 'MKDIR: '.$patientdirname.PHP_EOL;
+              }
+              else{
+                $logFile .= $patientdirname.' already exists'.PHP_EOL;
+              }
 
               //
               // Create the data directory
@@ -145,7 +183,7 @@ if ($handle = opendir($study_directory)) {
               }
 
               // move file at good location
-              // CHRIS_DATA/MRN-UID/SERIESDESC-UID/index.dcm
+              // CHRIS_DATA/MRN-UID/STUDYDESC-UID/SERIESDESC-UID/index.dcm
               // cp file over if doesnt exist
               // it happens than some dicom file have more than 1 instance number
               // it appears to be 0 and the real instance number
@@ -205,6 +243,22 @@ if ($handle = opendir($study_directory)) {
   // delete directory
   $logFile .= 'delete: '.$study_directory.PHP_EOL;
   rmdir($study_directory);
+}
+
+// add warning if we didn't receive all the expected files
+foreach($received as $key => $value){
+  $dataMapper = new Mapper('Data');
+  $dataMapper->filter('id = (?)',$value);
+  $dataResult = $dataMapper->get();
+  
+  if($dataResult['Data'][0]->status != $dataResult['Data'][0]->nb_files){
+    // warning in log
+    $logFile .= 'WARNING => DATA ID : '.$dataResult['Data'][0]->id.'('.$dataResult['Data'][0]->status.'/'.$dataResult['Data'][0]->nb_files.')'.$entry.PHP_EOL;
+    // update db to unlock plugin
+    $dataResult['Data'][0]->status = min($dataResult['Data'][0]->status, $dataResult['Data'][0]->nb_files);
+    $dataResult['Data'][0]->nb_files = $dataResult['Data'][0]->status;
+    Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
+  }
 }
 
 echo $logFile;
