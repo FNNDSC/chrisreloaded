@@ -101,7 +101,7 @@ class PACS implements PACSInterface {
    * @var string $movescu
    */
   private $movescu = null;
-  
+
   /**
    * DCMTK EchoSCU binary location.
    *
@@ -137,11 +137,11 @@ class PACS implements PACSInterface {
    * @snippet test.pacs.class.php testPing()
    */
   public function ping($timeout = 5){
-      $command = $this->echoscu.' -to '.$timeout.' ';
+    $command = $this->echoscu.' -to '.$timeout.' ';
 
-      $this->_finishCommand($command);
-      // execute the command, format it into a nice json and return it
-      return $this->_executeAndFormat($command);
+    $this->_finishCommand($command);
+    // execute the command, format it into a nice json and return it
+    return $this->_executeAndFormat($command);
   }
 
   /**
@@ -561,7 +561,7 @@ class PACS implements PACSInterface {
 
         // execute query
         $output[] = $query;
-        
+
         shell_exec($query);
       }
       return $output;
@@ -610,6 +610,11 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P ContentTime';
     $requiered_fields .= ' +P InstanceNumber';
     $requiered_fields .= ' +P SeriesDescription';
+
+    // Study Information
+    $requiered_fields .= ' +P Modality';
+    $requiered_fields .= ' +P StudyDescription';
+    $requiered_fields .= ' +P StudyDate';
 
     // Patient information
     $requiered_fields .= ' +P PatientName';
@@ -831,6 +836,110 @@ class PACS implements PACSInterface {
     }
     else {
       echo 'Data UID not provided in DICOM file'.PHP_EOL;
+      // finish data table lock
+      $db->unlock();
+      return 0;
+    }
+    // finish data table lock
+    $db->unlock();
+    return 1;
+  }
+
+  static public function AddStudy(&$db, &$process_file, &$study_chris_id, &$study_description){
+    $db->lock('study', 'WRITE');
+    // Does data exist: SeriesInstanceUID
+    if (array_key_exists('StudyInstanceUID',$process_file))
+    {
+      // does study exist??
+      $studyMapper = new Mapper('Study');
+      $studyMapper->filter('uid = (?)',$process_file['StudyInstanceUID'][0] );
+      $studyResult = $studyMapper->get();
+
+      // if study doesn't exist, create it
+      if(count($studyResult['Study']) == 0)
+      {
+        // create object
+        // create data model
+        $studyObject = new Study();
+        //
+        // get data uid
+        //
+        $studyObject->uid = $process_file['StudyInstanceUID'][0];
+        //
+        // get data name (series description)
+        //
+        if(array_key_exists('StudyDescription',$process_file))
+        {
+          $studyObject->description = sanitize($process_file['StudyDescription'][0]);
+        }
+        else{
+          $studyObject->name = 'NoStudyDescription';
+        }
+        
+        if(array_key_exists('Modality',$process_file))
+        {
+          $studyObject->modality = sanitize($process_file['Modality'][0]);
+        }
+        else{
+          $studyObject->modality = 'NoModality';
+        }
+
+        if(array_key_exists('StudyDate',$process_file))
+        {
+          $studyObject->date = $process_file['StudyDate'][0];
+        }
+        
+        
+        $study_description = $studyObject->date.'-'.$studyObject->description;
+
+        $studyObject->age = '0';
+        $studyObject->location = 'Boston Childrens Hospital';
+
+        $study_chris_id = Mapper::add($studyObject);
+      }
+      else{
+        // Content to be updated
+        if($studyResult['Study'][0]->age == '-1'){
+          //
+          // get data name (series description)
+          //
+          if(array_key_exists('StudyDescription',$process_file))
+          {
+            $studyResult['Study'][0]->description = sanitize($process_file['StudyDescription'][0]);
+          }
+          else{
+            $studyResult['Study'][0]->name = 'NoStudyDescription';
+          }
+
+          if(array_key_exists('Modality',$process_file))
+          {
+            $studyResult['Study'][0]->modality = sanitize($process_file['Modality'][0]);
+          }
+          else{
+            $studyResult['Study'][0]->modality = 'NoModality';
+          }
+
+          if(array_key_exists('StudyDate',$process_file))
+          {
+            $studyResult['Study'][0]->date = $process_file['StudyDate'][0];
+          }
+          
+          $study_description = $studyResult['Study'][0]->date.'-'.$studyResult['Study'][0]->description;
+
+          $studyResult['Study'][0]->age = '0';
+          $studyResult['Study'][0]->location = 'Boston Childrens Hospital';
+
+          $study_chris_id = Mapper::update($studyResult['Study'][0], $studyResult['Study'][0]->id);
+        }
+        // Content already up to date
+        else{
+          $study_chris_id = $studyResult['Study'][0]->id;
+          $study_description = $studyResult['Study'][0]->date.'-'.$studyResult['Study'][0]->description;
+        }
+      }
+    }
+    else {
+      echo 'Study UID not provided in DICOM file'.PHP_EOL;
       // finish data table lock
       $db->unlock();
       return 0;
