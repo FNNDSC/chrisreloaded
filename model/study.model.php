@@ -41,6 +41,13 @@ require_once 'object.model.php';
 class Study extends Object {
 
   /**
+   * The study unique id
+   *
+   * @var string $uid
+   */
+  public $uid = '';
+  
+  /**
    * The study description
    *
    * @var string $description
