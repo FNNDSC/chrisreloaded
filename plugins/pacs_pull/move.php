@@ -97,7 +97,7 @@ if ($handle = opendir($study_directory)) {
                 return;
               }
               
-              //
+              // keep track of processed series
               if(!in_array($data_chris_id, $received)){
                 array_push($received, $data_chris_id);
               }
@@ -112,13 +112,11 @@ if ($handle = opendir($study_directory)) {
               
               // if doesnt exist, add data
               $study_chris_id = -1;
-              if(count($studyResult['Study']) == 0)
-              {
+              $study_description = '';
+              $s_success = PACS::AddStudy($db, $process_file, $study_chris_id, $study_description);
+              if($s_success == 0){
                 echo $logFile;
                 return;
-              }
-              else{
-                $study_chris_id = $studyResult['Study'][0]->id;
               }
               
               // MAP PATIENT TO DATA
@@ -159,7 +157,7 @@ if ($handle = opendir($study_directory)) {
               //
               // Create the study directory
               //
-              $patientdirname .= '/'.$study_chris_id;
+              $patientdirname .= '/'.$study_description.'-'.$study_chris_id;
               if(!is_dir($patientdirname)){
                 mkdir($patientdirname);
                 $logFile .= 'MKDIR: '.$patientdirname.PHP_EOL;

@@ -412,15 +412,20 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
       }
 
       // study directory
-      $studydirname = $datadirname.'/'.$study_chris_id;
+      // get study description
+      $studyMapper = new Mapper('Study');
+      $studyMapper->filter('id = (?)', $study_chris_id);
+      $studyResult = $studyMapper->get();
+      $study_dir_name = $studyResult['Study'][0]->date.'-'.$studyResult['Study'][0]->description.'-'.$study_chris_id;
+      $studydirname = $datadirname.'/'.$study_dir_name;
       if(!is_dir($studydirname)){
         mkdir($studydirname);
       }
 
       // create data soft links
       $targetbase = CHRIS_DATA.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
-      $seriesdirnametarget = $targetbase .'/'.$study_chris_id .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
-      $seriesdirnamelink = $datadirname .'/'.$study_chris_id .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      $seriesdirnametarget = $targetbase .'/'.$study_dir_name .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      $seriesdirnamelink = $datadirname .'/'.$study_dir_name .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
       if(!is_link($seriesdirnamelink)){
         // create sof link
         symlink($seriesdirnametarget, $seriesdirnamelink);
