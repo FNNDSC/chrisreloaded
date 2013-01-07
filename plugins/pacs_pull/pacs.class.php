@@ -886,9 +886,10 @@ class PACS implements PACSInterface {
 
         if(array_key_exists('StudyDate',$process_file))
         {
-          $studyObject->date = $process_file['StudyDate'][0];
+          $studyObject->date = PACS::getDate($process_file);
         }
         
+        // sth wrong here
         
         $study_description = $studyObject->date.'-'.$studyObject->description;
 
@@ -971,6 +972,20 @@ class PACS implements PACSInterface {
     }
 
     return $date.' '. $time;
+  }
+  
+  static public function getDate($process_file){
+    $date = '';
+    if(array_key_exists('StudyDate',$process_file))
+    {
+      $raw_date = $process_file['Study'][0];
+      $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
+    }
+    else{
+      $date .= '0000-00-00';
+    }
+  
+    return $date;
   }
 }
 ?>

@@ -119,6 +119,10 @@ if ($handle = opendir($study_directory)) {
                 return;
               }
               
+              $logFile .= 'study success: '.$d_success.PHP_EOL;
+              $logFile .= 'study id: '.$study_chris_id.PHP_EOL;
+              $logFile .= 'study description: '.$study_chris_id.PHP_EOL;
+              
               // MAP PATIENT TO DATA
               $dataPatientMapper = new Mapper('Data_Patient');
               $dataPatientMapper->filter('patient_id = (?)',$patient_chris_id);
