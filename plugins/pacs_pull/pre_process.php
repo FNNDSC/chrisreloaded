@@ -426,25 +426,6 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
         symlink($seriesdirnametarget, $seriesdirnamelink);
       }
       
-      
-      /*
-       // create user patient directory
-      $patientdirname = $output_dir.'/../../data';
-      if(!is_dir($patientdirname)){
-      mkdir($patientdirname);
-      }
-
-      $padidirname = $patientdirname.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
-      if(!is_dir($padidirname)){
-      mkdir($padidirname);
-      }
-
-      $padidirnamelink = $padidirname.'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
-      if(!is_link($padidirnamelink)){
-      // create sof link
-      symlink($seriesdirnametarget, $padidirnamelink);
-      }*/
-
       /**
        * @todo Update the feed status
        */
