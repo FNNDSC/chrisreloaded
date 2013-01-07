@@ -584,7 +584,7 @@ class PACS implements PACSInterface {
     {
       $command = $this->movescu.' -S';
       $command .= ' --aetitle '.$this->user_aet;
-      $command .= ' --move '.$this->user_aet;
+      $command .= ' --move FNNDSC-CHRISDEV';
       $command .= ' -k QueryRetrieveLevel=SERIES';
       $command .= ' -k StudyInstanceUID='.$this->command_param['StudyInstanceUID'];
       $command .= ' -k SeriesInstanceUID='.$this->command_param['SeriesInstanceUID'];
