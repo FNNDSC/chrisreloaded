@@ -875,7 +875,7 @@ class PACS implements PACSInterface {
         else{
           $studyObject->name = 'NoStudyDescription';
         }
-        
+
         if(array_key_exists('Modality',$process_file))
         {
           $studyObject->modality = sanitize($process_file['Modality'][0]);
@@ -888,9 +888,9 @@ class PACS implements PACSInterface {
         {
           $studyObject->date = PACS::getDate($process_file);
         }
-        
+
         // sth wrong here
-        
+
         $study_description = $studyObject->date.'-'.$studyObject->description;
 
         $studyObject->age = '0';
@@ -920,17 +920,15 @@ class PACS implements PACSInterface {
             $studyResult['Study'][0]->modality = 'NoModality';
           }
 
-          if(array_key_exists('StudyDate',$process_file))
-          {
-            $studyResult['Study'][0]->date = $process_file['StudyDate'][0];
-          }
-          
+          $studyResult['Study'][0]->date = PACS::getDate($process_file);
+
           $study_description = $studyResult['Study'][0]->date.'-'.$studyResult['Study'][0]->description;
+          $study_chris_id = $studyResult['Study'][0]->id;
 
           $studyResult['Study'][0]->age = '0';
           $studyResult['Study'][0]->location = 'Boston Childrens Hospital';
 
-          $study_chris_id = Mapper::update($studyResult['Study'][0], $studyResult['Study'][0]->id);
+          Mapper::update($studyResult['Study'][0], $studyResult['Study'][0]->id);
         }
         // Content already up to date
         else{
@@ -973,18 +971,18 @@ class PACS implements PACSInterface {
 
     return $date.' '. $time;
   }
-  
+
   static public function getDate($process_file){
     $date = '';
     if(array_key_exists('StudyDate',$process_file))
     {
-      $raw_date = $process_file['Study'][0];
+      $raw_date = $process_file['StudyDate'][0];
       $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
     }
     else{
       $date .= '0000-00-00';
     }
-  
+
     return $date;
   }
 }
