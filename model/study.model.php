@@ -64,9 +64,9 @@ class Study extends Object {
   /**
    * The patient age at scan date
    *
-   * @var int $age
+   * @var string $age
    */
-  public $age = -1;
+  public $age = '';
   
   /**
    * The modality in this study.
