@@ -105,11 +105,6 @@ if ($handle = opendir($study_directory)) {
               $logFile .= 'data success: '.$d_success.PHP_EOL;
               $logFile .= 'data id: '.$data_chris_id.PHP_EOL;
               
-              // get study id
-              $studyMapper = new Mapper('Study');
-              $studyMapper->filter('uid = (?)',$process_file['StudyInstanceUID'][0] );
-              $studyResult = $studyMapper->get();
-              
               // if doesnt exist, add data
               $study_chris_id = -1;
               $study_description = '';
@@ -198,6 +193,7 @@ if ($handle = opendir($study_directory)) {
                 $logFile .= 'COPY: '.$filename.PHP_EOL;
                 // if file doesnt exist, +1 status
                 // +1 increase data status
+                //to do in pacs class (less sql queries)
                 $dataMapper = new Mapper('Data');
                 $dataMapper->filter('id = (?)',$data_chris_id);
                 $dataResult = $dataMapper->get();
@@ -240,6 +236,7 @@ if ($handle = opendir($study_directory)) {
 }
 
 // add warning if we didn't receive all the expected files
+// todo: all queries at once
 foreach($received as $key => $value){
   $dataMapper = new Mapper('Data');
   $dataMapper->filter('id = (?)',$value);

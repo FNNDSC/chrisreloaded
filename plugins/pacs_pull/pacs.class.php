@@ -817,21 +817,13 @@ class PACS implements PACSInterface {
         //
         // date
         $dataObject->time = PACS::getTime($process_file);
-        // get nb of files in data - only accessible through
-        // findscu query
-        /*         $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
-         $pacs->addParameter('RetrieveAETitle', '');
-        $pacs->addParameter('StudyInstanceUID', $result['StudyInstanceUID'][0]);
-        $pacs->addParameter('SeriesInstanceUID', $result['SeriesInstanceUID'][0]);
-        $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
-        $all_results = $pacs->querySeries();
-        $dataObject->nb_files = $all_results['NumberOfSeriesRelatedInstances'][0]; */
         //
         // add the data model to db and get its id
         //
         $data_chris_id = Mapper::add($dataObject);
       }
       else{
+        // update time and status here...!
         $data_chris_id = $dataResult['Data'][0]->id;
         $series_description = $dataResult['Data'][0]->name;
       }
@@ -988,7 +980,7 @@ class PACS implements PACSInterface {
 
   static public function getAge($process_file){
     // should we use PatientAge tag???
-    $age = '00Y00MOOD';
+    $age = '0';
     if(array_key_exists('ContentDate',$process_file) && array_key_exists('PatientBirthDate',$process_file))
     {
       $raw_bdate = $process_file['PatientBirthDate'][0];
@@ -998,7 +990,7 @@ class PACS implements PACSInterface {
       $cdate =  new DateTime(substr($raw_cdate, 0, 4).'-'.substr($raw_cdate, 4, 2).'-'.substr($raw_cdate, 6, 2));
 
       $raw_age = $bdate->diff($cdate);
-      $age = $raw_age->format('%Y%M%D');
+      $age = $raw_age->days;
     }
 
     return $age;
