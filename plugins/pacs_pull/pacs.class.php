@@ -615,6 +615,8 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P Modality';
     $requiered_fields .= ' +P StudyDescription';
     $requiered_fields .= ' +P StudyDate';
+    $requiered_fields .= ' +P StationName';
+    $requiered_fields .= ' +P PatientAge';
 
     // Patient information
     $requiered_fields .= ' +P PatientName';
@@ -889,18 +891,16 @@ class PACS implements PACSInterface {
           $studyObject->date = PACS::getDate($process_file);
         }
 
-        // sth wrong here
-
         $study_description = $studyObject->date.'-'.$studyObject->description;
 
-        $studyObject->age = '0';
-        $studyObject->location = 'Boston Childrens Hospital';
+        $studyObject->age = PACS::getAge($process_file);
+        $studyObject->location = PACS::getLocation($process_file);
 
         $study_chris_id = Mapper::add($studyObject);
       }
       else{
         // Content to be updated
-        if($studyResult['Study'][0]->age == '-1'){
+        if($studyResult['Study'][0]->age == ''){
           //
           // get data name (series description)
           //
@@ -925,8 +925,8 @@ class PACS implements PACSInterface {
           $study_description = $studyResult['Study'][0]->date.'-'.$studyResult['Study'][0]->description;
           $study_chris_id = $studyResult['Study'][0]->id;
 
-          $studyResult['Study'][0]->age = '0';
-          $studyResult['Study'][0]->location = 'Boston Childrens Hospital';
+          $studyResult['Study'][0]->age = PACS::getAge($process_file);
+          $studyResult['Study'][0]->location = PACS::getLocation($process_file);
 
           Mapper::update($studyResult['Study'][0], $studyResult['Study'][0]->id);
         }
@@ -984,6 +984,33 @@ class PACS implements PACSInterface {
     }
 
     return $date;
+  }
+
+  static public function getAge($process_file){
+    // should we use PatientAge tag???
+    $age = '00Y00MOOD';
+    if(array_key_exists('ContentDate',$process_file) && array_key_exists('PatientBirthDate',$process_file))
+    {
+      $raw_bdate = $process_file['PatientBirthDate'][0];
+      $bdate =  new DateTime(substr($raw_bdate, 0, 4).'-'.substr($raw_bdate, 4, 2).'-'.substr($raw_bdate, 6, 2));
+
+      $raw_cdate = $process_file['ContentDate'][0];
+      $cdate =  new DateTime(substr($raw_cdate, 0, 4).'-'.substr($raw_cdate, 4, 2).'-'.substr($raw_cdate, 6, 2));
+
+      $raw_age = $bdate->diff($cdate);
+      $age = $raw_age->format('%Y%M%D');
+    }
+
+    return $age;
+  }
+
+  static public function getLocation($process_file){
+    $location = 'unknown';
+    if(array_key_exists('StationName',$process_file))
+    {
+      $location = $process_file['StationName'][0];
+    }
+    return $location;
   }
 }
 ?>
