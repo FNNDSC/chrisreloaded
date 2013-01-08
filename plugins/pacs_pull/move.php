@@ -202,25 +202,17 @@ if ($handle = opendir($study_directory)) {
                 $dataMapper->filter('id = (?)',$data_chris_id);
                 $dataResult = $dataMapper->get();
 
-                $dataObject = new Data();
-                $dataObject->uid = $dataResult['Data'][0]->uid;
-                $dataObject->name = $dataResult['Data'][0]->name;
-                $dataObject->nb_files = $dataResult['Data'][0]->nb_files;
-                $dataObject->plugin = $dataResult['Data'][0]->plugin;
                 //
                 // update time if time == '0000-00-00 00:00:00'
                 //
                 if($dataResult['Data'][0]->time == '0000-00-00 00:00:00'){
-                  $dataObject->time = PACS::getTime($process_file);
-                }
-                else{
-                  $dataObject->time = $dataResult['Data'][0]->time;
+                  $dataResult['Data'][0]->time = PACS::getTime($process_file);
                 }
                 
                 // update status
-                $dataObject->status = $dataResult['Data'][0]->status +1;
+                $dataResult['Data'][0]->status += 1;
                 // Update database and get object
-                Mapper::update($dataObject, $data_chris_id);
+                Mapper::update($dataResult['Data'][0], $data_chris_id);
 
                 $logFile .= '+1 STATUS: '.$filename.PHP_EOL;
               }
@@ -230,13 +222,13 @@ if ($handle = opendir($study_directory)) {
 
               // delete file
               $logFile .= 'delete: '.$study_directory.'/'.$entry.'/'.$sub_entry.PHP_EOL;
-              unlink($study_directory.'/'.$entry.'/'.$sub_entry);
+              //unlink($study_directory.'/'.$entry.'/'.$sub_entry);
             }
           }
           closedir($sub_handle);
           // delete directory
           $logFile .= 'delete: '.$study_directory.'/'.$entry.PHP_EOL;
-          rmdir($study_directory.'/'.$entry);
+          //rmdir($study_directory.'/'.$entry);
         }
       }
     }
@@ -244,7 +236,7 @@ if ($handle = opendir($study_directory)) {
   closedir($handle);
   // delete directory
   $logFile .= 'delete: '.$study_directory.PHP_EOL;
-  rmdir($study_directory);
+  //rmdir($study_directory);
 }
 
 // add warning if we didn't receive all the expected files
