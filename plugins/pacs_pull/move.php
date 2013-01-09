@@ -75,7 +75,7 @@ if ($handle = opendir($study_directory)) {
               //get patient id
               $logFile .= 'getting patient id...'.PHP_EOL;
               $logFile .= 'PatientID exists...? -> '.array_key_exists('PatientID',$process_file).PHP_EOL;
-              
+
               $patient_chris_id = -1;
               //$db, $process_file, $patient_chris_id
               $p_success = PACS::AddPatient($db, $process_file, $patient_chris_id);
@@ -96,7 +96,7 @@ if ($handle = opendir($study_directory)) {
                 echo $logFile;
                 return;
               }
-              
+
               // keep track of processed series
               if(!in_array($data_chris_id, $received)){
                 array_push($received, $data_chris_id);
@@ -104,7 +104,7 @@ if ($handle = opendir($study_directory)) {
 
               $logFile .= 'data success: '.$d_success.PHP_EOL;
               $logFile .= 'data id: '.$data_chris_id.PHP_EOL;
-              
+
               // if doesnt exist, add data
               $study_chris_id = -1;
               $study_description = '';
@@ -113,11 +113,11 @@ if ($handle = opendir($study_directory)) {
                 echo $logFile;
                 return;
               }
-              
+
               $logFile .= 'study success: '.$d_success.PHP_EOL;
               $logFile .= 'study id: '.$study_chris_id.PHP_EOL;
               $logFile .= 'study description: '.$study_description.PHP_EOL;
-              
+
               // MAP PATIENT TO DATA
               $dataPatientMapper = new Mapper('Data_Patient');
               $dataPatientMapper->filter('patient_id = (?)',$patient_chris_id);
@@ -152,7 +152,7 @@ if ($handle = opendir($study_directory)) {
               else{
                 $logFile .= $patientdirname.' already exists'.PHP_EOL;
               }
-              
+
               //
               // Create the study directory
               //
@@ -185,7 +185,7 @@ if ($handle = opendir($study_directory)) {
               // it happens than some dicom file have more than 1 instance number
               // it appears to be 0 and the real instance number
               //$intanceNumber = max($process_file['InstanceNumber']);
-              // different naming based on 
+              // different naming based on
               $intanceNumber = $process_file['SOPInstanceUID'][0];
               $filename = $datadirname .'/'.$intanceNumber.'.dcm';
               if(!is_file($filename)){
@@ -204,7 +204,7 @@ if ($handle = opendir($study_directory)) {
                 if($dataResult['Data'][0]->time == '0000-00-00 00:00:00'){
                   $dataResult['Data'][0]->time = PACS::getTime($process_file);
                 }
-                
+
                 // update status
                 $dataResult['Data'][0]->status += 1;
                 // Update database and get object
@@ -241,13 +241,17 @@ foreach($received as $key => $value){
   $dataMapper = new Mapper('Data');
   $dataMapper->filter('id = (?)',$value);
   $dataResult = $dataMapper->get();
-  
+
   if($dataResult['Data'][0]->status != $dataResult['Data'][0]->nb_files){
-    // warning in log
     $logFile .= 'WARNING => DATA ID : '.$dataResult['Data'][0]->id.'('.$dataResult['Data'][0]->status.'/'.$dataResult['Data'][0]->nb_files.')'.$entry.PHP_EOL;
     // update db to unlock plugin
-    $dataResult['Data'][0]->status = min($dataResult['Data'][0]->status, $dataResult['Data'][0]->nb_files);
-    $dataResult['Data'][0]->nb_files = $dataResult['Data'][0]->status;
+    if($dataResult['Data'][0]->nb_files == -1){
+      $dataResult['Data'][0]->nb_files = $dataResult['Data'][0]->status;
+    }
+    else{
+      $dataResult['Data'][0]->status = min($dataResult['Data'][0]->status, $dataResult['Data'][0]->nb_files);
+      $dataResult['Data'][0]->nb_files = $dataResult['Data'][0]->status;
+    }
     Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
   }
 }
