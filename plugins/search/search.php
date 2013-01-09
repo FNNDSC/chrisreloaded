@@ -174,40 +174,55 @@ if(count($mapperResults[$type]) >= 1){
       $study_mapper->filter('study.description LIKE CONCAT("%",?,"%")', $description);
       $processLog .= 'description: '. $description.PHP_EOL;
     }
-    
+
     if(isset($location)){
       $study_mapper->filter('study.location LIKE CONCAT("%",?,"%")', $location);
       $processLog .= 'location: '. $location.PHP_EOL;
     }
-    
+
     if(isset($age)){
       $study_mapper->filter('study.age LIKE CONCAT("%",?,"%")', $age);
       $processLog .= 'age: '. $age.PHP_EOL;
     }
-    
+
     if(isset($modality)){
       $study_mapper->filter('study.modality LIKE CONCAT("%",?,"%")', $modality);
       $processLog .= 'modality: '. $modality.PHP_EOL;
     }
-    
+
     if(isset($date)){
       $study_mapper->filter('study.date LIKE CONCAT("%",?,"%")', $date);
       $processLog .= 'date: '. $date.PHP_EOL;
     }
-    
+
     $study_results = $study_mapper->get();
     if(count($study_results['Data']) >= 1){
-      echo '==============================================='.$value->id.PHP_EOL;
-      print_r($study_results['Data']);
-    }
-    // loop through results and create links
-    //$processLog .= date('Y-m-d h:i:s').' Creates soft link for Patient'.PHP_EOL;
-    // create data soft links
-    //$target = CHRIS_DATA.$value->uid.'-'.$value->id;
-    //$destination = $output_dir.$value->uid.'-'.$value->id;
+      foreach($study_results['Data'] as $key => $value){
+        // create patient directory
+        $location = $study_results['Patient'][$key]->uid.'-'.$study_results['Patient'][$key]->id;
+        $patientdir = $output_dir.$location;
+        if(!is_dir($patientdir)){
+          mkdir($patientdir);
+        }
+        // create study directory
+        $location .= '/'.$study_results['Study'][$key]->date.'-'.$study_results['Study'][$key]->description.'-'.$study_results['Study'][$key]->id;
+        $studydir = $output_dir.$location;
+        if(!is_dir($studydir)){
+          mkdir($studydir);
+        }
 
-    // create sof link
-    //symlink($target, $destination);
+        // create data symlink
+        // loop through results and create links
+        $processLog .= date('Y-m-d h:i:s').' Creates soft link for Patient'.PHP_EOL;
+        // create data soft links
+        $target = CHRIS_DATA.$location.'/'.$value->name.'-'.$value->id;
+        $destination = $studydir.'/'.$value->name.'-'.$value->id;;
+        
+        // create sof link
+        symlink($target, $destination);
+      }
+    }
+
   }
 
 }
