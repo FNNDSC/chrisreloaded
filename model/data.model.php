@@ -49,6 +49,14 @@ class Data extends Object {
   public $uid = '';
 
   /**
+   * The description of the data.
+   * Text file name, dicom protocol, etc...
+   *
+   * @var string $description
+   */
+  public $description = '';
+  
+  /**
    * The name of the data.
    * Text file name, dicom protocol, etc...
    *
