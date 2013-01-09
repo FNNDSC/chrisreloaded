@@ -48,11 +48,15 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_study.model.php'));
+
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'study.model.php'));
+
 // include pacs helper
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
 // define the options
-$shortopts = "o:n:d:i:s:";
+$shortopts = "o:n:d:i:s:1:2:3:4:5";
 
 $options = getopt($shortopts);
 
@@ -69,6 +73,21 @@ if(isset($options['i'])){
 }
 if(isset($options['s'])){
   $sex = $options['s'];
+}
+if(isset($options['1'])){
+  $description = $options['1'];
+}
+if(isset($options['2'])){
+  $location = $options['2'];
+}
+if(isset($options['3'])){
+  $age = $options['3'];
+}
+if(isset($options['4'])){
+  $modality = $options['4'];
+}
+if(isset($options['5'])){
+  $date = $options['5'];
 }
 
 //
@@ -145,15 +164,48 @@ if(count($mapperResults[$type]) >= 1){
 
   // create links in output directory!
   foreach ($mapperResults[$type] as $key => $value) {
-    // switch type!!
-    $processLog .= date('Y-m-d h:i:s').' Creates soft link for Patient'.PHP_EOL;
+    // if we have matches on patient, look for matches on the data!
+    // get all data for patient and link it to its study
+    // with search conditions
+    $study_mapper = new Mapper('Patient');
+    $study_mapper->ljoin('Data_Patient', 'patient.id = Data_Patient.patient_id')->ljoin('Data', 'Data_Patient.data_id = data.id')->ljoin('Data_Study', 'data.id = Data_Study.data_id')->ljoin('Study', 'Data_Study.study_id = study.id');
+    if(isset($description)){
+      $study_mapper->filter('study.description LIKE CONCAT("%",?,"%")', $description);
+      $processLog .= 'description: '. $description.PHP_EOL;
+    }
+    
+    if(isset($location)){
+      $study_mapper->filter('study.location LIKE CONCAT("%",?,"%")', $location);
+      $processLog .= 'location: '. $location.PHP_EOL;
+    }
+    
+    if(isset($age)){
+      $study_mapper->filter('study.age LIKE CONCAT("%",?,"%")', $age);
+      $processLog .= 'age: '. $age.PHP_EOL;
+    }
+    
+    if(isset($modality)){
+      $study_mapper->filter('study.modality LIKE CONCAT("%",?,"%")', $modality);
+      $processLog .= 'modality: '. $modality.PHP_EOL;
+    }
+    
+    if(isset($date)){
+      $study_mapper->filter('study.date LIKE CONCAT("%",?,"%")', $date);
+      $processLog .= 'date: '. $date.PHP_EOL;
+    }
+    
+    $study_results = $study_mapper->get();
+    if(count($study_results['Data']) >= 1){
+      print_r($study_results['Data']);
+    }
+    // loop through results and create links
+    //$processLog .= date('Y-m-d h:i:s').' Creates soft link for Patient'.PHP_EOL;
     // create data soft links
-
-    $target = CHRIS_DATA.$value->uid.'-'.$value->id;
-    $destination = $output_dir.$value->uid.'-'.$value->id;
+    //$target = CHRIS_DATA.$value->uid.'-'.$value->id;
+    //$destination = $output_dir.$value->uid.'-'.$value->id;
 
     // create sof link
-    symlink($target, $destination);
+    //symlink($target, $destination);
   }
 
 }

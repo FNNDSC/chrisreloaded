@@ -2,12 +2,12 @@
 #
 # Search patient plugin for ChRIS reloaded
 #
-#                         _                   _   _            _   
-# ___  ___  __ _ _ __ ___| |__    _ __   __ _| |_(_) ___ _ __ | |_ 
-#/ __|/ _ \/ _` | '__/ __| '_ \  | '_ \ / _` | __| |/ _ \ '_ \| __|
-#\__ \  __/ (_| | | | (__| | | | | |_) | (_| | |_| |  __/ | | | |_ 
-#|___/\___|\__,_|_|  \___|_| |_| | .__/ \__,_|\__|_|\___|_| |_|\__|
-#                                |_|                               
+#                         _      
+# ___  ___  __ _ _ __ ___| |__   
+#/ __|/ _ \/ _` | '__/ __| '_ \  
+#\__ \  __/ (_| | | | (__| | | | 
+#|___/\___|\__,_|_|  \___|_| |_| 
+#                                
 #
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
 #                   Boston Children's Hospital
@@ -23,16 +23,16 @@ from plugin import Plugin
 
 import datetime as d
 
-class search_patient(Plugin):
+class search(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
-  Plugin.TITLE = 'Search Patient'
+  Plugin.TITLE = 'Search'
   Plugin.CATEGORY = 'Search'
-  Plugin.DESCRIPTION = 'Search for a patient in the Database'
+  Plugin.DESCRIPTION = 'Search in the Database'
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
-  Plugin.VERSION = '0.1'
+  Plugin.VERSION = '0.2'
 
   def run(self, options):
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -43,7 +43,7 @@ class search_patient(Plugin):
     # preprocess!!
     print '======================================='
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start DB search...'
-    search_command = current_dir + "/search_patient.php"
+    search_command = current_dir + "/search.php"
     #output directory
     search_command += " -o " + options.output
     if options.NAME:
@@ -58,6 +58,21 @@ class search_patient(Plugin):
     if options.SEX:
       #sex
       search_command += " -s " + options.SEX
+    if options.DESCRIPTION:
+      #description
+      search_command += " -1 " + options.DESCRIPTION
+    if options.LOCATION:
+      #location
+      search_command += " -2 " + options.LOCATION
+    if options.AGE:
+      #age
+      search_command += " -3 " + options.AGE
+    if options.MODALITY:
+      #modality
+      search_command += " -4 " + options.MODALITY
+    if options.DATE:
+      #date
+      search_command += " -5 " + options.DATE
       
     print 'command:'
     print search_command
@@ -80,9 +95,16 @@ class search_patient(Plugin):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = search_patient()
-  plugin.add_parameter('Input', Plugin.STRING, '--name', action='store', default='', dest='NAME', help='Name of the patient')
-  plugin.add_parameter('Input', Plugin.STRING, '--dob', action='store', default='', dest='DOB', help='Date Of Birth of the patient')
-  plugin.add_parameter('Input', Plugin.STRING, '--id', action='store', default='', dest='ID', help='UID of the patient')
-  plugin.add_parameter('Input', Plugin.STRING, '--sex', action='store', default='', dest='SEX', help='Sex of the patient')
+  plugin = search()
+  plugin.add_parameter('Patient', Plugin.STRING, '--name', action='store', default='', dest='NAME', help='Name of the patient')
+  plugin.add_parameter('Patient', Plugin.STRING, '--dob', action='store', default='', dest='DOB', help='Date Of Birth of the patient')
+  plugin.add_parameter('Patient', Plugin.STRING, '--id', action='store', default='', dest='ID', help='UID of the patient')
+  plugin.add_parameter('Patient', Plugin.STRING, '--sex', action='store', default='', dest='SEX', help='Sex of the patient')
+  
+  plugin.add_parameter('Data', Plugin.STRING, '--desc', action='store', default='', dest='DESCRIPTION', help='Characters contained in data description or name')
+  plugin.add_parameter('Data', Plugin.STRING, '--location', action='store', default='', dest='LOCATION', help='Where the data was acquired')
+  plugin.add_parameter('Data', Plugin.STRING, '--age', action='store', default='', dest='AGE', help='Age of the patient at scan date')
+  plugin.add_parameter('Data', Plugin.STRING, '--modality', action='store', default='', dest='MODALITY', help='Modality')
+  plugin.add_parameter('Data', Plugin.STRING, '--date', action='store', default='', dest='DATE', help='Scan date')
+  
   plugin.launch(sys.argv)
