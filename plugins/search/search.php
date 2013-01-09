@@ -56,7 +56,7 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'study.model.php'));
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
 // define the options
-$shortopts = "o:n:d:i:s:1:2:3:4:5:6:7";
+$shortopts = "o:n:d:i:s:1:2:3:4:5:6:7:";
 
 $options = getopt($shortopts);
 
