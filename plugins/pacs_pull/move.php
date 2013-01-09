@@ -38,6 +38,8 @@ require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 // include chris data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'study.model.php'));
+// include chris data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_study.model.php'));
 // include chris patient models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 // include chris user_data models
@@ -138,7 +140,6 @@ if ($handle = opendir($study_directory)) {
                 $logFile .= 'patient data id: '.$dataPatientResult['Data_Patient'][0]->id.PHP_EOL;
               }
               
-              // MAP DATA TO STUDY
               // MAP DATA TO STUDY
               $dataStudyMapper = new Mapper('Data_Study');
               $dataStudyMapper->filter('data_id = (?)',$data_chris_id);

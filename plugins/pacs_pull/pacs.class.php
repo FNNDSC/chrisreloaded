@@ -801,16 +801,25 @@ class PACS implements PACSInterface {
         //
         $dataObject->uid = $process_file['SeriesInstanceUID'][0];
         //
-        // get data name (series description)
+        // get data name (protocol name)
+        //
+        if(array_key_exists('ProtocolName',$process_file))
+        {
+          $dataObject->name = sanitize($process_file['ProtocolName'][0]);
+        }
+        else{
+          $dataObject->name = 'NoProtocolName';
+        }
+        //
+        // get data description (series description)
         //
         if(array_key_exists('SeriesDescription',$process_file))
         {
-          $dataObject->name = sanitize($process_file['SeriesDescription'][0]);
+          $dataObject->description = sanitize($process_file['SeriesDescription'][0]);
         }
         else{
-          $dataObject->name = 'NoSeriesDescription';
+          $dataObject->description = 'NoSeriesDescription';
         }
-
         $series_description = $dataObject->name;
         //
         // get data time ContentDate-ContentTime
@@ -823,9 +832,22 @@ class PACS implements PACSInterface {
         $data_chris_id = Mapper::add($dataObject);
       }
       else{
-        // update time and status here...!
+        // todo: update time and status here...!
+        if($dataResult['Data'][0]->name == ''){
+          if(array_key_exists('ProtocolName',$process_file))
+          {
+            $dataResult['Data'][0]->name = sanitize($process_file['ProtocolName'][0]);
+          }
+          else{
+            $dataResult['Data'][0]->name = 'NoProtocolName';
+          }
+          $series_description = $dataResult['Data'][0]->name;
+          Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
+        }
+        else{
+          $series_description = $dataResult['Data'][0]->name;
+        }
         $data_chris_id = $dataResult['Data'][0]->id;
-        $series_description = $dataResult['Data'][0]->name;
       }
     }
     else {
