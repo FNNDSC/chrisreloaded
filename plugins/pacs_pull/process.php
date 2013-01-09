@@ -57,14 +57,6 @@ require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
 // define the options
 $shortopts = "u:f:m:s:p:a:o:";
-/*$longopts  = array(
- "user:",    // Required value
-    "feed:",    // Required value
-    "mrn:",     // Required value
-    "server:",  // Required value
-    "port:",    // Required value
-    "aetitle:" // Required value
-);*/
 
 $options = getopt($shortopts);
 
@@ -82,7 +74,7 @@ $output_dir = $options['o'];
 $logFile = $output_dir.'process.log';
 
 //
-// 3- INSTANTIATE PACS CLASS
+// 2- INSTANTIATE PACS CLASS
 //
 $instateLog = '======================================='.PHP_EOL;
 $instateLog .= date('Y-m-d h:i:s'). ' ---> Instantiate PACS class...'.PHP_EOL;
@@ -96,7 +88,7 @@ fclose($fh);
 $pacs = new PACS($server, $port, $aetitle);
 
 //
-// 4- TEST CONNECTION
+// 3- TEST CONNECTION
 //
 $connectionLog = '======================================='.PHP_EOL;
 $connectionLog .= date('Y-m-d h:i:s'). ' ---> Test connection to server...'.PHP_EOL;
@@ -121,8 +113,11 @@ fwrite($fh, $connectionLog);
 fclose($fh);
 
 //
-// 5- QUERY ALL INFORMATION
-//
+// 4- QUERY ALL INFORMATION
+// This step allows us to get all studies uids and series uids
+// Other information which is collected might be useful later on
+// (to monitor the progress in real time, to know if a dataset is corrupted, etc)
+
 $queryAllLog = '======================================='.PHP_EOL;
 $queryAllLog .= date('Y-m-d h:i:s'). ' ---> Query all information...'.PHP_EOL;
 $queryAllLog .= 'AETitle: '.$aetitle.PHP_EOL;
@@ -139,7 +134,7 @@ $series_parameter['StudyDescription'] = '';
 $series_parameter['NumberOfSeriesRelatedInstances'] = '';
 $results = $pacs->queryAll($study_parameter, $series_parameter, null);
 
-// if no data available, return null
+// if no series data available, return null
 if(count($results[1]) == 0)
 {
   $queryAllLog .= 'No matching series where found...'.PHP_EOL;
@@ -159,7 +154,7 @@ fwrite($fh, $queryAllLog);
 fclose($fh);
 
 //
-// 6-  ADD PATIENT TO DB
+// 5-  ADD PATIENT TO DB
 //
 $addPatientLog = '======================================='.PHP_EOL;
 $addPatientLog .= date('Y-m-d h:i:s'). ' ---> Add patient to DB...'.PHP_EOL;
@@ -208,24 +203,24 @@ fwrite($fh, $addPatientLog);
 fclose($fh);
 
 //
-// 7- ADD DATA TO DB
+// 6- ADD DATA TO DB
 //
 $addDataLog = '======================================='.PHP_EOL;
 $addDataLog .= date('Y-m-d h:i:s'). ' ---> Add data to DB...'.PHP_EOL;
 // loop through all data to be downloaded
 // if data not there, create row in the data db table
-// update the feed ids and status
+// update the feed ids, status and counter
 
 $data_chris_id = -1;
 $feed_status = '';
-
 $counter = 1;
 $total = count($results[1]['SeriesInstanceUID']);
 
 foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   // lock data db so no data added in the meanwhile
   $db->lock('data', 'WRITE');
-  $map = false;
+  $map_data = false;
+  $request_data = true;
 
   $addDataLog .= '********'.PHP_EOL;
   $addDataLog .= 'Data table locked on WRITE...'.PHP_EOL;
@@ -244,10 +239,9 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
     $dataObject->uid = $value;
     $dataObject->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
     $dataObject->name = sanitize($results[1]['SeriesDescription'][$key]);
-
     $dataObject->plugin = 'pacs_pull';
     $data_chris_id = Mapper::add($dataObject);
-    $map = true;
+    $map_data = true;
 
     $addDataLog .= 'Data doesn\'t exist...'.PHP_EOL;
   }
@@ -256,19 +250,16 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
     $data_chris_id = $dataResult['Data'][0]->id;
     $addDataLog .= 'Data exists...'.PHP_EOL;
     // if no nb_files provided, update this field in db
-    if($dataResult['Data'][0]->nb_files == 0){
-      // get a patient by id
-      $dataObject = new Data();
-      $dataObject->uid = $dataResult['Data'][0]->uid;
-      $dataObject->name = $dataResult['Data'][0]->name;
-      $dataObject->time = $dataResult['Data'][0]->time;
-      $dataObject->nb_files = $dataResult['Data'][0]->nb_files;
-      $dataObject->status = $dataResult['Data'][0]->status;
-      $dataObject->plugin = $dataResult['Data'][0]->plugin;
+    if($dataResult['Data'][0]->nb_files == 0 && $results[1]['NumberOfSeriesRelatedInstances'][$key] > 0){
+      $dataObject->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
       // Update database and get object
       Mapper::update($dataObject, $data_chris_id);
       $addDataLog .= 'Update data number of files...'.PHP_EOL;
       $addDataLog .= '0 -> '.$dataResult['Data'][0]->nb_files.PHP_EOL;
+    }
+    // if data is there and files have been received, we will not query it
+    if($dataResult['Data'][0]->nb_files == $dataResult['Data'][0]->status){
+      $request_data = false;
     }
   }
   $db->unlock();
@@ -278,8 +269,8 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   $addDataLog .= 'Feed id:'.$feed_chris_id.PHP_EOL;
   $addDataLog .= 'Data table unlocked on WRITE...'.PHP_EOL;
 
-  // Map data to patient if it is anew data set
-  if($map){
+  // Map data to patient if it is a new data set
+  if($map_data){
     // MAP DATA TO PATIENT
     $dataPatientObject = new Data_Patient();
     $dataPatientObject->data_id = $data_chris_id;
@@ -351,13 +342,15 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   }
 
   // move series (data)
-  $pacs2 = new PACS($server, $port, $aetitle);
-  echo $server.PHP_EOL;
-  echo $port.PHP_EOL;
-  echo $aetitle.PHP_EOL;
-  $pacs2->addParameter('StudyInstanceUID', $results[1]['StudyInstanceUID'][$key]);
-  $pacs2->addParameter('SeriesInstanceUID', $results[1]['SeriesInstanceUID'][$key]);
-  $pacs2->moveSeries();
+  if($request_data){
+    $pacs2 = new PACS($server, $port, $aetitle);
+    echo $server.PHP_EOL;
+    echo $port.PHP_EOL;
+    echo $aetitle.PHP_EOL;
+    $pacs2->addParameter('StudyInstanceUID', $results[1]['StudyInstanceUID'][$key]);
+    $pacs2->addParameter('SeriesInstanceUID', $results[1]['SeriesInstanceUID'][$key]);
+    $pacs2->moveSeries();
+  }
 
   // process series (data)
   // wait for all files to be received
@@ -430,7 +423,7 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
         // create sof link
         symlink($seriesdirnametarget, $seriesdirnamelink);
       }
-      
+
       /**
        * @todo Update the feed status
        */
@@ -445,6 +438,7 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
       sleep(2);
     }
   }
+
 
   // update status
   $counter++;
