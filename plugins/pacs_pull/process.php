@@ -79,7 +79,7 @@ $output_dir = $options['o'];
 //
 // 1- CREATE PRE-PROCESS LOG FILE
 //
-$logFile = $output_dir.'pre_process.log';
+$logFile = $output_dir.'process.log';
 
 //
 // 3- INSTANTIATE PACS CLASS
