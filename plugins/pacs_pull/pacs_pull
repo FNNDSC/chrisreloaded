@@ -31,7 +31,7 @@ class PACS_Pull(Plugin):
   Plugin.DESCRIPTION = 'Pull data from your PACS to our ChRIS server.'
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
-  Plugin.VERSION = '0.1'
+  Plugin.VERSION = '0.2'
 
   def run(self, options):
     current_dir = os.path.dirname(os.path.abspath(__file__))
