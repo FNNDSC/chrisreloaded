@@ -169,6 +169,7 @@ if(count($mapperResults[$type]) >= 1){
     // with search conditions
     $study_mapper = new Mapper('Patient');
     $study_mapper->ljoin('Data_Patient', 'patient.id = Data_Patient.patient_id')->ljoin('Data', 'Data_Patient.data_id = data.id')->ljoin('Data_Study', 'data.id = Data_Study.data_id')->ljoin('Study', 'Data_Study.study_id = study.id');
+    $study_mapper->filter('patient.id = (?)', $value->id);
     if(isset($description)){
       $study_mapper->filter('study.description LIKE CONCAT("%",?,"%")', $description);
       $processLog .= 'description: '. $description.PHP_EOL;
@@ -196,6 +197,7 @@ if(count($mapperResults[$type]) >= 1){
     
     $study_results = $study_mapper->get();
     if(count($study_results['Data']) >= 1){
+      echo '==============================================='.$value->id.PHP_EOL;
       print_r($study_results['Data']);
     }
     // loop through results and create links
