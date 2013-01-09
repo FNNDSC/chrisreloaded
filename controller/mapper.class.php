@@ -348,7 +348,7 @@ class Mapper implements MapperInterface {
 
     // query the database
     $results = DB::getInstance()->execute('SELECT * FROM '.strtolower($this->objectname).strtolower($this->joins).strtolower($this->_getWhere()).strtolower($this->group).strtolower($this->order), $this->_getParam());
-
+    
     // create an array to store the objects
     $objects = Array();
 
@@ -366,8 +366,10 @@ class Mapper implements MapperInterface {
 
         // parse on result
         foreach ($result as $field) {
+          // strip potential '-'
+          $clean = explode('-', $field[0]);
           // if we reach a "id" field, create new object
-          if ($field[0] == 'id') {
+          if ($clean[0] == 'id') {
             // if there is an object existing, push it to right location and update localid
             // we only push the object once it has been filled!
             if (!empty($object)) {
@@ -378,7 +380,7 @@ class Mapper implements MapperInterface {
             $object = new $this->objects[$localid]();
           }
           // update fields
-          $object->$field[0] = trim($field[1]);
+          $object->$clean[0] = trim($field[1]);
         }
         // push last object to the right location
         // we only push the object once it has been filled!
