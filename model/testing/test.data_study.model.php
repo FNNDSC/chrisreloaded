@@ -27,21 +27,27 @@
  */
 
 // we define a valid entry point
-if (!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
 //define('CHRIS_CONFIG_DEBUG',true);
 
 // include the configuration
-
-if (!defined('CHRIS_CONFIG_PARSED'))
-  require_once (dirname(dirname(dirname(__FILE__))).'/config.inc.php');
+if(!defined('CHRIS_CONFIG_PARSED'))
+  require_once(dirname(dirname(dirname(__FILE__))).'/config.inc.php');
 
 // include the simpletest chris framework
 require_once (SIMPLETEST_CHRIS);
 SimpleTest_Chris::setPreference();
 
-// include all the tests
-require_once ('test.db.class.php');
-require_once ('test.mapper.class.php');
+// include the test object class since we derive from that
+require_once('test.object.model.php');
+
+// include the data_patient class
+require_once(joinPaths(CHRIS_MODEL_FOLDER, 'data_study.model.php'));
+
+class TestData_StudyModel extends TestObjectModel {
+
+
+}
 
 ?>

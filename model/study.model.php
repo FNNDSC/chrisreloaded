@@ -35,61 +35,51 @@ require_once 'object.model.php';
 
 /**
  *
- * The Data class which describes the Data entity of the database.
+ * The Study class which describes the Study entity of the database.
  *
  */
-class Data extends Object {
+class Study extends Object {
 
   /**
-   * The data unique ID.
-   * We use it to make sure data we will add to the database doesn't already exists.
+   * The study unique id
    *
    * @var string $uid
    */
   public $uid = '';
-
+  
   /**
-   * The description of the data.
-   * Text file name, dicom protocol, etc...
+   * The study description
    *
    * @var string $description
    */
   public $description = '';
+
+  /**
+   * The study location.
+   *
+   * @var string $location
+   */
+  public $location = '';
+
+  /**
+   * The patient age at scan date
+   *
+   * @var string $age
+   */
+  public $age = '';
   
   /**
-   * The name of the data.
-   * Text file name, dicom protocol, etc...
+   * The modality in this study.
    *
-   * @var string $name
+   * @var string $modality
    */
-  public $name = '';
+  public $modality = '';
 
   /**
-   * The time of the data creation.
+   * The study date.
    *
-   * @var string $time
+   * @var string $date
    */
-  public $time = '';
-  
-  /**
-   * The number of files in this data.
-   *
-   * @var int $nb_files
-   */
-  public $nb_files = -1;
-
-  /**
-   * The status of this dataset
-   *
-   * @var int $status
-   */
-  public $status = 0;
-
-  /**
-   * The plugin which introduced this dataset
-   *
-   * @var string $plugin
-   */
-  public $plugin = '';
+  public $date = '';
 }
 ?>
