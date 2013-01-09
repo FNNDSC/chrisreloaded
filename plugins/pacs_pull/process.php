@@ -356,7 +356,7 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   // wait for all files to be received
   $waiting = true;
   while($waiting){
-    echo 'waiting....'.PHP_EOL;
+    echo '.';
     // check if *ALL* data is there
     $dataMapper = new Mapper('Data');
     $dataMapper->filter('id = (?)',$data_chris_id);
@@ -438,8 +438,6 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
       sleep(2);
     }
   }
-
-
   // update status
   $counter++;
 }
