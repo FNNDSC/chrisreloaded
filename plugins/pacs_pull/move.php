@@ -137,6 +137,26 @@ if ($handle = opendir($study_directory)) {
                 $logFile .= 'Patient already mapped to data...'.PHP_EOL;
                 $logFile .= 'patient data id: '.$dataPatientResult['Data_Patient'][0]->id.PHP_EOL;
               }
+              
+              // MAP DATA TO STUDY
+              // MAP DATA TO STUDY
+              $dataStudyMapper = new Mapper('Data_Study');
+              $dataStudyMapper->filter('data_id = (?)',$data_chris_id);
+              $dataStudyMapper->filter('study_id = (?)',$study_chris_id);
+              $dataStudyResult = $dataStudyMapper->get();
+              if(count($dataStudyResult['Data_Study']) == 0)
+              {
+                $dataStudyObject = new Data_Study();
+                $dataStudyObject->data_id = $data_chris_id;
+                $dataStudyObject->study_id = $study_chris_id;
+                $mapping_data_study_id = Mapper::add($dataStudyObject);
+                
+                $logFile .= 'data study id: '.$mapping_data_study_id.PHP_EOL;
+              }
+              else{
+                $logFile .= 'Study already mapped to data...'.PHP_EOL;
+                $logFile .= 'data study id: '.$dataStudyResult['Data_Study'][0]->id.PHP_EOL;
+              }
 
               // FILESYSTEM Processing
               //
