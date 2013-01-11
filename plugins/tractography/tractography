@@ -46,8 +46,9 @@ class tractography(Plugin):
     # grab the first dicom input file
     # dicom directory
     command += ' -D ' + options.dti
-    # dicom file
-    command += ' -d ' + os.listdir(options.dti)[1]
+    # get first dicom file
+    files = [d for d in os.listdir(options.dti) if not os.path.isdir(d)]
+    command += ' -d ' + files[0]
     
     # stages
     command += ' -t 12';
