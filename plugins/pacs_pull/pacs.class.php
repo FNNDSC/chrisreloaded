@@ -946,7 +946,7 @@ class PACS implements PACSInterface {
         // Content already up to date
         else{
           $study_chris_id = $studyResult['Study'][0]->id;
-          $study_description = formatStudy($studyResult['Study'][0]->date, $studyResult['Study'][0]->date, $studyResult['Study'][0]->description);
+          $study_description = formatStudy($studyResult['Study'][0]->date, $studyResult['Study'][0]->age, $studyResult['Study'][0]->description);
         }
       }
     }
