@@ -55,6 +55,7 @@ class tractography(Plugin):
     if not options.eddy:
       command += ' -k '
       
+      
     #mask1
     command += ' --m1 ' + options.m1 + ' --m1-lower-threshold ' + options.m1lowerthreshold + ' --m1-upper-threshold ' + options.m1upperthreshold
     

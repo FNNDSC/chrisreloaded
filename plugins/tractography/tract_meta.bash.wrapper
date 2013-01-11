@@ -1,5 +1,0 @@
-#!/bin/bash
-source ~/.bash_profile
-ss
-source chb-fsstable
-$1
