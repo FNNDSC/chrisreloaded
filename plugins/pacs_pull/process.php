@@ -409,7 +409,7 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
       $studyMapper = new Mapper('Study');
       $studyMapper->filter('id = (?)', $study_chris_id);
       $studyResult = $studyMapper->get();
-      $study_dir_name = $studyResult['Study'][0]->date.'-'.$studyResult['Study'][0]->description.'-'.$study_chris_id;
+      $study_dir_name = formatStudy($studyResult['Study'][0]->date, $studyResult['Study'][0]->age, $studyResult['Study'][0]->description).'-'.$study_chris_id;
       $studydirname = $datadirname.'/'.$study_dir_name;
       if(!is_dir($studydirname)){
         mkdir($studydirname);

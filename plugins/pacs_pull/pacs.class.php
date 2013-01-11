@@ -905,16 +905,16 @@ class PACS implements PACSInterface {
           $studyObject->date = PACS::getDate($process_file);
         }
 
-        $study_description = $studyObject->date.'-'.$studyObject->description;
-
         $studyObject->age = PACS::getAge($process_file);
         $studyObject->location = PACS::getLocation($process_file);
+        
+        $study_description = formatStudy($studyObject->date, $studyObject->age, $studyObject->description);
 
         $study_chris_id = Mapper::add($studyObject);
       }
       else{
         // Content to be updated
-        if($studyResult['Study'][0]->age == ''){
+        if($studyResult['Study'][0]->age == -1){
           //
           // get data name (series description)
           //
@@ -935,19 +935,18 @@ class PACS implements PACSInterface {
           }
 
           $studyResult['Study'][0]->date = PACS::getDate($process_file);
-
-          $study_description = $studyResult['Study'][0]->date.'-'.$studyResult['Study'][0]->description;
-          $study_chris_id = $studyResult['Study'][0]->id;
-
           $studyResult['Study'][0]->age = PACS::getAge($process_file);
           $studyResult['Study'][0]->location = PACS::getLocation($process_file);
+          
+          $study_description = formatStudy($studyResult['Study'][0]->date, $studyResult['Study'][0]->age, $studyResult['Study'][0]->description);
+          $study_chris_id = $studyResult['Study'][0]->id;
 
           Mapper::update($studyResult['Study'][0], $studyResult['Study'][0]->id);
         }
         // Content already up to date
         else{
           $study_chris_id = $studyResult['Study'][0]->id;
-          $study_description = $studyResult['Study'][0]->date.'-'.$studyResult['Study'][0]->description;
+          $study_description = formatStudy($studyResult['Study'][0]->date, $studyResult['Study'][0]->date, $studyResult['Study'][0]->description);
         }
       }
     }
