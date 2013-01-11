@@ -27,10 +27,10 @@
 	padding: 4px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: #e3e3e3;
+	border-color: #777;
 	display: none;
 	cursor: pointer;
-	background-color: whiteSmoke;
+	background-color: #DFE9FA;
 	text-align: center;
 	font-weight: bold;
 }
@@ -258,4 +258,24 @@
 		to(#8FBC8F) ); /*for webkit browsers*/
 	background: -moz-linear-gradient(top, #F5F5F5, #8FBC8F);
 	/* for firefox 3.6+ */
+}
+
+.feed_sea {
+	 display: none;
+}
+
+.feed_sea_header {
+   background: #CCFFFF;
+}
+
+.feed_fav_header {
+   background: #FFFFCC;
+}
+
+.feed_run_header {
+   background: #FFCCCC;
+}
+
+.feed_fin_header {
+   background: #CCFFCC;
 }

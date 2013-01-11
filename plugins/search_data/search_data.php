@@ -48,18 +48,15 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_study.model.php'));
-
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'study.model.php'));
-
 // include pacs helper
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
 // define the options
-$shortopts = "o:n:d:i:s:1:2:3:4:5:6:7:";
+$shortopts = "t:o:n:d:i:s:";
 
 $options = getopt($shortopts);
 
+$type = 'Data';
 $output_dir = $options['o'];
 
 if(isset($options['n'])){
@@ -74,32 +71,10 @@ if(isset($options['i'])){
 if(isset($options['s'])){
   $sex = $options['s'];
 }
-if(isset($options['1'])){
-  $description = $options['1'];
-}
-if(isset($options['2'])){
-  $location = $options['2'];
-}
-if(isset($options['3'])){
-  $agemin = $options['3'];
-}
-if(isset($options['4'])){
-  $agemax = $options['4'];
-}
-if(isset($options['5'])){
-  $modality = $options['5'];
-}
-if(isset($options['6'])){
-  $datemin = $options['6'];
-}
-if(isset($options['7'])){
-  $datemax = $options['7'];
-}
 
 //
 // 1- CREATE PRE-PROCESS LOG FILE
 //
-$type = 'Patient';
 $logFile = $output_dir.'search.log';
 
 //
@@ -170,82 +145,15 @@ if(count($mapperResults[$type]) >= 1){
 
   // create links in output directory!
   foreach ($mapperResults[$type] as $key => $value) {
-    // if we have matches on patient, look for matches on the data!
-    // get all data for patient and link it to its study
-    // with search conditions
-    $study_mapper = new Mapper('Patient');
-    $study_mapper->ljoin('Data_Patient', 'patient.id = Data_Patient.patient_id')->ljoin('Data', 'Data_Patient.data_id = data.id')->ljoin('Data_Study', 'data.id = Data_Study.data_id')->ljoin('Study', 'Data_Study.study_id = study.id');
-    $study_mapper->filter('patient.id = (?)', $value->id);
-    if(isset($description)){
-      $study_mapper->filter('study.description LIKE CONCAT("%",?,"%")', $description);
-      $processLog .= 'description: '. $description.PHP_EOL;
-    }
+    // switch type!!
+    $processLog .= date('Y-m-d h:i:s').' Creates soft link for Patient'.PHP_EOL;
+    // create data soft links
 
-    if(isset($location)){
-      $study_mapper->filter('study.location LIKE CONCAT("%",?,"%")', $location);
-      $processLog .= 'location: '. $location.PHP_EOL;
-    }
+    $target = CHRIS_DATA.$value->uid.'-'.$value->id;
+    $destination = $output_dir.$value->uid.'-'.$value->id;
 
-    if(isset($agemin)){
-      $study_mapper->filter('study.age >= (?)', $agemin);
-      $processLog .= 'agemin: '. $agemin.PHP_EOL;
-    }
-    
-    if(isset($agemax)){
-      $study_mapper->filter('study.age <= (?)', $agemax);
-      $processLog .= 'agemax: '. $agemax.PHP_EOL;
-    }
-
-    if(isset($modality)){
-      $study_mapper->filter('study.modality LIKE CONCAT("%",?,"%")', $modality);
-      $processLog .= 'modality: '. $modality.PHP_EOL;
-    }
-
-    if(isset($datemin)){
-      $study_mapper->filter('study.date >= (?)', $datemin);
-      $processLog .= 'datemin: '. $datemin.PHP_EOL;
-    }
-    
-    if(isset($datemax)){
-      $study_mapper->filter('study.date <= (?)', $datemax);
-      $processLog .= 'datemax: '. $datemax.PHP_EOL;
-    }
-
-    $study_results = $study_mapper->get();
-    if(count($study_results['Data']) >= 1){
-      foreach($study_results['Data'] as $key => $value){
-        $processLog .= $study_results['Patient'][$key]->id.PHP_EOL;
-        
-        // create patient directory
-        $fs_location = $study_results['Patient'][$key]->uid.'-'.$study_results['Patient'][$key]->id;
-        $patientdir = $output_dir.$fs_location;
-        if(!is_dir($patientdir)){
-          mkdir($patientdir);
-        }
-        
-        // create study directory
-        $fs_location .= '/'.formatStudy($study_results['Study'][$key]->date, $study_results['Study'][$key]->age, $study_results['Study'][$key]->description).'-'.$study_results['Study'][$key]->id;
-        $studydir = $output_dir.$fs_location;
-        if(!is_dir($studydir)){
-          mkdir($studydir);
-        }
-
-        // create data symlink
-        // loop through results and create links
-        $processLog .= date('Y-m-d h:i:s').' Creates soft link for Patient'.PHP_EOL;
-        // create data soft links
-        $target = CHRIS_DATA.$fs_location.'/'.$value->name.'-'.$value->id;
-        $destination = $studydir.'/'.$value->name.'-'.$value->id;
-        
-        $processLog .= CHRIS_DATA.$fs_location.'/'.$value->name.'-'.$value->id.PHP_EOL;
-        
-        $processLog .= $studydir.'/'.$value->name.'-'.$value->id.PHP_EOL;
-        
-        // create sof link
-        symlink($target, $destination);
-      }
-    }
-
+    // create sof link
+    symlink($target, $destination);
   }
 
 }

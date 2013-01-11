@@ -172,6 +172,7 @@ class DB {
 
     // execute the query
     $statement->execute();
+
     // -1 = select because select doesnt affect rows
     $queryType = $statement->affected_rows;
 
@@ -187,13 +188,22 @@ class DB {
     // check which fields are expected
     $fields = array();
     $resultFields = array();
+    $count = 0;
     while ($field = $result->fetch_field()) {
 
-      $fields[] = $field->name;
-      $resultFields[] = &${
-        $field->name};
+      $tmp_field = $field->name;
 
+      if (in_array($tmp_field, $fields)) {
+        $tmp_field .= '-'.$count;
+        $count++;
+      }
+
+      $fields[] = $tmp_field;
+      $resultFields[] = &${
+        $tmp_field};
     }
+    
+    //print_r($fields);
 
     // call $statement->bind_result for each of the expected fields
     call_user_func_array(array($statement, 'bind_result'), $resultFields);
@@ -209,8 +219,9 @@ class DB {
         // save field name
         $results[$i][$j][0] = $field;
         //save field value
-        $results[$i][$j][1] = $$field;
-        $j++;
+        $results[$i][$j][1] = ${
+          $field};
+          $j++;
       }
       $i++;
     }

@@ -219,12 +219,13 @@ class FeedC implements FeedControllerInterface {
       $feedMapper->filter('user_id = (?)', $user_id);
     }
     $feedMapper->filter('archive = (?)', '0');
+    $feedMapper->filter('favorite = (?)', '0');
     $feedMapper->filter('time < (?)',$feed_old);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
     if(count($feedResult['Feed']) >= 1){
-      // get all feeds which have been created since last upload
+      
       foreach ($feedResult['Feed'] as $key => $value) {
         if($nb_feeds >= 0 && $count >= $nb_feeds){
           break;

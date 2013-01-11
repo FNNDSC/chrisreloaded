@@ -80,7 +80,8 @@ class FeedV implements ObjectViewInterface {
     }
 
     // create the status text
-    $status_text = '<font color=red>Running ('.$object->status.'%)</font>';
+    $status_text = '<font color=red>Running <i class="icon-refresh rotating_class"></i></font>';
+    // ('.$object->status.'%)
     $share_text = '';
     if ($object->status == 100) {
       $status_text = '<font color=green>Done</font>';

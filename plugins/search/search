@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 #
-# Search plugin for ChRIS reloaded
+# Search patient plugin for ChRIS reloaded
 #
-#                             _     
-#                            | |    
-#  ___ _____ _____  ____ ____| |__  
-# /___) ___ (____ |/ ___) ___)  _ \ 
-#|___ | ____/ ___ | |  ( (___| | | |
-#(___/|_____)_____|_|   \____)_| |_|
-#                                   
+#                         _      
+# ___  ___  __ _ _ __ ___| |__   
+#/ __|/ _ \/ _` | '__/ __| '_ \  
+#\__ \  __/ (_| | | | (__| | | | 
+#|___/\___|\__,_|_|  \___|_| |_| 
+#                                
 #
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
 #                   Boston Children's Hospital
@@ -28,12 +27,12 @@ class search(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
-  Plugin.TITLE = 'Search in Database'
-  Plugin.CATEGORY = 'System'
-  Plugin.DESCRIPTION = 'Search for a patient or images in the Database'
+  Plugin.TITLE = 'Search'
+  Plugin.CATEGORY = 'Search'
+  Plugin.DESCRIPTION = 'Search in the Database'
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
-  Plugin.VERSION = '0.1'
+  Plugin.VERSION = '0.2'
 
   def run(self, options):
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -45,8 +44,6 @@ class search(Plugin):
     print '======================================='
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start DB search...'
     search_command = current_dir + "/search.php"
-    #type
-    search_command += " -t " + options.TYPE
     #output directory
     search_command += " -o " + options.output
     if options.NAME:
@@ -61,6 +58,27 @@ class search(Plugin):
     if options.SEX:
       #sex
       search_command += " -s " + options.SEX
+    if options.DESCRIPTION:
+      #description
+      search_command += " -1 " + options.DESCRIPTION
+    if options.LOCATION:
+      #location
+      search_command += " -2 " + options.LOCATION
+    if options.AGEMIN:
+      #agemin
+      search_command += " -3 " + options.AGEMIN
+    if options.AGEMAX:
+      #agemax
+      search_command += " -4 " + options.AGEMAX
+    if options.MODALITY:
+      #modality
+      search_command += " -5 " + options.MODALITY
+    if options.DATEMIN:
+      #datemin
+      search_command += " -6 " + options.DATEMIN
+    if options.DATEMAX:
+      #datemax
+      search_command += " -7 " + options.DATEMAX
       
     print 'command:'
     print search_command
@@ -84,9 +102,17 @@ class search(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = search()
-  plugin.add_parameter('Input', Plugin.STRING, '--type', action='store', default='Patient', dest='TYPE', help='Type of query')
-  plugin.add_parameter('Input', Plugin.STRING, '--name', action='store', default='', dest='NAME', help='Name of the patient')
-  plugin.add_parameter('Input', Plugin.STRING, '--dob', action='store', default='', dest='DOB', help='Date Of Birth of the patient')
-  plugin.add_parameter('Input', Plugin.STRING, '--id', action='store', default='', dest='ID', help='UID of the patient')
-  plugin.add_parameter('Input', Plugin.STRING, '--sex', action='store', default='', dest='SEX', help='Sex of the patient')
+  plugin.add_parameter('Patient', Plugin.STRING, '--name', action='store', default='', dest='NAME', help='Name of the patient')
+  plugin.add_parameter('Patient', Plugin.STRING, '--dob', action='store', default='', dest='DOB', help='Date Of Birth of the patient')
+  plugin.add_parameter('Patient', Plugin.STRING, '--id', action='store', default='', dest='ID', help='UID of the patient')
+  plugin.add_parameter('Patient', Plugin.STRING, '--sex', action='store', default='', dest='SEX', help='Sex of the patient')
+  
+  plugin.add_parameter('Data', Plugin.STRING, '--desc', action='store', default='', dest='DESCRIPTION', help='Characters contained in data description or name')
+  plugin.add_parameter('Data', Plugin.STRING, '--location', action='store', default='', dest='LOCATION', help='Where the data was acquired')
+  plugin.add_parameter('Data', Plugin.STRING, '--agemin', action='store', default='', dest='AGEMIN', help='Age of the patient at scan date')
+  plugin.add_parameter('Data', Plugin.STRING, '--agemax', action='store', default='', dest='AGEMAX', help='Age of the patient at scan date')
+  plugin.add_parameter('Data', Plugin.STRING, '--modality', action='store', default='', dest='MODALITY', help='Modality')
+  plugin.add_parameter('Data', Plugin.STRING, '--datemin', action='store', default='', dest='DATEMIN', help='Scan date')
+  plugin.add_parameter('Data', Plugin.STRING, '--datemax', action='store', default='', dest='DATEMAX', help='Scan date')
+  
   plugin.launch(sys.argv)
