@@ -62,7 +62,10 @@ function sanitize($dirty){
   return $clean;
 }
 
-// raw date in days into string
+/**
+ * Convert number of days into more meaninful description
+ * @param int $raw_age
+ */
 function formatAge($raw_age){
   $years = intval($raw_age/365.25);
   if( $years > 0){
@@ -85,6 +88,12 @@ function formatAge($raw_age){
   }
 }
 
+/**
+ * Format study folder name in a consitent manner
+ * @param string $raw_date
+ * @param int $raw_age
+ * @param string $raw_description
+ */
 function formatStudy($raw_date, $raw_age, $raw_description){
   $date = str_replace('-', '.', $raw_date);
   $age = formatAge($raw_age);
