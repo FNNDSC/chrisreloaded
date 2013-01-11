@@ -224,7 +224,7 @@ if(count($mapperResults[$type]) >= 1){
         }
         
         // create study directory
-        $fs_location .= '/'.$study_results['Study'][$key]->date.'-'.$study_results['Study'][$key]->description.'-'.$study_results['Study'][$key]->id;
+        $fs_location .= '/'.formatStudy($study_results['Study'][$key]->date, $study_results['Study'][$key]->age, $study_results['Study'][$key]->description).'-'.$study_results['Study'][$key]->id;
         $studydir = $output_dir.$fs_location;
         if(!is_dir($studydir)){
           mkdir($studydir);
