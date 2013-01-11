@@ -607,6 +607,13 @@ jQuery(document)
           // get oldest and newest feed value
           _FEED_.oldest = Number.MAX_VALUE;
           _FEED_.newest = Number.MIN_VALUE;
+          // look into favorites
+          var elt = jQuery(".feed_fav_content > .feed");
+          if (elt.length) {
+            if (jQuery(elt[0]).attr('data-chris-feed_time') > _FEED_.newest) {
+              _FEED_.newest = jQuery(elt[0]).attr('data-chris-feed_time');
+            }
+          }
           // look into running
           elt = jQuery(".feed_run_content > .feed");
           if (elt.length) {
