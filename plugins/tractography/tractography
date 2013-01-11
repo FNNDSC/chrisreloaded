@@ -75,8 +75,8 @@ class tractography(Plugin):
       command += ' -A tl'
 
     #image model
-    if options.immodel ==  'HARDY':
-      command += ' -I hardy'
+    if options.immodel ==  'HARDI':
+      command += ' -I hardi'
     
     #gradient image
     if options.usegradient:
@@ -107,7 +107,7 @@ if __name__ == "__main__":
   #general
   plugin.add_parameter('General', Plugin.INTEGER, '--anglethreshold', default='35', action='store', dest='anglethreshold', help='Angle threshold filtering')
   plugin.add_parameter('General', Plugin.COMBOBOX, '--recalgo', values=['FACT', '2nd_Order_Runga_Hutta', 'Interpolated_Streamline', 'Tensorline'], default='FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
-  plugin.add_parameter('General', Plugin.COMBOBOX, '--immodel', values=['DTI', 'HARDY'], default='DTI', action='store', dest='immodel', help='Image Model')
+  plugin.add_parameter('General', Plugin.COMBOBOX, '--immodel', values=['DTI', 'HARDI'], default='DTI', action='store', dest='immodel', help='Image Model')
   plugin.add_parameter('General', Plugin.BOOLEAN, '--eddy', default=False, action='store_true', dest='eddy', help='Run eddy correction')
   
   #Mask Filter
