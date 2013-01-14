@@ -50,7 +50,7 @@ class connectome(Plugin):
       os.symlink(os.path.join(options.t1, t1_file), os.path.join(input_dir, t1_file))
     
     #base command
-    command = ' \'/chb/arch/scripts/connectome_meta.bash ';
+    command = ' \'/chb/users/nicolas.rannou/gitroot/scripts/connectome_meta.bash';
 
     command += ' --tract-meta-stages 12'
     
@@ -68,7 +68,7 @@ class connectome(Plugin):
     #angle threshold
     command += ' --angle-threshold ' + options.anglethreshold
     #verbose
-    command += ' -v 10 '
+    command += ' -v 10'
     
     #recon algo
     if options.recalgo ==  '2nd_Order_Runga_Hutta':
@@ -84,7 +84,7 @@ class connectome(Plugin):
     
     #gradient image
     if options.usegradient:
-      command += ' -g ' + options.gradient
+      command += ' -g' + options.gradient
       
     #b0 value
     if options.useb0:
@@ -108,7 +108,7 @@ class connectome(Plugin):
 
     # tailarach
     if not options.tailarach:
-      command += ' -notailarach '
+      command += ' -notailarach'
       
         # grab the first dti dicom input file
     # dti dicom file
@@ -119,7 +119,7 @@ class connectome(Plugin):
     # t1 dicom file
     command += ' -1 ' + t1_files[0]
     
-    command += ' -f '
+    command += ' -f'
       
     command = current_dir + '/connectome.wrapper ' + command + '\''
     print command
@@ -133,7 +133,7 @@ if __name__ == "__main__":
   plugin.add_parameter('Input', Plugin.IMAGE, '--t1', action='store', dest='t1', help='the T1 scan')
   
   #general
-  plugin.add_parameter('General', Plugin.BOOLEAN, '--tailarach', default=True, action='store_true', dest='tailarach', help='Perform Tailarach')
+  plugin.add_parameter('General', Plugin.BOOLEAN, '--tailarach', default=False, action='store_true', dest='tailarach', help='Perform Tailarach')
   plugin.add_parameter('General', Plugin.INTEGER, '--anglethreshold', default='35', action='store', dest='anglethreshold', help='Angle threshold filtering')
   plugin.add_parameter('General', Plugin.COMBOBOX, '--recalgo', values=['FACT', '2nd_Order_Runga_Hutta', 'Interpolated_Streamline', 'Tensorline'], default='FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
   plugin.add_parameter('General', Plugin.COMBOBOX, '--immodel', values=['DTI', 'HARDY'], default='DTI', action='store', dest='immodel', help='Image Model')
