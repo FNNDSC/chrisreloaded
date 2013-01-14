@@ -103,12 +103,10 @@ class connectome(Plugin):
     command += ' -o _log'
     command += ' -R _log'
     
-    #all freesurfer args
-    command += ' -F '
-
+    #all freesurfer args - only 1 supported for now
     # tailarach
     if not options.tailarach:
-      command += ' -notailarach'
+      command += ' -F -notailarach'
       
         # grab the first dti dicom input file
     # dti dicom file
