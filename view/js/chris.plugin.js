@@ -198,6 +198,11 @@ jQuery(document)
                       '.parameter_spinner');
                   _default_value = _spinner.attr('data-default');
                   _spinner.spinner("value", _default_value);
+                  // double spinners
+                  _spinner = jQuery(_parameter_rows[i]).find(
+                      '.parameter_spinner_double');
+                  _default_value = _spinner.attr('data-default');
+                  _spinner.spinner("value", _default_value);                  
                   // checkboxes
                   var _checkbox = jQuery(_parameter_rows[i]).find(
                       '.parameter_checkbox');
@@ -303,6 +308,11 @@ jQuery(document)
                       var _spinner = jQuery(_parameter_rows[i]).find(
                           '.parameter_spinner');
                       _value = jQuery(_spinner).spinner("value");
+                    } else if (_type == 'spinner_double') {
+                      // spinners
+                      var _spinner = jQuery(_parameter_rows[i]).find(
+                          '.parameter_spinner_double');
+                      _value = jQuery(_spinner).spinner("value");
                     } else if (_type == 'checkbox') {
                       // checkboxes
                       var _checkbox = jQuery(_parameter_rows[i]).find(
@@ -400,6 +410,22 @@ jQuery(document)
             });
             _container.spinner("value", _default_value);
           });
+          jQuery('.parameter_spinner_double').each(function(i, v) {
+
+            var _container = jQuery(v);
+            var _default_value = _container.attr('data-default');
+            var _step = _container.attr('data-step');
+            
+            if (!_step) {
+              _step = 0.1;
+            }
+            
+            _container.spinner({
+              step: _step,
+              numberFormat: "n"
+            });
+            _container.spinner("value", _default_value);
+          });          
           jQuery('.parameter_combobox').each(function(i, v) {
 
             var _container = jQuery(v);
