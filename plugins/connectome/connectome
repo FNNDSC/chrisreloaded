@@ -50,36 +50,9 @@ class connectome(Plugin):
       os.symlink(os.path.join(options.t1, t1_file), os.path.join(input_dir, t1_file))
     
     #base command
-    command = ' \'/chb/arch/scripts/connectome_meta.bash -v 10 -f';
+    command = ' \'/chb/arch/scripts/connectome_meta.bash ';
 
-    # grab the first dti dicom input file
-    # dti dicom file
-    command += ' -D ' + input_dir
-    command += ' -d ' + dti_files[0]
-    
-    # grab the first t1 dicom input file
-    # t1 dicom file
-    command += ' -1 ' + t1_files[0]
-    
-    command += ' -O ' + options.output
-    command += ' -L ' + options.output
-    command += ' -o _log'
-    command += ' -R _log'
-    
-    #all freesurfer args
-    command += ' -F '
-    
-    #stages
-    # 1-> get the data
-    # 2-> tractogphy
-    # 3-> connectome
-    command += ' -t 123'
-    
     command += ' --tract-meta-stages 12'
-    
-    # tailarach
-    if not options.tailarach:
-      command += ' -notailarach '
     
     # stages
     if not options.eddy:
@@ -94,6 +67,8 @@ class connectome(Plugin):
         
     #angle threshold
     command += ' --angle-threshold ' + options.anglethreshold
+    #verbose
+    command += ' -v 10 '
     
     #recon algo
     if options.recalgo ==  '2nd_Order_Runga_Hutta':
@@ -122,7 +97,30 @@ class connectome(Plugin):
       command += ' -Y'
     if options.invertz:
       command += ' -Z'
-     
+    
+    command += ' -O ' + options.output
+    command += ' -L ' + options.output
+    command += ' -o _log'
+    command += ' -R _log'
+    
+    #all freesurfer args
+    command += ' -F '
+
+    # tailarach
+    if not options.tailarach:
+      command += ' -notailarach '
+      
+        # grab the first dti dicom input file
+    # dti dicom file
+    command += ' -D ' + input_dir
+    command += ' -d ' + dti_files[0]
+    
+    # grab the first t1 dicom input file
+    # t1 dicom file
+    command += ' -1 ' + t1_files[0]
+    
+    command += ' -f '
+      
     command = current_dir + '/connectome.wrapper ' + command + '\''
     print command
     os.system(command)
