@@ -1,3 +1,13 @@
 EXECUTABLE="BRAINSFit_exec"
 DIR=`dirname $0`
-export LD_LIBRARY_PATH=/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.1:/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.1/cli-modules && $DIR/$EXECUTABLE "$@"
+
+ARGUMENTS=$@
+# remove some extra output args since BRAINSFit only supports one output at a time
+ARGUMENTS=`echo $ARGUMENTS | awk '{sub("--outputTransform .*.mat",""); print $0}'`
+ARGUMENTS=`echo $ARGUMENTS | awk '{sub("--strippedOutputTransform .*.mat",""); print $0}'`
+ARGUMENTS=`echo $ARGUMENTS | awk '{sub("--outputMovingVolumeROI .*.nii",""); print $0}'`
+ARGUMENTS=`echo $ARGUMENTS | awk '{sub("--outputFixedVolumeROI .*.nii",""); print $0}'`
+ARGUMENTS=`echo $ARGUMENTS | awk '{sub("--linearTransform .*.mat",""); print $0}'`
+ARGUMENTS=`echo $ARGUMENTS | awk '{sub("--bsplineTransform .*.mat",""); print $0}'`
+
+export LD_LIBRARY_PATH=/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2:/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2/cli-modules && $DIR/$EXECUTABLE $ARGUMENTS
