@@ -69,20 +69,20 @@ function sanitize($dirty){
 function formatAge($raw_age){
   $years = intval($raw_age/365.25);
   if( $years > 0){
-    return $years.'Y';
+    return sprintf('%03d', $years).'Y';
   }
   else{
-    $month = intval($raw_age/30.42);
-    if( $month > 0){
-      return $month.'M';
+    $months = intval($raw_age/30.42);
+    if( $months > 0){
+      return sprintf('%03d', $months).'M';
     }
     else{
       $weeks = intval($raw_age/7);
       if( $weeks > 0){
-        return $weeks.'W';
+        return sprintf('%03d', $weeks).'W';
       }
       else{
-        return $raw_age.'D';
+        return sprintf('%03d', $raw_age).'D';
       }
     }
   }
