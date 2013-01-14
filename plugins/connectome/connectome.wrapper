@@ -2,4 +2,10 @@
 source ~/.bash_profile
 ss
 source chb-fsstable
+export PATH=/chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/bin:/chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/fsfast/bin:/chb/pices/arch/x86_64-Linux/packages/fsl/bin:/chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/mni/bin:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:/usr/games:/etc:/usr/etc:/usr/bin/X11:/usr/X11R6/bin:/opt/gnome/bin:/opt/local/bin:/sw/bin:/chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/bin:/chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/fsfast/bin:/chb/pices/arch/x86_64-Linux/packages/fsl/bin:/chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/mni/bin:/usr/bin:/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/local/sbin:/usr/games:/etc:/usr/etc:/usr/bin/X11:/usr/X11R6/bin:/opt/gnome/bin:/opt/local/bin:/sw/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/chb/pices/arch/x86_64-Linux/packages/mricron:/chb/pices/arch/x86_64-Linux/packages/Slicer/current/:/chb/pices/arch/x86_64-Linux/packages/dtk::/chb/pices/arch/x86_64-Linux/packages/fsl:/chb/pices/arch/x86_64-Linux/packages/fsl/bin:/chb/arch/Linux64/packages//mricron:/chb/arch/Linux64/packages//dtk:/chb/arch/Linux64/packages//gdcm/bin:/chb/arch/Linux64/packages//Slicer3/current:/chb/users/dicom/repo/trunk/scripts:/chb/pices/arch/x86_64-Linux/packages/mricron:/chb/pices/arch/x86_64-Linux/packages/Slicer/current/:/chb/pices/arch/x86_64-Linux/packages/dtk::/chb/pices/arch/x86_64-Linux/packages/fsl:/chb/pices/arch/x86_64-Linux/packages/fsl/bin
+source /chb/pices/arch/x86_64-Linux/packages/freesurfer/stable5.0.0/SetUpFreeSurfer.sh
+source /chb/pices/arch/x86_64-Linux/packages/fsl/etc/fslconf/fsl.sh
+export SUBJECTS_DIR=/tmp
+export DSI_PATH=/chb/pices/arch/x86_64-Linux/packages/dtk/matrices
+export PYTHONPATH=:/chb/arch/python/cmp/lib/python:/chb/arch/python/cmp:/chb/arch/python/cfflib:/chb/arch/python/nibabel:/chb/arch/python/cmp/lib/python
 $1
