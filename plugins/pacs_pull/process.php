@@ -205,8 +205,6 @@ fclose($fh);
 //
 // 6- ADD DATA TO DB
 //
-$addDataLog = '======================================='.PHP_EOL;
-$addDataLog .= date('Y-m-d h:i:s'). ' ---> Add data to DB...'.PHP_EOL;
 // loop through all data to be downloaded
 // if data not there, create row in the data db table
 // update the feed ids, status and counter
@@ -222,6 +220,8 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   $map_data = false;
   $request_data = true;
 
+  $addDataLog = '======================================='.PHP_EOL;
+  $addDataLog .= date('Y-m-d h:i:s'). ' ---> Add data to DB...'.PHP_EOL;
   $addDataLog .= '********'.PHP_EOL;
   $addDataLog .= 'Data table locked on WRITE...'.PHP_EOL;
   $addDataLog .= 'Data uid: '.$value.PHP_EOL;
@@ -349,9 +349,15 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
     echo $aetitle.PHP_EOL;
     $pacs2->addParameter('StudyInstanceUID', $results[1]['StudyInstanceUID'][$key]);
     $pacs2->addParameter('SeriesInstanceUID', $results[1]['SeriesInstanceUID'][$key]);
-    $pacs2->moveSeries();
+    $push_request = $pacs2->moveSeries();
+    $addDataLog .= $push_request.PHP_EOL;
+    
   }
-
+  
+  $fh = fopen($logFile, 'a')  or die("can't open file");
+  fwrite($fh, $addDataLog);
+  fclose($fh);
+  
   // process series (data)
   // wait for all files to be received
   $waiting = true;
@@ -441,10 +447,6 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   // update status
   $counter++;
 }
-
-$fh = fopen($logFile, 'a')  or die("can't open file");
-fwrite($fh, $addDataLog);
-fclose($fh);
 
 // update feed status in db
 $feedMapper = new Mapper('Feed');
