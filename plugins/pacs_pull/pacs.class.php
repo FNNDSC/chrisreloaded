@@ -974,7 +974,7 @@ class PACS implements PACSInterface {
     }
     //time
     $time = '';
-    if(array_key_exists('ContentTime',$process_file) && strlen(ContentTime['StudyDate'][0]) == 8)
+    if(array_key_exists('ContentTime',$process_file) && strlen($process_file['ContentTime'][0]) == 8)
     {
       $raw_time = $process_file['ContentTime'][0];
       $time .=  substr($raw_time, 0, 2).':'.substr($raw_time, 2, 2).':'.substr($raw_time, 4, 2);
