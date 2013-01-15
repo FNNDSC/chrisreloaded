@@ -862,6 +862,7 @@ class PACS implements PACSInterface {
   }
 
   static public function AddStudy(&$db, &$process_file, &$study_chris_id, &$study_description){
+
     $db->lock('study', 'WRITE');
     // Does data exist: SeriesInstanceUID
     if (array_key_exists('StudyInstanceUID',$process_file))
@@ -907,7 +908,7 @@ class PACS implements PACSInterface {
 
         $studyObject->age = PACS::getAge($process_file);
         $studyObject->location = PACS::getLocation($process_file);
-        
+
         $study_description = formatStudy($studyObject->date, $studyObject->age, $studyObject->description);
 
         $study_chris_id = Mapper::add($studyObject);
@@ -937,7 +938,7 @@ class PACS implements PACSInterface {
           $studyResult['Study'][0]->date = PACS::getDate($process_file);
           $studyResult['Study'][0]->age = PACS::getAge($process_file);
           $studyResult['Study'][0]->location = PACS::getLocation($process_file);
-          
+
           $study_description = formatStudy($studyResult['Study'][0]->date, $studyResult['Study'][0]->age, $studyResult['Study'][0]->description);
           $study_chris_id = $studyResult['Study'][0]->id;
 
@@ -963,7 +964,7 @@ class PACS implements PACSInterface {
 
   static public function getTime($process_file){
     $date = '';
-    if(array_key_exists('ContentDate',$process_file))
+    if(array_key_exists('ContentDate',$process_file) && strlen($process_file['ContentDate'][0]) == 8)
     {
       $raw_date = $process_file['ContentDate'][0];
       $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
@@ -973,7 +974,7 @@ class PACS implements PACSInterface {
     }
     //time
     $time = '';
-    if(array_key_exists('ContentTime',$process_file))
+    if(array_key_exists('ContentTime',$process_file) && strlen(ContentTime['StudyDate'][0]) == 8)
     {
       $raw_time = $process_file['ContentTime'][0];
       $time .=  substr($raw_time, 0, 2).':'.substr($raw_time, 2, 2).':'.substr($raw_time, 4, 2);
@@ -987,7 +988,7 @@ class PACS implements PACSInterface {
 
   static public function getDate($process_file){
     $date = '';
-    if(array_key_exists('StudyDate',$process_file))
+    if(array_key_exists('StudyDate',$process_file) && strlen($process_file['StudyDate'][0]) == 8)
     {
       $raw_date = $process_file['StudyDate'][0];
       $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
@@ -1002,7 +1003,7 @@ class PACS implements PACSInterface {
   static public function getAge($process_file){
     // should we use PatientAge tag???
     $age = '0';
-    if(array_key_exists('ContentDate',$process_file) && array_key_exists('PatientBirthDate',$process_file))
+    if(array_key_exists('ContentDate',$process_file) && array_key_exists('PatientBirthDate',$process_file) && strlen($process_file['PatientBirthDate'][0]) == 8)
     {
       $raw_bdate = $process_file['PatientBirthDate'][0];
       $bdate =  new DateTime(substr($raw_bdate, 0, 4).'-'.substr($raw_bdate, 4, 2).'-'.substr($raw_bdate, 6, 2));
