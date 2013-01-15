@@ -201,7 +201,7 @@ _FEED_.ajaxUpdate = function() {
                     jQuery(this).find('.feed_share').html(
                         '<i class="icon-share"></i>');
                   } else {
-                    elt.hide('blind', 'slow');
+                    elt.hide('blind', 'slow').remove();
                     if (data['new']['status'][i] == '100') {
                       _FEED_.finFeeds[0].unshift(data['new']['id'][i]);
                       _FEED_.finFeeds[1].unshift(data['new']['content'][i]);
