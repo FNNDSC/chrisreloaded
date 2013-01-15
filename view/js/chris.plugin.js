@@ -350,9 +350,9 @@ jQuery(document)
                   _jobs.push(_parameters);
                   _jobsOutputs.push(_outputs);
                 }
-                // TODO validate
+                
                 apprise('<h5>Please name this job!</h5>', {
-                  'input': new Date()
+                  'input': (new Date()).toISOString()
                 },
                     function(r) {
 
