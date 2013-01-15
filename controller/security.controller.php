@@ -97,13 +97,13 @@ class SecurityC implements SecurityControllerInterface {
 
     // valid credentials
     // so store everything as part of the session
-    $_SESSION['username'] = $username;
+    $_SESSION['username'] = strtolower($username);
     $_SESSION['password'] = $password;
     $_SESSION['userid'] = $user_id;
 
     $_SESSION['feed_new'] = '00.00';
     $_SESSION['feed_old'] = microtime(true);
-    
+
     return true;
 
   }
