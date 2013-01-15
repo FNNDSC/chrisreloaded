@@ -84,7 +84,7 @@ class connectome(Plugin):
     
     #gradient image
     if options.usegradient:
-      command += ' -g' + options.gradient
+      command += ' -g ' + options.gradient
       
     #b0 value
     if options.useb0:
