@@ -46,7 +46,7 @@ _CHRIS_.updateStatistics = function() {
 _CHRIS_.scalePanels = function() {
 
   // configure screen size related parameters
-  var _pluginpanelsize = jQuery(window).height()-490;
+  var _pluginpanelsize = jQuery(window).height()-447;
   var _feedcontentsize = jQuery(window).height()-129;  
   
   if (jQuery(window).height() <= 600) {
