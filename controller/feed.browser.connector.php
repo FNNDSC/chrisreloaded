@@ -32,9 +32,16 @@ if( file_exists($root . $_POST['dir']) ) {
   $files = scandir($root . $_POST['dir']);
   natcasesort($files);
   if( count($files) > 2 ) { /* The 2 accounts for . and .. */
+
     echo "<ul class=\"jqueryFileTree\" style=\"display: none;\">";
     // All dirs
     foreach( $files as $file ) {
+
+      if( $file{0} == '.') {
+        // skip hidden files and folders
+        continue;
+      }
+
       $fullpath = $root . $_POST['dir'] . $file;
       if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && is_dir($fullpath) ) {
 
@@ -49,6 +56,12 @@ if( file_exists($root . $_POST['dir']) ) {
     }
     // All files
     foreach( $files as $file ) {
+
+      if( $file{0} == '.') {
+        // skip hidden files and folders
+        continue;
+      }
+
       $fullpath = $root . $_POST['dir'] . $file;
       if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && !is_dir($fullpath) ) {
         $ext = preg_replace('/^.*\./', '', $file);
