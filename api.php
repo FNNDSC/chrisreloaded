@@ -64,7 +64,7 @@ if (!isset($_SESSION['username'])) {
   // propagate user attributes
   $result['username'] = $_SESSION['username'];
   $result['userid'] = $_SESSION['userid'];
-  
+
   //
   // API FUNCTIONS
   //
@@ -138,10 +138,26 @@ if (!isset($_SESSION['username'])) {
           $result['result'] = FeedC::updateClient($_SESSION['userid'], $parameters[0]);
         } else if($what == 'feed_previous'){
           $result['result'] = FeedC::scrollClient($_SESSION['userid'], $parameters[0], 5);
-        }
-        else if($what == 'feed_search'){
+        } else if($what == 'feed_search'){
           $result['result'] = FeedC::searchClient($_SESSION['userid'], $parameters[0]);
+        } else if($what == 'file') {
+
+          // here we don't create JSON but just pass thru the file content
+          $name = joinPaths(CHRIS_USERS, $parameters);
+
+          // enable cross origin requests
+          header("Access-Control-Allow-Origin: *");
+
+          $fp = fopen($name, 'rb');
+
+          header("Content-Length: " . filesize($name));
+
+          fpassthru($fp);
+
+          die();
+
         }
+
         break;
       case "help":
         $result['result'] = 'Perform actions on ChRIS.. Examples: COUNT: ?action=count&what=feed --- GET: ?action=get&what=feed&id=3 --- All parameters can be GET or POST.';
