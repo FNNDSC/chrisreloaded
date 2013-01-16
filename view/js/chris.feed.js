@@ -49,6 +49,9 @@ _FEED_.onclick = function(details, more) {
     case 'JS':
       _PREVIEW_.start('text', null, file);
       break;
+    case 'INFO':
+      _PREVIEW_.start('text', null, file);
+      break;
     }
   });
   // }
