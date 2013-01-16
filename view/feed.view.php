@@ -87,12 +87,12 @@ class FeedV implements ObjectViewInterface {
       $status_text = '<font color=green>Done</font>';
       $share_text = '<i class="icon-share-alt"></i>';
     }
-    
+
     $archive_text = '<i class="icon-remove"></i>';
     if ($object->archive == '1') {
       $archive_text = '<i class="icon-plus"></i>';
     }
-    
+
     $favorite_text = '<i class="icon-star-empty"></i>';
     if ($object->favorite == '1') {
       $favorite_text = '<i class="icon-star"></i>';
@@ -126,7 +126,7 @@ class FeedV implements ObjectViewInterface {
     // set html viewer if "index.html" exists in username/plugin/feed-id/
     if(is_file(joinPaths(CHRIS_USERS, $username,$object->plugin, $object->name.'-'.$object->id, 'index.html' ))){
       $t -> replace('FEED_HTML', 'feed_html.html');
-      $t -> replace('HTML_VIEWER', joinPaths('http://chris/usersdev', $username, $object->plugin, $object->name.'-'.$object->id, 'index.html' ));
+      $t -> replace('HTML_VIEWER', joinPaths('api.php?action=get&what=file&parameters=', $username, $object->plugin, $object->name.'-'.$object->id, 'index.html' ));
     }
     else{
       $t -> replace('FEED_HTML', '');
