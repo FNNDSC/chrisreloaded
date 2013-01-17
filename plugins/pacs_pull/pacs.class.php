@@ -594,9 +594,11 @@ class PACS implements PACSInterface {
 
       // execute query
       $output = shell_exec($command);
-      return $command.PHP_EOL.$output;
+      return array('command' => $command,
+          'output' => $output);
     }
-    return Array('MoveSeries: Missing parameters (Requieres: StudyInstanceUID, SeriesInstanceUID, User AE Title)');
+    return array('command' => '',
+        'output' => 'MoveSeries: Missing parameters (Requieres: StudyInstanceUID, SeriesInstanceUID, User AE Title)');
   }
 
   // process data once something has been received by the listener

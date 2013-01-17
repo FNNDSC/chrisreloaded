@@ -342,7 +342,8 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
   }
 
   // move series (data)
-  if($request_data){
+  $try = 0;
+  while($request_data && ($try < 5)){
     $pacs2 = new PACS($server, $port, $aetitle);
     echo $server.PHP_EOL;
     echo $port.PHP_EOL;
@@ -350,14 +351,29 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
     $pacs2->addParameter('StudyInstanceUID', $results[1]['StudyInstanceUID'][$key]);
     $pacs2->addParameter('SeriesInstanceUID', $results[1]['SeriesInstanceUID'][$key]);
     $push_request = $pacs2->moveSeries();
-    $addDataLog .= $push_request.PHP_EOL;
-    
+    $addDataLog .= $push_request['command'].PHP_EOL;
+    if($push_request['output'] == ''){
+      $addDataLog .= 'Move data success...'.PHP_EOL;
+      $request_data = False;
+    }
+    else{
+      $addDataLog .= 'Move data failure...'.PHP_EOL;
+      $addDataLog .= $push_request['output'].PHP_EOL;
+      $addDataLog .= 'New attemp in 5 seconds...'.PHP_EOL;
+      sleep(5);
+      $try++;
+    }
   }
-  
+
+  if($try == 5){
+    $addDataLog .= 'Data could not be pushed...'.PHP_EOL;
+    continue;
+  }
+
   $fh = fopen($logFile, 'a')  or die("can't open file");
   fwrite($fh, $addDataLog);
   fclose($fh);
-  
+
   // process series (data)
   // wait for all files to be received
   $waiting = true;
