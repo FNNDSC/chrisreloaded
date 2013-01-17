@@ -67,13 +67,24 @@ foreach($parameters as $k0 => $v0){
 
     }
 
-    $command .= ' --'.$value['name'].' '.$value['value'];
+    if ($value['name']) {
+      // support for parameters without a flag
+      $value['name'] = '--'.$value['name'];
+    }
+
+    $command .= ' '.$value['name'].' '.$value['value'];
   }
   // output?
   $output = ' {OUTPUT}/';
 
   foreach($_POST['FEED_OUTPUT'][$k0] as $key => $value){
-    $command .= ' --'.sanitize($value['name']).$output.sanitize($value['value']);
+
+    if ($value['name']) {
+      // support for parameters without a flag
+      $value['name'] = '--'.sanitize($value['name']);
+    }
+
+    $command .= ' '.$value['name'].$output.sanitize($value['value']);
   }
   $launch_command .= '--command \''.$command.'\' ';
 

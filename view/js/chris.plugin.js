@@ -271,15 +271,24 @@ jQuery(document)
                     var _output = null;
                     // strip possible --
                     _flag = _flag.replace(/-/g, '');
+                    
+                    var _filename = '';
+                    
+                    if (_flag == "") {
+                      _filename = "output";
+                    } else {
+                      _filename = _flag;
+                    }
+                    
                     var _value;
                     if (_type == 'directory') {
                       _value = '';
                     } else if (_type == 'image') {
-                      _value = _flag + '.nii';
+                      _value = _filename + '.nii';
                     } else if (_type == 'file') {
-                      _value = _flag + '.file';
+                      _value = _filename + '.file';
                     } else if (_type == 'transform') {
-                      _value = _flag + '.mat';
+                      _value = _filename + '.mat';
                     }
                     // push the output
                     _outputs.push({
