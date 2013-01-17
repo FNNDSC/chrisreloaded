@@ -261,6 +261,7 @@ jQuery(document)
                       });
                     }
                   }
+
                   // loop through all output rows
                   _output_rows.each(function(i) {
 
@@ -311,6 +312,25 @@ jQuery(document)
                     var _value;
                     if (_type == 'dropzone') {
                       // we already took care of dropzones
+                      // but we have to reset all flags which are indices
+                      
+                      var _index = _parameter_input.attr('data-index');
+                      
+                      if (_index) {
+                        for (_p in _parameters) {
+                          
+                          _p = _parameters[_p];
+                          if (_p.name == _index){
+                            
+                            // found parameter which is actually an index
+                            // so reset the name
+                            _p.name = '';
+                            
+                          }
+                          
+                        }
+                      }
+                      
                       return;
                     } else if (_type == 'spinner') {
                       // spinners

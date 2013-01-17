@@ -79,10 +79,12 @@
             <xsl:value-of select="label"/>
           </span>
           <span class='parameter_batchdrop' data-type='batchdrop' style='display:none;'>
+            <xsl:attribute name="data-index"><xsl:value-of select="index"/></xsl:attribute>
             <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>X
           </span>
           <span class='parameter_input parameter_dropzone' data-type='dropzone' data-default='Drag and drop here'>
             <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
+            <xsl:attribute name="data-index"><xsl:value-of select="index"/></xsl:attribute>            
             Drag and drop here</span>            
         </div>
       </xsl:otherwise>

@@ -13,8 +13,8 @@ _BATCH_.add = function(flag, p, newjob) {
     
     _BATCH_.emptyDropzones();
     
-    //_BATCH_.jobs.push({});
-    //_BATCH_.current++;
+//    _BATCH_.jobs.push({});
+//    _BATCH_.current++;
     
     _BATCH_.jobs.splice(++_BATCH_.current,0,{});
     
@@ -60,7 +60,14 @@ _BATCH_.drop = function(event, ui) {
   var _parameter = new _BATCH_.parameter(_mrn, jQuery.trim(_data_name.text()),
       _data_id, _full_path);
   
-  _BATCH_.add(jQuery(this).attr('data-flag'), _parameter, jQuery(this)
+  var _flag = jQuery(this).attr('data-flag');
+  
+  if (_flag == '') {
+    // if flag is not set, we must have an index
+    _flag = jQuery(this).attr('data-index');
+  }
+  
+  _BATCH_.add(_flag, _parameter, jQuery(this)
       .hasClass('parameter_batchdrop'));
 };
 
@@ -77,6 +84,13 @@ _BATCH_.show = function(flag, p) {
   // .. show it
   var _container = jQuery(".parameter_dropzone").filter(
       "[data-flag=" + flag + "]").filter(':visible');
+  
+  if (_container.length == 0) {
+    // we must have passed an index
+    _container = jQuery(".parameter_dropzone").filter(
+        "[data-index=" + flag + "]").filter(':visible');    
+  }
+  
   _container.empty();
   _container.append(_new_span);
   
