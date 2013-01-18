@@ -145,7 +145,7 @@
   </xsl:template>
   
   <!-- STRING parameter -->
-  <xsl:template match="string">
+  <xsl:template match="string | float-vector">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
       <span class='parameter_title' style='width:65px;'>
