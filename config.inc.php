@@ -53,6 +53,10 @@ define('CHRIS_TMP', '/chb/users/chris/dev/tmp/');
 define('CHRIS_USERS', '/chb/users/chris/dev/users/');
 define('CHRIS_LOG', '/chb/users/chris/dev/log/');
 
+// cluster
+define('CLUSTER_HOST', 'rc-goldfinger');
+define('CLUSTER_USERNAME', 'chris');
+
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
 define('SIMPLETEST_HTML_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/html_chris.php'));

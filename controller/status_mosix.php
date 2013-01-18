@@ -38,7 +38,7 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 
 // Get pids in mosix queue
-$mosix_command = "ssh chris@rc-goldfinger '/bin/mosq listall'";
+$mosix_command = "ssh ".CLUSTER_USERNAME."@".CLUSTER_HOST." '/bin/mosq listall'";
 $output = shell_exec($mosix_command);
 $lines = explode("\n", $output);
 
