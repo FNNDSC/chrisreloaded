@@ -514,10 +514,8 @@ jQuery(document)
           // replace the default values for string parameters
           jQuery('.parameter_string').each(function(i, v) {
 
-            if (jQuery(v).html() == '_CHRIS_DEFAULT') {
-              jQuery(v).html('');
-              jQuery(v).attr('data-default', '')
-            }
+              jQuery(v).html(jQuery(v).attr('data-default'));
+
           });
           // register keypress for string parameters
           jQuery('.parameter_string').keypress(

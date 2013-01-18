@@ -145,7 +145,7 @@
   </xsl:template>
   
   <!-- STRING parameter -->
-  <xsl:template match="string | float-vector">
+  <xsl:template match="string | float-vector | integer-vector">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
       <span class='parameter_title' style='width:65px;'>
@@ -155,12 +155,11 @@
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
         <textarea class='parameter_string'>
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>       
-          <xsl:value-of select="default"/>
+          _CHRIS_DEFAULT
         </textarea>
       </span>
     </div>
   </xsl:template>
-    
     
   <!-- STRING-ENUMERATION parameter -->
   <xsl:template match="string-enumeration">

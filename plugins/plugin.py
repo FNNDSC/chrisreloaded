@@ -119,9 +119,6 @@ class Plugin( argparse.ArgumentParser ):
 
         if parameter[3]:
           xml += '<default>' + str( parameter[3] ) + '</default>'
-        elif p_type == self.STRING:
-          # we need a default for strings
-          xml += '<default>_CHRIS_DEFAULT</default>'
 
         if parameter[4]:
           xml += '<description>' + str( parameter[4] ) + '</description>'
