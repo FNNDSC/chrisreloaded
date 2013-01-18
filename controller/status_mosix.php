@@ -37,38 +37,56 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 
-// Get unfinished feeds (status != 100)
-$feedMapper = new Mapper('Meta');
-$feedMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.name = (?)', 'pid')->filter('feed.status != (?)','100');
-$feedResult = $feedMapper->get();
-
 // Get pids in mosix queue
 $mosix_command = "ssh chris@rc-goldfinger '/bin/mosq listall'";
 $output = shell_exec($mosix_command);
 $lines = explode("\n", $output);
 
-// loop through unfinished feeds in db
-foreach($feedResult['Meta'] as $key0 => $value0){
-  $found = false;
-  foreach($lines as $key => $value){
-    $pid = explode(' ', trim($value));
-    if(isset($pid[0]) && $pid[0] != ''){
-      if($value0->value == $pid[0]){
-        $found = true;
-        break;
-      }
-    }
+// get array containing all running PIDs
+$pids = Array();
+foreach($lines as $key => $value){
+  $pid = explode(' ', trim($value));
+  if(isset($pid[0]) && $pid[0] != ''){
+    $pids[$pid[0]] = '';
   }
+}
 
-  // if no match, job has finished => update feed status!
-  if($found == false){
-    $startTime = $feedResult['Feed'][$key0]->time;
+// get all feeds where status =! 100
+$feedMapper = new Mapper('Meta');
+$feedMapper->ljoin('Feed', 'meta.target_id = feed.id')->filter('meta.name = (?)', 'pid')->filter('feed.status != (?)','100');
+$feedResult = $feedMapper->get();
+
+// keep track of how many pids are connected to 1 feed (batch)
+$count = Array();
+// map pid to feed
+$map = Array();
+// keep feed index in memory for fast access to object
+$index = Array();
+foreach($feedResult['Meta'] as $key => $value){
+  $map[$value->value] = $value->target_id;
+  isset($count[$value->target_id])?$count[$value->target_id]++:$count[$value->target_id]=1;
+  !isset($index[$value->target_id])?$index[$value->target_id] = $key:'Key already set...'.PHP_EOL;
+}
+
+// get pids which are finished:
+// status != 100 but do not exist anymore
+$finished =  array_diff_key ( $map, $pids );
+
+// update count of running pids for each feed
+foreach($finished as $key => $value){
+  isset($count[$value])?$count[$value]--:'ERROR: value not set - '.__LINE__.'-'.$value.PHP_EOL ;
+}
+
+// if no more running pids for a feed, it has terminate
+foreach($count as $key => $value){
+  if($value == 0){
+    $startTime = $feedResult['Feed'][$index[$key]]->time;
     $endTime = microtime(true);
     $duration = $endTime - $startTime;
-    $feedResult['Feed'][$key0]->status = 100;
-    $feedResult['Feed'][$key0]->time = $endTime;
-    $feedResult['Feed'][$key0]->duration = (int)$duration;
-    echo Mapper::update($feedResult['Feed'][$key0],  $feedResult['Feed'][$key0]->id);
+    $feedResult['Feed'][$index[$key]]->status = 100;
+    $feedResult['Feed'][$index[$key]]->time = $endTime;
+    $feedResult['Feed'][$index[$key]]->duration = (int)$duration;
+    echo Mapper::update($feedResult['Feed'][$index[$key]],  $feedResult['Feed'][$index[$key]]->id);
   }
 }
 ?>

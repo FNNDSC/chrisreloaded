@@ -420,8 +420,6 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
       $dataLog .= "Data CHRIS ID: ".$data_chris_id.PHP_EOL;
 
       $datadirname = $output_dir.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
-      //print_r($patientResult);
-      //echo $datadirname;
       if(!is_dir($datadirname)){
         mkdir($datadirname);
       }
