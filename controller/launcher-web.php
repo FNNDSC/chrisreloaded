@@ -40,7 +40,8 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 
 // format session variables and post variable into a command line format
 $feed_id = -1;
-$parameters = $_POST['FEED_PARAM'];
+// do not assume FEED_PARAM is set
+$parameters = isset($_POST['FEED_PARAM'])?$_POST['FEED_PARAM']:array(0 => "");
 
 foreach($parameters as $k0 => $v0){
 
@@ -59,32 +60,38 @@ foreach($parameters as $k0 => $v0){
   // plugin name?
   $command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
   // parameters?
-  foreach($v0 as $key => $value){
+  if(is_array($v0)){
+    foreach($v0 as $key => $value){
 
-    if ($value['type'] == 'dropzone' && $value['value'] != '') {
+      if ($value['type'] == 'dropzone' && $value['value'] != '') {
 
-      $value['value'] = joinPaths(CHRIS_USERS, $value['value']);
+        $value['value'] = joinPaths(CHRIS_USERS, $value['value']);
 
+      }
+
+      if ($value['name']) {
+        // support for parameters without a flag
+        $value['name'] = '--'.$value['name'];
+      }
+
+      $command .= ' '.$value['name'].' '.$value['value'];
     }
-
-    if ($value['name']) {
-      // support for parameters without a flag
-      $value['name'] = '--'.$value['name'];
-    }
-
-    $command .= ' '.$value['name'].' '.$value['value'];
   }
   // output?
   $output = ' {OUTPUT}/';
 
-  foreach($_POST['FEED_OUTPUT'][$k0] as $key => $value){
+  if(is_array($_POST['FEED_OUTPUT'])
+      && array_key_exists($k0, $_POST['FEED_OUTPUT'])
+      && is_array($_POST['FEED_OUTPUT'][$k0])){
+    foreach($_POST['FEED_OUTPUT'][$k0] as $key => $value){
 
-    if ($value['name']) {
-      // support for parameters without a flag
-      $value['name'] = '--'.sanitize($value['name']);
+      if ($value['name']) {
+        // support for parameters without a flag
+        $value['name'] = '--'.sanitize($value['name']);
+      }
+
+      $command .= ' '.$value['name'].$output.sanitize($value['value']);
     }
-
-    $command .= ' '.$value['name'].$output.sanitize($value['value']);
   }
   $launch_command .= '--command \''.$command.'\' ';
 
