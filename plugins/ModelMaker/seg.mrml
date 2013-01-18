@@ -1,0 +1,14 @@
+<MRML >
+<ModelHierarchy
+  id="vtkMRMLModelHierarchyNode1"  name="ModelHierarchy"  hideFromEditors="true"  selectable="true"  selected="false"  sortingValue="0"  allowMultipleChildren="true"  displayNodeID="vtkMRMLModelDisplayNode1"  expanded="true"></ModelHierarchy>
+ <ModelDisplay
+  id="vtkMRMLModelDisplayNode1"  name="ModelDisplay"  hideFromEditors="true"  selectable="true"  selected="false"  color="0.5 0.5 0.5"  selectedColor="1 0 0"  selectedAmbient="0.4"  ambient="0"  diffuse="1"  selectedSpecular="0.5"  specular="0"  power="1"  opacity="1"  visibility="true"  clipping="false"  sliceIntersectionVisibility="false"  backfaceCulling="true"  scalarVisibility="false"  vectorVisibility="false"  tensorVisibility="false"  interpolateTexture="false"  autoScalarRange="true"  scalarRange="0 100"  ></ModelDisplay>
+ <ModelHierarchy
+  id="vtkMRMLModelHierarchyNode2"  name="ModelHierarchy_1"  hideFromEditors="true"  selectable="true"  selected="false"  sortingValue="0"  allowMultipleChildren="true"  displayNodeID="vtkMRMLModelDisplayNode2"  expanded="true" ></ModelHierarchy>
+ <ModelDisplay
+  id="vtkMRMLModelDisplayNode2"  name="ModelDisplay_1"  hideFromEditors="true"  selectable="true"  selected="false"  color="0.5 0.5 0.5"  selectedColor="1 0 0"  selectedAmbient="0.4"  ambient="0"  diffuse="1"  selectedSpecular="0.5"  specular="0"  power="1"  opacity="1"  visibility="true"  clipping="false"  sliceIntersectionVisibility="false"  backfaceCulling="true"  scalarVisibility="false"  vectorVisibility="false"  tensorVisibility="false"  interpolateTexture="false"  autoScalarRange="true"  scalarRange="0 100"  ></ModelDisplay>
+ <ModelHierarchy
+  id="vtkMRMLModelHierarchyNode3"  name="ModelHierarchy_2"  hideFromEditors="true"  selectable="true"  selected="false"  sortingValue="0"  allowMultipleChildren="true"  displayNodeID="vtkMRMLModelDisplayNode3"  expanded="true" ></ModelHierarchy>
+ <ModelDisplay
+  id="vtkMRMLModelDisplayNode3"  name="ModelDisplay_2"  hideFromEditors="true"  selectable="true"  selected="false"  color="0.5 0.5 0.5"  selectedColor="1 0 0"  selectedAmbient="0.4"  ambient="0"  diffuse="1"  selectedSpecular="0.5"  specular="0"  power="1"  opacity="1"  visibility="true"  clipping="false"  sliceIntersectionVisibility="false"  backfaceCulling="true"  scalarVisibility="false"  vectorVisibility="false"  tensorVisibility="false"  interpolateTexture="false"  autoScalarRange="true"  scalarRange="0 100"  ></ModelDisplay>
+</MRML>

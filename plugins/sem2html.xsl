@@ -59,8 +59,8 @@
   
   <!-- PARAMETERS -->
   
-  <!-- IMAGE/FILE/DIRECTORY/TRANSFORM parameter -->
-  <xsl:template match="image | file | directory | transform">
+  <!-- IMAGE/FILE/DIRECTORY/TRANSFORM/GEOMETRY parameter -->
+  <xsl:template match="image | file | directory | transform | geometry">
     <xsl:variable name="channel" select="channel"/>
     <xsl:choose>
       <xsl:when test="$channel = 'output'">
@@ -106,8 +106,8 @@
     </div>
   </xsl:template>
 
-  <!-- DOUBLE parameter -->
-  <xsl:template match="double">
+  <!-- DOUBLE,FLOAT parameter -->
+  <xsl:template match="double | float">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
       <xsl:call-template name="create_label"/>
@@ -144,7 +144,7 @@
     </div>
   </xsl:template>
   
-  <!-- STRING parameter -->
+  <!-- STRING,INTEGER-VECTOR,FLOAT-VECTOR parameter -->
   <xsl:template match="string | float-vector | integer-vector">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          

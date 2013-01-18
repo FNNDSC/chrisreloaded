@@ -290,6 +290,8 @@ jQuery(document)
                       _value = _filename + '.file';
                     } else if (_type == 'transform') {
                       _value = _filename + '.mat';
+                    } else if (_type == 'geometry') {
+                      _value = _filename + '.mrml';
                     }
                     // push the output
                     _outputs.push({
