@@ -53,9 +53,14 @@ $result = array(
     'parameters' => null,
     'result' => null);
 
-// TODO here the session has to be verified, actually this should happen in _session.inc.php
-// right now, we just check if the session contains a username
-if (!isset($_SESSION['username'])) {
+
+// validate the credentials
+if (!SecurityC::login()) {
+
+  // invalid credentials
+
+  // destroy the session
+  session_destroy();
 
   $result['status'] = 'access denied';
 

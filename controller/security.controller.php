@@ -55,7 +55,7 @@ class SecurityC implements SecurityControllerInterface {
 
   static public function login_attempt() {
 
-    return (isset($_SESSION['username']) || isset($_POST['username']));
+    return (isset($_SESSION['username']) || isset($_POST['username']) || isset($_GET['username']));
 
   }
 
@@ -78,6 +78,10 @@ class SecurityC implements SecurityControllerInterface {
       // a login is requested via HTTP POST
       $username = $_POST['username'];
       $password = $_POST['password'];
+    } else if (isset($_GET['username']) && isset($_GET['password'])) {
+      // a login is requested via HTTP GET
+      $username = $_GET['username'];
+      $password = $_GET['password'];
     }
 
     // validate the credentials
@@ -86,12 +90,7 @@ class SecurityC implements SecurityControllerInterface {
     if ($user_id == -1) {
 
       // invalid credentials
-
-      // destroy the session
-      session_destroy();
-      // .. and forward to the sorry page
-      header('Location: ?sorry');
-      exit();
+      return false;
 
     }
 
