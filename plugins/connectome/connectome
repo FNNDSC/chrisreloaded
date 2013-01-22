@@ -38,14 +38,22 @@ class connectome(Plugin):
     if not os.path.exists(input_dir):
       os.makedirs(input_dir)
     # get dti images
-    dti_files = [d for d in os.listdir(options.dti) if not os.path.isdir(d)]
+    dti_files = [d for d in os.listdir(options.dti) if not os.path.isdir(d) and os.path.splitext(d)[1] == ".dcm"]
+    # check incoming dti directory
+    if not len(dti_files) > 0:
+      print options.dti + ' doesn\'t contain any *.dcm files' 
+      sys.exit(0)
         # link them!
     for dti_file in dti_files:
       os.symlink(os.path.join(options.dti, dti_file), os.path.join(input_dir, dti_file))
       
     # get t1 images
-    t1_files = [d for d in os.listdir(options.t1) if not os.path.isdir(d)]
-        # link them!
+    t1_files = [d for d in os.listdir(options.t1) if not os.path.isdir(d) and os.path.splitext(d)[1] == ".dcm"]
+    # check incoming t1 directory
+    if not len(t1_files) > 0:
+      print options.t1 + ' doesn\'t contain any *.dcm files' 
+      sys.exit(0)
+    # link them!
     for t1_file in t1_files:
       os.symlink(os.path.join(options.t1, t1_file), os.path.join(input_dir, t1_file))
     

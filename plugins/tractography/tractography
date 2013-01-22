@@ -47,8 +47,12 @@ class tractography(Plugin):
     # dicom directory
     command += ' -D ' + options.dti
     # get first dicom file
-    files = [d for d in os.listdir(options.dti) if not os.path.isdir(d)]
-    command += ' -d ' + files[0]
+    files = [d for d in os.listdir(options.dti) if not os.path.isdir(d) and os.path.splitext(d)[1] == '.dcm']
+    if len(files) > 0:
+      command += ' -d ' + files[0]
+    else:
+      print options.dti + ' doesn\'t contain any *.dcm files' 
+      sys.exit(0)
     
     # stages
     command += ' -t 12';

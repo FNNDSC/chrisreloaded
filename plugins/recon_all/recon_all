@@ -31,12 +31,17 @@ class recon_all( Plugin ):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     # grab the first dicom input file
-    firstDicomFile = os.listdir(options.MRI)[0]
+    files = [d for d in os.listdir(options.MRI) if not os.path.isdir(d) and os.path.splitext(d)[1] == '.dcm']
+    if len(files) > 0:
+      # launch recon-all
+      cmd = 'cd ' + options.output +';' + current_dir + '/reconall.wrapper -subject Freesurfer -i ' + os.path.join(options.MRI, files[0]) + ' -all'
+      print cmd
+      os.system(cmd)
+    else:
+      print options.MRI + ' doesn\'t contain any *.dcm files'
+      sys.exit(0)
     
-    # launch recon-all
-    cmd = 'cd ' + options.output +';' + current_dir + '/reconall.wrapper -subject Freesurfer -i ' + os.path.join(options.MRI, firstDicomFile) + ' -all'
-    print cmd
-    os.system(cmd)
+
 
 # ENTRYPOINT
 if __name__ == "__main__":
