@@ -109,13 +109,18 @@ jQuery(document)
                     // now reset all jobs
                     _BATCH_.reset();
                   });
+          
+          
           // set default plugin to the first one
-          var _first_plugin = jQuery(".carousel-inner").children(':first');
+          var _first_plugin = jQuery("#search");
           var _first_plugin_id = _first_plugin.attr('id');
           // .. activate it in the carousel
           _first_plugin.addClass("active");
           // .. and show it's panel
           jQuery('#panel_' + _first_plugin_id).show();
+          
+          
+          
           // turn off automated rotation
           jQuery('#pipelines').carousel({
             interval: false
