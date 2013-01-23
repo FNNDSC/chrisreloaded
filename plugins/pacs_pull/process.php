@@ -128,11 +128,11 @@ $study_parameter['PatientID'] = $details;
 $study_parameter['PatientName'] = '';
 $study_parameter['PatientBirthDate'] = '';
 $study_parameter['PatientSex'] = '';
-$study_parameter['Modality'] = 'MR';
 $series_parameter = Array();
 $series_parameter['SeriesDescription'] = '';
 $series_parameter['StudyDescription'] = '';
 $series_parameter['NumberOfSeriesRelatedInstances'] = '';
+$series_parameter['Modality'] = 'MR';
 $results = $pacs->queryAll($study_parameter, $series_parameter, null);
 
 // if no series data available, return null
