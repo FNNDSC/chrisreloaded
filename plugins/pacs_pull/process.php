@@ -132,6 +132,7 @@ $series_parameter = Array();
 $series_parameter['SeriesDescription'] = '';
 $series_parameter['StudyDescription'] = '';
 $series_parameter['NumberOfSeriesRelatedInstances'] = '';
+$series_parameter['Modality'] = 'MR';
 $results = $pacs->queryAll($study_parameter, $series_parameter, null);
 
 // if no series data available, return null
