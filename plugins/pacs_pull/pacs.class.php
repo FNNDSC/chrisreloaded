@@ -25,6 +25,11 @@
  *                        dev@babyMRI.org
  *
  */
+// include the chris configuration
+require_once (dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
+// include the PACS Pull configuration file
+require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/config.php'));
+
 // interface
 interface PACSInterface
 {
@@ -551,7 +556,7 @@ class PACS implements PACSInterface {
       foreach($target['StudyInstanceUID'] as $value){
         $query = $this->movescu;
         $query .= ' --aetitle '.$this->user_aet;
-        $query .= ' --move FNNDSC-CHRISDEV';
+        $query .= ' --move '.DEST_AETITLE;
         $query .= ' --study ';
         $query .= ' -k QueryRetrieveLevel=STUDY';
         $query .= ' -k StudyInstanceUID='.$value;
@@ -584,7 +589,7 @@ class PACS implements PACSInterface {
     {
       $command = $this->movescu.' -S';
       $command .= ' --aetitle '.$this->user_aet;
-      $command .= ' --move FNNDSC-CHRISDEV';
+      $command .= ' --move '.DEST_AETITLE;
       $command .= ' -k QueryRetrieveLevel=SERIES';
       $command .= ' -k StudyInstanceUID='.$this->command_param['StudyInstanceUID'];
       $command .= ' -k SeriesInstanceUID='.$this->command_param['SeriesInstanceUID'];
