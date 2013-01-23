@@ -608,8 +608,8 @@ jQuery(document)
     .ready(
         function() {
           // get oldest and newest feed value
-          _FEED_.oldest = Number.MAX_VALUE;
-          _FEED_.newest = Number.MIN_VALUE;
+          _FEED_.oldest = '9007199254740992';
+          _FEED_.newest = '0';
           // look into favorites
           var elt = jQuery(".feed_fav_content > .feed");
           if (elt.length) {
