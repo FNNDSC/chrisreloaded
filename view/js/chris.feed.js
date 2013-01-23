@@ -447,6 +447,23 @@ _FEED_.feed_share_onclick = function() {
                     '<h5>Feed not shared</h5>');
               }
             });
+        
+        // now fetch the user list for autocompletion
+        jQuery.ajax({
+          type: 'GET',
+          url: 'api.php?action=get&what=users',
+          dataType: "json",
+          success: function(data) {
+            
+            if (data['result'] != '') {
+             
+              $('.aTextbox').typeahead({source: data['result']});
+              
+            }
+            
+          }
+        });
+
         // modify
         e.stopPropagation();
       });
