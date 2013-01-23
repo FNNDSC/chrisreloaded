@@ -42,6 +42,8 @@ interface UserControllerInterface
   static public function get();
   // Login
   static public function login($username, $password);
+  // Create new user
+  static public function create($username, $password, $email);
 }
 
 /**
@@ -65,6 +67,11 @@ class UserC implements UserControllerInterface {
     return -1;
   }
 
+  /**
+   * Get all usernames.
+   *
+   * @return array
+   */
   static public function get() {
 
     $userMapper = new Mapper('User');
@@ -110,6 +117,24 @@ class UserC implements UserControllerInterface {
     }
 
     return -1;
+
+  }
+
+  /**
+   * Create a new user.
+   *
+   * @param string $username
+   * @param string $password
+   * @param string $email
+   */
+  static public function create($username, $password, $email) {
+
+    // create user and add it to db
+    $userObject = new User();
+    $userObject->username = $username;
+    $userObject->password = $password;
+    $userObject->email = $email;
+    return Mapper::add($userObject);
 
   }
 
