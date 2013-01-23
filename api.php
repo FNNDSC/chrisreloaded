@@ -38,6 +38,7 @@ require_once ('config.inc.php');
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
 
 // return values
 $start_time = new DateTime();
@@ -160,6 +161,10 @@ if (!SecurityC::login()) {
           fpassthru($fp);
 
           die();
+
+        } else if($what == 'users') {
+
+          $result['result'] = UserC::get();
 
         }
 
