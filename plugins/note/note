@@ -47,4 +47,5 @@ class FileBrowser( Plugin ):
 if __name__ == "__main__":
   plugin = FileBrowser()
   plugin.add_parameter( 'Note', Plugin.STRING, '--textBox', default='Enter some html here.', action='store', dest='noteHtml', help='add some html notes' )
+  plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
   plugin.launch( sys.argv )
