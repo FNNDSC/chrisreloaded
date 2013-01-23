@@ -118,7 +118,7 @@ $parameters = implode(' ', $plugin_command_array);
 // get user if from username
 $user_id = UserC::getID($username);
 
-// set the initial status, if --instant is provided, set the status to 100
+// set the initial status, if --status is provided, use this value
 $status = 0;
 if (array_key_exists('status', $options)) {
   $status = $options['status'];
