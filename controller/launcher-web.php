@@ -53,6 +53,10 @@ foreach($parameters as $k0 => $v0){
   $launch_command .= '--feedname=\''.sanitize($_POST['FEED_NAME']).'\' ';
   // feed id?
   $launch_command .= '--feedid=\''.$feed_id.'\' ';
+  if (isset($_POST['FEED_STATUS'])) {
+    // status, if we don't want to start with status=0
+    $launch_command .= '--status=\''.sanitize($_POST['FEED_STATUS']).'\' ';
+  }
   // job id?
   if(count($parameters) > 1){
     $launch_command .= '--jobid=\''.$k0.'\' ';

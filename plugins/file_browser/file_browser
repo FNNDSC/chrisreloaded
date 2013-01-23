@@ -39,4 +39,5 @@ class file_browser( Plugin ):
 if __name__ == "__main__":
   plugin = file_browser()
   plugin.add_parameter( 'Input', Plugin.STRING, '--dir', action='store', dest='DIR', help='directory to browse' )
+  plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
   plugin.launch( sys.argv )

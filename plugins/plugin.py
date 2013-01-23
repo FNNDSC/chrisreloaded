@@ -54,6 +54,9 @@ class Plugin( argparse.ArgumentParser ):
     self.__panels = []
     self.__parameters = []
 
+    # the initial status
+    self.status = 0
+
   def error( self, message ):
     '''
     The error handler if wrong commandline arguments
@@ -71,7 +74,12 @@ class Plugin( argparse.ArgumentParser ):
     plugin.
     '''
     xml = '<?xml version="1.0" encoding="utf-8"?>\n'
-    xml += '<executable>\n'
+
+    if self.status > 0:
+      xml += '<executable status="' + str( self.status ) + '">'
+    else:
+      xml += '<executable>\n'
+
     xml += '<category>' + Plugin.CATEGORY + '</category>\n'
     xml += '<title>' + Plugin.TITLE + '</title>\n'
     xml += '<description>' + Plugin.DESCRIPTION + '</description>\n'

@@ -385,6 +385,15 @@ jQuery(document)
                   _jobsOutputs.push(_outputs);
                 }
                 
+                // check if this plugin has a predefined status
+                var _status = 0;
+                var _definedStatus = jQuery(_visible_panel.parent()[0]).attr('data-status'); 
+                if (_definedStatus) {
+                  
+                  _status = _definedStatus;
+                  
+                }
+                
                 apprise('<h5>Please name this job!</h5>', {
                   'input': (new Date()).toISOString()
                 },
@@ -402,6 +411,7 @@ jQuery(document)
                             FEED_PLUGIN: _plugin_name,
                             FEED_NAME: _feed_name,
                             FEED_PARAM: _jobs,
+                            FEED_STATUS: _status,
                             FEED_OUTPUT: _jobsOutputs
                           },
                           success: function(data) {

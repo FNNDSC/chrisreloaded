@@ -225,7 +225,7 @@ class FeedC implements FeedControllerInterface {
     $feedResult = $feedMapper->get();
 
     if(count($feedResult['Feed']) >= 1){
-      
+
       foreach ($feedResult['Feed'] as $key => $value) {
         if($nb_feeds >= 0 && $count >= $nb_feeds){
           break;
@@ -398,18 +398,18 @@ class FeedC implements FeedControllerInterface {
     return $invert;
 
   }
-  
+
   static public function archive($feed_id){
-  
+
     $feedResult = Mapper::getStatic('Feed', $feed_id);
     $invert = (int)!$feedResult['Feed'][0]->archive;
     $feedResult['Feed'][0]->archive = $invert;
     Mapper::update($feedResult['Feed'][0], $feed_id);
     return $invert;
-  
+
   }
 
-  static public function create($user_id, $plugin, $name){
+  static public function create($user_id, $plugin, $name, $status=0){
     // get user id from name or user_id
     //$user_id = FeedC::_GetUserID($user);
 
@@ -419,6 +419,7 @@ class FeedC implements FeedControllerInterface {
     $feedObject->name = $name;
     $feedObject->plugin = $plugin;
     $feedObject->time = microtime(true);
+    $feedObject->status = $status;
     return Mapper::add($feedObject);
     // new data
     /*     $dataObject = new Data();

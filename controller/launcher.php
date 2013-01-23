@@ -47,7 +47,8 @@ $longopts  = array(
     "feedname::",    // Optional value
     "feedid::",    // Optional value
     "jobid::",    // Optional value
-    "help",    // Optional value
+    "status::", // Optional value
+    "help"    // Optional value
 );
 
 $options = getopt($shortopts, $longopts);
@@ -117,10 +118,16 @@ $parameters = implode(' ', $plugin_command_array);
 // get user if from username
 $user_id = UserC::getID($username);
 
+// set the initial status, if --instant is provided, set the status to 100
+$status = 0;
+if (array_key_exists('status', $options)) {
+  $status = $options['status'];
+}
+
 // create the feed if first batch job
 $feed_id = $options['feedid'];
 if($feed_id == -1){
-  $feed_id = FeedC::create($user_id, $plugin_name, $feedname);
+  $feed_id = FeedC::create($user_id, $plugin_name, $feedname, $status);
 }
 
 // create the feed directory
