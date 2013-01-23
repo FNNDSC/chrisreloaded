@@ -115,4 +115,6 @@ if __name__ == "__main__":
   plugin.add_parameter('Data', Plugin.STRING, '--datemin', action='store', default='', dest='DATEMIN', help='Scan date')
   plugin.add_parameter('Data', Plugin.STRING, '--datemax', action='store', default='', dest='DATEMAX', help='Scan date')
   
+  plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
+  
   plugin.launch(sys.argv)
