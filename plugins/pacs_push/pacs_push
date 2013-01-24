@@ -66,7 +66,7 @@ if __name__ == "__main__":
   plugin = PACS_Push()
   plugin.add_parameter('Input', Plugin.IMAGE, '--directory', action='store', dest='DIR', help='Directory to be pushed')
   plugin.add_parameter('Advanced', Plugin.STRING, '--host', action='store', default='pretoria.tch.harvard.edu', dest='HOST', help='Target Host')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--port', action='store', default='10501', dest='PORT', help='Target Port')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--port', action='store', default='10502', dest='PORT', help='Target Port')
   plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='*', dest='EXT', help='Extension of files to be pushed')
   plugin.add_parameter('Advanced', Plugin.STRING, '--aetitle', action='store', default='CHRIS2', dest='AETITLE', help='Calling AETitle')
   plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Anonymize the dataset')
