@@ -56,7 +56,7 @@ function joinPaths($args) {
  */
 function sanitize($dirty){
 
-  $dangerous_characters = array(' ', '>', '<', '/', '?', '&', '#', '\\', '%', '(', ')', ',', '+', '*', '-', ':');
+  $dangerous_characters = array(' ', '>', '<', '/', '?', '&', '#', '\\', '%', '(', ')', ',', '+', '*', '-', ':', '^');
   $clean = str_replace ($dangerous_characters, '_', $dirty);
 
   return $clean;
