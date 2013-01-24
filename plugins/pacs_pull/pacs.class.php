@@ -827,7 +827,7 @@ class PACS implements PACSInterface {
         else{
           $dataObject->description = 'NoSeriesDescription';
         }
-        $series_description = $dataObject->name;
+        $series_description = $dataObject->description.'-'.$dataObject->name;
         //
         // get data time ContentDate-ContentTime
         //
@@ -848,11 +848,11 @@ class PACS implements PACSInterface {
           else{
             $dataResult['Data'][0]->name = 'NoProtocolName';
           }
-          $series_description = $dataResult['Data'][0]->name;
+          $series_description = $dataResult['Data'][0]->description.'-'.$dataResult['Data'][0]->name;
           Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
         }
         else{
-          $series_description = $dataResult['Data'][0]->name;
+          $series_description = $dataResult['Data'][0]->description.'-'.$dataResult['Data'][0]->name;
         }
         $data_chris_id = $dataResult['Data'][0]->id;
       }
@@ -897,7 +897,7 @@ class PACS implements PACSInterface {
           $studyObject->description = sanitize($process_file['StudyDescription'][0]);
         }
         else{
-          $studyObject->name = 'NoStudyDescription';
+          $studyObject->description = 'NoStudyDescription';
         }
 
         if(array_key_exists('Modality',$process_file))
@@ -931,7 +931,7 @@ class PACS implements PACSInterface {
             $studyResult['Study'][0]->description = sanitize($process_file['StudyDescription'][0]);
           }
           else{
-            $studyResult['Study'][0]->name = 'NoStudyDescription';
+            $studyResult['Study'][0]->description = 'NoStudyDescription';
           }
 
           if(array_key_exists('Modality',$process_file))

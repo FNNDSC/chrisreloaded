@@ -438,8 +438,9 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
 
       // create data soft links
       $targetbase = CHRIS_DATA.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
-      $seriesdirnametarget = $targetbase .'/'.$study_dir_name .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
-      $seriesdirnamelink = $datadirname .'/'.$study_dir_name .'/'.$dataResult['Data'][0]->name.'-'.$dataResult['Data'][0]->id;
+      $series_dir_name = $dataResult['Data'][0]->description .'-'. $dataResult['Data'][0]->name;
+      $seriesdirnametarget = $targetbase .'/'.$study_dir_name .'/'.$series_dir_name.'-'.$dataResult['Data'][0]->id;
+      $seriesdirnamelink = $datadirname .'/'.$study_dir_name .'/'.$series_dir_name.'-'.$dataResult['Data'][0]->id;
       if(!is_link($seriesdirnamelink)){
         // create sof link
         symlink($seriesdirnametarget, $seriesdirnamelink);
