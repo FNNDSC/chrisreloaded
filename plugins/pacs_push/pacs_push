@@ -49,7 +49,8 @@ class PACS_Push(Plugin):
       command += ' -A'
     command += ' -h ' + options.HOST;
     command += ' -p ' + options.PORT;
-    command += ' -E ' + options.EXT;
+    if not options.EXT == "*":
+      command += ' -E ' + options.EXT;
     command += ' -a ' + options.AETITLE;
     command += ' ' + options.DIR;
     command = current_dir + '/dicom_dirSend.bash.wrapper ' + command + '\''
@@ -66,7 +67,7 @@ if __name__ == "__main__":
   plugin.add_parameter('Input', Plugin.IMAGE, '--directory', action='store', dest='DIR', help='Directory to be pushed')
   plugin.add_parameter('Advanced', Plugin.STRING, '--host', action='store', default='pretoria.tch.harvard.edu', dest='HOST', help='Target Host')
   plugin.add_parameter('Advanced', Plugin.STRING, '--port', action='store', default='10501', dest='PORT', help='Target Port')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='dcm', dest='EXT', help='Extension of files to be pushed')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='*', dest='EXT', help='Extension of files to be pushed')
   plugin.add_parameter('Advanced', Plugin.STRING, '--aetitle', action='store', default='CHRIS2', dest='AETITLE', help='Calling AETitle')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=True, action='store_true', dest='ANONYM', help='Anonymize the dataset')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Anonymize the dataset')
   plugin.launch(sys.argv)
