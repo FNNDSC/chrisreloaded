@@ -27,13 +27,16 @@ class Fetal_Moco( Plugin ):
   Plugin.VERSION = '0.1'
 
   def run( self, options ):
-    # do whatever
-    print 'running moco'
+
+    cmd = '/chb/arch/Linux64/packages/fetal_moco/reconstruction '+options.output+'/out.nii 3 ' + options.Axial + ' ' + options.Sagittal + ' ' + options.Coronal + ' id id id'
+    print cmd
+    os.system(cmd)    
+
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = Fetal_Moco()
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--t1_axial', action='store', dest='T1_axial', help='the axial T1 scan' )
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--t1_sagittal', action='store', dest='T1_sagittal', help='the sagittal T1 scan' )
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--t1_coronal', action='store', dest='T1_coronal', help='the coronal T1 scan' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--axial', action='store', dest='Axial', help='the axial scan' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--sagittal', action='store', dest='Sagittal', help='the sagittal scan' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--coronal', action='store', dest='Coronal', help='the coronal scan' )
   plugin.launch( sys.argv )
