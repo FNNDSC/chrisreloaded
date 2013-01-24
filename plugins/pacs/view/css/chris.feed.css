@@ -1,0 +1,281 @@
+.feed_title {
+	padding: 10px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+	border-color: #e3e3e3;
+	border-top-right-radius: 4px;
+	border-top-left-radius: 4px;
+	background-color: whiteSmoke;
+	cursor: pointer;
+}
+
+.feed_advanced {
+	margin-top: -1px;
+	padding: 4px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+	border-color: #e3e3e3;
+	display: none;
+	cursor: pointer;
+	background-color: whiteSmoke;
+	text-align: center;
+	font-weight: bold;
+}
+
+.feed_update {
+	margin-top: -1px;
+	padding: 4px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+	border-color: #777;
+	display: none;
+	cursor: pointer;
+	background-color: #DFE9FA;
+	text-align: center;
+	font-weight: bold;
+}
+
+.feed {
+	margin-top: -1px;
+	padding: 5px;
+	border-top: 1px solid;
+	border-color: #e3e3e3;
+	overflow: hidden;
+	background: whiteSmoke;
+}
+
+.feed_content {
+	margin-top: 43px;
+	max-height: 600px;
+	overflow-x: hidden;
+}
+
+.feed_footer {
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+	background-color: #fff;
+	border-bottom: 1px solid;
+	border-color: #e3e3e3;
+	height: 5px;
+}
+
+.feed:hover { /* gradient*/
+	background: #eee; /* for non-css3 browsers */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee',
+		endColorstr='#ffffff' );
+	/*for IE*/
+	background: -webkit-gradient(linear, left top, left bottom, from(#eee),
+		to(#fff) ); /*for webkit browsers*/
+	background: -moz-linear-gradient(top, #eee, #fff);
+	/* for firefox 3.6+ */
+}
+
+.feed_header {
+	cursor: pointer;
+	/* 	min-height: 50px; */
+	/* 	background: lightgreen; */
+}
+
+.feed_header_line_one {
+	width: 100%;
+	/* 	min-height: 24px; */
+}
+
+.feed_header_line_two {
+	width: 100%;
+	/* 	min-height: 24px; */
+}
+
+.feed_icon {
+	float: left;
+	width: 48px;
+	height: 48px;
+	margin-right: 5px;
+}
+
+.feed_header_small {
+	color: #999;
+	font-size: 11px;
+}
+
+.feed_type {
+	font-weight: bold;
+}
+
+.feed_username {
+	
+}
+
+.feed_status {
+	color: #000;
+	position: relative;
+}
+
+.feed_time {
+	color: #999;
+	float: right;
+}
+
+.feed_more {
+	float: right;
+}
+
+.feed_message {
+	
+}
+
+.feed_details {
+	overflow: auto;
+	display: none;
+	position: relative;
+	/* 	background: lightblue; */
+	clear: both;
+	/* 	margin-left: 50px; */
+}
+
+.feed_data_name {
+	font-size: 11px;
+	margin-left: -5px;
+}
+
+.feed_data_nb_files {
+	color: #999;
+}
+
+.feed>.feed_details>.data:hover {
+	background: #B5E9FF;
+}
+
+.feed>.feed_details>.data_patient {
+	background: white;
+}
+
+.feed>.feed_details>.feed_meta {
+	background: white;
+	margin-top: 5px;
+	/* 	border: 1px solid; */
+	/* 	border-color: grey; */
+	/* 	padding: 5px; */
+}
+
+.feed>.feed_details>.feed_meta>.feed_meta_header {
+	cursor: pointer;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.feed>.feed_details>.feed_meta>.feed_meta_header:hover {
+	background: #B5E9FF;
+}
+
+.feed>.feed_details>.feed_meta>.feed_meta_content {
+	display: none;
+	font-size: 11px;
+}
+
+.feed>.feed_details>.feed_data>.data_meta_header {
+	cursor: pointer;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.feed>.feed_details>.feed_data>.data_meta_header:hover {
+	background: #B5E9FF;
+}
+
+.feed>.feed_details>.feed_data>.data_meta_content {
+	display: none;
+	font-size: 11px;
+}
+
+.feed>.feed_details>.feed_data>.data_browser_header {
+	cursor: pointer;
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.feed>.feed_details>.feed_data>.data_browser_header:hover {
+	background: #B5E9FF;
+}
+
+.feed>.feed_details>.feed_data>.data_browser {
+	display: none;
+}
+
+.feed>.feed_details>.feed_data { /* 	background: lightsalmon; */
+	/* 	background: white; */
+	/* 	margin: 5px; */
+	/* 	border: 1px solid; */
+	/* 	border-color: grey; */
+	/* 	padding: 5px; */
+	
+}
+
+.feed>.feed_details>.feed_html { /* 	background: lightsteelblue; */
+	background: white;
+	margin: 5px;
+	border: 1px solid;
+	border-color: grey;
+	padding: 5px;
+}
+
+.feed>.feed_details>.feed_html>.html_viewer {
+	display: none;
+}
+
+.html_header {
+	cursor: pointer;
+}
+
+/*  need hierarchy */
+.feed_location_text {
+	display: none;
+}
+
+.feed_preview {
+	cursor: pointer;
+}
+
+.feed_select {
+	cursor: pointer;
+}
+
+.feed_move {
+	cursor: move;
+	opacity: 0.1;
+}
+
+.feed_search {
+	background: whiteSmoke;
+}
+
+.feed_search:hover { /* gradient*/
+	background: #F5F5F5; /* for non-css3 browsers */
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F5F5F5',
+		endColorstr='#8FBC8F' );
+	/*for IE*/
+	background: -webkit-gradient(linear, left top, left bottom, from(#F5F5F5),
+		to(#8FBC8F) ); /*for webkit browsers*/
+	background: -moz-linear-gradient(top, #F5F5F5, #8FBC8F);
+	/* for firefox 3.6+ */
+}
+
+.feed_sea {
+	 display: none;
+}
+
+.feed_sea_header {
+   background: #CCFFFF;
+}
+
+.feed_fav_header {
+   background: #FFFFCC;
+}
+
+.feed_run_header {
+   background: #FFCCCC;
+}
+
+.feed_fin_header {
+   background: #CCFFCC;
+}
