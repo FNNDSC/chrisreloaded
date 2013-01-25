@@ -46,7 +46,8 @@ _PACS_.queryDayAll = function(mrn, date, nb_queries) {
       PACS_MOD : jQuery("#PACS_MOD").attr('value'),
       PACS_DAT : date,
       PACS_ACC_NUM : '',
-      PACS_STU_DES : '',
+      PACS_STU_DES : jQuery("#PACS_STU_DES").attr('value'),
+      PACS_SER_DES : jQuery("#PACS_SER_DES").attr('value'),
       PACS_STU_UID : '',
       PACS_PSAET : jQuery("#PACS_PSAET").attr('value')
     },
@@ -58,7 +59,9 @@ _PACS_.queryDayAll = function(mrn, date, nb_queries) {
       window.console.log(date);
       window.console.log(_PACS_.status);
       _PACS_.status++;
-      jQuery("#SEARCH").html('<i class="icon-refresh rotating_class"></i> <span> ' + parseInt(100*_PACS_.status/nb_queries) + '%</span>');
+      jQuery("#SEARCH").html(
+          '<i class="icon-refresh rotating_class"></i> <span> '
+              + parseInt(100 * _PACS_.status / nb_queries) + '%</span>');
       if (nb_queries == _PACS_.status) {
         jQuery("#SEARCH").removeClass('btn-warning').addClass('btn-primary');
         jQuery("#SEARCH").html('Search');
@@ -70,7 +73,9 @@ _PACS_.queryDayAll = function(mrn, date, nb_queries) {
       window.console.log(textStatus);
       window.console.log(error);
       _PACS_.status++;
-      jQuery("#SEARCH").html('<i class="icon-refresh rotating_class"></i> <span> ' + parseInt(100*_PACS_.status/nb_queries) + '%</span>');
+      jQuery("#SEARCH").html(
+          '<i class="icon-refresh rotating_class"></i> <span> '
+              + parseInt(100 * _PACS_.status / nb_queries) + '%</span>');
       if (nb_queries == _PACS_.status) {
         jQuery("#SEARCH").removeClass('btn-warning').addClass('btn-primary');
         jQuery("#SEARCH").html('Search');
@@ -126,12 +131,13 @@ _PACS_.ajaxAdvanced = function() {
   // window.console.log(dates);
   // window.console.log(nb_dates);
   nb_queries = nb_mrns * nb_dates;
-  
   // keep reference to current object for the ajax response
   // modify class
   jQuery("#SEARCH").removeClass('btn-primary').addClass('btn-warning');
   // modify content
-  jQuery("#SEARCH").html('<i class="icon-refresh rotating_class"></i> <span> ' + parseInt(100*_PACS_.status/nb_queries) + '%</span>');
+  jQuery("#SEARCH").html(
+      '<i class="icon-refresh rotating_class"></i> <span> '
+          + parseInt(100 * _PACS_.status / nb_queries) + '%</span>');
   window.console.log(dates);
   window.console.log(nb_queries);
   var i = 0;
@@ -211,9 +217,6 @@ _PACS_.ajaxAdvancedResults = function(data, force) {
   }
   // cache the result data
   _PACS_.cachedData = data;
-  if (data[1] == null) {
-    _PACS_.ajaxAdvanced();
-  }
   if (data[0] != null) {
     // if no table, create it
     if (jQuery('#S-RESULTS').length == 0 || force == true) {

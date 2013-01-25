@@ -36,6 +36,8 @@ $pacs = new PACS($_POST['SERVER_IP'], $_POST['SERVER_POR'], $_POST['USER_AET']);
 // set values to be filtered out after pacs query
 $post_filter = Array();
 $post_filter['PerformedStationAETitle'] = $_POST['PACS_PSAET'];
+$post_filter['StudyDescription'] = $_POST['PACS_STU_DES'];
+$post_filter['SeriesDescription'] = $_POST['PACS_SER_DES'];
 
 if($_POST['PACS_LEV'] == 'ALL'){
   $study_parameter = Array();
@@ -50,7 +52,10 @@ if($_POST['PACS_LEV'] == 'ALL'){
   $series_parameter = Array();
   $series_parameter['NumberOfSeriesRelatedInstances'] = '';
   $series_parameter['SeriesDescription'] = '';
+  
+  // write json file!
 
+  // return value
   echo json_encode(PACS::postFilter("all", $pacs->queryAll($study_parameter, $series_parameter, null), $post_filter));
 }
 else{

@@ -38,7 +38,8 @@
           class="input-small ssearch" placeholder="Study Date" value=''>
 
          <button id="SEARCH" class="btn btn-primary">Query</button>
-         <button id="PULL" class="btn btn-success pull-right">Pull Selection</button>
+         <button id="PULL" class="btn btn-success pull-right">Pull
+          Selection</button>
          <div id="show_advanced" style="padding-top: 10px;">
           <i class="icon-chevron-down"></i><b>Advanced parameters</b>
          </div>
@@ -48,7 +49,11 @@
            <input id='PACS_MOD' type="text" class="input-small ssearch"
             placeholder="Modality" value='MR'> <input
             id='PACS_PSAET' type="text" class="input-small asearch"
-            placeholder="StationAETitle" value=''>
+            placeholder="StationAETitle" value=''> <input
+            id='PACS_STU_DES' type="text" class="input-small ssearch"
+            placeholder="Study Description" value=''> <input
+            id='PACS_SER_DES' type="text" class="input-small ssearch"
+            placeholder="Series Description" value=''>
           </form>
          </div>
         </form>
@@ -62,9 +67,9 @@
         <h2>
          Results:
          <div class="btn-group" data-toggle="buttons-radio">
-          <button id="STUDY_VIEW" type="button"
-           class="btn btn-primary">Study</button>
-          <button id="SERIES_VIEW" type="button" class="btn btn-primary active">Series</button>
+          <button id="STUDY_VIEW" type="button" class="btn btn-primary">Study</button>
+          <button id="SERIES_VIEW" type="button"
+           class="btn btn-primary active">Series</button>
          </div>
         </h2>
         <div id='SC-RESULTS' class='row-fluid'></div>
