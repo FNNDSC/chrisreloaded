@@ -138,6 +138,17 @@ if (!SecurityC::login()) {
         else if($what == 'feed_archive'){
           $result['result'] = FeedC::archive($id);
         }
+        else if($what == 'file') {
+
+          // here we store content to a file
+          $name = joinPaths(CHRIS_USERS, $parameters[0]);
+
+          $fp = fopen($name, 'w');
+
+          fwrite($fp, $parameters[1]);
+          $result['result'] = $name.' written.';
+
+        }
         break;
       case "get":
         if ($what == 'feed_updates') {

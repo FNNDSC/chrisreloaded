@@ -2,6 +2,10 @@
     "use strict";
 
     var templates = {
+        "save": "<li>" +
+                    "<div class='btn-group'>" +
+                        "<a class='btn' title='Save'><b>Save</b></a>" +
+                    "</div>",
         "font-styles": "<li class='dropdown'>" +
                            "<a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>" +
                                "<i class='icon-font'></i>&nbsp;<span class='current-font'>Normal text</span>&nbsp;<b class='caret'></b>" +
@@ -69,6 +73,7 @@
     };
 
     var defaultOptions = {
+        "save": true,
         "font-styles": true,
         "emphasis": true,
         "lists": true,

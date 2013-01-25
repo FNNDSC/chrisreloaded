@@ -324,9 +324,37 @@ _FEED_.editor_loaded = function() {
   var _editor = _wysihtml5.composer.element;
 
   var filename = $(_wysihtml5.textareaElement).parent().attr('data-path');
+  var save_button = $(_wysihtml5.toolbar.container.children[0]).find('a');
+
+  // callback for the save button
+  save_button.on('click', function() {
+
+    var data = _editor.innerHTML;
+
+    jQuery.ajax({
+      type: 'POST',
+      url: 'api.php',
+      data: {
+        action: 'set',
+        what: 'file',
+        parameters: [filename, data]
+      },
+      success: function(data) {
+
+        // reset the button
+        save_button.removeClass('btn-danger');
+
+        // notify the user
+        jQuery().toastmessage(
+            'showSuccessToast',
+            '<h5>Note saved.</h5>');
+
+      }
+    })
+
+  });
 
   // grab possible existing content and display it
-
   jQuery.ajax({
     type: 'GET',
     url: 'api.php?action=get&what=file&parameters='+filename,
@@ -337,8 +365,8 @@ _FEED_.editor_loaded = function() {
       _editor.innerHTML = data;
 
       // register the callbacks for content change
-      _editor.addEventListener("keyup", function() {console.log(_editor.innerHTML);});
-      _wysihtml5.on("aftercommand:composer", function() {console.log(_editor.innerHTML);});
+      _editor.addEventListener("keyup", function() { save_button.addClass('btn-danger'); });
+      _wysihtml5.on("aftercommand:composer", function() { save_button.addClass('btn-danger'); });
 
     }
   });
