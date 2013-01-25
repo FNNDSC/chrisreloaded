@@ -3,6 +3,7 @@
  */
 var _FEED_ = _FEED_ || {};
 _FEED_.onclick = function(details, more) {
+
   // generate the file browser on demand, if doesnt exist already
   var _file_browser = details.find('.file_browser');
   // if (_file_browser.is(':empty')) {
@@ -66,6 +67,7 @@ _FEED_.onclick = function(details, more) {
       active : _last_div_index
     });
   }
+
   // default value for 'force' is false
   if (typeof more == 'undefined') {
     more = false;
@@ -77,15 +79,19 @@ _FEED_.onclick = function(details, more) {
       more.closest('.feed').css('margin-top', '10px');
       more.closest('.feed').css('margin-bottom', '11px');
     }
-    details.show('blind', 'slow');
+    //details.show('blind','slow');
+    details.slideDown('fast');
   } else {
     if (more) {
       more.html('<a>Show details</a>');
       more.closest('.feed').css('margin-top', '-1px');
       more.closest('.feed').css('margin-bottom', '0px');
     }
-    details.hide('blind', 'slow');
+    //details.hide('blind', 'slow');
+    details.slideUp('fast');
+
   }
+
 }
 _FEED_.feed_title_onclick = function() {
   jQuery(document).on('click', '.feed_title', function() {
@@ -279,6 +285,92 @@ _FEED_.updateTime = function() {
       jQuery(this).find('.feed_time').html(day + ' days ago');
     }
   });
+}
+_FEED_.notes_tab_onclick = function() {
+  jQuery(document).on(
+    'click',
+    '.notes_tab',
+    function(e) {
+      
+      var _editor_div = jQuery(this).next();
+
+      if (_editor_div.find('.wysihtml5-toolbar').length == 0) {
+        
+        var _notes_editor = _editor_div.find('.notes_editor');
+        _notes_editor.wysihtml5({
+          "save": true,
+          "events": {
+            "load": _FEED_.editor_loaded
+          }
+        });
+
+// wysihtml5Editor = _notes_editor.data("wysihtml5").editor;
+// wysihtml5Editor.composer.commands.exec("bold");        
+
+      }// else {
+
+        // destroy the text editor
+        // jQuery(this).next().find('.wysihtml5-sandbox').first().remove();
+        // jQuery(this).next().find("iframe.wysihtml5-sandbox, input[name='_wysihtml5_mode']").first().remove();
+        // jQuery(this).next().find('.wysihtml5-toolbar').first().remove();
+        // jQuery(this).next().find(".notes_editor").first().css("display", "block");
+
+      //}
+    });
+}
+_FEED_.editor_loaded = function() {
+
+  var _wysihtml5 = $(this)[0];
+  var _editor = _wysihtml5.composer.element;
+
+  var filename = $(_wysihtml5.textareaElement).parent().attr('data-path');
+  var save_button = $(_wysihtml5.toolbar.container.children[0]).find('a');
+
+  // callback for the save button
+  save_button.on('click', function() {
+
+    var data = _editor.innerHTML;
+
+    jQuery.ajax({
+      type: 'POST',
+      url: 'api.php',
+      data: {
+        action: 'set',
+        what: 'file',
+        parameters: [filename, data]
+      },
+      success: function(data) {
+
+        // reset the button
+        save_button.removeClass('btn-danger');
+
+        // notify the user
+        jQuery().toastmessage(
+            'showSuccessToast',
+            '<h5>Note saved.</h5>');
+
+      }
+    })
+
+  });
+
+  // grab possible existing content and display it
+  jQuery.ajax({
+    type: 'GET',
+    url: 'api.php?action=get&what=file&parameters='+filename,
+    dataType : "text",
+    success : function(data) {
+
+      // display the content
+      _editor.innerHTML = data;
+
+      // register the callbacks for content change
+      _editor.addEventListener("keyup", function() { save_button.addClass('btn-danger'); });
+      _wysihtml5.on("aftercommand:composer", function() { save_button.addClass('btn-danger'); });
+
+    }
+  });
+
 }
 _FEED_.feed_favorite_onclick = function() {
   jQuery(document).on(
@@ -672,10 +764,42 @@ jQuery(document)
           _FEED_.updateFeedTimeout();
           _FEED_.updateTime();
           _FEED_.activateDraggableIcons();
+          _FEED_.notes_tab_onclick();
           // show placeholder when there are no feeds
           if (jQuery('#feed_count').html() == "0") {
             jQuery('.feed_empty').show();
           }
           _FEED_.scrollBottom();
           _FEED_.search();
+
+          // also register the check for unsaved notes
+          window.onbeforeunload = function (e) {
+
+              var _unsaved_notes = false;
+
+              // check if notes were not saved yet
+              jQuery('.editor_save_button').each(function(i,v) {
+                if($(v).hasClass('btn-danger')) {
+                  _unsaved_notes = true;
+                } 
+              });
+
+              if (_unsaved_notes) {
+
+                // show a warning
+
+                e = e || window.event;
+
+                // For IE and Firefox prior to version 4
+                if (e) {
+                    e.returnValue = 'Warning: Some notes were not saved yet.';
+                }
+
+                // For Safari
+                return 'Warning: Some notes were not saved yet.';              
+              }
+
+          };          
+
+
         });
