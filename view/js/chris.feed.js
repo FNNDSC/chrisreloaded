@@ -3,6 +3,7 @@
  */
 var _FEED_ = _FEED_ || {};
 _FEED_.onclick = function(details, more) {
+
   // generate the file browser on demand, if doesnt exist already
   var _file_browser = details.find('.file_browser');
   // if (_file_browser.is(':empty')) {
@@ -66,6 +67,7 @@ _FEED_.onclick = function(details, more) {
       active : _last_div_index
     });
   }
+
   // default value for 'force' is false
   if (typeof more == 'undefined') {
     more = false;
@@ -77,15 +79,19 @@ _FEED_.onclick = function(details, more) {
       more.closest('.feed').css('margin-top', '10px');
       more.closest('.feed').css('margin-bottom', '11px');
     }
-    details.show('blind', 'slow');
+    //details.show('blind','slow');
+    details.slideDown('fast');
   } else {
     if (more) {
       more.html('<a>Show details</a>');
       more.closest('.feed').css('margin-top', '-1px');
       more.closest('.feed').css('margin-bottom', '0px');
     }
-    details.hide('blind', 'slow');
+    //details.hide('blind', 'slow');
+    details.slideUp('fast');
+
   }
+
 }
 _FEED_.feed_title_onclick = function() {
   jQuery(document).on('click', '.feed_title', function() {
@@ -279,6 +285,45 @@ _FEED_.updateTime = function() {
       jQuery(this).find('.feed_time').html(day + ' days ago');
     }
   });
+}
+_FEED_.notes_tab_onclick = function() {
+  jQuery(document).on(
+    'click',
+    '.notes_tab',
+    function(e) {
+      
+      var _editor_div = jQuery(this).next();
+
+      if (_editor_div.find('.wysihtml5-toolbar').length == 0) {
+        
+        var _notes_editor = _editor_div.find('.notes_editor');
+        _notes_editor.wysihtml5({
+          "events": {
+            "load": _FEED_.editor_loaded
+          }
+        });
+
+// wysihtml5Editor = _notes_editor.data("wysihtml5").editor;
+// wysihtml5Editor.composer.commands.exec("bold");        
+
+      }// else {
+
+        // destroy the text editor
+        // jQuery(this).next().find('.wysihtml5-sandbox').first().remove();
+        // jQuery(this).next().find("iframe.wysihtml5-sandbox, input[name='_wysihtml5_mode']").first().remove();
+        // jQuery(this).next().find('.wysihtml5-toolbar').first().remove();
+        // jQuery(this).next().find(".notes_editor").first().css("display", "block");
+
+      //}
+    });
+}
+_FEED_.editor_loaded = function() {
+
+  // register the callbacks for content change
+  var _editor = $(this)[0].composer.element;
+  _editor.addEventListener("keyup", function() {console.log(_editor.innerHTML);});
+  $(this)[0].on("aftercommand:composer", function() {console.log(_editor.innerHTML);});
+
 }
 _FEED_.feed_favorite_onclick = function() {
   jQuery(document).on(
@@ -672,6 +717,7 @@ jQuery(document)
           _FEED_.updateFeedTimeout();
           _FEED_.updateTime();
           _FEED_.activateDraggableIcons();
+          _FEED_.notes_tab_onclick();
           // show placeholder when there are no feeds
           if (jQuery('#feed_count').html() == "0") {
             jQuery('.feed_empty').show();
