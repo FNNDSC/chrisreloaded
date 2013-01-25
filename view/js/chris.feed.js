@@ -771,4 +771,35 @@ jQuery(document)
           }
           _FEED_.scrollBottom();
           _FEED_.search();
+
+          // also register the check for unsaved notes
+          window.onbeforeunload = function (e) {
+
+              var _unsaved_notes = false;
+
+              // check if notes were not saved yet
+              jQuery('.editor_save_button').each(function(i,v) {
+                if($(v).hasClass('btn-danger')) {
+                  _unsaved_notes = true;
+                } 
+              });
+
+              if (_unsaved_notes) {
+
+                // show a warning
+
+                e = e || window.event;
+
+                // For IE and Firefox prior to version 4
+                if (e) {
+                    e.returnValue = 'Warning: Some notes were not saved yet.';
+                }
+
+                // For Safari
+                return 'Warning: Some notes were not saved yet.';              
+              }
+
+          };          
+
+
         });

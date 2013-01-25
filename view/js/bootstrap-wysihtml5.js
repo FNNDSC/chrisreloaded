@@ -4,7 +4,7 @@
     var templates = {
         "save": "<li>" +
                     "<div class='btn-group'>" +
-                        "<a class='btn' title='Save'><b>Save</b></a>" +
+                        "<a class='btn editor_save_button' title='Save'><b>Save</b></a>" +
                     "</div>",
         "font-styles": "<li class='dropdown'>" +
                            "<a class='btn dropdown-toggle' data-toggle='dropdown' href='#'>" +
