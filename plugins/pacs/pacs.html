@@ -7,22 +7,14 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<link href="view/css/bootstrap.min.css" rel="stylesheet">
+<link href="../../view/css/bootstrap.min.css" rel="stylesheet">
+<link href="../../view/css/jquery-ui-1.8.23.css" rel="stylesheet">
 
-<link href="view/css/jquery-ui-1.8.23.css" rel="stylesheet">
-
-<link href="view/css/jquery.dataTables.css" rel="stylesheet">
-
-<link href="view/css/jquery.toastmessage.css" rel="stylesheet">
-
-<link href="view/css/chris.css" rel="stylesheet">
-<link href="view/css/chris.cart.css" rel="stylesheet">
-<link href="view/css/chris.feed.css" rel="stylesheet">
-<link href="view/css/chris.data.css" rel="stylesheet">
-<link href="view/css/chris.pacs.css" rel="stylesheet">
+<link href="jquery.dataTables.css" rel="stylesheet">
+<link href="pacs.css" rel="stylesheet">
 </head>
 
-<body style='background: url("view/gfx/background1.jpg")'>
+<body style='background: url("../../view/gfx/background1.jpg")'>
 
  <div class="container"
   style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
@@ -45,8 +37,8 @@
           value=''> <input id='PACS_DAT' type="text"
           class="input-small ssearch" placeholder="Study Date" value=''>
 
-         <button id="SEARCH" class="btn btn-primary">Search</button>
-         <div class="input-append"></div>
+         <button id="SEARCH" class="btn btn-primary">Query</button>
+         <button id="PULL" class="btn btn-success pull-right">Pull Selection</button>
          <div id="show_advanced" style="padding-top: 10px;">
           <i class="icon-chevron-down"></i><b>Advanced parameters</b>
          </div>
@@ -71,8 +63,8 @@
          Results:
          <div class="btn-group" data-toggle="buttons-radio">
           <button id="STUDY_VIEW" type="button"
-           class="btn btn-primary active">Study</button>
-          <button id="SERIES_VIEW" type="button" class="btn btn-primary">Series</button>
+           class="btn btn-primary">Study</button>
+          <button id="SERIES_VIEW" type="button" class="btn btn-primary active">Series</button>
          </div>
         </h2>
         <div id='SC-RESULTS' class='row-fluid'></div>
@@ -95,10 +87,6 @@
        <div>
         Port: <input id='SERVER_POR' type="text" value='104' />
        </div>
-       <div>
-        <input class='btn btn-primary pacsPing' type="button"
-         value="Test Connection"> <span id='pacsping'></span>
-       </div>
       </div>
       <div class='span6 well'>
        <h1 style="border-bottom: 1px solid; border-color: lightgrey;">
@@ -113,10 +101,6 @@
        <div>
         Port: <input id='SERVER_POR' type="text" value='104' />
        </div>
-       <div>
-        <input class='btn btn-primary pacsPing' type="button"
-         value="Test Connection"> <span id='pacsping'></span>
-       </div>
       </div>
      </div>
      <div class='row-fluid'>
@@ -126,7 +110,7 @@
          class="img-rounded"> User
        </h1>
        AE Title: <input id='USER_AET' type="text"
-        value='${CHRIS_AETITLE}'>
+        value='FNNDSC-CHRISTEST'>
       </div>
      </div>
     </div>
@@ -134,17 +118,18 @@
   </div>
  </div>
 
- <script type="text/javascript" src="view/js/jquery.min.js"></script>
+ <script type="text/javascript" src="../../view/js/jquery.min.js"></script>
  <script type="text/javascript"
-  src="view/js/jquery-ui-1.8.23.custom.min.js"></script>
- <script type="text/javascript" src="view/js/bootstrap.min.js"></script>
+  src="../../view/js/jquery-ui-1.8.23.custom.min.js"></script>
+ <script type="text/javascript" src="../../view/js/bootstrap.min.js"></script>
 
- <script type="text/javascript" src="view/js/jquery.dataTables.min.js"></script>
- <script type="text/javascript" src="view/js/jquery.backstretch.min.js"></script>
- <script type="text/javascript" src="view/js/DT_bootstrap.js"></script>
+ <script type="text/javascript"
+  src="../../view/js/jquery.backstretch.min.js"></script>
+
+ <script type="text/javascript" src="jquery.dataTables.min.js"></script>
+ <script type="text/javascript" src="DT_bootstrap.js"></script>
 
  <!-- CHRIS PACS -->
- <script type="text/javascript" src="view/js/chris.pacs.js"></script>
- <script type="text/javascript" src="view/js/chris.pacs.class.js"></script>
+ <script type="text/javascript" src="chris.pacs.class.js"></script>
 </body>
 </html>
