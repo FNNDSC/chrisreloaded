@@ -123,6 +123,8 @@ class FeedV implements ObjectViewInterface {
     $d -> replace('DATA_ID', 'fake_data_id');
     $t -> replace('DATA_BROWSER', $d);
 
+    $t -> replace('NOTES', '<b>some notes</b>');
+
     // set html viewer if "index.html" exists in username/plugin/feed-id/
     if(is_file(joinPaths(CHRIS_USERS, $username,$object->plugin, $object->name.'-'.$object->id, 'index.html' ))){
       $t -> replace('FEED_HTML', 'feed_html.html');
