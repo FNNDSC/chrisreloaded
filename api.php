@@ -154,6 +154,11 @@ if (!SecurityC::login()) {
           // enable cross origin requests
           header("Access-Control-Allow-Origin: *");
 
+          // if the file does not exist, just die
+          if (!is_file($name)) {
+            die();
+          }
+
           $fp = fopen($name, 'rb');
 
           header("Content-Length: " . filesize($name));
