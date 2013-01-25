@@ -298,6 +298,7 @@ _FEED_.notes_tab_onclick = function() {
         
         var _notes_editor = _editor_div.find('.notes_editor');
         _notes_editor.wysihtml5({
+          "save": true,
           "events": {
             "load": _FEED_.editor_loaded
           }
@@ -319,10 +320,28 @@ _FEED_.notes_tab_onclick = function() {
 }
 _FEED_.editor_loaded = function() {
 
-  // register the callbacks for content change
-  var _editor = $(this)[0].composer.element;
-  _editor.addEventListener("keyup", function() {console.log(_editor.innerHTML);});
-  $(this)[0].on("aftercommand:composer", function() {console.log(_editor.innerHTML);});
+  var _wysihtml5 = $(this)[0];
+  var _editor = _wysihtml5.composer.element;
+
+  var filename = $(_wysihtml5.textareaElement).parent().attr('data-path');
+
+  // grab possible existing content and display it
+
+  jQuery.ajax({
+    type: 'GET',
+    url: 'api.php?action=get&what=file&parameters='+filename,
+    dataType : "text",
+    success : function(data) {
+
+      // display the content
+      _editor.innerHTML = data;
+
+      // register the callbacks for content change
+      _editor.addEventListener("keyup", function() {console.log(_editor.innerHTML);});
+      _wysihtml5.on("aftercommand:composer", function() {console.log(_editor.innerHTML);});
+
+    }
+  });
 
 }
 _FEED_.feed_favorite_onclick = function() {
