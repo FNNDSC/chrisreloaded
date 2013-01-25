@@ -58,6 +58,7 @@ _PACS_.queryDayAll = function(mrn, date, nb_queries) {
       window.console.log(date);
       window.console.log(_PACS_.status);
       _PACS_.status++;
+      jQuery("#SEARCH").html('<i class="icon-refresh rotating_class"></i> <span> ' + parseInt(100*_PACS_.status/nb_queries) + '%</span>');
       if (nb_queries == _PACS_.status) {
         jQuery("#SEARCH").removeClass('btn-warning').addClass('btn-primary');
         jQuery("#SEARCH").html('Search');
@@ -69,6 +70,7 @@ _PACS_.queryDayAll = function(mrn, date, nb_queries) {
       window.console.log(textStatus);
       window.console.log(error);
       _PACS_.status++;
+      jQuery("#SEARCH").html('<i class="icon-refresh rotating_class"></i> <span> ' + parseInt(100*_PACS_.status/nb_queries) + '%</span>');
       if (nb_queries == _PACS_.status) {
         jQuery("#SEARCH").removeClass('btn-warning').addClass('btn-primary');
         jQuery("#SEARCH").html('Search');
@@ -81,12 +83,6 @@ _PACS_.queryDayAll = function(mrn, date, nb_queries) {
  * Setup the 'Advanced' search button.
  */
 _PACS_.ajaxAdvanced = function() {
-  // keep reference to current object for the ajax response
-  var me = jQuery("#SEARCH");
-  // modify class
-  me.removeClass('btn-primary').addClass('btn-warning');
-  // modify content
-  me.html('<i class="icon-refresh rotating_class">');
   // destroy the results table if it exists
   if (jQuery('#S-RESULTS').length != 0) {
     _PACS_.sTable.dataTable().fnDestroy();
@@ -130,6 +126,12 @@ _PACS_.ajaxAdvanced = function() {
   // window.console.log(dates);
   // window.console.log(nb_dates);
   nb_queries = nb_mrns * nb_dates;
+  
+  // keep reference to current object for the ajax response
+  // modify class
+  jQuery("#SEARCH").removeClass('btn-primary').addClass('btn-warning');
+  // modify content
+  jQuery("#SEARCH").html('<i class="icon-refresh rotating_class"></i> <span> ' + parseInt(100*_PACS_.status/nb_queries) + '%</span>');
   window.console.log(dates);
   window.console.log(nb_queries);
   var i = 0;
