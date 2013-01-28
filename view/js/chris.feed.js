@@ -774,6 +774,13 @@ _FEED_.activateDroppableIcons = function() {
             var _file_browser = _master_feed.find('.file_browser');
             // if (_file_browser.is(':empty')) {
             var _folder = _file_browser.attr('data-folder');
+
+            // here we have to check if this was a folder pointing to /0/ and remove it
+            var _endOfFolder = _folder.substr(_folder.length - 3);
+            if (_endOfFolder == "/0/") {
+              _folder = _folder.substr(0, _folder.length - 2);
+            }
+
             _file_browser.fileTree({
               root : _folder,
               script : 'controller/feed.browser.connector.php'
