@@ -2,6 +2,49 @@
  * Define the FEED namespace
  */
 var _FEED_ = _FEED_ || {};
+_FEED_.preview = function(file) {
+  // grab the file extension
+  var extension = file.split('.').pop().toUpperCase();
+  // support no extensions
+  if (extension == file.toUpperCase()) {
+    // this means no extension
+    extension = '';
+  }
+  switch (extension) {
+  case 'NII':
+  case 'MGH':
+  case 'MGZ':
+  case 'DCM':
+  case 'DICOM':
+  case 'NII':
+  case 'GZ':
+  case 'NRRD':
+    _PREVIEW_.start('2D', 'volume', file);
+    break;
+  case 'TRK':
+    _PREVIEW_.start('3D', 'fibers', file);
+    break;
+  case 'FSM':
+  case 'SMOOTHWM':
+  case 'PIAL':
+  case 'INFLATED':
+  case 'SPHERE':
+  case 'ORIG':
+  case 'VTK':
+  case 'STL':
+    _PREVIEW_.start('3D', 'mesh', file);
+    break;
+  case 'TXT':
+  case 'LOG':
+  case 'ERR':
+  case 'JS':
+    _PREVIEW_.start('text', null, file);
+    break;
+  case 'INFO':
+    _PREVIEW_.start('text', null, file);
+    break;
+  }
+}
 _FEED_.onclick = function(details, more) {
 
   // generate the file browser on demand, if doesnt exist already
@@ -11,50 +54,7 @@ _FEED_.onclick = function(details, more) {
   _file_browser.fileTree({
     root : _folder,
     script : 'controller/feed.browser.connector.php'
-  }, function(file) {
-    // grab the file extension
-    // grab the file extension
-    var extension = file.split('.').pop().toUpperCase();
-    // support no extensions
-    if (extension == file.toUpperCase()) {
-      // this means no extension
-      extension = '';
-    }
-    switch (extension) {
-    case 'NII':
-    case 'MGH':
-    case 'MGZ':
-    case 'DCM':
-    case 'DICOM':
-    case 'NII':
-    case 'GZ':
-    case 'NRRD':
-      _PREVIEW_.start('2D', 'volume', file);
-      break;
-    case 'TRK':
-      _PREVIEW_.start('3D', 'fibers', file);
-      break;
-    case 'FSM':
-    case 'SMOOTHWM':
-    case 'PIAL':
-    case 'INFLATED':
-    case 'SPHERE':
-    case 'ORIG':
-    case 'VTK':
-    case 'STL':
-      _PREVIEW_.start('3D', 'mesh', file);
-      break;
-    case 'TXT':
-    case 'LOG':
-    case 'ERR':
-    case 'JS':
-      _PREVIEW_.start('text', null, file);
-      break;
-    case 'INFO':
-      _PREVIEW_.start('text', null, file);
-      break;
-    }
-  });
+  }, _FEED_.preview);
   // }
   // also create the multi accordion
   // if it doesn't exist
@@ -767,7 +767,7 @@ _FEED_.activateDroppableIcons = function() {
                               '<i class="icon-plus">');
             _old_feed.hide('blind', 'slow', function() {
               _old_feed.remove();
-            });
+            });            
 
           } else {
             jQuery()

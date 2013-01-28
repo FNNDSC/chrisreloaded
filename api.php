@@ -155,6 +155,12 @@ if (!SecurityC::login()) {
           // .. and the slave id
           $slave_feed_id = $parameters;
 
+          // merge the feeds
+          FeedC::mergeFeeds($master_feed_id, $slave_feed_id);
+
+          // and archive the slave
+          FeedC::archive($slave_feed_id);
+
           $result['result'] = 'done';
 
         }
