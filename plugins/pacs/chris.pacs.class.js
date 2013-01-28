@@ -94,11 +94,13 @@ _PACS_.ajaxAdvanced = function() {
     _PACS_.sTable = null;
     jQuery('#S-RESULTS').remove();
   }
+  // clean delete cache
+  _PACS_.cachedData = [ {}, {} ];
   // split MRNs on white space
   mrns = jQuery("#PACS_MRN").attr('value').split(/\s+/g);
   nb_mrns = mrns.length;
-  if (nb_mrns >= 2 && mrns[1] == "") {
-    nb_mrns = 1;
+  if (nb_mrns >= 2 && mrns[nb_mrns-1] == "") {
+    nb_mrns--;
   }
   // window.console.log(mrns);
   // window.console.log(nb_mrns);
@@ -207,6 +209,16 @@ _PACS_.advancedTable = function() {
             "bAutoWidth" : false
           });
 }
+_PACS_.jsonConcat = function(json1, json2) {
+  for ( var key in json2) {
+    if (typeof json1[key] === "undefined") {
+      json1[key] = json2[key];
+    } else {
+      json1[key] = json1[key].concat(json2[key]);
+    }
+  }
+  return json1;
+}
 /**
  * Handle 'Advanced' AJAX query results.
  */
@@ -216,7 +228,12 @@ _PACS_.ajaxAdvancedResults = function(data, force) {
     force = false;
   }
   // cache the result data
-  _PACS_.cachedData = data;
+  if (force == false) {
+    window.console.log(data[0]);
+    window.console.log(data[1]);
+    _PACS_.cachedData[0] = _PACS_.jsonConcat(_PACS_.cachedData[0], data[0]);
+    _PACS_.cachedData[1] = _PACS_.jsonConcat(_PACS_.cachedData[1], data[1]);
+  }
   if (data[0] != null) {
     // if no table, create it
     if (jQuery('#S-RESULTS').length == 0 || force == true) {
