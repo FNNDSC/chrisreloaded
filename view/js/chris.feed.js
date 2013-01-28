@@ -38,9 +38,8 @@ _FEED_.preview = function(file) {
   case 'LOG':
   case 'ERR':
   case 'JS':
-    _PREVIEW_.start('text', null, file);
-    break;
   case 'INFO':
+  case 'PARAM':
     _PREVIEW_.start('text', null, file);
     break;
   }

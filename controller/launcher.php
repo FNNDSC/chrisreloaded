@@ -149,6 +149,11 @@ $parameters = str_replace("{OUTPUT}", $job_path, $parameters);
 $parameters = str_replace("{FEED_ID}", $feed_id, $parameters);
 $parameters = str_replace("{USER_ID}", $user_id, $parameters);
 
+// create chris.param file
+$fp = fopen(joinPaths($job_path, 'chris.param'), 'w');
+fwrite($fp, $parameters);
+fclose($fp);
+
 // add meta information to the feed
 FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
 // add owner
