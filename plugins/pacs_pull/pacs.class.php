@@ -329,7 +329,9 @@ class PACS implements PACSInterface {
     }
     $resultquery = $this->queryStudy();
 
-    $this->_appendResults($result[0], $resultquery);
+    if(is_array($resultquery)){
+      $this->_appendResults($result[0], $resultquery);
+    }
 
     // loop though studies
     if ($resultquery != null && array_key_exists('StudyInstanceUID',$resultquery))
@@ -343,9 +345,9 @@ class PACS implements PACSInterface {
         $this->addParameter('StudyInstanceUID', $studyvalue);
 
         $resultseries = $this->querySeries();
-
-        $this->_appendResults($result[1], $resultseries);
-
+        if(is_array($resultseries)){
+          $this->_appendResults($result[1], $resultseries);
+        }
         // loop though images
         if ($imageParameters != null && $resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
         {
@@ -359,7 +361,9 @@ class PACS implements PACSInterface {
             $this->addParameter('StudyInstanceUID', $seriesvalue);
             $this->addParameter('SeriesInstanceUID', $resultseries['SeriesInstanceUID'][$j]);
             $resultimage = $this->queryImage();
-            $this->_appendResults($result[2], $resultimage);
+            if(is_array($resultimage)){
+              $this->_appendResults($result[2], $resultimage);
+            }
           }
           ++$j;
         }
