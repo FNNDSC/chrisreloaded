@@ -724,12 +724,18 @@ class PACS implements PACSInterface {
 
         // clean array indices
         // in study
-        foreach ($output as $key => $value){
-          $output[$key] = array_values($value);
+        if(!empty($output))
+        {
+          foreach ($output as $key => $value){
+            $output[$key] = array_values($value);
+          }
         }
         // in series
-        foreach ($output1 as $key => $value){
-          $output1[$key] = array_values($value);
+        if(!empty($output1))
+        {
+          foreach ($output1 as $key => $value){
+            $output1[$key] = array_values($value);
+          }
         }
 
         $output2 = Array();
