@@ -103,8 +103,6 @@ _PACS_.ajaxAdvanced = function() {
   if (nb_mrns >= 2 && mrns[nb_mrns - 1] == "") {
     nb_mrns--;
   }
-  // window.console.log(mrns);
-  // window.console.log(nb_mrns);
   // split dates
   dates = jQuery("#PACS_DAT").attr('value').split(/\-/g);
   nb_dates = dates.length;
@@ -185,7 +183,7 @@ _PACS_.ajaxAdvanced = function() {
 _PACS_.advancedTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
   var i = 0;
-  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>Location</th><th>files</th><th><label class="checkbox pull-right"> <input type="checkbox"></label></th></tr></thead><tbody>';
+  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>Location</th><th>files</th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   // update html with table
   jQuery('#SC-RESULTS').html(content);
@@ -489,7 +487,7 @@ _PACS_.ajaxSimpleResults = function(data, force) {
  */
 _PACS_.simpleTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
-  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th>Location</th><th><label class="d_series checkbox pull-right"><input type="checkbox"></label></th></tr></thead><tbody>';
+  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   jQuery('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
@@ -643,6 +641,40 @@ _PACS_.seriesFormat = function(data) {
   return content;
 }
 /**
+ * Setup the download button to only download the series which are remaing after
+ * filtering in the advanced mode.
+ */
+//_PACS_.setupDownloadSeriesFiltered = function() {
+//  jQuery(".dseries_filter").live('click', function() {
+//    // get filtered data
+//    var filter = _PACS_.sTable._('tr', {
+//      "filter" : "applied"
+//    });
+//    var nb_filter = filter.length;
+//    var i = 0;
+//    // get all download button ID and simulate click on it
+//    for (i = 0; i < nb_filter; i++) {
+//      var id = filter[i][9].split(' ')[1].split('"')[1];
+//      jQuery('#' + id).click();
+//    }
+//  });
+//}
+//_PACS_.setupDownloadStudiesFiltered = function() {
+//  jQuery(".dstudies_filter").live('click', function() {
+//    // get filtered data
+//    var filter = _PACS_.sTable._('tr', {
+//      "filter" : "applied"
+//    });
+//    var nb_filter = filter.length;
+//    var i = 0;
+//    // get all download button ID and simulate click on it
+//    for (i = 0; i < nb_filter; i++) {
+//      var id = filter[i][7].split(' ')[1].split('"')[1];
+//      jQuery('#' + id).click();
+//    }
+//  });
+//}
+/**
  * Setup the javascript when document is ready (finshed loading)
  */
 $(document).ready(function() {
@@ -679,7 +711,8 @@ $(document).ready(function() {
   //
   // advanced mode
   //
-  // _PACS_.setupDownloadSeriesFiltered();
+  //_PACS_.setupDownloadStudiesFiltered();
+  //_PACS_.setupDownloadSeriesFiltered();
   //
   // both modes
   //
