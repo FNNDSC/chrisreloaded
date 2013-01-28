@@ -708,6 +708,24 @@ _FEED_.activateDraggableIcons = function() {
     zIndex : 2500
   });
 }
+_FEED_.activateDroppableIcons = function() {
+  console.log('droppable');
+  jQuery(".feed_icon").droppable({
+    activeClass: "parameter_dropzone_active",
+    hoverClass: "parameter_dropzone_hover",
+    tolerance: "pointer",
+    accept: ":not(.ui-sortable-helper)",
+    activate: function(event, ui) {
+      console.log('activate');
+    },
+    deactivate: function(event, ui) {
+      console.log('deactivate');
+    },
+    drop: function(event, ui) {
+      console.log('drop');
+    }
+  });
+}
 _FEED_.createFeedDetails = function() {
 }
 /**
@@ -764,6 +782,7 @@ jQuery(document)
           _FEED_.updateFeedTimeout();
           _FEED_.updateTime();
           _FEED_.activateDraggableIcons();
+          _FEED_.activateDroppableIcons();
           _FEED_.notes_tab_onclick();
           // show placeholder when there are no feeds
           if (jQuery('#feed_count').html() == "0") {
