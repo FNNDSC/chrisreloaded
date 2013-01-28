@@ -668,12 +668,15 @@ class PACS implements PACSInterface {
       case "image":
         break;
       case "all":
-        // only filter on studies for now
+        // filter series and studies
         $output = $arrayToFilter[0];
         $output1 = $arrayToFilter[1];
-        if($arrayToFilter[0] != null){
-          // if one study contains the value to be filtered, delete it
+
+        // if one series contains the values to be filtered on
+        if($arrayToFilter[0] != null && $arrayToFilter[1] != null ){
+          // if one series contains the value to be filtered, delete it
           foreach ($arrayFilter as $key => $value){
+
             if(array_key_exists($key, $arrayToFilter[0]) && $value !=""){
               foreach ($arrayToFilter[0][$key] as $key2 => $value2){
                 // should do regex
@@ -694,17 +697,39 @@ class PACS implements PACSInterface {
                 }
               }
             }
-          }
 
-          // clean array indices
-          // in study
-          foreach ($output as $key => $value){
-            $output[$key] = array_values($value);
+            if(array_key_exists($key, $arrayToFilter[1]) && $value !=""){
+              foreach ($arrayToFilter[1][$key] as $key2 => $value2){
+                // should do regex
+                if(strpos($value2,$value) === false){
+                  // delete this array
+                  foreach ($arrayToFilter[1] as $key3 => $value3){
+                    unset($output1[$key3][$key2]);
+                  }
+                }
+              }
+            }
           }
-          // in series
-          foreach ($output1 as $key => $value){
-            $output1[$key] = array_values($value);
+          // if we have studies with NO series, delete them
+          foreach ($arrayToFilter[0]["StudyInstanceUID"] as $key2 => $value2){
+            $index =  array_search($arrayToFilter[0]['StudyInstanceUID'][$key2], $output1['StudyInstanceUID']);
+            // if doesnt exist, delete it
+            if($index === false){
+              foreach ($output as $key4 => $value4){
+                unset($output[$key4][$key2]);
+              }
+            }
           }
+        }
+
+        // clean array indices
+        // in study
+        foreach ($output as $key => $value){
+          $output[$key] = array_values($value);
+        }
+        // in series
+        foreach ($output1 as $key => $value){
+          $output1[$key] = array_values($value);
         }
 
         $output2 = Array();
