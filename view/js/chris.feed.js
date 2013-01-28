@@ -767,7 +767,17 @@ _FEED_.activateDroppableIcons = function() {
                               '<i class="icon-plus">');
             _old_feed.hide('blind', 'slow', function() {
               _old_feed.remove();
-            });            
+            });
+
+            // refresh the file browser
+            var _master_feed = jQuery('.feed[data-chris-feed_id='+_master_feed_id+']');
+            var _file_browser = _master_feed.find('.file_browser');
+            // if (_file_browser.is(':empty')) {
+            var _folder = _file_browser.attr('data-folder');
+            _file_browser.fileTree({
+              root : _folder,
+              script : 'controller/feed.browser.connector.php'
+            }, _FEED_.preview);
 
           } else {
             jQuery()
