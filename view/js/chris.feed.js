@@ -780,6 +780,9 @@ _FEED_.activateDroppableIcons = function() {
               _folder = _folder.substr(0, _folder.length - 2);
             }
 
+            // re-propagate the new _folder
+            _file_browser.attr('data-folder', _folder);
+
             _file_browser.fileTree({
               root : _folder,
               script : 'controller/feed.browser.connector.php'
