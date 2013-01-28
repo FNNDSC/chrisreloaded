@@ -100,7 +100,7 @@ _PACS_.ajaxAdvanced = function() {
   // split MRNs on white space
   mrns = jQuery("#PACS_MRN").attr('value').split(/\s+/g);
   nb_mrns = mrns.length;
-  if (nb_mrns >= 2 && mrns[nb_mrns-1] == "") {
+  if (nb_mrns >= 2 && mrns[nb_mrns - 1] == "") {
     nb_mrns--;
   }
   // window.console.log(mrns);
@@ -323,10 +323,26 @@ _PACS_.advancedFormat = function(data, i) {
       : data[0].PerformedStationAETitle[index]).replace(/\>/g, "&gt").replace(
       /\</g, "&lt"));
   sub.push(data[1].NumberOfSeriesRelatedInstances[i]);
-  sub
-      .push('<label id="'
-          + id
-          + '-ad" class="d_series checkbox pull-right"><input type="checkbox"></label>');
+  // update download icon based on its status
+  var status = 0;
+  var cached_study = stuid in _PACS_.cache;
+  if (cached_study) {
+    var series_index = _PACS_.cache[stuid].SeriesInstanceUID.indexOf(serid);
+    if (series_index >= 0) {
+      status = _PACS_.cache[stuid].Status[series_index];
+    }
+  }
+  if (!status) {
+    sub
+        .push('<label id="'
+            + id
+            + '-ad" class="d_series checkbox pull-right"><input type="checkbox"></label>');
+  } else {
+    sub
+        .push('<label id="'
+            + id
+            + '-ad" class="d_series checkbox pull-right"><input type="checkbox" checked></label>');
+  }
   return sub;
 }
 _PACS_.studyView = function() {
@@ -341,32 +357,6 @@ _PACS_.seriesView = function() {
     _PACS_.ajaxAdvancedResults(_PACS_.cachedData, true);
   });
 }
-/**
- * Setup the download button to only download the series which are remaing after
- * filtering in the advanced mode.
- */
-/*
- * _PACS_.setupDownloadSeriesFiltered = function() {
- * jQuery(".d_filter").live('click', function() { // get filtered data var
- * filter = _PACS_.sTable._('tr', { "filter" : "applied" }); var nb_filter =
- * filter.length; var i = 0; // get all download button ID and simulate click on
- * it for (i = 0; i < nb_filter; i++) { var id = filter[i][8].split('
- * ')[1].split('"')[1]; jQuery('#' + id).click(); } }); }
- */
-/**
- * Setup the download button to download all series for a given study.
- */
-/*
- * _PACS_.setupDownloadStudy = function() { jQuery(".d_study").live( 'click',
- * function() { // replace the '_' var stuid =
- * jQuery(this).attr('id').replace(/\_/g, "."); // remove the '-std' tad at the
- * end of the id stuid = stuid.substring(0, stuid.length - 4); // modify class
- * jQuery(this).removeClass('btn-primary').removeClass('d_study')
- * .addClass('btn-warning'); // modify content jQuery(this).html('<i
- * class="icon-refresh rotating_class">'); // update study status
- * _PACS_.cacheStatus[stuid] = 1; // download all related series
- * _PACS_.ajaxSeries(stuid); }); }
- */
 /**
  * Setup the details button to show series within a study in simple query.
  */
@@ -393,90 +383,69 @@ _PACS_.setupDetailStudy = function() {
   });
 }
 /**
+ * Setup the download button to download all series for a given study.
+ */
+_PACS_.setupDownloadStudy = function() {
+  jQuery(".d_study")
+      .live(
+          'click',
+          function() { // replace the '_'
+            var stuid = jQuery(this).attr('id').replace(/\_/g, ".");
+            // remove the '-std' tad at the end of the id
+            stuid = stuid.substring(0, stuid.length - 4);
+            // check/uncheck target
+            // modify status
+            // var seriesData = _PACS_.cache[studyUID];
+            // update all of them in cache + GUI
+            // var index = seriesData.SeriesInstanceUID.indexOf(seriesUID);
+            // seriesData.Status[index] = 1;
+            // update study status
+            window.console.log(stuid);
+            if (typeof _PACS_.cacheStatus[stuid] === "undefined") {
+              _PACS_.cacheStatus[stuid] = 1;
+            } else {
+              _PACS_.cacheStatus[stuid] = !_PACS_.cacheStatus[stuid];
+            }
+            // "click" all inside series!
+            // no need to update status, will be done with click callback
+            // click all (-sed)
+            for ( var key in _PACS_.cache[stuid]["SeriesInstanceUID"]) {
+              var full = '#'
+                  + stuid.replace(/\./g, "_")
+                  + "-"
+                  + _PACS_.cache[stuid]["SeriesInstanceUID"][key].replace(
+                      /\./g, "_") + "-sed";
+              window.console.log(full);
+              if (_PACS_.cacheStatus[stuid] != _PACS_.cache[stuid]["Status"][key]) {
+                if (jQuery(full).length != 0) {
+                  jQuery(full).click();
+                  window.console.log("found!");
+                } else {
+                  _PACS_.cache[stuid]["Status"][key] != _PACS_.cache[stuid]["Status"][key];
+                  window.console.log("NOT found!");
+                  // update status
+                }
+              }
+            }
+            // download all related series
+            // _PACS_.ajaxSeries(stuid);
+          });
+}
+/**
  * Setup the download series button.
  */
-/*
- * _PACS_.setupDownloadSeries = function() { jQuery(".d_series").live('click',
- * function(event) { window.console("d_series clicked - do nothing"); // var id =
- * jQuery(this).attr('id'); // var split_id = id.split('-'); // var stuid =
- * split_id[0].replace(/\_/g, "."); // var seuid = split_id[1].replace(/\_/g,
- * "."); // _PACS_.ajaxImage(stuid, seuid, '#' + id); }); } _PACS_.queryDayAll =
- * function(day, today) { window.console.log(day); year =
- * day.getFullYear().toString(); month = ("0" +
- * day.getMonth().toString()).slice(-2); date = ("0" +
- * day.getDate().toString()).slice(-2); window.console.log(today); jQuery.ajax({
- * type : "POST", url : "pacs_query.php", dataType : "json", data : { USER_AET :
- * jQuery("#USER_AET").attr('value'), SERVER_IP :
- * jQuery("#SERVER_IP").attr('value'), SERVER_POR :
- * jQuery("#SERVER_POR").attr('value'), PACS_LEV : 'ALL', PACS_MRN :
- * jQuery("#PACS_MRN").attr('value'), PACS_NAM :
- * jQuery("#PACS_NAM").attr('value'), PACS_MOD :
- * jQuery("#PACS_MOD").attr('value'), PACS_DAT : year + month + date,
- * PACS_ACC_NUM : '', PACS_STU_DES : '', PACS_STU_UID : '', PACS_PSAET :
- * jQuery("#PACS_PSAET").attr('value') }, success : function(data) {
- * jQuery("#PACS-RESULTS").show('blind', 100); // data simple visualization
- * _PACS_.ajaxAdvancedResults(data); day.setDate(day.getDate() + 1); if (day <
- * today) { window.console.log('recursive call'); _PACS_.queryDayAll(day,
- * today); } else { window.console.log('done'); } } }); }
- *//*
-     * _PACS_.queryDay = function(day, today) { window.console.log(day); year =
-     * day.getFullYear().toString(); month = ("0" +
-     * day.getMonth().toString()).slice(-2); date = ("0" +
-     * day.getDate().toString()).slice(-2); window.console.log(today);
-     * jQuery.ajax({ type : "POST", url : "pacs_query.php", dataType : "json",
-     * data : { USER_AET : jQuery("#USER_AET").attr('value'), SERVER_IP :
-     * jQuery("#SERVER_IP").attr('value'), SERVER_POR :
-     * jQuery("#SERVER_POR").attr('value'), PACS_LEV : 'STUDY', PACS_MRN :
-     * jQuery("#PACS_MRN").attr('value'), PACS_NAM :
-     * jQuery("#PACS_NAM").attr('value'), PACS_MOD :
-     * jQuery("#PACS_MOD").attr('value'), PACS_DAT : year + month + date,
-     * PACS_ACC_NUM : '', PACS_STU_DES : '', PACS_STU_UID : '', PACS_PSAET :
-     * jQuery("#PACS_PSAET").attr('value') }, success : function(data) {
-     * jQuery("#PACS-RESULTS").show('blind', 100); // reformat data in 2 arrays
-     * data = _PACS_.reformatSimpleResults(data); _PACS_.cachedData = data; //
-     * data simple visualization _PACS_.ajaxSimpleResults(data);
-     * day.setDate(day.getDate() + 1); if (day < today) {
-     * window.console.log('recursive call'); _PACS_.queryDay(day, today); } else {
-     * window.console.log('done'); } } }); }
-     */
-/**
- * Setup the 'Simple' search button.
- */
-/*
- * _PACS_.ajaxSimple = function() { var me = jQuery("#SEARCH");
- * me.removeClass('btn-primary').addClass('btn-warning'); // modify content
- * me.html('<i class="icon-refresh rotating_class">'); if
- * (jQuery('#S-RESULTS').length != 0) { // destroy the table
- * _PACS_.sTable.dataTable().fnDestroy(); _PACS_.sTable = null;
- * jQuery('#S-RESULTS').remove(); } // // get date // var dateString =
- * jQuery("#PACS_DAT").attr('value'); var year = dateString.substring(0, 4); var
- * month = dateString.substring(4, 6); var day = dateString.substring(6, 8); var
- * date = new Date(year, month, day); var today = new Date(); // if (date <
- * today) { _PACS_.queryDay(date, date); // }
- * me.removeClass('btn-warning').addClass('btn-primary'); me.html('Search'); //
- * if string finis // var mrn_split = jQuery("#PACS_MRN").attr('value').split('
- * '); // var mrn_nb = mrn_split.length; // var mrn_received = 0; // var i = 0; //
- * for (i = 0; i < mrn_nb; i++) { // query pacs on parameters, at STUDY LEVEL /*
- * jQuery.ajax({ type : "POST", url : "pacs_query.php", dataType : "json", data : {
- * USER_AET : jQuery("#USER_AET").attr('value'), SERVER_IP :
- * jQuery("#SERVER_IP").attr('value'), SERVER_POR :
- * jQuery("#SERVER_POR").attr('value'), PACS_LEV : 'STUDY', PACS_MRN :
- * mrn_split[i], PACS_NAM : jQuery("#PACS_NAM").attr('value'), PACS_MOD :
- * jQuery("#PACS_MOD").attr('value'), PACS_DAT :
- * jQuery("#PACS_DAT").attr('value'), PACS_ACC_NUM : '', PACS_STU_DES : '',
- * PACS_STU_UID : '', PACS_PSAET : jQuery("#PACS_PSAET").attr('value') },
- * success : function(data) { jQuery("#PACS-RESULTS").show('blind', 100);
- * mrn_received++; if (mrn_received == mrn_nb) {
- * me.removeClass('btn-warning').addClass('btn-primary'); me.html('Search'); } //
- * reformat data in 2 arrays data = _PACS_.reformatSimpleResults(data);
- * _PACS_.cachedData = data; // data simple visualization
- * _PACS_.ajaxSimpleResults(data); } });
- */
-// }
-/*
- * } _PACS_.reformatSimpleResults = function(data) { var reformat = new Array();
- * reformat[0] = data; reformat[1] = null; return reformat; }
- */
+_PACS_.setupDownloadSeries = function() {
+  jQuery(".d_series").live('click', function(event) {
+    window.console.log("d_series clicked - do nothing");
+    var id = jQuery(this).attr('id');
+    var split_id = id.split('-');
+    var stuid = split_id[0].replace(/\_/g, ".");
+    var seuid = split_id[1].replace(/\_/g, ".");
+    var index = _PACS_.cache[stuid].SeriesInstanceUID.indexOf(seuid);
+    _PACS_.cache[stuid].Status[index] = !_PACS_.cache[stuid].Status[index];
+    // todo uncheck study if all series within one study unckecked
+  });
+}
 /**
  * Handle 'Simple' AJAX query results.
  */
@@ -551,10 +520,26 @@ _PACS_.simpleFormat = function(data, i) {
   sub.push(data.ModalitiesInStudy[i]);
   sub.push(data.PerformedStationAETitle[i].replace(/\>/g, "&gt").replace(/\</g,
       "&lt").replace(/\_/g, " "));
-  sub
-      .push('<label id="'
-          + stuid.replace(/\./g, "_")
-          + '-std" class="d_study checkbox pull-right"><input type="checkbox"></label>');
+  // if study cached, check status of series to update icon
+  var cached = stuid in _PACS_.cacheStatus;
+  var status = 0;
+  if (cached) {
+    status = _PACS_.cacheStatus[stuid];
+  } else {
+    _PACS_.cacheStatus[stuid] = 0;
+    _PACS_.cacheCount[stuid] = 0;
+  }
+  if (!status) {
+    sub
+        .push('<label id="'
+            + stuid.replace(/\./g, "_")
+            + '-std" class="d_study checkbox pull-right"><input type="checkbox"></label>');
+  } else {
+    sub
+        .push('<label id="'
+            + stuid.replace(/\./g, "_")
+            + '-std" class="d_study checkbox pull-right"><input type="checkbox" checked></label>');
+  }
   return sub;
 }
 /**
@@ -632,7 +617,7 @@ _PACS_.seriesFormat = function(data) {
     content += '<td>' + data.NumberOfSeriesRelatedInstances[i] + '</td>';
     // sed: SEries Download
     // status == 0: data is not checked
-    if (data.Status[i] == 0) {
+    if (!data.Status[i]) {
       content += '<td class="center"><label id="'
           + id
           + '-sed" class="d_series checkbox pull-right"><input type="checkbox"></label></td>';
@@ -640,43 +625,13 @@ _PACS_.seriesFormat = function(data) {
     } else {
       content += '<td class="center"><label id="'
           + id
-          + '-sed" class="d_series checkbox pull-right"><input type="checkbox"></label></td>';
+          + '-sed" class="d_series checkbox pull-right"><input type="checkbox" checked></label></td>';
     }
     content += '</tr>';
   }
   content += '</body></table></div>';
   return content;
 }
-/**
- * Get 'Image' data AJAX.
- */
-/*
- * _PACS_.ajaxImage = function(studyUID, seriesUID, buttonID) { // if series
- * already or is being downloaded (preview use case) if (jQuery(buttonID).length ==
- * 0 || jQuery(buttonID).hasClass('btn-primary')) { // wait button // modify
- * class jQuery(buttonID).removeClass('btn-primary').removeClass('d_series')
- * .addClass('btn-warning'); // modify content jQuery(buttonID).html('<i
- * class="icon-refresh rotating_class">'); // modify status var seriesData =
- * _PACS_.cache[studyUID]; var index =
- * seriesData.SeriesInstanceUID.indexOf(seriesUID); seriesData.Status[index] =
- * 1; jQuery .ajax({ type : "POST", url : "controller/pacs_move.php", dataType :
- * "json", data : { USER_AET : jQuery('#USER_AET').attr('value'), SERVER_IP :
- * '134.174.12.21', SERVER_POR : '104', PACS_LEV : 'SERIES', PACS_STU_UID :
- * studyUID, PACS_SER_UID : seriesUID, PACS_MRN : '', PACS_NAM : '', PACS_MOD :
- * '', PACS_DAT : '', PACS_STU_DES : '', PACS_ACC_NUM : '' }, success :
- * function(data) { var seriesData = _PACS_.cache[studyUID]; var i =
- * seriesData.SeriesInstanceUID.indexOf(seriesUID); seriesData.Status[i] = 2; //
- * update visu if not closed! // use "this", modify style, refresh
- * jQuery(buttonID).removeClass('btn-warning').addClass('btn-success'); //
- * modify content jQuery(buttonID).html('<i class="icon-ok icon-white">'); var
- * studyButtonID = '#' + studyUID.replace(/\./g, "_") + '-std'; // update count
- * _PACS_.cacheCount[studyUID]++; if (jQuery(studyButtonID).length != 0 &&
- * _PACS_.cacheCount[studyUID] == seriesData.SeriesInstanceUID.length) { // all
- * series downloaded, update button! _PACS_.cacheStatus[studyUID] = 2;
- * jQuery(studyButtonID).removeClass('btn-warning').addClass( 'btn-success'); //
- * modify content jQuery(studyButtonID).html('<i class="icon-ok icon-white">'); } }
- * }); } }
- */
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -711,7 +666,6 @@ $(document).ready(function() {
   //
   _PACS_.openStudies = [];
   _PACS_.setupDetailStudy();
-  // _PACS_.setupDownloadStudy();
   //
   // advanced mode
   //
@@ -720,5 +674,6 @@ $(document).ready(function() {
   // both modes
   //
   // search button pushed
-  // _PACS_.setupDownloadSeries();
+  _PACS_.setupDownloadStudy();
+  _PACS_.setupDownloadSeries();
 });
