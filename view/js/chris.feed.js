@@ -584,6 +584,7 @@ _FEED_.update_onclick = function() {
         _FEED_.updateTime();
         // re-activate draggable for all feed icons
         _FEED_.activateDraggableIcons();
+        _FEED_.activateDroppableIcons();
       });
 }
 _FEED_.scrollBottom = function() {
@@ -614,6 +615,7 @@ _FEED_.scrollBottom = function() {
               _FEED_.updateTime();
               jQuery('.feed_content').bind('scroll');
               _FEED_.activateDraggableIcons();
+              _FEED_.activateDroppableIcons();
             }
           });
         }
@@ -669,6 +671,7 @@ _FEED_.search = function() {
               // jQuery('.feed_sea').find('.feed').addClass('feed_search');
               _FEED_.updateTime();
               _FEED_.activateDraggableIcons();
+              _FEED_.activateDroppableIcons();
             }
           });
         } else {
