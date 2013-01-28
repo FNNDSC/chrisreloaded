@@ -95,6 +95,7 @@ _PACS_.ajaxAdvanced = function() {
     jQuery('#S-RESULTS').remove();
   }
   // clean delete cache
+  _PACS_.cache = [];
   _PACS_.cachedData = [ {}, {} ];
   // split MRNs on white space
   mrns = jQuery("#PACS_MRN").attr('value').split(/\s+/g);
