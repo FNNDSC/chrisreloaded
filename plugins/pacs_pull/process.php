@@ -62,11 +62,30 @@ $options = getopt($shortopts);
 
 $user_id = $options['u'];
 $feed_chris_id = $options['f'];
-$details = $options['m'];
+if(isset($options['m'])){
+  $details = $options['m'];
+}
+else{
+  $details = "";
+}
 $server = $options['s'];
 $port = $options['p'];
 $aetitle = $options['a'];
 $output_dir = $options['o'];
+
+if(isset($options['d'])){
+  $study_uid = $options['d'];
+}
+else{
+  $study_uid = "";
+}
+
+if(isset($options['e'])){
+  $series_uid = $options['e'];
+}
+else{
+  $series_uid = "";
+}
 
 //
 // 1- CREATE PRE-PROCESS LOG FILE
@@ -122,13 +141,17 @@ $queryAllLog = '======================================='.PHP_EOL;
 $queryAllLog .= date('Y-m-d h:i:s'). ' ---> Query all information...'.PHP_EOL;
 $queryAllLog .= 'AETitle: '.$aetitle.PHP_EOL;
 $queryAllLog .= 'MRN: '.$details.PHP_EOL;
+$queryAllLog .= 'StudyUID: '.$study_uid.PHP_EOL;
+$queryAllLog .= 'SeriesUID: '.$series_uid.PHP_EOL;
 
 $study_parameter = Array();
+//$study_parameter['StudyInstanceUID'] = $study_uid;
 $study_parameter['PatientID'] = $details;
 $study_parameter['PatientName'] = '';
 $study_parameter['PatientBirthDate'] = '';
 $study_parameter['PatientSex'] = '';
 $series_parameter = Array();
+//$series_parameter['SeriesInstanceUID'] = $series_uid;
 $series_parameter['SeriesDescription'] = '';
 $series_parameter['StudyDescription'] = '';
 $series_parameter['NumberOfSeriesRelatedInstances'] = '';
@@ -153,6 +176,8 @@ $queryAllLog .= count($results[1]['SeriesInstanceUID'])." matching serie(s) wher
 $fh = fopen($logFile, 'a')  or die("can't open file");
 fwrite($fh, $queryAllLog);
 fclose($fh);
+
+/*
 
 //
 // 5-  ADD PATIENT TO DB
@@ -446,9 +471,6 @@ foreach ($results[1]['SeriesInstanceUID'] as $key => $value){
         symlink($seriesdirnametarget, $seriesdirnamelink);
       }
 
-      /**
-       * @todo Update the feed status
-       */
       // update feed status?
       $fh = fopen($logFile, 'a')  or die("can't open file");
       fwrite($fh, $dataLog);
@@ -470,6 +492,6 @@ $feedMapper->filter('id = (?)',$feed_chris_id);
 $feedResult = $feedMapper->get();
 $feedResult['Feed'][0]->status = 99;
 Mapper::update($feedResult['Feed'][0],  $feedResult['Feed'][0]->id);
-
+*/
 exit(0);
 ?>
