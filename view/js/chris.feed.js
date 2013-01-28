@@ -743,6 +743,38 @@ _FEED_.activateDroppableIcons = function() {
     },
     drop: function(event, ui) {
       
+      var _master_feed_id = $(this).attr('data-chris-feed_id');
+      var _slave_feed_id = $(ui.draggable[0]).attr('data-chris-feed_id');
+
+      // trigger merge request
+      jQuery.ajax({
+        type : "POST",
+        url : "api.php?action=set&what=feed_merge&id=" + _master_feed_id + '&parameters=' + _slave_feed_id,
+        dataType : "json",
+        success : function(data) {
+          if (data['result'] == 'done') {
+            jQuery()
+                .toastmessage(
+                    'showSuccessToast',
+                    '<h5>Feeds merged.</h5>');
+
+            // archive the old feed
+            var _old_feed = jQuery('.feed[data-chris-feed_id='+_slave_feed_id+']');
+            _old_feed.find('.feed_archive').html(
+                              '<i class="icon-plus">');
+            _old_feed.hide('blind', 'slow', function() {
+              _old_feed.remove();
+            });
+
+          } else {
+            jQuery()
+                .toastmessage(
+                    'showErrorToast',
+                    '<h5>Could not merge feeds.</h5>');
+          }
+        }
+      });      
+
     },
     over: function(event, ui) {
 
