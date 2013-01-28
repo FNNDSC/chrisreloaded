@@ -297,7 +297,7 @@ _PACS_.advancedCaching = function(data, i) {
         .push(data[1].NumberOfSeriesRelatedInstances[i]);
     study.QueryRetrieveLevel.push(data[1].QueryRetrieveLevel[i]);
     study.RetrieveAETitle.push(data[1].RetrieveAETitle[i]);
-    study.Status.push(0);
+    study.Status.push(false);
   }
 }
 /**
@@ -393,42 +393,26 @@ _PACS_.setupDownloadStudy = function() {
             var stuid = jQuery(this).attr('id').replace(/\_/g, ".");
             // remove the '-std' tad at the end of the id
             stuid = stuid.substring(0, stuid.length - 4);
-            // check/uncheck target
-            // modify status
-            // var seriesData = _PACS_.cache[studyUID];
-            // update all of them in cache + GUI
-            // var index = seriesData.SeriesInstanceUID.indexOf(seriesUID);
-            // seriesData.Status[index] = 1;
             // update study status
-            window.console.log(stuid);
             if (typeof _PACS_.cacheStatus[stuid] === "undefined") {
-              _PACS_.cacheStatus[stuid] = 1;
+              _PACS_.cacheStatus[stuid] = true;
             } else {
               _PACS_.cacheStatus[stuid] = !_PACS_.cacheStatus[stuid];
             }
-            // "click" all inside series!
-            // no need to update status, will be done with click callback
-            // click all (-sed)
             for ( var key in _PACS_.cache[stuid]["SeriesInstanceUID"]) {
               var full = '#'
                   + stuid.replace(/\./g, "_")
                   + "-"
                   + _PACS_.cache[stuid]["SeriesInstanceUID"][key].replace(
-                      /\./g, "_") + "-sed";
-              window.console.log(full);
+                      /\./g, "_") + "-sed > :checkbox";
               if (_PACS_.cacheStatus[stuid] != _PACS_.cache[stuid]["Status"][key]) {
+                _PACS_.cache[stuid]["Status"][key] = !_PACS_.cache[stuid]["Status"][key];
                 if (jQuery(full).length != 0) {
-                  jQuery(full).click();
-                  window.console.log("found!");
-                } else {
-                  _PACS_.cache[stuid]["Status"][key] != _PACS_.cache[stuid]["Status"][key];
-                  window.console.log("NOT found!");
-                  // update status
+                  jQuery(full).prop('checked',
+                      _PACS_.cache[stuid]["Status"][key]);
                 }
               }
             }
-            // download all related series
-            // _PACS_.ajaxSeries(stuid);
           });
 }
 /**
@@ -436,7 +420,6 @@ _PACS_.setupDownloadStudy = function() {
  */
 _PACS_.setupDownloadSeries = function() {
   jQuery(".d_series").live('click', function(event) {
-    window.console.log("d_series clicked - do nothing");
     var id = jQuery(this).attr('id');
     var split_id = id.split('-');
     var stuid = split_id[0].replace(/\_/g, ".");
@@ -444,6 +427,33 @@ _PACS_.setupDownloadSeries = function() {
     var index = _PACS_.cache[stuid].SeriesInstanceUID.indexOf(seuid);
     _PACS_.cache[stuid].Status[index] = !_PACS_.cache[stuid].Status[index];
     // todo uncheck study if all series within one study unckecked
+    // check if related study should be unchecked
+    var full_1 = true;
+    for ( var key in _PACS_.cache[stuid]["Status"]) {
+      if (!_PACS_.cache[stuid]["Status"][key]) {
+        full_1 = false;
+      }
+    }
+    var fullname = "#" + split_id[0] + "-std > :checkbox";
+    // uncheck study if necessary
+    if (typeof _PACS_.cacheStatus[stuid] === "undefined") {
+      _PACS_.cacheStatus[stuid] = full_1;
+    }
+    if (full_1) {
+      if (!_PACS_.cacheStatus[stuid]) {
+        if (jQuery(fullname).length != 0) {
+          $(fullname).prop('checked', true);
+        }
+        _PACS_.cacheStatus[stuid] = !_PACS_.cacheStatus[stuid];
+      }
+    } else {
+      if (_PACS_.cacheStatus[stuid]) {
+        if (jQuery(fullname).length != 0) {
+          $(fullname).prop('checked', false);
+        }
+        _PACS_.cacheStatus[stuid] = !_PACS_.cacheStatus[stuid];
+      }
+    }
   });
 }
 /**
