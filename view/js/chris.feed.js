@@ -705,26 +705,50 @@ _FEED_.activateDraggableIcons = function() {
     opacity : 0.5,
     helper : "clone",
     appendTo : "body",
-    zIndex : 2500
+    zIndex : 2500,
+    start: function(event, ui) {
+
+      // disable all feed dropzones
+      $(".feed").droppable('option','disabled', true)
+
+      // activate dropzones for feeds of the same type
+      // but only if we have a different id so we can't drop on the same feed
+      var _feed_type = $(this).attr('data-type');
+      var _feed_id = $(this).attr('data-chris-feed_id');
+      $(".feed").filter("[data-type='"+_feed_type+"']").filter("[data-chris-feed_id!='"+_feed_id+"']").droppable(
+        'option','disabled', false
+      )
+
+    },
+    stop: function(event, ui) {
+
+      // re-enable all feeds
+      $(".feed").droppable('option','disabled', false);
+
+    }
   });
 }
 _FEED_.activateDroppableIcons = function() {
-  console.log('droppable');
-  jQuery(".feed_icon").droppable({
-    activeClass: "parameter_dropzone_active",
-    hoverClass: "parameter_dropzone_hover",
+  
+  $(".feed").droppable({
+    activeClass: "feed_dropzone_active",
+    hoverClass: "feed_dropzone_hover",          
     tolerance: "pointer",
     accept: ":not(.ui-sortable-helper)",
     activate: function(event, ui) {
-      console.log('activate');
+
     },
     deactivate: function(event, ui) {
-      console.log('deactivate');
+      
     },
     drop: function(event, ui) {
-      console.log('drop');
+      
+    },
+    over: function(event, ui) {
+
     }
   });
+  
 }
 _FEED_.createFeedDetails = function() {
 }
