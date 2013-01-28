@@ -121,6 +121,21 @@ class FeedV implements ObjectViewInterface {
     $feed_folder = joinPaths($username,$object->plugin, $object->name.'-'.$object->id);
     $feed_subfolders = scandir(CHRIS_USERS.$feed_folder);
     natcasesort($feed_subfolders);
+
+    // get rid of eventual notes.html or index.html files
+    // find notes.html
+    $notes = array_search('notes.html', $feed_subfolders);
+    if ($notes) {
+      // remove this entry - we don't want to touch it
+      unset($feed_subfolders[$notes]);
+    }
+    // find index.html
+    $index = array_search('index.html', $feed_subfolders);
+    if ($index) {
+      // remove this entry - we don't want to touch it
+      unset($feed_subfolders[$index]);
+    }
+
     if (count($feed_subfolders) == 3 && $feed_subfolders[2] == '0' && is_dir(CHRIS_USERS.$feed_folder.'/'.$feed_subfolders[2])) {
       // only one job exists in the output folder, enter it immediately
       $feed_folder .= '/0';
