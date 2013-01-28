@@ -148,6 +148,21 @@ if (!SecurityC::login()) {
           fwrite($fp, $parameters[1]);
           $result['result'] = $name.' written.';
 
+        } else if($what == 'feed_merge') {
+
+          // grab the master id
+          $master_feed_id = $id;
+          // .. and the slave id
+          $slave_feed_id = $parameters;
+
+          // merge the feeds
+          FeedC::mergeFeeds($master_feed_id, $slave_feed_id);
+
+          // and archive the slave
+          FeedC::archive($slave_feed_id);
+
+          $result['result'] = 'done';
+
         }
         break;
       case "get":
@@ -199,6 +214,7 @@ if (!SecurityC::login()) {
   $result['action'] = $action;
   $result['what'] = $what;
   $result['id'] = $id;
+  $result['parameters'] = $parameters;
 
   $result['status'] = 'done';
 

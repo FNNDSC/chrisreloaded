@@ -118,7 +118,14 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('FAVORITE_TEXT', $favorite_text);
     // set data browser
     $d = new Template('feed_data_browser.html');
-    $d -> replace('FOLDER', joinPaths($username,$object->plugin, $object->name.'-'.$object->id));
+    $feed_folder = joinPaths($username,$object->plugin, $object->name.'-'.$object->id);
+    $feed_subfolders = scandir(CHRIS_USERS.$feed_folder);
+    natcasesort($feed_subfolders);
+    if (count($feed_subfolders) == 3 && $feed_subfolders[2] == '0' && is_dir(CHRIS_USERS.$feed_folder.'/'.$feed_subfolders[2])) {
+      // only one job exists in the output folder, enter it immediately
+      $feed_folder .= '/0';
+    }
+    $d -> replace('FOLDER', $feed_folder);
     $d -> replace('PATIENT_ID', 'fake_patient_id');
     $d -> replace('DATA_ID', 'fake_data_id');
     $t -> replace('DATA_BROWSER', $d);
