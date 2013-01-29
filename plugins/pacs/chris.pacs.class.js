@@ -228,12 +228,17 @@ _PACS_.ajaxAdvancedResults = function(data, force) {
   }
   // cache the result data
   if (force == false) {
-    window.console.log(data[0]);
-    window.console.log(data[1]);
-    _PACS_.cachedData[0] = _PACS_.jsonConcat(_PACS_.cachedData[0], data[0]);
-    _PACS_.cachedData[1] = _PACS_.jsonConcat(_PACS_.cachedData[1], data[1]);
+    if (typeof data != 'undefined' && data[0] != null) {
+      _PACS_.cachedData[0] = _PACS_.jsonConcat(_PACS_.cachedData[0], data[0]);
+    }
+    if (typeof data != 'undefined' && data[1] != null) {
+      _PACS_.cachedData[1] = _PACS_.jsonConcat(_PACS_.cachedData[1], data[1]);
+    }
   }
-  if (data[0] != null) {
+  
+  // note: Object.keys might not be supported by all browsers
+  if (data[0] != null && Object.keys(data[0]).length > 0 && data[1] != null
+      && Object.keys(data[1]).length > 0) {
     // if no table, create it
     if (jQuery('#S-RESULTS').length == 0 || force == true) {
       _PACS_.advancedTable();
@@ -644,36 +649,36 @@ _PACS_.seriesFormat = function(data) {
  * Setup the download button to only download the series which are remaing after
  * filtering in the advanced mode.
  */
-//_PACS_.setupDownloadSeriesFiltered = function() {
-//  jQuery(".dseries_filter").live('click', function() {
-//    // get filtered data
-//    var filter = _PACS_.sTable._('tr', {
-//      "filter" : "applied"
-//    });
-//    var nb_filter = filter.length;
-//    var i = 0;
-//    // get all download button ID and simulate click on it
-//    for (i = 0; i < nb_filter; i++) {
-//      var id = filter[i][9].split(' ')[1].split('"')[1];
-//      jQuery('#' + id).click();
-//    }
-//  });
-//}
-//_PACS_.setupDownloadStudiesFiltered = function() {
-//  jQuery(".dstudies_filter").live('click', function() {
-//    // get filtered data
-//    var filter = _PACS_.sTable._('tr', {
-//      "filter" : "applied"
-//    });
-//    var nb_filter = filter.length;
-//    var i = 0;
-//    // get all download button ID and simulate click on it
-//    for (i = 0; i < nb_filter; i++) {
-//      var id = filter[i][7].split(' ')[1].split('"')[1];
-//      jQuery('#' + id).click();
-//    }
-//  });
-//}
+// _PACS_.setupDownloadSeriesFiltered = function() {
+// jQuery(".dseries_filter").live('click', function() {
+// // get filtered data
+// var filter = _PACS_.sTable._('tr', {
+// "filter" : "applied"
+// });
+// var nb_filter = filter.length;
+// var i = 0;
+// // get all download button ID and simulate click on it
+// for (i = 0; i < nb_filter; i++) {
+// var id = filter[i][9].split(' ')[1].split('"')[1];
+// jQuery('#' + id).click();
+// }
+// });
+// }
+// _PACS_.setupDownloadStudiesFiltered = function() {
+// jQuery(".dstudies_filter").live('click', function() {
+// // get filtered data
+// var filter = _PACS_.sTable._('tr', {
+// "filter" : "applied"
+// });
+// var nb_filter = filter.length;
+// var i = 0;
+// // get all download button ID and simulate click on it
+// for (i = 0; i < nb_filter; i++) {
+// var id = filter[i][7].split(' ')[1].split('"')[1];
+// jQuery('#' + id).click();
+// }
+// });
+// }
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -711,8 +716,8 @@ $(document).ready(function() {
   //
   // advanced mode
   //
-  //_PACS_.setupDownloadStudiesFiltered();
-  //_PACS_.setupDownloadSeriesFiltered();
+  // _PACS_.setupDownloadStudiesFiltered();
+  // _PACS_.setupDownloadSeriesFiltered();
   //
   // both modes
   //
