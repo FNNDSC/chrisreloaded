@@ -7,11 +7,7 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
-<link href="../../view/css/bootstrap.min.css" rel="stylesheet">
-<link href="../../view/css/jquery-ui-1.8.23.css" rel="stylesheet">
-
-<link href="css/jquery.dataTables.css" rel="stylesheet">
-<link href="css/pacs.css" rel="stylesheet">
+${CSS_CHRIS} ${CSS_PACS}
 </head>
 
 <body style='background: url("../../view/gfx/background1.jpg")'>
@@ -20,8 +16,8 @@
   style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
   <div class="tabbable well">
    <ul class="nav nav-tabs">
-    <li class="active"><a href="#tab0" data-toggle="tab">Retrieve data</a>
-    </li>
+    <li class="active"><a href="#tab0" data-toggle="tab">Retrieve
+      data</a></li>
     <li><a href="#tab2" data-toggle="tab">Settings</a></li>
    </ul>
    <div class="tab-content">
@@ -32,10 +28,10 @@
         <h2 style="border-bottom: 1px solid; border-color: lightgrey;">Parameters</h2>
         <form id="pacs_form" class="form-inline">
          <input id='PACS_MRN' type="text" class="input-small ssearch"
-          placeholder="MRN" value=''> <input id='PACS_NAM' type="text"
-          class="input-small ssearch" placeholder="Name" value=''> <input
-          id='PACS_DAT' type="text" class="input-small ssearch"
-          placeholder="Study Date" value=''>
+          placeholder="MRN" value=''> <input id='PACS_NAM'
+          type="text" class="input-small ssearch" placeholder="Name"
+          value=''> <input id='PACS_DAT' type="text"
+          class="input-small ssearch" placeholder="Study Date" value=''>
 
          <button id="SEARCH" class="btn btn-primary">Query</button>
          <button id="PULL" class="btn btn-success pull-right">Pull
@@ -47,8 +43,8 @@
           style="display: none; padding-top: 10px; margin-bottom: -15px; border-top: 1px solid; border-color: lightgrey;">
           <form id="pacs_aform" class="form-inline">
            <input id='PACS_MOD' type="text" class="input-small ssearch"
-            placeholder="Modality" value='MR'> <input id='PACS_PSAET'
-            type="text" class="input-small asearch"
+            placeholder="Modality" value='MR'> <input
+            id='PACS_PSAET' type="text" class="input-small asearch"
             placeholder="StationAETitle" value=''> <input
             id='PACS_STU_DES' type="text" class="input-small ssearch"
             placeholder="Study Description" value=''> <input
@@ -61,21 +57,7 @@
        </div>
       </div>
      </div>
-     <div id="PACS-RESULTS" class='row-fluid' style="display: none">
-      <div class='span12'>
-       <div class='well'>
-        <h2>
-         Results:
-         <div class="btn-group" data-toggle="buttons-radio">
-          <button id="STUDY_VIEW" type="button" class="btn btn-primary">Study</button>
-          <button id="SERIES_VIEW" type="button"
-           class="btn btn-primary active">Series</button>
-         </div>
-        </h2>
-        <div id='SC-RESULTS' class='row-fluid'></div>
-       </div>
-      </div>
-     </div>
+     ${RESULTS}
     </div>
     <div class="tab-pane" id="tab2">
 
@@ -107,18 +89,7 @@
   </div>
  </div>
 
- <script type="text/javascript" src="../../view/js/jquery.min.js"></script>
- <script type="text/javascript"
-  src="../../view/js/jquery-ui-1.8.23.custom.min.js"></script>
- <script type="text/javascript" src="../../view/js/bootstrap.min.js"></script>
+ ${JS_CHRIS} ${JS_PACS}
 
- <script type="text/javascript" src="../../view/js/jquery.backstretch.min.js"></script>
-
- <script type="text/javascript"
-  src="js/jquery.dataTables.min.js"></script>
- <script type="text/javascript" src="js/DT_bootstrap.js"></script>
-
- <!-- CHRIS PACS -->
- <script type="text/javascript" src="js/chris.pacs.class.js"></script>
 </body>
 </html>
