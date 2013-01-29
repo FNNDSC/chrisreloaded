@@ -40,7 +40,6 @@ _PACS_.queryDayAll = function(mrn, date, nb_queries) {
       USER_AET : jQuery("#USER_AET").attr('value'),
       SERVER_IP : jQuery("#SERVER_IP").attr('value'),
       SERVER_POR : jQuery("#SERVER_POR").attr('value'),
-      PACS_LEV : 'ALL',
       PACS_MRN : mrn,
       PACS_NAM : jQuery("#PACS_NAM").attr('value'),
       PACS_MOD : jQuery("#PACS_MOD").attr('value'),
@@ -396,10 +395,10 @@ _PACS_.setupDownloadStudy = function() {
             // remove the '-std' tad at the end of the id
             stuid = stuid.substring(0, stuid.length - 4);
             // update study status
-            if (typeof _PACS_.cacheStatus[stuid] === "undefined") {
-              _PACS_.cacheStatus[stuid] = true;
+            if (typeof _PACS_.studyStatus[stuid] === "undefined") {
+              _PACS_.studyStatus[stuid] = true;
             } else {
-              _PACS_.cacheStatus[stuid] = !_PACS_.cacheStatus[stuid];
+              _PACS_.studyStatus[stuid] = !_PACS_.studyStatus[stuid];
             }
             for ( var key in _PACS_.cache[stuid]["SeriesInstanceUID"]) {
               var full = '#'
@@ -407,7 +406,7 @@ _PACS_.setupDownloadStudy = function() {
                   + "-"
                   + _PACS_.cache[stuid]["SeriesInstanceUID"][key].replace(
                       /\./g, "_") + "-sed > :checkbox";
-              if (_PACS_.cacheStatus[stuid] != _PACS_.cache[stuid]["Status"][key]) {
+              if (_PACS_.studyStatus[stuid] != _PACS_.cache[stuid]["Status"][key]) {
                 _PACS_.cache[stuid]["Status"][key] = !_PACS_.cache[stuid]["Status"][key];
                 if (jQuery(full).length != 0) {
                   jQuery(full).prop('checked',
@@ -438,22 +437,22 @@ _PACS_.setupDownloadSeries = function() {
     }
     var fullname = "#" + split_id[0] + "-std > :checkbox";
     // uncheck study if necessary
-    if (typeof _PACS_.cacheStatus[stuid] === "undefined") {
-      _PACS_.cacheStatus[stuid] = full_1;
+    if (typeof _PACS_.studyStatus[stuid] === "undefined") {
+      _PACS_.studyStatus[stuid] = full_1;
     }
     if (full_1) {
-      if (!_PACS_.cacheStatus[stuid]) {
+      if (!_PACS_.studyStatus[stuid]) {
         if (jQuery(fullname).length != 0) {
           $(fullname).prop('checked', true);
         }
-        _PACS_.cacheStatus[stuid] = !_PACS_.cacheStatus[stuid];
+        _PACS_.studyStatus[stuid] = !_PACS_.studyStatus[stuid];
       }
     } else {
-      if (_PACS_.cacheStatus[stuid]) {
+      if (_PACS_.studyStatus[stuid]) {
         if (jQuery(fullname).length != 0) {
           $(fullname).prop('checked', false);
         }
-        _PACS_.cacheStatus[stuid] = !_PACS_.cacheStatus[stuid];
+        _PACS_.studyStatus[stuid] = !_PACS_.studyStatus[stuid];
       }
     }
   });
@@ -533,13 +532,12 @@ _PACS_.simpleFormat = function(data, i) {
   sub.push(data.PerformedStationAETitle[i].replace(/\>/g, "&gt").replace(/\</g,
       "&lt").replace(/\_/g, " "));
   // if study cached, check status of series to update icon
-  var cached = stuid in _PACS_.cacheStatus;
+  var cached = stuid in _PACS_.studyStatus;
   var status = 0;
   if (cached) {
-    status = _PACS_.cacheStatus[stuid];
+    status = _PACS_.studyStatus[stuid];
   } else {
-    _PACS_.cacheStatus[stuid] = 0;
-    _PACS_.cacheCount[stuid] = 0;
+    _PACS_.studyStatus[stuid] = false;
   }
   if (!status) {
     sub
@@ -681,28 +679,28 @@ _PACS_.ajaxPull = function() {
   // create user AETITLE
   param_container.push({
     name : 'aet',
-    value : '\\\"'+jQuery("#USER_AET").attr('value')+'\\\"',
+    value : '\\\"' + jQuery("#USER_AET").attr('value') + '\\\"',
     type : 'string',
     target_type : 'feed'
   });
   // create SERVER IP
   param_container.push({
     name : 'serverip',
-    value : '\\\"'+jQuery("#SERVER_IP").attr('value')+'\\\"',
+    value : '\\\"' + jQuery("#SERVER_IP").attr('value') + '\\\"',
     type : 'string',
     target_type : 'feed'
   });
   // create SERVER PORT
   param_container.push({
     name : 'serverport',
-    value : '\\\"'+jQuery("#SERVER_POR").attr('value')+'\\\"',
+    value : '\\\"' + jQuery("#SERVER_POR").attr('value') + '\\\"',
     type : 'string',
     target_type : 'feed'
   });
   // create LIST
   param_container.push({
     name : 'listseries',
-    value :'\\\"'+list+'\\\"',
+    value : '\\\"' + list + '\\\"',
     type : 'string',
     target_type : 'feed'
   });
@@ -741,82 +739,21 @@ _PACS_.ajaxPull = function() {
   });
 }
 /**
- * Setup the download button to only download the series which are remaing after
- * filtering in the advanced mode.
- */
-// _PACS_.setupDownloadSeriesFiltered = function() {
-// jQuery(".dseries_filter").live('click', function() {
-// // get filtered data
-// var filter = _PACS_.sTable._('tr', {
-// "filter" : "applied"
-// });
-// var nb_filter = filter.length;
-// var i = 0;
-// // get all download button ID and simulate click on it
-// for (i = 0; i < nb_filter; i++) {
-// var id = filter[i][9].split(' ')[1].split('"')[1];
-// jQuery('#' + id).click();
-// }
-// });
-// }
-// _PACS_.setupDownloadStudiesFiltered = function() {
-// jQuery(".dstudies_filter").live('click', function() {
-// // get filtered data
-// var filter = _PACS_.sTable._('tr', {
-// "filter" : "applied"
-// });
-// var nb_filter = filter.length;
-// var i = 0;
-// // get all download button ID and simulate click on it
-// for (i = 0; i < nb_filter; i++) {
-// var id = filter[i][7].split(' ')[1].split('"')[1];
-// jQuery('#' + id).click();
-// }
-// });
-// }
-/**
  * Setup the javascript when document is ready (finshed loading)
  */
 $(document).ready(function() {
-  window.console.log('READY!');
-  // global variable
-  //
-  // caching variables
-  //
-  _PACS_.cacheStatus = {};
-  _PACS_.cacheCount = {};
+  // is study checked?
+  _PACS_.studyStatus = {};
   _PACS_.cache = {};
   _PACS_.cachedData = null;
   _PACS_.status = 0;
-  //
-  // Advanced table
-  //
   _PACS_.sTable = null;
-  // show/hide advanced parameters
   _PACS_.pacsAdvanced();
-  // connect search button to search method
   _PACS_.ajaxSearch();
-  //
-  // _PACS_.ajaxSearch();
-  /*
-   * _PACS_.studySearch(); _PACS_.seriesSearch();
-   */
   _PACS_.studyView();
   _PACS_.seriesView();
-  //
-  // simple mode
-  //
   _PACS_.openStudies = [];
   _PACS_.setupDetailStudy();
-  //
-  // advanced mode
-  //
-  // _PACS_.setupDownloadStudiesFiltered();
-  // _PACS_.setupDownloadSeriesFiltered();
-  //
-  // both modes
-  //
-  // search button pushed
   _PACS_.setupDownloadStudy();
   _PACS_.setupDownloadSeries();
   _PACS_.connectPull();
