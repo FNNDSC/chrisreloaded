@@ -537,6 +537,7 @@ class FeedC implements FeedControllerInterface {
 
     // find the slave feed folders
     $slavefeedSubfolders = scandir($slavefeedDirectory);
+    natcasesort($slavefeedSubfolders);
     // always remove . and ..
     unset($slavefeedSubfolders[0]);
     unset($slavefeedSubfolders[1]);
@@ -569,6 +570,7 @@ class FeedC implements FeedControllerInterface {
 
     // check for the highest subfolder index in the master feed folder
     $masterfeedSubfolders = scandir($masterfeedDirectory);
+    natcasesort($masterfeedSubfolders);
 
     // always remove . and ..
     unset($masterfeedSubfolders[0]);
