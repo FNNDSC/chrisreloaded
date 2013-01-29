@@ -235,7 +235,6 @@ _PACS_.ajaxAdvancedResults = function(data, force) {
       _PACS_.cachedData[1] = _PACS_.jsonConcat(_PACS_.cachedData[1], data[1]);
     }
   }
-  
   // note: Object.keys might not be supported by all browsers
   if (data[0] != null && Object.keys(data[0]).length > 0 && data[1] != null
       && Object.keys(data[1]).length > 0) {
@@ -645,6 +644,102 @@ _PACS_.seriesFormat = function(data) {
   content += '</body></table></div>';
   return content;
 }
+_PACS_.connectPull = function() {
+  jQuery("#PULL").live('click', function(event) {
+    _PACS_.ajaxPull();
+  });
+}
+_PACS_.ajaxPull = function() {
+  // get list to pull fron cache!
+  var list = "";
+  for ( var study_key in _PACS_.cache) {
+    for ( var key in _PACS_.cache[study_key]["Status"]) {
+      if (_PACS_.cache[study_key]["Status"][key]) {
+        list += _PACS_.cache[study_key]["StudyInstanceUID"][key] + ","
+            + _PACS_.cache[study_key]["SeriesInstanceUID"][key] + " ";
+      }
+    }
+  }
+  window.console.log(list);
+  // plugin
+  var plugin = "pacs_pull";
+  // status
+  var status = 0;
+  // output
+  var output = [];
+  var output_container = [];
+  output_container.push({
+    name : 'output',
+    value : '',
+    type : 'simple',
+    target_type : 'feed'
+  });
+  output.push(output_container);
+  // params
+  var param = [];
+  var param_container = [];
+  // create user AETITLE
+  param_container.push({
+    name : 'aet',
+    value : '\\\"'+jQuery("#USER_AET").attr('value')+'\\\"',
+    type : 'string',
+    target_type : 'feed'
+  });
+  // create SERVER IP
+  param_container.push({
+    name : 'serverip',
+    value : '\\\"'+jQuery("#SERVER_IP").attr('value')+'\\\"',
+    type : 'string',
+    target_type : 'feed'
+  });
+  // create SERVER PORT
+  param_container.push({
+    name : 'serverport',
+    value : '\\\"'+jQuery("#SERVER_POR").attr('value')+'\\\"',
+    type : 'string',
+    target_type : 'feed'
+  });
+  // create LIST
+  param_container.push({
+    name : 'listseries',
+    value :'\\\"'+list+'\\\"',
+    type : 'string',
+    target_type : 'feed'
+  });
+  // create SERVER PORT
+  param_container.push({
+    name : 'feedid',
+    value : '\\\"{FEED_ID}\\\"',
+    type : 'string',
+    target_type : 'feed'
+  });
+  // create SERVER PORT
+  param_container.push({
+    name : 'userid',
+    value : '\\\"{USER_ID}\\\"',
+    type : 'string',
+    target_type : 'feed'
+  });
+  param.push(param_container);
+  var _feed_name = (new Date()).toISOString();
+  window.console.log(param);
+  // send to the launcher
+  jQuery.ajax({
+    type : "POST",
+    url : "../../controller/launcher-web.php",
+    dataType : "text",
+    data : {
+      FEED_PLUGIN : plugin,
+      FEED_NAME : _feed_name,
+      FEED_PARAM : param,
+      FEED_STATUS : status,
+      FEED_OUTPUT : output
+    },
+    success : function(data) {
+      window.console.log('Youhou');
+    }
+  });
+}
 /**
  * Setup the download button to only download the series which are remaing after
  * filtering in the advanced mode.
@@ -724,4 +819,5 @@ $(document).ready(function() {
   // search button pushed
   _PACS_.setupDownloadStudy();
   _PACS_.setupDownloadSeries();
+  _PACS_.connectPull();
 });
