@@ -135,12 +135,21 @@ class DataC implements DataControllerInterface {
    */
   static public function getCount($user_id) {
 
-    $dataMapper = new Mapper('Data');
-    $dataMapper->join('User_Data', 'data.id = user_data.data_id');
-    $dataMapper->filter('user_data.user_id=(?)', $user_id);
-    $results = $dataMapper->get();
+    if ($user_id == 0) {
+      
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM data');
+      return $results[0][0][1];
 
-    return count($results['Data']);
+    } else {
+
+      $dataMapper = new Mapper('Data');
+      $dataMapper->join('User_Data', 'data.id = user_data.data_id');
+      $dataMapper->filter('user_data.user_id=(?)', $user_id);
+      $results = $dataMapper->get();
+
+      return count($results['Data']);
+
+    }
 
   }
 

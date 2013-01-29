@@ -489,7 +489,12 @@ class FeedC implements FeedControllerInterface {
    */
   static public function getCount($userid) {
 
-    $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?)',Array($userid));
+    if ($userid == 0) {
+      // special case for the admin
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed');
+    } else {
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?)',Array($userid));  
+    }
 
     return $results[0][0][1];
 
@@ -502,7 +507,12 @@ class FeedC implements FeedControllerInterface {
    */
   static public function getRunningCount($userid) {
 
-    $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?) AND status=(?)',Array($userid,'0'));
+    if ($userid == 0) {
+      // special case for the admin
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE status=(?)',Array('0'));
+    } else {
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?) AND status=(?)',Array($userid,'0'));
+    }
 
     return $results[0][0][1];
 
