@@ -40,7 +40,7 @@ class PACS_Pull(Plugin):
     print Plugin.VERSION
     # if "MRN" provided, split on "white spaces" and loop through them
     if options.MRN:
-      list_mrn = options.MRN.split(" ");
+      list_mrn = options.MRN.strip().split(" ");
       for mrn in list_mrn:
         print mrn
         # process!!
@@ -63,13 +63,12 @@ class PACS_Pull(Plugin):
           print '(see process.log for more information)'
     # else if "LIST_SERIES" provided, loop through them 
     elif options.LIST_SERIES:
-      list_series = options.LIST_SERIES.split(" ");
+      print options.LIST_SERIES
+      list_series = options.LIST_SERIES.strip().split(" ");
       for pair in list_series:
         study, series = pair.split(",");
         # process!!
         print '======================================='
-        print study
-        print series
         print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
         command = current_dir + "/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -o " + options.output + " -d " + study + " -e " + series 
         print 'command:'
