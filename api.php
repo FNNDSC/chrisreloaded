@@ -126,6 +126,11 @@ if (!SecurityC::login()) {
           $result['result'] = DataC::getCount($_SESSION['userid']);
         } else if ($what == 'running') {
           $result['result'] = FeedC::getRunningCount($_SESSION['userid']);
+        } else if ($what == 'datafeedrunning') {
+          $result['result'] = Array();
+          $result['result'][] = DataC::getCount($_SESSION['userid']);
+          $result['result'][] = FeedC::getCount($_SESSION['userid']);
+          $result['result'][] = FeedC::getRunningCount($_SESSION['userid']);
         }
         break;
       case "set":
