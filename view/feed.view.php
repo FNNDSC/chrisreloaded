@@ -118,17 +118,43 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('FAVORITE_TEXT', $favorite_text);
     // set data browser
     $d = new Template('feed_data_browser.html');
-    $d -> replace('FOLDER', joinPaths($username,$object->plugin, $object->name.'-'.$object->id));
+    $feed_folder = joinPaths($username,$object->plugin, $object->name.'-'.$object->id);
+    $feed_subfolders = scandir(CHRIS_USERS.$feed_folder);
+    natcasesort($feed_subfolders);
+
+    // get rid of eventual notes.html or index.html files
+    // find notes.html
+    $notes = array_search('notes.html', $feed_subfolders);
+    if ($notes) {
+      // remove this entry - we don't want to touch it
+      unset($feed_subfolders[$notes]);
+    }
+    // find index.html
+    $index = array_search('index.html', $feed_subfolders);
+    if ($index) {
+      // remove this entry - we don't want to touch it
+      unset($feed_subfolders[$index]);
+    }
+
+    if (count($feed_subfolders) == 3 && $feed_subfolders[2] == '0' && is_dir(CHRIS_USERS.$feed_folder.'/'.$feed_subfolders[2])) {
+      // only one job exists in the output folder, enter it immediately
+      $feed_folder .= '/0';
+    }
+    $d -> replace('FOLDER', $feed_folder);
     $d -> replace('PATIENT_ID', 'fake_patient_id');
     $d -> replace('DATA_ID', 'fake_data_id');
     $t -> replace('DATA_BROWSER', $d);
+
+    // notes
+    $n = new Template('feed_notes.html');
+    $n -> replace('PATH', joinPaths($username,$object->plugin, $object->name.'-'.$object->id, 'notes.html'));
+    $t -> replace('NOTES', $n);
 
     // set html viewer if "index.html" exists in username/plugin/feed-id/
     if(is_file(joinPaths(CHRIS_USERS, $username,$object->plugin, $object->name.'-'.$object->id, 'index.html' ))){
       $t -> replace('FEED_HTML', 'feed_html.html');
       $t -> replace('HTML_VIEWER', joinPaths('api.php?action=get&what=file&parameters=', $username, $object->plugin, $object->name.'-'.$object->id, 'index.html' ));
-    }
-    else{
+    } else{
       $t -> replace('FEED_HTML', '');
     }
 

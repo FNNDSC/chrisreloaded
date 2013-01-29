@@ -59,10 +59,8 @@ foreach($parameters as $k0 => $v0){
     // status, if we don't want to start with status=0
     $launch_command .= '--status=\''.sanitize($_POST['FEED_STATUS']).'\' ';
   }
-  // job id?
-  if(count($parameters) > 1){
-    $launch_command .= '--jobid=\''.$k0.'\' ';
-  }
+  // always provide a job id
+  $launch_command .= '--jobid=\''.$k0.'\' ';
   // plugin name?
   $command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
   // parameters?

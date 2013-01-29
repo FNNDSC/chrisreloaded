@@ -2,7 +2,50 @@
  * Define the FEED namespace
  */
 var _FEED_ = _FEED_ || {};
+_FEED_.preview = function(file) {
+  // grab the file extension
+  var extension = file.split('.').pop().toUpperCase();
+  // support no extensions
+  if (extension == file.toUpperCase()) {
+    // this means no extension
+    extension = '';
+  }
+  switch (extension) {
+  case 'NII':
+  case 'MGH':
+  case 'MGZ':
+  case 'DCM':
+  case 'DICOM':
+  case 'NII':
+  case 'GZ':
+  case 'NRRD':
+    _PREVIEW_.start('2D', 'volume', file);
+    break;
+  case 'TRK':
+    _PREVIEW_.start('3D', 'fibers', file);
+    break;
+  case 'FSM':
+  case 'SMOOTHWM':
+  case 'PIAL':
+  case 'INFLATED':
+  case 'SPHERE':
+  case 'ORIG':
+  case 'VTK':
+  case 'STL':
+    _PREVIEW_.start('3D', 'mesh', file);
+    break;
+  case 'TXT':
+  case 'LOG':
+  case 'ERR':
+  case 'JS':
+  case 'INFO':
+  case 'PARAM':
+    _PREVIEW_.start('text', null, file);
+    break;
+  }
+}
 _FEED_.onclick = function(details, more) {
+
   // generate the file browser on demand, if doesnt exist already
   var _file_browser = details.find('.file_browser');
   // if (_file_browser.is(':empty')) {
@@ -10,50 +53,7 @@ _FEED_.onclick = function(details, more) {
   _file_browser.fileTree({
     root : _folder,
     script : 'controller/feed.browser.connector.php'
-  }, function(file) {
-    // grab the file extension
-    // grab the file extension
-    var extension = file.split('.').pop().toUpperCase();
-    // support no extensions
-    if (extension == file.toUpperCase()) {
-      // this means no extension
-      extension = '';
-    }
-    switch (extension) {
-    case 'NII':
-    case 'MGH':
-    case 'MGZ':
-    case 'DCM':
-    case 'DICOM':
-    case 'NII':
-    case 'GZ':
-    case 'NRRD':
-      _PREVIEW_.start('2D', 'volume', file);
-      break;
-    case 'TRK':
-      _PREVIEW_.start('3D', 'fibers', file);
-      break;
-    case 'FSM':
-    case 'SMOOTHWM':
-    case 'PIAL':
-    case 'INFLATED':
-    case 'SPHERE':
-    case 'ORIG':
-    case 'VTK':
-    case 'STL':
-      _PREVIEW_.start('3D', 'mesh', file);
-      break;
-    case 'TXT':
-    case 'LOG':
-    case 'ERR':
-    case 'JS':
-      _PREVIEW_.start('text', null, file);
-      break;
-    case 'INFO':
-      _PREVIEW_.start('text', null, file);
-      break;
-    }
-  });
+  }, _FEED_.preview);
   // }
   // also create the multi accordion
   // if it doesn't exist
@@ -66,6 +66,7 @@ _FEED_.onclick = function(details, more) {
       active : _last_div_index
     });
   }
+
   // default value for 'force' is false
   if (typeof more == 'undefined') {
     more = false;
@@ -77,15 +78,19 @@ _FEED_.onclick = function(details, more) {
       more.closest('.feed').css('margin-top', '10px');
       more.closest('.feed').css('margin-bottom', '11px');
     }
-    details.show('blind', 'slow');
+    //details.show('blind','slow');
+    details.slideDown('fast');
   } else {
     if (more) {
       more.html('<a>Show details</a>');
       more.closest('.feed').css('margin-top', '-1px');
       more.closest('.feed').css('margin-bottom', '0px');
     }
-    details.hide('blind', 'slow');
+    //details.hide('blind', 'slow');
+    details.slideUp('fast');
+
   }
+
 }
 _FEED_.feed_title_onclick = function() {
   jQuery(document).on('click', '.feed_title', function() {
@@ -279,6 +284,92 @@ _FEED_.updateTime = function() {
       jQuery(this).find('.feed_time').html(day + ' days ago');
     }
   });
+}
+_FEED_.notes_tab_onclick = function() {
+  jQuery(document).on(
+    'click',
+    '.notes_tab',
+    function(e) {
+      
+      var _editor_div = jQuery(this).next();
+
+      if (_editor_div.find('.wysihtml5-toolbar').length == 0) {
+        
+        var _notes_editor = _editor_div.find('.notes_editor');
+        _notes_editor.wysihtml5({
+          "save": true,
+          "events": {
+            "load": _FEED_.editor_loaded
+          }
+        });
+
+// wysihtml5Editor = _notes_editor.data("wysihtml5").editor;
+// wysihtml5Editor.composer.commands.exec("bold");        
+
+      }// else {
+
+        // destroy the text editor
+        // jQuery(this).next().find('.wysihtml5-sandbox').first().remove();
+        // jQuery(this).next().find("iframe.wysihtml5-sandbox, input[name='_wysihtml5_mode']").first().remove();
+        // jQuery(this).next().find('.wysihtml5-toolbar').first().remove();
+        // jQuery(this).next().find(".notes_editor").first().css("display", "block");
+
+      //}
+    });
+}
+_FEED_.editor_loaded = function() {
+
+  var _wysihtml5 = $(this)[0];
+  var _editor = _wysihtml5.composer.element;
+
+  var filename = $(_wysihtml5.textareaElement).parent().attr('data-path');
+  var save_button = $(_wysihtml5.toolbar.container.children[0]).find('a');
+
+  // callback for the save button
+  save_button.on('click', function() {
+
+    var data = _editor.innerHTML;
+
+    jQuery.ajax({
+      type: 'POST',
+      url: 'api.php',
+      data: {
+        action: 'set',
+        what: 'file',
+        parameters: [filename, data]
+      },
+      success: function(data) {
+
+        // reset the button
+        save_button.removeClass('btn-danger');
+
+        // notify the user
+        jQuery().toastmessage(
+            'showSuccessToast',
+            '<h5>Note saved.</h5>');
+
+      }
+    })
+
+  });
+
+  // grab possible existing content and display it
+  jQuery.ajax({
+    type: 'GET',
+    url: 'api.php?action=get&what=file&parameters='+filename,
+    dataType : "text",
+    success : function(data) {
+
+      // display the content
+      _editor.innerHTML = data;
+
+      // register the callbacks for content change
+      _editor.addEventListener("keyup", function() { save_button.addClass('btn-danger'); });
+      _wysihtml5.on("aftercommand:composer", function() { save_button.addClass('btn-danger'); });
+
+    }
+  });
+
 }
 _FEED_.feed_favorite_onclick = function() {
   jQuery(document).on(
@@ -492,6 +583,7 @@ _FEED_.update_onclick = function() {
         _FEED_.updateTime();
         // re-activate draggable for all feed icons
         _FEED_.activateDraggableIcons();
+        _FEED_.activateDroppableIcons();
       });
 }
 _FEED_.scrollBottom = function() {
@@ -522,6 +614,7 @@ _FEED_.scrollBottom = function() {
               _FEED_.updateTime();
               jQuery('.feed_content').bind('scroll');
               _FEED_.activateDraggableIcons();
+              _FEED_.activateDroppableIcons();
             }
           });
         }
@@ -577,6 +670,7 @@ _FEED_.search = function() {
               // jQuery('.feed_sea').find('.feed').addClass('feed_search');
               _FEED_.updateTime();
               _FEED_.activateDraggableIcons();
+              _FEED_.activateDroppableIcons();
             }
           });
         } else {
@@ -613,8 +707,102 @@ _FEED_.activateDraggableIcons = function() {
     opacity : 0.5,
     helper : "clone",
     appendTo : "body",
-    zIndex : 2500
+    zIndex : 2500,
+    start: function(event, ui) {
+
+      // disable all feed dropzones
+      $(".feed").droppable('option','disabled', true)
+
+      // activate dropzones for feeds of the same type
+      // but only if we have a different id so we can't drop on the same feed
+      var _feed_type = $(this).attr('data-type');
+      var _feed_id = $(this).attr('data-chris-feed_id');
+      $(".feed").filter("[data-type='"+_feed_type+"']").filter("[data-chris-feed_id!='"+_feed_id+"']").droppable(
+        'option','disabled', false
+      )
+
+    },
+    stop: function(event, ui) {
+
+      // re-enable all feeds
+      $(".feed").droppable('option','disabled', false);
+
+    }
   });
+}
+_FEED_.activateDroppableIcons = function() {
+  
+  $(".feed").droppable({
+    activeClass: "feed_dropzone_active",
+    hoverClass: "feed_dropzone_hover",          
+    tolerance: "pointer",
+    accept: ":not(.ui-sortable-helper)",
+    activate: function(event, ui) {
+
+    },
+    deactivate: function(event, ui) {
+      
+    },
+    drop: function(event, ui) {
+      
+      var _master_feed_id = $(this).attr('data-chris-feed_id');
+      var _slave_feed_id = $(ui.draggable[0]).attr('data-chris-feed_id');
+
+      // trigger merge request
+      jQuery.ajax({
+        type : "POST",
+        url : "api.php?action=set&what=feed_merge&id=" + _master_feed_id + '&parameters=' + _slave_feed_id,
+        dataType : "json",
+        success : function(data) {
+          if (data['result'] == 'done') {
+            jQuery()
+                .toastmessage(
+                    'showSuccessToast',
+                    '<h5>Feeds merged.</h5>');
+
+            // archive the old feed
+            var _old_feed = jQuery('.feed[data-chris-feed_id='+_slave_feed_id+']');
+            _old_feed.find('.feed_archive').html(
+                              '<i class="icon-plus">');
+            _old_feed.hide('blind', 'slow', function() {
+              _old_feed.remove();
+            });
+
+            // refresh the file browser
+            var _master_feed = jQuery('.feed[data-chris-feed_id='+_master_feed_id+']');
+            var _file_browser = _master_feed.find('.file_browser');
+            // if (_file_browser.is(':empty')) {
+            var _folder = _file_browser.attr('data-folder');
+
+            // here we have to check if this was a folder pointing to /0/ and remove it
+            var _endOfFolder = _folder.substr(_folder.length - 3);
+            if (_endOfFolder == "/0/") {
+              _folder = _folder.substr(0, _folder.length - 2);
+            }
+
+            // re-propagate the new _folder
+            _file_browser.attr('data-folder', _folder);
+
+            _file_browser.fileTree({
+              root : _folder,
+              script : 'controller/feed.browser.connector.php'
+            }, _FEED_.preview);
+
+          } else {
+            jQuery()
+                .toastmessage(
+                    'showErrorToast',
+                    '<h5>Could not merge feeds.</h5>');
+          }
+        }
+      });      
+
+    },
+    over: function(event, ui) {
+
+    }
+  });
+  
 }
 _FEED_.createFeedDetails = function() {
 }
@@ -672,10 +860,43 @@ jQuery(document)
           _FEED_.updateFeedTimeout();
           _FEED_.updateTime();
           _FEED_.activateDraggableIcons();
+          _FEED_.activateDroppableIcons();
+          _FEED_.notes_tab_onclick();
           // show placeholder when there are no feeds
           if (jQuery('#feed_count').html() == "0") {
             jQuery('.feed_empty').show();
           }
           _FEED_.scrollBottom();
           _FEED_.search();
+
+          // also register the check for unsaved notes
+          window.onbeforeunload = function (e) {
+
+              var _unsaved_notes = false;
+
+              // check if notes were not saved yet
+              jQuery('.editor_save_button').each(function(i,v) {
+                if($(v).hasClass('btn-danger')) {
+                  _unsaved_notes = true;
+                } 
+              });
+
+              if (_unsaved_notes) {
+
+                // show a warning
+
+                e = e || window.event;
+
+                // For IE and Firefox prior to version 4
+                if (e) {
+                    e.returnValue = 'Warning: Some notes were not saved yet.';
+                }
+
+                // For Safari
+                return 'Warning: Some notes were not saved yet.';              
+              }
+
+          };          
+
+
         });

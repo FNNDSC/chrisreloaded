@@ -279,3 +279,11 @@
 .feed_fin_header {
    background: #CCFFCC;
 }
+
+.feed_dropzone_active {
+	background-color: #D9E7FE;
+}
+
+.feed_dropzone_hover {
+	background-color: #9CB0D8;
+}

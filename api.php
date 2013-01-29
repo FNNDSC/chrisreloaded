@@ -126,6 +126,11 @@ if (!SecurityC::login()) {
           $result['result'] = DataC::getCount($_SESSION['userid']);
         } else if ($what == 'running') {
           $result['result'] = FeedC::getRunningCount($_SESSION['userid']);
+        } else if ($what == 'datafeedrunning') {
+          $result['result'] = Array();
+          $result['result'][] = DataC::getCount($_SESSION['userid']);
+          $result['result'][] = FeedC::getCount($_SESSION['userid']);
+          $result['result'][] = FeedC::getRunningCount($_SESSION['userid']);
         }
         break;
       case "set":
@@ -137,6 +142,32 @@ if (!SecurityC::login()) {
         }
         else if($what == 'feed_archive'){
           $result['result'] = FeedC::archive($id);
+        }
+        else if($what == 'file') {
+
+          // here we store content to a file
+          $name = joinPaths(CHRIS_USERS, $parameters[0]);
+
+          $fp = fopen($name, 'w');
+
+          fwrite($fp, $parameters[1]);
+          $result['result'] = $name.' written.';
+
+        } else if($what == 'feed_merge') {
+
+          // grab the master id
+          $master_feed_id = $id;
+          // .. and the slave id
+          $slave_feed_id = $parameters;
+
+          // merge the feeds
+          FeedC::mergeFeeds($master_feed_id, $slave_feed_id);
+
+          // and archive the slave
+          FeedC::archive($slave_feed_id);
+
+          $result['result'] = 'done';
+
         }
         break;
       case "get":
@@ -153,6 +184,11 @@ if (!SecurityC::login()) {
 
           // enable cross origin requests
           header("Access-Control-Allow-Origin: *");
+
+          // if the file does not exist, just die
+          if (!is_file($name)) {
+            die();
+          }
 
           $fp = fopen($name, 'rb');
 
@@ -183,6 +219,7 @@ if (!SecurityC::login()) {
   $result['action'] = $action;
   $result['what'] = $what;
   $result['id'] = $id;
+  $result['parameters'] = $parameters;
 
   $result['status'] = 'done';
 
