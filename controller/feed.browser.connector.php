@@ -46,7 +46,7 @@ if( is_dir($path) ) {
       $fullpath = $path . $file;
       if( file_exists($fullpath) && $file != '.' && $file != '..' ) {
         if(is_dir($fullpath)){
-          $t = new Template('feed_data_browser_item.html');
+          $t = new Template('feed_data_browser_directory_item.html');
           $t->replace('CLASSES', 'directory collapsed');
           $t->replace('FULLPATH', $fullpath);
           $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file . '/'));
@@ -56,7 +56,7 @@ if( is_dir($path) ) {
         elseif(is_file($fullpath)){
           $ext = preg_replace('/^.*\./', '', $file);
           
-          $t = new Template('feed_data_browser_item.html');
+          $t = new Template('feed_data_browser_file_item.html');
           $t->replace('CLASSES', 'file ext_'.$ext);
           $t->replace('FULLPATH', $fullpath);
           $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file));

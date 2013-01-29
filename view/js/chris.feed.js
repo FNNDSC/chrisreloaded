@@ -3,6 +3,7 @@
  */
 var _FEED_ = _FEED_ || {};
 _FEED_.preview = function(file) {
+
   // grab the file extension
   var extension = file.split('.').pop().toUpperCase();
   // support no extensions

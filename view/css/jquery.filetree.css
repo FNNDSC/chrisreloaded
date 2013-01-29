@@ -14,21 +14,21 @@ UL.jqueryFileTree LI {
 	white-space: nowrap;
 }
 
-UL.jqueryFileTree A {
+UL.jqueryFileTree .entry {
 	color: #333;
 	text-decoration: none;
 	display: block;
 	padding: 0px 2px;
 }
 
-UL.jqueryFileTree A:hover {
+UL.jqueryFileTree .entry:hover {
 	background: #BDF;
 }
 
 /* Core Styles */
 .jqueryFileTree LI.directory { background: url("../gfx/folder_closed.png") left top no-repeat; }
 .jqueryFileTree LI.expanded { background: url("../gfx/folder_opened.png") left top no-repeat; }
-.jqueryFileTree LI.file { background: url("../gfx/file.png") left top no-repeat; }
+.jqueryFileTree LI.file { cursor: pointer; background: url("../gfx/file.png") left top no-repeat; }
 .jqueryFileTree LI.wait { background: url(../gfx/spinner.gif) left top no-repeat; }
 /* File Extensions*/
 /* .jqueryFileTree LI.ext_3gp { background: url(images/film.png) left top no-repeat; } */

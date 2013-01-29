@@ -193,6 +193,8 @@ if (!SecurityC::login()) {
           $fp = fopen($name, 'rb');
 
           header("Content-Length: " . filesize($name));
+          header("Content-Type: application/octet-stream");
+          header("Content-Disposition: attachment; filename=\"".basename($name)."\"");
 
           fpassthru($fp);
 
