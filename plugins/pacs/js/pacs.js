@@ -114,14 +114,10 @@ _PACS_.ajaxSearch = function() {
         // loop through dates
         var j = 0;
         for (j = 0; j < nb_dates; j++) {
-          window.console.log("i:" + i + " j:" + j);
-          window.console.log("mrns[i]:" + mrns[i] + " dates[j]:" + dates[j]);
           _PACS_.queryDayAll(mrns[i], dates[j], nb_queries);
         }
       } else {
         // no dates loop
-        window.console.log("i:" + i + " j:0");
-        window.console.log("mrns[i]:" + mrns[i] + " dates[0]:" + dates[0]);
         _PACS_.queryDayAll(mrns[i], dates[0], nb_queries);
       }
     }
@@ -131,13 +127,9 @@ _PACS_.ajaxSearch = function() {
       // loop through dates
       var j = 0;
       for (j = 0; j < nb_dates; j++) {
-        window.console.log("i:0 j:" + j);
-        window.console.log("mrns[0]:" + mrns[0] + " dates[j]:" + dates[j]);
         _PACS_.queryDayAll(mrns[0], dates[j], nb_queries);
       }
     } else {
-      window.console.log("i:0 j:0");
-      window.console.log("mrns[0]:" + mrns[0] + " dates[0]:" + dates[0]);
       _PACS_.queryDayAll(mrns[0], dates[0], nb_queries);
     }
   }
@@ -165,9 +157,6 @@ _PACS_.queryDayAll = function(mrn, date, nb_queries) {
       jQuery("#PACS-RESULTS").show('blind', 100);
       // data simple visualization
       _PACS_.ajaxAdvancedResults(data);
-      window.console.log(mrn);
-      window.console.log(date);
-      window.console.log(_PACS_.ajaxStatus);
       _PACS_.ajaxStatus++;
       jQuery("#SEARCH").html(
           '<i class="icon-refresh rotating_class"></i> <span> '
@@ -179,9 +168,6 @@ _PACS_.queryDayAll = function(mrn, date, nb_queries) {
       }
     },
     error : function(xhr, textStatus, error) {
-      window.console.log(xhr);
-      window.console.log(textStatus);
-      window.console.log(error);
       _PACS_.ajaxStatus++;
       jQuery("#SEARCH").html(
           '<i class="icon-refresh rotating_class"></i> <span> '
