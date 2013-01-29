@@ -35,10 +35,7 @@ require_once ('../../config.inc.php');
 // include the template class
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
-require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 
 // validate the credentials
 if (!SecurityC::login()) {
@@ -48,10 +45,14 @@ if (!SecurityC::login()) {
   die("Access denied.");
 }
 
-// create the login page
+// create the pacs query page
 function queryPage() {
-  // create the login page
   $t = new Template('template/pacs.html');
+  $t -> replace('CSS_CHRIS', 'template/css.chris.html');
+  $t -> replace('CSS_PACS', 'template/css.pacs.html');
+  $t -> replace('JS_CHRIS', 'template/js.chris.html');
+  $t -> replace('JS_PACS', 'template/js.pacs.html');
+  $t -> replace('RESULTS', 'template/results.html');
   return $t;
 }
 
