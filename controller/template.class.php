@@ -109,8 +109,10 @@ class Template {
 
     // check if the content is a file
     if (is_file(joinPaths(CHRIS_TEMPLATE_FOLDER,$content))) {
-      // yes, it is
       $content = $this->parse(joinPaths(CHRIS_TEMPLATE_FOLDER,$content));
+    }
+    elseif (is_file($content)){
+      $content = $this->parse($content);
     }
 
     // here the $content is for sure a string
