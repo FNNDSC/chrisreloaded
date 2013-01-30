@@ -107,12 +107,17 @@ class Template {
    */
   public function replace($tag, $content) {
 
-    // check if the content is a file
+    // check if the content is file
+    // do not read png files
     if (is_file(joinPaths(CHRIS_TEMPLATE_FOLDER,$content))) {
-      $content = $this->parse(joinPaths(CHRIS_TEMPLATE_FOLDER,$content));
+      if(pathinfo(joinPaths(CHRIS_TEMPLATE_FOLDER,$content), PATHINFO_EXTENSION) != "png"){
+        $content = $this->parse(joinPaths(CHRIS_TEMPLATE_FOLDER,$content));
+      }
     }
     elseif (is_file($content)){
-      $content = $this->parse($content);
+      if(pathinfo($content, PATHINFO_EXTENSION) != "png"){
+        $content = $this->parse($content);
+      }
     }
 
     // here the $content is for sure a string
