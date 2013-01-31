@@ -36,12 +36,12 @@ class Fyborg( Plugin ):
   def run( self, options ):
     # copy input and dti to one temp folder
     # and run fyborg on it
-    import tempfile, shutil, subprocess
-    tempdir = tempfile.mkdtemp( 'fy', 'borg', '/chb/tmp' )
-    shutil.copytree( options.Freesurfer, tempdir + '/T1' )
-    shutil.copytree( options.Tractography, tempdir + '/DTI' )
+    # import tempfile, shutil, subprocess
+    # tempdir = tempfile.mkdtemp( 'fy', 'borg', '/chb/tmp' )
+    # shutil.copytree( options.Freesurfer, tempdir + '/T1' )
+    # shutil.copytree( options.Tractography, tempdir + '/DTI' )
     cmd = ''
-    cmd += '/chb/arch/scripts/fyborg.py -i ' + tempdir + ' -o ' + options.output + ' -r ' + options.Radius + ' --overwrite --verbose'
+    cmd += '/chb/arch/scripts/fyconn.py -i ' + options.Connectome + ' -o ' + options.output + ' -r ' + options.Radius + ' --overwrite --verbose'
     # sp = subprocess.Popen( ["/bin/bash", "-i", "-c", cmd], stdout=sys.stdout )
     # sp.communicate()
     os.system( cmd );
@@ -49,7 +49,6 @@ class Fyborg( Plugin ):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = Fyborg()
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--freesurfer', action='store', dest='Freesurfer', help='the Freesurfer reconstruction' )
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--tractography', action='store', dest='Tractography', help='the Tractography reconstruction' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--connectome', action='store', dest='Connectome', help='the Connectome folder' )
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--radius', action='store', default=3, dest='Radius', help='the look-around Radius' )
   plugin.launch( sys.argv )
