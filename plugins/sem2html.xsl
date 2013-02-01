@@ -7,6 +7,7 @@
         <xsl:attribute name="id">panel_${PLUGIN_NAME}</xsl:attribute>
         <xsl:attribute name="data-category"><xsl:value-of select="category"/></xsl:attribute>
         <xsl:attribute name="data-status"><xsl:value-of select="@status"/></xsl:attribute>
+        <xsl:attribute name="data-memory"><xsl:value-of select="@memory"/></xsl:attribute>
         <xsl:attribute name="data-executable">${PLUGIN_EXECUTABLE}</xsl:attribute>
         <span>
           <strong><xsl:value-of select="title"/></strong>
