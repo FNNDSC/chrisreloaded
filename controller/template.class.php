@@ -105,21 +105,11 @@ class Template {
    * @param string $tag The tag to replace, f.e. MENU.
    * @param string $content The content to replace the tag with: either a file path or a string.
    */
-  public function replace($tag, $content) {
+  public function replace($tag, $content, $templateDir = CHRIS_TEMPLATE_FOLDER) {
 
-    // check if the content is file
-    // do not read png files
-    if (is_file(joinPaths(CHRIS_TEMPLATE_FOLDER,$content))) {
-      if(pathinfo(joinPaths(CHRIS_TEMPLATE_FOLDER,$content), PATHINFO_EXTENSION) != "png"){
-        $content = $this->parse(joinPaths(CHRIS_TEMPLATE_FOLDER,$content));
-      }
+    if (is_file(joinPaths($templateDir,$content))) {
+      $content = $this->parse(joinPaths($templateDir,$content));
     }
-    elseif (is_file($content)){
-      if(pathinfo($content, PATHINFO_EXTENSION) != "png"){
-        $content = $this->parse($content);
-      }
-    }
-
     // here the $content is for sure a string
     // so we can replace teh ${tag} with the $content
     $this->content = str_replace('${'.$tag.'}', $content, $this->content);

@@ -48,11 +48,11 @@ if (!SecurityC::login()) {
 // create the pacs query page
 function queryPage() {
   $t = new Template('template/pacs.html');
-  $t -> replace('CSS_CHRIS', 'template/css.chris.html');
-  $t -> replace('CSS_PACS', 'template/css.pacs.html');
-  $t -> replace('JS_CHRIS', 'template/js.chris.html');
-  $t -> replace('JS_PACS', 'template/js.pacs.html');
-  $t -> replace('RESULTS', 'template/results.html');
+  $t -> replace('CSS_CHRIS', 'css.chris.html', 'template');
+  $t -> replace('CSS_PACS', 'css.pacs.html', 'template');
+  $t -> replace('JS_CHRIS', 'js.chris.html', 'template');
+  $t -> replace('JS_PACS', 'js.pacs.html', 'template');
+  $t -> replace('RESULTS', 'results.html', 'template');
   return $t;
 }
 
