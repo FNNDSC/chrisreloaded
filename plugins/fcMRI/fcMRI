@@ -34,6 +34,8 @@ class fcMRI( Plugin ):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = fcMRI()
+  # minimum required memory to start the plugin
+  plugin.memory = 16384
   plugin.add_parameter( 'Input Data', Plugin.IMAGE, '--Functional', action='store', dest='Functional', help='Functional fcMRI dataset to convert' )
   plugin.add_parameter( 'Input Data', Plugin.INTEGER, '--Timeseries_to_skip', default = 4, action='store', dest='Timeseries_to_skip', help='Functional 4D time-serie to skip (default 4)' )
   plugin.add_parameter( 'Input Data', Plugin.IMAGE, '--Anatomical', action='store', dest='Anatomical', help='Anatomical 3D volume to convert' )

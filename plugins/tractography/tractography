@@ -106,6 +106,7 @@ class tractography(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = tractography()
+  plugin.memory = 2500
   #inputs
   plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='dti', help='the dti scan')
   
@@ -134,5 +135,5 @@ if __name__ == "__main__":
   plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertx', default=False, action='store_true', dest='invertx', help='Invert X gradient')
   plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--inverty', default=False, action='store_true', dest='inverty', help='Invert Y gradient')
   plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertz', default=False, action='store_true', dest='invertz', help='Invert Z gradient')
-  
+    
   plugin.launch(sys.argv)
