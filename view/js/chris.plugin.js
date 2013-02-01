@@ -394,6 +394,15 @@ jQuery(document)
                   
                 }
                 
+                // check if this plugin has a predefined memory
+                var _memory = 0;
+                var _definedMemory = jQuery(_visible_panel.parent()[0]).attr('data-memory'); 
+                if (_definedMemory) {
+                  
+                  _memory = _definedMemory;
+                  
+                }
+                
                 apprise('<h5>Please name this job!</h5>', {
                   'input': (new Date()).toISOString()
                 },
@@ -412,6 +421,7 @@ jQuery(document)
                             FEED_NAME: _feed_name,
                             FEED_PARAM: _jobs,
                             FEED_STATUS: _status,
+                            FEED_MEMORY: _memory,
                             FEED_OUTPUT: _jobsOutputs
                           },
                           success: function(data) {
