@@ -1,4 +1,3 @@
-#!/usr/bin/php
 <?php
 /**
  *
@@ -26,13 +25,36 @@
  *                        dev@babyMRI.org
  *
  */
-// we define a valid entry point
-if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
-// include the configuration file
-if(!defined('CHRIS_CONFIG_PARSED'))
-  require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
-$options = include('run.php');
-$mosix_command = "ssh ".CLUSTER_USERNAME."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]."  > ".$options["l"]."/chris.log 2> ".$options["l"]."/chris.err < /dev/null & echo $!'";
-echo shell_exec($mosix_command);
+// we define a valid entry point
+define('__CHRIS_ENTRY_POINT__', 666);
+
+// include the configuration
+require_once ('../../config.inc.php');
+
+// include the template class
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
+
+// validate the credentials
+if (!SecurityC::login()) {
+  // invalid credentials
+  // destroy the session
+  session_destroy();
+  die("Access denied.");
+}
+
+// create the pacs query page
+function queryPage() {
+  $t = new Template('template/pacs.html');
+  $t -> replace('CSS_CHRIS', 'css.chris.html', 'template');
+  $t -> replace('CSS_PACS', 'css.pacs.html', 'template');
+  $t -> replace('JS_CHRIS', 'js.chris.html', 'template');
+  $t -> replace('JS_PACS', 'js.pacs.html', 'template');
+  $t -> replace('RESULTS', 'results.html', 'template');
+  return $t;
+}
+
+echo queryPage();
 ?>

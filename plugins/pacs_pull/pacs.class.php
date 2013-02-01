@@ -329,7 +329,9 @@ class PACS implements PACSInterface {
     }
     $resultquery = $this->queryStudy();
 
-    $this->_appendResults($result[0], $resultquery);
+    if(is_array($resultquery)){
+      $this->_appendResults($result[0], $resultquery);
+    }
 
     // loop though studies
     if ($resultquery != null && array_key_exists('StudyInstanceUID',$resultquery))
@@ -343,9 +345,9 @@ class PACS implements PACSInterface {
         $this->addParameter('StudyInstanceUID', $studyvalue);
 
         $resultseries = $this->querySeries();
-
-        $this->_appendResults($result[1], $resultseries);
-
+        if(is_array($resultseries)){
+          $this->_appendResults($result[1], $resultseries);
+        }
         // loop though images
         if ($imageParameters != null && $resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
         {
@@ -359,7 +361,9 @@ class PACS implements PACSInterface {
             $this->addParameter('StudyInstanceUID', $seriesvalue);
             $this->addParameter('SeriesInstanceUID', $resultseries['SeriesInstanceUID'][$j]);
             $resultimage = $this->queryImage();
-            $this->_appendResults($result[2], $resultimage);
+            if(is_array($resultimage)){
+              $this->_appendResults($result[2], $resultimage);
+            }
           }
           ++$j;
         }
@@ -477,7 +481,7 @@ class PACS implements PACSInterface {
     // else, finish splitting and append value to result array
     else{
       $value = split('\]', $tmpsplit[1]);
-      $array[$field][] =  $value[0];
+      $array[$field][] =  $array[$field][] =  utf8_encode($value[0]);
     }
 
     ++$i;
@@ -668,12 +672,15 @@ class PACS implements PACSInterface {
       case "image":
         break;
       case "all":
-        // only filter on studies for now
+        // filter series and studies
         $output = $arrayToFilter[0];
         $output1 = $arrayToFilter[1];
-        if($arrayToFilter[0] != null){
-          // if one study contains the value to be filtered, delete it
+
+        // if one series contains the values to be filtered on
+        if($arrayToFilter[0] != null && $arrayToFilter[1] != null ){
+          // if one series contains the value to be filtered, delete it
           foreach ($arrayFilter as $key => $value){
+
             if(array_key_exists($key, $arrayToFilter[0]) && $value !=""){
               foreach ($arrayToFilter[0][$key] as $key2 => $value2){
                 // should do regex
@@ -694,14 +701,42 @@ class PACS implements PACSInterface {
                 }
               }
             }
-          }
 
-          // clean array indices
-          // in study
+            if(array_key_exists($key, $arrayToFilter[1]) && $value !=""){
+              foreach ($arrayToFilter[1][$key] as $key2 => $value2){
+                // should do regex
+                if(strpos($value2,$value) === false){
+                  // delete this array
+                  foreach ($arrayToFilter[1] as $key3 => $value3){
+                    unset($output1[$key3][$key2]);
+                  }
+                }
+              }
+            }
+          }
+          // if we have studies with NO series, delete them
+          foreach ($arrayToFilter[0]["StudyInstanceUID"] as $key2 => $value2){
+            $index =  array_search($arrayToFilter[0]['StudyInstanceUID'][$key2], $output1['StudyInstanceUID']);
+            // if doesnt exist, delete it
+            if($index === false){
+              foreach ($output as $key4 => $value4){
+                unset($output[$key4][$key2]);
+              }
+            }
+          }
+        }
+
+        // clean array indices
+        // in study
+        if(!empty($output))
+        {
           foreach ($output as $key => $value){
             $output[$key] = array_values($value);
           }
-          // in series
+        }
+        // in series
+        if(!empty($output1))
+        {
           foreach ($output1 as $key => $value){
             $output1[$key] = array_values($value);
           }

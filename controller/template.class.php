@@ -67,12 +67,17 @@ class Template {
 
     // look up if we have the requested template in our view folder
     if (!file_exists($file_path)) {
-
-      throw new Exception('The requested template '.$name.' ('.$file_path.') was not found.');
+      if(!file_exists($name)){
+        throw new Exception('The requested template '.$name.' ('.$file_path.') was not found.');
+      }
+      else{
+        $this->content = file_get_contents($name);
+      }
 
     }
-
-    $this->content = file_get_contents($file_path);
+    else{
+      $this->content = file_get_contents($file_path);
+    }
 
   }
 
@@ -100,14 +105,11 @@ class Template {
    * @param string $tag The tag to replace, f.e. MENU.
    * @param string $content The content to replace the tag with: either a file path or a string.
    */
-  public function replace($tag, $content) {
+  public function replace($tag, $content, $templateDir = CHRIS_TEMPLATE_FOLDER) {
 
-    // check if the content is a file
-    if (is_file(joinPaths(CHRIS_TEMPLATE_FOLDER,$content))) {
-      // yes, it is
-      $content = $this->parse(joinPaths(CHRIS_TEMPLATE_FOLDER,$content));
+    if (is_file(joinPaths($templateDir,$content))) {
+      $content = $this->parse(joinPaths($templateDir,$content));
     }
-
     // here the $content is for sure a string
     // so we can replace teh ${tag} with the $content
     $this->content = str_replace('${'.$tag.'}', $content, $this->content);

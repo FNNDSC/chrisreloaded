@@ -43,6 +43,8 @@ $feed_id = -1;
 // do not assume FEED_PARAM is set
 $parameters = isset($_POST['FEED_PARAM'])?$_POST['FEED_PARAM']:array(0 => "");
 
+print_r($parameters);
+
 foreach($parameters as $k0 => $v0){
 
   // launcher.php compliant
@@ -100,7 +102,6 @@ foreach($parameters as $k0 => $v0){
   $launch_command .= '--command \''.$command.'\' ';
 
   // return output
-  echo $launch_command;
   $feed_id = shell_exec($launch_command);
   echo PHP_EOL.$feed_id.PHP_EOL;
 }
