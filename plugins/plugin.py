@@ -81,11 +81,11 @@ class Plugin( argparse.ArgumentParser ):
     # extra parameters for the executable
     executable_parameters = "";
     if self.status > 0:
-      executable_parameters += ' status=' + str( self.status )
+      executable_parameters += ' status="' + str( self.status ) + '"'
     if self.memory > 0:
-      executable_parameters+= ' memory=' + str( self.memory )
+      executable_parameters+= ' memory="' + str( self.memory ) + '"'
       
-    xml += '<executable' + executable_parameters + '>\n'
+    xml += '<executable ' + executable_parameters + '>\n'
     xml += '<category>' + Plugin.CATEGORY + '</category>\n'
     xml += '<title>' + Plugin.TITLE + '</title>\n'
     xml += '<description>' + Plugin.DESCRIPTION + '</description>\n'
