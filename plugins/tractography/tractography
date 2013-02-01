@@ -47,13 +47,20 @@ class tractography(Plugin):
     # dicom directory
     command += ' -D ' + options.dti
     # get first dicom file
-    files = [d for d in os.listdir(options.dti) if not os.path.isdir(d) and os.path.splitext(d)[1] == '.dcm']
-    if len(files) > 0:
-      command += ' -d ' + files[0]
-    else:
-      print options.dti + ' doesn\'t contain any *.dcm files' 
+    first_file = ""
+    for file in os.listdir(options.dti):
+      filearray = os.path.splitext(file)
+      if not os.path.isdir(file) and filearray[1] == '.dcm' :
+        if first_file > int(filearray[0]):
+          first_file = int(filearray[0])
+        
+    if first_file == "":
+      print "No *.dcm files found in " + options.dti
+      print "Exiting NOW"
       sys.exit(0)
-    
+    else :
+      command += ' -d ' + str(first_file) + '.dcm'
+
     # stages
     command += ' -t 12';
     
@@ -106,7 +113,8 @@ class tractography(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = tractography()
-  plugin.memory = 2500
+  # minimum required memory to start the plugin
+  plugin.memory = 2048
   #inputs
   plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='dti', help='the dti scan')
   
