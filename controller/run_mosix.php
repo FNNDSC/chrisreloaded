@@ -34,7 +34,7 @@ if(!defined('CHRIS_CONFIG_PARSED'))
 
 $options = include('run.php');
 
-$mosix_command = "ssh ".CLUSTER_USERNAME."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b ".$options["c"]."  > ".$options["l"]."/chris.log 2> ".$options["l"]."/chris.err < /dev/null & echo $!'";
+$mosix_command = "ssh ".CLUSTER_USERNAME."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]."  > ".$options["l"]."/chris.log 2> ".$options["l"]."/chris.err < /dev/null & echo $!'";
 
 echo shell_exec($mosix_command);
 ?>

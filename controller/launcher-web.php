@@ -57,6 +57,8 @@ foreach($parameters as $k0 => $v0){
     // status, if we don't want to start with status=0
     $launch_command .= '--status=\''.sanitize($_POST['FEED_STATUS']).'\' ';
   }
+  // status, if we don't want to start with status=0
+  $launch_command .= '--memory=\''.sanitize($_POST['FEED_MEMORY']).'\' ';
   // always provide a job id
   $launch_command .= '--jobid=\''.$k0.'\' ';
   // plugin name?

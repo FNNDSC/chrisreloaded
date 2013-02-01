@@ -48,6 +48,7 @@ $longopts  = array(
     "feedid::",    // Optional value
     "jobid::",    // Optional value
     "status::", // Optional value
+    "memory::", // Optional value
     "help"    // Optional value
 );
 
@@ -124,6 +125,12 @@ if (array_key_exists('status', $options)) {
   $status = $options['status'];
 }
 
+// set the initial memory, if --status is provided, use this value
+$memory = 256;
+if (array_key_exists('memory', $options)) {
+  $memory = $options['memory'];
+}
+
 // create the feed if first batch job
 $feed_id = $options['feedid'];
 if($feed_id == -1){
@@ -161,6 +168,7 @@ FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 
 // run dummy mosix script - should use crun
 $arguments = ' -l '.$job_path;
+$arguments .= ' -m '.$memory;
 $arguments .= ' -c "'.$command.'"';
 // run on cluster and return pid
 $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
