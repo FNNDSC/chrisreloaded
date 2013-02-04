@@ -215,8 +215,7 @@ if ($handle = opendir($study_directory)) {
               // it appears to be 0 and the real instance number
               //$intanceNumber = max($process_file['InstanceNumber']);
               // different naming based on
-              $intanceNumber = $process_file['InstanceNumber'][0];
-              $filename = $datadirname .'/'.$intanceNumber.'.dcm';
+              $filename = $datadirname .'/'.$process_file['InstanceNumber'][0].'-'. $process_file['SOPInstanceUID'][0] . '.dcm';
               if(!is_file($filename)){
                 copy($study_directory.'/'.$entry.'/'.$sub_entry, $filename);
                 $logFile .= 'COPY: '.$filename.PHP_EOL;
