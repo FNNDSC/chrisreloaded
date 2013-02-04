@@ -1,6 +1,6 @@
 <li class="${CLASSES}">
 	<span class='entry' onclick='$(this).children()[0].click();'>
     <a href="#" class="file" data-full-path="${FULLPATH}" rel="${RELATIVEPATH}" style='width:90%'>${FILENAME}</a>
-    <a href="api.php?action=get&what=file&parameters=${RELATIVEPATH}" onclick='var e = arguments[0] || window.event; e.stopPropagation();'><i class='icon-download-alt' title='Download' style='right: 10px;position:absolute;margin-top:2px;'/></a>
+    <a href="api.php?action=download&what=file&parameters=${RELATIVEPATH}" onclick='var e = arguments[0] || window.event; e.stopPropagation();'><i class='icon-download-alt' title='Download' style='right: 10px;position:absolute;margin-top:2px;'/></a>
   </span> 
 </li>

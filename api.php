@@ -192,10 +192,6 @@ if (!SecurityC::login()) {
 
           $fp = fopen($name, 'rb');
 
-          header("Content-Length: " . filesize($name));
-          header("Content-Type: application/octet-stream");
-          header("Content-Disposition: attachment; filename=\"".basename($name)."\"");
-
           fpassthru($fp);
 
           die();
@@ -207,6 +203,31 @@ if (!SecurityC::login()) {
         }
 
         break;
+      case "download":
+        if($what == 'file') {
+
+          // here we don't create JSON but just pass thru the file content
+          $name = joinPaths(CHRIS_USERS, $parameters);
+
+          // enable cross origin requests
+          header("Access-Control-Allow-Origin: *");
+
+          // if the file does not exist, just die
+          if (!is_file($name)) {
+            die();
+          }
+
+          $fp = fopen($name, 'rb');
+
+          header("Content-Length: " . filesize($name));
+          header("Content-Type: application/octet-stream");
+          header("Content-Disposition: attachment; filename=\"".basename($name)."\"");
+
+          fpassthru($fp);
+
+          die();
+
+        }
       case "help":
         $result['result'] = 'Perform actions on ChRIS.. Examples: COUNT: ?action=count&what=feed --- GET: ?action=get&what=feed&id=3 --- All parameters can be GET or POST.';
         break;
