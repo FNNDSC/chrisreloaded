@@ -190,7 +190,7 @@ if(count($mapperResults[$type]) >= 1){
       $study_mapper->filter('study.age >= (?)', $agemin);
       $processLog .= 'agemin: '. $agemin.PHP_EOL;
     }
-    
+
     if(isset($agemax)){
       $study_mapper->filter('study.age <= (?)', $agemax);
       $processLog .= 'agemax: '. $agemax.PHP_EOL;
@@ -205,7 +205,7 @@ if(count($mapperResults[$type]) >= 1){
       $study_mapper->filter('study.date >= (?)', $datemin);
       $processLog .= 'datemin: '. $datemin.PHP_EOL;
     }
-    
+
     if(isset($datemax)){
       $study_mapper->filter('study.date <= (?)', $datemax);
       $processLog .= 'datemax: '. $datemax.PHP_EOL;
@@ -215,34 +215,60 @@ if(count($mapperResults[$type]) >= 1){
     if(count($study_results['Data']) >= 1){
       foreach($study_results['Data'] as $key => $value){
         $processLog .= $study_results['Patient'][$key]->id.PHP_EOL;
-        
+
         // create patient directory
         $fs_location = $study_results['Patient'][$key]->uid.'-'.$study_results['Patient'][$key]->id;
         $patientdir = $output_dir.$fs_location;
-        if(!is_dir($patientdir)){
-          mkdir($patientdir);
-        }
-        
+
         // create study directory
         $fs_location .= '/'.formatStudy($study_results['Study'][$key]->date, $study_results['Study'][$key]->age, $study_results['Study'][$key]->description).'-'.$study_results['Study'][$key]->id;
         $studydir = $output_dir.$fs_location;
-        if(!is_dir($studydir)){
-          mkdir($studydir);
-        }
 
         // create data symlink
         // loop through results and create links
         $processLog .= date('Y-m-d h:i:s').' Creates soft link for Patient'.PHP_EOL;
         // create data soft links
-        $target = CHRIS_DATA.$fs_location.'/'.$value->name.'-'.$value->id;
-        $destination = $studydir.'/'.$value->name.'-'.$value->id;
+        $dataObject->description.'-'.$dataObject->name;
+        $name = '';
+        if(file_exists(CHRIS_DATA.$fs_location.'/'.$value->description.'-'.$value->name.'-'.$value->id))
+        {
+          $name = $value->description.'-'.$value->name.'-'.$value->id;
+        }
+        else if(file_exists(CHRIS_DATA.$fs_location.'/'.$value->name.'-'.$value->id)){
+          // legacy, old dicom listener
+          $name = $value->name.'-'.$value->id;
+        }
         
-        $processLog .= CHRIS_DATA.$fs_location.'/'.$value->name.'-'.$value->id.PHP_EOL;
-        
-        $processLog .= $studydir.'/'.$value->name.'-'.$value->id.PHP_EOL;
-        
-        // create sof link
-        symlink($target, $destination);
+        if($name != ''){
+          if(!is_dir($patientdir)){
+            mkdir($patientdir);
+          }
+
+          if(!is_dir($studydir)){
+            mkdir($studydir);
+          }
+
+          $target = CHRIS_DATA.$fs_location.'/'.$name;
+          $destination = $studydir.'/'.$name;
+
+          $processLog .= CHRIS_DATA.$fs_location.'/'.$name.PHP_EOL;
+          $processLog .= $studydir.'/'.$name.PHP_EOL;
+
+          // create sof link
+          echo $target.PHP_EOL;
+          echo $destination.PHP_EOL;
+          symlink($target, $destination);
+        }
+        else{
+          $message = "Target series doesn't exists".PHP_EOL;
+          $message .= "File System: ".$fs_location.PHP_EOL;
+          $message .= "Description: ".$value->description.PHP_EOL;
+          $message .= "Name: ".$value->name.PHP_EOL;
+          $message .= "Id: ".$value->id.PHP_EOL;
+
+          $processLog .= $message;
+          echo $message;
+        }
       }
     }
 
