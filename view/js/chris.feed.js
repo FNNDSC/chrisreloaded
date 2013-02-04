@@ -40,6 +40,7 @@ _FEED_.preview = function(file) {
   case 'ERR':
   case 'JS':
   case 'INFO':
+  case 'STATUS':
   case 'PARAM':
     _PREVIEW_.start('text', null, file);
     break;
