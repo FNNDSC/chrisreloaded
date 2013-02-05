@@ -132,9 +132,6 @@ _FEED_.activate_feed_name_edit = function(_me, event) {
     var _value = _textbox.val();
     var _feed_id = _me.closest('.feed').attr('data-chris-feed_id');
     
-    if (_old_name == _value)
-      return;
-    
     // call the API
     jQuery.ajax({
       type: 'POST',
