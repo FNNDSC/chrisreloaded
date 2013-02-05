@@ -168,6 +168,10 @@ if (!SecurityC::login()) {
 
           $result['result'] = 'done';
 
+        } else if($what == 'feed_name') {
+
+          $result['result'] = FeedC::updateName($id, $parameters);
+
         }
         break;
       case "get":

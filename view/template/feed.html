@@ -14,7 +14,10 @@
     class="feed_time feed_header_small">Some time ago..</span>
   </div>
   <div class='feed_header_line_two'>
-   <span class='feed_message'>${FEED_META_SIMPLE}</span> <span
+   <span class='feed_name'>${FEED_NAME}</span>
+   <input onclick='var e = arguments[0] || window.event; e.stopPropagation();' class='feed_name_edit' style='display:none;font-size:12px;line-height:12px' type='text' value='${FEED_NAME}'/> 
+   <img class='feed_edit_icon' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png' style='height:12px; opacity:0.6;margin-top:-5px' onclick='_FEED_.activate_feed_name_edit($(this),event)'>
+   <span
     class='feed_more feed_header_small'><a>${MORE}</a></span>
   </div>
  </div>

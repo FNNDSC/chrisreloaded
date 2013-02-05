@@ -124,6 +124,12 @@
 	
 }
 
+.feed_name_edit {
+	font-size: 12px;
+	max-height: 12px;
+	line-height: 12px;
+}
+
 .feed_details {
 	overflow: auto;
 	display: none;
@@ -261,23 +267,23 @@
 }
 
 .feed_sea {
-	 display: none;
+	display: none;
 }
 
 .feed_sea_header {
-   background: #CCFFFF;
+	background: #CCFFFF;
 }
 
 .feed_fav_header {
-   background: #FFFFCC;
+	background: #FFFFCC;
 }
 
 .feed_run_header {
-   background: #FFCCCC;
+	background: #FFCCCC;
 }
 
 .feed_fin_header {
-   background: #CCFFCC;
+	background: #CCFFCC;
 }
 
 .feed_dropzone_active {

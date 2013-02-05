@@ -56,6 +56,8 @@ interface FeedControllerInterface
   static public function getRunningCount($userid);
   // merge two feeds
   static public function mergeFeeds($master_id, $slave_id);
+  // update feed name
+  static public function updateName($id, $name);
 }
 
 /**
@@ -316,6 +318,12 @@ class FeedC implements FeedControllerInterface {
         if(count($metaResult['Meta']) >= 1){
           foreach($metaResult['Meta'] as $k0 => $v0){
             $v0->target_id = $new_id;
+
+            // make sure to properly update the root_id
+            if ($v0->name == 'root_id') {
+              $v0->value = $feed_id;
+            }
+
             Mapper::add($v0);
           }
         }
@@ -493,7 +501,7 @@ class FeedC implements FeedControllerInterface {
       // special case for the admin
       $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed');
     } else {
-      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?)',Array($userid));  
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?)',Array($userid));
     }
 
     return $results[0][0][1];
@@ -627,6 +635,66 @@ class FeedC implements FeedControllerInterface {
       symlink($value, joinPaths($masterfeedDirectory, $highestSubfolderIndex));
 
     }
+  }
+
+  /**
+   * Set the name of a specific feed.
+   *
+   * @param int $id The feed id.
+   * @param string $name The feed name to set.
+   */
+  static public function updateName($id, $name) {
+
+    $username = $_SESSION['username'];
+
+    $safe_name = sanitize($name);
+
+    // rename feed
+    $feedResult = Mapper::getStatic('Feed', $id);
+    $old_name = $feedResult['Feed'][0]->name;
+    $feedResult['Feed'][0]->name = $safe_name;
+    Mapper::update($feedResult['Feed'][0], $id);
+
+    // rename feed folder
+    $old_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $old_name.'-'.$feedResult['Feed'][0]->id);
+    $new_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
+    rename($old_path, $new_path);
+
+
+    // find all shared versions of this feed
+    $metaMapper = new Mapper('Meta');
+    $metaMapper->filter('value = (?)', $id);
+    $metaMapper->filter('name = (?)', 'root_id');
+    $metaMapper->filter('target_id != (?)', $id);
+    $metaResult = $metaMapper->get();
+
+    // adjust all links to the new folder
+    if(count($metaResult['Meta']) >= 1){
+      foreach($metaResult['Meta'] as $key => $value) {
+
+        $feed = Mapper::getStatic('Feed', $value->target_id);
+        $feed = $feed['Feed'][0];
+
+        $user = Mapper::getStatic('User', $feed->user_id);
+        $user = $user['User'][0];
+
+        $link_path = joinPaths(CHRIS_USERS.$user->username, $feed->plugin, $feed->name.'-'.$feed->id);
+
+        // remove old link
+        unlink($link_path);
+        // create new link
+        symlink($new_path, $link_path);
+
+
+      }
+    }
+
+    $results = Array();
+    $results[] = $safe_name;
+    $results[] = joinPaths($username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
+
+    return $results;
+
   }
 
 }

@@ -106,7 +106,7 @@ class FeedV implements ObjectViewInterface {
     }
     $t -> replace('IMAGE_SRC', $feed_gfx64);
     $t -> replace('USERNAME', $username_displayed);
-    $t -> replace('FEED_META_SIMPLE', $object->name);
+    $t -> replace('FEED_NAME', $object->name);
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
     $t -> replace('TIME_FORMATED', $object->time);
     $t -> replace('PLUGIN', ucwords(str_replace('_',' ',$object->plugin)));

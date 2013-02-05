@@ -403,43 +403,30 @@ jQuery(document)
                   
                 }
                 
-                apprise('<h5>Please name this job!</h5>', {
-                  'input': (new Date()).toISOString()
-                },
-                    function(r) {
+                var _feed_name = (new Date()).toISOString();
+                // send to the launcher
+                jQuery.ajax({
+                  type: "POST",
+                  url: "controller/launcher-web.php",
+                  dataType: "text",
+                  data: {
+                    FEED_PLUGIN: _plugin_name,
+                    FEED_NAME: _feed_name,
+                    FEED_PARAM: _jobs,
+                    FEED_STATUS: _status,
+                    FEED_MEMORY: _memory,
+                    FEED_OUTPUT: _jobsOutputs
+                  },
+                  success: function(data) {
 
-                      if (r) {
-                        // 
-                        var _feed_name = r;
-                        // send to the launcher
-                        jQuery.ajax({
-                          type: "POST",
-                          url: "controller/launcher-web.php",
-                          dataType: "text",
-                          data: {
-                            FEED_PLUGIN: _plugin_name,
-                            FEED_NAME: _feed_name,
-                            FEED_PARAM: _jobs,
-                            FEED_STATUS: _status,
-                            FEED_MEMORY: _memory,
-                            FEED_OUTPUT: _jobsOutputs
-                          },
-                          success: function(data) {
+                    jQuery().toastmessage(
+                        'showSuccessToast',
+                        '<h5>Job started.</h5>' + 'Plugin: <b>' +
+                            _plugin_name + '</b><br>' + 'Name: <b>' +
+                            _feed_name + '</b>');
+                  }
+                });
 
-                            jQuery().toastmessage(
-                                'showSuccessToast',
-                                '<h5>Job started.</h5>' + 'Plugin: <b>' +
-                                    _plugin_name + '</b><br>' + 'Name: <b>' +
-                                    _feed_name + '</b>');
-                          }
-                        });
-                      } else {
-                        jQuery().toastmessage(
-                            'showErrorToast',
-                            '<h5>Submission failed.</h5>'
-                                + 'Please enter a name!');
-                      }
-                    });
               });
           jQuery('.panelgroup').multiAccordion({
             heightStyle: "content",
