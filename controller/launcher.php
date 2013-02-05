@@ -126,7 +126,7 @@ if (array_key_exists('status', $options)) {
 }
 
 // set the initial memory, if --status is provided, use this value
-$memory = 256;
+$memory = 2048;
 if (array_key_exists('memory', $options)) {
   $memory = $options['memory'];
 }
