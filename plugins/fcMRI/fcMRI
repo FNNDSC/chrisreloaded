@@ -29,7 +29,7 @@ class fcMRI( Plugin ):
   def run( self, options ):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    os.system('cd ' + options.output +';' + current_dir + '/fcMRI.wrapper '+ options.Functional + ' ' + options.Timeseries_to_skip + ' ' + options.Anatomical + ' ' + options.BET_parameter + ' ' + options.Results_Folder)
+    os.system('cd ' + options.output +';' + current_dir + '/fcMRI.wrapper '+ options.Functional + ' ' + options.Timeseries_to_skip + ' ' + options.Anatomical + ' ' + options.BET_parameter + ' ' + options.Results_Folder + ' ' + options.Number_of_Components)
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -39,4 +39,5 @@ if __name__ == "__main__":
   plugin.add_parameter( 'Input Data', Plugin.IMAGE, '--Anatomical', action='store', dest='Anatomical', help='Anatomical 3D volume to convert' )
   plugin.add_parameter( 'Input Data', Plugin.STRING, '--BET_parameter', default = '0.5', action='store', dest='BET parameter', help='Adjust FSL bet parameter between 0 and 1 (smaller value gives larger brain contour estimate)' )
   plugin.add_parameter( 'Input Data', Plugin.STRING, '--Results_Folder', default = 'ICA_Results', action='store', dest='Results Folder', help='Specify a folder where ICA results are written' )
+  plugin.add_parameter( 'Input Data', Plugin.STRING, '--Number_of_Components', default = 'Automatic', action='store', dest='Number of ICA Components', help='Specify the number of ICA components to extract (the default is recommended, i.e. Automatic Estimation' )
   plugin.launch( sys.argv )
