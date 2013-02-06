@@ -6,8 +6,15 @@
         <!-- attach the id -->
         <xsl:attribute name="id">panel_${PLUGIN_NAME}</xsl:attribute>
         <xsl:attribute name="data-category"><xsl:value-of select="category"/></xsl:attribute>
+        <xsl:attribute name="data-status"><xsl:value-of select="@status"/></xsl:attribute>
+        <xsl:attribute name="data-memory"><xsl:value-of select="@memory"/></xsl:attribute>
         <xsl:attribute name="data-executable">${PLUGIN_EXECUTABLE}</xsl:attribute>
-        <strong><xsl:value-of select="title"/></strong><br/>
+        <span>
+          <strong><xsl:value-of select="title"/></strong>
+          <span style="float:right;line-height:20px;">
+            <xsl:attribute name="id">batch_${PLUGIN_NAME}</xsl:attribute>
+          </span>
+        </span><br/>
         <!-- process the parameters blocks -->
         <div class='panelgroup'>
           <xsl:apply-templates select="parameters"/>
@@ -73,22 +80,42 @@
           <span class='parameter_title' style='width:65px'>
             <xsl:value-of select="label"/>
           </span>
+          <span class='parameter_batchdrop' data-type='batchdrop' style='display:none;'>
+            <xsl:attribute name="data-index"><xsl:value-of select="index"/></xsl:attribute>
+            <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>X
+          </span>
           <span class='parameter_input parameter_dropzone' data-type='dropzone' data-default='Drag and drop here'>
             <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
-            Drag and drop here</span>
+            <xsl:attribute name="data-index"><xsl:value-of select="index"/></xsl:attribute>            
+            Drag and drop here</span>            
         </div>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   
-  <!-- INTEGER/DOUBLE parameter -->
-  <xsl:template match="integer | double">
+  <!-- INTEGER parameter -->
+  <xsl:template match="integer">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
       <xsl:call-template name="create_label"/>
       <span class='parameter_input' data-type='spinner'>
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
         <input class='parameter_spinner'>  
+          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
+          <xsl:attribute name="data-step"><xsl:value-of select="constraints/step"/></xsl:attribute>
+        </input>
+      </span>
+    </div>
+  </xsl:template>
+
+  <!-- DOUBLE parameter -->
+  <xsl:template match="double">
+    <div rel='left_tooltip' class='parameter_row'>
+      <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
+      <xsl:call-template name="create_label"/>
+      <span class='parameter_input' data-type='spinner_double'>
+        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
+        <input class='parameter_spinner_double'>  
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
           <xsl:attribute name="data-step"><xsl:value-of select="constraints/step"/></xsl:attribute>
         </input>
@@ -120,7 +147,7 @@
   </xsl:template>
   
   <!-- STRING parameter -->
-  <xsl:template match="string">
+  <xsl:template match="string | float-vector | integer-vector">
     <div rel='left_tooltip' class='parameter_row'>
       <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
       <span class='parameter_title' style='width:65px;'>
@@ -130,10 +157,30 @@
         <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
         <textarea class='parameter_string'>
           <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>       
-          <xsl:value-of select="default"/>
+          _CHRIS_DEFAULT
         </textarea>
       </span>
     </div>
   </xsl:template>
     
+  <!-- STRING-ENUMERATION parameter -->
+  <xsl:template match="string-enumeration">
+    <div rel='left_tooltip' class='parameter_row'>
+      <xsl:attribute name="title"><xsl:value-of select="description"/></xsl:attribute>          
+      <span class='parameter_title' style='width:85px;'>
+        <xsl:value-of select="label"/>
+      </span>
+      <span class='parameter_input' data-type='combobox'>
+        <xsl:attribute name="data-flag"><xsl:value-of select="longflag"/></xsl:attribute>
+        <select class='parameter_combobox'>
+          <xsl:attribute name="data-default"><xsl:value-of select="default"/></xsl:attribute>
+          <xsl:for-each select="element">
+            <option><xsl:value-of select="."/></option>
+          </xsl:for-each>
+        </select>        
+      </span>
+    </div>
+  </xsl:template>
+      
+  
 </xsl:stylesheet>

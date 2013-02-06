@@ -39,34 +39,71 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 
 // format session variables and post variable into a command line format
-// launcher.php compliant
+$feed_id = -1;
+// do not assume FEED_PARAM is set
+$parameters = isset($_POST['FEED_PARAM'])?$_POST['FEED_PARAM']:array(0 => "");
 
-$launch_command = './launcher.php ';
-// user?
-$launch_command .= '--username=\''.$_SESSION['username'].'\' ';
-// feed name?
-$launch_command .= '--feedname=\''.sanitize($_POST['FEED_NAME']).'\' ';
-// plugin name?
-$command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
-// parameters?
-foreach($_POST['FEED_PARAM'] as $key => $value){
+print_r($parameters);
 
-  if ($value['type'] == 'dropzone' && $value['value'] != '') {
+foreach($parameters as $k0 => $v0){
 
-    $value['value'] = joinPaths(CHRIS_USERS, $value['value']);
-
+  // launcher.php compliant
+  $launch_command = './launcher.php ';
+  // user?
+  $launch_command .= '--username=\''.$_SESSION['username'].'\' ';
+  // feed name?
+  $launch_command .= '--feedname=\''.sanitize($_POST['FEED_NAME']).'\' ';
+  // feed id?
+  $launch_command .= '--feedid=\''.$feed_id.'\' ';
+  if (isset($_POST['FEED_STATUS'])) {
+    // status, if we don't want to start with status=0
+    $launch_command .= '--status=\''.sanitize($_POST['FEED_STATUS']).'\' ';
   }
+  // status, if we don't want to start with status=0
+  $launch_command .= '--memory=\''.sanitize($_POST['FEED_MEMORY']).'\' ';
+  // always provide a job id
+  $launch_command .= '--jobid=\''.$k0.'\' ';
+  // plugin name?
+  $command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
+  // parameters?
+  if(is_array($v0)){
+    foreach($v0 as $key => $value){
 
-  $command .= ' --'.$value['name'].' \"'.$value['value'].'\"';
-}
-// output?
-foreach($_POST['FEED_OUTPUT'] as $key => $value){
-  $command .= ' --'.sanitize($value['name']).' {OUTPUT}/'.sanitize($value['value']);
-}
-$launch_command .= '--command \''.$command.'\' ';
+      if ($value['type'] == 'dropzone' && $value['value'] != '') {
 
-// return output
-echo $launch_command;
-echo shell_exec($launch_command);
+        $value['value'] = joinPaths(CHRIS_USERS, $value['value']);
+
+      }
+
+      if ($value['name']) {
+        // support for parameters without a flag
+        $value['name'] = '--'.$value['name'];
+      }
+
+      $command .= ' '.$value['name'].' '.$value['value'];
+    }
+  }
+  // output?
+  $output = ' {OUTPUT}/';
+
+  if(is_array($_POST['FEED_OUTPUT'])
+      && array_key_exists($k0, $_POST['FEED_OUTPUT'])
+      && is_array($_POST['FEED_OUTPUT'][$k0])){
+    foreach($_POST['FEED_OUTPUT'][$k0] as $key => $value){
+
+      if ($value['name']) {
+        // support for parameters without a flag
+        $value['name'] = '--'.sanitize($value['name']);
+      }
+
+      $command .= ' '.$value['name'].$output.sanitize($value['value']);
+    }
+  }
+  $launch_command .= '--command \''.$command.'\' ';
+
+  // return output
+  $feed_id = shell_exec($launch_command);
+  echo PHP_EOL.$feed_id.PHP_EOL;
+}
 
 ?>

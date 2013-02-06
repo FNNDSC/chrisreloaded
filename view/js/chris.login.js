@@ -15,7 +15,7 @@ jQuery(document).ready(
           
         } else if (_command == 'logged_out') {
           
-          var _goodbye = ['See ya', 'Sayonara', 'Au revoir', 'Auf wiedersehen', 'Vaarwel', 'Adios', 'Joi gin', 'Arrivederci', 'Chao', 'Adeus', 'Doviduvanje'];
+          var _goodbye = ['See ya', 'Sayonara', 'Au revoir', 'Auf wiedersehen', 'Vaarwel', 'Adios', 'Joi gin', 'Arrivederci', 'Chao', 'Adeus', 'Doviduvanje', 'G&uuml;le G&uuml;le'];
           
           
           jQuery().toastmessage('showSuccessToast',

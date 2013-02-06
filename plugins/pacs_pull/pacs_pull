@@ -31,84 +31,71 @@ class PACS_Pull(Plugin):
   Plugin.DESCRIPTION = 'Pull data from your PACS to our ChRIS server.'
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
-  Plugin.VERSION = '0.1'
+  Plugin.VERSION = '0.2'
 
   def run(self, options):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     print Plugin.TITLE
     print Plugin.VERSION
-
-    # preprocess!!
-    print '======================================='
-    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pre_processing...'
-    pre_command = current_dir + "/pre_process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + options.MRN + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
-    print 'command:'
-    print pre_command
-    pre_output = os.system(pre_command)
-    print 'output:'
-    print pre_output
+    # if "MRN" provided, split on "white spaces" and loop through them
+    if options.MRN:
+      list_mrn = options.MRN.strip().split(" ");
+      for mrn in list_mrn:
+        print mrn
+        # process!!
+        print '======================================='
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
+        command = current_dir + "/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + mrn + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -y MR " + " -o " + options.output
+        print 'command:'
+        print command
+        output = os.system(command)
+        print 'output:'
+        print output
     
-    # evaluate pre_processing step
-    if pre_output == 0:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Pre_processing: SUCCESS'
-        print '(see pre_process.log for more information)'
-    else:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Pre_processing: FAILURE'
-        print 'EXIT pacs_pull plugin NOW'
-        print '(see pre_process.log for more information)'
-        return
+        # evaluate processing step
+        if output == 0:
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
+          print '(see process.log for more information)'
+        else:
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
+          print 'EXIT pacs_pull plugin NOW'
+          print '(see process.log for more information)'
+    # else if "LIST_SERIES" provided, loop through them 
+    elif options.LIST_SERIES:
+      print options.LIST_SERIES
+      list_series = options.LIST_SERIES.strip().split(" ");
+      for pair in list_series:
+        study, series = pair.split(",");
+        # process!!
+        print '======================================='
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
+        command = current_dir + "/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -o " + options.output + " -d " + study + " -e " + series 
+        print 'command:'
+        print command
+        output = os.system(command)
+        print 'output:'
+        print output
+    
+        # evaluate processing step
+        if output == 0:
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
+          print '(see process.log for more information)'
+        else:
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
+          print 'EXIT pacs_pull plugin NOW'
+          print '(see process.log for more information)'
+      
+
         
-    # should return 0, if not, an issue occured, do not go to the next step
-
-    # process
-    print '======================================='
-    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
-    pro_command = current_dir + "/process.php -m " + options.MRN + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET  + " -o " + options.output
-    print 'command:'
-    print pro_command
-    pro_output = os.system(pro_command)
-    print 'output:'
-    print pro_output
-    
-    # evaluate processing step
-    if pro_output == 0:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
-        print '(see process.log for more information)'
-    else:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
-        print 'EXIT pacs_pull plugin NOW'
-        print '(see process.log for more information)'
-        return
-    
-    # postprocess
-    print '======================================='
-    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start post_processing...'
-    post_command = current_dir + "/post_process.php -f " + options.FEED_ID + " -o " + options.output
-    print 'command:'
-    print post_command
-    post_output = os.system(post_command)
-    print 'output:'
-    print post_output
-    
-    # evaluate post_processing step
-    if post_output == 0:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Post_processing: SUCCESS'
-        print '(see post_process.log for more information)'
-    else:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Post_processing: FAILURE'
-        print 'EXIT pacs_pull plugin NOW'
-        print '(see post_process.log for more information)'
-        return
-
-
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = PACS_Pull()
-  plugin.add_parameter('Input', Plugin.STRING, '--mrn', action='store', default='MRN', dest='MRN', help='MRN to be pulled')
+  plugin.add_parameter('Input', Plugin.STRING, '--mrn', action='store', dest='MRN', help='MRN to be pulled (mrn1 mrn2 mrn3 etc.)')
   plugin.add_parameter('Input', Plugin.STRING, '--aet', action='store', default='AETITLE', dest='USER_AET', help='User AETitle')
   plugin.add_parameter('Advanced', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')
   plugin.add_parameter('Advanced', Plugin.STRING, '--serverport', action='store', default='104', dest='SERVER_PORT', help='Server Port')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--listseries', action='store', dest='LIST_SERIES', help='Series to be downloaded: "study_uid,series_uid study_uid,series_uid, etc."')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--userid', action='store', default="{USER_ID}", dest='USER_ID', help='User ID')
   plugin.launch(sys.argv)

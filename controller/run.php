@@ -29,6 +29,8 @@
 $shortopts = "";
 // location: from where should the script be started
 $shortopts .= "l:";
+// memory requiered to start a job
+$shortopts .= "m:";
 // command: command to be executed
 $shortopts .= "c:";
 

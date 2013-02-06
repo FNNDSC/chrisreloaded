@@ -44,6 +44,8 @@ SimpleTest_Chris::setPreference();
 // data related models
 require_once ('test.data.model.php');
 require_once ('test.data_patient.model.php');
+require_once ('test.study.model.php');
+require_once ('test.data_study.model.php');
 // user related models
 require_once ('test.user.model.php');
 require_once ('test.user_data.model.php');

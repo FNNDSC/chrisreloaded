@@ -35,8 +35,10 @@ class Plugin( argparse.ArgumentParser ):
   '''
   IMAGE = 'image'
   INTEGER = 'integer'
+  DOUBLE = 'double'
   BOOLEAN = 'boolean'
   STRING = 'string'
+  COMBOBOX = 'string-enumeration'
 
   def __init__( self ):
     '''
@@ -51,6 +53,12 @@ class Plugin( argparse.ArgumentParser ):
     # the custom parameter list
     self.__panels = []
     self.__parameters = []
+
+    # the initial status
+    self.status = 0
+    
+    # the initial memory
+    self.memory = 512
 
   def error( self, message ):
     '''
@@ -69,7 +77,15 @@ class Plugin( argparse.ArgumentParser ):
     plugin.
     '''
     xml = '<?xml version="1.0" encoding="utf-8"?>\n'
-    xml += '<executable>\n'
+
+    # extra parameters for the executable
+    executable_parameters = "";
+    if self.status > 0:
+      executable_parameters += ' status="' + str( self.status ) + '"'
+    if self.memory > 0:
+      executable_parameters+= ' memory="' + str( self.memory ) + '"'
+      
+    xml += '<executable ' + executable_parameters + '>\n'
     xml += '<category>' + Plugin.CATEGORY + '</category>\n'
     xml += '<title>' + Plugin.TITLE + '</title>\n'
     xml += '<description>' + Plugin.DESCRIPTION + '</description>\n'
@@ -112,14 +128,20 @@ class Plugin( argparse.ArgumentParser ):
         xml += '<label>' + parameter[0].replace( '_', ' ' ) + '</label>'
         xml += '<longflag>' + parameter[2] + '</longflag>'
 
+        if p_type == self.DOUBLE:
+          xml += '<constraints><step>0.1</step></constraints>'
+
         if parameter[3]:
           xml += '<default>' + str( parameter[3] ) + '</default>'
-        elif p_type == self.STRING:
-          # we need a default for strings
-          xml += '<default>_CHRIS_DEFAULT</default>'
 
         if parameter[4]:
           xml += '<description>' + str( parameter[4] ) + '</description>'
+
+        if p_type == self.COMBOBOX and parameter[5]:
+          # create element entries
+          for e in parameter[5]:
+            xml += '<element>' + str( e ) + '</element>'
+
         xml += end_tag
 
       xml += '</parameters>\n'
@@ -160,9 +182,15 @@ class Plugin( argparse.ArgumentParser ):
     # grab the flag (required)
     flag = args[0]
 
+    # check if we have values set (for a collection of choices)
+    values = None
+    if 'values' in kwargs:
+      values = kwargs['values']
+      del kwargs['values']
+
     # store the parameter internally
     # (FIFO)
-    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default, _help] )
+    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default, _help, values] )
 
     # add the argument to the parser
     self.add_argument( *args, **kwargs )

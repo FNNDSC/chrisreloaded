@@ -38,8 +38,12 @@ interface UserControllerInterface
 {
   // Get the User ID for a username
   static public function getID($username);
+  // Get all users
+  static public function get();
   // Login
   static public function login($username, $password);
+  // Create new user
+  static public function create($username, $password, $email);
 }
 
 /**
@@ -61,6 +65,28 @@ class UserC implements UserControllerInterface {
     }
 
     return -1;
+  }
+
+  /**
+   * Get all usernames.
+   *
+   * @return array
+   */
+  static public function get() {
+
+    $userMapper = new Mapper('User');
+    $userResults = $userMapper->get();
+
+    $usernames = array();
+
+    foreach ($userResults['User'] as $key => $value) {
+      if ($value->id != 0) {
+        $usernames[] = $value->username;
+      }
+    }
+
+    return $usernames;
+
   }
 
   /**
@@ -91,6 +117,24 @@ class UserC implements UserControllerInterface {
     }
 
     return -1;
+
+  }
+
+  /**
+   * Create a new user.
+   *
+   * @param string $username
+   * @param string $password
+   * @param string $email
+   */
+  static public function create($username, $password, $email) {
+
+    // create user and add it to db
+    $userObject = new User();
+    $userObject->username = $username;
+    $userObject->password = $password;
+    $userObject->email = $email;
+    return Mapper::add($userObject);
 
   }
 

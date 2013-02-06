@@ -43,6 +43,5 @@ SimpleTest_Chris::setPreference();
 // include all the tests
 require_once ('test.db.class.php');
 require_once ('test.mapper.class.php');
-require_once ('test.pacs.class.php');
 
 ?>

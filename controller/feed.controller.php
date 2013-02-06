@@ -54,6 +54,10 @@ interface FeedControllerInterface
   static public function getCount($userid);
   // return the number of running jobs for a user
   static public function getRunningCount($userid);
+  // merge two feeds
+  static public function mergeFeeds($master_id, $slave_id);
+  // update feed name
+  static public function updateName($id, $name);
 }
 
 /**
@@ -81,6 +85,7 @@ class FeedC implements FeedControllerInterface {
     $feedMapper = new Mapper('Feed');
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
+      $feedMapper->filter('archive = (?)', '0');
     }
     // different conditions depending on filter type
     switch ($type){
@@ -151,6 +156,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('time > (?)',$feed_new);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -182,6 +188,7 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('status != (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
@@ -215,12 +222,14 @@ class FeedC implements FeedControllerInterface {
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
     }
+    $feedMapper->filter('archive = (?)', '0');
+    $feedMapper->filter('favorite = (?)', '0');
     $feedMapper->filter('time < (?)',$feed_old);
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
     if(count($feedResult['Feed']) >= 1){
-      // get all feeds which have been created since last upload
+
       foreach ($feedResult['Feed'] as $key => $value) {
         if($nb_feeds >= 0 && $count >= $nb_feeds){
           break;
@@ -273,7 +282,7 @@ class FeedC implements FeedControllerInterface {
     return $feed_update;
   }
 
-  static public function share($feed_id, $ownername, $targetname){
+  static public function share($feed_id, $ownerid, $ownername, $targetname){
     // get target user id
     $userMapper = new Mapper('User');
     $userMapper->filter('username = (?)', $targetname);
@@ -291,7 +300,38 @@ class FeedC implements FeedControllerInterface {
         $feedResult['Feed'][0]->favorite = 0;
         $new_id = Mapper::add($feedResult['Feed'][0]);
 
-        // copy files on file system
+        // get parameters, owner meta information
+        $metaMapper = new Mapper('Meta');
+        // OR confiton between all filters
+        $metaMapper->filter('', '', 0, 'OR');
+        // first filters
+        $metaMapper->filter('name = (?)', 'root_id', 1);
+        $metaMapper->filter('target_id = (?)', $feed_id, 1);
+        $metaMapper->filter('target_type = (?)', 'feed', 1);
+        // second filters
+        $metaMapper->filter('name = (?)', 'parameters', 2);
+        $metaMapper->filter('target_id = (?)', $feed_id, 2);
+        $metaMapper->filter('target_type = (?)', 'feed', 2);
+        // get results
+        $metaResult = $metaMapper->get();
+        // for earch result, create same meta with different target id
+        if(count($metaResult['Meta']) >= 1){
+          foreach($metaResult['Meta'] as $k0 => $v0){
+            $v0->target_id = $new_id;
+
+            // make sure to properly update the root_id
+            if ($v0->name == 'root_id') {
+              $v0->value = $feed_id;
+            }
+
+            Mapper::add($v0);
+          }
+        }
+
+        // add sharer
+        FeedC::addMetaS($new_id, 'sharer_id', (string)$ownerid, 'simple');
+
+        // link files on file system
         $targetDirectory = CHRIS_USERS.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id;
 
         $destinationDirectory = CHRIS_USERS.$targetname.'/'.$feedResult['Feed'][0]->plugin;
@@ -301,9 +341,12 @@ class FeedC implements FeedControllerInterface {
 
         $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
 
-        if(!is_dir($destinationDirectory)){
-          recurse_copy($targetDirectory, $destinationDirectory);
-        }
+        // just a link?
+        symlink($targetDirectory, $destinationDirectory);
+
+        //if(!is_dir($destinationDirectory)){
+        //  recurse_copy($targetDirectory, $destinationDirectory);
+        //}
       }
       else{
         return "Invalid feed id: ". $feed_id;
@@ -356,7 +399,7 @@ class FeedC implements FeedControllerInterface {
 
   }
 
-  static public function setFavorite($feed_id, $favorite="1"){
+  static public function favorite($feed_id){
 
     $feedResult = Mapper::getStatic('Feed', $feed_id);
     $invert = (int)!$feedResult['Feed'][0]->favorite;
@@ -366,7 +409,17 @@ class FeedC implements FeedControllerInterface {
 
   }
 
-  static public function create($user_id, $plugin, $name){
+  static public function archive($feed_id){
+
+    $feedResult = Mapper::getStatic('Feed', $feed_id);
+    $invert = (int)!$feedResult['Feed'][0]->archive;
+    $feedResult['Feed'][0]->archive = $invert;
+    Mapper::update($feedResult['Feed'][0], $feed_id);
+    return $invert;
+
+  }
+
+  static public function create($user_id, $plugin, $name, $status=0){
     // get user id from name or user_id
     //$user_id = FeedC::_GetUserID($user);
 
@@ -376,6 +429,7 @@ class FeedC implements FeedControllerInterface {
     $feedObject->name = $name;
     $feedObject->plugin = $plugin;
     $feedObject->time = microtime(true);
+    $feedObject->status = $status;
     return Mapper::add($feedObject);
     // new data
     /*     $dataObject = new Data();
@@ -443,7 +497,12 @@ class FeedC implements FeedControllerInterface {
    */
   static public function getCount($userid) {
 
-    $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?)',Array($userid));
+    if ($userid == 0) {
+      // special case for the admin
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed');
+    } else {
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?)',Array($userid));
+    }
 
     return $results[0][0][1];
 
@@ -456,9 +515,185 @@ class FeedC implements FeedControllerInterface {
    */
   static public function getRunningCount($userid) {
 
-    $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?) AND status=(?)',Array($userid,'0'));
+    if ($userid == 0) {
+      // special case for the admin
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE status=(?)',Array('0'));
+    } else {
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?) AND status=(?)',Array($userid,'0'));
+    }
 
     return $results[0][0][1];
+
+  }
+
+  /**
+   * Merge a slave feed into a master feed. After merging, the slave feed gets
+   * archived.
+   *
+   * @param int $master_id The master feed id (target for merge).
+   * @param int $slave_id The slave feed id.
+   */
+  static public function mergeFeeds($master_id, $slave_id) {
+
+    $username = $_SESSION['username'];
+
+    // grab the master feed folder
+    $masterfeedMapper = new Mapper('Feed');
+    $masterfeedMapper->filter('id = (?)', $master_id);
+    $masterfeedResult = $masterfeedMapper->get();
+    $masterfeedDirectory = joinPaths(CHRIS_USERS.$username, $masterfeedResult['Feed'][0]->plugin, $masterfeedResult['Feed'][0]->name.'-'.$masterfeedResult['Feed'][0]->id);
+
+    // grab the slave feed folder
+    $slavefeedMapper = new Mapper('Feed');
+    $slavefeedMapper->filter('id = (?)', $slave_id);
+    $slavefeedResult = $slavefeedMapper->get();
+    $slavefeedDirectory = joinPaths(CHRIS_USERS.$username, $slavefeedResult['Feed'][0]->plugin, $slavefeedResult['Feed'][0]->name.'-'.$slavefeedResult['Feed'][0]->id);
+
+    // folders to link
+    $foldersToLink = Array();
+    $highestSubfolderIndex = 0;
+
+    // find the slave feed folders
+    $slavefeedSubfolders = scandir($slavefeedDirectory);
+    natcasesort($slavefeedSubfolders);
+    // always remove . and ..
+    unset($slavefeedSubfolders[0]);
+    unset($slavefeedSubfolders[1]);
+    // find notes.html
+    $notes = array_search('notes.html', $slavefeedSubfolders);
+    if ($notes) {
+      // remove this entry - we don't want to touch it
+      unset($slavefeedSubfolders[$notes]);
+    }
+    // find index.html
+    $index = array_search('index.html', $slavefeedSubfolders);
+    if ($index) {
+      // remove this entry - we don't want to touch it
+      unset($slavefeedSubfolders[$index]);
+    }
+    // if subfolder 0 does not exist, use the current contents without notes.html and index.html as folder 0
+    $folder0 = array_search('0', $slavefeedSubfolders);
+    if (!$folder0) {
+      // only one job exists
+      $foldersToLink[] = $slavefeedDirectory;
+
+    } else {
+      // multiple jobs exist
+      // and $slavefeedSubfolders contains the list
+      // just prepend the slavefeedDirectory
+      foreach($slavefeedSubfolders as $key => $value) {
+        $foldersToLink[] = $slavefeedDirectory.'/'.$value;
+      }
+    }
+
+    // check for the highest subfolder index in the master feed folder
+    $masterfeedSubfolders = scandir($masterfeedDirectory);
+    natcasesort($masterfeedSubfolders);
+
+    // always remove . and ..
+    unset($masterfeedSubfolders[0]);
+    unset($masterfeedSubfolders[1]);
+    // find notes.html
+    $notes = array_search('notes.html', $masterfeedSubfolders);
+    if ($notes) {
+      // remove this entry - we don't want to touch it
+      unset($masterfeedSubfolders[$notes]);
+    }
+    // find index.html
+    $index = array_search('index.html', $masterfeedSubfolders);
+    if ($index) {
+      // remove this entry - we don't want to touch it
+      unset($masterfeedSubfolders[$index]);
+    }
+    // if subfolder 0 does not exist, create folder 0 right now
+    $folder0 = array_search('0', $masterfeedSubfolders);
+    if (!$folder0) {
+
+      // note: this only ensures backwards compatibility
+      // all new feeds after 01/28/2013 should contain folder 0
+
+      // create folder 0
+      mkdir($masterfeedDirectory.'/0');
+
+      // move all content from this feed into the new directory 0
+      foreach($masterfeedSubfolders as $key => $value) {
+        rename(joinPaths($masterfeedDirectory, $value), joinPaths($masterfeedDirectory.'/0', $value));
+      }
+
+    } else {
+      // multiple jobs exist
+
+      // adjust the highest subfolder index
+      $highestSubfolderIndex = end($masterfeedSubfolders);
+
+    }
+
+    // now start linking the foldersToLink into the master feed directory
+    foreach($foldersToLink as $key => $value) {
+      // increase the highestSubfolderIndex
+      $highestSubfolderIndex++;
+      symlink($value, joinPaths($masterfeedDirectory, $highestSubfolderIndex));
+
+    }
+  }
+
+  /**
+   * Set the name of a specific feed.
+   *
+   * @param int $id The feed id.
+   * @param string $name The feed name to set.
+   */
+  static public function updateName($id, $name) {
+
+    $username = $_SESSION['username'];
+
+    $safe_name = sanitize($name);
+
+    // rename feed
+    $feedResult = Mapper::getStatic('Feed', $id);
+    $old_name = $feedResult['Feed'][0]->name;
+    $feedResult['Feed'][0]->name = $safe_name;
+    Mapper::update($feedResult['Feed'][0], $id);
+
+    // rename feed folder
+    $old_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $old_name.'-'.$feedResult['Feed'][0]->id);
+    $new_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
+    rename($old_path, $new_path);
+
+
+    // find all shared versions of this feed
+    $metaMapper = new Mapper('Meta');
+    $metaMapper->filter('value = (?)', $id);
+    $metaMapper->filter('name = (?)', 'root_id');
+    $metaMapper->filter('target_id != (?)', $id);
+    $metaResult = $metaMapper->get();
+
+    // adjust all links to the new folder
+    if(count($metaResult['Meta']) >= 1){
+      foreach($metaResult['Meta'] as $key => $value) {
+
+        $feed = Mapper::getStatic('Feed', $value->target_id);
+        $feed = $feed['Feed'][0];
+
+        $user = Mapper::getStatic('User', $feed->user_id);
+        $user = $user['User'][0];
+
+        $link_path = joinPaths(CHRIS_USERS.$user->username, $feed->plugin, $feed->name.'-'.$feed->id);
+
+        // remove old link
+        unlink($link_path);
+        // create new link
+        symlink($new_path, $link_path);
+
+
+      }
+    }
+
+    $results = Array();
+    $results[] = $safe_name;
+    $results[] = joinPaths($username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
+
+    return $results;
 
   }
 

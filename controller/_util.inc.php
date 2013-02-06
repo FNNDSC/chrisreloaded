@@ -56,10 +56,49 @@ function joinPaths($args) {
  */
 function sanitize($dirty){
 
-  $dangerous_characters = array(' ', '/', '?', '&', '#', '\\', '%', '(', ')', ',', '+', '*');
+  $dangerous_characters = array(' ', '>', '<', '/', '?', '&', '#', '\\', '%', '(', ')', ',', '+', '*', '-', ':', '^');
   $clean = str_replace ($dangerous_characters, '_', $dirty);
 
   return $clean;
+}
+
+/**
+ * Convert number of days into more meaninful description
+ * @param int $raw_age
+ */
+function formatAge($raw_age){
+  $years = intval($raw_age/365.25);
+  if( $years > 0){
+    return sprintf('%03d', $years).'Y';
+  }
+  else{
+    $months = intval($raw_age/30.42);
+    if( $months > 0){
+      return sprintf('%03d', $months).'M';
+    }
+    else{
+      $weeks = intval($raw_age/7);
+      if( $weeks > 0){
+        return sprintf('%03d', $weeks).'W';
+      }
+      else{
+        return sprintf('%03d', $raw_age).'D';
+      }
+    }
+  }
+}
+
+/**
+ * Format study folder name in a consitent manner
+ * @param string $raw_date
+ * @param int $raw_age
+ * @param string $raw_description
+ */
+function formatStudy($raw_date, $raw_age, $raw_description){
+  $date = str_replace('-', '.', $raw_date);
+  $age = formatAge($raw_age);
+  $description = sanitize($raw_description);
+  return $date.'-'.$age.'-'.$description;
 }
 
 /**

@@ -75,8 +75,25 @@ class Feed extends Object {
    */
   public $duration = -1;
   
+  /**
+   * The status of the feed. Goes from 0 to 100.
+   *
+   * @var int $status
+   */
   public $status = 0;
   
+  /**
+   * Is feed marked as favorite
+   *
+   * @var bool $favorite
+   */
   public $favorite = false;
+  
+  /**
+   * Is feed marked as archive
+   *
+   * @var bool $archive
+   */
+  public $archive = false;
 }
 ?>

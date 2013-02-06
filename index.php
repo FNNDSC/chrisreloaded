@@ -85,7 +85,17 @@ if (SecurityC::login_attempt()) {
   // login could be requested using a session or a post request
 
   // perform the login
-  SecurityC::login();
+  if (!SecurityC::login()) {
+
+    // invalid credentials
+
+    // destroy the session
+    session_destroy();
+    // .. and forward to the sorry page
+    header('Location: ?sorry');
+    exit();
+
+  }
 
   // show the homepage
   echo homePage();

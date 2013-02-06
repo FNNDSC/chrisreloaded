@@ -27,10 +27,10 @@
 	padding: 4px;
 	border-top: 1px solid;
 	border-bottom: 1px solid;
-	border-color: #e3e3e3;
+	border-color: #777;
 	display: none;
 	cursor: pointer;
-	background-color: whiteSmoke;
+	background-color: #DFE9FA;
 	text-align: center;
 	font-weight: bold;
 }
@@ -109,7 +109,6 @@
 .feed_status {
 	color: #000;
 	position: relative;
-	margin-left: 180px;
 }
 
 .feed_time {
@@ -123,6 +122,12 @@
 
 .feed_message {
 	
+}
+
+.feed_name_edit {
+	font-size: 12px;
+	max-height: 12px;
+	line-height: 12px;
 }
 
 .feed_details {
@@ -243,6 +248,7 @@
 
 .feed_move {
 	cursor: move;
+	opacity: 0.1;
 }
 
 .feed_search {
@@ -258,4 +264,32 @@
 		to(#8FBC8F) ); /*for webkit browsers*/
 	background: -moz-linear-gradient(top, #F5F5F5, #8FBC8F);
 	/* for firefox 3.6+ */
+}
+
+.feed_sea {
+	display: none;
+}
+
+.feed_sea_header {
+	background: #CCFFFF;
+}
+
+.feed_fav_header {
+	background: #FFFFCC;
+}
+
+.feed_run_header {
+	background: #FFCCCC;
+}
+
+.feed_fin_header {
+	background: #CCFFCC;
+}
+
+.feed_dropzone_active {
+	background-color: #D9E7FE;
+}
+
+.feed_dropzone_hover {
+	background-color: #9CB0D8;
 }

@@ -40,13 +40,13 @@
      </ul>
 
      <!-- PACS PULL -->
-     <textarea id="action_command" placeholder="Action"
+     <!--<textarea id="action_command" placeholder="Action"
       style="width: 100%; height: 19px; overflow: hidden; padding-bottom: 5px; margin-top: 13px; margin-bottom: 0px; margin-left: -7px; max-width: 100%;"></textarea>
      <div id="action_ui">
       <a id='action_run' class="btn btn-warning"
        style="margin-top: 6px; float: right"><i
        class="icon icon-white icon-ok"></i> Run</a> <br> <br>
-     </div>
+     </div>-->
     </div>
 
     ${PLUGIN}
@@ -70,8 +70,7 @@
        value="1" checked> Finished
       </label> <label class="checkbox inline feed_header_small"
        style='padding-top: 0px; margin-top: -5px;'> <input
-       type="checkbox" class="feed_sea_check" style='opacity: 0.6'
-       value="1" checked> Search
+       type="checkbox" class="feed_sea_check" value="0"> Search
       </label> <span class="pull-right" style=''> <input
        class="feed_search_input" type="text" placeholder="Search..."
        style='height: 10px; line-height: 12px; width: 135px; font-size: 11px;'>
@@ -80,7 +79,7 @@
      <!--      <div class="feed_advanced feed_gradient">
       <div></div>
      </div> -->
-     <div class="feed_update feed_gradient"></div>
+     <div class="feed_update feed_dark"></div>
     </div>
    </div>
    <!--    <div class="span12 pull-right" data-spy="affix"
@@ -89,7 +88,7 @@
    <div class="span8 pull-right">
     <div class="feed_content">
      <div class="feed_empty"
-      style="display: none; height: 300px; background-color: white; text-align: center; padding-top: 250px;">No
+      style="display: none; height: 100%; background-color: whiteSmoke; text-align: center; padding-top: 250px;">No
       activity yet.</div>
      ${FEED_ALL}
     </div>

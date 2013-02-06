@@ -27,41 +27,45 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
 $_POST['dir'] = urldecode($_POST['dir']);
 $root = CHRIS_USERS;
+$path = $root . $_POST['dir'];
 
-if( file_exists($root . $_POST['dir']) ) {
-  $files = scandir($root . $_POST['dir']);
+if( is_dir($path) ) {
+  $files = scandir($path);
   natcasesort($files);
   if( count($files) > 2 ) { /* The 2 accounts for . and .. */
+
     echo "<ul class=\"jqueryFileTree\" style=\"display: none;\">";
     // All dirs
     foreach( $files as $file ) {
-      $fullpath = $root . $_POST['dir'] . $file;
-      if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && is_dir($fullpath) ) {
 
-        $t = new Template('feed_data_browser_item.html');
-        $t->replace('CLASSES', 'directory collapsed');
-        $t->replace('FULLPATH', $fullpath);
-        $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file . '/'));
-        $t->replace('FILENAME', htmlentities($file));
-        echo $t;
+      if( $file{0} == '.') {
+        // skip hidden files and folders
+        continue;
+      }
 
+      $fullpath = $path . $file;
+      if( file_exists($fullpath) && $file != '.' && $file != '..' ) {
+        if(is_dir($fullpath)){
+          $t = new Template('feed_data_browser_directory_item.html');
+          $t->replace('CLASSES', 'directory collapsed');
+          $t->replace('FULLPATH', $fullpath);
+          $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file . '/'));
+          $t->replace('FILENAME', htmlentities($file));
+          echo $t;
+        }
+        elseif(is_file($fullpath)){
+          $ext = preg_replace('/^.*\./', '', $file);
+          
+          $t = new Template('feed_data_browser_file_item.html');
+          $t->replace('CLASSES', 'file ext_'.$ext);
+          $t->replace('FULLPATH', $fullpath);
+          $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file));
+          $t->replace('FILENAME', htmlentities($file));
+          echo $t;
+        }
       }
     }
-    // All files
-    foreach( $files as $file ) {
-      $fullpath = $root . $_POST['dir'] . $file;
-      if( file_exists($root . $_POST['dir'] . $file) && $file != '.' && $file != '..' && !is_dir($fullpath) ) {
-        $ext = preg_replace('/^.*\./', '', $file);
 
-        $t = new Template('feed_data_browser_item.html');
-        $t->replace('CLASSES', 'file ext_'.$ext);
-        $t->replace('FULLPATH', $fullpath);
-        $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file));
-        $t->replace('FILENAME', htmlentities($file));
-        echo $t;
-
-      }
-    }
     echo "</ul>";
   }
 }

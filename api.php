@@ -38,6 +38,7 @@ require_once ('config.inc.php');
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
 
 // return values
 $start_time = new DateTime();
@@ -53,9 +54,14 @@ $result = array(
     'parameters' => null,
     'result' => null);
 
-// TODO here the session has to be verified, actually this should happen in _session.inc.php
-// right now, we just check if the session contains a username
-if (!isset($_SESSION['username'])) {
+
+// validate the credentials
+if (!SecurityC::login()) {
+
+  // invalid credentials
+
+  // destroy the session
+  session_destroy();
 
   $result['status'] = 'access denied';
 
@@ -64,7 +70,6 @@ if (!isset($_SESSION['username'])) {
   // propagate user attributes
   $result['username'] = $_SESSION['username'];
   $result['userid'] = $_SESSION['userid'];
-
 
   //
   // API FUNCTIONS
@@ -121,14 +126,52 @@ if (!isset($_SESSION['username'])) {
           $result['result'] = DataC::getCount($_SESSION['userid']);
         } else if ($what == 'running') {
           $result['result'] = FeedC::getRunningCount($_SESSION['userid']);
+        } else if ($what == 'datafeedrunning') {
+          $result['result'] = Array();
+          $result['result'][] = DataC::getCount($_SESSION['userid']);
+          $result['result'][] = FeedC::getCount($_SESSION['userid']);
+          $result['result'][] = FeedC::getRunningCount($_SESSION['userid']);
         }
         break;
       case "set":
         if ($what == 'feed_favorite') {
-          $result['result'] = FeedC::setFavorite($id);
+          $result['result'] = FeedC::favorite($id);
         }
         else if($what == 'feed_share'){
-          $result['result'] = FeedC::share($id, $result['username'], $parameters[0]);
+          $result['result'] = FeedC::share($id, $result['userid'], $result['username'], $parameters[0]);
+        }
+        else if($what == 'feed_archive'){
+          $result['result'] = FeedC::archive($id);
+        }
+        else if($what == 'file') {
+
+          // here we store content to a file
+          $name = joinPaths(CHRIS_USERS, $parameters[0]);
+
+          $fp = fopen($name, 'w');
+
+          fwrite($fp, $parameters[1]);
+          $result['result'] = $name.' written.';
+
+        } else if($what == 'feed_merge') {
+
+          // grab the master id
+          $master_feed_id = $id;
+          // .. and the slave id
+          $slave_feed_id = $parameters;
+
+          // merge the feeds
+          FeedC::mergeFeeds($master_feed_id, $slave_feed_id);
+
+          // and archive the slave
+          FeedC::archive($slave_feed_id);
+
+          $result['result'] = 'done';
+
+        } else if($what == 'feed_name') {
+
+          $result['result'] = FeedC::updateName($id, $parameters);
+
         }
         break;
       case "get":
@@ -136,11 +179,59 @@ if (!isset($_SESSION['username'])) {
           $result['result'] = FeedC::updateClient($_SESSION['userid'], $parameters[0]);
         } else if($what == 'feed_previous'){
           $result['result'] = FeedC::scrollClient($_SESSION['userid'], $parameters[0], 5);
-        }
-        else if($what == 'feed_search'){
+        } else if($what == 'feed_search'){
           $result['result'] = FeedC::searchClient($_SESSION['userid'], $parameters[0]);
+        } else if($what == 'file') {
+
+          // here we don't create JSON but just pass thru the file content
+          $name = joinPaths(CHRIS_USERS, $parameters);
+
+          // enable cross origin requests
+          header("Access-Control-Allow-Origin: *");
+
+          // if the file does not exist, just die
+          if (!is_file($name)) {
+            die();
+          }
+
+          $fp = fopen($name, 'rb');
+
+          fpassthru($fp);
+
+          die();
+
+        } else if($what == 'users') {
+
+          $result['result'] = UserC::get();
+
         }
+
         break;
+      case "download":
+        if($what == 'file') {
+
+          // here we don't create JSON but just pass thru the file content
+          $name = joinPaths(CHRIS_USERS, $parameters);
+
+          // enable cross origin requests
+          header("Access-Control-Allow-Origin: *");
+
+          // if the file does not exist, just die
+          if (!is_file($name)) {
+            die();
+          }
+
+          $fp = fopen($name, 'rb');
+
+          header("Content-Length: " . filesize($name));
+          header("Content-Type: application/octet-stream");
+          header("Content-Disposition: attachment; filename=\"".basename($name)."\"");
+
+          fpassthru($fp);
+
+          die();
+
+        }
       case "help":
         $result['result'] = 'Perform actions on ChRIS.. Examples: COUNT: ?action=count&what=feed --- GET: ?action=get&what=feed&id=3 --- All parameters can be GET or POST.';
         break;
@@ -155,6 +246,7 @@ if (!isset($_SESSION['username'])) {
   $result['action'] = $action;
   $result['what'] = $what;
   $result['id'] = $id;
+  $result['parameters'] = $parameters;
 
   $result['status'] = 'done';
 

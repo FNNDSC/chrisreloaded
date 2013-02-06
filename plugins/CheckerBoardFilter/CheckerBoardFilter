@@ -1,0 +1,12 @@
+EXECUTABLE="CheckerBoardFilter_exec"
+DIR=`dirname $0`
+
+ARGUMENTS=$@
+
+export LD_LIBRARY_PATH=/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2:/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2/cli-modules
+RETURN=`$DIR/$EXECUTABLE $ARGUMENTS`
+
+# now replace the category
+RETURN=`echo $RETURN | awk '{sub("<category>.*</category>","<category>3D Slicer</category>"); print $0}'`
+
+echo $RETURN

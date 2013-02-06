@@ -13,7 +13,7 @@
 }
 
 #cart_categories {
-	height: 20px;
+	height: 23px;
 	line-height: 22px;
 	width: 140px;
 	margin-bottom: 0px;
@@ -186,4 +186,34 @@
 
 .parameter_dropzone_hover {
 	background-color: #9CB0D8;
+}
+
+.batchicon {
+	vertical-align: sub;
+	cursor: pointer;
+}
+
+.parameter_batchdrop {
+	border: solid thin gray;
+	float: right;
+	width: 30px;
+	text-align: center;
+	color: gray;
+	white-space: nowrap;
+	overflow-x: hidden;
+	padding-left: 3px;
+	font-size: 10px;
+	text-overflow: ellipsis;
+	background-color: lightGreen;
+}
+
+.parameter_batchdrop_hover {
+	background-color: seaGreen;
+}
+
+.parameter_combobox {
+	height: 23px;
+	line-height: 22px;
+	width: 140px;
+	font-size: 11px;
 }

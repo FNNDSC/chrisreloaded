@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+${CSS_CHRIS} ${CSS_PACS}
+</head>
+
+<body style='background: url("../../view/gfx/background1.jpg")'>
+
+ <div class="container"
+  style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png);">
+  <div class="tabbable well">
+   <ul class="nav nav-tabs">
+    <li class="active"><a href="#tab0" data-toggle="tab">Retrieve
+      data</a></li>
+    <li><a href="#tab2" data-toggle="tab">Settings</a></li>
+   </ul>
+   <div class="tab-content">
+    <div class="tab-pane active" id="tab0">
+     <div class='row-fluid'>
+      <div class='span12'>
+       <div class='well'>
+        <h2 style="border-bottom: 1px solid; border-color: lightgrey;">Parameters</h2>
+        <form id="pacs_form" class="form-inline">
+         <input id='PACS_MRN' type="text" class="input-small ssearch"
+          placeholder="MRN" value=''> <input id='PACS_NAM'
+          type="text" class="input-small ssearch" placeholder="Name"
+          value=''> <input id='PACS_DAT' type="text"
+          class="input-small ssearch" placeholder="Study Date" value=''>
+
+         <button id="SEARCH" class="btn btn-primary">Query</button>
+         <button id="PULL" class="btn btn-success pull-right">Pull
+          Selection</button>
+         <div id="show_advanced" style="padding-top: 10px;">
+          <i class="icon-chevron-down"></i><b>Advanced parameters</b>
+         </div>
+         <div id="pacs_advanced"
+          style="display: none; padding-top: 10px; margin-bottom: -15px; border-top: 1px solid; border-color: lightgrey;">
+          <form id="pacs_aform" class="form-inline">
+           <input id='PACS_MOD' type="text" class="input-small ssearch"
+            placeholder="Modality" value='MR'> <input
+            id='PACS_PSAET' type="text" class="input-small asearch"
+            placeholder="StationAETitle" value=''> <input
+            id='PACS_STU_DES' type="text" class="input-small ssearch"
+            placeholder="Study Description" value=''> <input
+            id='PACS_SER_DES' type="text" class="input-small ssearch"
+            placeholder="Series Description" value=''>
+          </form>
+         </div>
+        </form>
+
+       </div>
+      </div>
+     </div>
+     ${RESULTS}
+    </div>
+    <div class="tab-pane" id="tab2">
+
+     <div class='row-fluid'>
+      <div class='span6 well'>
+       <h1 style="border-bottom: 1px solid; border-color: lightgrey;">
+        <img src='../../view/gfx/jigsoar-icons/dark/48_download.png'
+         class="img-rounded">Download
+       </h1>
+       <div>
+        IP / Host Name: <input id='SERVER_IP' type="text"
+         value='134.174.12.21' />
+       </div>
+       <div>
+        Port: <input id='SERVER_POR' type="text" value='104' />
+       </div>
+      </div>
+      <div class='span6 well'>
+       <h1 style="border-bottom: 1px solid; border-color: lightgrey;">
+        <img src='../../view/gfx/jigsoar-icons/dark/48_users.png'
+         class="img-rounded"> User
+       </h1>
+       AE Title: <input id='USER_AET' type="text"
+        value='FNNDSC-CHRISTEST'>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ ${JS_CHRIS} ${JS_PACS}
+
+</body>
+</html>

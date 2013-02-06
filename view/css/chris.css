@@ -33,8 +33,7 @@ body,html { /* 	background: url( */
 	border-left: 5px solid black;
 }
 
-@
--moz-keyframes rotate {from { -moz-transform:rotate(0deg);
+@-moz-keyframes rotate {from { -moz-transform:rotate(0deg);
 	
 }
 
@@ -43,8 +42,7 @@ to {
 }
 
 }
-@
--webkit-keyframes rotate {from { -webkit-transform:rotate(0deg);
+@-webkit-keyframes rotate {from { -webkit-transform:rotate(0deg);
 	
 }
 
@@ -53,8 +51,7 @@ to {
 }
 
 }
-@
--ms-keyframes rotate {from { -ms-transform:rotate(0deg);
+@-ms-keyframes rotate {from { -ms-transform:rotate(0deg);
 	
 }
 
@@ -79,7 +76,7 @@ to {
 }
 
 select,textarea,.btn {
-	font-size: 12px;
+	font-size: 10px;
 }
 
 #action_ui {

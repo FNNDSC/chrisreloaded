@@ -7,46 +7,26 @@ _CHRIS_.updateStatistics = function() {
   
   jQuery.ajax({
     type : "GET",
-    url : "api.php?action=count&what=running",
+    url : "api.php?action=count&what=datafeedrunning",
     dataType : "json",
     success : function(data) {
-      
-      // update running count
-      jQuery('#running_count').html(data['result']);
-      
-    }
-  });
-  
-  jQuery.ajax({
-    type : "GET",
-    url : "api.php?action=count&what=feed",
-    dataType : "json",
-    success : function(data) {
-      
-      // update feed count
-      jQuery('#feed_count').html(data['result']);
-      
-    }
-  });
-  
-  jQuery.ajax({
-    type : "GET",
-    url : "api.php?action=count&what=data",
-    dataType : "json",
-    success : function(data) {
-      
+
       // update data count
-      jQuery('#data_count').html(data['result']);
+      jQuery('#data_count').html(data['result'][0]);
+      // update feed count
+      jQuery('#feed_count').html(data['result'][1]);      
+      // update running count
+      jQuery('#running_count').html(data['result'][2]);
       
     }
-  });  
+  });
   
 }
 
 _CHRIS_.scalePanels = function() {
 
   // configure screen size related parameters
-  var _pluginpanelsize = jQuery(window).height()-490;
+  var _pluginpanelsize = jQuery(window).height()-447;
   var _feedcontentsize = jQuery(window).height()-129;  
   
   if (jQuery(window).height() <= 600) {
@@ -113,7 +93,7 @@ jQuery(document).ready(function() {
   });
   
   // activate polling of new statistics
-  setInterval(_CHRIS_.updateStatistics, 1000);
+  setInterval(_CHRIS_.updateStatistics, 5000);
   
 });
 

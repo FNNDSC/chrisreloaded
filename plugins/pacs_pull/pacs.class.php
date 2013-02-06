@@ -25,6 +25,11 @@
  *                        dev@babyMRI.org
  *
  */
+// include the chris configuration
+require_once (dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
+// include the PACS Pull configuration file
+require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/config.php'));
+
 // interface
 interface PACSInterface
 {
@@ -101,7 +106,7 @@ class PACS implements PACSInterface {
    * @var string $movescu
    */
   private $movescu = null;
-  
+
   /**
    * DCMTK EchoSCU binary location.
    *
@@ -137,11 +142,11 @@ class PACS implements PACSInterface {
    * @snippet test.pacs.class.php testPing()
    */
   public function ping($timeout = 5){
-      $command = $this->echoscu.' -to '.$timeout.' ';
+    $command = $this->echoscu.' -to '.$timeout.' ';
 
-      $this->_finishCommand($command);
-      // execute the command, format it into a nice json and return it
-      return $this->_executeAndFormat($command);
+    $this->_finishCommand($command);
+    // execute the command, format it into a nice json and return it
+    return $this->_executeAndFormat($command);
   }
 
   /**
@@ -324,7 +329,9 @@ class PACS implements PACSInterface {
     }
     $resultquery = $this->queryStudy();
 
-    $this->_appendResults($result[0], $resultquery);
+    if(is_array($resultquery)){
+      $this->_appendResults($result[0], $resultquery);
+    }
 
     // loop though studies
     if ($resultquery != null && array_key_exists('StudyInstanceUID',$resultquery))
@@ -338,9 +345,9 @@ class PACS implements PACSInterface {
         $this->addParameter('StudyInstanceUID', $studyvalue);
 
         $resultseries = $this->querySeries();
-
-        $this->_appendResults($result[1], $resultseries);
-
+        if(is_array($resultseries)){
+          $this->_appendResults($result[1], $resultseries);
+        }
         // loop though images
         if ($imageParameters != null && $resultseries != null &&  array_key_exists('StudyInstanceUID',$resultseries))
         {
@@ -354,7 +361,9 @@ class PACS implements PACSInterface {
             $this->addParameter('StudyInstanceUID', $seriesvalue);
             $this->addParameter('SeriesInstanceUID', $resultseries['SeriesInstanceUID'][$j]);
             $resultimage = $this->queryImage();
-            $this->_appendResults($result[2], $resultimage);
+            if(is_array($resultimage)){
+              $this->_appendResults($result[2], $resultimage);
+            }
           }
           ++$j;
         }
@@ -472,7 +481,7 @@ class PACS implements PACSInterface {
     // else, finish splitting and append value to result array
     else{
       $value = split('\]', $tmpsplit[1]);
-      $array[$field][] =  $value[0];
+      $array[$field][] = utf8_encode($value[0]);
     }
 
     ++$i;
@@ -551,7 +560,7 @@ class PACS implements PACSInterface {
       foreach($target['StudyInstanceUID'] as $value){
         $query = $this->movescu;
         $query .= ' --aetitle '.$this->user_aet;
-        $query .= ' --move FNNDSC-CHRISDEV';
+        $query .= ' --move '.DEST_AETITLE;
         $query .= ' --study ';
         $query .= ' -k QueryRetrieveLevel=STUDY';
         $query .= ' -k StudyInstanceUID='.$value;
@@ -561,7 +570,7 @@ class PACS implements PACSInterface {
 
         // execute query
         $output[] = $query;
-        
+
         shell_exec($query);
       }
       return $output;
@@ -584,7 +593,7 @@ class PACS implements PACSInterface {
     {
       $command = $this->movescu.' -S';
       $command .= ' --aetitle '.$this->user_aet;
-      $command .= ' --move '.$this->user_aet;
+      $command .= ' --move '.DEST_AETITLE;
       $command .= ' -k QueryRetrieveLevel=SERIES';
       $command .= ' -k StudyInstanceUID='.$this->command_param['StudyInstanceUID'];
       $command .= ' -k SeriesInstanceUID='.$this->command_param['SeriesInstanceUID'];
@@ -594,9 +603,11 @@ class PACS implements PACSInterface {
 
       // execute query
       $output = shell_exec($command);
-      return $output;
+      return array('command' => $command,
+          'output' => $output);
     }
-    return Array('MoveSeries: Missing parameters (Requieres: StudyInstanceUID, SeriesInstanceUID, User AE Title)');
+    return array('command' => '',
+        'output' => 'MoveSeries: Missing parameters (Requieres: StudyInstanceUID, SeriesInstanceUID, User AE Title)');
   }
 
   // process data once something has been received by the listener
@@ -610,6 +621,13 @@ class PACS implements PACSInterface {
     $requiered_fields .= ' +P ContentTime';
     $requiered_fields .= ' +P InstanceNumber';
     $requiered_fields .= ' +P SeriesDescription';
+
+    // Study Information
+    $requiered_fields .= ' +P Modality';
+    $requiered_fields .= ' +P StudyDescription';
+    $requiered_fields .= ' +P StudyDate';
+    $requiered_fields .= ' +P StationName';
+    $requiered_fields .= ' +P PatientAge';
 
     // Patient information
     $requiered_fields .= ' +P PatientName';
@@ -654,12 +672,15 @@ class PACS implements PACSInterface {
       case "image":
         break;
       case "all":
-        // only filter on studies for now
+        // filter series and studies
         $output = $arrayToFilter[0];
         $output1 = $arrayToFilter[1];
-        if($arrayToFilter[0] != null){
-          // if one study contains the value to be filtered, delete it
+
+        // if one series contains the values to be filtered on
+        if($arrayToFilter[0] != null && $arrayToFilter[1] != null ){
+          // if one series contains the value to be filtered, delete it
           foreach ($arrayFilter as $key => $value){
+
             if(array_key_exists($key, $arrayToFilter[0]) && $value !=""){
               foreach ($arrayToFilter[0][$key] as $key2 => $value2){
                 // should do regex
@@ -680,14 +701,42 @@ class PACS implements PACSInterface {
                 }
               }
             }
-          }
 
-          // clean array indices
-          // in study
+            if(array_key_exists($key, $arrayToFilter[1]) && $value !=""){
+              foreach ($arrayToFilter[1][$key] as $key2 => $value2){
+                // should do regex
+                if(strpos($value2,$value) === false){
+                  // delete this array
+                  foreach ($arrayToFilter[1] as $key3 => $value3){
+                    unset($output1[$key3][$key2]);
+                  }
+                }
+              }
+            }
+          }
+          // if we have studies with NO series, delete them
+          foreach ($arrayToFilter[0]["StudyInstanceUID"] as $key2 => $value2){
+            $index =  array_search($arrayToFilter[0]['StudyInstanceUID'][$key2], $output1['StudyInstanceUID']);
+            // if doesnt exist, delete it
+            if($index === false){
+              foreach ($output as $key4 => $value4){
+                unset($output[$key4][$key2]);
+              }
+            }
+          }
+        }
+
+        // clean array indices
+        // in study
+        if(!empty($output))
+        {
           foreach ($output as $key => $value){
             $output[$key] = array_values($value);
           }
-          // in series
+        }
+        // in series
+        if(!empty($output1))
+        {
           foreach ($output1 as $key => $value){
             $output1[$key] = array_values($value);
           }
@@ -794,39 +843,53 @@ class PACS implements PACSInterface {
         //
         $dataObject->uid = $process_file['SeriesInstanceUID'][0];
         //
-        // get data name (series description)
+        // get data name (protocol name)
+        //
+        if(array_key_exists('ProtocolName',$process_file))
+        {
+          $dataObject->name = sanitize($process_file['ProtocolName'][0]);
+        }
+        else{
+          $dataObject->name = 'NoProtocolName';
+        }
+        //
+        // get data description (series description)
         //
         if(array_key_exists('SeriesDescription',$process_file))
         {
-          $dataObject->name = sanitize($process_file['SeriesDescription'][0]);
+          $dataObject->description = sanitize($process_file['SeriesDescription'][0]);
         }
         else{
-          $dataObject->name = 'NoSeriesDescription';
+          $dataObject->description = 'NoSeriesDescription';
         }
-
-        $series_description = $dataObject->name;
+        $series_description = $dataObject->description.'-'.$dataObject->name;
         //
         // get data time ContentDate-ContentTime
         //
         // date
         $dataObject->time = PACS::getTime($process_file);
-        // get nb of files in data - only accessible through
-        // findscu query
-        /*         $pacs = new PACS(PACS_SERVER, PACS_PORT, CHRIS_AETITLE);
-         $pacs->addParameter('RetrieveAETitle', '');
-        $pacs->addParameter('StudyInstanceUID', $result['StudyInstanceUID'][0]);
-        $pacs->addParameter('SeriesInstanceUID', $result['SeriesInstanceUID'][0]);
-        $pacs->addParameter('NumberOfSeriesRelatedInstances', '');
-        $all_results = $pacs->querySeries();
-        $dataObject->nb_files = $all_results['NumberOfSeriesRelatedInstances'][0]; */
         //
         // add the data model to db and get its id
         //
         $data_chris_id = Mapper::add($dataObject);
       }
       else{
+        // todo: update time and status here...!
+        if($dataResult['Data'][0]->name == ''){
+          if(array_key_exists('ProtocolName',$process_file))
+          {
+            $dataResult['Data'][0]->name = sanitize($process_file['ProtocolName'][0]);
+          }
+          else{
+            $dataResult['Data'][0]->name = 'NoProtocolName';
+          }
+          $series_description = $dataResult['Data'][0]->description.'-'.$dataResult['Data'][0]->name;
+          Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
+        }
+        else{
+          $series_description = $dataResult['Data'][0]->description.'-'.$dataResult['Data'][0]->name;
+        }
         $data_chris_id = $dataResult['Data'][0]->id;
-        $series_description = $dataResult['Data'][0]->name;
       }
     }
     else {
@@ -840,9 +903,110 @@ class PACS implements PACSInterface {
     return 1;
   }
 
+  static public function AddStudy(&$db, &$process_file, &$study_chris_id, &$study_description){
+
+    $db->lock('study', 'WRITE');
+    // Does data exist: SeriesInstanceUID
+    if (array_key_exists('StudyInstanceUID',$process_file))
+    {
+      // does study exist??
+      $studyMapper = new Mapper('Study');
+      $studyMapper->filter('uid = (?)',$process_file['StudyInstanceUID'][0] );
+      $studyResult = $studyMapper->get();
+
+      // if study doesn't exist, create it
+      if(count($studyResult['Study']) == 0)
+      {
+        // create object
+        // create data model
+        $studyObject = new Study();
+        //
+        // get data uid
+        //
+        $studyObject->uid = $process_file['StudyInstanceUID'][0];
+        //
+        // get data name (series description)
+        //
+        if(array_key_exists('StudyDescription',$process_file))
+        {
+          $studyObject->description = sanitize($process_file['StudyDescription'][0]);
+        }
+        else{
+          $studyObject->description = 'NoStudyDescription';
+        }
+
+        if(array_key_exists('Modality',$process_file))
+        {
+          $studyObject->modality = sanitize($process_file['Modality'][0]);
+        }
+        else{
+          $studyObject->modality = 'NoModality';
+        }
+
+        if(array_key_exists('StudyDate',$process_file))
+        {
+          $studyObject->date = PACS::getDate($process_file);
+        }
+
+        $studyObject->age = PACS::getAge($process_file);
+        $studyObject->location = PACS::getLocation($process_file);
+
+        $study_description = formatStudy($studyObject->date, $studyObject->age, $studyObject->description);
+
+        $study_chris_id = Mapper::add($studyObject);
+      }
+      else{
+        // Content to be updated
+        if($studyResult['Study'][0]->age == -1){
+          //
+          // get data name (series description)
+          //
+          if(array_key_exists('StudyDescription',$process_file))
+          {
+            $studyResult['Study'][0]->description = sanitize($process_file['StudyDescription'][0]);
+          }
+          else{
+            $studyResult['Study'][0]->description = 'NoStudyDescription';
+          }
+
+          if(array_key_exists('Modality',$process_file))
+          {
+            $studyResult['Study'][0]->modality = sanitize($process_file['Modality'][0]);
+          }
+          else{
+            $studyResult['Study'][0]->modality = 'NoModality';
+          }
+
+          $studyResult['Study'][0]->date = PACS::getDate($process_file);
+          $studyResult['Study'][0]->age = PACS::getAge($process_file);
+          $studyResult['Study'][0]->location = PACS::getLocation($process_file);
+
+          $study_description = formatStudy($studyResult['Study'][0]->date, $studyResult['Study'][0]->age, $studyResult['Study'][0]->description);
+          $study_chris_id = $studyResult['Study'][0]->id;
+
+          Mapper::update($studyResult['Study'][0], $studyResult['Study'][0]->id);
+        }
+        // Content already up to date
+        else{
+          $study_chris_id = $studyResult['Study'][0]->id;
+          $study_description = formatStudy($studyResult['Study'][0]->date, $studyResult['Study'][0]->age, $studyResult['Study'][0]->description);
+        }
+      }
+    }
+    else {
+      echo 'Study UID not provided in DICOM file'.PHP_EOL;
+      // finish data table lock
+      $db->unlock();
+      return 0;
+    }
+    // finish data table lock
+    $db->unlock();
+    return 1;
+  }
+
   static public function getTime($process_file){
     $date = '';
-    if(array_key_exists('ContentDate',$process_file))
+    if(array_key_exists('ContentDate',$process_file) && strlen($process_file['ContentDate'][0]) == 8)
     {
       $raw_date = $process_file['ContentDate'][0];
       $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
@@ -852,7 +1016,7 @@ class PACS implements PACSInterface {
     }
     //time
     $time = '';
-    if(array_key_exists('ContentTime',$process_file))
+    if(array_key_exists('ContentTime',$process_file) && strlen($process_file['ContentTime'][0]) == 8)
     {
       $raw_time = $process_file['ContentTime'][0];
       $time .=  substr($raw_time, 0, 2).':'.substr($raw_time, 2, 2).':'.substr($raw_time, 4, 2);
@@ -862,6 +1026,47 @@ class PACS implements PACSInterface {
     }
 
     return $date.' '. $time;
+  }
+
+  static public function getDate($process_file){
+    $date = '';
+    if(array_key_exists('StudyDate',$process_file) && strlen($process_file['StudyDate'][0]) == 8)
+    {
+      $raw_date = $process_file['StudyDate'][0];
+      $date .=  substr($raw_date, 0, 4).'-'.substr($raw_date, 4, 2).'-'.substr($raw_date, 6, 2);
+    }
+    else{
+      $date .= '0000-00-00';
+    }
+
+    return $date;
+  }
+
+  static public function getAge($process_file){
+    // should we use PatientAge tag???
+    $age = '0';
+    if(array_key_exists('ContentDate',$process_file) && array_key_exists('PatientBirthDate',$process_file) && strlen($process_file['PatientBirthDate'][0]) == 8)
+    {
+      $raw_bdate = $process_file['PatientBirthDate'][0];
+      $bdate =  new DateTime(substr($raw_bdate, 0, 4).'-'.substr($raw_bdate, 4, 2).'-'.substr($raw_bdate, 6, 2));
+
+      $raw_cdate = $process_file['ContentDate'][0];
+      $cdate =  new DateTime(substr($raw_cdate, 0, 4).'-'.substr($raw_cdate, 4, 2).'-'.substr($raw_cdate, 6, 2));
+
+      $raw_age = $bdate->diff($cdate);
+      $age = $raw_age->days;
+    }
+
+    return $age;
+  }
+
+  static public function getLocation($process_file){
+    $location = 'unknown';
+    if(array_key_exists('StationName',$process_file))
+    {
+      $location = $process_file['StationName'][0];
+    }
+    return $location;
   }
 }
 ?>
