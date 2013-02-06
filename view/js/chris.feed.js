@@ -114,6 +114,9 @@ _FEED_.activate_feed_name_edit = function(_me, event) {
   }
   e.stopPropagation();
   
+  // collapse the feed
+  _me.closest('.feed').find('.feed_details').slideUp('fast');
+
   // hide the label and the edit icon
   // show the textbox
   _me.hide();
@@ -156,11 +159,7 @@ _FEED_.activate_feed_name_edit = function(_me, event) {
         
         // re-propagate the folder
         _file_browser.attr('data-folder', _folder);
-        
-        _file_browser.fileTree({
-          root: _folder,
-          script: 'controller/feed.browser.connector.php'
-        }, _FEED_.preview);
+      
           
         
         // reshow the label and the edit icon
