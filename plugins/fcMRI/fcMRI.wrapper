@@ -63,7 +63,8 @@ echo
 date
 echo "-------------------------------"
 if [$6 != 'Automatic']
-	then melodic -i reg_mas_4D_norm_bet_den_mcf_stc_art_fcmri.nii.gz -o $5 --dim $6 --bgimage=bet_anat.nii.gz --nomask --nobet --Oall --report --debug
+	then 
+	melodic -i reg_mas_4D_norm_bet_den_mcf_stc_art_fcmri.nii.gz -o $5 --dim $6 --bgimage=bet_anat.nii.gz --nomask --nobet --Oall --report --debug
 else
 	melodic -i reg_mas_4D_norm_bet_den_mcf_stc_art_fcmri.nii.gz -o $5 --bgimage=bet_anat.nii.gz --nomask --nobet --Oall --report --debug
 fi
