@@ -161,12 +161,20 @@ if (!SecurityC::login()) {
           $slave_feed_id = $parameters;
 
           // merge the feeds
-          FeedC::mergeFeeds($master_feed_id, $slave_feed_id);
+          $merged = FeedC::mergeFeeds($master_feed_id, $slave_feed_id);
 
-          // and archive the slave
-          FeedC::archive($slave_feed_id);
+          if ($merged) {
+            // and archive the slave
+            FeedC::archive($slave_feed_id);
 
-          $result['result'] = 'done';
+            $result['result'] = 'done';
+
+          } else {
+
+            // feeds not merged since there was a collision
+            $result['result'] = 'error';
+
+          }
 
         } else if($what == 'feed_name') {
 

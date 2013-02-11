@@ -136,10 +136,6 @@ class FeedV implements ObjectViewInterface {
       unset($feed_subfolders[$index]);
     }
 
-    if (count($feed_subfolders) == 3 && $feed_subfolders[2] == '0' && is_dir(CHRIS_USERS.$feed_folder.'/'.$feed_subfolders[2])) {
-      // only one job exists in the output folder, enter it immediately
-      $feed_folder .= '/0';
-    }
     $d -> replace('FOLDER', $feed_folder);
     $d -> replace('PATIENT_ID', 'fake_patient_id');
     $d -> replace('DATA_ID', 'fake_data_id');
