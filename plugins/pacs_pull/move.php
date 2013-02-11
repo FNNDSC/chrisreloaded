@@ -52,43 +52,50 @@ require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 // send email to admin
 // should be more generic to email user after plugins has finished too
 
-function sendEmail(&$patientInfo, &$fullLog){
+function sendEmail(&$patientInfo, &$dataLocation){
   // start email:
-  $begin_email = '=================================================='.PHP_EOL;
-  $begin_email .= 'GENERAL INFORMATION'.PHP_EOL;
-  $begin_email .= '=================================================='.PHP_EOL.PHP_EOL;
-  if(isset($patientInfo)){
-    foreach($patientInfo as $key => $value){
-      $begin_email .= $key.' : '.$value[0].PHP_EOL;
-    }
-  }
-
-  $begin_email .= PHP_EOL.'=================================================='.PHP_EOL;
-  $begin_email .= 'FULL LOG'.PHP_EOL;
-  $begin_email .= '=================================================='.PHP_EOL.PHP_EOL;
+  $message = 'Dear <username>,'.PHP_EOL;
+  $message .= 'You have a new incoming series available at:'.PHP_EOL.PHP_EOL;
+  $message .= 'Output directory: '.$dataLocation.PHP_EOL.PHP_EOL;
   
+  // patient information
+  $message .= '===== Patient ====='.PHP_EOL;
+  $message .= 'ID: '.$patientInfo['PatientID'][0].PHP_EOL;
+  $message .= 'Name: '.$patientInfo['PatientName'][0].PHP_EOL;
+  $message .= 'Sex: '.$patientInfo['PatientSex'][0].PHP_EOL;
+  $message .= 'BirthDate: '.$patientInfo['PatientBirthDate'][0].PHP_EOL.PHP_EOL;
+  
+  // patient information
+  $message .= '===== Data ====='.PHP_EOL;
+  $message .= 'Study Date: '.$patientInfo['StudyDate'][0].PHP_EOL;
+  $message .= 'Study Description: '.$patientInfo['StudyDescription'][0].PHP_EOL;
+  $message .= 'Series Description: '.$patientInfo['SeriesDescription'][0].PHP_EOL;
+  $message .= 'Protocol: '.$patientInfo['ProtocolName'][0].PHP_EOL;
+  $message .= 'Station: '.$patientInfo['StationName'][0].PHP_EOL.PHP_EOL.PHP_EOL;
+  
+  $message .= "Thank you for using ChRIS,";
+
   // output
   // email admins
   $command = joinPaths(CHRIS_PLUGINS_FOLDER, 'mail/mail');
   $command .= ' --output ' . CHRIS_LOG;
   $command .= ' --to ' . CHRIS_DICOM_EMAIL_TO;
   $command .= ' --from ' . CHRIS_DICOM_EMAIL_FROM;
-  $command .= ' --subj "New Dicom Series Have arrived"';
-  $command .= ' --msg "'.$begin_email.$fullLog.'"' ;
-  $output = PHP_EOL.'output: '.PHP_EOL.shell_exec($command);
+  $command .= ' --subj "New Dicom Series has been received"';
+  $command .= ' --msg "'.$message.'"' ;
+
+  shell_exec($command);
 
   // mv output/mail.log
   // to output/date-mail.log
   $old_name = joinPaths(CHRIS_LOG,'mail.log');
-  $new_name = joinPaths(CHRIS_LOG,date('Ymdhis').'-mail.log');
+  $new_name = joinPaths(CHRIS_LOG,date('YmdHis').'-mail.log');
   while(!file_exists($new_name)){
     if(rename($old_name, $new_name)){
       break;
     }
-    $new_name = joinPaths(CHRIS_PLUGINS_FOLDER,date('Ymdhis').'-mail.log');
+    $new_name = joinPaths(CHRIS_LOG,date('YmdHis').'-mail.log');
   }
-  
-  $fullLog = PHP_EOL.$command.PHP_EOL.$output.PHP_EOL;
 }
 
 // main function
@@ -290,13 +297,13 @@ if ($handle = opendir($study_directory)) {
 
               // delete file
               $logFile .= 'delete: '.$study_directory.'/'.$entry.'/'.$sub_entry.PHP_EOL;
-              unlink($study_directory.'/'.$entry.'/'.$sub_entry);
+              //unlink($study_directory.'/'.$entry.'/'.$sub_entry);
             }
           }
           closedir($sub_handle);
           // delete directory
           $logFile .= 'delete: '.$study_directory.'/'.$entry.PHP_EOL;
-          rmdir($study_directory.'/'.$entry);
+          //rmdir($study_directory.'/'.$entry);
         }
       }
     }
@@ -304,7 +311,7 @@ if ($handle = opendir($study_directory)) {
   closedir($handle);
   // delete directory
   $logFile .= 'delete: '.$study_directory.PHP_EOL;
-  rmdir($study_directory);
+  //rmdir($study_directory);
 }
 
 // add warning if we didn't receive all the expected files
@@ -328,7 +335,7 @@ foreach($received as $key => $value){
   }
 }
 
-sendEmail(&$process_file, &$logFile);
+sendEmail($process_file, $datadirname);
 
 echo $logFile;
 
