@@ -75,12 +75,12 @@ foreach($parameters as $k0 => $v0){
 
         if (!$parentFolder) {
 
-          // no parent folder set yet, so let's grab this one
+          // no parent folder set yet, so let's grab this value
           if (is_dir($value['value'])) {
             // this is already the directory
-            $parentFolder = basename($value['value']);
+            $parentFolder = $value['value'];
           } else {
-            $parentFolder = basename(dirname($value['value']));
+            $parentFolder = dirname($value['value']);
           }
 
         }
@@ -102,8 +102,50 @@ foreach($parameters as $k0 => $v0){
   // b) information parsed from a 0.info file of the first dropzone
   // if there is no dropzone
   // c) the current timestamp
-  $subfoldertail = $parentFolder;
-  if (!$parentFolder) {
+  $subfoldertail = "";
+  if ($parentFolder) {
+
+    // check for a 0.info in the $parentFolder
+    $info_file = joinPaths($parentFolder,'0.info');
+
+    if (is_file($info_file)) {
+
+      // case b)
+
+      $patientId = "";
+      $patientAge = "";
+      $patientSex = "";
+
+      // found one, let's parse it
+      $file_handle = fopen($info_file, "r");
+      while (!feof($file_handle)) {
+        $line = fgets($file_handle);
+
+        // split the line at :
+        $arr = explode(":", $line);
+
+        if (trim($arr[0]) == "PatientID") {
+          $patientId = trim($arr[1]);
+        } else if (trim($arr[0]) == "PatientAge") {
+          $patientAge = trim($arr[1]);
+        } else if (trim($arr[0]) == "PatientSex") {
+          $patientSex = trim($arr[1]);
+        }
+
+      }
+      fclose($file_handle);
+
+      $subfoldertail = sanitize($patientId)."-".sanitize($patientAge)."-".sanitize($patientSex);
+
+    } else {
+
+      // there is no 0.info file -> case a)
+      $subfoldertail = basename($parentFolder);
+
+    }
+
+
+  } else {
     // no parent folder set yet, this is case c)
     $subfoldertail = date('Y-m-d-H-i-s');
   }
