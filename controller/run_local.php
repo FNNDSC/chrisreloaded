@@ -34,5 +34,9 @@ if(!defined('CHRIS_CONFIG_PARSED'))
 
 $options = include('run.php');
 
-echo 'NOT_IMPLEMENTED';
+// run without any cluster scheduler
+$local_command = $options["c"]."  > ".$options["l"]."/chris.log 2> ".$options["l"]."/chris.err < /dev/null & echo $!";
+
+echo shell_exec($local_command);
+
 ?>
