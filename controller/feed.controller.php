@@ -549,9 +549,6 @@ class FeedC implements FeedControllerInterface {
     $slavefeedResult = $slavefeedMapper->get();
     $slavefeedDirectory = joinPaths(CHRIS_USERS.$username, $slavefeedResult['Feed'][0]->plugin, $slavefeedResult['Feed'][0]->name.'-'.$slavefeedResult['Feed'][0]->id);
 
-    // folders to link
-    $foldersToLink = Array();
-    $highestSubfolderIndex = 0;
 
     // find the slave feed folders
     $slavefeedSubfolders = scandir($slavefeedDirectory);
@@ -571,70 +568,28 @@ class FeedC implements FeedControllerInterface {
       // remove this entry - we don't want to touch it
       unset($slavefeedSubfolders[$index]);
     }
-    // if subfolder 0 does not exist, use the current contents without notes.html and index.html as folder 0
-    $folder0 = array_search('0', $slavefeedSubfolders);
-    if (!$folder0) {
-      // only one job exists
-      $foldersToLink[] = $slavefeedDirectory;
 
-    } else {
-      // multiple jobs exist
-      // and $slavefeedSubfolders contains the list
-      // just prepend the slavefeedDirectory
-      foreach($slavefeedSubfolders as $key => $value) {
-        $foldersToLink[] = $slavefeedDirectory.'/'.$value;
-      }
-    }
+    // check for possible collisions
+    foreach($slavefeedSubfolders as $key => $value) {
 
-    // check for the highest subfolder index in the master feed folder
-    $masterfeedSubfolders = scandir($masterfeedDirectory);
-    natcasesort($masterfeedSubfolders);
+      if (file_exists($masterfeedDirectory.'/'.$value)) {
 
-    // always remove . and ..
-    unset($masterfeedSubfolders[0]);
-    unset($masterfeedSubfolders[1]);
-    // find notes.html
-    $notes = array_search('notes.html', $masterfeedSubfolders);
-    if ($notes) {
-      // remove this entry - we don't want to touch it
-      unset($masterfeedSubfolders[$notes]);
-    }
-    // find index.html
-    $index = array_search('index.html', $masterfeedSubfolders);
-    if ($index) {
-      // remove this entry - we don't want to touch it
-      unset($masterfeedSubfolders[$index]);
-    }
-    // if subfolder 0 does not exist, create folder 0 right now
-    $folder0 = array_search('0', $masterfeedSubfolders);
-    if (!$folder0) {
+        // uh-oh! collision!
+        return false;
 
-      // note: this only ensures backwards compatibility
-      // all new feeds after 01/28/2013 should contain folder 0
-
-      // create folder 0
-      mkdir($masterfeedDirectory.'/0');
-
-      // move all content from this feed into the new directory 0
-      foreach($masterfeedSubfolders as $key => $value) {
-        rename(joinPaths($masterfeedDirectory, $value), joinPaths($masterfeedDirectory.'/0', $value));
       }
 
-    } else {
-      // multiple jobs exist
+    }
 
-      // adjust the highest subfolder index
-      $highestSubfolderIndex = end($masterfeedSubfolders);
+    // link all job directories of the slave in the master folder
+    foreach($slavefeedSubfolders as $key => $value) {
+
+      symlink($slavefeedDirectory.'/'.$value, $masterfeedDirectory.'/'.$value);
 
     }
 
-    // now start linking the foldersToLink into the master feed directory
-    foreach($foldersToLink as $key => $value) {
-      // increase the highestSubfolderIndex
-      $highestSubfolderIndex++;
-      symlink($value, joinPaths($masterfeedDirectory, $highestSubfolderIndex));
+    return true;
 
-    }
   }
 
   /**
