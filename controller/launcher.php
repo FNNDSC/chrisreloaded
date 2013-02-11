@@ -166,12 +166,16 @@ FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
 // add owner
 FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 
-// run dummy mosix script - should use crun
 $arguments = ' -l '.$job_path;
 $arguments .= ' -m '.$memory;
 $arguments .= ' -c "'.$command.'"';
-// run on cluster and return pid
-$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
+if ($status == 100) {
+  // run locally
+  $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_local.php '.$arguments);
+} else {
+  // run on cluster and return pid
+  $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
+}
 $output = shell_exec($process_command);
 
 // attach pid to feed
