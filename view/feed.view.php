@@ -110,7 +110,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
     $t -> replace('TIME_FORMATED', $object->time);
     $t -> replace('PLUGIN', ucwords(str_replace('_',' ',$object->plugin)));
-    $t -> replace('MORE', 'Show details');
+    $t -> replace('MORE', '<i class="icon-play"></i>');
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
     $t -> replace('SHARE_TEXT', $share_text);
