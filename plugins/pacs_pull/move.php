@@ -48,6 +48,50 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 // include pacs helper
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
+
+// send email to admin
+// should be more generic to email user after plugins has finished too
+
+function sendEmail(&$patientInfo, &$fullLog){
+  // start email:
+  $begin_email = '=================================================='.PHP_EOL;
+  $begin_email .= 'GENERAL INFORMATION'.PHP_EOL;
+  $begin_email .= '=================================================='.PHP_EOL.PHP_EOL;
+  if(isset($patientInfo)){
+    foreach($patientInfo as $key => $value){
+      $begin_email .= $key.' : '.$value[0].PHP_EOL;
+    }
+  }
+
+  $begin_email .= PHP_EOL.'=================================================='.PHP_EOL;
+  $begin_email .= 'FULL LOG'.PHP_EOL;
+  $begin_email .= '=================================================='.PHP_EOL.PHP_EOL;
+  
+  // output
+  // email admins
+  $command = joinPaths(CHRIS_PLUGINS_FOLDER, 'mail/mail');
+  $command .= ' --output ' . CHRIS_LOG;
+  $command .= ' --to ' . CHRIS_DICOM_EMAIL_TO;
+  $command .= ' --from ' . CHRIS_DICOM_EMAIL_FROM;
+  $command .= ' --subj "New Dicom Series Have arrived"';
+  $command .= ' --msg "'.$begin_email.$fullLog.'"' ;
+  $output = PHP_EOL.'output: '.PHP_EOL.shell_exec($command);
+
+  // mv output/mail.log
+  // to output/date-mail.log
+  $old_name = joinPaths(CHRIS_LOG,'mail.log');
+  $new_name = joinPaths(CHRIS_LOG,date('Ymdhis').'-mail.log');
+  while(!file_exists($new_name)){
+    if(rename($old_name, $new_name)){
+      break;
+    }
+    $new_name = joinPaths(CHRIS_PLUGINS_FOLDER,date('Ymdhis').'-mail.log');
+  }
+  
+  $fullLog = PHP_EOL.$command.PHP_EOL.$output.PHP_EOL;
+}
+
+// main function
 $shortopts = "d:";
 
 $options = getopt($shortopts);
@@ -139,7 +183,7 @@ if ($handle = opendir($study_directory)) {
                 $logFile .= 'Patient already mapped to data...'.PHP_EOL;
                 $logFile .= 'patient data id: '.$dataPatientResult['Data_Patient'][0]->id.PHP_EOL;
               }
-              
+
               // MAP DATA TO STUDY
               $dataStudyMapper = new Mapper('Data_Study');
               $dataStudyMapper->filter('data_id = (?)',$data_chris_id);
@@ -151,7 +195,7 @@ if ($handle = opendir($study_directory)) {
                 $dataStudyObject->data_id = $data_chris_id;
                 $dataStudyObject->study_id = $study_chris_id;
                 $mapping_data_study_id = Mapper::add($dataStudyObject);
-                
+
                 $logFile .= 'data study id: '.$mapping_data_study_id.PHP_EOL;
               }
               else{
@@ -198,10 +242,10 @@ if ($handle = opendir($study_directory)) {
                 // create the 0.info file, which contains more information about the data
                 $myFile = $datadirname.'/0.info';
                 $fh = fopen($myFile, 'a');
-                
+
                 foreach($process_file as $key => $value)
                   fwrite($fh, $key.' : '.$value[0].PHP_EOL);
-                
+
                 fclose($fh);
               }
               else{
@@ -246,13 +290,13 @@ if ($handle = opendir($study_directory)) {
 
               // delete file
               $logFile .= 'delete: '.$study_directory.'/'.$entry.'/'.$sub_entry.PHP_EOL;
-              unlink($study_directory.'/'.$entry.'/'.$sub_entry);
+              //unlink($study_directory.'/'.$entry.'/'.$sub_entry);
             }
           }
           closedir($sub_handle);
           // delete directory
           $logFile .= 'delete: '.$study_directory.'/'.$entry.PHP_EOL;
-          rmdir($study_directory.'/'.$entry);
+          //rmdir($study_directory.'/'.$entry);
         }
       }
     }
@@ -260,7 +304,7 @@ if ($handle = opendir($study_directory)) {
   closedir($handle);
   // delete directory
   $logFile .= 'delete: '.$study_directory.PHP_EOL;
-  rmdir($study_directory);
+  //rmdir($study_directory);
 }
 
 // add warning if we didn't receive all the expected files
@@ -284,6 +328,9 @@ foreach($received as $key => $value){
   }
 }
 
+sendEmail(&$process_file, &$logFile);
+
 echo $logFile;
+
 return;
 ?>
