@@ -65,12 +65,25 @@ foreach($parameters as $k0 => $v0){
   // plugin name?
   $command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
   // parameters?
+  $parentFolder = null;
   if(is_array($v0)){
     foreach($v0 as $key => $value){
 
       if ($value['type'] == 'dropzone' && $value['value'] != '') {
 
         $value['value'] = joinPaths(CHRIS_USERS, $value['value']);
+
+        if (!$parentFolder) {
+
+          // no parent folder set yet, so let's grab this one
+          if (is_dir($value['value'])) {
+            // this is already the directory
+            $parentFolder = basename($value['value']);
+          } else {
+            $parentFolder = basename(dirname($value['value']));
+          }
+
+        }
 
       }
 
@@ -89,7 +102,11 @@ foreach($parameters as $k0 => $v0){
   // b) information parsed from a 0.info file of the first dropzone
   // if there is no dropzone
   // c) the current timestamp
-  $subfoldertail = '13124';
+  $subfoldertail = $parentFolder;
+  if (!$parentFolder) {
+    // no parent folder set yet, this is case c)
+    $subfoldertail = date('Y-m-d-H-i-s');
+  }
 
   // always provide a job id
   $launch_command .= '--jobid=\''.$k0.'_'.$subfoldertail.'\' ';
