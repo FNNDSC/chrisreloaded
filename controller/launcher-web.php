@@ -61,8 +61,7 @@ foreach($parameters as $k0 => $v0){
   }
   // status, if we don't want to start with status=0
   $launch_command .= '--memory=\''.sanitize($_POST['FEED_MEMORY']).'\' ';
-  // always provide a job id
-  $launch_command .= '--jobid=\''.$k0.'\' ';
+
   // plugin name?
   $command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
   // parameters?
@@ -83,6 +82,18 @@ foreach($parameters as $k0 => $v0){
       $command .= ' '.$value['name'].' '.$value['value'];
     }
   }
+
+  // the subfoldertail can be
+  // if an input parameter is a dropzone
+  // a) the parent directory of the first dropzone
+  // b) information parsed from a 0.info file of the first dropzone
+  // if there is no dropzone
+  // c) the current timestamp
+  $subfoldertail = '13124';
+
+  // always provide a job id
+  $launch_command .= '--jobid=\''.$k0.'_'.$subfoldertail.'\' ';
+
   // output?
   $output = ' {OUTPUT}/';
 
