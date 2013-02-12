@@ -116,7 +116,7 @@
 	float: right;
 }
 
-.feed_more {
+.bottom-right {
 	float: right;
 }
 
@@ -292,4 +292,16 @@
 
 .feed_dropzone_hover {
 	background-color: #9CB0D8;
+}
+
+.show_me {
+	display: none;
+}
+
+.focus {
+	opacity: 0.6;
+}
+
+.focus:hover{
+	opacity: 1;
 }
