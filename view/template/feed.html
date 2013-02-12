@@ -10,7 +10,11 @@
    <span class='span3' style='margin-left: 0px; float: none;'><span
     class='feed_type'>${PLUGIN}</span>&nbsp;&nbsp; <span
     class='feed_username feed_header_small'>${USERNAME}</span></span><span
-    class="feed_time feed_header_small">Some time ago..</span>
+    class="bottom-right"><span
+    class='feed_status feed_header_small show_me'>Status:
+     ${STATUS_TEXT} </span><span class="feed_favorite show_me focus">${FAVORITE_TEXT}</span><span
+    class="feed_share show_me focus">${SHARE_TEXT}</span><span
+    class="feed_archive show_me focus">${ARCHIVE_TEXT}</span></span>
   </div>
   <div class='feed_header_line_two'>
    <span class='feed_more feed_header_small focus'>${MORE}</span> <span
@@ -22,11 +26,7 @@
     class='feed_edit_icon show_me focus'
     src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'
     onclick='_FEED_.activate_feed_name_edit($(this),event)'><span
-    class="bottom-right"><span
-    class='feed_status feed_header_small show_me'>Status:
-     ${STATUS_TEXT} </span><span class="feed_favorite show_me focus">${FAVORITE_TEXT}</span><span
-    class="feed_share show_me focus">${SHARE_TEXT}</span><span
-    class="feed_archive show_me focus">${ARCHIVE_TEXT}</span></span>
+    class="feed_time feed_header_small">Some time ago..</span>
   </div>
  </div>
 
