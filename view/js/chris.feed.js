@@ -639,11 +639,9 @@ _FEED_.update_onclick = function() {
 _FEED_.header_onhover = function() {
   jQuery(".feed").on('mouseenter', function() {
     $(this).find(".show_me").show();
-    window.console.log("show me");
   });
   jQuery(".feed").on('mouseleave', function() {
     $(this).find(".show_me").hide();
-    window.console.log("hide me");
   });
 }
 _FEED_.scrollBottom = function() {
