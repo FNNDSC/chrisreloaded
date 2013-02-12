@@ -305,3 +305,7 @@
 .focus:hover{
 	opacity: 1;
 }
+
+.feed:hover .show_me{
+	display:inline;
+}

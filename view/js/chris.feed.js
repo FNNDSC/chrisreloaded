@@ -635,14 +635,7 @@ _FEED_.update_onclick = function() {
         _FEED_.activateDroppableIcons();
       });
 }
-_FEED_.header_onhover = function() {
-  jQuery(".feed").on('mouseenter', function() {
-    $(this).find(".show_me").show();
-  });
-  jQuery(".feed").on('mouseleave', function() {
-    $(this).find(".show_me").hide();
-  });
-}
+
 _FEED_.scrollBottom = function() {
   jQuery('.feed_content').scroll(
       function() {
@@ -901,7 +894,6 @@ jQuery(document)
           _FEED_.activateDraggableIcons();
           _FEED_.activateDroppableIcons();
           _FEED_.notes_tab_onclick();
-          _FEED_.header_onhover();
           // show placeholder when there are no feeds
           if (jQuery('#feed_count').html() == "0") {
             jQuery('.feed_empty').show();
