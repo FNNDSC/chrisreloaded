@@ -403,7 +403,7 @@ jQuery(document)
                   
                 }
                 
-                var _feed_name = (new Date()).toISOString();
+                var _feed_name = (new Date()).toLocaleString();
                 // send to the launcher
                 jQuery.ajax({
                   type: "POST",

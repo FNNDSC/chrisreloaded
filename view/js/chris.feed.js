@@ -76,9 +76,8 @@ _FEED_.onclick = function(details, more) {
       // rotate icon more.html('<a>Hide details</a>');
       // For webkit browsers: e.g. Chrome
       more.find('i').css('WebkitTransform', 'rotate(90deg)');
-        // For Mozilla browser: e.g. Firefox
+      // For Mozilla browser: e.g. Firefox
       more.find('i').css('-moz-transform', 'rotate(90deg)');
-      
       more.closest('.feed').css('margin-top', '10px');
       more.closest('.feed').css('margin-bottom', '11px');
     }
@@ -88,8 +87,8 @@ _FEED_.onclick = function(details, more) {
     if (more) {
       // rotate icon
       // For webkit browsers: e.g. Chrome
-      more.find('i').css('WebkitTransform','rotate(0deg)');
-        // For Mozilla browser: e.g. Firefox
+      more.find('i').css('WebkitTransform', 'rotate(0deg)');
+      // For Mozilla browser: e.g. Firefox
       more.find('i').css('-moz-transform', 'rotate(0deg)');
       more.closest('.feed').css('margin-top', '-1px');
       more.closest('.feed').css('margin-bottom', '0px');
