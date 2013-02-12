@@ -298,10 +298,10 @@
 	display: none;
 }
 
-.opacitor {
+.focus {
 	opacity: 0.6;
 }
 
-.opacitor:hover{
+.focus:hover{
 	opacity: 1;
 }
