@@ -635,7 +635,6 @@ _FEED_.update_onclick = function() {
         _FEED_.activateDroppableIcons();
       });
 }
-
 _FEED_.scrollBottom = function() {
   jQuery('.feed_content').scroll(
       function() {
@@ -671,73 +670,78 @@ _FEED_.scrollBottom = function() {
       });
 }
 _FEED_.search = function() {
-  jQuery('.feed_search_input').keyup(
-      function(event) {
-        if (event.which == 13) {
-          event.preventDefault();
+  jQuery('.feed_search_input').keyup(function(event) {
+    clearTimeout($.data(this, 'timer'));
+    if (event.which == 13) {
+      event.preventDefault();
+    }
+    // if value not empty, ajax call
+    if (jQuery(this).val() != '') {
+      // check checkbox
+      if (!jQuery('.feed_sea_check').attr('checked')) {
+        jQuery('.feed_sea_check').click();
+      }
+      // uncheck checkbox
+      if (jQuery('.feed_fav_check').attr('checked')) {
+        jQuery('.feed_fav_check').click();
+      }
+      // uncheck checkbox
+      if (jQuery('.feed_run_check').attr('checked')) {
+        jQuery('.feed_run_check').click();
+      }
+      // uncheck checkbox
+      if (jQuery('.feed_fin_check').attr('checked')) {
+        jQuery('.feed_fin_check').click();
+      }
+      
+      // ajax query
+      if (event.which == 13) {
+        _FEED_.searchAjax();
+      } else {
+        $(this).data('timer', setTimeout(_FEED_.searchAjax, 500));
+      }
+    } else {
+      // check checkbox
+      if (jQuery('.feed_sea_check').attr('checked')) {
+        jQuery('.feed_sea_check').click();
+      }
+      if (!jQuery('.feed_fav_check').attr('checked')) {
+        jQuery('.feed_fav_check').click();
+      }
+      if (!jQuery('.feed_run_check').attr('checked')) {
+        jQuery('.feed_run_check').click();
+      }
+      if (!jQuery('.feed_fin_check').attr('checked')) {
+        jQuery('.feed_fin_check').click();
+      }
+    }
+  });
+}
+_FEED_.searchAjax = function() {
+  // ajax call
+  jQuery.ajax({
+    type : "POST",
+    url : "api.php?action=get&what=feed_search&parameters[]="
+        + jQuery('.feed_search_input').val(),
+    dataType : "json",
+    success : function(data) {
+      data = data['result'];
+      old_Feeds = '';
+      var length_done = data['content'].length;
+      if (length_done > 0) {
+        var i = 0;
+        while (i <= length_done - 1) {
+          // if id in new delete it!
+          old_Feeds += data['content'][i];
+          i++;
         }
-        // if value not empty, ajax call
-        if (jQuery(this).val() != '') {
-          // check checkbox
-          if (!jQuery('.feed_sea_check').attr('checked')) {
-            jQuery('.feed_sea_check').click();
-            window.console.log('checked');
-          } else {
-            window.console.log('already checked');
-          }
-          // uncheck checkbox
-          if (jQuery('.feed_fav_check').attr('checked')) {
-            jQuery('.feed_fav_check').click();
-          }
-          // uncheck checkbox
-          if (jQuery('.feed_run_check').attr('checked')) {
-            jQuery('.feed_run_check').click();
-          }
-          // uncheck checkbox
-          if (jQuery('.feed_fin_check').attr('checked')) {
-            jQuery('.feed_fin_check').click();
-          }
-          // ajax call
-          jQuery.ajax({
-            type : "POST",
-            url : "api.php?action=get&what=feed_search&parameters[]="
-                + jQuery(this).val(),
-            dataType : "json",
-            success : function(data) {
-              data = data['result'];
-              old_Feeds = '';
-              var length_done = data['content'].length;
-              if (length_done > 0) {
-                var i = 0;
-                while (i <= length_done - 1) {
-                  // if id in new delete it!
-                  old_Feeds += data['content'][i];
-                  i++;
-                }
-              }
-              jQuery('.feed_sea_content').html(old_Feeds);
-              // jQuery('.feed_sea').find('.feed').addClass('feed_search');
-              _FEED_.updateTime();
-              _FEED_.activateDraggableIcons();
-              _FEED_.activateDroppableIcons();
-            }
-          });
-        } else {
-          // check checkbox
-          if (jQuery('.feed_sea_check').attr('checked')) {
-            jQuery('.feed_sea_check').click();
-          }
-          if (!jQuery('.feed_fav_check').attr('checked')) {
-            jQuery('.feed_fav_check').click();
-          }
-          if (!jQuery('.feed_run_check').attr('checked')) {
-            jQuery('.feed_run_check').click();
-          }
-          if (!jQuery('.feed_fin_check').attr('checked')) {
-            jQuery('.feed_fin_check').click();
-          }
-        }
-      });
+      }
+      jQuery('.feed_sea_content').html(old_Feeds);
+      _FEED_.updateTime();
+      _FEED_.activateDraggableIcons();
+      _FEED_.activateDroppableIcons();
+    }
+  });
 }
 _FEED_.activateDraggable = function() {
   // setup draggable items for all file browser elements
