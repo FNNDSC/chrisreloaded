@@ -13,8 +13,7 @@
     class="bottom-right">
     <span
     class="feed_time feed_header_small">Some time ago..</span>
-    <span
-    class='feed_status feed_header_small show_me'>${STATUS_TEXT} </span><span class="feed_favorite show_me focus">${FAVORITE_TEXT}</span><span
+    <span class="feed_favorite show_me focus">${FAVORITE_TEXT}</span><span
     class="feed_share show_me focus">${SHARE_TEXT}</span><span
     class="feed_archive show_me focus">${ARCHIVE_TEXT}</span></span>
   </div>
@@ -28,6 +27,9 @@
     class='feed_edit_icon show_me focus'
     src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'
     onclick='_FEED_.activate_feed_name_edit($(this),event)'>
+    
+    <span
+    class='feed_status feed_header_small show_me pull-right'>Status: ${STATUS_TEXT} </span>
   </div>
  </div>
 
