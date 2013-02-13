@@ -554,7 +554,7 @@ _FEED_.feed_share_onclick = function() {
       '.feed_share',
       function(e) {
         // get feed id
-        var feedElt = jQuery(this).parents().eq(2);
+        var feedElt = jQuery(this).parents().eq(3);
         var feedID = feedElt.attr('data-chris-feed_id');
         apprise('<h5>Which user do you want to share this feed with?</h5>', {
           'input' : new Date()
