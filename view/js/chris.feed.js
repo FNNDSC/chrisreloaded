@@ -718,8 +718,13 @@ _FEED_.search = function() {
   });
 }
 _FEED_.searchAjax = function() {
+  // readystate 4: complete
+  if(_FEED_.searchXHR && _FEED_.searchXHR.readystate != 4){
+    _FEED_.searchXHR.abort();
+    window.console.log('XHR request aborted');
+  }
   // ajax call
-  jQuery.ajax({
+  _FEED_.searchXHR = jQuery.ajax({
     type : "POST",
     url : "api.php?action=get&what=feed_search&parameters[]="
         + jQuery('.feed_search_input').val(),
@@ -848,6 +853,8 @@ _FEED_.createFeedDetails = function() {
 jQuery(document)
     .ready(
         function() {
+          // track status of search ajax request
+          _FEED_.searchXHR;
           // get oldest and newest feed value
           _FEED_.oldest = '9007199254740992';
           _FEED_.newest = '0';

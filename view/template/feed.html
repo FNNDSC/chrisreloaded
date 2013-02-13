@@ -10,13 +10,40 @@
    <span class='span3' style='margin-left: 0px; float: none;'><span
     class='feed_type'>${PLUGIN}</span>&nbsp;&nbsp; <span
     class='feed_username feed_header_small'>${USERNAME}</span></span><span
-    class="bottom-right">
+    class="pull-right"> 
+    
     <span
     class="feed_time feed_header_small">Some time ago..</span>
+    <!--  Color Button
     <span
-    class='feed_status feed_header_small show_me'>${STATUS_TEXT} </span><span class="feed_favorite show_me focus">${FAVORITE_TEXT}</span><span
-    class="feed_share show_me focus">${SHARE_TEXT}</span><span
-    class="feed_archive show_me focus">${ARCHIVE_TEXT}</span></span>
+    class='feed_status show_me feed_header_small'>${STATUS_TEXT}</span>
+-->
+    <span class="btn-group pull-right show_me">
+     <button class="btn btn-mini" tabindex="-1">
+      <span class="feed_share">${SHARE_TEXT}</span>
+     </button>
+     <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"
+      tabindex="-1">
+      <span class="caret"></span>
+     </button>
+     <ul class="dropdown-menu">
+      <li><a href="#"><span
+    class="feed_favorite">${FAVORITE_TEXT}</span>
+       Favorite</a></li>
+             <li><a href="#"><span class="feed_share">${SHARE_TEXT}</span>
+       Share</a></li>
+      <li><a href="#"><span class="feed_archive">${ARCHIVE_TEXT}</span>
+       Archive</a></li>
+      <li><a href="#"><span class="feed_archive"><i class="icon-ban-circle"></i></span>
+       Cancel </a></li>
+             <li><a href="#"><span class="feed_archive"><i class="icon-refresh"></i></span>
+       Restart </a></li>
+      <li><a href="#"><span class="feed_archive"><i class="icon-trash"></i></span>
+       Delete </a></li>
+     </ul>
+    </span>
+
+   </span>
   </div>
   <div class='feed_header_line_two'>
    <span class='feed_more feed_header_small focus'>${MORE}</span> <span

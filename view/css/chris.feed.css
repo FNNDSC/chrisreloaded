@@ -307,4 +307,14 @@
 
 .feed:hover .show_me{
 	display:inline;
+	z-index: 999999999;
 }
+
+.dropdown-menu {
+	z-index: 999999999;
+}
+
+.feed_fin_content.in { overflow:visible; }
+.feed_content.in { overflow:visible; }
+
+.feed.in { overflow:visible; }
