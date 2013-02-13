@@ -73,25 +73,15 @@ _FEED_.onclick = function(details, more) {
   var hidden = details.is(':hidden');
   if (hidden) {
     if (more) {
-      // rotate icon more.html('<a>Hide details</a>');
-      // For webkit browsers: e.g. Chrome
-      more.find('i').css('WebkitTransform', 'rotate(90deg)');
-      // For Mozilla browser: e.g. Firefox
-      more.find('i').css('-moz-transform', 'rotate(90deg)');
-      more.closest('.feed').css('margin-top', '10px');
-      more.closest('.feed').css('margin-bottom', '11px');
+      details.closest('.feed').css('margin-top', '10px');
+      details.closest('.feed').css('margin-bottom', '11px');
     }
     // details.show('blind','slow');
     details.slideDown('fast');
   } else {
     if (more) {
-      // rotate icon
-      // For webkit browsers: e.g. Chrome
-      more.find('i').css('WebkitTransform', 'rotate(0deg)');
-      // For Mozilla browser: e.g. Firefox
-      more.find('i').css('-moz-transform', 'rotate(0deg)');
-      more.closest('.feed').css('margin-top', '-1px');
-      more.closest('.feed').css('margin-bottom', '0px');
+      details.closest('.feed').css('margin-top', '-1px');
+      details.closest('.feed').css('margin-bottom', '0px');
     }
     // details.hide('blind', 'slow');
     details.slideUp('fast');
@@ -193,14 +183,13 @@ _FEED_.feed_more_onclick = function() {
     // modify
     e.stopPropagation();
     var details = jQuery(this).closest('.feed').find('.feed_details');
-    _FEED_.onclick(details, jQuery(this));
+    _FEED_.onclick(details, true);
   });
 }
 _FEED_.feed_onclick = function() {
   jQuery(document).on('click', '.feed_header', function() {
-    var more = jQuery(this).parent().find('.feed_more');
     var details = jQuery(this).parent().find('.feed_details');
-    _FEED_.onclick(details, more);
+    _FEED_.onclick(details, true);
   });
   jQuery(document).on('click', '.feed_meta_header', function() {
     var details = jQuery(this).parent().find('.feed_meta_content');
