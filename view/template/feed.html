@@ -14,22 +14,19 @@
     
     <span
     class="feed_time feed_header_small">Some time ago..</span>
-    <!--  Color Button
+    
     <span
-    class='feed_status show_me feed_header_small'>${STATUS_TEXT}</span>
--->
+    class="feed_favorite show_me">${FAVORITE_TEXT}</span> &nbsp;
+
     <span class="btn-group pull-right show_me">
-     <button class="btn btn-mini" tabindex="-1">
+     <button class="btn btn-mini feed_btn" tabindex="-1">
       <span class="feed_share">${SHARE_TEXT}</span>
      </button>
-     <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown"
+     <button class="btn btn-mini dropdown-toggle feed_btn" data-toggle="dropdown"
       tabindex="-1">
       <span class="caret"></span>
      </button>
      <ul class="dropdown-menu">
-      <li><a href="#"><span
-    class="feed_favorite">${FAVORITE_TEXT}</span>
-       Favorite</a></li>
              <li><a href="#"><span class="feed_share">${SHARE_TEXT}</span>
        Share</a></li>
       <li><a href="#"><span class="feed_archive">${ARCHIVE_TEXT}</span>
@@ -55,6 +52,9 @@
     class='feed_edit_icon show_me focus'
     src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'
     onclick='_FEED_.activate_feed_name_edit($(this),event)'>
+    
+    <span
+    class='feed_status feed_header_small pull-right show_me'>Status: ${STATUS_TEXT} </span>
   </div>
  </div>
 
