@@ -88,6 +88,11 @@ class FeedV implements ObjectViewInterface {
       $share_text = '<i class="icon-share-alt"></i>';
     }
 
+    $edit_icon = '';
+    if ($object->status == 100) {
+      $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png' onclick='_FEED_.activate_feed_name_edit($(this),event)'>";
+    }
+
     $archive_text = '<i class="icon-remove"></i>';
     if ($object->archive == '1') {
       $archive_text = '<i class="icon-plus"></i>';
@@ -114,6 +119,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
     $t -> replace('SHARE_TEXT', $share_text);
+    $t -> replace('EDIT_ICON', $edit_icon);
     $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_TEXT', $favorite_text);
     // set data browser
