@@ -336,7 +336,7 @@ class FeedC implements FeedControllerInterface {
 
         $destinationDirectory = CHRIS_USERS.$targetname.'/'.$feedResult['Feed'][0]->plugin;
         if(!is_dir($destinationDirectory)){
-          mkdir($destinationDirectory);
+          mkdir($destinationDirectory, 0777, true);
         }
 
         $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
