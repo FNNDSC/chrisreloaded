@@ -11,8 +11,7 @@
     class='feed_type'>${PLUGIN}</span>&nbsp;&nbsp; <span
     class='feed_username feed_header_small'>${USERNAME}</span></span><span
     class="pull-right"> <span class="feed_time feed_header_small">Some
-     time ago..</span> <span class="feed_favorite show_me">${FAVORITE_TEXT}</span>
-    &nbsp; <span class="btn-group pull-right show_me">
+     time ago..</span> &nbsp; <span class="btn-group pull-right show_me">
      <button class="btn btn-mini feed_btn" tabindex="-1">
       <span class="feed_share">${SHARE_TEXT}</span>
      </button>
@@ -23,6 +22,13 @@
      <ul class="dropdown-menu">
       <li><a href="#"><span class="feed_share">${SHARE_TEXT}</span>
         Share</a></li>
+
+      <li><a href="#"><span class="feed_favorite show_me">${FAVORITE_TEXT}</span>
+        Favorite</a></li>
+
+
+
+
 
       <li class="divider"></li>
       <li><a href="#"><span class="feed_archive">${ARCHIVE_TEXT}</span>
@@ -64,7 +70,7 @@
     class='feed_name_edit '
     style='display: none; font-size: 12px; line-height: 12px'
     type='text' value='${FEED_NAME}' /> <span
-    class='feed_status feed_header_small pull-right show_me'>Status:
+    class='feed_status feed_header_small pull-right'>Status:
     ${STATUS_TEXT} </span>
   </div>
  </div>
