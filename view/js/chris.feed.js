@@ -37,6 +37,7 @@ _FEED_.preview = function(file) {
   case 'TXT':
   case 'LOG':
   case 'ERR':
+  case 'STD':
   case 'JS':
   case 'INFO':
   case 'STATUS':
