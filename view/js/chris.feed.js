@@ -337,12 +337,12 @@ _FEED_.updateTime = function() {
       var hour = Math.floor((diff % d) / h);
       if (hour == 0) {
         var min = Math.floor(((diff % d) % h) / m);
-        jQuery(this).find('.feed_time').html(min + ' minutes ago');
+        jQuery(this).find('.feed_time').html(feedTime.toLocaleTimeString() + " ("+min + ' minutes ago)');
       } else {
-        jQuery(this).find('.feed_time').html(hour + ' hours ago');
+        jQuery(this).find('.feed_time').html(feedTime.toLocaleTimeString() + " ("+hour + ' hours ago)');
       }
     } else {
-      jQuery(this).find('.feed_time').html(day + ' days ago');
+      jQuery(this).find('.feed_time').html(feedTime.toLocaleTimeString() + " ("+day + ' days ago)');
     }
   });
 }
