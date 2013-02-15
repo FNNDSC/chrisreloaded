@@ -100,14 +100,24 @@ class UserC implements UserControllerInterface {
 
     if (!isset($username) || !isset($password)) return -1;
 
-    $userMapper = new Mapper('User');
-    $userMapper->filter('username=(?)', $username);
-    //$userMapper->filter('password=(?)', UserC::hashPassword($password));
-    $userResults = $userMapper->get();
+    $cmd = "sshpass -p '".$password."' scp -o StrictHostKeyChecking=no ".$username."@".CLUSTER_HOST.":/etc/hostname /tmp";
 
-    if(isset($userResults['User'][0])) {
+    $cmd_output = array();
+    $exit_status = -1;
 
-      if (crypt($password, $userResults['User'][0]->password) == $userResults['User'][0]->password) {
+    exec($cmd, $cmd_output, $exit_status);
+
+    if ($exit_status == 0) {
+
+      // the user credentials are valid!
+
+      // make sure this user is also allowed to access chris by checking the user table and grabbing the user id
+
+      $userMapper = new Mapper('User');
+      $userMapper->filter('username=(?)', $username);
+      $userResults = $userMapper->get();
+
+      if(isset($userResults['User'][0])) {
 
         // valid user
         return $userResults['User'][0]->id;
