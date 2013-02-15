@@ -41,7 +41,7 @@ class tractography(Plugin):
     #output
     command += ' -O ' + options.output
     command += ' -L ' + options.output
-    command += ' -R -log'
+    command += ' -R _log'
     
     # grab the first dicom input file
     # dicom directory
