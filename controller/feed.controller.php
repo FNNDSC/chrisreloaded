@@ -344,6 +344,16 @@ class FeedC implements FeedControllerInterface {
         // just a link?
         symlink($targetDirectory, $destinationDirectory);
 
+        // we need to change the permission of the target directory to 777 (as the owner)
+        // so that the other user can write to this folder
+        // but only if the targetDirectory is a directory and not a link (a link means it was re-shared)
+        if (is_dir($targetDirectory)) {
+          $username = $_SESSION['username'];
+          $password = $_SESSION['password'];
+          $chmod_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'chmod -R 777 ".$targetDirectory."'";
+          exec($chmod_command);
+        }
+
         //if(!is_dir($destinationDirectory)){
         //  recurse_copy($targetDirectory, $destinationDirectory);
         //}
