@@ -89,8 +89,10 @@ class FeedV implements ObjectViewInterface {
     }
 
     $archive_icon = 'icon-remove';
+    $archive_text = 'Archive';
     if ($object->archive == '1') {
       $archive_icon = 'icon-plus';
+      $archive_text = 'Restore';
     }
 
     $favorite_icon = 'icon-star-empty';
@@ -114,6 +116,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('STATUS_TEXT', $status_text);
     $t -> replace('SHARE_ICON', $share_icon);
     $t -> replace('ARCHIVE_ICON', $archive_icon);
+    $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_ICON', $favorite_icon);
     // set data browser
     $d = new Template('feed_data_browser.html');

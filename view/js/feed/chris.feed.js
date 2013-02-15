@@ -412,132 +412,8 @@ _FEED_.editor_loaded = function() {
     }
   });
 }
-_FEED_.feed_favorite_onclick = function() {
-  jQuery(document).on(
-      'click',
-      '.feed_favorite',
-      function(e) {
-        // modify
-        e.stopPropagation();
-        // get feed id
-        var feedElt = jQuery(this).parents().eq(3);
-        var feedID = feedElt.attr('data-chris-feed_id');
-        var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
-        // api.php add to favorites
-        jQuery.ajax({
-          type : "POST",
-          url : "api.php?action=set&what=feed_favorite&id=" + feedID,
-          dataType : "json",
-          success : function(data) {
-            jQuery(allElts).each(
-                function() {
-                  var elt = jQuery(this);
-                  if (!elt.parent().hasClass('feed_sea_content')) {
-                    if (data['result'] == "1") {
-                      jQuery(elt).hide(
-                          'blind',
-                          'slow',
-                          function() {
-                            jQuery(elt).find('.feed_favorite').html(
-                                '<i class="icon-star">');
-                            jQuery(elt).prependTo('.feed_fav_content')
-                                .slideDown('slow');
-                          });
-                    } else {
-                      if (elt.attr('data-chris-feed_status') != 100) {
-                        jQuery(elt).hide(
-                            'blind',
-                            'slow',
-                            function() {
-                              jQuery(elt).find('.feed_favorite').html(
-                                  '<i class="icon-star-empty">');
-                              jQuery(elt).prependTo('.feed_run_content')
-                                  .slideDown('slow');
-                            });
-                      } else {
-                        jQuery(elt).hide(
-                            'blind',
-                            'slow',
-                            function() {
-                              jQuery(elt).find('.feed_favorite').html(
-                                  '<i class="icon-star-empty">');
-                              jQuery(elt).prependTo('.feed_fin_content')
-                                  .slideDown('slow');
-                            });
-                      }
-                    }
-                  } else {
-                    if (data['result'] == "1") {
-                      jQuery(elt).find('.feed_favorite').html(
-                          '<i class="icon-star">');
-                    } else {
-                      jQuery(elt).find('.feed_favorite').html(
-                          '<i class="icon-star-empty">');
-                    }
-                  }
-                });
-          }
-        });
-      });
-}
-_FEED_.feed_archive_onclick = function() {
-  jQuery(document).on(
-      'click',
-      '.feed_archive',
-      function(e) {
-        // modify
-        e.stopPropagation();
-        // get feed id
-        var feedElt = jQuery(this).parents().eq(3);
-        var feedID = feedElt.attr('data-chris-feed_id');
-        var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
-        // api.php add to favorites
-        jQuery.ajax({
-          type : "POST",
-          url : "api.php?action=set&what=feed_archive&id=" + feedID,
-          dataType : "json",
-          success : function(data) {
-            jQuery(allElts)
-                .each(
-                    function() {
-                      var elt = jQuery(this);
-                      if (elt.parent().hasClass('feed_sea_content')) {
-                        if (data['result'] == "1") {
-                          jQuery(elt).find('.feed_archive').html(
-                              '<i class="icon-plus">');
-                        } else {
-                          jQuery(elt).find('.feed_archive').html(
-                              '<i class="icon-remove">');
-                          // clone and put at good location!
-                          clone = elt.clone().hide();
-                          // if favorite, push it in the favorites
-                          if (elt.find('.feed_favorite > .i').hasClass(
-                              'icon-star')) {
-                            jQuery(clone).prependTo('.feed_fav_content')
-                                .slideDown('slow');
-                          } else {
-                            if (elt.attr('data-chris-feed_status') != 100) {
-                              jQuery(clone).prependTo('.feed_run_content')
-                                  .slideDown('slow');
-                            } else {
-                              jQuery(clone).prependTo('.feed_fin_content')
-                                  .slideDown('slow');
-                            }
-                          }
-                        }
-                      } else {
-                        // remove
-                        if (data['result'] == "1") {
-                          jQuery(elt).hide('blind', 'slow', function() {
-                            jQuery(this).remove();
-                          });
-                        }
-                      }
-                    });
-          }
-        });
-      });
-}
+
+
 
 _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
@@ -823,8 +699,6 @@ jQuery(document)
           _FEED_.runFeeds = [ [], [] ];
           // on click callbacks
           _FEED_.feed_onclick();
-          _FEED_.feed_favorite_onclick();
-          _FEED_.feed_archive_onclick();
           // _FEED_.feed_title_onclick();
           _FEED_.feed_fav_onclick();
           _FEED_.feed_run_onclick();
