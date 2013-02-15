@@ -97,64 +97,6 @@ _FEED_.feed_title_onclick = function() {
      */
   });
 }
-_FEED_.activate_feed_name_edit = function(_me, event) {
-  // avoid collapsing/expanding the feed
-  var e = window.event;
-  if (!e) {
-    e = event;
-  }
-  e.stopPropagation();
-  // collapse the feed
-  _me.closest('.feed').find('.feed_details').slideUp('fast');
-  // hide the label and the edit icon
-  // show the textbox
-  _me.hide();
-  var _label = _me.prev().prev();
-  _label.hide();
-  var _old_name = _label.html();
-  var _textbox = _me.prev();
-  _textbox.show('fade');
-  _textbox.trigger('focus');
-  var _exit_callback = function() {
-    // save this guy.
-    var _value = _textbox.val();
-    var _feed_id = _me.closest('.feed').attr('data-chris-feed_id');
-    // call the API
-    jQuery.ajax({
-      type : 'POST',
-      url : 'api.php',
-      data : {
-        action : 'set',
-        what : 'feed_name',
-        id : _feed_id,
-        parameters : _value
-      },
-      dataType : 'json',
-      success : function(data) {
-        var safe_name = data['result'][0];
-        var _folder = data['result'][1] + '/';
-        // propagate the value in the UI
-        _label.html(safe_name);
-        // re-generate the file browser
-        var _file_browser = _me.closest('.feed').find('.file_browser');
-        // re-propagate the folder
-        _file_browser.attr('data-folder', _folder);
-        // reshow the label and the edit icon
-        _me.show();
-        _textbox.hide();
-        _label.show('fade');
-      }
-    });
-  }
-  _textbox.keypress(function(e) {
-    // if not enter, do not save
-    if (e.keyCode != 13) {
-      return;
-    }
-    _exit_callback();
-  });
-  _textbox.blur(_exit_callback); // focus lost
-}
 _FEED_.feed_fav_onclick = function() {
   jQuery(document).on('click', '.feed_fav_check', function() {
     var advanced = jQuery(this).parents().eq(5).find('.feed_fav');
@@ -329,22 +271,27 @@ _FEED_.updateTime = function() {
   var m = 60 * 1000;
   var h = m * 60;
   var d = h * 24;
-  jQuery('div[data-chris-feed_time]').each(function() {
-    var feedTime = new Date(jQuery(this).attr('data-chris-feed_time') * 1000);
-    var diff = currentTime.getTime() - feedTime.getTime();
-    var day = Math.floor(diff / d);
-    if (day == 0) {
-      var hour = Math.floor((diff % d) / h);
-      if (hour == 0) {
-        var min = Math.floor(((diff % d) % h) / m);
-        jQuery(this).find('.feed_time').html(feedTime.toLocaleTimeString() + " ("+min + ' minutes ago)');
-      } else {
-        jQuery(this).find('.feed_time').html(feedTime.toLocaleTimeString() + " ("+hour + ' hours ago)');
-      }
-    } else {
-      jQuery(this).find('.feed_time').html(feedTime.toLocaleTimeString() + " ("+day + ' days ago)');
-    }
-  });
+  jQuery('div[data-chris-feed_time]').each(
+      function() {
+        var feedTime = new Date(
+            jQuery(this).attr('data-chris-feed_time') * 1000);
+        var diff = currentTime.getTime() - feedTime.getTime();
+        var day = Math.floor(diff / d);
+        if (day == 0) {
+          var hour = Math.floor((diff % d) / h);
+          if (hour == 0) {
+            var min = Math.floor(((diff % d) % h) / m);
+            jQuery(this).find('.feed_time').html(
+                feedTime.toLocaleTimeString() + " (" + min + ' minutes ago)');
+          } else {
+            jQuery(this).find('.feed_time').html(
+                feedTime.toLocaleTimeString() + " (" + hour + ' hours ago)');
+          }
+        } else {
+          jQuery(this).find('.feed_time').html(
+              feedTime.toLocaleTimeString() + " (" + day + ' days ago)');
+        }
+      });
 }
 _FEED_.notes_tab_onclick = function() {
   jQuery(document).on('click', '.notes_tab', function(e) {
@@ -412,9 +359,6 @@ _FEED_.editor_loaded = function() {
     }
   });
 }
-
-
-
 _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
       'click',
@@ -502,7 +446,6 @@ _FEED_.search = function() {
       if (jQuery('.feed_fin_check').attr('checked')) {
         jQuery('.feed_fin_check').click();
       }
-      
       // ajax query
       if (event.which == 13) {
         _FEED_.searchAjax();
@@ -528,7 +471,7 @@ _FEED_.search = function() {
 }
 _FEED_.searchAjax = function() {
   // readystate 4: complete
-  if(_FEED_.searchXHR && _FEED_.searchXHR.readystate != 4){
+  if (_FEED_.searchXHR && _FEED_.searchXHR.readystate != 4) {
     _FEED_.searchXHR.abort();
     window.console.log('XHR request aborted');
   }
