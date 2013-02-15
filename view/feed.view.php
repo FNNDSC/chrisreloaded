@@ -82,11 +82,11 @@ class FeedV implements ObjectViewInterface {
     // create the status text
     $status_text = '<font color=red>Running <i class="icon-refresh rotating_class"></i></font>';
     // ('.$object->status.'%)
-    $share_icon = '';
     if ($object->status == 100) {
       $status_text = '<font color=green>Done</font>';
-      $share_icon = 'icon-share-alt';
     }
+
+    $share_icon = 'icon-share-alt';
 
     $archive_icon = 'icon-remove';
     $archive_text = 'Archive';
@@ -98,6 +98,11 @@ class FeedV implements ObjectViewInterface {
     $favorite_icon = 'icon-star-empty';
     if ($object->favorite == '1') {
       $favorite_icon = 'icon-star';
+    }
+
+    $edit_icon = '';
+    if ($object->status == 100) {
+      $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png' onclick='_FEED_.activate_feed_name_edit($(this),event)'>";
     }
 
     $t = new Template('feed.html');
@@ -118,6 +123,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('ARCHIVE_ICON', $archive_icon);
     $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_ICON', $favorite_icon);
+    $t -> replace('EDIT_ICON', $edit_icon);
     // set data browser
     $d = new Template('feed_data_browser.html');
     $feed_folder = joinPaths($username,$object->plugin, $object->name.'-'.$object->id);
