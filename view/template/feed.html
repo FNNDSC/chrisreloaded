@@ -19,19 +19,19 @@
       <span class="caret"></span>
      </button>
      <ul class="dropdown-menu">
-      <li><a class="feed_share" href="#"><i class="${SHARE_ICON}"></i> Share</a></li>
-      <li><a class="feed_favorite" href="#"><i class="${FAVORITE_ICON}"></i> Favorite</a></li>
+      <li><a class="feed_share" href="#"><i class="${SHARE_ICON}"></i>&nbsp;Share</a></li>
+      <li><a class="feed_favorite" href="#"><i class="${FAVORITE_ICON}"></i>&nbsp;Favorite</a></li>
       <!--       <li class="divider"></li> -->
-      <li><a class="feed_archive" href="#"><i class="${ARCHIVE_ICON}"></i> Archive</a></li>
+      <li><a class="feed_archive" href="#"><i class="${ARCHIVE_ICON}"></i>&nbsp;<span>${ARCHIVE_TEXT}</span></a></li>
       <!--       <li><a href="#"><span class="feed_archive"><i
          class="icon-ban-circle"></i></span> Cancel </a></li>
       <li><a href="#"><span class="feed_archive"><i
          class="icon-refresh"></i></span> Restart </a></li>
       <li class="divider"></li> -->
-      <li><a href="#"><img class='feed_edit_icon'
+<!--       <li><a href="#"><img class='feed_edit_icon'
         src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'
         onclick='_FEED_.activate_feed_name_edit($(this),event)'>
-        Rename</a></li>
+        Rename</a></li> -->
 
       <!--       <li><a href="#"><span class="feed_archive"><i
          class="icon-tag"></i></span> Tag </a></li>
@@ -43,7 +43,7 @@
       <li><a href="#"><span class="feed_archive"><i
          class=" icon-thumbs-up"></i></span> Like</a></li> -->
 
-      <li><a href="#"><i class="icon-fire"></i> Report bug </a></li>
+<!--       <li><a href="#"><i class="icon-fire"></i>&nbsp;Report bug </a></li> -->
 
 
 
@@ -57,7 +57,9 @@
     onclick='var e = arguments[0] || window.event; e.stopPropagation();'
     class='feed_name_edit '
     style='display: none; font-size: 12px; line-height: 12px'
-    type='text' value='${FEED_NAME}' /> <span
+    type='text' value='${FEED_NAME}' /><img class='feed_edit_icon show_me focus'
+        src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'
+        onclick='_FEED_.activate_feed_name_edit($(this),event)'><span
     class='feed_status feed_header_small pull-right'>Status:
     ${STATUS_TEXT} </span>
   </div>
