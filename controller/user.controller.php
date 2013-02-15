@@ -100,7 +100,7 @@ class UserC implements UserControllerInterface {
 
     if (!isset($username) || !isset($password)) return -1;
 
-    $cmd = "sshpass -p '".$password."' scp -o StrictHostKeyChecking=no ".$username."@".CLUSTER_HOST.":/etc/hostname /tmp";
+    $cmd = "sshpass -p '".$password."' ssh -o StrictHostKeyChecking=no ".$username."@".CLUSTER_HOST." cat /etc/hostname";
 
     $cmd_output = array();
     $exit_status = -1;

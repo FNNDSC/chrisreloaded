@@ -44,6 +44,7 @@ $shortopts = "c:u::f::i::j::h";
 $longopts  = array(
     "command:",     // Required value
     "username::",    // Optional value
+    "password::",
     "feedname::",    // Optional value
     "feedid::",    // Optional value
     "jobid::",    // Optional value
@@ -86,6 +87,17 @@ if( array_key_exists('u', $options))
 elseif (array_key_exists('username', $options))
 {
   $username = $options['username'];
+}
+
+// is password given?
+$password = 'secret';
+if( array_key_exists('p', $options))
+{
+  $username = $options['p'];
+}
+elseif (array_key_exists('password', $options))
+{
+  $password = $options['password'];
 }
 
 // is feedname given?
@@ -139,13 +151,17 @@ if($feed_id == -1){
 
 // create the feed directory
 $feed_path = joinPaths(CHRIS_USERS, $username, $plugin_name, $feedname.'-'.$feed_id);
-mkdir($feed_path, 0777, true);
+$mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$feed_path."'";
+exec($mkdir_command);
+//umask(022);
+//mkdir($feed_path, 0777, true);
 
 // create job directory
 $job_path = $feed_path;
 if($jobid != ''){
   $job_path .= '/'.$jobid;
-  mkdir($job_path, 0777, true);
+  $mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$job_path."'";
+  exec($mkdir_command);
 }
 
 // replace ${OUTPUT} pattern in the command and in the parameters
@@ -157,9 +173,11 @@ $parameters = str_replace("{FEED_ID}", $feed_id, $parameters);
 $parameters = str_replace("{USER_ID}", $user_id, $parameters);
 
 // create chris.param file
-$fp = fopen(joinPaths($job_path, 'chris.param'), 'w');
-fwrite($fp, $parameters);
-fclose($fp);
+//$fp = fopen(joinPaths($job_path, 'chris.param'), 'w');
+//fwrite($fp, $parameters);
+//fclose($fp);
+$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'echo \"".escapeshellcmd($parameters)."\" > ".joinPaths($job_path, 'chris.param')."'";
+exec($write_command);
 
 // add meta information to the feed
 FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
@@ -169,6 +187,9 @@ FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 $arguments = ' -l '.$job_path;
 $arguments .= ' -m '.$memory;
 $arguments .= ' -c "'.$command.'"';
+$arguments .= ' -u "'.$username.'"';
+$arguments .= ' -p "'.$password.'"';
+$arguments .= ' -o "'.$feed_path.'"';
 if ($status == 100) {
   // run locally
   $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_local.php '.$arguments);
@@ -183,6 +204,8 @@ $metaObject = new Meta();
 $metaObject->name = "pid";
 $metaObject->value = $output;
 FeedC::addMeta($feed_id, Array(0 => $metaObject));
+
+echo $output;
 
 echo $feed_id;
 ?>

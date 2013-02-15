@@ -43,7 +43,22 @@ $feed_id = -1;
 // do not assume FEED_PARAM is set
 $parameters = isset($_POST['FEED_PARAM'])?$_POST['FEED_PARAM']:array(0 => "");
 
-print_r($parameters);
+// validate the credentials
+if (!SecurityC::login()) {
+
+  // invalid credentials
+
+  // destroy the session
+  session_destroy();
+  // .. and forward to the sorry page
+  header('Location: ?sorry');
+  exit();
+
+}
+
+
+//print_r($parameters);
+
 
 foreach($parameters as $k0 => $v0){
 
@@ -51,6 +66,7 @@ foreach($parameters as $k0 => $v0){
   $launch_command = './launcher.php ';
   // user?
   $launch_command .= '--username=\''.$_SESSION['username'].'\' ';
+  $launch_command .= '--password=\''.$_SESSION['password'].'\' ';
   // feed name?
   $launch_command .= '--feedname=\''.sanitize($_POST['FEED_NAME']).'\' ';
   // feed id?
