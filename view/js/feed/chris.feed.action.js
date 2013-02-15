@@ -11,7 +11,6 @@ _FEED_.feed_share = function() {
         // get feed id
         var feedElt = jQuery(this).closest('.feed');
         var feedID = feedElt.attr('data-chris-feed_id');
-
         apprise('<h5>Which user do you want to share this feed with?</h5>', {
           'input' : new Date()
         },
@@ -62,7 +61,6 @@ _FEED_.feed_share = function() {
         e.stopPropagation();
       });
 }
-
 _FEED_.feed_favorite = function() {
   jQuery(document).on(
       'click',
@@ -89,7 +87,10 @@ _FEED_.feed_favorite = function() {
                           'blind',
                           'slow',
                           function() {
-                            jQuery(elt).find('.feed_favorite > i').removeClass().addClass('icon-star');
+                            jQuery(elt).find('.feed_favorite > i')
+                                .removeClass().addClass('icon-star');
+                            jQuery(elt).find('.feed_favorite > span').html(
+                            '<b>Favorited</b>');
                             jQuery(elt).prependTo('.feed_fav_content')
                                 .slideDown('slow');
                           });
@@ -99,7 +100,10 @@ _FEED_.feed_favorite = function() {
                             'blind',
                             'slow',
                             function() {
-                              jQuery(elt).find('.feed_favorite > i').removeClass().addClass('icon-star-empty');
+                              jQuery(elt).find('.feed_favorite > i')
+                                  .removeClass().addClass('icon-star-empty');
+                              jQuery(elt).find('.feed_favorite > span').html(
+                              'Favorite');
                               jQuery(elt).prependTo('.feed_run_content')
                                   .slideDown('slow');
                             });
@@ -108,7 +112,10 @@ _FEED_.feed_favorite = function() {
                             'blind',
                             'slow',
                             function() {
-                              jQuery(elt).find('.feed_favorite > i').removeClass().addClass('icon-star-empty');
+                              jQuery(elt).find('.feed_favorite > i')
+                                  .removeClass().addClass('icon-star-empty');
+                              jQuery(elt).find('.feed_favorite > span').html(
+                              'Favorite');
                               jQuery(elt).prependTo('.feed_fin_content')
                                   .slideDown('slow');
                             });
@@ -116,9 +123,15 @@ _FEED_.feed_favorite = function() {
                     }
                   } else {
                     if (data['result'] == "1") {
-                      jQuery(elt).find('.feed_favorite > i').removeClass().addClass('icon-star');
+                      jQuery(elt).find('.feed_favorite > i').removeClass()
+                          .addClass('icon-star');
+                      jQuery(elt).find('.feed_favorite > span').html(
+                      '<b>Favorited</b>');
                     } else {
-                      jQuery(elt).find('.feed_favorite > i').removeClass().addClass('icon-star-empty');
+                      jQuery(elt).find('.feed_favorite > i').removeClass()
+                          .addClass('icon-star-empty');
+                      jQuery(elt).find('.feed_favorite > span').html(
+                      'Favorite');
                     }
                   }
                 });
@@ -126,7 +139,6 @@ _FEED_.feed_favorite = function() {
         });
       });
 }
-
 _FEED_.feed_archive = function() {
   jQuery(document).on(
       'click',
@@ -150,13 +162,17 @@ _FEED_.feed_archive = function() {
                       var elt = jQuery(this);
                       if (elt.parent().hasClass('feed_sea_content')) {
                         if (data['result'] == "1") {
-                          jQuery(elt).find('.feed_archive > i').removeClass().addClass('icon-plus');
+                          jQuery(elt).find('.feed_archive > i').removeClass()
+                              .addClass('icon-plus');
                           // update text
-                          jQuery(elt).find('.feed_archive > span').html('Restore');
+                          jQuery(elt).find('.feed_archive > span').html(
+                              'Restore');
                         } else {
-                          jQuery(elt).find('.feed_archive > i').removeClass().addClass('icon-remove');
+                          jQuery(elt).find('.feed_archive > i').removeClass()
+                              .addClass('icon-remove');
                           // update text
-                          jQuery(elt).find('.feed_archive > span').html('Archive');
+                          jQuery(elt).find('.feed_archive > span').html(
+                              'Archive');
                           // clone and put at good location!
                           clone = elt.clone().hide();
                           // if favorite, push it in the favorites
@@ -187,7 +203,64 @@ _FEED_.feed_archive = function() {
         });
       });
 }
-
+_FEED_.feed_rename = function(_me, event) {
+  // avoid collapsing/expanding the feed
+  var e = window.event;
+  if (!e) {
+    e = event;
+  }
+  e.stopPropagation();
+  // collapse the feed
+  _me.closest('.feed').find('.feed_details').slideUp('fast');
+  // hide the label and the edit icon
+  // show the textbox
+  _me.hide();
+  var _label = _me.prev().prev();
+  _label.hide();
+  var _old_name = _label.html();
+  var _textbox = _me.prev();
+  _textbox.show('fade');
+  _textbox.trigger('focus');
+  var _exit_callback = function() {
+    // save this guy.
+    var _value = _textbox.val();
+    var _feed_id = _me.closest('.feed').attr('data-chris-feed_id');
+    // call the API
+    jQuery.ajax({
+      type : 'POST',
+      url : 'api.php',
+      data : {
+        action : 'set',
+        what : 'feed_name',
+        id : _feed_id,
+        parameters : _value
+      },
+      dataType : 'json',
+      success : function(data) {
+        var safe_name = data['result'][0];
+        var _folder = data['result'][1] + '/';
+        // propagate the value in the UI
+        _label.html(safe_name);
+        // re-generate the file browser
+        var _file_browser = _me.closest('.feed').find('.file_browser');
+        // re-propagate the folder
+        _file_browser.attr('data-folder', _folder);
+        // reshow the label and the edit icon
+        _me.show();
+        _textbox.hide();
+        _label.show('fade');
+      }
+    });
+  }
+  _textbox.keypress(function(e) {
+    // if not enter, do not save
+    if (e.keyCode != 13) {
+      return;
+    }
+    _exit_callback();
+  });
+  _textbox.blur(_exit_callback); // focus lost
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */

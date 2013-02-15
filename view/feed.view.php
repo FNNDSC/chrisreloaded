@@ -96,13 +96,15 @@ class FeedV implements ObjectViewInterface {
     }
 
     $favorite_icon = 'icon-star-empty';
+    $favorite_text = 'Favorite';
     if ($object->favorite == '1') {
       $favorite_icon = 'icon-star';
+      $favorite_text = '<b>Favorited</b>';
     }
 
     $edit_icon = '';
     if ($object->status == 100) {
-      $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png' onclick='_FEED_.activate_feed_name_edit($(this),event)'>";
+      $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png' onclick='_FEED_.feed_rename($(this),event)'>";
     }
 
     $t = new Template('feed.html');
@@ -123,6 +125,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('ARCHIVE_ICON', $archive_icon);
     $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_ICON', $favorite_icon);
+    $t -> replace('FAVORITE_TEXT', $favorite_text);
     $t -> replace('EDIT_ICON', $edit_icon);
     // set data browser
     $d = new Template('feed_data_browser.html');
