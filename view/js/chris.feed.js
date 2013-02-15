@@ -42,6 +42,7 @@ _FEED_.preview = function(file) {
   case 'INFO':
   case 'STATUS':
   case 'PARAM':
+  case 'RUN':
     _PREVIEW_.start('text', null, file);
     break;
   }
