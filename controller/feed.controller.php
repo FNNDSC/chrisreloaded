@@ -312,6 +312,10 @@ class FeedC implements FeedControllerInterface {
         $metaMapper->filter('name = (?)', 'parameters', 2);
         $metaMapper->filter('target_id = (?)', $feed_id, 2);
         $metaMapper->filter('target_type = (?)', 'feed', 2);
+        // second filters
+        $metaMapper->filter('name = (?)', 'pid', 3);
+        $metaMapper->filter('target_id = (?)', $feed_id, 3);
+        $metaMapper->filter('target_type = (?)', 'feed', 3);
         // get results
         $metaResult = $metaMapper->get();
         // for earch result, create same meta with different target id

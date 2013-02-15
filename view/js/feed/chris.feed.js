@@ -75,25 +75,15 @@ _FEED_.onclick = function(details, more) {
   var hidden = details.is(':hidden');
   if (hidden) {
     if (more) {
-      // rotate icon more.html('<a>Hide details</a>');
-      // For webkit browsers: e.g. Chrome
-      more.find('i').css('WebkitTransform', 'rotate(90deg)');
-      // For Mozilla browser: e.g. Firefox
-      more.find('i').css('-moz-transform', 'rotate(90deg)');
-      more.closest('.feed').css('margin-top', '10px');
-      more.closest('.feed').css('margin-bottom', '11px');
+      details.closest('.feed').css('margin-top', '10px');
+      details.closest('.feed').css('margin-bottom', '11px');
     }
     // details.show('blind','slow');
     details.slideDown('fast');
   } else {
     if (more) {
-      // rotate icon
-      // For webkit browsers: e.g. Chrome
-      more.find('i').css('WebkitTransform', 'rotate(0deg)');
-      // For Mozilla browser: e.g. Firefox
-      more.find('i').css('-moz-transform', 'rotate(0deg)');
-      more.closest('.feed').css('margin-top', '-1px');
-      more.closest('.feed').css('margin-bottom', '0px');
+      details.closest('.feed').css('margin-top', '-1px');
+      details.closest('.feed').css('margin-bottom', '0px');
     }
     // details.hide('blind', 'slow');
     details.slideUp('fast');
@@ -107,64 +97,6 @@ _FEED_.feed_title_onclick = function() {
      * @todo push feed css down?
      */
   });
-}
-_FEED_.activate_feed_name_edit = function(_me, event) {
-  // avoid collapsing/expanding the feed
-  var e = window.event;
-  if (!e) {
-    e = event;
-  }
-  e.stopPropagation();
-  // collapse the feed
-  _me.closest('.feed').find('.feed_details').slideUp('fast');
-  // hide the label and the edit icon
-  // show the textbox
-  _me.hide();
-  var _label = _me.prev().prev();
-  _label.hide();
-  var _old_name = _label.html();
-  var _textbox = _me.prev();
-  _textbox.show('fade');
-  _textbox.trigger('focus');
-  var _exit_callback = function() {
-    // save this guy.
-    var _value = _textbox.val();
-    var _feed_id = _me.closest('.feed').attr('data-chris-feed_id');
-    // call the API
-    jQuery.ajax({
-      type : 'POST',
-      url : 'api.php',
-      data : {
-        action : 'set',
-        what : 'feed_name',
-        id : _feed_id,
-        parameters : _value
-      },
-      dataType : 'json',
-      success : function(data) {
-        var safe_name = data['result'][0];
-        var _folder = data['result'][1] + '/';
-        // propagate the value in the UI
-        _label.html(safe_name);
-        // re-generate the file browser
-        var _file_browser = _me.closest('.feed').find('.file_browser');
-        // re-propagate the folder
-        _file_browser.attr('data-folder', _folder);
-        // reshow the label and the edit icon
-        _me.show();
-        _textbox.hide();
-        _label.show('fade');
-      }
-    });
-  }
-  _textbox.keypress(function(e) {
-    // if not enter, do not save
-    if (e.keyCode != 13) {
-      return;
-    }
-    _exit_callback();
-  });
-  _textbox.blur(_exit_callback); // focus lost
 }
 _FEED_.feed_fav_onclick = function() {
   jQuery(document).on('click', '.feed_fav_check', function() {
@@ -195,14 +127,13 @@ _FEED_.feed_more_onclick = function() {
     // modify
     e.stopPropagation();
     var details = jQuery(this).closest('.feed').find('.feed_details');
-    _FEED_.onclick(details, jQuery(this));
+    _FEED_.onclick(details, true);
   });
 }
 _FEED_.feed_onclick = function() {
   jQuery(document).on('click', '.feed_header', function() {
-    var more = jQuery(this).parent().find('.feed_more');
     var details = jQuery(this).parent().find('.feed_details');
-    _FEED_.onclick(details, more);
+    _FEED_.onclick(details, true);
   });
   jQuery(document).on('click', '.feed_meta_header', function() {
     var details = jQuery(this).parent().find('.feed_meta_content');
@@ -220,6 +151,12 @@ _FEED_.feed_onclick = function() {
     var details = jQuery(this).parent().find('.data_browser');
     _FEED_.onclick(details);
   });
+}
+_FEED_.hasS = function(value) {
+  if (value < 2) {
+    return '';
+  }
+  return 's';
 }
 _FEED_.updateFeedTimeout = function() {
   timer = setInterval(_FEED_.refresh, 5000);
@@ -325,10 +262,10 @@ _FEED_.ajaxUpdate = function() {
               i--;
             }
           }
-          var $newFeeds = _FEED_.finFeeds[0].length + _FEED_.runFeeds[0].length;
-          if ($newFeeds > 0) {
+          var newFeeds = _FEED_.finFeeds[0].length + _FEED_.runFeeds[0].length;
+          if (newFeeds > 0) {
             jQuery('.feed_update').html(
-                '<b>' + $newFeeds + ' </b>More feeds available');
+                newFeeds + ' <b>new feed' + _FEED_.hasS(newFeeds) + ' available</b>');
             if (!jQuery('.feed_update').is(':visible')) {
               jQuery('.feed_update').show('blind', 100);
             }
@@ -341,22 +278,30 @@ _FEED_.updateTime = function() {
   var m = 60 * 1000;
   var h = m * 60;
   var d = h * 24;
-  jQuery('div[data-chris-feed_time]').each(function() {
-    var feedTime = new Date(jQuery(this).attr('data-chris-feed_time') * 1000);
-    var diff = currentTime.getTime() - feedTime.getTime();
-    var day = Math.floor(diff / d);
-    if (day == 0) {
-      var hour = Math.floor((diff % d) / h);
-      if (hour == 0) {
-        var min = Math.floor(((diff % d) % h) / m);
-        jQuery(this).find('.feed_time').html(min + ' minutes ago');
-      } else {
-        jQuery(this).find('.feed_time').html(hour + ' hours ago');
-      }
-    } else {
-      jQuery(this).find('.feed_time').html(day + ' days ago');
-    }
-  });
+  jQuery('div[data-chris-feed_time]').each(
+      function() {
+        var feedTime = new Date(
+            jQuery(this).attr('data-chris-feed_time') * 1000);
+        var diff = currentTime.getTime() - feedTime.getTime();
+        var day = Math.floor(diff / d);
+        if (day == 0) {
+          var hour = Math.floor((diff % d) / h);
+          if (hour == 0) {
+            var min = Math.floor(((diff % d) % h) / m);
+            jQuery(this).find('.feed_time').html(
+                feedTime.toLocaleTimeString() + " (" + min + ' minute'
+                    + _FEED_.hasS(min) + ' ago)');
+          } else {
+            jQuery(this).find('.feed_time').html(
+                feedTime.toLocaleTimeString() + " (" + hour + ' hour'
+                    + _FEED_.hasS(hour) + ' ago)');
+          }
+        } else {
+          jQuery(this).find('.feed_time').html(
+              feedTime.toLocaleTimeString() + " (" + day + ' day'
+                  + _FEED_.hasS(day) + ' ago)');
+        }
+      });
 }
 _FEED_.notes_tab_onclick = function() {
   jQuery(document).on('click', '.notes_tab', function(e) {
@@ -423,190 +368,6 @@ _FEED_.editor_loaded = function() {
       });
     }
   });
-}
-_FEED_.feed_favorite_onclick = function() {
-  jQuery(document).on(
-      'click',
-      '.feed_favorite',
-      function(e) {
-        // modify
-        e.stopPropagation();
-        // get feed id
-        var feedElt = jQuery(this).parents().eq(3);
-        var feedID = feedElt.attr('data-chris-feed_id');
-        var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
-        // api.php add to favorites
-        jQuery.ajax({
-          type : "POST",
-          url : "api.php?action=set&what=feed_favorite&id=" + feedID,
-          dataType : "json",
-          success : function(data) {
-            jQuery(allElts).each(
-                function() {
-                  var elt = jQuery(this);
-                  if (!elt.parent().hasClass('feed_sea_content')) {
-                    if (data['result'] == "1") {
-                      jQuery(elt).hide(
-                          'blind',
-                          'slow',
-                          function() {
-                            jQuery(elt).find('.feed_favorite').html(
-                                '<i class="icon-star">');
-                            jQuery(elt).prependTo('.feed_fav_content')
-                                .slideDown('slow');
-                          });
-                    } else {
-                      if (elt.attr('data-chris-feed_status') != 100) {
-                        jQuery(elt).hide(
-                            'blind',
-                            'slow',
-                            function() {
-                              jQuery(elt).find('.feed_favorite').html(
-                                  '<i class="icon-star-empty">');
-                              jQuery(elt).prependTo('.feed_run_content')
-                                  .slideDown('slow');
-                            });
-                      } else {
-                        jQuery(elt).hide(
-                            'blind',
-                            'slow',
-                            function() {
-                              jQuery(elt).find('.feed_favorite').html(
-                                  '<i class="icon-star-empty">');
-                              jQuery(elt).prependTo('.feed_fin_content')
-                                  .slideDown('slow');
-                            });
-                      }
-                    }
-                  } else {
-                    if (data['result'] == "1") {
-                      jQuery(elt).find('.feed_favorite').html(
-                          '<i class="icon-star">');
-                    } else {
-                      jQuery(elt).find('.feed_favorite').html(
-                          '<i class="icon-star-empty">');
-                    }
-                  }
-                });
-          }
-        });
-      });
-}
-_FEED_.feed_archive_onclick = function() {
-  jQuery(document).on(
-      'click',
-      '.feed_archive',
-      function(e) {
-        // modify
-        e.stopPropagation();
-        // get feed id
-        var feedElt = jQuery(this).parents().eq(3);
-        var feedID = feedElt.attr('data-chris-feed_id');
-        var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
-        // api.php add to favorites
-        jQuery.ajax({
-          type : "POST",
-          url : "api.php?action=set&what=feed_archive&id=" + feedID,
-          dataType : "json",
-          success : function(data) {
-            jQuery(allElts)
-                .each(
-                    function() {
-                      var elt = jQuery(this);
-                      if (elt.parent().hasClass('feed_sea_content')) {
-                        if (data['result'] == "1") {
-                          jQuery(elt).find('.feed_archive').html(
-                              '<i class="icon-plus">');
-                        } else {
-                          jQuery(elt).find('.feed_archive').html(
-                              '<i class="icon-remove">');
-                          // clone and put at good location!
-                          clone = elt.clone().hide();
-                          // if favorite, push it in the favorites
-                          if (elt.find('.feed_favorite > .i').hasClass(
-                              'icon-star')) {
-                            jQuery(clone).prependTo('.feed_fav_content')
-                                .slideDown('slow');
-                          } else {
-                            if (elt.attr('data-chris-feed_status') != 100) {
-                              jQuery(clone).prependTo('.feed_run_content')
-                                  .slideDown('slow');
-                            } else {
-                              jQuery(clone).prependTo('.feed_fin_content')
-                                  .slideDown('slow');
-                            }
-                          }
-                        }
-                      } else {
-                        // remove
-                        if (data['result'] == "1") {
-                          jQuery(elt).hide('blind', 'slow', function() {
-                            jQuery(this).remove();
-                          });
-                        }
-                      }
-                    });
-          }
-        });
-      });
-}
-_FEED_.feed_share_onclick = function() {
-  jQuery(document).on(
-      'click',
-      '.feed_share',
-      function(e) {
-        // get feed id
-        var feedElt = jQuery(this).parents().eq(3);
-        var feedID = feedElt.attr('data-chris-feed_id');
-        apprise('<h5>Which user do you want to share this feed with?</h5>', {
-          'input' : new Date()
-        },
-            function(r) {
-              if (r) {
-                // 
-                var _user_name = r;
-                // send to the launcher
-                jQuery.ajax({
-                  type : "POST",
-                  url : "api.php?action=set&what=feed_share&id=" + feedID
-                      + "&parameters[]=" + _user_name,
-                  dataType : "json",
-                  success : function(data) {
-                    if (data['result'] == '') {
-                      jQuery()
-                          .toastmessage(
-                              'showSuccessToast',
-                              '<h5>Feed Shared with <b>' + _user_name
-                                  + '</b></h5>');
-                    } else {
-                      jQuery().toastmessage(
-                          'showErrorToast',
-                          '<h5>Feed not shared</h5><br><b>' + data['result']
-                              + '</b>');
-                    }
-                  }
-                });
-              } else {
-                jQuery().toastmessage('showErrorToast',
-                    '<h5>Feed not shared</h5>');
-              }
-            });
-        // now fetch the user list for autocompletion
-        jQuery.ajax({
-          type : 'GET',
-          url : 'api.php?action=get&what=users',
-          dataType : "json",
-          success : function(data) {
-            if (data['result'] != '') {
-              $('.aTextbox').typeahead({
-                source : data['result']
-              });
-            }
-          }
-        });
-        // modify
-        e.stopPropagation();
-      });
 }
 _FEED_.update_onclick = function() {
   jQuery(".feed_update").on(
@@ -695,7 +456,6 @@ _FEED_.search = function() {
       if (jQuery('.feed_fin_check').attr('checked')) {
         jQuery('.feed_fin_check').click();
       }
-      
       // ajax query
       if (event.which == 13) {
         _FEED_.searchAjax();
@@ -720,8 +480,13 @@ _FEED_.search = function() {
   });
 }
 _FEED_.searchAjax = function() {
+  // readystate 4: complete
+  if (_FEED_.searchXHR && _FEED_.searchXHR.readystate != 4) {
+    _FEED_.searchXHR.abort();
+    window.console.log('XHR request aborted');
+  }
   // ajax call
-  jQuery.ajax({
+  _FEED_.searchXHR = jQuery.ajax({
     type : "POST",
     url : "api.php?action=get&what=feed_search&parameters[]="
         + jQuery('.feed_search_input').val(),
@@ -850,6 +615,8 @@ _FEED_.createFeedDetails = function() {
 jQuery(document)
     .ready(
         function() {
+          // track status of search ajax request
+          _FEED_.searchXHR;
           // get oldest and newest feed value
           _FEED_.oldest = '9007199254740992';
           _FEED_.newest = '0';
@@ -885,9 +652,6 @@ jQuery(document)
           _FEED_.runFeeds = [ [], [] ];
           // on click callbacks
           _FEED_.feed_onclick();
-          _FEED_.feed_favorite_onclick();
-          _FEED_.feed_share_onclick();
-          _FEED_.feed_archive_onclick();
           // _FEED_.feed_title_onclick();
           _FEED_.feed_fav_onclick();
           _FEED_.feed_run_onclick();

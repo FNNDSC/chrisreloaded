@@ -80,6 +80,7 @@ foreach($finished as $key => $value){
 // if no more running pids for a feed, it has terminate
 foreach($count as $key => $value){
   if($value == 0){
+    // all feeds lined to this feed
     $startTime = $feedResult['Feed'][$index[$key]]->time;
     $endTime = microtime(true);
     $duration = $endTime - $startTime;
