@@ -151,14 +151,12 @@ _FEED_.feed_onclick = function() {
     _FEED_.onclick(details);
   });
 }
-
 _FEED_.hasS = function(value) {
-  if(value < 2){
+  if (value < 2) {
     return '';
   }
   return 's';
 }
-
 _FEED_.updateFeedTimeout = function() {
   timer = setInterval(_FEED_.refresh, 5000);
 }
@@ -265,7 +263,8 @@ _FEED_.ajaxUpdate = function() {
           }
           var newFeeds = _FEED_.finFeeds[0].length + _FEED_.runFeeds[0].length;
           if (newFeeds > 0) {
-            jQuery('.feed_update').html('<b>new feed' + _FEED_.hasS(newFeeds) + ' available</b>' + text);
+            jQuery('.feed_update').html(
+                newFeeds + ' <b>new feed' + _FEED_.hasS(newFeeds) + ' available</b>');
             if (!jQuery('.feed_update').is(':visible')) {
               jQuery('.feed_update').show('blind', 100);
             }
@@ -289,14 +288,17 @@ _FEED_.updateTime = function() {
           if (hour == 0) {
             var min = Math.floor(((diff % d) % h) / m);
             jQuery(this).find('.feed_time').html(
-                feedTime.toLocaleTimeString() + " (" + min + ' minute'+ _FEED_.hasS(min)+' ago)');
+                feedTime.toLocaleTimeString() + " (" + min + ' minute'
+                    + _FEED_.hasS(min) + ' ago)');
           } else {
             jQuery(this).find('.feed_time').html(
-                feedTime.toLocaleTimeString() + " (" + hour + ' hour'+ _FEED_.hasS(hour)+' ago)');
+                feedTime.toLocaleTimeString() + " (" + hour + ' hour'
+                    + _FEED_.hasS(hour) + ' ago)');
           }
         } else {
           jQuery(this).find('.feed_time').html(
-              feedTime.toLocaleTimeString() + " (" + day + ' day'+ _FEED_.hasS(day)+' ago)');
+              feedTime.toLocaleTimeString() + " (" + day + ' day'
+                  + _FEED_.hasS(day) + ' ago)');
         }
       });
 }
