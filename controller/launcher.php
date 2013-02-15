@@ -151,8 +151,9 @@ if($feed_id == -1){
 
 // create the feed directory
 $feed_path = joinPaths(CHRIS_USERS, $username, $plugin_name, $feedname.'-'.$feed_id);
-$mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$feed_path."'";
-exec($mkdir_command);
+// SINCE WE CREATE ALL JOB FOLDERS, WE DO NOT NEED TO CREATE THE FEED FOLDER
+//$mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$feed_path."'";
+//exec($mkdir_command);
 //umask(022);
 //mkdir($feed_path, 0777, true);
 
@@ -176,8 +177,9 @@ $parameters = str_replace("{USER_ID}", $user_id, $parameters);
 //$fp = fopen(joinPaths($job_path, 'chris.param'), 'w');
 //fwrite($fp, $parameters);
 //fclose($fp);
-$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'echo \"".$parameters."\" > ".joinPaths($job_path, 'chris.param')."'";
-exec($write_command);
+// WE DO NOT NEED THE .param FILE ANYMORE - everything is in the chris.run file
+//$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'echo \"".$parameters."\" > ".joinPaths($job_path, 'chris.param')."'";
+//exec($write_command);
 
 // add meta information to the feed
 FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
