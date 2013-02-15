@@ -176,7 +176,7 @@ $parameters = str_replace("{USER_ID}", $user_id, $parameters);
 //$fp = fopen(joinPaths($job_path, 'chris.param'), 'w');
 //fwrite($fp, $parameters);
 //fclose($fp);
-$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'echo \"".escapeshellcmd($parameters)."\" > ".joinPaths($job_path, 'chris.param')."'";
+$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'echo \"".$parameters."\" > ".joinPaths($job_path, 'chris.param')."'";
 exec($write_command);
 
 // add meta information to the feed
@@ -184,9 +184,19 @@ FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
 // add owner
 FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 
+// append the log files to the command
+$command .= ' > '.$job_path.'/chris.log 2> '.$job_path.'/chris.err';
+
+// create the chris.run file
+$runfile = joinPaths($job_path, 'chris.run');
+$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'echo \"".$command."\" > ".$runfile."; echo \"chmod -R 755 ".$feed_path."\" >> ".$runfile."; chmod +x ".$runfile."'";
+exec($write_command);
+
+
 $arguments = ' -l '.$job_path;
 $arguments .= ' -m '.$memory;
-$arguments .= ' -c "'.$command.'"';
+//$arguments .= ' -c "'.$command.'"';
+$arguments .= ' -c "'.$runfile.'"';
 $arguments .= ' -u "'.$username.'"';
 $arguments .= ' -p "'.$password.'"';
 $arguments .= ' -o "'.$feed_path.'"';
