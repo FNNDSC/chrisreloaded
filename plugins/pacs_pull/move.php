@@ -73,9 +73,9 @@ function sendEmail(&$patientInfo, &$dataLocation){
   $message .= 'Protocol: '.$patientInfo['ProtocolName'][0].PHP_EOL;
   $message .= 'Station: '.$patientInfo['StationName'][0].PHP_EOL.PHP_EOL.PHP_EOL;
 
-  $message .= "Thank you for using ChRIS,";
+  $message .= "Thank you for using ChRIS.";
 
-  email(CHRIS_DICOM_EMAIL_FROM, CHRIS_DICOM_EMAIL_TO, "New Dicom Series has been received", $message);
+  email(CHRIS_DICOM_EMAIL_FROM, CHRIS_DICOM_EMAIL_TO, "New dicom series has been received", $message);
 }
 
 // main function

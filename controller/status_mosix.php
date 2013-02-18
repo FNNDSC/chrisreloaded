@@ -105,9 +105,9 @@ foreach($count as $key => $value){
       $subject = "ChRIS2 - " . $feedResult['Feed'][$index[$key]]->plugin ." plugin finished";
 
       $message = "Hello " . $userResult['User'][0]->username . "," . PHP_EOL. PHP_EOL;
-      $message .= "Your results available at:" . PHP_EOL;
+      $message .= "Your results are available at:" . PHP_EOL;
       $message .= joinPaths(CHRIS_USERS, $userResult['User'][0]->username, $feedResult['Feed'][$index[$key]]->plugin, $feedResult['Feed'][$index[$key]]->name.'-'.$feedResult['Feed'][$index[$key]]->id) . PHP_EOL. PHP_EOL;
-      $message .= "Thank you for using ChRIS,";
+      $message .= "Thank you for using ChRIS.";
 
       // get user email address
       email(CHRIS_PLUGIN_EMAIL_FROM, $userResult['User'][0]->email, $subject, $message);
