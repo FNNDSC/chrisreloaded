@@ -708,11 +708,11 @@ _PACS_.ajaxPull = function() {
     target_type : 'feed'
   });
   param.push(param_container);
-  var _feed_name = (new Date()).toISOString();
+  var _feed_name = (new Date()).toLocaleString();
   window.console.log(param);
   // send to the launcher
   jQuery.ajax({
-    type : "POST",
+    type : "POST",                var _feed_name = (new Date()).toLocaleString();
     url : "../../controller/launcher-web.php",
     dataType : "text",
     data : {
@@ -750,7 +750,7 @@ $(document).ready(function() {
   _PACS_.table = null;
   // keep track of opened studies in simple view
   _PACS_.openStudies = [];
-  // connect button
+  // connect button                var _feed_name = (new Date()).toLocaleString();
   // show/hide the advanced parameters on click
   _PACS_.connectShowAdvancedParameters();
   // connect button for
