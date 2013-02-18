@@ -121,14 +121,6 @@ _FEED_.feed_sea_onclick = function() {
     _FEED_.onclick(advanced);
   });
 }
-_FEED_.feed_more_onclick = function() {
-  jQuery(document).on('click', '.feed_more', function(e) {
-    // modify
-    e.stopPropagation();
-    var details = jQuery(this).closest('.feed').find('.feed_details');
-    _FEED_.onclick(details, true);
-  });
-}
 _FEED_.feed_onclick = function() {
   jQuery(document).on('click', '.feed_header', function() {
     var details = jQuery(this).parent().find('.feed_details');
@@ -656,7 +648,6 @@ jQuery(document)
           _FEED_.feed_run_onclick();
           _FEED_.feed_fin_onclick();
           _FEED_.feed_sea_onclick();
-          _FEED_.feed_more_onclick();
           _FEED_.update_onclick();
           _FEED_.updateFeedTimeout();
           _FEED_.updateTime();
