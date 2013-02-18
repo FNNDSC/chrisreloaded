@@ -127,4 +127,35 @@ function recurse_copy($src,$dst) {
   closedir($dir);
 }
 
+/**
+ * Convenience method to send emails
+ * @param string $from sender
+ * @param string $to receiver
+ * @param string $subj subject
+ * @param string $msg message
+ */
+function email($from, $to, $subj, $msg) {
+
+  // email admins
+  $command = joinPaths(CHRIS_PLUGINS_FOLDER, 'mail/mail');
+  $command .= ' --output ' . CHRIS_TMP;
+  $command .= ' --to ' . $to;
+  $command .= ' --from ' . $from;
+  $command .= ' --subj "'. $subj.'"';
+  $command .= ' --msg "'.$msg.'"' ;
+
+  shell_exec($command);
+
+  // mv output/mail.log
+  // to output/date-mail.log
+  $old_name = joinPaths(CHRIS_TMP,'mail.log');
+  $new_name = joinPaths(CHRIS_LOG,date('YmdHis').'-mail.log');
+  while(!file_exists($new_name)){
+    if(rename($old_name, $new_name)){
+      break;
+    }
+    $new_name = joinPaths(CHRIS_LOG,date('YmdHis').'-mail.log');
+  }
+}
+
 ?>

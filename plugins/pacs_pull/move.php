@@ -57,14 +57,14 @@ function sendEmail(&$patientInfo, &$dataLocation){
   $message = 'Dear <username>,'.PHP_EOL;
   $message .= 'You have a new incoming series available at:'.PHP_EOL.PHP_EOL;
   $message .= 'Output directory: '.$dataLocation.PHP_EOL.PHP_EOL;
-  
+
   // patient information
   $message .= '===== Patient ====='.PHP_EOL;
   $message .= 'ID: '.$patientInfo['PatientID'][0].PHP_EOL;
   $message .= 'Name: '.$patientInfo['PatientName'][0].PHP_EOL;
   $message .= 'Sex: '.$patientInfo['PatientSex'][0].PHP_EOL;
   $message .= 'BirthDate: '.$patientInfo['PatientBirthDate'][0].PHP_EOL.PHP_EOL;
-  
+
   // patient information
   $message .= '===== Data ====='.PHP_EOL;
   $message .= 'Study Date: '.$patientInfo['StudyDate'][0].PHP_EOL;
@@ -72,30 +72,10 @@ function sendEmail(&$patientInfo, &$dataLocation){
   $message .= 'Series Description: '.$patientInfo['SeriesDescription'][0].PHP_EOL;
   $message .= 'Protocol: '.$patientInfo['ProtocolName'][0].PHP_EOL;
   $message .= 'Station: '.$patientInfo['StationName'][0].PHP_EOL.PHP_EOL.PHP_EOL;
-  
+
   $message .= "Thank you for using ChRIS,";
 
-  // output
-  // email admins
-  $command = joinPaths(CHRIS_PLUGINS_FOLDER, 'mail/mail');
-  $command .= ' --output ' . CHRIS_LOG;
-  $command .= ' --to ' . CHRIS_DICOM_EMAIL_TO;
-  $command .= ' --from ' . CHRIS_DICOM_EMAIL_FROM;
-  $command .= ' --subj "New Dicom Series has been received"';
-  $command .= ' --msg "'.$message.'"' ;
-
-  shell_exec($command);
-
-  // mv output/mail.log
-  // to output/date-mail.log
-  $old_name = joinPaths(CHRIS_LOG,'mail.log');
-  $new_name = joinPaths(CHRIS_LOG,date('YmdHis').'-mail.log');
-  while(!file_exists($new_name)){
-    if(rename($old_name, $new_name)){
-      break;
-    }
-    $new_name = joinPaths(CHRIS_LOG,date('YmdHis').'-mail.log');
-  }
+  email(CHRIS_DICOM_EMAIL_FROM, CHRIS_DICOM_EMAIL_TO, "New Dicom Series has been received", $message);
 }
 
 // main function
