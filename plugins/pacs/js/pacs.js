@@ -712,7 +712,7 @@ _PACS_.ajaxPull = function() {
   window.console.log(param);
   // send to the launcher
   jQuery.ajax({
-    type : "POST",                var _feed_name = (new Date()).toLocaleString();
+    type : "POST",
     url : "../../controller/launcher-web.php",
     dataType : "text",
     data : {
@@ -750,7 +750,7 @@ $(document).ready(function() {
   _PACS_.table = null;
   // keep track of opened studies in simple view
   _PACS_.openStudies = [];
-  // connect button                var _feed_name = (new Date()).toLocaleString();
+  // connect button
   // show/hide the advanced parameters on click
   _PACS_.connectShowAdvancedParameters();
   // connect button for
