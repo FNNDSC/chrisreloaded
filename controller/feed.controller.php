@@ -584,7 +584,7 @@ class FeedC implements FeedControllerInterface {
     foreach($slavefeedSubfolders as $key => $value) {
       // split name
       $index = explode('_', $value, 2);
-      if(count($index) != 2){
+      if(count($index) != 2 || !is_numeric($index[0])){
         $index = array('0', $value);
       }
       $slaveindex = intval($index[0]);
