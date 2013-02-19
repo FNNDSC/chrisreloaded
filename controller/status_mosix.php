@@ -36,6 +36,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 
 // Get pids in mosix queue
 $mosix_command = "ssh ".CLUSTER_USERNAME."@".CLUSTER_HOST." '/bin/mosq listall'";
@@ -88,6 +89,31 @@ foreach($count as $key => $value){
     $feedResult['Feed'][$index[$key]]->time = $endTime;
     $feedResult['Feed'][$index[$key]]->duration = (int)$duration;
     echo Mapper::update($feedResult['Feed'][$index[$key]],  $feedResult['Feed'][$index[$key]]->id);
+
+    // user's email
+    $userMapper = new Mapper('User');
+    $userMapper->filter('user.id = (?)', $feedResult['Feed'][$index[$key]]->user_id);
+    $userResult = $userMapper->get();
+
+    // if nothing in DB yet, return -1
+    if(count($userResult['User']) == 0)
+    {
+      return -1;
+    }
+    else{
+
+      $subject = "ChRIS2 - " . $feedResult['Feed'][$index[$key]]->plugin ." plugin finished";
+
+      $message = "Hello " . $userResult['User'][0]->username . "," . PHP_EOL. PHP_EOL;
+      $message .= "Your results are available at:" . PHP_EOL;
+      $message .= joinPaths(CHRIS_USERS, $userResult['User'][0]->username, $feedResult['Feed'][$index[$key]]->plugin, $feedResult['Feed'][$index[$key]]->name.'-'.$feedResult['Feed'][$index[$key]]->id) . PHP_EOL. PHP_EOL;
+      $message .= "Thank you for using ChRIS.";
+
+      // get user email address
+      email(CHRIS_PLUGIN_EMAIL_FROM, $userResult['User'][0]->email, $subject, $message);
+
+      return $userResult['User'][0]->id;
+    }
   }
 }
 ?>

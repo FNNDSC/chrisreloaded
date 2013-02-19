@@ -583,27 +583,38 @@ class FeedC implements FeedControllerInterface {
       unset($slavefeedSubfolders[$index]);
     }
 
-    // check for possible collisions
-    foreach($slavefeedSubfolders as $key => $value) {
+    // try "smart" renaming, if not working, user did something and we do
+    // solve collision in a dummy way
 
-      if (file_exists($masterfeedDirectory.'/'.$value)) {
-
-        // uh-oh! collision!
-        return false;
-
-      }
-
-    }
+    // get number of directories in master directory
+    $masterfeedSubfolders = scandir($masterfeedDirectory);
+    $startindex = count($masterfeedSubfolders) - 2;
 
     // link all job directories of the slave in the master folder
     foreach($slavefeedSubfolders as $key => $value) {
+      // split name
+      $index = explode('_', $value, 2);
+      if(count($index) != 2 || !is_numeric($index[0])){
+        $index = array('0', $value);
+      }
+      $slaveindex = intval($index[0]);
+      $dest = strval($startindex+$slaveindex).'_'.$index[1];
 
-      symlink($slavefeedDirectory.'/'.$value, $masterfeedDirectory.'/'.$value);
+      while(file_exists($masterfeedDirectory.'/'.$dest)){
+        $slaveindex++;
+        $dest = strval($startindex+$slaveindex).'_'.$index[1];
+      }
 
+      // if doesnt exist
+      if (!file_exists($masterfeedDirectory.'/'.$dest)) {
+        symlink($slavefeedDirectory.'/'.$value, $masterfeedDirectory.'/'.$dest);
+      }
+      else{
+        // uh-oh! collision!
+        return false;
+      }
     }
-
     return true;
-
   }
 
   /**
