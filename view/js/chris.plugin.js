@@ -235,6 +235,11 @@ jQuery(document)
                 // fire it up!!
                 // prevent scrolling up
                 e.preventDefault();
+                
+                if (jQuery(this).hasClass('disabled')) {
+                  return;
+                }
+                
                 // grab the visible plugin panel
                 var _visible_panel = jQuery('.plugin_panel :visible');
                 var _plugin_name = _visible_panel.parent().attr('id').replace(
@@ -403,6 +408,11 @@ jQuery(document)
                   
                 }
                 
+                jQuery('#plugin_submit_play').hide();
+                jQuery('#plugin_submit_wait').show();                
+                jQuery(this).addClass('disabled');
+
+                
                 var _feed_name = (new Date()).toLocaleString();
                 // send to the launcher
                 jQuery.ajax({
@@ -424,6 +434,12 @@ jQuery(document)
                         '<h5>Job started.</h5>' + 'Plugin: <b>' +
                             _plugin_name + '</b><br>' + 'Name: <b>' +
                             _feed_name + '</b>');
+                    
+                    jQuery('#plugin_submit').removeClass('disabled');
+                    jQuery('#plugin_submit_wait').hide();
+                    jQuery('#plugin_submit_play').show();
+                                        
+                    
                   }
                 });
 
