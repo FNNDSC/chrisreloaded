@@ -200,7 +200,7 @@ $arguments .= ' -m '.$memory;
 //$arguments .= ' -c "'.$command.'"';
 $arguments .= ' -c "'.$runfile.'"';
 $arguments .= ' -u "'.$username.'"';
-$arguments .= ' -p "'.escapeshellarg($password).'"';
+$arguments .= ' -p "'.escapeshellcmd($password).'"';
 $arguments .= ' -o "'.$feed_path.'"';
 if ($status == 100) {
   // run locally
