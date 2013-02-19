@@ -16,13 +16,13 @@
 	href='view/slicedrop/css/frontpage.css' />
 <link type='text/css' rel='stylesheet'
 	href='view/slicedrop/css/viewer.css' />
-	
+
 ${CSS}
 
 </head>
 
 <body id='body' style='overflow: hidden;'>
-
+	<div id='maintenance' style='${MAINTENANCE}'><div id='maintenance_label'><h1>Maintenance!</h1> The system will be available again shortly!<br>Sorry for the inconvenience!!</div></div>
 	<div id='frontpage'>
 		<div class="navbar navbar-fixed-top navbar-inverse">
 			<div class="navbar-inner">
@@ -49,9 +49,12 @@ ${CSS}
 					<form class="well-large" style="background-color: #000">
 						<img src="view/gfx/slicedrop_transparent.png"><br> <br>
 						<span style="color: white;">Instantly view medical imaging
-							data in 3D.<br>Drop files here or <input id='filebutton' type='file'
-          multiple onchange='selectfiles(this.files)' style='display: none;'></input><a
-							class="btn btn-primary btn-mini" onclick='javascript:document.getElementById("filebutton").click();'>Select files</a>
+							data in 3D.<br>Drop files here or <input id='filebutton'
+							type='file' multiple onchange='selectfiles(this.files)'
+							style='display: none;'></input><a
+							class="btn btn-primary btn-mini"
+							onclick='javascript:document.getElementById("filebutton").click();'>Select
+								files</a>
 						</span>
 					</form>
 					<form class="well-large" style="background-color: #000;">
@@ -280,7 +283,7 @@ ${CSS}
 
 	${JAVASCRIPT_LIBS}
 	<script type="text/javascript" src="view/js/chris.login.js"></script>
-	
+
 	<script type='text/javascript'
 		src='view/slicedrop/js/jquery.ui.slider.js'></script>
 	<script type='text/javascript'

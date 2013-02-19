@@ -115,6 +115,13 @@ if (!SecurityC::login()) {
 
   } else {
 
+    // check if maintenance is active
+    if (CHRIS_MAINTENANCE) {
+
+      $action = "maintenance";
+
+    }
+
     // valid minimal parameters
 
     // check actions
@@ -243,6 +250,12 @@ if (!SecurityC::login()) {
       case "help":
         $result['result'] = 'Perform actions on ChRIS.. Examples: COUNT: ?action=count&what=feed --- GET: ?action=get&what=feed&id=3 --- All parameters can be GET or POST.';
         break;
+      case "maintenance":
+
+        // this is maintenance mode
+        $result['result'] = 'maintenance';
+        break;
+
       case "ping":
       default:
         // this is a ping

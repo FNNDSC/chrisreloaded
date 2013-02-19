@@ -49,6 +49,13 @@ function loginPage() {
   $t -> replace('CSS', 'css.html');
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.html');
+
+  if (CHRIS_MAINTENANCE) {
+    $t -> replace('MAINTENANCE', 'display:block');
+  } else {
+    $t -> replace('MAINTENANCE', 'display:none');
+  }
+
   return $t;
 }
 
@@ -67,6 +74,13 @@ function homePage() {
   $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.html');
   $t -> replace('JAVASCRIPT_CHRIS', 'javascript.chris.html');
   $t -> replace('USERNAME', ucfirst($_SESSION['username']));
+
+  if (CHRIS_MAINTENANCE) {
+    $t -> replace('MAINTENANCE', 'display:block');
+  } else {
+    $t -> replace('MAINTENANCE', 'display:none');
+  }
+
   return $t;
 }
 
