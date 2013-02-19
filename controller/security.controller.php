@@ -69,11 +69,13 @@ class SecurityC implements SecurityControllerInterface {
 
     $username = null;
     $password = null;
+    $valid = false;
 
     if (isset($_SESSION['username']) && isset($_SESSION['password'])) {
       // a session is active
       $username = $_SESSION['username'];
       $password = $_SESSION['password'];
+      $valid = true;
     } else if (isset($_POST['username']) && isset($_POST['password'])) {
       // a login is requested via HTTP POST
       $username = $_POST['username'];
@@ -85,7 +87,11 @@ class SecurityC implements SecurityControllerInterface {
     }
 
     // validate the credentials
-    $user_id = UserC::login($username, $password);
+    if (!$valid) {
+      $user_id = UserC::login($username, $password);
+    } else {
+      return true;
+    }
 
     if ($user_id == -1) {
 

@@ -33,6 +33,6 @@ if(!defined('CHRIS_CONFIG_PARSED'))
   require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
 $options = include('run.php');
-$mosix_command = "ssh ".CLUSTER_USERNAME."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]."  > ".$options["l"]."/chris.log 2> ".$options["l"]."/chris.err < /dev/null & echo $!'";
+$mosix_command = "sshpass -p '".$options["p"]."' ssh ".$options["u"]."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]." < /dev/null & echo $!'";
 echo shell_exec($mosix_command);
 ?>

@@ -130,22 +130,24 @@ class FeedV implements ObjectViewInterface {
     // set data browser
     $d = new Template('feed_data_browser.html');
     $feed_folder = joinPaths($username,$object->plugin, $object->name.'-'.$object->id);
-    $feed_subfolders = scandir(CHRIS_USERS.$feed_folder);
-    natcasesort($feed_subfolders);
+    if (file_exists($feed_folder)) {
+      $feed_subfolders = scandir(CHRIS_USERS.$feed_folder);
+      natcasesort($feed_subfolders);
 
-    // get rid of eventual notes.html or index.html files
-    // find notes.html
-    $notes = array_search('notes.html', $feed_subfolders);
-    if ($notes) {
-      // remove this entry - we don't want to touch it
-      unset($feed_subfolders[$notes]);
-    }
-    // find index.html
-    $index = array_search('index.html', $feed_subfolders);
-    if ($index) {
-      // remove this entry - we don't want to touch it
-      unset($feed_subfolders[$index]);
-    }
+      // get rid of eventual notes.html or index.html files
+      // find notes.html
+      $notes = array_search('notes.html', $feed_subfolders);
+      if ($notes) {
+        // remove this entry - we don't want to touch it
+        unset($feed_subfolders[$notes]);
+      }
+      // find index.html
+      $index = array_search('index.html', $feed_subfolders);
+      if ($index) {
+        // remove this entry - we don't want to touch it
+        unset($feed_subfolders[$index]);
+      }
+      }
 
     $d -> replace('FOLDER', $feed_folder);
     $d -> replace('PATIENT_ID', 'fake_patient_id');

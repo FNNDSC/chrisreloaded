@@ -33,6 +33,12 @@ $shortopts .= "l:";
 $shortopts .= "m:";
 // command: command to be executed
 $shortopts .= "c:";
+// username
+$shortopts .= "u:";
+// password
+$shortopts .= "p:";
+// output folder
+$shortopts .= "o:";
 
 return getopt($shortopts);
 ?>
