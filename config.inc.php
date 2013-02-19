@@ -33,7 +33,7 @@ if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 require_once(dirname(__FILE__).'/controller/_util.inc.php');
 
 // maintenance mode
-define('CHRIS_MAINTENANCE', false);
+define('CHRIS_MAINTENANCE', true);
 
 // admin email
 define('CHRIS_ADMIN_EMAIL', 'chris@babymri.org');
