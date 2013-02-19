@@ -191,7 +191,7 @@ $command .= ' > '.$job_path.'/chris.log 2> '.$job_path.'/chris.err';
 
 // create the chris.run file
 $runfile = joinPaths($job_path, 'chris.run');
-$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$job_path."; echo \"".$command."\" > ".$runfile."; echo \"chmod -R 755 ".$feed_path."\" >> ".$runfile."; chmod +x ".$runfile."'";
+$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$job_path."; echo \"".$command."\" > ".$runfile."; echo \"chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;\" >> ".$runfile."; chmod +x ".$runfile."'";
 exec($write_command);
 
 
