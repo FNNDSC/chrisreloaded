@@ -161,8 +161,8 @@ $feed_path = joinPaths(CHRIS_USERS, $username, $plugin_name, $feedname.'-'.$feed
 $job_path = $feed_path;
 if($jobid != ''){
   $job_path .= '/'.$jobid;
-  $mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$job_path."'";
-  exec($mkdir_command);
+  //$mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$job_path."'";
+  //exec($mkdir_command);
 }
 
 // replace ${OUTPUT} pattern in the command and in the parameters
@@ -191,7 +191,7 @@ $command .= ' > '.$job_path.'/chris.log 2> '.$job_path.'/chris.err';
 
 // create the chris.run file
 $runfile = joinPaths($job_path, 'chris.run');
-$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'echo \"".$command."\" > ".$runfile."; echo \"chmod -R 755 ".$feed_path."\" >> ".$runfile."; chmod +x ".$runfile."'";
+$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$job_path."; echo \"".$command."\" > ".$runfile."; echo \"chmod -R 755 ".$feed_path."\" >> ".$runfile."; chmod +x ".$runfile."'";
 exec($write_command);
 
 
