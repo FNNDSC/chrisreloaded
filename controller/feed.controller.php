@@ -636,10 +636,11 @@ class FeedC implements FeedControllerInterface {
     // rename feed folder
     $old_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $old_name.'-'.$feedResult['Feed'][0]->id);
     $new_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
-    
+
     if(!is_link($new_path) or !is_file($new_path)){
-      
+
       $ssh_connection->exec('ln -s '.$old_path.' '.$new_path);
+
     }
 
     // find all shared versions of this feed
@@ -669,7 +670,7 @@ class FeedC implements FeedControllerInterface {
     }
 
     $results = Array();
-   /$results[] = joinPaths($username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
+    $results[] = joinPaths($username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
 
     return $results;
 
