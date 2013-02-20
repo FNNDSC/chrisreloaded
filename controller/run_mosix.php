@@ -36,5 +36,5 @@ $options = include('run.php');
 
 $mosix_command = "sshpass -p '".$options["p"]."' ssh -t ".$options["u"]."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]." < /dev/null & echo $!'";
 
-echo shell_exec($mosix_command);
+system($mosix_command);
 ?>
