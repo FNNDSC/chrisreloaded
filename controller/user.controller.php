@@ -33,6 +33,8 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
 
+require_once ('Net/SSH2.php');
+
 // interface
 interface UserControllerInterface
 {
@@ -100,14 +102,8 @@ class UserC implements UserControllerInterface {
 
     if (!isset($username) || !isset($password)) return -1;
 
-    $cmd = "sshpass -p '".$password."' ssh -o StrictHostKeyChecking=no ".$username."@".CLUSTER_HOST." cat /etc/hostname";
-
-    $cmd_output = array();
-    $exit_status = -1;
-
-    exec($cmd, $cmd_output, $exit_status);
-
-    if ($exit_status == 0) {
+    $ssh = new Net_SSH2(CLUSTER_HOST);
+    if ($ssh->login($username, $password)) {
 
       // the user credentials are valid!
 
@@ -126,6 +122,7 @@ class UserC implements UserControllerInterface {
 
     }
 
+    // invalid credentials
     return -1;
 
   }
