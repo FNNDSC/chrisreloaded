@@ -312,6 +312,10 @@ class FeedC implements FeedControllerInterface {
         $metaMapper->filter('name = (?)', 'parameters', 2);
         $metaMapper->filter('target_id = (?)', $feed_id, 2);
         $metaMapper->filter('target_type = (?)', 'feed', 2);
+        // second filters
+        $metaMapper->filter('name = (?)', 'pid', 3);
+        $metaMapper->filter('target_id = (?)', $feed_id, 3);
+        $metaMapper->filter('target_type = (?)', 'feed', 3);
         // get results
         $metaResult = $metaMapper->get();
         // for earch result, create same meta with different target id
@@ -336,13 +340,23 @@ class FeedC implements FeedControllerInterface {
 
         $destinationDirectory = CHRIS_USERS.$targetname.'/'.$feedResult['Feed'][0]->plugin;
         if(!is_dir($destinationDirectory)){
-          mkdir($destinationDirectory);
+          mkdir($destinationDirectory, 0777, true);
         }
 
         $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
 
         // just a link?
         symlink($targetDirectory, $destinationDirectory);
+
+        // we need to change the permission of the target directory to 777 (as the owner)
+        // so that the other user can write to this folder
+        // but only if the targetDirectory is a directory and not a link (a link means it was re-shared)
+        if (is_dir($targetDirectory)) {
+          $username = $_SESSION['username'];
+          $password = $_SESSION['password'];
+          $chmod_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'chmod -R 777 ".$targetDirectory."'";
+          exec($chmod_command);
+        }
 
         //if(!is_dir($destinationDirectory)){
         //  recurse_copy($targetDirectory, $destinationDirectory);
@@ -549,9 +563,6 @@ class FeedC implements FeedControllerInterface {
     $slavefeedResult = $slavefeedMapper->get();
     $slavefeedDirectory = joinPaths(CHRIS_USERS.$username, $slavefeedResult['Feed'][0]->plugin, $slavefeedResult['Feed'][0]->name.'-'.$slavefeedResult['Feed'][0]->id);
 
-    // folders to link
-    $foldersToLink = Array();
-    $highestSubfolderIndex = 0;
 
     // find the slave feed folders
     $slavefeedSubfolders = scandir($slavefeedDirectory);
@@ -571,70 +582,39 @@ class FeedC implements FeedControllerInterface {
       // remove this entry - we don't want to touch it
       unset($slavefeedSubfolders[$index]);
     }
-    // if subfolder 0 does not exist, use the current contents without notes.html and index.html as folder 0
-    $folder0 = array_search('0', $slavefeedSubfolders);
-    if (!$folder0) {
-      // only one job exists
-      $foldersToLink[] = $slavefeedDirectory;
 
-    } else {
-      // multiple jobs exist
-      // and $slavefeedSubfolders contains the list
-      // just prepend the slavefeedDirectory
-      foreach($slavefeedSubfolders as $key => $value) {
-        $foldersToLink[] = $slavefeedDirectory.'/'.$value;
-      }
-    }
+    // try "smart" renaming, if not working, user did something and we do
+    // solve collision in a dummy way
 
-    // check for the highest subfolder index in the master feed folder
+    // get number of directories in master directory
     $masterfeedSubfolders = scandir($masterfeedDirectory);
-    natcasesort($masterfeedSubfolders);
+    $startindex = count($masterfeedSubfolders) - 2;
 
-    // always remove . and ..
-    unset($masterfeedSubfolders[0]);
-    unset($masterfeedSubfolders[1]);
-    // find notes.html
-    $notes = array_search('notes.html', $masterfeedSubfolders);
-    if ($notes) {
-      // remove this entry - we don't want to touch it
-      unset($masterfeedSubfolders[$notes]);
-    }
-    // find index.html
-    $index = array_search('index.html', $masterfeedSubfolders);
-    if ($index) {
-      // remove this entry - we don't want to touch it
-      unset($masterfeedSubfolders[$index]);
-    }
-    // if subfolder 0 does not exist, create folder 0 right now
-    $folder0 = array_search('0', $masterfeedSubfolders);
-    if (!$folder0) {
+    // link all job directories of the slave in the master folder
+    foreach($slavefeedSubfolders as $key => $value) {
+      // split name
+      $index = explode('_', $value, 2);
+      if(count($index) != 2 || !is_numeric($index[0])){
+        $index = array('0', $value);
+      }
+      $slaveindex = intval($index[0]);
+      $dest = strval($startindex+$slaveindex).'_'.$index[1];
 
-      // note: this only ensures backwards compatibility
-      // all new feeds after 01/28/2013 should contain folder 0
-
-      // create folder 0
-      mkdir($masterfeedDirectory.'/0');
-
-      // move all content from this feed into the new directory 0
-      foreach($masterfeedSubfolders as $key => $value) {
-        rename(joinPaths($masterfeedDirectory, $value), joinPaths($masterfeedDirectory.'/0', $value));
+      while(file_exists($masterfeedDirectory.'/'.$dest)){
+        $slaveindex++;
+        $dest = strval($startindex+$slaveindex).'_'.$index[1];
       }
 
-    } else {
-      // multiple jobs exist
-
-      // adjust the highest subfolder index
-      $highestSubfolderIndex = end($masterfeedSubfolders);
-
+      // if doesnt exist
+      if (!file_exists($masterfeedDirectory.'/'.$dest)) {
+        symlink($slavefeedDirectory.'/'.$value, $masterfeedDirectory.'/'.$dest);
+      }
+      else{
+        // uh-oh! collision!
+        return false;
+      }
     }
-
-    // now start linking the foldersToLink into the master feed directory
-    foreach($foldersToLink as $key => $value) {
-      // increase the highestSubfolderIndex
-      $highestSubfolderIndex++;
-      symlink($value, joinPaths($masterfeedDirectory, $highestSubfolderIndex));
-
-    }
+    return true;
   }
 
   /**

@@ -708,7 +708,7 @@ _PACS_.ajaxPull = function() {
     target_type : 'feed'
   });
   param.push(param_container);
-  var _feed_name = (new Date()).toISOString();
+  var _feed_name = (new Date()).toLocaleString();
   window.console.log(param);
   // send to the launcher
   jQuery.ajax({

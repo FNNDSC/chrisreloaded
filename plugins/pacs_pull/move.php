@@ -48,6 +48,37 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 // include pacs helper
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
+
+// send email to admin
+// should be more generic to email user after plugins has finished too
+
+function sendEmail(&$patientInfo, &$dataLocation){
+  // start email:
+  $message = 'Dear <username>,'.PHP_EOL;
+  $message .= 'You have a new incoming series available at:'.PHP_EOL.PHP_EOL;
+  $message .= 'Output directory: '.$dataLocation.PHP_EOL.PHP_EOL;
+
+  // patient information
+  $message .= '===== Patient ====='.PHP_EOL;
+  $message .= 'ID: '.$patientInfo['PatientID'][0].PHP_EOL;
+  $message .= 'Name: '.$patientInfo['PatientName'][0].PHP_EOL;
+  $message .= 'Sex: '.$patientInfo['PatientSex'][0].PHP_EOL;
+  $message .= 'BirthDate: '.$patientInfo['PatientBirthDate'][0].PHP_EOL.PHP_EOL;
+
+  // patient information
+  $message .= '===== Data ====='.PHP_EOL;
+  $message .= 'Study Date: '.$patientInfo['StudyDate'][0].PHP_EOL;
+  $message .= 'Study Description: '.$patientInfo['StudyDescription'][0].PHP_EOL;
+  $message .= 'Series Description: '.$patientInfo['SeriesDescription'][0].PHP_EOL;
+  $message .= 'Protocol: '.$patientInfo['ProtocolName'][0].PHP_EOL;
+  $message .= 'Station: '.$patientInfo['StationName'][0].PHP_EOL.PHP_EOL.PHP_EOL;
+
+  $message .= "Thank you for using ChRIS.";
+
+  email(CHRIS_DICOM_EMAIL_FROM, CHRIS_DICOM_EMAIL_TO, "New dicom series has been received", $message);
+}
+
+// main function
 $shortopts = "d:";
 
 $options = getopt($shortopts);
@@ -139,7 +170,7 @@ if ($handle = opendir($study_directory)) {
                 $logFile .= 'Patient already mapped to data...'.PHP_EOL;
                 $logFile .= 'patient data id: '.$dataPatientResult['Data_Patient'][0]->id.PHP_EOL;
               }
-              
+
               // MAP DATA TO STUDY
               $dataStudyMapper = new Mapper('Data_Study');
               $dataStudyMapper->filter('data_id = (?)',$data_chris_id);
@@ -151,7 +182,7 @@ if ($handle = opendir($study_directory)) {
                 $dataStudyObject->data_id = $data_chris_id;
                 $dataStudyObject->study_id = $study_chris_id;
                 $mapping_data_study_id = Mapper::add($dataStudyObject);
-                
+
                 $logFile .= 'data study id: '.$mapping_data_study_id.PHP_EOL;
               }
               else{
@@ -198,10 +229,10 @@ if ($handle = opendir($study_directory)) {
                 // create the 0.info file, which contains more information about the data
                 $myFile = $datadirname.'/0.info';
                 $fh = fopen($myFile, 'a');
-                
+
                 foreach($process_file as $key => $value)
                   fwrite($fh, $key.' : '.$value[0].PHP_EOL);
-                
+
                 fclose($fh);
               }
               else{
@@ -284,6 +315,9 @@ foreach($received as $key => $value){
   }
 }
 
+sendEmail($process_file, $datadirname);
+
 echo $logFile;
+
 return;
 ?>

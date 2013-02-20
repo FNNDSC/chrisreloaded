@@ -34,5 +34,8 @@ if(!defined('CHRIS_CONFIG_PARSED'))
 
 $options = include('run.php');
 
-echo 'NOT_IMPLEMENTED';
+// run without any cluster scheduler
+$local_command = "sshpass -p '".$options["p"]."' ssh ".$options["u"]."@localhost '".$options["c"]." < /dev/null & echo $!'";
+echo shell_exec($local_command);
+
 ?>

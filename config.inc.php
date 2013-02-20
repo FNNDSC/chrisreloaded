@@ -32,6 +32,15 @@ if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 // include the utilities
 require_once(dirname(__FILE__).'/controller/_util.inc.php');
 
+// maintenance mode
+define('CHRIS_MAINTENANCE', false);
+
+// admin email
+define('CHRIS_ADMIN_EMAIL', 'chris@babymri.org');
+define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.org');
+define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.org');
+define('CHRIS_DICOM_EMAIL_TO', 'nicolas.rannou@childrens.harvard.edu,rudolph.pienaar@childrens.harvard.edu,borjan.gagoski@childrens.harvard.edu');
+
 // MYSQL configuration
 define('SQL_HOST', 'chris');
 define('SQL_USERNAME', 'chris');

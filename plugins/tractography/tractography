@@ -35,24 +35,33 @@ class tractography(Plugin):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
-    #base command
-    command = ' \'/chb/arch/scripts/tract_meta.bash -v 10 -f';
-    
-    #output
-    command += ' -O ' + options.output
-    command += ' -L ' + options.output
-    command += ' -R -log'
-    
-    # grab the first dicom input file
-    # dicom directory
-    command += ' -D ' + options.dti
+    # create/format input directory to fit connectome_meta requierements
+    input_dir = os.path.join(options.output, 'input')
+    # create input directory
+    if not os.path.exists(input_dir):
+      os.makedirs(input_dir)
+      
     # get dti images
     dti_files = [d for d in os.listdir(options.dti) if not os.path.isdir(d) and os.path.splitext(d)[1] == ".dcm"]
     # check incoming dti directory
     if not len(dti_files) > 0:
       print options.dti + ' doesn\'t contain any *.dcm files' 
       sys.exit(0)
-
+      
+    for dti_file in dti_files:
+      os.symlink(os.path.join(options.dti, dti_file), os.path.join(input_dir, dti_file))
+      
+    #base command
+    command = ' \'/chb/arch/scripts/tract_meta.bash -v 10 -f';
+    
+    #output
+    command += ' -O ' + options.output
+    command += ' -L ' + options.output
+    command += ' -R _log'
+    
+    # grab the first dicom input file
+    # dicom directory
+    command += ' -D ' + input_dir
     command += ' -d ' + dti_files[0]
     # stages
     command += ' -t 12';
@@ -72,7 +81,7 @@ class tractography(Plugin):
     command += ' --angle-threshold ' + options.anglethreshold
     
     #recon algo
-    if options.recalgo ==  '2nd_Order_Runga_Hutta':
+    if options.recalgo == '2nd_Order_Runga_Hutta':
       command += ' -A rk2'
     elif options.recalgo == 'Interpolated_Streamline':
       command += ' -A sl'
@@ -80,7 +89,7 @@ class tractography(Plugin):
       command += ' -A tl'
 
     #image model
-    if options.immodel ==  'HARDI':
+    if options.immodel == 'HARDI':
       command += ' -I hardi'
     
     #gradient image

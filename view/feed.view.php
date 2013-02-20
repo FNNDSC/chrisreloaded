@@ -82,20 +82,29 @@ class FeedV implements ObjectViewInterface {
     // create the status text
     $status_text = '<font color=red>Running <i class="icon-refresh rotating_class"></i></font>';
     // ('.$object->status.'%)
-    $share_text = '';
     if ($object->status == 100) {
       $status_text = '<font color=green>Done</font>';
-      $share_text = '<i class="icon-share-alt"></i>';
     }
 
-    $archive_text = '<i class="icon-remove"></i>';
+    $share_icon = 'icon-share-alt';
+
+    $archive_icon = 'icon-remove';
+    $archive_text = 'Archive';
     if ($object->archive == '1') {
-      $archive_text = '<i class="icon-plus"></i>';
+      $archive_icon = 'icon-plus';
+      $archive_text = 'Restore';
     }
 
-    $favorite_text = '<i class="icon-star-empty"></i>';
+    $favorite_icon = 'icon-star-empty';
+    $favorite_text = 'Favorite';
     if ($object->favorite == '1') {
-      $favorite_text = '<i class="icon-star"></i>';
+      $favorite_icon = 'icon-star';
+      $favorite_text = '<b>Favorited</b>';
+    }
+
+    $edit_icon = '';
+    if ($object->status == 100) {
+      $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png' onclick='_FEED_.feed_rename($(this),event)'>";
     }
 
     $t = new Template('feed.html');
@@ -110,36 +119,36 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
     $t -> replace('TIME_FORMATED', $object->time);
     $t -> replace('PLUGIN', ucwords(str_replace('_',' ',$object->plugin)));
-    $t -> replace('MORE', 'Show details');
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
-    $t -> replace('SHARE_TEXT', $share_text);
+    $t -> replace('SHARE_ICON', $share_icon);
+    $t -> replace('ARCHIVE_ICON', $archive_icon);
     $t -> replace('ARCHIVE_TEXT', $archive_text);
+    $t -> replace('FAVORITE_ICON', $favorite_icon);
     $t -> replace('FAVORITE_TEXT', $favorite_text);
+    $t -> replace('EDIT_ICON', $edit_icon);
     // set data browser
     $d = new Template('feed_data_browser.html');
     $feed_folder = joinPaths($username,$object->plugin, $object->name.'-'.$object->id);
-    $feed_subfolders = scandir(CHRIS_USERS.$feed_folder);
-    natcasesort($feed_subfolders);
+    if (file_exists($feed_folder)) {
+      $feed_subfolders = scandir(CHRIS_USERS.$feed_folder);
+      natcasesort($feed_subfolders);
 
-    // get rid of eventual notes.html or index.html files
-    // find notes.html
-    $notes = array_search('notes.html', $feed_subfolders);
-    if ($notes) {
-      // remove this entry - we don't want to touch it
-      unset($feed_subfolders[$notes]);
-    }
-    // find index.html
-    $index = array_search('index.html', $feed_subfolders);
-    if ($index) {
-      // remove this entry - we don't want to touch it
-      unset($feed_subfolders[$index]);
-    }
+      // get rid of eventual notes.html or index.html files
+      // find notes.html
+      $notes = array_search('notes.html', $feed_subfolders);
+      if ($notes) {
+        // remove this entry - we don't want to touch it
+        unset($feed_subfolders[$notes]);
+      }
+      // find index.html
+      $index = array_search('index.html', $feed_subfolders);
+      if ($index) {
+        // remove this entry - we don't want to touch it
+        unset($feed_subfolders[$index]);
+      }
+      }
 
-    if (count($feed_subfolders) == 3 && $feed_subfolders[2] == '0' && is_dir(CHRIS_USERS.$feed_folder.'/'.$feed_subfolders[2])) {
-      // only one job exists in the output folder, enter it immediately
-      $feed_folder .= '/0';
-    }
     $d -> replace('FOLDER', $feed_folder);
     $d -> replace('PATIENT_ID', 'fake_patient_id');
     $d -> replace('DATA_ID', 'fake_data_id');

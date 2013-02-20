@@ -40,6 +40,22 @@ class PACS_Push(Plugin):
     
     print Plugin.TITLE
     print Plugin.VERSION
+    
+    # create/format input directory to fit connectome_meta requierements
+    input_dir = os.path.join(options.output, 'input')
+    # create input directory
+    if not os.path.exists(input_dir):
+      os.makedirs(input_dir)
+      
+    # get dcm images
+    dcm_files = [e for e in os.listdir(options.DIR) if not os.path.isdir(e)]
+    # check incoming dti directory
+    if not len(dcm_files) > 0:
+      print options.DIR + ' doesn\'t contain any files' 
+      sys.exit(0)
+      
+    for dcm_file in dcm_files:
+      os.symlink(os.path.join(options.DIR, dcm_file), os.path.join(input_dir, dcm_file))
 
     # process!!
     print '======================================='
@@ -52,7 +68,7 @@ class PACS_Push(Plugin):
     if not options.EXT == "*":
       command += ' -E ' + options.EXT;
     command += ' -a ' + options.AETITLE;
-    command += ' ' + options.DIR;
+    command += ' ' + input_dir;
     command = current_dir + '/dicom_dirSend.bash.wrapper ' + command + '\''
     print 'command:'
     print command
@@ -67,7 +83,7 @@ if __name__ == "__main__":
   plugin.add_parameter('Input', Plugin.IMAGE, '--directory', action='store', dest='DIR', help='Directory to be pushed')
   plugin.add_parameter('Advanced', Plugin.STRING, '--host', action='store', default='pretoria.tch.harvard.edu', dest='HOST', help='Target Host')
   plugin.add_parameter('Advanced', Plugin.STRING, '--port', action='store', default='10502', dest='PORT', help='Target Port')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='*', dest='EXT', help='Extension of files to be pushed')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='dcm', dest='EXT', help='Extension of files to be pushed')
   plugin.add_parameter('Advanced', Plugin.STRING, '--aetitle', action='store', default='CHRIS2', dest='AETITLE', help='Calling AETitle')
   plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Anonymize the dataset')
   plugin.launch(sys.argv)

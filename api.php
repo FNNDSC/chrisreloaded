@@ -115,6 +115,13 @@ if (!SecurityC::login()) {
 
   } else {
 
+    // check if maintenance is active
+    if (CHRIS_MAINTENANCE) {
+
+      $action = "maintenance";
+
+    }
+
     // valid minimal parameters
 
     // check actions
@@ -161,12 +168,20 @@ if (!SecurityC::login()) {
           $slave_feed_id = $parameters;
 
           // merge the feeds
-          FeedC::mergeFeeds($master_feed_id, $slave_feed_id);
+          $merged = FeedC::mergeFeeds($master_feed_id, $slave_feed_id);
 
-          // and archive the slave
-          FeedC::archive($slave_feed_id);
+          if ($merged) {
+            // and archive the slave
+            FeedC::archive($slave_feed_id);
 
-          $result['result'] = 'done';
+            $result['result'] = 'done';
+
+          } else {
+
+            // feeds not merged since there was a collision
+            $result['result'] = 'error';
+
+          }
 
         } else if($what == 'feed_name') {
 
@@ -235,6 +250,12 @@ if (!SecurityC::login()) {
       case "help":
         $result['result'] = 'Perform actions on ChRIS.. Examples: COUNT: ?action=count&what=feed --- GET: ?action=get&what=feed&id=3 --- All parameters can be GET or POST.';
         break;
+      case "maintenance":
+
+        // this is maintenance mode
+        $result['result'] = 'maintenance';
+        break;
+
       case "ping":
       default:
         // this is a ping

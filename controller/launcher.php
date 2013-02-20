@@ -44,6 +44,7 @@ $shortopts = "c:u::f::i::j::h";
 $longopts  = array(
     "command:",     // Required value
     "username::",    // Optional value
+    "password::",
     "feedname::",    // Optional value
     "feedid::",    // Optional value
     "jobid::",    // Optional value
@@ -86,6 +87,17 @@ if( array_key_exists('u', $options))
 elseif (array_key_exists('username', $options))
 {
   $username = $options['username'];
+}
+
+// is password given?
+$password = 'secret';
+if( array_key_exists('p', $options))
+{
+  $username = $options['p'];
+}
+elseif (array_key_exists('password', $options))
+{
+  $password = $options['password'];
 }
 
 // is feedname given?
@@ -139,13 +151,18 @@ if($feed_id == -1){
 
 // create the feed directory
 $feed_path = joinPaths(CHRIS_USERS, $username, $plugin_name, $feedname.'-'.$feed_id);
-mkdir($feed_path, 0777, true);
+// SINCE WE CREATE ALL JOB FOLDERS, WE DO NOT NEED TO CREATE THE FEED FOLDER
+//$mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$feed_path."'";
+//exec($mkdir_command);
+//umask(022);
+//mkdir($feed_path, 0777, true);
 
 // create job directory
 $job_path = $feed_path;
 if($jobid != ''){
   $job_path .= '/'.$jobid;
-  mkdir($job_path, 0777, true);
+  //$mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$job_path."'";
+  //exec($mkdir_command);
 }
 
 // replace ${OUTPUT} pattern in the command and in the parameters
@@ -157,21 +174,41 @@ $parameters = str_replace("{FEED_ID}", $feed_id, $parameters);
 $parameters = str_replace("{USER_ID}", $user_id, $parameters);
 
 // create chris.param file
-$fp = fopen(joinPaths($job_path, 'chris.param'), 'w');
-fwrite($fp, $parameters);
-fclose($fp);
+//$fp = fopen(joinPaths($job_path, 'chris.param'), 'w');
+//fwrite($fp, $parameters);
+//fclose($fp);
+// WE DO NOT NEED THE .param FILE ANYMORE - everything is in the chris.run file
+//$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'echo \"".$parameters."\" > ".joinPaths($job_path, 'chris.param')."'";
+//exec($write_command);
 
 // add meta information to the feed
 FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
 // add owner
 FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 
-// run dummy mosix script - should use crun
+// append the log files to the command
+$command .= ' > '.$job_path.'/chris.log 2> '.$job_path.'/chris.err';
+
+// create the chris.run file
+$runfile = joinPaths($job_path, 'chris.run');
+$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$job_path."; echo \"".$command."\" > ".$runfile."; echo \"chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;\" >> ".$runfile."; chmod +x ".$runfile."'";
+exec($write_command);
+
+
 $arguments = ' -l '.$job_path;
 $arguments .= ' -m '.$memory;
-$arguments .= ' -c "'.$command.'"';
-// run on cluster and return pid
-$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
+//$arguments .= ' -c "'.$command.'"';
+$arguments .= ' -c "'.$runfile.'"';
+$arguments .= ' -u "'.$username.'"';
+$arguments .= ' -p "'.escapeshellcmd($password).'"';
+$arguments .= ' -o "'.$feed_path.'"';
+if ($status == 100) {
+  // run locally
+  $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_local.php '.$arguments);
+} else {
+  // run on cluster and return pid
+  $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
+}
 $output = shell_exec($process_command);
 
 // attach pid to feed
@@ -179,6 +216,8 @@ $metaObject = new Meta();
 $metaObject->name = "pid";
 $metaObject->value = $output;
 FeedC::addMeta($feed_id, Array(0 => $metaObject));
+
+echo $output;
 
 echo $feed_id;
 ?>

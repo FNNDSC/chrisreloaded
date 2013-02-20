@@ -32,8 +32,15 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 if(!defined('CHRIS_CONFIG_PARSED'))
   require_once(dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
 
-// open log file
-$logFile = joinPaths(CHRIS_LOG, 'pacs_pull_listen.log');
+// create log file
+$logFile = joinPaths(CHRIS_LOG,date('YmdHis').'-pacs_pull_listen.log');
+while(!file_exists($logFile)){
+  if(touch($logFile)){
+    break;
+  }
+  $logFile = joinPaths(CHRIS_LOG,date('YmdHis').'-pacs_pull_listen.log');
+}
+
 $fullReport = '';
 
 // CREATE UNIQUE DIRECTORY

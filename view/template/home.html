@@ -7,17 +7,16 @@
 <title>ChRIS</title> ${CSS}
 </head>
 <body>
-
+<div id='maintenance' style='${MAINTENANCE}'><div id='maintenance_label'><h1>Maintenance!</h1> The system will be available again shortly!<br>Sorry for the inconvenience!!</div></div>
  ${NAVBAR}
 
  <div class="container" id='opaqueoverlay'
-  style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(https://twimg0-a.akamaihd.net/a/1344442772/t1/img/wash-white-30.png); min-height: 100%;">
+  style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(view/gfx/wash-white-30.png); min-height: 100%;">
 
   ${FEED_DATA_PREVIEW}
 
   <div id='home' class="row">
-   <div class="span4" data-spy="affix" style="z-index: 1000;">
-
+   <div class="span4" >
     <div class="well" id='information'
      style='padding-top: 10px; padding-bottom: 12px;'>
      <!-- GREETING -->
@@ -48,10 +47,8 @@
        class="icon icon-white icon-ok"></i> Run</a> <br> <br>
      </div>-->
     </div>
-
     ${PLUGIN}
    </div>
-   <div class="span12" data-spy="affix" style="z-index: 1000;">
     <div class="span8 pull-right">
      <div class="feed_title">
       <span style="font-size: 16px; font-weight: bold;">Activity
@@ -81,7 +78,6 @@
      </div> -->
      <div class="feed_update feed_dark"></div>
     </div>
-   </div>
    <!--    <div class="span12 pull-right" data-spy="affix"
     style="z-index: 500; margin-top: -20px; height: 40px; background: #66CCFF">
    </div> -->

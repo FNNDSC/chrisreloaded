@@ -10,6 +10,15 @@ _CHRIS_.updateStatistics = function() {
     url : "api.php?action=count&what=datafeedrunning",
     dataType : "json",
     success : function(data) {
+      
+      if (data['result'] == 'maintenance') {
+        
+        // we are in maintenance mode
+        // lock the screen
+        $('#maintenance').show();
+        return;
+        
+      }
 
       // update data count
       jQuery('#data_count').html(data['result'][0]);

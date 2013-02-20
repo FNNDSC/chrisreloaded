@@ -32,8 +32,13 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 if(!defined('CHRIS_CONFIG_PARSED'))
   require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
+<<<<<<< HEAD
 $options = include('run.php');
 
 $mosix_command = "ssh ".CLUSTER_USERNAME."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]."  > ".$options["l"]."/chris.log 2> ".$options["l"]."/chris.err < /dev/null & echo $!'";
+=======
+$options = include('run.php');
+$mosix_command = "sshpass -p '".$options["p"]."' ssh ".$options["u"]."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]." < /dev/null & echo $!'";
+>>>>>>> upstream/master
 echo shell_exec($mosix_command);
 ?>
