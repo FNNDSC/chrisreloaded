@@ -188,7 +188,9 @@ foreach($parameters as $k0 => $v0){
   $launch_command .= '--command \''.$command.'\' ';
 
   // return output
-  $feed_id = shell_exec($launch_command);
+  $output = Array();
+  exec($launch_command, $output);
+  $feed_id = $output[0];
   //echo PHP_EOL.$feed_id.PHP_EOL;
 }
 
