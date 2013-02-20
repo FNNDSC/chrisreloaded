@@ -55,9 +55,9 @@ interface FeedControllerInterface
   // return the number of running jobs for a user
   static public function getRunningCount($userid);
   // merge two feeds
-  static public function mergeFeeds($master_id, $slave_id);
+  static public function mergeFeeds($master_id, $slave_id, &$ssh_connection);
   // update feed name
-  static public function updateName($id, $name);
+  static public function updateName($id, $name, &$ssh_connection);
 }
 
 /**
@@ -282,7 +282,7 @@ class FeedC implements FeedControllerInterface {
     return $feed_update;
   }
 
-  static public function share($feed_id, $ownerid, $ownername, $targetname){
+  static public function share($feed_id, $ownerid, $ownername, $targetname, &$ssh_connection){
     // get target user id
     $userMapper = new Mapper('User');
     $userMapper->filter('username = (?)', $targetname);
@@ -340,6 +340,7 @@ class FeedC implements FeedControllerInterface {
 
         $destinationDirectory = CHRIS_USERS.$targetname.'/'.$feedResult['Feed'][0]->plugin;
         if(!is_dir($destinationDirectory)){
+          // 777? 775
           mkdir($destinationDirectory, 0777, true);
         }
 
@@ -352,10 +353,7 @@ class FeedC implements FeedControllerInterface {
         // so that the other user can write to this folder
         // but only if the targetDirectory is a directory and not a link (a link means it was re-shared)
         if (is_dir($targetDirectory)) {
-          $username = $_SESSION['username'];
-          $password = $_SESSION['password'];
-          $chmod_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'chmod -R 777 ".$targetDirectory."'";
-          exec($chmod_command);
+          $ssh_connection->exec('chmod -R 777 '.$targetDirectory);
         }
 
         //if(!is_dir($destinationDirectory)){
@@ -547,7 +545,7 @@ class FeedC implements FeedControllerInterface {
    * @param int $master_id The master feed id (target for merge).
    * @param int $slave_id The slave feed id.
    */
-  static public function mergeFeeds($master_id, $slave_id) {
+  static public function mergeFeeds($master_id, $slave_id, &$ssh_connection) {
 
     $username = $_SESSION['username'];
 
@@ -607,7 +605,7 @@ class FeedC implements FeedControllerInterface {
 
       // if doesnt exist
       if (!file_exists($masterfeedDirectory.'/'.$dest)) {
-        symlink($slavefeedDirectory.'/'.$value, $masterfeedDirectory.'/'.$dest);
+        $ssh_connection->exec('ln -s '.$slavefeedDirectory.'/'.$value.' '.$masterfeedDirectory.'/'.$dest);
       }
       else{
         // uh-oh! collision!
@@ -623,7 +621,7 @@ class FeedC implements FeedControllerInterface {
    * @param int $id The feed id.
    * @param string $name The feed name to set.
    */
-  static public function updateName($id, $name) {
+  static public function updateName($id, $name, &$ssh_connection) {
 
     $username = $_SESSION['username'];
 
@@ -638,8 +636,12 @@ class FeedC implements FeedControllerInterface {
     // rename feed folder
     $old_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $old_name.'-'.$feedResult['Feed'][0]->id);
     $new_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
-    rename($old_path, $new_path);
 
+    if(!is_link($new_path) or !is_file($new_path)){
+
+      $ssh_connection->exec('ln -s '.$old_path.' '.$new_path);
+
+    }
 
     // find all shared versions of this feed
     $metaMapper = new Mapper('Meta');
@@ -664,13 +666,10 @@ class FeedC implements FeedControllerInterface {
         unlink($link_path);
         // create new link
         symlink($new_path, $link_path);
-
-
       }
     }
 
     $results = Array();
-    $results[] = $safe_name;
     $results[] = joinPaths($username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
 
     return $results;
