@@ -209,7 +209,10 @@ if ($status == 100) {
   // run on cluster and return pid
   $process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
 }
-$output = shell_exec($process_command);
+
+$output = Array();
+exec($process_command, $output);
+$output = $output[0];
 
 // attach pid to feed
 $metaObject = new Meta();

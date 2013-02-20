@@ -34,7 +34,7 @@ if(!defined('CHRIS_CONFIG_PARSED'))
 
 $options = include('run.php');
 
-$mosix_command = "sshpass -p '".$options["p"]."' ssh -t ".$options["u"]."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]." < /dev/null & echo $!; exit;'";
+$mosix_command = "sshpass -p '".$options["p"]."' ssh -t ".$options["u"]."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]." < /dev/null & echo $!;'";
 
 $output = Array();
 exec($mosix_command, $output);
