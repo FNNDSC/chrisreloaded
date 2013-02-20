@@ -29,17 +29,17 @@ class fcMRI( Plugin ):
   def run( self, options ):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    os.system('cd ' + options.output +';' + current_dir + '/fcMRI.wrapper '+ options.Functional + ' ' + options.Timeseries_to_skip + ' ' + options.Anatomical + ' ' + options.BET_parameter + ' ' + options.Results_Folder + ' ' + options.Number_of_Components)
+    os.system('cd ' + options.output +';' + current_dir + '/fcMRI.wrapper '+ options.Functional + ' ' + options.Timeseries_to_skip + ' ' + options.Anatomical + ' ' + options.BET_parameter + ' ' + options.Results_Folder + ' ' + options.Number_of_ICA_components)
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = fcMRI()
   # minimum required memory to start the plugin
   plugin.memory = 20480
-  plugin.add_parameter( 'Input Data', Plugin.IMAGE, '--Functional', action='store', dest='Functional', help='Functional fMRI 4D volume' )
-  plugin.add_parameter( 'Input Data', Plugin.INTEGER, '--Timeseries_to_skip', default = 4, action='store', dest='Timeseries_to_skip', help='Functional 4D time-series to skip (default 4)' )
-  plugin.add_parameter( 'Input Data', Plugin.IMAGE, '--Anatomical', action='store', dest='Anatomical', help='Anatomical 3D volume' )
-  plugin.add_parameter( 'Input Data', Plugin.STRING, '--BET_parameter', default = '0.5', action='store', dest='BET_parameter', help='Adjust FSL bet parameter between 0 and 1 (smaller value gives larger brain contour estimate)' )
-  plugin.add_parameter( 'Input Data', Plugin.STRING, '--Results_Folder', default = 'ICA_Results', action='store', dest='Results_Folder', help='Specify a folder where ICA results are written' )
-  plugin.add_parameter( 'Input Data', Plugin.STRING, '--Number_of_Components', default = 'Automatic', action='store', dest='Number_of_Components', help='Specify the number of ICA components to extract (the default is recommended, i.e. Automatic)' )
+  plugin.add_parameter( 'Data', Plugin.IMAGE, '--Functional', action='store', dest='Functional', help='Functional fMRI 4D volume' )
+  plugin.add_parameter( 'Data', Plugin.INTEGER, '--Timeseries_to_skip', default = 4, action='store', dest='Timeseries_to_skip', help='Functional 4D time-series to skip (default 4)' )
+  plugin.add_parameter( 'Data', Plugin.IMAGE, '--Anatomical', action='store', dest='Anatomical', help='Anatomical 3D volume' )
+  plugin.add_parameter( 'Brain Extraction', Plugin.DOUBLE, '--BET_parameter', default = 0.5, action='store', dest='BET_parameter', help='Adjust FSL bet parameter between 0 and 1 (smaller value gives larger brain contour estimate)' )
+  plugin.add_parameter( 'Results', Plugin.STRING, '--Results_Folder', default = 'ICA_Results', action='store', dest='Results_Folder', help='Specify a folder where ICA results are written' )
+  plugin.add_parameter( 'ICA', Plugin.INTEGER, '--Number_of_ICA_components', default = -1, action='store', dest='Number_of_ICA_components', help='Automatic estimation (default = -1, recommended), otherwise specify the number of ICA components to extract' )
   plugin.launch( sys.argv )
