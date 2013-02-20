@@ -53,6 +53,7 @@ define('CHRIS_MODEL_FOLDER', joinPaths(CHRIS_WWWROOT,'model'));
 define('CHRIS_VIEW_FOLDER', joinPaths(CHRIS_WWWROOT,'view'));
 define('CHRIS_TEMPLATE_FOLDER', joinPaths(CHRIS_VIEW_FOLDER,'template'));
 define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
+define('CHRIS_LIB_FOLDER', joinPaths(CHRIS_WWWROOT,'lib'));
 define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
 
@@ -79,6 +80,9 @@ if(defined('CHRIS_CONFIG_DEBUG')) {
   $all_constants = get_defined_constants(true);
   print_r($all_constants['user']);
 }
+
+// setup phpseclib for SSH access
+set_include_path(get_include_path() . PATH_SEPARATOR . joinPaths(CHRIS_LIB_FOLDER, 'phpseclib', 'phpseclib'));
 
 
 // FLAG showing that the config was parsed
