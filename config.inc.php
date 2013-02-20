@@ -66,6 +66,9 @@ define('CHRIS_LOG', '/chb/users/chris/dev/log/');
 // cluster
 define('CLUSTER_HOST', 'rc-goldfinger');
 define('CLUSTER_USERNAME', 'chris');
+// we replace {MEMORY} with a memory requirement
+// and {COMMAND} with the command to schedule
+define('CLUSTER_SCHEDULER', 'nohup /bin/mosbatch -q -b -m{MEMORY} {COMMAND}');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));

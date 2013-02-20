@@ -252,7 +252,9 @@ if ($status == 100) {
   //$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_local.php '.$arguments);
 } else {
   // run on cluster and return pid
-  $pid = $ssh->exec("nohup /bin/mosbatch -q -b -m".$memory." ".$runfile." < /dev/null & echo $!;");
+  $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_SCHEDULER);
+  $cluster_command = str_replace("{COMMAND}", $runfile, $cluster_command);
+  $pid = $ssh->exec($cluster_command." < /dev/null & echo $!;");
   //$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
 }
 
