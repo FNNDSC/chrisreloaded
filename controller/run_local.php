@@ -32,14 +32,15 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 if(!defined('CHRIS_CONFIG_PARSED'))
   require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
+require_once ('Net/SSH2.php');
+
 $options = include('run.php');
 
-// run without any cluster scheduler
-$local_command = "sshpass -p '".$options["p"]."' ssh -t ".$options["u"]."@localhost '".$options["c"]." < /dev/null & echo $!'";
+$ssh = new Net_SSH2("localhost");
+if (!$ssh->login($options["u"], $options["p"])) {
+  die('Login Failed');
+}
 
-$output = Array();
-exec($local_command, $output);
-
-print_r($output[0]);
+echo $ssh->exec($options["c"]);
 
 ?>

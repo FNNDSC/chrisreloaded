@@ -36,19 +36,12 @@ require_once ('Net/SSH2.php');
 
 $options = include('run.php');
 
-//$mosix_command = "sshpass -p '".$options["p"]."' ssh -t ".$options["u"]."@".CLUSTER_HOST." 'nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]." < /dev/null & echo $!;'";
-
 $ssh = new Net_SSH2(CLUSTER_HOST);
 if (!$ssh->login($options["u"], $options["p"])) {
   die('Login Failed');
 }
 
+// return the PID
 echo $ssh->exec("nohup /bin/mosbatch -q -b -m".$options["m"]." ".$options["c"]." < /dev/null & echo $!;");
-
-
-//$output = Array();
-//exec($mosix_command, $output);
-
-//print_r($output[0]);
 
 ?>
