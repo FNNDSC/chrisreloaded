@@ -36,6 +36,10 @@ $options = include('run.php');
 
 // run without any cluster scheduler
 $local_command = "sshpass -p '".$options["p"]."' ssh -t ".$options["u"]."@localhost '".$options["c"]." < /dev/null & echo $!'";
-system($local_command);
+
+$output = Array();
+exec($local_command, $output);
+
+print_r($output[0]);
 
 ?>

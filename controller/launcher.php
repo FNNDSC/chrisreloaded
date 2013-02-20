@@ -217,7 +217,7 @@ $metaObject->name = "pid";
 $metaObject->value = $output;
 FeedC::addMeta($feed_id, Array(0 => $metaObject));
 
-echo $output;
+//echo $output;
 
 echo $feed_id;
 ?>

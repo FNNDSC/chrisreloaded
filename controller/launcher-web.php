@@ -189,7 +189,7 @@ foreach($parameters as $k0 => $v0){
 
   // return output
   $feed_id = shell_exec($launch_command);
-  echo PHP_EOL.$feed_id.PHP_EOL;
+  //echo PHP_EOL.$feed_id.PHP_EOL;
 }
 
 ?>
