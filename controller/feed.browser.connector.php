@@ -29,6 +29,10 @@ $_POST['dir'] = urldecode($_POST['dir']);
 $root = CHRIS_USERS;
 $path = $root . $_POST['dir'];
 
+if(is_link($path)){
+  $path = readlink($path);
+}
+
 if( is_dir($path) ) {
   $files = scandir($path);
   natcasesort($files);
@@ -55,7 +59,7 @@ if( is_dir($path) ) {
         }
         elseif(is_file($fullpath)){
           $ext = preg_replace('/^.*\./', '', $file);
-          
+
           $t = new Template('feed_data_browser_file_item.html');
           $t->replace('CLASSES', 'file ext_'.$ext);
           $t->replace('FULLPATH', $fullpath);
@@ -69,5 +73,4 @@ if( is_dir($path) ) {
     echo "</ul>";
   }
 }
-
 ?>
