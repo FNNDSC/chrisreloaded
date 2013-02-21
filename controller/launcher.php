@@ -227,7 +227,7 @@ if (!$ssh->login($username, $password)) {
   die('Login Failed');
 }
 
-$setStatus = joinPaths(CHRIS_CONTROLLER_FOLDER, 'setStatus.php');
+$setStatus = joinPaths(CHRIS_CONTROLLER_FOLDER, 'set_status.php');
 $setStatus .= ' '.$feed_id;
 
 $ssh->exec('mkdir -p '.$job_path);
