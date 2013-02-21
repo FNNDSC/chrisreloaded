@@ -2,7 +2,6 @@
  * Define the FEED namespace
  */
 var _FEED_ = _FEED_ || {};
-
 _FEED_.feed_share = function() {
   jQuery(document).on(
       'click',
@@ -90,7 +89,7 @@ _FEED_.feed_favorite = function() {
                             jQuery(elt).find('.feed_favorite > i')
                                 .removeClass().addClass('icon-star');
                             jQuery(elt).find('.feed_favorite > span').html(
-                            '<b>Favorited</b>');
+                                '<b>Favorited</b>');
                             jQuery(elt).prependTo('.feed_fav_content')
                                 .slideDown('slow');
                           });
@@ -103,7 +102,7 @@ _FEED_.feed_favorite = function() {
                               jQuery(elt).find('.feed_favorite > i')
                                   .removeClass().addClass('icon-star-empty');
                               jQuery(elt).find('.feed_favorite > span').html(
-                              'Favorite');
+                                  'Favorite');
                               jQuery(elt).prependTo('.feed_run_content')
                                   .slideDown('slow');
                             });
@@ -115,7 +114,7 @@ _FEED_.feed_favorite = function() {
                               jQuery(elt).find('.feed_favorite > i')
                                   .removeClass().addClass('icon-star-empty');
                               jQuery(elt).find('.feed_favorite > span').html(
-                              'Favorite');
+                                  'Favorite');
                               jQuery(elt).prependTo('.feed_fin_content')
                                   .slideDown('slow');
                             });
@@ -126,12 +125,12 @@ _FEED_.feed_favorite = function() {
                       jQuery(elt).find('.feed_favorite > i').removeClass()
                           .addClass('icon-star');
                       jQuery(elt).find('.feed_favorite > span').html(
-                      '<b>Favorited</b>');
+                          '<b>Favorited</b>');
                     } else {
                       jQuery(elt).find('.feed_favorite > i').removeClass()
                           .addClass('icon-star-empty');
-                      jQuery(elt).find('.feed_favorite > span').html(
-                      'Favorite');
+                      jQuery(elt).find('.feed_favorite > span')
+                          .html('Favorite');
                     }
                   }
                 });
@@ -203,28 +202,23 @@ _FEED_.feed_archive = function() {
         });
       });
 }
-_FEED_.feed_rename = function(_me, event) {
-  // avoid collapsing/expanding the feed
-  var e = window.event;
-  if (!e) {
-    e = event;
-  }
-  e.stopPropagation();
-  // collapse the feed
-  _me.closest('.feed').find('.feed_details').slideUp('fast');
-  // hide the label and the edit icon
-  // show the textbox
-  _me.hide();
-  var _label = _me.prev().prev();
-  _label.hide();
-  var _old_name = _label.html();
-  var _textbox = _me.prev();
-  _textbox.show('fade');
-  _textbox.trigger('focus');
-  var _exit_callback = function() {
-    // save this guy.
-    var _value = _textbox.val();
-    var _feed_id = _me.closest('.feed').attr('data-chris-feed_id');
+_FEED_.feed_rename = function() {
+  jQuery(document).on('keypress', '.feed_name_edit', function(e) {
+    // if not enter, do not save
+    if (e.keyCode != 13) {
+      return;
+    }
+    // trigger blur
+    jQuery(this).trigger('blur');
+  });
+  
+  jQuery(document).on('blur', '.feed_name_edit', function(e) {
+    // window.console.log('enter pressed');
+    var _value = jQuery(this).val();
+    var _label = jQuery(this).prev();
+    var _icon = jQuery(this).next();
+    var _input = jQuery(this);
+    var _feed_id = jQuery(this).closest('.feed').attr('data-chris-feed_id');
     // call the API
     jQuery.ajax({
       type : 'POST',
@@ -242,24 +236,32 @@ _FEED_.feed_rename = function(_me, event) {
         // propagate the value in the UI
         _label.html(safe_name);
         // re-generate the file browser
-        var _file_browser = _me.closest('.feed').find('.file_browser');
+        var _file_browser = _input.closest('.feed').find('.file_browser');
         // re-propagate the folder
         _file_browser.attr('data-folder', _folder);
         // reshow the label and the edit icon
-        _me.show();
-        _textbox.hide();
+        _icon.css('display', '');
+        _input.hide();
+        _input.removeClass('focused');
         _label.show('fade');
       }
     });
-  }
-  _textbox.keypress(function(e) {
-    // if not enter, do not save
-    if (e.keyCode != 13) {
-      return;
-    }
-    _exit_callback();
   });
-  _textbox.blur(_exit_callback); // focus lost
+  jQuery(document).on('click', '.feed_edit_icon', function(e) {
+    e.stopPropagation();
+    // collapse the feed
+    jQuery(this).closest('.feed').find('.feed_details').slideUp('fast');
+    // hide the label and the edit icon
+    // show the textbox
+    jQuery(this).hide();
+    var _label = jQuery(this).prev().prev();
+    _label.hide();
+    var _old_name = _label.html();
+    var _textbox = jQuery(this).prev();
+    _textbox.show('fade');
+    _textbox.trigger('focus');
+    _textbox.addClass('focused');
+  });
 }
 /**
  * Setup the javascript when document is ready (finshed loading)
@@ -268,4 +270,5 @@ jQuery(document).ready(function() {
   _FEED_.feed_share();
   _FEED_.feed_favorite();
   _FEED_.feed_archive();
+  _FEED_.feed_rename();
 });
