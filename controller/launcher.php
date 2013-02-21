@@ -180,7 +180,9 @@ if($feed_id == -1){
 }
 
 // create the feed directory
-$feed_path = joinPaths(CHRIS_USERS, $username, $plugin_name, $feedname.'-'.$feed_id);
+$user_path = joinPaths(CHRIS_USERS, $username);
+$plugin_path = joinPaths($user_path, $plugin_name);
+$feed_path = joinPaths($plugin_path, $feedname.'-'.$feed_id);
 // SINCE WE CREATE ALL JOB FOLDERS, WE DO NOT NEED TO CREATE THE FEED FOLDER
 //$mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$feed_path."'";
 //exec($mkdir_command);
@@ -234,7 +236,7 @@ if (!$ssh->login($username, $password)) {
 
 $ssh->exec('mkdir -p '.$job_path);
 $ssh->exec('echo "'.$command.'" > '.$runfile);
-$ssh->exec("echo 'chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile");
+$ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile");
 $ssh->exec("chmod +x $runfile;");
 
 
