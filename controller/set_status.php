@@ -118,10 +118,17 @@ if ($status == 100) {
     //return $userResult['User'][0]->id;
   }
 
+  $startTime = $feedResult['Feed'][0]->time;
+  $endTime = microtime(true);
+  $duration = $endTime - $startTime;
+
+  $feedResult['Feed'][0]->time = $endTime;
+  $feedResult['Feed'][0]->duration = $duration;
 
 }
 
 # push to database
+
 $feedResult['Feed'][0]->status = $status;
 Mapper::update($feedResult['Feed'][0], $feed_id);
 
