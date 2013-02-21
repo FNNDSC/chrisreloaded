@@ -123,9 +123,12 @@ _FEED_.feed_sea_onclick = function() {
   });
 }
 _FEED_.feed_onclick = function() {
-  jQuery(document).on('click', '.feed_header', function() {
+  jQuery(document).on('click', '.feed_header', function(e) {
     var details = jQuery(this).parent().find('.feed_details');
-    _FEED_.onclick(details, true);
+    var foc = details.parent().find('.feed_name_edit').hasClass("focused");
+    if (!foc) {
+      _FEED_.onclick(details, true);
+    }
   });
   jQuery(document).on('click', '.feed_meta_header', function() {
     var details = jQuery(this).parent().find('.feed_meta_content');
@@ -257,7 +260,8 @@ _FEED_.ajaxUpdate = function() {
           var newFeeds = _FEED_.finFeeds[0].length + _FEED_.runFeeds[0].length;
           if (newFeeds > 0) {
             jQuery('.feed_update').html(
-                newFeeds + ' <b>new feed' + _FEED_.hasS(newFeeds) + ' available</b>');
+                newFeeds + ' <b>new feed' + _FEED_.hasS(newFeeds)
+                    + ' available</b>');
             if (!jQuery('.feed_update').is(':visible')) {
               jQuery('.feed_update').show('blind', 100);
             }

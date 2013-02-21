@@ -104,7 +104,7 @@ class FeedV implements ObjectViewInterface {
 
     $edit_icon = '';
     if ($object->status == 100) {
-      $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png' onclick='_FEED_.feed_rename($(this),event)'>";
+      $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'>";
     }
 
     $t = new Template('feed.html');
