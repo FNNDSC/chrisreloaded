@@ -56,14 +56,14 @@ if (count($feedResult['Feed']) == 0) {
   die('Invalid feed id.');
 }
 
+# grab old status
+$old_status = $feedResult['Feed'][0]->status;
+
 if ($status{0} == '+') {
 
   // increasing mode
 
   echo "Increasing status of feed $feed_id by $status...\n";
-
-  # grab old status
-  $old_status = $feedResult['Feed'][0]->status;
 
   # increase status
   $status = $old_status + $status;
@@ -72,7 +72,16 @@ if ($status{0} == '+') {
 
   // set mode
 
-  echo "Setting status of feed $feed_id to $status...\n";
+  if ($old_status >= $status || $status > 100) {
+
+    die("Ignoring setting the status since the old status $old_status >= the new status $status or the old status >= 100.\n");
+    $status = $old_status;
+
+  } else {
+
+    echo "Setting status of feed $feed_id to $status...\n";
+
+  }
 
 }
 
