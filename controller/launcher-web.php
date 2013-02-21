@@ -56,33 +56,21 @@ if (!SecurityC::login()) {
 
 }
 
-
-//print_r($parameters);
-
+$status_step = number_format (100 / count($parameters), 2);
 
 foreach($parameters as $k0 => $v0){
 
   // launcher.php compliant
-  //$launch_command = './launcher.php ';
   // user?
   $username = $_SESSION['username'];
   $password = $_SESSION['password'];
   $feedname = sanitize($_POST['FEED_NAME']);
 
-
-  //$launch_command .= '--username=\''.$_SESSION['username'].'\' ';
-  //$launch_command .= '--password=\''.$_SESSION['password'].'\' ';
-  // feed name?
-  //$launch_command .= '--feedname=\''.sanitize($_POST['FEED_NAME']).'\' ';
-  // feed id?
-  //$launch_command .= '--feedid=\''.$feed_id.'\' ';
   if (isset($_POST['FEED_STATUS'])) {
     // status, if we don't want to start with status=0
-    //$launch_command .= '--status=\''.sanitize($_POST['FEED_STATUS']).'\' ';
     $status = sanitize($_POST['FEED_STATUS']);
   }
-  // status, if we don't want to start with status=0
-  //$launch_command .= '--memory=\''.sanitize($_POST['FEED_MEMORY']).'\' ';
+  // memory, if we don't want to start with memory=256
   $memory = sanitize($_POST['FEED_MEMORY']);
 
   // plugin name?
@@ -174,7 +162,6 @@ foreach($parameters as $k0 => $v0){
   }
 
   // always provide a job id
-  //$launch_command .= '--jobid=\''.$k0.'_'.$subfoldertail.'\' ';
   $jobid = $k0.'_'.$subfoldertail;
 
   // output?
@@ -194,11 +181,6 @@ foreach($parameters as $k0 => $v0){
     }
   }
 
-  //$launch_command .= '--command \''.$command.'\' ';
-
-
-
-
   // The following variables have to be defined to be picked up
   // by launcher.php
   // $command
@@ -209,6 +191,7 @@ foreach($parameters as $k0 => $v0){
   // $jobid
   // $memory
   // $status
+  // $status_step
   include('launcher.php');
 
 }

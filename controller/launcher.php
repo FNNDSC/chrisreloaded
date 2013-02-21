@@ -58,6 +58,7 @@ if ($commandline_mode) {
       "feedid::",    // Optional value
       "jobid::",    // Optional value
       "status::", // Optional value
+      "statusstep::",
       "memory::", // Optional value
       "help"    // Optional value
   );
@@ -138,6 +139,12 @@ if ($commandline_mode) {
   if (array_key_exists('status', $options)) {
     $status = $options['status'];
   }
+  
+  // set the initial status, if --status is provided, use this value
+  $status_step = 100;
+  if (array_key_exists('statusstep', $options)) {
+    $status_step = $options['statusstep'];
+  }
 
   // set the initial memory, if --status is provided, use this value
   $memory = 2048;
@@ -159,6 +166,7 @@ if ($commandline_mode) {
 // $jobid
 // $memory
 // $status
+// $status_step
 // *****************
 
 
@@ -219,15 +227,20 @@ if (!$ssh->login($username, $password)) {
   die('Login Failed');
 }
 
+$setStatus = joinPaths(CHRIS_CONTROLLER_FOLDER, 'setStatus.php');
+$setStatus .= ' '.$feed_id;
+
 $ssh->exec('mkdir -p '.$job_path);
-$ssh->exec('echo "'.$command.'" > '.$runfile);
+$ssh->exec('echo "'.$setStatus.' 1" > '.$runfile);
+$ssh->exec('echo "'.$command.'" >> '.$runfile);
+$ssh->exec('echo "'.$setStatus.' +'.$status_step.'" >> '.$runfile);
+
 $ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile");
 $ssh->exec("chmod +x $runfile;");
 
 
 $arguments = ' -l '.$job_path;
 $arguments .= ' -m '.$memory;
-//$arguments .= ' -c "'.$command.'"';
 $arguments .= ' -c "'.$runfile.'"';
 $arguments .= ' -u "'.$username.'"';
 $arguments .= ' -p "'.$password.'"';
@@ -236,18 +249,12 @@ if ($status == 100) {
   // run locally
   $ssh->exec($runfile);
   $pid = -1;
-  //$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_local.php '.$arguments);
 } else {
   // run on cluster and return pid
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_SCHEDULER);
   $cluster_command = str_replace("{COMMAND}", $runfile, $cluster_command);
   $pid = $ssh->exec($cluster_command." < /dev/null & echo $!;");
-  //$process_command = joinPaths(CHRIS_CONTROLLER_FOLDER, 'run_mosix.php '.$arguments);
 }
-
-//$output = Array();
-//exec($process_command, $output);
-//$output = $output[0];
 
 // attach pid to feed
 $metaObject = new Meta();
