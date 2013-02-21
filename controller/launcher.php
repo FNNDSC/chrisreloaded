@@ -183,18 +183,11 @@ if($feed_id == -1){
 $user_path = joinPaths(CHRIS_USERS, $username);
 $plugin_path = joinPaths($user_path, $plugin_name);
 $feed_path = joinPaths($plugin_path, $feedname.'-'.$feed_id);
-// SINCE WE CREATE ALL JOB FOLDERS, WE DO NOT NEED TO CREATE THE FEED FOLDER
-//$mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$feed_path."'";
-//exec($mkdir_command);
-//umask(022);
-//mkdir($feed_path, 0777, true);
 
 // create job directory
 $job_path = $feed_path;
 if($jobid != ''){
   $job_path .= '/'.$jobid;
-  //$mkdir_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'mkdir -p ".$job_path."'";
-  //exec($mkdir_command);
 }
 
 // replace ${OUTPUT} pattern in the command and in the parameters
@@ -204,14 +197,6 @@ $command = str_replace("{USER_ID}", $user_id, $command);
 $parameters = str_replace("{OUTPUT}", $job_path, $parameters);
 $parameters = str_replace("{FEED_ID}", $feed_id, $parameters);
 $parameters = str_replace("{USER_ID}", $user_id, $parameters);
-
-// create chris.param file
-//$fp = fopen(joinPaths($job_path, 'chris.param'), 'w');
-//fwrite($fp, $parameters);
-//fclose($fp);
-// WE DO NOT NEED THE .param FILE ANYMORE - everything is in the chris.run file
-//$write_command = "sshpass -p '".$password."' ssh ".$username."@localhost 'echo \"".$parameters."\" > ".joinPaths($job_path, 'chris.param')."'";
-//exec($write_command);
 
 // add meta information to the feed
 FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
