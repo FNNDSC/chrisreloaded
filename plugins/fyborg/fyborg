@@ -21,6 +21,11 @@
 import os, sys
 sys.path.append( os.path.join( os.path.dirname( __file__ ), '../' ) )
 from plugin import Plugin
+sys.path.append( '/chb/arch/scripts' )
+sys.path.append( '/chb/arch/scripts/fyborg' )
+sys.path.append( '/chb/arch/scripts/fyborg/_common' )
+from fyconn import *
+
 
 class Fyborg( Plugin ):
   '''
@@ -40,16 +45,19 @@ class Fyborg( Plugin ):
     tempdir = tempfile.mkdtemp( 'fy', 'borg', '/chb/tmp' )
     shutil.copytree( options.Freesurfer, tempdir + '/T1' )
     shutil.copytree( options.DTI, tempdir + '/DTI' )
-    cmd = ''
-    cmd += '/chb/arch/scripts/fyconn.py -i ' + tempdir + ' -o ' + options.output + ' -r ' + options.Radius + ' --overwrite --verbose'
+    # cmd = ''
+    # cmd += '/chb/arch/scripts/fyconn.py -i ' + tempdir + ' -o ' + options.output + ' -r ' + options.Radius + ' --overwrite --verbose'
     # sp = subprocess.Popen( ["/bin/bash", "-i", "-c", cmd], stdout=sys.stdout )
     # sp.communicate()
-    os.system( cmd );
+    # os.system( cmd );
+    logic = FyborgLogic()
+    logic.run( tempdir, options.output, int( options.Radius ), "20 200", -1, False, True )
+
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = Fyborg()
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--freesurfer', action='store', dest='Freesurfer', help='the Freesurfer reconstruction' )
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--dti', action='store', dest='DTI', help='the DTI reconstruction' )
-  plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--radius', action='store', default=3, dest='Radius', help='the look-around Radius' )
+  # plugin.add_parameter( 'Input', Plugin.IMAGE, '--freesurfer', action='store', dest='Freesurfer', help='the Freesurfer reconstruction' )
+  # plugin.add_parameter( 'Input', Plugin.IMAGE, '--dti', action='store', dest='DTI', help='the DTI reconstruction' )
+  # plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--radius', action='store', default=3, dest='Radius', help='the look-around Radius' )
   plugin.launch( sys.argv )
