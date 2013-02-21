@@ -60,7 +60,7 @@ class Fyborg( Plugin ):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = Fyborg()
-  # plugin.add_parameter( 'Input', Plugin.IMAGE, '--freesurfer', action='store', dest='Freesurfer', help='the Freesurfer reconstruction' )
-  # plugin.add_parameter( 'Input', Plugin.IMAGE, '--dti', action='store', dest='DTI', help='the DTI reconstruction' )
-  # plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--radius', action='store', default=3, dest='Radius', help='the look-around Radius' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--freesurfer', action='store', dest='Freesurfer', help='the Freesurfer reconstruction' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--dti', action='store', dest='DTI', help='the DTI reconstruction' )
+  plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--radius', action='store', default=3, dest='Radius', help='the look-around Radius' )
   plugin.launch( sys.argv )
