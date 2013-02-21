@@ -24,7 +24,10 @@ from plugin import Plugin
 sys.path.append( '/chb/arch/scripts' )
 sys.path.append( '/chb/arch/scripts/fyborg' )
 sys.path.append( '/chb/arch/scripts/fyborg/_common' )
-from fyconn import *
+try:
+  from fyconn import *
+except:
+  pass
 
 
 class Fyborg( Plugin ):
