@@ -231,9 +231,9 @@ $setStatus = joinPaths(CHRIS_CONTROLLER_FOLDER, 'set_status.php');
 $setStatus .= ' '.$feed_id;
 
 $ssh->exec('mkdir -p '.$job_path);
-$ssh->exec('echo "'.$setStatus.' 1" > '.$runfile);
+if($status != 100) $ssh->exec('echo "'.$setStatus.' 1" >> '.$runfile);
 $ssh->exec('echo "'.$command.'" >> '.$runfile);
-$ssh->exec('echo "'.$setStatus.' +'.$status_step.'" >> '.$runfile);
+if($status != 100) $ssh->exec('echo "'.$setStatus.' +'.$status_step.'" >> '.$runfile);
 
 $ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile");
 $ssh->exec("chmod +x $runfile;");

@@ -640,7 +640,7 @@ class FeedC implements FeedControllerInterface {
     $old_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $old_name.'-'.$feedResult['Feed'][0]->id);
     $new_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
 
-    if(!is_link($new_path) or !is_file($new_path)){
+    if(!is_link($new_path) and !file_exists($new_path)){
       $ssh_connection->exec('ln -s '.$old_path.' '.$new_path);
     }
 
