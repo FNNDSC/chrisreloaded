@@ -33,10 +33,6 @@ if(is_link($path)){
   $path = readlink($path);
 }
 
-echo 'YO '.$path.PHP_EOL;
-echo trim(`stat -c%F $path`).PHP_EOL;
-echo "PASSED".PHP_EOL;
-
 if( is_dir($path) ) {
   $files = scandir($path);
   natcasesort($files);
