@@ -49,6 +49,10 @@ if (count($argv)<3) {
 $feed_id = $argv[1];
 $status = $argv[2];
 
+// get $db instance
+$db = DB::getInstance();
+$db->lock('feed', 'WRITE');
+
 // grab the feed
 $feedResult = Mapper::getStatic('Feed', $feed_id);
 
@@ -86,11 +90,24 @@ if ($status{0} == '+') {
 }
 
 # clamp the addition
-if ($status > 100) {
+if ($status >= 100) {
   $status = 100;
+
+  $startTime = $feedResult['Feed'][0]->time;
+  $endTime = microtime(true);
+  $duration = $endTime - $startTime;
+
+  $feedResult['Feed'][0]->time = $endTime;
+  $feedResult['Feed'][0]->duration = $duration;
 }
 
-echo $status.PHP_EOL;
+# push to database
+
+$feedResult['Feed'][0]->status = $status;
+Mapper::update($feedResult['Feed'][0], $feed_id);
+
+// unlock $db connection
+$db->unlock();
 
 # send email if status == 100
 if ($status == 100) {
@@ -103,7 +120,6 @@ if ($status == 100) {
   // if nothing in DB yet, return -1
   if(count($userResult['User']) > 0)
   {
-
     $subject = "ChRIS2 - " . $feedResult['Feed'][0]->plugin ." plugin finished";
 
     $message = "Hello " . $userResult['User'][0]->username . "," . PHP_EOL. PHP_EOL;
@@ -115,23 +131,8 @@ if ($status == 100) {
 
     // get user email address
     email(CHRIS_PLUGIN_EMAIL_FROM, $userResult['User'][0]->email, $subject, $message);
-
-    //return $userResult['User'][0]->id;
   }
-
-  $startTime = $feedResult['Feed'][0]->time;
-  $endTime = microtime(true);
-  $duration = $endTime - $startTime;
-
-  $feedResult['Feed'][0]->time = $endTime;
-  $feedResult['Feed'][0]->duration = $duration;
-
 }
-
-# push to database
-
-$feedResult['Feed'][0]->status = $status;
-Mapper::update($feedResult['Feed'][0], $feed_id);
 
 echo "New status == $status. Done.\n";
 
