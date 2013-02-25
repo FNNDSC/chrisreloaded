@@ -70,8 +70,11 @@ foreach($parameters as $k0 => $v0){
     // status, if we don't want to start with status=0
     $status = sanitize($_POST['FEED_STATUS']);
   }
-  // memory, if we don't want to start with memory=256
-  $memory = sanitize($_POST['FEED_MEMORY']);
+
+  if ($_POST['FEED_MEMORY']){
+    // memory, if we don't want to start with memory=256
+    $memory = sanitize($_POST['FEED_MEMORY']);
+  }
 
   // plugin name?
   $command = PluginC::getExecutable(sanitize($_POST['FEED_PLUGIN']));
