@@ -109,9 +109,21 @@ Mapper::update($feedResult['Feed'][0], $feed_id);
 // unlock $db connection
 $db->unlock();
 
+# update related shared feeds
+$relatedMapper = new Mapper('Feed');
+$relatedMapper->join('Meta', 'Meta.target_id = Feed.id')->filter('Meta.name = (?)', 'root_id')->filter('Meta.value = (?)',$feedResult['Feed'][0]->id); 
+$relatedResult = $relatedMapper->get();
+
+foreach($relatedResult['Feed'] as $key => $value){
+  $relatedResult['Feed'][$key]->time = $feedResult['Feed'][0]->time;
+  $relatedResult['Feed'][$key]->duration = $feedResult['Feed'][0]->duration;
+  $relatedResult['Feed'][$key]->status = $feedResult['Feed'][0]->status;
+  
+  Mapper::update($relatedResult['Feed'][$key], $relatedResult['Feed'][$key]->id);
+}
+  
 # send email if status == 100
 if ($status == 100) {
-
   // user's email
   $userMapper = new Mapper('User');
   $userMapper->filter('user.id = (?)', $feedResult['Feed'][0]->user_id);
