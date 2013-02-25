@@ -90,6 +90,7 @@ if ($status > 100) {
   $status = 100;
 }
 
+echo $status.PHP_EOL;
 
 # send email if status == 100
 if ($status == 100) {

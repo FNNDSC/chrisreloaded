@@ -44,7 +44,8 @@ class connectome(Plugin):
       print options.dti + ' doesn\'t contain any *.dcm files' 
       sys.exit(0)
         # link them!
-    for dti_file in dti_files:
+    for dti_file in dti_files:      
+      # rename
       os.symlink(os.path.join(options.dti, dti_file), os.path.join(input_dir, dti_file))
       
     # get t1 images
@@ -79,7 +80,7 @@ class connectome(Plugin):
     command += ' -v 10'
     
     #recon algo
-    if options.recalgo ==  '2nd_Order_Runga_Hutta':
+    if options.recalgo == '2nd_Order_Runga_Hutta':
       command += ' -A rk2'
     elif options.recalgo == 'Interpolated_Streamline':
       command += ' -A sl'
@@ -87,7 +88,7 @@ class connectome(Plugin):
       command += ' -A tl'
 
     #image model
-    if options.immodel ==  'HARDI':
+    if options.immodel == 'HARDI':
       command += ' -I hardi'
     
     #gradient image
