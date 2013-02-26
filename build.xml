@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="My Project" default="build" basedir=".">
+ <property name="source" value="trunk"/>
+
+ <target name="prepstructure" description="Prepare the structure of the codebase">
+  <delete dir="${basedir}/build/docs"/>
+  <delete dir="${basedir}/build/logs"/>
+  <delete dir="${basedir}/build/testresults"/>
+  <mkdir dir="${basedir}/build/docs"/>
+  <mkdir dir="${basedir}/build/logs"/>
+  <mkdir dir="${basedir}/build/testresults"/>
+ </target>
+	
+ <target name="build" depends="prepstructure"/>
+</project>

@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<run>
+  <group size="13">
+    <name>test.chris.php</name>
+    <case>
+      <name>TestDBClass</name>
+      <test>
+        <name>testGetInstance</name>
+        <pass>Equal expectation [Object: of DB] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.db.class.php line 59]</pass>
+        <pass>Equal expectation [String: DB] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.db.class.php line 62]</pass>
+        <time>0.005372</time>
+      </test>
+      <test>
+        <name>testExecute</name>
+        <time>0.001476</time>
+      </test>
+      <test>
+        <name>testExecute2</name>
+        <time>0.001793</time>
+      </test>
+      <test>
+        <name>testExecute3</name>
+        <time>0.00134</time>
+      </test>
+      <test>
+        <name>testExecute4</name>
+        <time>0.001307</time>
+      </test>
+    </case>
+    <case>
+      <name>TestMapperClass</name>
+      <test>
+        <name>testFilter</name>
+        <fail>Expected true, got [Boolean: false] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 63]</fail>
+        <fail>Expected true, got [Boolean: false] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 73]</fail>
+        <fail>Expected true, got [Boolean: false] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 90]</fail>
+        <time>0.006077</time>
+      </test>
+      <test>
+        <name>testJoin</name>
+        <time>4.6000000000004E-5</time>
+      </test>
+      <test>
+        <name>testLjoin</name>
+        <time>4.3000000000001E-5</time>
+      </test>
+      <test>
+        <name>testGroup</name>
+        <fail>Expected true, got [Boolean: false] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 152]</fail>
+        <time>0.001721</time>
+      </test>
+      <test>
+        <name>testGet</name>
+        <pass>Expected true, got [Boolean: true] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 187]</pass>
+        <fail>Expected true, got [Boolean: false] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 195]</fail>
+        <time>0.0077</time>
+      </test>
+      <test>
+        <name>testGetStatic</name>
+        <time>0.00263</time>
+      </test>
+      <test>
+        <name>testAdd</name>
+        <pass>Expected true, got [Boolean: true] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 228]</pass>
+        <fail>Expected true, got [Boolean: false] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 233]</fail>
+        <time>0.128662</time>
+      </test>
+      <test>
+        <name>testDelete</name>
+        <pass>Expected true, got [Boolean: true] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 260]</pass>
+        <time>0.04223</time>
+      </test>
+      <test>
+        <name>testUpdate</name>
+        <pass>Expected true, got [Boolean: true] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 287]</pass>
+        <fail>Expected true, got [Boolean: false] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 293]</fail>
+        <pass>Expected true, got [Boolean: true] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/controller/testing/test.mapper.class.php line 300]</pass>
+        <time>0.074728</time>
+      </test>
+    </case>
+    <case>
+      <name>TestObjectModel</name>
+      <test>
+        <name>testToString</name>
+        <time>6.8000000000012E-5</time>
+      </test>
+    </case>
+    <case>
+      <name>TestDataModel</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 10] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 16] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 30] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 37] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 44] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 57] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 67] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 11] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.00092799999999998</time>
+      </test>
+    </case>
+    <case>
+      <name>TestData_PatientModel</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 26] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 38] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 31] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.000392</time>
+      </test>
+    </case>
+    <case>
+      <name>TestStudyModel</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 12] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 18] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 32] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 43] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 51] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 62] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 13] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.00082199999999999</time>
+      </test>
+    </case>
+    <case>
+      <name>TestData_StudyModel</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 22] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 34] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 27] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.00019600000000003</time>
+      </test>
+    </case>
+    <case>
+      <name>TestUserModel</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 10] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 21] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 32] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 40] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.00024599999999997</time>
+      </test>
+    </case>
+    <case>
+      <name>TestUser_DataModel</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 20] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 32] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 25] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.000195</time>
+      </test>
+    </case>
+    <case>
+      <name>TestFeedModel</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 10] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 22] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 29] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 38] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 48] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 61] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 71] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 82] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 15] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.00050299999999998</time>
+      </test>
+    </case>
+    <case>
+      <name>TestFeed_DataModel</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 20] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 32] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 25] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.000197</time>
+      </test>
+    </case>
+    <case>
+      <name>TestMeta</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 10] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 17] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 25] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 32] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 40] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 54] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 47] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.00039699999999998</time>
+      </test>
+    </case>
+    <case>
+      <name>TestPatientModel</name>
+      <test>
+        <name>testToString</name>
+        <pass>Expected true, got [Integer: 16] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 23] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 29] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 35] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <pass>Expected true, got [Integer: 36] at [/net/pretoria/local_mount/space/pretoria/2/chb/users/nicolas.rannou/gitroot/chrisreloaded/model/testing/test.object.model.php line 80]</pass>
+        <time>0.00029600000000002</time>
+      </test>
+    </case>
+  </group>
+</run>
