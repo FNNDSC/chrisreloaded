@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="My Project" default="build" basedir=".">
+<project name="chris" default="build" basedir=".">
  <property name="source" value="trunk"/>
 
  <target name="prepstructure" description="Prepare the structure of the codebase">
