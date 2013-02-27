@@ -1,3 +1,7 @@
 #!/bin/bash
 source /chb/arch/scripts/chb-fsdev
+ln -s $FREESURFER_HOME/subjects/lh.EC_average
+ln -s $FREESURFER_HOME/subjects/rh.EC_average
+ln -s $FREESURFER_HOME/subjects/V1_average
+ln -s $FREESURFER_HOME/subjects/fsaverage
 recon-all $@

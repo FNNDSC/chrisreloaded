@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#                                                            _           
+#                                                            _
 # FREESURFER RECON ALL
 #
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
@@ -12,7 +12,7 @@
 
 # import the plugin.py superclass
 import os, sys
-sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+sys.path.append( os.path.join( os.path.dirname( __file__ ), '../' ) )
 from plugin import Plugin
 
 class recon_all( Plugin ):
@@ -28,19 +28,36 @@ class recon_all( Plugin ):
 
   def run( self, options ):
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    
+    current_dir = os.path.dirname( os.path.abspath( __file__ ) )
+
     # grab the first dicom input file
-    files = [d for d in os.listdir(options.MRI) if not os.path.isdir(d) and os.path.splitext(d)[1] == '.dcm']
-    if len(files) > 0:
+    files = [d for d in os.listdir( options.MRI ) if not os.path.isdir( d ) and os.path.splitext( d )[1] == '.dcm']
+    if len( files ) > 0:
+      # migrate data
+      # create temp dir
+      import tempfile, shutil, subprocess
+      tempdir = tempfile.mkdtemp( 'free', 'surf', '/chb/pices/tmp' )
+      shutil.copytree( options.MRI, tempdir + '/MRI' )
+      # create link for preview during running
+      os.symlink( tempdir + '/MRI', options.output + '/Freesurfer' )
+
       # launch recon-all
-      cmd = 'cd ' + options.output +';' + current_dir + '/reconall.wrapper -subject Freesurfer -i ' + os.path.join(options.MRI, files[0]) + ' -all'
+      cmd = 'cd ' + tempdir + '/MRI' + ';' + current_dir + '/reconall.wrapper -subject Freesurfer -i ' + os.path.join( tempdir + '/MRI', files[0] ) + ' -all -notalairach'
       print cmd
-      os.system(cmd)
+      os.system( cmd )
+
+      # remove link
+      os.unlink( options.output + '/Freesurfer' )
+
+      # now copy the results back
+      shutil.copytree( tempdir + '/MRI/Freesurfer', options.output + '/Freesurfer' )
+      # and remove the temp dir
+      shutil.rmtree( tempdir )
+
     else:
       print options.MRI + ' doesn\'t contain any *.dcm files'
-      sys.exit(0)
-    
+      sys.exit( 0 )
+
 
 
 # ENTRYPOINT
