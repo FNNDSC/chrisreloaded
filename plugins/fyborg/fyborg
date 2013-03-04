@@ -55,6 +55,8 @@ class Fyborg( Plugin ):
     # os.system( cmd );
     logic = FyborgLogic()
     logic.run( tempdir, options.output, int( options.Radius ), "20 200", -1, False, True )
+    # clean up
+    shutil.rmtree( tempdir)
 
 
 # ENTRYPOINT
