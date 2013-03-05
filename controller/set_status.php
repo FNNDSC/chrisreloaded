@@ -57,6 +57,7 @@ $db->lock('feed', 'WRITE');
 $feedResult = Mapper::getStatic('Feed', $feed_id);
 
 if (count($feedResult['Feed']) == 0) {
+  $db->unlock();
   die('Invalid feed id.');
 }
 
@@ -77,10 +78,8 @@ if ($status{0} == '+') {
   // set mode
 
   if ($old_status >= $status || $status > 100) {
-
+    $db->unlock();
     die("Ignoring setting the status since the old status $old_status >= the new status $status or the old status >= 100.\n");
-    $status = $old_status;
-
   } else {
 
     echo "Setting status of feed $feed_id to $status...\n";
@@ -106,12 +105,11 @@ if ($status >= 100) {
 $feedResult['Feed'][0]->status = $status;
 Mapper::update($feedResult['Feed'][0], $feed_id);
 
-// unlock $db connection
 $db->unlock();
 
 # update related shared feeds
 $relatedMapper = new Mapper('Feed');
-$relatedMapper->join('Meta', 'Meta.target_id = Feed.id')->filter('Meta.name = (?)', 'root_id')->filter('Meta.value = (?)',$feedResult['Feed'][0]->id); 
+$relatedMapper->join('Meta', 'Meta.target_id = Feed.id')->filter('Meta.name = (?)', 'root_id')->filter('Meta.value = (?)',$feedResult['Feed'][0]->id)->filter('Feed.id != (?)',$feedResult['Feed'][0]->id); 
 $relatedResult = $relatedMapper->get();
 
 foreach($relatedResult['Feed'] as $key => $value){
@@ -147,5 +145,4 @@ if ($status == 100) {
 }
 
 echo "New status == $status. Done.\n";
-
 ?>
