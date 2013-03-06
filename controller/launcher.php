@@ -139,7 +139,7 @@ if ($commandline_mode) {
   if (array_key_exists('status', $options)) {
     $status = $options['status'];
   }
-  
+
   // set the initial status, if --status is provided, use this value
   $status_step = 100;
   if (array_key_exists('statusstep', $options)) {
@@ -235,8 +235,8 @@ if($status != 100) $ssh->exec('echo "'.$setStatus.' 1" >> '.$runfile);
 $ssh->exec('echo "'.$command.'" >> '.$runfile);
 if($status != 100) $ssh->exec('echo "'.$setStatus.' +'.$status_step.'" >> '.$runfile);
 
-$ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile");
-$ssh->exec("chmod +x $runfile;");
+$ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
+//$ssh->exec("chmod +x $runfile;");
 
 
 $arguments = ' -l '.$job_path;
@@ -252,7 +252,7 @@ if ($status == 100) {
 } else {
   // run on cluster and return pid
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_SCHEDULER);
-  $cluster_command = str_replace("{COMMAND}", $runfile, $cluster_command);
+  $cluster_command = str_replace("{COMMAND}", "/bin/bash ".$runfile, $cluster_command);
   $pid = $ssh->exec($cluster_command." < /dev/null & echo $!;");
 }
 
