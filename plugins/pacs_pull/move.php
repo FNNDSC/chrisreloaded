@@ -44,6 +44,8 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_study.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 // include chris user_data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
+// include chris data models
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 
 // include pacs helper
 require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
@@ -52,9 +54,9 @@ require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 // send email to admin
 // should be more generic to email user after plugins has finished too
 
-function sendEmail(&$patientInfo, &$dataLocation){
+function sendEmail(&$patientInfo, &$dataLocation, &$emailTo){
   // start email:
-  $message = 'Dear <username>,'.PHP_EOL;
+  $message = 'Dear ChRIS user,'.PHP_EOL;
   $message .= 'You have a new incoming series available at:'.PHP_EOL.PHP_EOL;
   $message .= 'Output directory: '.$dataLocation.PHP_EOL.PHP_EOL;
 
@@ -75,7 +77,7 @@ function sendEmail(&$patientInfo, &$dataLocation){
 
   $message .= "Thank you for using ChRIS.";
 
-  email(CHRIS_DICOM_EMAIL_FROM, CHRIS_DICOM_EMAIL_TO, "New dicom series has been received", $message);
+  email(CHRIS_DICOM_EMAIL_FROM, $emailTo, "New dicom series has been received", $message);
 }
 
 // main function
@@ -84,6 +86,7 @@ $shortopts = "d:";
 $options = getopt($shortopts);
 
 $study_directory = $options['d'];
+$emailTo = CHRIS_DICOM_EMAIL_TO;
 
 // open log file
 $logFile = '';
@@ -290,6 +293,28 @@ if ($handle = opendir($study_directory)) {
     }
   }
   closedir($handle);
+
+  // parse files in directory to know who we should email
+  if ($handle2 = opendir($study_directory)) {
+    /* This is the correct way to loop over the directory. */
+    while (false !== ($entry2 = readdir($handle2))) {
+      if($entry2 != "." && $entry2 != ".."){
+        // if user exists, add him to the mailing list
+        $userMapper = new Mapper('User');
+        $userMapper->filter('username = (?)',$entry2);
+        $userResult = $userMapper->get();
+        
+        if(count($userResult['User']) != 0)
+        {
+          $emailTo .= ','.$userResult['User'][0]->email;
+        }
+        
+        unlink($study_directory.'/'.$entry2);
+      }
+    }
+  }
+  closedir($handle2);
+
   // delete directory
   $logFile .= 'delete: '.$study_directory.PHP_EOL;
   rmdir($study_directory);
@@ -316,7 +341,7 @@ foreach($received as $key => $value){
   }
 }
 
-sendEmail($process_file, $datadirname);
+sendEmail($process_file, $datadirname, $emailTo);
 
 echo $logFile;
 
