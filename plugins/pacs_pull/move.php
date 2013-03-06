@@ -290,6 +290,18 @@ if ($handle = opendir($study_directory)) {
     }
   }
   closedir($handle);
+
+  // parse files in directory to know who we should email
+  if ($handle2 = opendir($study_directory)) {
+    /* This is the correct way to loop over the directory. */
+    while (false !== ($entry2 = readdir($handle2))) {
+      if($entry2 != "." && $entry2 != ".."){
+        unlink($study_directory.'/'.$entry2);
+      }
+    }
+  }
+  closedir($handle);
+
   // delete directory
   $logFile .= 'delete: '.$study_directory.PHP_EOL;
   rmdir($study_directory);
