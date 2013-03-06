@@ -247,7 +247,7 @@ $arguments .= ' -p "'.$password.'"';
 $arguments .= ' -o "'.$feed_path.'"';
 if ($status == 100) {
   // run locally
-  $ssh->exec($runfile);
+  $ssh->exec("/bin/bash ".$runfile);
   $pid = -1;
 } else {
   // run on cluster and return pid
