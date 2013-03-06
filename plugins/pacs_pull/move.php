@@ -300,7 +300,7 @@ if ($handle = opendir($study_directory)) {
       }
     }
   }
-  closedir($handle);
+  closedir($handle2);
 
   // delete directory
   $logFile .= 'delete: '.$study_directory.PHP_EOL;
