@@ -58,6 +58,8 @@ interface FeedControllerInterface
   static public function mergeFeeds($master_id, $slave_id, &$ssh_connection);
   // update feed name
   static public function updateName($id, $name, &$ssh_connection);
+  // cancel the job
+  static public function cancel($id, &$ssh_connection);
 }
 
 /**
@@ -94,9 +96,11 @@ class FeedC implements FeedControllerInterface {
         break;
       case "running":
         $feedMapper->filter('status != (?)', '100');
+        $feedMapper->filter('status != (?)', '-100');
         break;
       case "finished":
         $feedMapper->filter('status = (?)', '100');
+        $feedMapper->filter('status = (?)', '-100', 1, 'OR');
         break;
       default:
         break;
@@ -190,6 +194,7 @@ class FeedC implements FeedControllerInterface {
     }
     $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('status != (?)','100');
+    $feedMapper->filter('status != (?)','-100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
@@ -616,6 +621,57 @@ class FeedC implements FeedControllerInterface {
       }
     }
     return true;
+  }
+
+  /**
+   * Cancel a running feed.
+   *
+   * Returns TRUE if feed is not running anymore.
+   *
+   * @param int $id The feed id.
+   */
+  static public function cancel($id, &$ssh_connection) {
+
+    // check if feed status is running
+    $feedResult = Mapper::getStatic('Feed', $id);
+
+    if($feedResult['Feed'][0]->status != 100) {
+
+      // job is running or queued
+
+      // find the PID
+      $metaMapper = new Mapper('Meta');
+      $metaMapper->filter('target_id = (?)', $id);
+      $metaMapper->filter('name = (?)', 'pid');
+      $metaResult = $metaMapper->get();
+      $pid = $metaResult['Meta'][0]->value;
+
+      if ($pid == -1) {
+        // this is a local job
+        return true;
+      }
+
+      // kill the job on the cluster
+      $ssh_connection->exec('kill -9 '.$pid);
+
+      // set status to canceled
+      $status = -100;
+
+      $startTime = $feedResult['Feed'][0]->time;
+      $endTime = microtime(true);
+      $duration = $endTime - $startTime;
+
+      $feedResult['Feed'][0]->time = $endTime;
+      $feedResult['Feed'][0]->duration = $duration;
+      $feedResult['Feed'][0]->status = $status;
+
+      // push to the db
+      Mapper::update($feedResult['Feed'][0], $id);
+
+    }
+
+    return true;
+
   }
 
   /**

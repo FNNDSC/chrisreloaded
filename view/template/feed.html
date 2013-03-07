@@ -1,39 +1,45 @@
 <div data-chris-feed_id="${ID}" data-chris-feed_status="${STATUS}"
- data-chris-feed_time="${TIME_FORMATED}" class="feed"
- data-type='${PLUGIN}'>
- <div class='feed_header'>
-  <span class='feed_icon' data-type='${PLUGIN}'
-   data-chris-feed_id="${ID}"> <img src="${IMAGE_SRC}"
-   class="img-rounded">
-  </span>
-  <div class='feed_header_line_one'>
-   <span class='span3' style='margin-left: 0px; float: none;'><span
-    class='feed_type'>${PLUGIN}</span>&nbsp;&nbsp; <span
-    class='feed_username feed_header_small'>${USERNAME}</span></span><span
-    class="pull-right"> <span class="feed_time feed_header_small">Some
-     time ago..</span><span class="btn-group pull-right show_me">
-     <button class="btn btn-mini feed_btn feed_share" tabindex="-1"><i class="${SHARE_ICON}" style='height:12px;'></i>
-     </button>
-     <button class="btn btn-mini dropdown-toggle feed_btn"
-      data-toggle="dropdown" tabindex="-1">
-      <span class="caret"></span>
-     </button>
-     <ul class="dropdown-menu">
-      <li><a class="feed_share" href="#"><i class="${SHARE_ICON}"></i>&nbsp;Share</a></li>
-      <li><a class="feed_favorite" href="#"><i class="${FAVORITE_ICON}"></i>&nbsp;<span>${FAVORITE_TEXT}</span></a></li>
-      <!--       <li class="divider"></li> -->
-      <li><a class="feed_archive" href="#"><i class="${ARCHIVE_ICON}"></i>&nbsp;<span>${ARCHIVE_TEXT}</span></a></li>
-      <!--       <li><a href="#"><span class="feed_archive"><i
-         class="icon-ban-circle"></i></span> Cancel </a></li>
+	data-chris-feed_time="${TIME_FORMATED}" class="feed"
+	data-type='${PLUGIN}'>
+	<div class='feed_header'>
+		<span class='feed_icon' data-type='${PLUGIN}'
+			data-chris-feed_id="${ID}"> <img src="${IMAGE_SRC}"
+			class="img-rounded">
+		</span>
+		<div class='feed_header_line_one'>
+			<span class='span3' style='margin-left: 0px; float: none;'><span
+				class='feed_type'>${PLUGIN}</span>&nbsp;&nbsp; <span
+				class='feed_username feed_header_small'>${USERNAME}</span></span><span
+				class="pull-right"> <span class="feed_time feed_header_small">Some
+					time ago..</span><span class="btn-group pull-right show_me">
+					<button class="btn btn-mini feed_btn feed_share" tabindex="-1">
+						<i class="${SHARE_ICON}" style='height: 12px;'></i>
+					</button>
+					<button class="btn btn-mini dropdown-toggle feed_btn"
+						data-toggle="dropdown" tabindex="-1">
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a class="feed_share" href=""><i
+								class="${SHARE_ICON}"></i>&nbsp;Share</a></li>
+						<li><a class="feed_favorite" href=""><i
+								class="${FAVORITE_ICON}"></i>&nbsp;<span>${FAVORITE_TEXT}</span></a></li>
+						<!--       <li class="divider"></li> -->
+						<li><a class="feed_archive" href=""><i
+								class="${ARCHIVE_ICON}"></i>&nbsp;<span>${ARCHIVE_TEXT}</span></a></li>
+
+						<li style="${CANCEL}"><a href="" class="feed_cancel"><span><i
+									class="icon-ban-circle disabled"></i></span> Cancel </a></li>
+						<!-- 
       <li><a href="#"><span class="feed_archive"><i
          class="icon-refresh"></i></span> Restart </a></li>
       <li class="divider"></li> -->
-<!--       <li><a href="#"><img class='feed_edit_icon'
+						<!--       <li><a href="#"><img class='feed_edit_icon'
         src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'
         onclick='_FEED_.activate_feed_name_edit($(this),event)'>
         Rename</a></li> -->
 
-      <!--       <li><a href="#"><span class="feed_archive"><i
+						<!--       <li><a href="#"><span class="feed_archive"><i
          class="icon-tag"></i></span> Tag </a></li>
 
 
@@ -43,30 +49,29 @@
       <li><a href="#"><span class="feed_archive"><i
          class=" icon-thumbs-up"></i></span> Like</a></li> -->
 
-<!--       <li><a href="#"><i class="icon-fire"></i>&nbsp;Report bug </a></li> -->
-     </ul>
-   </span>
+						<!--       <li><a href="#"><i class="icon-fire"></i>&nbsp;Report bug </a></li> -->
+					</ul>
+			</span>
 
-   </span>
-  </div>
-  <div class='feed_header_line_two'>
-   <span class='feed_name'>${FEED_NAME}</span> <input class='feed_name_edit '
-    style='display: none; font-size: 12px; line-height: 12px'
-    type='text' value='${FEED_NAME}' /> ${EDIT_ICON}
-    
-<span
-    class='feed_status feed_header_small pull-right'>Status:
-    ${STATUS_TEXT} </span>
-  </div>
- </div>
+			</span>
+		</div>
+		<div class='feed_header_line_two'>
+			<span class='feed_name'>${FEED_NAME}</span> <input
+				class='feed_name_edit '
+				style='display: none; font-size: 12px; line-height: 12px'
+				type='text' value='${FEED_NAME}' /> ${EDIT_ICON} <span
+				class='feed_status feed_header_small pull-right'>Status:
+				${STATUS_TEXT} </span>
+		</div>
+	</div>
 
- <div class='feed_details'>
-  <div class='feedpanel' style='margin-top: 12px;'>
-   <h3 class='notes_tab'>Notes</h3>
-   <div>${NOTES}</div>
-   <h3>Files</h3>
-   <div>${DATA_BROWSER}</div>
-   ${FEED_HTML}
-  </div>
- </div>
+	<div class='feed_details'>
+		<div class='feedpanel' style='margin-top: 12px;'>
+			<h3 class='notes_tab'>Notes</h3>
+			<div>${NOTES}</div>
+			<h3>Files</h3>
+			<div>${DATA_BROWSER}</div>
+			${FEED_HTML}
+		</div>
+	</div>
 </div>

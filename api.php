@@ -158,6 +158,15 @@ if (!SecurityC::login()) {
         else if($what == 'feed_archive'){
           $result['result'] = FeedC::archive($id);
         }
+        else if($what == 'feed_cancel'){
+          $ssh_connection = new Net_SSH2(CLUSTER_HOST);
+          if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
+            die('Login Failed');
+          }
+
+          $result['result'] = FeedC::cancel($id, $ssh_connection);
+
+        }
         else if($what == 'file') {
           $ssh_connection = new Net_SSH2(CLUSTER_HOST);
           if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {

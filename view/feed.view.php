@@ -84,6 +84,8 @@ class FeedV implements ObjectViewInterface {
     // ('.$object->status.'%)
     if ($object->status == 100) {
       $status_text = '<font color=green>Done</font>';
+    } else if ($object->status == -100) {
+      $status_text = '<font color=darkred>Canceled</font>';
     }
 
     $share_icon = 'icon-share-alt';
@@ -103,8 +105,12 @@ class FeedV implements ObjectViewInterface {
     }
 
     $edit_icon = '';
-    if ($object->status == 100) {
+    $cancel = '';
+    if ($object->status == 100 || $object->status == -100) {
       $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'>";
+
+      // if the job is not queued or running, don't display the cancel icon
+      $cancel = "display:none";
     }
 
     $t = new Template('feed.html');
@@ -126,6 +132,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_ICON', $favorite_icon);
     $t -> replace('FAVORITE_TEXT', $favorite_text);
+    $t -> replace('CANCEL', $cancel);
     $t -> replace('EDIT_ICON', $edit_icon);
     // set data browser
     $d = new Template('feed_data_browser.html');

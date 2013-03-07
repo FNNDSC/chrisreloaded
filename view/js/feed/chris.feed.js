@@ -214,6 +214,11 @@ _FEED_.ajaxUpdate = function() {
                               _FEED_.finFeeds[0].unshift(data['new']['id'][i]);
                               _FEED_.finFeeds[1]
                                   .unshift(data['new']['content'][i]);
+                            } else if (data['new']['status'][i] == '-100') {
+                              // canceled feed
+                              _FEED_.finFeeds[0].unshift(data['new']['id'][i]);
+                              _FEED_.finFeeds[1]
+                                  .unshift(data['new']['content'][i]);                        
                             } else {
                               _FEED_.runFeeds[0].unshift(data['new']['id'][i]);
                               _FEED_.runFeeds[1]
