@@ -100,7 +100,7 @@ class FeedC implements FeedControllerInterface {
         break;
       case "finished":
         $feedMapper->filter('status = (?)', '100');
-        $feedMapper->filter('status = (?)', '-100', 1, 'OR');
+        //$feedMapper->filter('status = (?)', '-100', 1, 'OR');
         break;
       default:
         break;
