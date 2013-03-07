@@ -63,6 +63,12 @@ define('CHRIS_TMP', '/chb/users/chris/dev/tmp/');
 define('CHRIS_USERS', '/chb/users/chris/dev/users/');
 define('CHRIS_LOG', '/chb/users/chris/dev/log/');
 
+// known scanners and contact information
+define('CHRIS_SCANNERS', serialize(array(
+    "MRC25948" => "borjan.gagoski@childrens.harvard.edu",
+    "MRWAL2" => "borjan.gagoski@childrens.harvard.edu",
+    "MR1" => "borjan.gagoski@childrens.harvard.edu")));
+
 // cluster
 define('CLUSTER_HOST', 'rc-goldfinger');
 define('CLUSTER_USERNAME', 'chris');

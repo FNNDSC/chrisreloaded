@@ -297,18 +297,26 @@ if ($handle = opendir($study_directory)) {
   // parse files in directory to know who we should email
   if ($handle2 = opendir($study_directory)) {
     /* This is the correct way to loop over the directory. */
+    // make an array from scanners name/conact
+    $chris_scanners = unserialize(CHRIS_SCANNERS);
     while (false !== ($entry2 = readdir($handle2))) {
       if($entry2 != "." && $entry2 != ".."){
-        // if user exists, add him to the mailing list
-        $userMapper = new Mapper('User');
-        $userMapper->filter('username = (?)',$entry2);
-        $userResult = $userMapper->get();
-        
-        if(count($userResult['User']) != 0)
-        {
-          $emailTo .= ','.$userResult['User'][0]->email;
+        // if known scanner
+        if(array_key_exists($entry2, $chris_scanners)){
+          $emailTo .= ','.$chris_scanners[$entry2];
         }
-        
+        else{
+          // if user exists, add him to the mailing list
+          $userMapper = new Mapper('User');
+          $userMapper->filter('username = (?)',$entry2);
+          $userResult = $userMapper->get();
+
+          if(count($userResult['User']) != 0)
+          {
+            $emailTo .= ','.$userResult['User'][0]->email;
+          }
+        }
+        // delete the temp file
         unlink($study_directory.'/'.$entry2);
       }
     }
