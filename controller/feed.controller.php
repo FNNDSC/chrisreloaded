@@ -537,9 +537,9 @@ class FeedC implements FeedControllerInterface {
 
     if ($userid == 0) {
       // special case for the admin
-      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE status=(?)',Array('0'));
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE status!=(?) AND status!=(?)',Array('100', '-100'));
     } else {
-      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?) AND status=(?)',Array($userid,'0'));
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?) AND status!=(?) AND status!=(?)',Array($userid,'100', '-100'));
     }
 
     return $results[0][0][1];
