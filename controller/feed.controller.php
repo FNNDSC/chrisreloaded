@@ -85,6 +85,7 @@ class FeedC implements FeedControllerInterface {
 
     // get feeds objects ordered by creation time
     $feedMapper = new Mapper('Feed');
+    $feedMapper->filter('', '', 0);
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
       $feedMapper->filter('archive = (?)', '0');
@@ -99,8 +100,8 @@ class FeedC implements FeedControllerInterface {
         $feedMapper->filter('status != (?)', '-100');
         break;
       case "finished":
-        $feedMapper->filter('status = (?)', '100');
-        //$feedMapper->filter('status = (?)', '-100', 1, 'OR');
+        $feedMapper->filter('status = (?)', '100', 2);
+        $feedMapper->filter('status = (?)', '-100', 2, 'OR');
         break;
       default:
         break;
