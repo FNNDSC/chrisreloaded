@@ -104,7 +104,7 @@ _FEED_.feed_favorite = function() {
                                 .slideDown('slow');
                           });
                     } else {
-                      if (elt.attr('data-chris-feed_status') != 100) {
+                      if (elt.attr('data-chris-feed_status') < 100) {
                         jQuery(elt).hide(
                             'blind',
                             'slow',
