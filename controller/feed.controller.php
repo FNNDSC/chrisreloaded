@@ -666,6 +666,30 @@ class FeedC implements FeedControllerInterface {
       // push to the db
       Mapper::update($feedResult['Feed'][0], $id);
 
+      // find all shared versions of this feed
+      $metaMapper = new Mapper('Meta');
+      $metaMapper->filter('value = (?)', $id);
+      $metaMapper->filter('name = (?)', 'root_id');
+      $metaMapper->filter('target_id != (?)', $id);
+      $metaResult = $metaMapper->get();
+
+      // adjust all statuses
+      if(count($metaResult['Meta']) >= 1){
+        foreach($metaResult['Meta'] as $key => $value) {
+
+          $feed = Mapper::getStatic('Feed', $value->target_id);
+
+          $feed['Feed'][0]->time = $endTime;
+          $feed['Feed'][0]->duration = $duration;
+          $feed['Feed'][0]->status = $status;
+
+          // push to the db
+          Mapper::update($feed['Feed'][0], $value->target_id);
+
+        }
+
+      }
+
     }
 
     return true;
