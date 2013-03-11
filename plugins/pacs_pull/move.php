@@ -229,13 +229,26 @@ if ($handle = opendir($study_directory)) {
               if(!is_dir($datadirname)){
                 mkdir($datadirname);
                 $logFile .= 'MKDIR: '.$datadirname.PHP_EOL;
-                // create the 0.info file, which contains more information about the data
+                
                 $myFile = $datadirname.'/0.info';
                 $fh = fopen($myFile, 'a');
-
+                
+                // Add Patient information
+                fwrite($fh, '---------------------------'.PHP_EOL.'    GENERAL INFORMATION    '.PHP_EOL.'---------------------------'.PHP_EOL);
                 foreach($process_file as $key => $value)
                   fwrite($fh, $key.' : '.$value[0].PHP_EOL);
-
+                
+                // Add Image information
+                fwrite($fh, PHP_EOL.'---------------------------'.PHP_EOL.'    IMAGE INFORMATION    '.PHP_EOL.'---------------------------'.PHP_EOL);
+                // create the 0.info file, which contains more information about the data
+                // build command
+                $command = '/bin/bash -c  "';
+                $command .= 'source /chb/arch/scripts/chb-fs stable  2>&1 ; mri_info '.$study_directory.'/'.$entry.'/'.$sub_entry.' ;';
+                $command .= '"';
+                $command_output = shell_exec($command);
+                fwrite($fh, $command_output);
+                
+                
                 fclose($fh);
               }
               else{
