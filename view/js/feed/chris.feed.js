@@ -228,7 +228,7 @@ _FEED_.ajaxUpdate = function() {
                         });
               } else {
                 // hide element to relevant list based on status
-                if (data['new']['status'][i] == '100') {
+                if (data['new']['status'][i] >= '100') {
                   _FEED_.finFeeds[0].unshift(data['new']['id'][i]);
                   _FEED_.finFeeds[1].unshift(data['new']['content'][i]);
                 } else {
