@@ -203,11 +203,21 @@ _FEED_.ajaxUpdate = function() {
                           if (elt.find('i').hasClass('icon-star')
                               || elt.parent().hasClass('feed_sea_content')) {
                             // update its status to 100%
-                            jQuery(this).attr('data-chris-feed_status', '100');
-                            jQuery(this).find('.feed_status').html(
-                                'Status: <font color=green>Done</font>');
-                            jQuery(this).find('.feed_share').html(
-                                '<i class="icon-share"></i>');
+                            jQuery(this).attr('data-chris-feed_status', data['new']['status'][i]);
+                            
+                            // here the feed is either done or canceled
+                            if (data['new']['status'][i] == 100) {
+                              
+                              jQuery(this).find('.feed_status').html(
+                                  'Status: <font color=green>Done</font>');
+                              
+                            } else {
+                             
+                              jQuery(this).find('.feed_status').html(
+                                  'Status: <font color=darkred>Canceled</font>');
+                              
+                            }
+                            
                           } else {
                             elt.hide('blind', 'slow').remove();
                             if (data['new']['status'][i] == '100') {

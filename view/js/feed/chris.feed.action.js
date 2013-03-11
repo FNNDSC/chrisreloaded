@@ -306,7 +306,12 @@ _FEED_.feed_cancel = function() {
           dataType: "json",
           success: function(data) {
 
-            // move div around
+            if (jQuery(feedElt).find('i').hasClass('icon-star')) {
+              // this feed is favorited, meaning that we don't hide it
+              return;
+            }
+            
+            // hide the div
             jQuery(feedElt).hide(
                 'blind',
                 'slow');
