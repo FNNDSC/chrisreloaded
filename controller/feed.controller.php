@@ -85,7 +85,6 @@ class FeedC implements FeedControllerInterface {
 
     // get feeds objects ordered by creation time
     $feedMapper = new Mapper('Feed');
-    $feedMapper->filter('', '', 0);
     if($user_id){
       $feedMapper->filter('user_id = (?)', $user_id);
       $feedMapper->filter('archive = (?)', '0');
@@ -96,12 +95,10 @@ class FeedC implements FeedControllerInterface {
         $feedMapper->filter('favorite = (?)', '1');
         break;
       case "running":
-        $feedMapper->filter('status != (?)', '100');
-        $feedMapper->filter('status != (?)', '-100');
+        $feedMapper->filter('status < (?)', '100');
         break;
       case "finished":
-        $feedMapper->filter('status = (?)', '100', 2);
-        $feedMapper->filter('status = (?)', '-100', 2, 'OR');
+        $feedMapper->filter('status >= (?)', '100');
         break;
       default:
         break;
@@ -194,8 +191,7 @@ class FeedC implements FeedControllerInterface {
       $feedMapper->filter('user_id = (?)', $user_id);
     }
     $feedMapper->filter('archive = (?)', '0');
-    $feedMapper->filter('status != (?)','100');
-    $feedMapper->filter('status != (?)','-100');
+    $feedMapper->filter('status < (?)','100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
@@ -538,9 +534,9 @@ class FeedC implements FeedControllerInterface {
 
     if ($userid == 0) {
       // special case for the admin
-      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE status!=(?) AND status!=(?)',Array('100', '-100'));
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE status < (?)',Array('100'));
     } else {
-      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?) AND status!=(?) AND status!=(?)',Array($userid,'100', '-100'));
+      $results = DB::getInstance()->execute('SELECT COUNT(*) FROM feed WHERE user_id=(?) AND status < (?)',Array($userid,'100'));
     }
 
     return $results[0][0][1];
@@ -656,7 +652,7 @@ class FeedC implements FeedControllerInterface {
       $ssh_connection->exec('kill -9 '.$pid);
 
       // set status to canceled
-      $status = -100;
+      $status = 101;
 
       $startTime = $feedResult['Feed'][0]->time;
       $endTime = microtime(true);

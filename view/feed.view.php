@@ -84,7 +84,7 @@ class FeedV implements ObjectViewInterface {
     // ('.$object->status.'%)
     if ($object->status == 100) {
       $status_text = '<font color=green>Done</font>';
-    } else if ($object->status == -100) {
+    } else if ($object->status == 101) {
       $status_text = '<font color=darkred>Canceled</font>';
     }
 
@@ -106,7 +106,7 @@ class FeedV implements ObjectViewInterface {
 
     $edit_icon = '';
     $cancel = '';
-    if ($object->status == 100 || $object->status == -100) {
+    if ($object->status >= 100) {
       $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'>";
 
       // if the job is not queued or running, don't display the cancel icon
