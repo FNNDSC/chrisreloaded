@@ -227,6 +227,7 @@ class FeedC implements FeedControllerInterface {
     $feedMapper->filter('archive = (?)', '0');
     $feedMapper->filter('favorite = (?)', '0');
     $feedMapper->filter('time < (?)',$feed_old);
+    $feedMapper->filter('status < (?)', '100');
     $feedMapper->order('time');
     $feedResult = $feedMapper->get();
 
