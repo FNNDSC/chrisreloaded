@@ -642,15 +642,22 @@ class FeedC implements FeedControllerInterface {
       $metaMapper->filter('target_id = (?)', $id);
       $metaMapper->filter('name = (?)', 'pid');
       $metaResult = $metaMapper->get();
-      $pid = $metaResult['Meta'][0]->value;
 
-      if ($pid == -1) {
-        // this is a local job
-        return true;
+      if(count($metaResult['Meta']) >= 1){
+        foreach($metaResult['Meta'] as $key => $value) {
+
+          $pid = $value->value;
+
+          if ($pid == -1) {
+            // this is a local job
+            return true;
+          }
+
+          // kill the job on the cluster
+          $ssh_connection->exec('kill -9 '.$pid);
+
+        }
       }
-
-      // kill the job on the cluster
-      $ssh_connection->exec('kill -9 '.$pid);
 
       // set status to canceled
       $status = 101;
