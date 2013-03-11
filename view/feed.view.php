@@ -54,6 +54,7 @@ class FeedV implements ObjectViewInterface {
     // Format username
     $username = FeedV::_getUsername($object->user_id);
     $username_displayed = ucwords($username);
+    $shared_feed = false;
     // Format time
     //$time = FeedV::_getTime(date("Y-m-d H:i:s", $object->time));
     // Format simple meta feed
@@ -66,6 +67,7 @@ class FeedV implements ObjectViewInterface {
       $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value. '</br>';
       if($value->name == "sharer_id"){
         $username_displayed = 'Shared by '.ucwords(FeedV::_getUsername($value->value));
+        $shared_feed = true;
       }
     }
 
@@ -106,10 +108,11 @@ class FeedV implements ObjectViewInterface {
 
     $edit_icon = '';
     $cancel = '';
-    if ($object->status >= 100) {
+    if ($object->status >= 100 || $shared_feed) {
       $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'>";
 
       // if the job is not queued or running, don't display the cancel icon
+      // also if the feed was shared
       $cancel = "display:none";
     }
 

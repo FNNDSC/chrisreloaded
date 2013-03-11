@@ -288,26 +288,32 @@ _FEED_.feed_rename = function() {
 
 _FEED_.feed_cancel = function() {
 
-  jQuery(document).on('click', '.feed_cancel', function(e) {
+  jQuery(document).on(
+      'click',
+      '.feed_cancel',
+      function(e) {
 
-    // modify
-    e.stopPropagation();
-    // get feed id
-    var feedElt = jQuery(this).closest('.feed');
-    var feedID = feedElt.attr('data-chris-feed_id');
-    var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
-    // api.php add to favorites
-    jQuery.ajax({
-      type: "POST",
-      url: "api.php?action=set&what=feed_cancel&id=" + feedID,
-      dataType: "json",
-      success: function(data) {
+        // modify
+        e.stopPropagation();
+        // get feed id
+        var feedElt = jQuery(this).closest('.feed');
+        var feedID = feedElt.attr('data-chris-feed_id');
+        var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
+        // api.php add to favorites
+        jQuery.ajax({
+          type: "POST",
+          url: "api.php?action=set&what=feed_cancel&id=" + feedID,
+          dataType: "json",
+          success: function(data) {
 
-        console.log(data);
-        
-      }
-    });
-  });
+            // move div around
+            jQuery(feedElt).hide(
+                'blind',
+                'slow');
+
+          }
+        });
+      });
   
 }
 
