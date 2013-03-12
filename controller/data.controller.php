@@ -42,15 +42,8 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 // interface
 interface DataControllerInterface
 {
-  // get the relative location of the data on the filesyten, given its series uid.
-  static public function getLocation($series_uid);
-
-  static public function create($user);
-  static public function addUser($data_id, $user_id);
-
   // return the number of data sets for a specific user
   static public function getCount($user_id);
-
 }
 
 /**
@@ -59,84 +52,15 @@ interface DataControllerInterface
 class DataC implements DataControllerInterface {
 
   /**
-   * Get the relative location of the data on the filesyten, given its series uid.
-   * getLocation(1233213123) returns "MRN-ID/SERIES_DESC-ID".
-   * getLocation(1233213123) returnrs "" if data was not found.
-   * Use CHRIS_DATA to get absolute file location:
-   * CHRIS_DATA.getLocation(1233213123)
-   * @param string $series_uid series uid of the dataset we are looking for
-   * @return string the returned string is empty if the data was not found.
-   */
-  static public function getLocation($series_uid){
-    // retrieve the data
-    $dataMapper = new Mapper('Data');
-    $dataMapper->filter('unique_id = (?)',$series_uid);
-    $dataResult = $dataMapper->get();
-
-    // if nothing in DB yet, return empty string
-    if(count($dataResult['Data']) == 0)
-    {
-      return "";
-    }
-
-    // get data and patient UIDs
-    $data_uid = $dataResult['Data'][0]->id;
-    $patient_uid = $dataResult['Data'][0]->patient_id;
-
-    // find the data and the patient location
-    // find patient
-    $patient_entry = '';
-    if ($handle = opendir(CHRIS_DATA)) {
-      while (false !== ($entry = readdir($handle))) {
-        if($entry != "." && $entry != ".."){
-          if (preg_match('/\-'.$patient_uid.'$/', $entry)) {
-            // patient directory
-            $patient_entry = $entry;
-            break;
-          }
-        }
-      }
-      closedir($handle);
-    }
-
-    // find data
-    $data_entry = '';
-    if ($handle2 = opendir(CHRIS_DATA.$patient_entry)) {
-      while (false !== ($entry2 = readdir($handle2))) {
-        if($entry2 != "." && $entry2 != ".."){
-          if (preg_match('/\-'.$data_uid.'$/', $entry2)) {
-            $data_entry = $entry2;
-            break;
-          }
-        }
-      }
-      closedir($handle2);
-    }
-
-    return $patient_entry.'/'.$data_entry;
-  }
-
-  static public function create($plugin){
-    $dataObject = new Data();
-    $dataObject->plugin = $plugin;
-    $dataObject->time = date("Y-m-d H:i:s");
-    return Mapper::add($dataObject);
-  }
-
-  static public function addUser($data_id, $user_id){
-    $user_dataObject = new User_Data();
-    $user_dataObject->user_id = $user_id;
-    $user_dataObject->data_id = $data_id;
-    Mapper::add($user_dataObject);
-  }
-
-  /**
-   * Return the number of data available for a specific user.
-   */
+  * Return the number of datasets (series) available for a specific user.
+  *
+  * @var int $user_id
+  */
   static public function getCount($user_id) {
 
+    // if we are logged in as admin, we want to see all the datasets
     if ($user_id == 0) {
-      
+
       $results = DB::getInstance()->execute('SELECT COUNT(*) FROM data');
       return $results[0][0][1];
 
