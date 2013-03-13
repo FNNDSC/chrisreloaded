@@ -251,7 +251,8 @@ if ($status == 100) {
   $pid = -1;
 } else {
   // run on cluster and return pid
-  $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_SCHEDULER);
+  $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
+  $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
   $cluster_command = str_replace("{COMMAND}", "/bin/bash ".$runfile, $cluster_command);
   $pid = $ssh->exec($cluster_command." < /dev/null & echo $!;");
 }
