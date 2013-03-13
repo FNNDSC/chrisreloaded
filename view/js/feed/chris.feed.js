@@ -212,7 +212,9 @@ _FEED_.ajaxUpdate = function() {
                                   'Status: <font color=green>Done</font>');
                               
                             } else {
-                             
+                             // hide cancel option
+                              jQuery(this).find('.feed_cancel').parent().hide();
+                             // change status
                               jQuery(this).find('.feed_status').html(
                                   'Status: <font color=darkred>Canceled</font>');
                               
