@@ -8,6 +8,17 @@ body,html { /* 	background: url( */
 	overflow: hidden !important;
 }
 
+#firstlogin {
+	position: absolute;
+  background: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  margin-left: -15px;
+  z-index: 999999;
+  display: none;
+}
+
 #maintenance {
 	position: absolute;
 	background: rgba(0, 0, 0, 0.8);

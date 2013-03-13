@@ -7,12 +7,20 @@
 <title>ChRIS</title> ${CSS}
 </head>
 <body>
+
 <div id='maintenance' style='${MAINTENANCE}'><div id='maintenance_label'><h1>Maintenance!</h1> The system will be available again shortly!<br>Sorry for the inconvenience!!</div></div>
  ${NAVBAR}
 
  <div class="container" id='opaqueoverlay'
   style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(view/gfx/wash-white-30.png); min-height: 100%;">
-
+<div id='firstlogin'>
+<img id='tutprev' src='view/gfx/tut_previous.png' style='position:absolute;left:-230px;top:300px;cursor:pointer;'>
+<img id='tutnext' src='view/gfx/tut_next.png' style='position:absolute;left:1000px;top:300px;cursor:pointer;'>
+<img id='tutcancel' src='view/gfx/tut_cancel.png' style='position:absolute;left:1000px;cursor:pointer;'>
+<img id='tut1' src='view/gfx/tut_stats.png' style='position: absolute;top: 40px;left:-10px;'>
+<img id='tut2' src='view/gfx/tut_plugins.png' style='position: absolute;top: 50px;left:-30px;display:none'>
+<img id='tut3' src='view/gfx/tut_feed.png' style='position: absolute;top: 30px;left:250px;display:none'>
+</div>
   ${FEED_DATA_PREVIEW}
 
   <div id='home' class="row">
