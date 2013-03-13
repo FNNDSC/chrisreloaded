@@ -104,6 +104,7 @@ jQuery(document).ready(function() {
   // activate polling of new statistics
   setInterval(_CHRIS_.updateStatistics, 5000);
   
+  
 });
 
 // activate backstretch

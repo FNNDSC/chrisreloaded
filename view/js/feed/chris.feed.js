@@ -679,6 +679,7 @@ jQuery(document)
           // show placeholder when there are no feeds
           if (jQuery('#feed_count').html() == "0") {
             jQuery('.feed_empty').show();
+            jQuery('#firstlogin').show();
           }
           _FEED_.scrollBottom();
           _FEED_.search();
