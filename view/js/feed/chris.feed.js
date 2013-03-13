@@ -680,6 +680,36 @@ jQuery(document)
           if (jQuery('#feed_count').html() == "0") {
             jQuery('.feed_empty').show();
             jQuery('#firstlogin').show();
+            
+            // install the callbacks for the tutorial
+            _TUTORIAL_ = 1;
+            $('#tutcancel').click(function() {$('#firstlogin').hide()});
+            $('#tutnext').click(function() {
+              
+              $('#tut'+_TUTORIAL_).hide();
+              _TUTORIAL_++;
+              
+              if (_TUTORIAL_>3) {
+                _TUTORIAL_ = 1;
+              }              
+              
+              $('#tut'+_TUTORIAL_).show();
+            
+            
+            });
+            $('#tutprev').click(function() {
+              
+              $('#tut'+_TUTORIAL_).hide();
+              _TUTORIAL_--;
+              
+              if (_TUTORIAL_<1) {
+                _TUTORIAL_ = 3;
+              }              
+              
+              $('#tut'+_TUTORIAL_).show();
+              
+            });
+            
           }
           _FEED_.scrollBottom();
           _FEED_.search();
