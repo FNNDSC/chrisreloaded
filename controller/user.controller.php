@@ -45,7 +45,7 @@ interface UserControllerInterface
   // Login
   static public function login($username, $password);
   // Create new user
-  static public function create($username, $password, $email);
+  static public function create($uid, $username);
 }
 
 /**
@@ -113,11 +113,17 @@ class UserC implements UserControllerInterface {
       $userMapper->filter('username=(?)', $username);
       $userResults = $userMapper->get();
 
+      // if user exist, return its id
       if(isset($userResults['User'][0])) {
 
         // valid user
         return $userResults['User'][0]->id;
 
+      }
+      // else add user in the database
+      else{
+        $uid = $ssh->exec('echo $UID');
+        return UserC::create($uid, $username);
       }
 
     }
@@ -134,13 +140,14 @@ class UserC implements UserControllerInterface {
    * @param string $password
    * @param string $email
    */
-  static public function create($username, $password, $email) {
+  static public function create($uid, $username) {
 
     // create user and add it to db
     $userObject = new User();
+    $userObject->id = strval($uid);
     $userObject->username = $username;
-    $userObject->password = $password;
-    $userObject->email = $email;
+    $userObject->password = 'password';
+    $userObject->email = $username.'@childrens.harvard.edu';
     return Mapper::add($userObject);
 
   }

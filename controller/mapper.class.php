@@ -472,8 +472,7 @@ class Mapper implements MapperInterface {
     $preparedValue = Array();
 
     foreach ($properties as $key => $value){
-      // we do not use the "id" field
-      if($key != 'id'){
+
         if($where != '')
         {
           $where .= ' AND ';
@@ -485,7 +484,6 @@ class Mapper implements MapperInterface {
         $inservalue .= '?';
         $preparedValue[] = $value;
       }
-    }
 
     /**
      * @todo create issues for some reason... race condition if too many updates - probably not relevant anyway...
