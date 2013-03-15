@@ -1,3 +1,6 @@
 [submodule "lib/phpseclib"]
 	path = lib/phpseclib
 	url = https://github.com/FNNDSC/phpseclib.git
+[submodule "lib/simpletest"]
+	path = lib/simpletest
+	url = https://github.com/lox/simpletest.git
