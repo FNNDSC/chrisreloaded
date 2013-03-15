@@ -37,7 +37,7 @@ if (!defined('__CHRIS_ENTRY_POINT__'))
  */
 class Object {
 
-  public $id = -1;
+  public $id = 0;
 
   public function __construct() {
   }
