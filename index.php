@@ -48,7 +48,7 @@ function loginPage() {
   $t = new Template('login.html');
   $t -> replace('CSS', 'css.html');
   $t -> replace('FOOTER', 'footer.html');
-  $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.html');
+  $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.php');
 
   if (CHRIS_MAINTENANCE) {
     $t -> replace('MAINTENANCE', 'display:block');
@@ -71,7 +71,7 @@ function homePage() {
   $t -> replace('FEED_ALL', FeedC::getAllHTML($_SESSION['userid']));
   $t -> replace('FEED_DATA_PREVIEW', 'feed_data_preview.html');
   $t -> replace('FOOTER', 'footer.html');
-  $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.html');
+  $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.php');
   $t -> replace('JAVASCRIPT_CHRIS', 'javascript.chris.html');
   $t -> replace('USERNAME', ucfirst($_SESSION['username']));
 

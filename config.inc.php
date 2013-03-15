@@ -84,6 +84,8 @@ define('SIMPLETEST_XML_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/xml_chris.php'))
 define('SIMPLETEST_SIMPLETEST', joinPaths(CHRIS_WWWROOT,'lib/simpletest/simpletest.php'));
 define('SIMPLETEST_AUTORUN', joinPaths(CHRIS_WWWROOT,'lib/simpletest/autorun.php'));
 
+// GOOGLE ANALYTICS
+define('ANALYTICS_ACCOUNT', 'UA-39303022-1');
 
 // if CHRIS_DEBUG is defined, print all constants
 if(defined('CHRIS_CONFIG_DEBUG')) {
