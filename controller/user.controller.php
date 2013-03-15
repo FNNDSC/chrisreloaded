@@ -123,7 +123,10 @@ class UserC implements UserControllerInterface {
       // else add user in the database
       else{
         $uid = $ssh->exec('echo $UID');
-        return UserC::create($uid, $username);
+        // returns 0 since the user table doesnt have auto increment
+        UserC::create($uid, $username);
+        
+        return $uid;
       }
 
     }
