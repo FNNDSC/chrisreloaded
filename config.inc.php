@@ -32,6 +32,9 @@ if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 // include the utilities
 require_once(dirname(__FILE__).'/controller/_util.inc.php');
 
+// version
+define('CHRIS_VERSION', '1.1');
+
 // maintenance mode
 define('CHRIS_MAINTENANCE', false);
 

@@ -74,6 +74,7 @@ function homePage() {
   $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.php');
   $t -> replace('JAVASCRIPT_CHRIS', 'javascript.chris.html');
   $t -> replace('USERNAME', ucfirst($_SESSION['username']));
+  $t -> replace('CHRIS_VERSION', CHRIS_VERSION);
 
   if (CHRIS_MAINTENANCE) {
     $t -> replace('MAINTENANCE', 'display:block');
