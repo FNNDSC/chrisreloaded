@@ -8,23 +8,35 @@
 </head>
 <body>
 
-<div id='maintenance' style='${MAINTENANCE}'><div id='maintenance_label'><h1>Maintenance!</h1> The system will be available again shortly!<br>Sorry for the inconvenience!!</div></div>
+ <div id='maintenance' style='${MAINTENANCE}'>
+  <div id='maintenance_label'>
+   <h1>Maintenance!</h1>
+   The system will be available again shortly!<br>Sorry for the
+   inconvenience!!
+  </div>
+ </div>
  ${NAVBAR}
 
  <div class="container" id='opaqueoverlay'
   style="margin: 0px auto; padding: 60px 14px 14px 14px; background-image: url(view/gfx/wash-white-30.png); min-height: 100%;">
-<div id='firstlogin'>
-<img id='tutprev' src='view/gfx/tut_previous.png' style='position:absolute;left:-230px;top:300px;cursor:pointer;'>
-<img id='tutnext' src='view/gfx/tut_next.png' style='position:absolute;left:1000px;top:300px;cursor:pointer;'>
-<img id='tutcancel' src='view/gfx/tut_cancel.png' style='position:absolute;left:1000px;cursor:pointer;'>
-<img id='tut1' src='view/gfx/tut_stats.png' style='position: absolute;top: 40px;left:-10px;'>
-<img id='tut2' src='view/gfx/tut_plugins.png' style='position: absolute;top: 50px;left:-30px;display:none'>
-<img id='tut3' src='view/gfx/tut_feed.png' style='position: absolute;top: 30px;left:250px;display:none'>
-</div>
+  <div id='firstlogin'>
+   <img id='tutprev' src='view/gfx/tut_previous.png'
+    style='position: absolute; left: -230px; top: 300px; cursor: pointer;'>
+   <img id='tutnext' src='view/gfx/tut_next.png'
+    style='position: absolute; left: 1000px; top: 300px; cursor: pointer;'>
+   <img id='tutcancel' src='view/gfx/tut_cancel.png'
+    style='position: absolute; left: 1000px; cursor: pointer;'> <img
+    id='tut1' src='view/gfx/tut_stats.png'
+    style='position: absolute; top: 40px; left: -10px;'> <img
+    id='tut2' src='view/gfx/tut_plugins.png'
+    style='position: absolute; top: 50px; left: -30px; display: none'>
+   <img id='tut3' src='view/gfx/tut_feed.png'
+    style='position: absolute; top: 30px; left: 250px; display: none'>
+  </div>
   ${FEED_DATA_PREVIEW}
 
   <div id='home' class="row">
-   <div class="span4" >
+   <div class="span4">
     <div class="well" id='information'
      style='padding-top: 10px; padding-bottom: 12px;'>
      <!-- GREETING -->
@@ -57,39 +69,32 @@
     </div>
     ${PLUGIN}
    </div>
-    <div class="span8 pull-right">
-     <div class="feed_title">
-      <span style="font-size: 16px; font-weight: bold;">Activity
-       Feed</span> <sub>( <a href="#">Me</a> / <b>All </b>)
-      </sub><label class="checkbox inline feed_header_small"
-       style='margin-left: 10px; padding-top: 0px; margin-top: -5px;'>
-       <input type="checkbox" class="feed_fav_check"
-       style='opacity: 0.6;' value="1" checked> Favorites
-      </label> <label class="checkbox inline feed_header_small"
-       style='padding-top: 0px; margin-top: -5px;'> <input
-       type="checkbox" class="feed_run_check" style='opacity: 0.6'
-       value="1" checked> Running
-      </label> <label class="checkbox inline feed_header_small"
-       style='padding-top: 0px; margin-top: -5px;'> <input
-       type="checkbox" class="feed_fin_check" style='opacity: 0.6'
-       value="1" checked> Finished
-      </label> <label class="checkbox inline feed_header_small"
-       style='padding-top: 0px; margin-top: -5px;'> <input
-       type="checkbox" class="feed_sea_check" value="0"> Search
-      </label> <span class="pull-right" style=''> <input
-       class="feed_search_input" type="text" placeholder="Search..."
-       style='height: 10px; line-height: 12px; width: 135px; font-size: 11px;'>
-      </span>
-     </div>
-     <!--      <div class="feed_advanced feed_gradient">
-      <div></div>
-     </div> -->
-     <div class="feed_update feed_dark"></div>
-    </div>
-   <!--    <div class="span12 pull-right" data-spy="affix"
-    style="z-index: 500; margin-top: -20px; height: 40px; background: #66CCFF">
-   </div> -->
+
    <div class="span8 pull-right">
+    <div class="feed_title">
+     <span style="font-size: 16px; font-weight: bold;">Activity
+      Feed</span> <sub>( <a href="#">Me</a> / <b>All </b>)
+     </sub><label class="checkbox inline feed_header_small"
+      style='margin-left: 10px; padding-top: 0px; margin-top: -5px;'>
+      <input type="checkbox" class="feed_fav_check"
+      style='opacity: 0.6;' value="1" checked> Favorites
+     </label> <label class="checkbox inline feed_header_small"
+      style='padding-top: 0px; margin-top: -5px;'> <input
+      type="checkbox" class="feed_run_check" style='opacity: 0.6'
+      value="1" checked> Running
+     </label> <label class="checkbox inline feed_header_small"
+      style='padding-top: 0px; margin-top: -5px;'> <input
+      type="checkbox" class="feed_fin_check" style='opacity: 0.6'
+      value="1" checked> Finished
+     </label> <label class="checkbox inline feed_header_small"
+      style='padding-top: 0px; margin-top: -5px;'> <input
+      type="checkbox" class="feed_sea_check" value="0"> Search
+     </label> <span class="pull-right" style=''> <input
+      class="feed_search_input" type="text" placeholder="Search..."
+      style='height: 10px; line-height: 12px; width: 135px; font-size: 11px;'>
+     </span>
+    </div>
+    <div class="feed_update feed_dark"></div>
     <div class="feed_content">
      <div class="feed_empty"
       style="display: none; height: 100%; background-color: whiteSmoke; text-align: center; padding-top: 250px;">No
