@@ -8,8 +8,8 @@ The Children's Hospital Radiology Information System.
 2013 03 15 - **r1.1**
 
 * Add `Google Analytics` support
-* Easy login: all ldap user can login, the database will be updated automatically
+* Easy login: all ldap users can login, the database will be updated accordingly
 
 2013 03 13 - **r1.0**
 
-* First released version
+* First release!
