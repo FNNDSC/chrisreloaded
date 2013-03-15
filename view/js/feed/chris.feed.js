@@ -146,6 +146,23 @@ _FEED_.feed_onclick = function() {
     var details = jQuery(this).parent().find('.data_browser');
     _FEED_.onclick(details);
   });
+  
+  jQuery(document).on('click', '.feed_fav_header', function(e) {
+    var details = jQuery(this).parent().find('.feed_fav_content');
+    _FEED_.onclick(details);
+  });
+  jQuery(document).on('click', '.feed_run_header', function(e) {
+    var details = jQuery(this).parent().find('.feed_run_content');
+    _FEED_.onclick(details);
+  });
+  jQuery(document).on('click', '.feed_fin_header', function(e) {
+    var details = jQuery(this).parent().find('.feed_fin_content');
+    _FEED_.onclick(details);
+  });
+  jQuery(document).on('click', '.feed_sea_header', function(e) {
+    var details = jQuery(this).parent().find('.feed_sea_content');
+    _FEED_.onclick(details);
+  });
 }
 _FEED_.hasS = function(value) {
   if (value < 2) {

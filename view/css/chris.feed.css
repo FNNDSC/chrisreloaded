@@ -271,19 +271,31 @@
 }
 
 .feed_sea_header {
-	background: #CCFFFF;
+	cursor: pointer;
+	background: #2F4296;
+	 color: #FFFFFF;
+	   border-top:1px solid #FFFFFF;
 }
 
 .feed_fav_header {
-	background: #FFFFCC;
+	cursor: pointer;
+	background: #2F4296;
+	 color: #FFFFFF;
+	   border-top:1px solid #FFFFFF;
 }
 
 .feed_run_header {
-	background: #FFCCCC;
+	cursor: pointer;
+	background: #2F4296;
+	 color: #FFFFFF;
+	   border-top:1px solid #FFFFFF;
 }
 
 .feed_fin_header {
-	background: #CCFFCC;
+	cursor: pointer;
+	background: #2F4296;
+	color: #FFFFFF;
+	border-top:1px solid #FFFFFF;
 }
 
 .feed_dropzone_active {
