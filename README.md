@@ -5,9 +5,9 @@ The Children's Hospital Radiology Information System.
 
 ### Change log ###
 
-current - **r1.2**
-* get rid of deprecated chb-fsdev and chb-fsstable
-* add version in configuration file and in footer
+Current - **r1.2**
+* Get rid of deprecated chb-fsdev and chb-fsstable
+* Add chris version in configuration file and in footer
 
 2013 03 15 - **r1.1**
 
