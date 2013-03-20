@@ -5,8 +5,8 @@ The Children's Hospital Radiology Information System.
 
 ### Change log ###
 
-Current - **r1.2**
-* Bug fixes
+2013 03 20 - **r1.2**
+* Bug fixes (Mapper::add if id already exists)
 * Get rid of deprecated chb-fsdev and chb-fsstable
 * Add chris version in configuration file and in footer
 
