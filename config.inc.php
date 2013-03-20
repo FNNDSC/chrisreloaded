@@ -42,7 +42,7 @@ define('CHRIS_MAINTENANCE', false);
 define('CHRIS_ADMIN_EMAIL', 'chris@babymri.org');
 define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.org');
 define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.org');
-define('CHRIS_DICOM_EMAIL_TO', 'nicolas.rannou@childrens.harvard.edu,rudolph.pienaar@childrens.harvard.edu');
+define('CHRIS_DICOM_EMAIL_TO', 'nicolas.rannou@childrens.harvard.edu');
 
 // MYSQL configuration
 define('SQL_HOST', 'chris');
