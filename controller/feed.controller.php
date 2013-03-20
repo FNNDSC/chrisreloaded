@@ -298,6 +298,7 @@ class FeedC implements FeedControllerInterface {
       $feedResult = $feedMapper->get();
 
       if(count($feedResult['Feed']) >= 1){
+        $feedResult['Feed'][0]->id = 0;
         $feedResult['Feed'][0]->user_id = $userResult['User'][0]->id;
         $feedResult['Feed'][0]->time = microtime(true);
         $feedResult['Feed'][0]->favorite = 0;
@@ -324,6 +325,7 @@ class FeedC implements FeedControllerInterface {
         // for earch result, create same meta with different target id
         if(count($metaResult['Meta']) >= 1){
           foreach($metaResult['Meta'] as $k0 => $v0){
+            $v0->id = 0;
             $v0->target_id = $new_id;
 
             // make sure to properly update the root_id
@@ -390,6 +392,7 @@ class FeedC implements FeedControllerInterface {
       foreach($values as $key => $value){
         $metaObject->$key = $value;
       }
+      $metaObject->id = 0;
       $metaObject->target_id = $feed_id;
       $metaObject->target_type = 'feed';
 
