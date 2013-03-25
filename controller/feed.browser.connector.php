@@ -60,9 +60,12 @@ if( is_dir($path) ) {
         elseif(is_file($fullpath)){
           $ext = preg_replace('/^.*\./', '', $file);
 
+          $GLOBALS['ext'] = $ext;
+
           $t = new Template('feed_data_browser_file_item.html');
           $t->replace('CLASSES', 'file ext_'.$ext);
           $t->replace('FULLPATH', $fullpath);
+          $t->replace('SLICEDROP', 'feed_data_browser_file_item_slicedrop.php');
           $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file));
           $t->replace('FILENAME', htmlentities($file));
           echo $t;
