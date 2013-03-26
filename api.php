@@ -43,6 +43,9 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
 // ssh - to be removed when user::controller works
 require_once ('Net/SSH2.php');
 
+// enable cross origin requests
+header("Access-Control-Allow-Origin: *");
+
 // return values
 $start_time = new DateTime();
 $result = array(
@@ -229,9 +232,6 @@ if (!SecurityC::login()) {
           // here we don't create JSON but just pass thru the file content
           $name = joinPaths(CHRIS_USERS, $parameters);
 
-          // enable cross origin requests
-          header("Access-Control-Allow-Origin: *");
-
           // if the file does not exist, just die
           if (!is_file($name)) {
             die();
@@ -255,9 +255,6 @@ if (!SecurityC::login()) {
 
           // here we don't create JSON but just pass thru the file content
           $name = joinPaths(CHRIS_USERS, $parameters);
-
-          // enable cross origin requests
-          header("Access-Control-Allow-Origin: *");
 
           // if the file does not exist, just die
           if (!is_file($name)) {
