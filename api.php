@@ -94,8 +94,13 @@ if (!$loggedIn) {
 } else {
 
   // propagate user attributes
-  $result['username'] = $_SESSION['username'];
-  $result['userid'] = $_SESSION['userid'];
+  if (isset($_SESSION['username'])) {
+    $result['username'] = $_SESSION['username'];
+  }
+
+  if (isset($_SESSION['userid'])) {
+    $result['userid'] = $_SESSION['userid'];
+  }
 
   //
   // API FUNCTIONS
