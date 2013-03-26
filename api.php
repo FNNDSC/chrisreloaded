@@ -39,6 +39,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'token.controller.php'));
 
 // ssh - to be removed when user::controller works
 require_once ('Net/SSH2.php');
@@ -60,9 +61,28 @@ $result = array(
     'parameters' => null,
     'result' => null);
 
-
+//
 // validate the credentials
-if (!SecurityC::login()) {
+//
+
+// check if a token was passed
+$loggedIn = false;
+if (isset($_GET['token'])) {
+
+  // token provided
+
+  $loggedIn = TokenC::validate($_GET['token']);
+
+} else {
+
+  // no token provided
+
+  // if we don't have a token, we need to login
+  $loggedIn = SecurityC::login();
+
+}
+
+if (!$loggedIn) {
 
   // invalid credentials
 
@@ -246,6 +266,10 @@ if (!SecurityC::login()) {
         } else if($what == 'users') {
 
           $result['result'] = UserC::get();
+
+        } else if($what == 'token') {
+
+          $result['result'] = TokenC::create();
 
         }
 
