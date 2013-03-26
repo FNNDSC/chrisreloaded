@@ -296,6 +296,30 @@ _FEED_.feed_cancel = function() {
         });
       });
 }
+_FEED_.slicedrop = function(el) {
+    
+    var _token = '';
+  
+    // grab a fresh token
+    jQuery.ajax({
+      type : "POST",
+      url : "api.php?action=get&what=token",
+      dataType : 'json',
+      success : function(data) {
+        
+        _token = data['result'];
+
+        // now we need the relative path to the data
+        var _relativepath = $(el.target).siblings('.file').attr('rel');
+        
+        var _url = 'http://slicedrop.com/?'+window.location.origin + window.location.pathname+'api.php?token='+_token+'&action=download&what=file&parameters='+_relativepath;
+        
+        window.open(_url);        
+        
+      }
+    });
+
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -305,4 +329,5 @@ jQuery(document).ready(function() {
   _FEED_.feed_archive();
   _FEED_.feed_rename();
   _FEED_.feed_cancel();
+  _FEED_.slicedrop();
 });
