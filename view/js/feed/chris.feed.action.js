@@ -329,5 +329,4 @@ jQuery(document).ready(function() {
   _FEED_.feed_archive();
   _FEED_.feed_rename();
   _FEED_.feed_cancel();
-  _FEED_.slicedrop();
 });
