@@ -320,6 +320,30 @@ _FEED_.slicedrop = function(el) {
     });
 
 }
+_FEED_.slicedrop_dicom = function(el) {
+  
+  var _token = '';
+
+  // grab a fresh token
+  jQuery.ajax({
+    type : "POST",
+    url : "api.php?action=get&what=token",
+    dataType : 'json',
+    success : function(data) {
+      
+      _token = data['result'];
+
+      // now we need the relative path to the data
+      var _relativepath = $(el.target).closest('.file').attr('rel');
+      
+      var _url = 'http://chris/d/slicedrop.github.com/?scene='+window.location.origin + window.location.pathname+'api.php?token='+_token+'&action=get&what=dicomscene&parameters='+_relativepath;
+      //console.log(_url);
+      window.open(_url);        
+      
+    }
+  });
+
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */

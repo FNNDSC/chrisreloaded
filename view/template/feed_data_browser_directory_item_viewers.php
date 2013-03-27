@@ -12,7 +12,7 @@
 ?>
 <img
 	src='view/gfx/slicedrop.png' title='Open with Slice:Drop'
-	class='slicedrop_icon focus' onclick='var e = arguments[0] || window.event; e.stopPropagation(); _FEED_.slicedrop(e);' style='position: absolute; right: 10px;'>
+	class='slicedrop_icon focus' onclick='var e = arguments[0] || window.event; e.stopPropagation(); _FEED_.slicedrop_dicom(e);' style='position: absolute; right: 10px;'>
 <?php
 
   }
