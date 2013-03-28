@@ -312,7 +312,7 @@ _FEED_.slicedrop = function(el) {
         // now we need the relative path to the data
         var _relativepath = $(el.target).siblings('.file').attr('rel');
         
-        var _url = 'http://slicedrop.com/?'+window.location.origin + window.location.pathname+'api.php?token='+_token+'&action=download&what=file&parameters='+_relativepath;
+        var _url = 'http://slicedrop.com/?'+window.location.protocol+"//"+window.location.host + window.location.pathname+'api.php?token='+_token+'&action=download&what=file&parameters='+_relativepath;
         
         window.open(_url);        
         
@@ -336,7 +336,7 @@ _FEED_.slicedrop_dicom = function(el) {
       // now we need the relative path to the data
       var _relativepath = $(el.target).closest('.file').attr('rel');
       
-      var _url = 'http://slicedrop.com/?scene='+window.location.origin + window.location.pathname+'api.php?token='+_token+'&action=get&what=dicomscene&parameters='+_relativepath;
+      var _url = 'http://slicedrop.com/?scene='+window.location.protocol+"//"+window.location.host + window.location.pathname+'api.php?token='+_token+'&action=get&what=dicomscene&parameters='+_relativepath;
       //console.log(_url);
       window.open(_url);        
       
