@@ -336,7 +336,7 @@ _FEED_.slicedrop_dicom = function(el) {
       // now we need the relative path to the data
       var _relativepath = $(el.target).closest('.file').attr('rel');
       
-      var _url = 'http://chris/d/slicedrop.github.com/?scene='+window.location.origin + window.location.pathname+'api.php?token='+_token+'&action=get&what=dicomscene&parameters='+_relativepath;
+      var _url = 'http://slicedrop.com/?scene='+window.location.origin + window.location.pathname+'api.php?token='+_token+'&action=get&what=dicomscene&parameters='+_relativepath;
       //console.log(_url);
       window.open(_url);        
       
