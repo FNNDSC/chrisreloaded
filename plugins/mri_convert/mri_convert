@@ -30,6 +30,12 @@ class MRIConvert( Plugin ):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
+    # migrate data
+    # create temp dir
+    import tempfile, shutil, subprocess
+    tempdir = tempfile.mkdtemp( 'free', 'surf', '/chb/pices/tmp' )
+    shutil.copytree( os.path.dirname(options.input), tempdir + '/mri') 
+    
     # grab just the file name
     basename = os.path.basename(options.input)
     
@@ -37,8 +43,12 @@ class MRIConvert( Plugin ):
     basename_new = os.path.splitext(basename)[0] + '.' + options.format
     
     # launch recon-all
-    cmd = 'cd ' + options.output +';' + current_dir + '/mri_convert.wrapper ' + options.input + ' ' + os.path.join(options.output,basename_new)
+    cmd = 'cd ' + options.output +';' + current_dir + '/mri_convert.wrapper ' + os.path.join(tempdir+'/mri', basename) + ' ' + os.path.join(tempdir, basename_new)
     os.system(cmd)
+    
+    shutil.copyfile(os.path.join(tempdir, basename_new), os.path.join(options.output, basename_new))
+    
+    shutil.rmtree( tempdir )
 
 # ENTRYPOINT
 if __name__ == "__main__":
