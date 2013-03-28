@@ -296,6 +296,54 @@ _FEED_.feed_cancel = function() {
         });
       });
 }
+_FEED_.slicedrop = function(el) {
+    
+    var _token = '';
+  
+    // grab a fresh token
+    jQuery.ajax({
+      type : "POST",
+      url : "api.php?action=get&what=token",
+      dataType : 'json',
+      success : function(data) {
+        
+        _token = data['result'];
+
+        // now we need the relative path to the data
+        var _relativepath = $(el.target).siblings('.file').attr('rel');
+        
+        var _url = 'http://slicedrop.com/?'+window.location.protocol+"//"+window.location.host + window.location.pathname+'api.php?token='+_token+'&action=download&what=file&parameters='+_relativepath;
+        
+        window.open(_url);        
+        
+      }
+    });
+
+}
+_FEED_.slicedrop_dicom = function(el) {
+  
+  var _token = '';
+
+  // grab a fresh token
+  jQuery.ajax({
+    type : "POST",
+    url : "api.php?action=get&what=token",
+    dataType : 'json',
+    success : function(data) {
+      
+      _token = data['result'];
+
+      // now we need the relative path to the data
+      var _relativepath = $(el.target).closest('.file').attr('rel');
+      
+      var _url = 'http://slicedrop.com/?scene='+window.location.protocol+"//"+window.location.host + window.location.pathname+'api.php?token='+_token+'&action=get&what=dicomscene&parameters='+_relativepath;
+      //console.log(_url);
+      window.open(_url);        
+      
+    }
+  });
+
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */

@@ -50,9 +50,13 @@ if( is_dir($path) ) {
       $fullpath = $path . $file;
       if( file_exists($fullpath) && $file != '.' && $file != '..' ) {
         if(is_dir($fullpath)){
+
+          $GLOBALS['fullpath'] = $fullpath;
+
           $t = new Template('feed_data_browser_directory_item.html');
           $t->replace('CLASSES', 'directory collapsed');
           $t->replace('FULLPATH', $fullpath);
+          $t->replace('VIEWERS', 'feed_data_browser_directory_item_viewers.php');
           $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file . '/'));
           $t->replace('FILENAME', htmlentities($file));
           echo $t;
@@ -60,9 +64,12 @@ if( is_dir($path) ) {
         elseif(is_file($fullpath)){
           $ext = preg_replace('/^.*\./', '', $file);
 
+          $GLOBALS['ext'] = $ext;
+
           $t = new Template('feed_data_browser_file_item.html');
           $t->replace('CLASSES', 'file ext_'.$ext);
           $t->replace('FULLPATH', $fullpath);
+          $t->replace('VIEWERS', 'feed_data_browser_file_item_viewers.php');
           $t->replace('RELATIVEPATH', htmlentities($_POST['dir'] . $file));
           $t->replace('FILENAME', htmlentities($file));
           echo $t;

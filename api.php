@@ -39,9 +39,13 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'token.controller.php'));
 
 // ssh - to be removed when user::controller works
 require_once ('Net/SSH2.php');
+
+// enable cross origin requests
+header("Access-Control-Allow-Origin: *");
 
 // return values
 $start_time = new DateTime();
@@ -57,9 +61,28 @@ $result = array(
     'parameters' => null,
     'result' => null);
 
-
+//
 // validate the credentials
-if (!SecurityC::login()) {
+//
+
+// check if a token was passed
+$loggedIn = false;
+if (isset($_GET['token'])) {
+
+  // token provided
+
+  $loggedIn = TokenC::validate($_GET['token']);
+
+} else {
+
+  // no token provided
+
+  // if we don't have a token, we need to login
+  $loggedIn = SecurityC::login();
+
+}
+
+if (!$loggedIn) {
 
   // invalid credentials
 
@@ -71,8 +94,13 @@ if (!SecurityC::login()) {
 } else {
 
   // propagate user attributes
-  $result['username'] = $_SESSION['username'];
-  $result['userid'] = $_SESSION['userid'];
+  if (isset($_SESSION['username'])) {
+    $result['username'] = $_SESSION['username'];
+  }
+
+  if (isset($_SESSION['userid'])) {
+    $result['userid'] = $_SESSION['userid'];
+  }
 
   //
   // API FUNCTIONS
@@ -229,9 +257,6 @@ if (!SecurityC::login()) {
           // here we don't create JSON but just pass thru the file content
           $name = joinPaths(CHRIS_USERS, $parameters);
 
-          // enable cross origin requests
-          header("Access-Control-Allow-Origin: *");
-
           // if the file does not exist, just die
           if (!is_file($name)) {
             die();
@@ -247,6 +272,37 @@ if (!SecurityC::login()) {
 
           $result['result'] = UserC::get();
 
+        } else if($what == 'token') {
+
+          $result['result'] = TokenC::create();
+
+        } else if($what == 'dicomscene') {
+
+          $name = joinPaths(CHRIS_USERS, $parameters);
+
+          // this only works with directories
+          if (!is_dir($name)) {
+            die();
+          }
+
+          $dicom_files = glob($name."/{*.dcm,*.dicom}",GLOB_BRACE);
+
+          $output = array("volume"=>array("file"=>array()));
+
+          foreach ($dicom_files as &$df) {
+
+            // 1. create a token
+            $token = TokenC::create();
+            // 2. generate url (including the token)
+            $url = "http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?token=".$token."&action=download&what=file&parameters=".joinPaths($parameters,basename($df));
+            // 3. attach to output
+            $output['volume']['file'][] = $url;
+
+          }
+
+          // return JSON encoded output
+          die(json_encode($output));
+
         }
 
         break;
@@ -255,9 +311,6 @@ if (!SecurityC::login()) {
 
           // here we don't create JSON but just pass thru the file content
           $name = joinPaths(CHRIS_USERS, $parameters);
-
-          // enable cross origin requests
-          header("Access-Control-Allow-Origin: *");
 
           // if the file does not exist, just die
           if (!is_file($name)) {
