@@ -5,8 +5,12 @@ The Children's Hospital Radiology Information System.
 
 ### Change log ###
 
-current - **r1.3**
+current - **r1.4**
+
+2013 03 29 - **r1.3**
 * Enhance style
+* Integrate Slice:Drop for files and DICOM folders
+* Fix bug in the mri_convert plugin which crashed when the input path was too long
 
 2013 03 20 - **r1.2**
 * Bug fixes (Mapper::add if id already exists)
