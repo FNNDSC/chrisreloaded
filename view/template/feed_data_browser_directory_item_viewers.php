@@ -31,7 +31,7 @@
   if (count($freesurfer_meshes) > 0) {
 
 ?>
-<span style='position: absolute; right: 10px;'>SurfView</span>
+<span style='position: absolute; right: 10px;'></span>
 <?php
 
   }
