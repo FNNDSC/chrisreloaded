@@ -341,7 +341,7 @@ class FeedC implements FeedControllerInterface {
         FeedC::addMetaS($new_id, 'sharer_id', (string)$ownerid, 'simple');
 
         // link files on file system
-        $targetDirectory = CHRIS_USERS.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id;
+        $targetDirectory = CHRIS_USERS.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feed_id;
 
         $destinationDirectory = CHRIS_USERS.$targetname.'/'.$feedResult['Feed'][0]->plugin;
         if(!is_dir($destinationDirectory)){
