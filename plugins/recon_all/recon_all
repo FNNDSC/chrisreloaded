@@ -40,6 +40,9 @@ class recon_all( Plugin ):
       shutil.copytree( options.MRI, tempdir + '/MRI' )
       # create link for preview during running
       os.symlink( tempdir + '/MRI', options.output + '/Freesurfer' )
+      
+      # adjust permissions to tempdir + '/MRI' so that the chris user can view the contents
+      os.chmod(tempdir, 0777)
 
       # launch recon-all
       cmd = 'cd ' + tempdir + '/MRI' + ';' + current_dir + '/reconall.wrapper -subject Freesurfer -i ' + os.path.join( tempdir + '/MRI', files[0] ) + ' -all -notalairach'
