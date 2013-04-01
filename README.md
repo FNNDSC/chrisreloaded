@@ -6,6 +6,8 @@ The Children's Hospital Radiology Information System.
 ### Change log ###
 
 current - **r1.4**
+* Fix permission issue to view Freesurfer working directory when running a recon-all
+* Fix critical bug when sharing a feed 
 
 2013 03 29 - **r1.3**
 * Enhance style
