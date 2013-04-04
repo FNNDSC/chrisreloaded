@@ -28,7 +28,7 @@ class Fetal_Moco( Plugin ):
 
   def run( self, options ):
 
-    cmd = '/chb/arch/Linux64/packages/fetal_moco/reconstruction '+options.output+'/out.nii 3 ' + options.Axial + ' ' + options.Sagittal + ' ' + options.Coronal + ' id id id'
+    cmd = '/chb/arch/Linux64/packages/fetal_moco/reconstruction '+options.output+'/out.nii 3 ' + options.Template + ' ' + options.Scan1 + ' ' + options.Scan2 + ' id id id -iterations ' + str(options.Iterations) + ' -sigma ' + str(options.Sigma) + ' -resolution ' + str(options.Resolution) + ' -multires ' + str(options.Multires) + ' -delta ' + str(options.Delta) + ' -lambda ' + str(options.Lambda) + ' -lastIter ' + str(options.LastIter)
     print cmd
     os.system(cmd)    
 
@@ -36,14 +36,15 @@ class Fetal_Moco( Plugin ):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = Fetal_Moco()
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--axial', action='store', dest='Axial', help='the axial scan' )
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--sagittal', action='store', dest='Sagittal', help='the sagittal scan' )
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--coronal', action='store', dest='Coronal', help='the coronal scan' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--template', action='store', dest='Template', help='the template scan' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--scan1', action='store', dest='Scan1', help='the first scan' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--scan2', action='store', dest='Scan2', help='the second scan' )
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--iterations', action='store', default=9, dest='Iterations', help='Number of registration-reconstruction iterations.' )
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--sigma', action='store', default=12, dest='Sigma', help='Stdev for bias field. [mm]' )
   plugin.add_parameter( 'Advanced', Plugin.DOUBLE, '--resolution', step=0.01, action='store', default=0.75, dest='Resolution', help='Isotropic resolution of the output volume.' )
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--multires', action='store', default=3, dest='Multires', help='Multiresolution smoothing with given number of levels.' )
-  plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--average', action='store', default=700, dest='Average', help='Average intensity value for stacks.' )
+  # average parameter crashes fetal moco
+  #plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--average', action='store', default=700, dest='Average', help='Average intensity value for stacks.' )
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--delta', action='store', default=150, dest='Delta', help='Parameter to define what is an edge.' )
   plugin.add_parameter( 'Advanced', Plugin.DOUBLE, '--lambda', step=0.02, action='store', default=0.02, dest='Lambda', help='Smoothing parameter.' )
   plugin.add_parameter( 'Advanced', Plugin.DOUBLE, '--lastIter', step=0.01, action='store', default=0.01, dest='LastIter', help='Smoothing parameter for last iteration.' )
