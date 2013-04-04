@@ -29,7 +29,7 @@ class fcMRI( Plugin ):
   def run( self, options ):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    os.system('cd ' + options.output +';' + current_dir + '/fcMRI.wrapper '+ options.Functional + ' ' + options.Timeseries_to_skip + ' ' + options.Anatomical + ' ' + options.BET_parameter + ' ' + options.Size_in_mm + ' ' + options.Results_Folder + ' ' + options.Number_of_ICA_components)
+    os.system('cd ' + options.output +';' + current_dir + '/fcMRI.wrapper '+ options.Functional + ' ' + options.Timeseries_to_skip + ' ' + options.Anatomical + ' ' + options.BET_parameter + ' ' + options.Size_in_mm + ' ' + options.Results_Folder + ' ' + str(options.Number_of_ICA_components))
 
 # ENTRYPOINT
 if __name__ == "__main__":
