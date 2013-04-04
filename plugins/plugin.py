@@ -129,7 +129,12 @@ class Plugin( argparse.ArgumentParser ):
         xml += '<longflag>' + parameter[2] + '</longflag>'
 
         if p_type == self.DOUBLE:
-          xml += '<constraints><step>0.1</step></constraints>'
+          
+          step = 0.1
+          if parameter[6]:
+            step = parameter[6]
+          
+          xml += '<constraints><step>'+str(step)+'</step></constraints>'
 
         if parameter[3]:
           xml += '<default>' + str( parameter[3] ) + '</default>'
@@ -187,10 +192,15 @@ class Plugin( argparse.ArgumentParser ):
     if 'values' in kwargs:
       values = kwargs['values']
       del kwargs['values']
+      
+    step = None
+    if 'step' in kwargs:
+      step = kwargs['step']
+      del kwargs['step']
 
     # store the parameter internally
     # (FIFO)
-    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default, _help, values] )
+    self.__parameters[len( self.__panels ) - 1].append( [kwargs['dest'], type, flag, default, _help, values, step] )
 
     # add the argument to the parser
     self.add_argument( *args, **kwargs )
