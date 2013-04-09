@@ -231,7 +231,7 @@ jQuery(document)
           jQuery('#plugin_submit').on(
               'click',
               function(e) {
-
+                
                 // fire it up!!
                 // prevent scrolling up
                 e.preventDefault();
@@ -246,6 +246,48 @@ jQuery(document)
                     'panel_', '');
                 var _parameter_rows = _visible_panel.find('.parameter_row');
                 var _output_rows = _visible_panel.find('.output_row');
+                
+                // if interactive plugin calling, give control to the plugin
+                // check if this plugin has a predefined memory
+                var _definedInteractive = jQuery(_visible_panel.parent()[0]).attr('data-interactive'); 
+                if (_definedInteractive != "") {
+                  // modify css
+                  jQuery('#opaqueoverlay').removeClass('container');
+                  jQuery('#opaqueoverlay').addClass('container-fluid');
+                  
+                  //
+                  jQuery('#home').removeClass('row');
+                  jQuery('#home').addClass('row-fluid');
+                  
+                  jQuery('#left').removeClass('span4');
+                  jQuery('#left').addClass('span2');
+                  
+                  //
+                  jQuery('#right').removeClass('span8');
+                  jQuery('#right').addClass('span3');
+                  
+                  jQuery('#right > div > label').hide();
+                  
+                  // load content via ajax + plugin name
+                  //http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]=widget/index.html
+                    
+                    jQuery.ajax({
+                      type: "POST",
+                      url: "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="+_plugin_name+"/widget/index.html",
+                      dataType: "text",
+                      success: function(data) {
+                        jQuery('#center').html(data);
+                      }
+                    });
+                    
+                    // show interactive plugin div
+                    jQuery('#center').show();
+                  
+                  // re-able icon
+                  jQuery('#plugin_submit').removeClass('disabled');
+                  return;
+                }
+                
                 var _jobs = [];
                 var _jobsOutputs = [];
                 var _numberOfJobs = _BATCH_.jobs.length;

@@ -91,6 +91,10 @@ class PACS_Pull(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = PACS_Pull()
+  
+  # this is an interactive plugin
+  plugin.interactive = True
+      
   plugin.add_parameter('Input', Plugin.STRING, '--mrn', action='store', dest='MRN', help='MRN to be pulled (mrn1 mrn2 mrn3 etc.)')
   plugin.add_parameter('Input', Plugin.STRING, '--aet', action='store', default='AETITLE', dest='USER_AET', help='User AETitle')
   plugin.add_parameter('Advanced', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')

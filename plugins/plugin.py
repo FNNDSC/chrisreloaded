@@ -59,6 +59,9 @@ class Plugin( argparse.ArgumentParser ):
     
     # the initial memory
     self.memory = 512
+    
+    # is it an inteactive plugin
+    self.interactive = False
 
   def error( self, message ):
     '''
@@ -84,6 +87,8 @@ class Plugin( argparse.ArgumentParser ):
       executable_parameters += ' status="' + str( self.status ) + '"'
     if self.memory > 0:
       executable_parameters+= ' memory="' + str( self.memory ) + '"'
+    if self.interactive == True:
+      executable_parameters+= ' interactive="' + str( self.interactive ) + '"'
       
     xml += '<executable ' + executable_parameters + '>\n'
     xml += '<category>' + Plugin.CATEGORY + '</category>\n'
