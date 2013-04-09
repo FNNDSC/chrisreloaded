@@ -177,7 +177,7 @@ if(count($mapperResults[$type]) >= 1){
     $study_mapper->ljoin('Data_Patient', 'patient.id = Data_Patient.patient_id')->ljoin('Data', 'Data_Patient.data_id = data.id')->ljoin('Data_Study', 'data.id = Data_Study.data_id')->ljoin('Study', 'Data_Study.study_id = study.id');
     $study_mapper->filter('patient.id = (?)', $value->id);
     if(isset($description)){
-      $study_mapper->filter('study.description LIKE CONCAT("%",?,"%")', $description);
+      $study_mapper->filter('data.description LIKE CONCAT("%",?,"%")', $description);
       $processLog .= 'description: '. $description.PHP_EOL;
     }
 
@@ -238,7 +238,7 @@ if(count($mapperResults[$type]) >= 1){
           // legacy, old dicom listener
           $name = $value->name.'-'.$value->id;
         }
-        
+
         if($name != ''){
           if(!is_dir($patientdir)){
             mkdir($patientdir);
