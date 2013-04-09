@@ -5,7 +5,13 @@ The Children's Hospital Radiology Information System.
 
 ### Change log ###
 
-current - **r1.5**
+current - **r1.6**
+
+2013 04 09 - **r1.5**
+* Introduce a step setting for Plugin.DOUBLE parameters
+* Expose all parameters of the Fetal Motion Correction plugin
+* Fix the fcMRI plugin
+* Search on Series description rather than Study description
 
 2013 04 01 - **r1.4**
 * Fix permission issue to view Freesurfer working directory when running a recon-all
