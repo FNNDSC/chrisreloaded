@@ -210,10 +210,16 @@ _PACS_.advancedTable = function() {
             "aaSorting" : [ [ 1, 'desc' ] ],
             "bAutoWidth" : false
           });
+  
+  $('#S-RESULTS_info').addClass('pull-left');
+  $('#S-RESULTS_length').addClass('pull-right');
+  $('#S-RESULTS_length > label').css('font-size', '12px');
+  $('#S-RESULTS_filter').addClass('pull-right');
+  $('#S-RESULTS_filter > label').css('font-size', '12px');
 }
 _PACS_.jsonConcat = function(json1, json2) {
   for ( var key in json2) {
-    if (typeof json1[key] === "undefined") {
+    if (typeof json1[key] == "undefined") {
       json1[key] = json2[key];
     } else {
       json1[key] = json1[key].concat(json2[key]);
@@ -231,10 +237,10 @@ _PACS_.ajaxAdvancedResults = function(data, force) {
   }
   // cache the result data
   if (force == false) {
-    if (typeof data != 'undefined' && data[0] != null) {
+    if (typeof data != 'undefined' && data[0] != null && data[0] != '') {
       _PACS_.cachedRaw[0] = _PACS_.jsonConcat(_PACS_.cachedRaw[0], data[0]);
     }
-    if (typeof data != 'undefined' && data[1] != null) {
+    if (typeof data != 'undefined' && data[1] != null && data[1] != '') {
       _PACS_.cachedRaw[1] = _PACS_.jsonConcat(_PACS_.cachedRaw[1], data[1]);
     }
   }
@@ -284,9 +290,7 @@ _PACS_.advancedCaching = function(data, i) {
     study.RetrieveAETitle = Array();
     study.Status = Array();
   } else {
-    console.log('cahcing the data');
     study = _PACS_.cachedSeries[stuid];
-    console.log(_PACS_.cachedSeries);
   }
   // fill study container
   var index = data[0].StudyInstanceUID.indexOf(data[1].StudyInstanceUID[i]);
@@ -524,6 +528,12 @@ _PACS_.simpleTable = function() {
             "bAutoWidth" : false,
             "aaSorting" : [ [ 1, 'desc' ] ],
           });
+  
+  $('#S-RESULTS_info').addClass('pull-left');
+  $('#S-RESULTS_length').addClass('pull-right');
+  $('#S-RESULTS_length > label').css('font-size', '12px');
+  $('#S-RESULTS_filter').addClass('pull-right');
+  $('#S-RESULTS_filter > label').css('font-size', '12px');
 }
 /**
  * Reformat data after 'Advanced' AJAX query to fit the dataTable standard.
@@ -635,6 +645,9 @@ _PACS_.seriesFormat = function(data) {
 }
 _PACS_.connectPull = function() {
   $(document).off('click','#PULL').on('click', '#PULL', function(event) {
+    // modify button icon
+    $("#PULL").removeClass('btn-success').addClass('btn-warning');
+    $("#PULL").html('<i class="icon-refresh rotating_class"></i>');
     _PACS_.ajaxPull();
   });
 }
@@ -711,7 +724,6 @@ _PACS_.ajaxPull = function() {
   });
   param.push(param_container);
   var _feed_name = (new Date()).toLocaleString();
-  window.console.log(param);
   // send to the launcher
   $.ajax({
     type : "POST",
@@ -725,11 +737,12 @@ _PACS_.ajaxPull = function() {
       FEED_OUTPUT : output
     },
     success : function(data) {
-      //close modal
+        $("#PULL").removeClass('btn-warning').addClass('btn-success');
+        $("#PULL").html('Pull selection');
+        
       window.parent.$().toastmessage('showSuccessToast', '<h5>Job started.</h5>'
           + 'Plugin: <b>' + plugin + '</b><br>' + 'Name: <b>'
           + _feed_name + '</b>');
-      // close modal
       //
     }
   });

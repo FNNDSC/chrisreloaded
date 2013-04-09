@@ -256,7 +256,6 @@ if (!$loggedIn) {
             switch ($parameters[0]){
               case "css":
                 $name = joinPaths(CHRIS_VIEW_FOLDER,'css', $parameters[1]);
-                echo $name.PHP_EOL;
                 header("Content-type: text/css", true);
                 break;
               case "js":
@@ -267,7 +266,6 @@ if (!$loggedIn) {
                 break;
               case "cssP":
                 $name = joinPaths(CHRIS_PLUGINS_FOLDER, $parameters[1]);
-                echo $name;
                 header("Content-type: text/css", true);
                 break;
               case "jsP":
