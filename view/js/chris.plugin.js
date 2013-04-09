@@ -3,7 +3,6 @@
  */
 var _PLUGIN_ = _PLUGIN_ || {};
 _PLUGIN_.showBatchDrop = function() {
-
   // grab the visible plugin panel
   var _visible_panel = jQuery('.plugin_panel :visible');
   var _plugin_name = _visible_panel.parent().attr('id').replace('panel_', '');
@@ -13,13 +12,12 @@ _PLUGIN_.showBatchDrop = function() {
   _visible_panel.find('.parameter_batchdrop').show();
   // setup droppable item
   jQuery(".parameter_batchdrop").droppable({
-    hoverClass: "parameter_batchdrop_hover",
-    tolerance: "pointer",
-    drop: _BATCH_.drop
+    hoverClass : "parameter_batchdrop_hover",
+    tolerance : "pointer",
+    drop : _BATCH_.drop
   });
 }
 _PLUGIN_.hideBatchDrop = function() {
-
   // grab the visible plugin panel
   var _visible_panel = jQuery('.plugin_panel :visible');
   var _plugin_name = _visible_panel.parent().attr('id').replace('panel_', '');
@@ -34,11 +32,9 @@ _PLUGIN_.hideBatchDrop = function() {
 jQuery(document)
     .ready(
         function() {
-
           // parse all categories
-          _PLUGIN_.categories = ['-- Show all --'];
+          _PLUGIN_.categories = [ '-- Show all --' ];
           jQuery('.plugin_panel').each(function(i, v) {
-
             var _category = jQuery(v).attr('data-category');
             // propagate all categories to the carousel items
             var _id = jQuery(v).attr('id').replace('panel_', '');
@@ -49,7 +45,6 @@ jQuery(document)
           });
           // order alphabetically
           _PLUGIN_.categories.sort(function(a, b) {
-
             if (a.toLowerCase() < b.toLowerCase())
               return -1;
             if (a.toLowerCase() > b.toLowerCase())
@@ -70,7 +65,6 @@ jQuery(document)
               .bind(
                   'change',
                   function() {
-
                     var _new_category = jQuery('#cart_categories').val();
                     // remove all
                     jQuery('.carousel-inner').empty();
@@ -102,15 +96,64 @@ jQuery(document)
                     // reset to default
                     jQuery('#plugin_cancel').click();
                     jQuery('.plugin_panel').hide();
-                    jQuery(
-                        '#panel_' +
-                            jQuery('.carousel-inner').children().first().attr(
-                                'id')).show();
+                    // clean up after interactive
+                    //
+                    jQuery('#opaqueoverlay').addClass('container');
+                    jQuery('#opaqueoverlay').removeClass('container-fluid');
+                    //
+                    jQuery('#home').addClass('row');
+                    jQuery('#home').removeClass('row-fluid');
+                    jQuery('#left').addClass('span4');
+                    jQuery('#left').removeClass('span2');
+                    //
+                    jQuery('#right').addClass('span8');
+                    jQuery('#right').removeClass('span3');
+                    jQuery('#right > div > label').show();
+                    jQuery('#center').hide();
+                    
+                    jQuery('#plugin_submit').removeClass('disabled');
+                    
+                    
+                    var _new_plugin_id = jQuery('.carousel-inner').children()
+                        .first().attr('id');
+                    jQuery('#panel_' + _new_plugin_id).show();
+                    // if interactive plugin calling, give control to the plugin
+                    // check if this plugin has a predefined memory
+                    var _visible_panel = jQuery('#panel_' + _new_plugin_id);
+                    var _definedInteractive = _visible_panel
+                        .attr('data-interactive');
+                    if (_definedInteractive != "") {
+                      jQuery('#plugin_submit').addClass('disabled');
+                      // modify css
+                      jQuery('#opaqueoverlay').removeClass('container');
+                      jQuery('#opaqueoverlay').addClass('container-fluid');
+                      //
+                      jQuery('#home').removeClass('row');
+                      jQuery('#home').addClass('row-fluid');
+                      jQuery('#left').removeClass('span4');
+                      jQuery('#left').addClass('span2');
+                      //
+                      jQuery('#right').removeClass('span8');
+                      jQuery('#right').addClass('span3');
+                      jQuery('#right > div > label').hide();
+                      // load content via ajax + plugin name
+                      // http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]=widget/index.html
+                      jQuery
+                          .ajax({
+                            type : "POST",
+                            url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
+                                + _new_plugin_id + "/widget/index.html",
+                            dataType : "text",
+                            success : function(data) {
+                              jQuery('#center').html(data);
+                            }
+                          });
+                      // show interactive plugin div
+                      jQuery('#center').show();
+                    }
                     // now reset all jobs
                     _BATCH_.reset();
                   });
-          
-          
           // set default plugin to the first one
           var _first_plugin = jQuery("#search");
           var _first_plugin_id = _first_plugin.attr('id');
@@ -118,19 +161,15 @@ jQuery(document)
           _first_plugin.addClass("active");
           // .. and show it's panel
           jQuery('#panel_' + _first_plugin_id).show();
-          
-          
-          
           // turn off automated rotation
           jQuery('#pipelines').carousel({
-            interval: false
+            interval : false
           });
           // show/hide panels on sliding of the carousel
           // the old one
           jQuery('#pipelines').bind(
               'slide',
               function() {
-
                 // reset to default
                 jQuery('#plugin_cancel').click();
                 // update UI
@@ -138,27 +177,79 @@ jQuery(document)
                     '.active').attr('id');
                 // by hiding the old plugin
                 jQuery('#panel_' + _old_plugin_id).hide();
+                // clean up after interactive plugin
+                jQuery('#opaqueoverlay').addClass('container');
+                jQuery('#opaqueoverlay').removeClass('container-fluid');
+                //
+                jQuery('#home').addClass('row');
+                jQuery('#home').removeClass('row-fluid');
+                jQuery('#left').addClass('span4');
+                jQuery('#left').removeClass('span2');
+                //
+                jQuery('#right').addClass('span8');
+                jQuery('#right').removeClass('span3');
+                jQuery('#right > div > label').show();
+                
+
+                $("#center").die();
+                jQuery('#center').hide();
+                
+                // re-able icon
+                jQuery('#plugin_submit').removeClass('disabled');
               });
           // the new one
-          jQuery('#pipelines').bind(
-              'slid',
-              function() {
-
-                // update UI
-                var _new_plugin_id = jQuery(".carousel-inner").children(
-                    '.active').attr('id');
-                // by showing the new plugin
-                jQuery('#panel_' + _new_plugin_id).show();
-                // now reset all jobs
-                _BATCH_.reset();
-              });
+          jQuery('#pipelines')
+              .bind(
+                  'slid',
+                  function() {
+                    // update UI
+                    var _new_plugin_id = jQuery(".carousel-inner").children(
+                        '.active').attr('id');
+                    // by showing the new plugin
+                    jQuery('#panel_' + _new_plugin_id).show();
+                    // if interactive plugin calling, give control to the plugin
+                    // check if this plugin has a predefined memory
+                    var _visible_panel = jQuery('#panel_' + _new_plugin_id);
+                    var _definedInteractive = _visible_panel
+                        .attr('data-interactive');
+                    if (_definedInteractive != "") {
+                      jQuery('#plugin_submit').addClass('disabled');
+                      // modify css
+                      jQuery('#opaqueoverlay').removeClass('container');
+                      jQuery('#opaqueoverlay').addClass('container-fluid');
+                      //
+                      jQuery('#home').removeClass('row');
+                      jQuery('#home').addClass('row-fluid');
+                      jQuery('#left').removeClass('span4');
+                      jQuery('#left').addClass('span2');
+                      //
+                      jQuery('#right').removeClass('span8');
+                      jQuery('#right').addClass('span3');
+                      jQuery('#right > div > label').hide();
+                      // load content via ajax + plugin name
+                      // http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]=widget/index.html
+                      jQuery
+                          .ajax({
+                            type : "POST",
+                            url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
+                                + _new_plugin_id + "/widget/index.html",
+                            dataType : "text",
+                            success : function(data) {
+                              jQuery('#center').html(data);
+                            }
+                          });
+                      // show interactive plugin div
+                      jQuery('#center').show();
+                    }
+                    // now reset all jobs
+                    _BATCH_.reset();
+                  });
           jQuery(".parameter_dropzone").droppable({
-            activeClass: "parameter_dropzone_active",
-            hoverClass: "parameter_dropzone_hover",
-            tolerance: "pointer",
-            accept: ":not(.ui-sortable-helper)",
-            activate: function(event, ui) {
-
+            activeClass : "parameter_dropzone_active",
+            hoverClass : "parameter_dropzone_hover",
+            tolerance : "pointer",
+            accept : ":not(.ui-sortable-helper)",
+            activate : function(event, ui) {
               if (!jQuery(this).is(":visible")) {
                 return;
               }
@@ -173,16 +264,14 @@ jQuery(document)
                 _PLUGIN_.showBatchDrop();
               }
             },
-            deactivate: function(event, ui) {
-
+            deactivate : function(event, ui) {
               _PLUGIN_.hideBatchDrop();
             },
-            drop: _BATCH_.drop
+            drop : _BATCH_.drop
           });
           jQuery('#plugin_cancel').on(
               'click',
               function(e) {
-
                 // reset all parameters to default values
                 // prevent scrolling up
                 e.preventDefault();
@@ -191,7 +280,6 @@ jQuery(document)
                 _parameter_rows = _visible_panel.find('.parameter_row');
                 // loop through all parameter rows
                 _parameter_rows.each(function(i) {
-
                   // and restore all inputs to the default values
                   // dropzones
                   var _dropzone_field = jQuery(_parameter_rows[i]).find(
@@ -207,7 +295,7 @@ jQuery(document)
                   _spinner = jQuery(_parameter_rows[i]).find(
                       '.parameter_spinner_double');
                   _default_value = _spinner.attr('data-default');
-                  _spinner.spinner("value", _default_value);                  
+                  _spinner.spinner("value", _default_value);
                   // checkboxes
                   var _checkbox = jQuery(_parameter_rows[i]).find(
                       '.parameter_checkbox');
@@ -223,7 +311,6 @@ jQuery(document)
                       '.parameter_combobox');
                   _default_value = _combobox.attr('data-default');
                   _combobox.val(_default_value);
-                  
                 });
                 // reset all jobs
                 _BATCH_.reset();
@@ -231,63 +318,18 @@ jQuery(document)
           jQuery('#plugin_submit').on(
               'click',
               function(e) {
-                
                 // fire it up!!
                 // prevent scrolling up
                 e.preventDefault();
-                
                 if (jQuery(this).hasClass('disabled')) {
                   return;
                 }
-                
                 // grab the visible plugin panel
                 var _visible_panel = jQuery('.plugin_panel :visible');
                 var _plugin_name = _visible_panel.parent().attr('id').replace(
                     'panel_', '');
                 var _parameter_rows = _visible_panel.find('.parameter_row');
                 var _output_rows = _visible_panel.find('.output_row');
-                
-                // if interactive plugin calling, give control to the plugin
-                // check if this plugin has a predefined memory
-                var _definedInteractive = jQuery(_visible_panel.parent()[0]).attr('data-interactive'); 
-                if (_definedInteractive != "") {
-                  // modify css
-                  jQuery('#opaqueoverlay').removeClass('container');
-                  jQuery('#opaqueoverlay').addClass('container-fluid');
-                  
-                  //
-                  jQuery('#home').removeClass('row');
-                  jQuery('#home').addClass('row-fluid');
-                  
-                  jQuery('#left').removeClass('span4');
-                  jQuery('#left').addClass('span2');
-                  
-                  //
-                  jQuery('#right').removeClass('span8');
-                  jQuery('#right').addClass('span3');
-                  
-                  jQuery('#right > div > label').hide();
-                  
-                  // load content via ajax + plugin name
-                  //http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]=widget/index.html
-                    
-                    jQuery.ajax({
-                      type: "POST",
-                      url: "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="+_plugin_name+"/widget/index.html",
-                      dataType: "text",
-                      success: function(data) {
-                        jQuery('#center').html(data);
-                      }
-                    });
-                    
-                    // show interactive plugin div
-                    jQuery('#center').show();
-                  
-                  // re-able icon
-                  jQuery('#plugin_submit').removeClass('disabled');
-                  return;
-                }
-                
                 var _jobs = [];
                 var _jobsOutputs = [];
                 var _numberOfJobs = _BATCH_.jobs.length;
@@ -306,17 +348,15 @@ jQuery(document)
                       // strip possible --
                       flag = flag.replace(/-/g, '');
                       _parameters.push({
-                        name: flag,
-                        value: fullpath,
-                        type: 'dropzone',
-                        target_type: 'feed'
+                        name : flag,
+                        value : fullpath,
+                        type : 'dropzone',
+                        target_type : 'feed'
                       });
                     }
                   }
-
                   // loop through all output rows
                   _output_rows.each(function(i) {
-
                     var _parameter_output = jQuery(_output_rows[i]).find(
                         '.parameter_output');
                     var _flag = _parameter_output.attr('data-flag');
@@ -324,15 +364,12 @@ jQuery(document)
                     var _output = null;
                     // strip possible --
                     _flag = _flag.replace(/-/g, '');
-                    
                     var _filename = '';
-                    
                     if (_flag == "") {
                       _filename = "output";
                     } else {
                       _filename = _flag;
                     }
-                    
                     var _value;
                     if (_type == 'directory') {
                       _value = '';
@@ -345,15 +382,14 @@ jQuery(document)
                     }
                     // push the output
                     _outputs.push({
-                      name: _flag,
-                      value: _value,
-                      type: 'simple',
-                      target_type: 'feed'
+                      name : _flag,
+                      value : _value,
+                      type : 'simple',
+                      target_type : 'feed'
                     });
                   });
                   // loop through all parameter rows
                   _parameter_rows.each(function(i) {
-
                     var _parameter_input = jQuery(_parameter_rows[i]).find(
                         '.parameter_input');
                     var _flag = _parameter_input.attr('data-flag');
@@ -365,24 +401,17 @@ jQuery(document)
                     if (_type == 'dropzone') {
                       // we already took care of dropzones
                       // but we have to reset all flags which are indices
-                      
                       var _index = _parameter_input.attr('data-index');
-                      
                       if (_index) {
                         for (_p in _parameters) {
-                          
                           _p = _parameters[_p];
-                          if (_p.name == _index){
-                            
+                          if (_p.name == _index) {
                             // found parameter which is actually an index
                             // so reset the name
                             _p.name = '';
-                            
                           }
-                          
                         }
                       }
-                      
                       return;
                     } else if (_type == 'spinner') {
                       // spinners
@@ -422,124 +451,99 @@ jQuery(document)
                     }
                     // push the parameter
                     _parameters.push({
-                      name: _flag,
-                      value: _value,
-                      type: _type,
-                      target_type: 'feed'
+                      name : _flag,
+                      value : _value,
+                      type : _type,
+                      target_type : 'feed'
                     });
                   });
                   _jobs.push(_parameters);
                   _jobsOutputs.push(_outputs);
                 }
-                
                 // check if this plugin has a predefined status
                 var _status = 0;
-                var _definedStatus = jQuery(_visible_panel.parent()[0]).attr('data-status'); 
+                var _definedStatus = jQuery(_visible_panel.parent()[0]).attr(
+                    'data-status');
                 if (_definedStatus) {
-                  
                   _status = _definedStatus;
-                  
                 }
-                
                 // check if this plugin has a predefined memory
                 var _memory = 0;
-                var _definedMemory = jQuery(_visible_panel.parent()[0]).attr('data-memory'); 
+                var _definedMemory = jQuery(_visible_panel.parent()[0]).attr(
+                    'data-memory');
                 if (_definedMemory) {
-                  
                   _memory = _definedMemory;
-                  
                 }
-                
                 jQuery('#plugin_submit_play').hide();
-                jQuery('#plugin_submit_wait').show();                
+                jQuery('#plugin_submit_wait').show();
                 jQuery(this).addClass('disabled');
-
-                
                 var _feed_name = (new Date()).toLocaleString();
                 // send to the launcher
                 jQuery.ajax({
-                  type: "POST",
-                  url: "controller/launcher-web.php",
-                  dataType: "text",
-                  data: {
-                    FEED_PLUGIN: _plugin_name,
-                    FEED_NAME: _feed_name,
-                    FEED_PARAM: _jobs,
-                    FEED_STATUS: _status,
-                    FEED_MEMORY: _memory,
-                    FEED_OUTPUT: _jobsOutputs
+                  type : "POST",
+                  url : "controller/launcher-web.php",
+                  dataType : "text",
+                  data : {
+                    FEED_PLUGIN : _plugin_name,
+                    FEED_NAME : _feed_name,
+                    FEED_PARAM : _jobs,
+                    FEED_STATUS : _status,
+                    FEED_MEMORY : _memory,
+                    FEED_OUTPUT : _jobsOutputs
                   },
-                  success: function(data) {
-
+                  success : function(data) {
                     jQuery().toastmessage(
                         'showSuccessToast',
-                        '<h5>Job started.</h5>' + 'Plugin: <b>' +
-                            _plugin_name + '</b><br>' + 'Name: <b>' +
-                            _feed_name + '</b>');
-                    
+                        '<h5>Job started.</h5>' + 'Plugin: <b>' + _plugin_name
+                            + '</b><br>' + 'Name: <b>' + _feed_name + '</b>');
                     jQuery('#plugin_submit').removeClass('disabled');
                     jQuery('#plugin_submit_wait').hide();
                     jQuery('#plugin_submit_play').show();
-                                        
-                    
                   }
                 });
-
               });
           jQuery('.panelgroup').multiAccordion({
-            heightStyle: "content",
-            animate: false,
+            heightStyle : "content",
+            animate : false,
             // collapse all panels by default (they later get shown again if
             // they are not advanced panels)
-            active: 'none'
+            active : 'none'
           });
           jQuery('.parameter_spinner').each(function(i, v) {
-
             var _container = jQuery(v);
             var _default_value = _container.attr('data-default');
             var _step = _container.attr('data-step');
-            
             if (!_step) {
               _step = 1;
             }
-            
             _container.spinner({
-              step: _step,
-              numberFormat: "n"
+              step : _step,
+              numberFormat : "n"
             });
             _container.spinner("value", _default_value);
           });
           jQuery('.parameter_spinner_double').each(function(i, v) {
-
             var _container = jQuery(v);
             var _default_value = _container.attr('data-default');
             var _step = _container.attr('data-step');
-            
             if (!_step) {
               _step = 0.1;
             }
-            
             _container.spinner({
-              step: _step,
-              numberFormat: "n"
+              step : _step,
+              numberFormat : "n"
             });
             _container.spinner("value", _default_value);
-          });          
-          jQuery('.parameter_combobox').each(function(i, v) {
-
-            var _container = jQuery(v);
-            
-            var _default_value = _container.attr('data-default');
-            
-            _container.val(_default_value);
-            
           });
-          
+          jQuery('.parameter_combobox').each(function(i, v) {
+            var _container = jQuery(v);
+            var _default_value = _container.attr('data-default');
+            _container.val(_default_value);
+          });
           // show non-advanced panels
           jQuery('.panelgroup')
               .each(
                   function(i, v) {
-
                     var _accordion = jQuery(v);
                     var _activeTabs = _accordion
                         .multiAccordion('getActiveTabs');
@@ -551,7 +555,6 @@ jQuery(document)
                     jQuery(v).children('.panel_content')
                         .each(
                             function(j, w) {
-
                               // check if this is an advanced panel
                               var _advanced_panel = (jQuery(w).attr(
                                   'data-advanced') == 'true');
@@ -583,20 +586,17 @@ jQuery(document)
                   });
           // replace the default values for string parameters
           jQuery('.parameter_string').each(function(i, v) {
-
-              jQuery(v).html(jQuery(v).attr('data-default'));
-
+            jQuery(v).html(jQuery(v).attr('data-default'));
           });
           // register keypress for string parameters
           jQuery('.parameter_string').keypress(
               function(e) {
-
                 if (e.which == '13') {
                   // on return, adjust the size
                   jQuery(this).css(
                       'height',
-                      parseInt(jQuery(this).css('height'), 10) +
-                          parseInt(jQuery(this).css('line-height'), 10));
+                      parseInt(jQuery(this).css('height'), 10)
+                          + parseInt(jQuery(this).css('line-height'), 10));
                 }
               })
         });

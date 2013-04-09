@@ -86,7 +86,7 @@ _PACS_.preProcessDate = function() {
 _PACS_.ajaxSearch = function() {
   _PACS_.cleanResults();
   // clean delete cache
-  _PACS_.cachedSeries = [];
+  _PACS_.cachedSeries = {};
   _PACS_.cachedRaw = [ {}, {} ];
   // split MRNs on white space
   var pro_mrn = _PACS_.preProcessMRN();
@@ -284,7 +284,9 @@ _PACS_.advancedCaching = function(data, i) {
     study.RetrieveAETitle = Array();
     study.Status = Array();
   } else {
+    console.log('cahcing the data');
     study = _PACS_.cachedSeries[stuid];
+    console.log(_PACS_.cachedSeries);
   }
   // fill study container
   var index = data[0].StudyInstanceUID.indexOf(data[1].StudyInstanceUID[i]);
@@ -640,14 +642,14 @@ _PACS_.ajaxPull = function() {
   // get list to pull fron cache!
   var list = "";
   for ( var study_key in _PACS_.cachedSeries) {
-    for ( var key in _PACS_.cachedSeries[study_key]["Status"]) {
-      if (_PACS_.cachedSeries[study_key]["Status"][key]) {
-        list += _PACS_.cachedSeries[study_key]["StudyInstanceUID"][key] + ","
-            + _PACS_.cachedSeries[study_key]["SeriesInstanceUID"][key] + " ";
+    for ( var j=0; j< _PACS_.cachedSeries[study_key]["Status"].length; j++) {
+      if (_PACS_.cachedSeries[study_key]["Status"][j] == true) {
+        list += _PACS_.cachedSeries[study_key]["StudyInstanceUID"][j] + ","
+            + _PACS_.cachedSeries[study_key]["SeriesInstanceUID"][j] + " ";
       }
     }
   }
-  window.console.log(list);
+
   // plugin
   var plugin = "pacs_pull";
   // status
