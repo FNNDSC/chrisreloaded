@@ -5,26 +5,26 @@ var _PACS_ = _PACS_ || {};
 /**
  * Bind the simple search input field to the simple search button.
  */
-jQuery('#pacs_form').submit(function(e) {
+$('#pacs_form').submit(function(e) {
   e.preventDefault();
   if (e.which == 13) {
-    jQuery("#SEARCH").click();
+    $("#SEARCH").click();
   }
 });
 /**
  * Show/hide the advanced parameters div on click
  */
 _PACS_.connectShowAdvancedParameters = function() {
-  jQuery("#show_advanced").live(
-      'click',
+  $(document).off('click',"#show_advanced").on(
+      'click',"#show_advanced",
       function(event) {
-        if (jQuery("#pacs_advanced").is(':visible')) {
-          jQuery("#pacs_advanced").hide('blind', 100);
-          jQuery("#show_advanced").html(
+        if ($("#pacs_advanced").is(':visible')) {
+          $("#pacs_advanced").hide('blind', 100);
+          $("#show_advanced").html(
               '<i class="icon-chevron-down"></i><b>Advanced parameters</b>');
         } else {
-          jQuery("#pacs_advanced").show('blind', 100);
-          jQuery("#show_advanced").html(
+          $("#pacs_advanced").show('blind', 100);
+          $("#show_advanced").html(
               '<i class="icon-chevron-up"></i><b>Advanced parameters</b>');
         }
       });
@@ -33,19 +33,19 @@ _PACS_.connectShowAdvancedParameters = function() {
  * Start ajax search on click
  */
 _PACS_.connectAjaxSearch = function() {
-  jQuery("#SEARCH").live('click', function(event) {
+  $(document).off('click',"#SEARCH").on('click', "#SEARCH", function(event) {
     _PACS_.ajaxSearch();
   });
 }
 _PACS_.cleanResults = function() {
-  if (jQuery('#S-RESULTS').length != 0) {
+  if ($('#S-RESULTS').length != 0) {
     _PACS_.table.dataTable().fnDestroy();
     _PACS_.table = null;
-    jQuery('#S-RESULTS').remove();
+    $('#S-RESULTS').remove();
   }
 }
 _PACS_.preProcessMRN = function() {
-  var mrns = jQuery("#PACS_MRN").attr('value').split(/\s+/g);
+  var mrns = $("#PACS_MRN").attr('value').split(/\s+/g);
   var nb_mrns = mrns.length;
   if (nb_mrns >= 2 && mrns[nb_mrns - 1] == "") {
     nb_mrns--;
@@ -53,7 +53,7 @@ _PACS_.preProcessMRN = function() {
   return [ mrns, nb_mrns ];
 }
 _PACS_.preProcessDate = function() {
-  var dates = jQuery("#PACS_DAT").attr('value').split(/\-/g);
+  var dates = $("#PACS_DAT").attr('value').split(/\-/g);
   var nb_dates = dates.length;
   // list all dates to be queried
   if (nb_dates >= 2 && dates[1] != "") {
@@ -101,9 +101,9 @@ _PACS_.ajaxSearch = function() {
   var nb_queries = nb_mrns * nb_dates;
   // keep reference to current object for the ajax response
   // modify class
-  jQuery("#SEARCH").removeClass('btn-primary').addClass('btn-warning');
+  $("#SEARCH").removeClass('btn-primary').addClass('btn-warning');
   // modify content
-  jQuery("#SEARCH").html(
+  $("#SEARCH").html(
       '<i class="icon-refresh rotating_class"></i> <span> '
           + parseInt(100 * _PACS_.ajaxStatus / nb_queries) + '%</span>');
   var i = 0;
@@ -135,46 +135,46 @@ _PACS_.ajaxSearch = function() {
   }
 }
 _PACS_.queryDayAll = function(mrn, date, nb_queries) {
-  jQuery.ajax({
+  $.ajax({
     type : "POST",
     url : "plugins/pacs_pull/core/pacs_query.php",
     dataType : "json",
     data : {
-      USER_AET : jQuery("#USER_AET").attr('value'),
-      SERVER_IP : jQuery("#SERVER_IP").attr('value'),
-      SERVER_POR : jQuery("#SERVER_POR").attr('value'),
+      USER_AET : $("#USER_AET").attr('value'),
+      SERVER_IP : $("#SERVER_IP").attr('value'),
+      SERVER_POR : $("#SERVER_POR").attr('value'),
       PACS_MRN : mrn,
-      PACS_NAM : jQuery("#PACS_NAM").attr('value'),
-      PACS_MOD : jQuery("#PACS_MOD").attr('value'),
+      PACS_NAM : $("#PACS_NAM").attr('value'),
+      PACS_MOD : $("#PACS_MOD").attr('value'),
       PACS_DAT : date,
       PACS_ACC_NUM : '',
-      PACS_STU_DES : jQuery("#PACS_STU_DES").attr('value'),
-      PACS_SER_DES : jQuery("#PACS_SER_DES").attr('value'),
+      PACS_STU_DES : $("#PACS_STU_DES").attr('value'),
+      PACS_SER_DES : $("#PACS_SER_DES").attr('value'),
       PACS_STU_UID : '',
-      PACS_PSAET : jQuery("#PACS_PSAET").attr('value')
+      PACS_PSAET : $("#PACS_PSAET").attr('value')
     },
     success : function(data) {
-      jQuery("#PACS-RESULTS").show('blind', 100);
+      $("#PACS-RESULTS").show('blind', 100);
       // data simple visualization
       _PACS_.ajaxAdvancedResults(data);
       _PACS_.ajaxStatus++;
-      jQuery("#SEARCH").html(
+      $("#SEARCH").html(
           '<i class="icon-refresh rotating_class"></i> <span> '
               + parseInt(100 * _PACS_.ajaxStatus / nb_queries) + '%</span>');
       if (nb_queries == _PACS_.ajaxStatus) {
-        jQuery("#SEARCH").removeClass('btn-warning').addClass('btn-primary');
-        jQuery("#SEARCH").html('Search');
+        $("#SEARCH").removeClass('btn-warning').addClass('btn-primary');
+        $("#SEARCH").html('Search');
         _PACS_.ajaxStatus = 0;
       }
     },
     error : function(xhr, textStatus, error) {
       _PACS_.ajaxStatus++;
-      jQuery("#SEARCH").html(
+      $("#SEARCH").html(
           '<i class="icon-refresh rotating_class"></i> <span> '
               + parseInt(100 * _PACS_.ajaxStatus / nb_queries) + '%</span>');
       if (nb_queries == _PACS_.ajaxStatus) {
-        jQuery("#SEARCH").removeClass('btn-warning').addClass('btn-primary');
-        jQuery("#SEARCH").html('Search');
+        $("#SEARCH").removeClass('btn-warning').addClass('btn-primary');
+        $("#SEARCH").html('Search');
         _PACS_.ajaxStatus = 0;
       }
     }
@@ -189,9 +189,9 @@ _PACS_.advancedTable = function() {
   content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>Location</th><th>files</th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   // update html with table
-  jQuery('#SC-RESULTS').html(content);
+  $('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
-  _PACS_.table = jQuery('#S-RESULTS')
+  _PACS_.table = $('#S-RESULTS')
       .dataTable(
           {
             "sDom" : "<'row-fluid'<'span6' il ><'span6'f>r>t<'row-fluid'<'span6'><'span6'p>>",
@@ -242,7 +242,7 @@ _PACS_.ajaxAdvancedResults = function(data, force) {
   if (data[0] != null && Object.keys(data[0]).length > 0 && data[1] != null
       && Object.keys(data[1]).length > 0) {
     // if no table, create it
-    if (jQuery('#S-RESULTS').length == 0 || force == true) {
+    if ($('#S-RESULTS').length == 0 || force == true) {
       _PACS_.advancedTable();
     }
     // add data in the table!
@@ -256,11 +256,11 @@ _PACS_.ajaxAdvancedResults = function(data, force) {
       append.push(_PACS_.advancedFormat(data, i));
     }
     // add table to current table
-    jQuery('#S-RESULTS').dataTable().fnAddData(append);
+    $('#S-RESULTS').dataTable().fnAddData(append);
   } else {
     // no studies found and not doing multiple mrn_split
     if (_PACS_.table == null) {
-      jQuery('#SC-RESULTS').html("No data found...");
+      $('#SC-RESULTS').html("No data found...");
     }
   }
 }
@@ -290,7 +290,7 @@ _PACS_.advancedCaching = function(data, i) {
   }
   // fill study container
   var index = data[0].StudyInstanceUID.indexOf(data[1].StudyInstanceUID[i]);
-  var exists = jQuery.inArray(data[1].SeriesInstanceUID[i],
+  var exists = $.inArray(data[1].SeriesInstanceUID[i],
       study.SeriesInstanceUID);
   if (exists == -1) {
     study.StudyInstanceUID.push(data[1].StudyInstanceUID[i]);
@@ -354,13 +354,13 @@ _PACS_.advancedFormat = function(data, i) {
   return sub;
 }
 _PACS_.studyView = function() {
-  jQuery("#STUDY_VIEW").live('click', function(event) {
+  $(document).off('click',"#STUDY_VIEW").on('click',"#STUDY_VIEW" , function(event) {
     // new representation of cached data
     _PACS_.ajaxSimpleResults(_PACS_.cachedRaw, true);
   });
 }
 _PACS_.seriesView = function() {
-  jQuery("#SERIES_VIEW").live('click', function(event) {
+  $(document).off('click',"#SERIES_VIEW").on('click',"#SERIES_VIEW", function(event) {
     // new representation of cached data
     _PACS_.ajaxAdvancedResults(_PACS_.cachedRaw, true);
   });
@@ -369,21 +369,21 @@ _PACS_.seriesView = function() {
  * Setup the details button to show series within a study in simple query.
  */
 _PACS_.setupDetailStudy = function() {
-  jQuery('#S-RESULTS td .control').live('click', function() {
+  $(document).off('click','#S-RESULTS td .control').on('click', '#S-RESULTS td .control', function() {
     // get the row
-    var nTr = jQuery(this).parents('tr')[0];
+    var nTr = $(this).parents('tr')[0];
     // get the related study UID
     // replace back '_' by '.'
-    var stuid = jQuery(this).attr('id').replace(/\_/g, ".");
+    var stuid = $(this).attr('id').replace(/\_/g, ".");
     // if data has not been cached, perform ajax query, else show it without
     // ajax!
-    var i = jQuery.inArray(nTr, _PACS_.openStudies);
+    var i = $.inArray(nTr, _PACS_.openStudies);
     if (i == -1) {
       // get related series
       _PACS_.ajaxSeries(stuid, nTr);
     } else {
-      jQuery('i', this).attr('class', 'icon-chevron-down');
-      jQuery('div.innerDetails', jQuery(nTr).next()[0]).slideUp(function() {
+      $('i', this).attr('class', 'icon-chevron-down');
+      $('div.innerDetails', $(nTr).next()[0]).slideUp(function() {
         _PACS_.table.fnClose(nTr);
         _PACS_.openStudies.splice(i, 1);
       });
@@ -394,11 +394,11 @@ _PACS_.setupDetailStudy = function() {
  * Setup the download button to download all series for a given study.
  */
 _PACS_.setupDownloadStudy = function() {
-  jQuery(".d_study")
-      .live(
-          'click',
+  $(document).off('click','.d_study')
+      .on(
+          'click','.d_study',
           function() { // replace the '_'
-            var stuid = jQuery(this).attr('id').replace(/\_/g, ".");
+            var stuid = $(this).attr('id').replace(/\_/g, ".");
             // remove the '-std' tad at the end of the id
             stuid = stuid.substring(0, stuid.length - 4);
             // update study status
@@ -415,8 +415,8 @@ _PACS_.setupDownloadStudy = function() {
                       .replace(/\./g, "_") + "-sed > :checkbox";
               if (_PACS_.studyStatus[stuid] != _PACS_.cachedSeries[stuid]["Status"][key]) {
                 _PACS_.cachedSeries[stuid]["Status"][key] = !_PACS_.cachedSeries[stuid]["Status"][key];
-                if (jQuery(full).length != 0) {
-                  jQuery(full).prop('checked',
+                if ($(full).length != 0) {
+                  $(full).prop('checked',
                       _PACS_.cachedSeries[stuid]["Status"][key]);
                 }
               }
@@ -427,11 +427,11 @@ _PACS_.setupDownloadStudy = function() {
  * Setup the download series button.
  */
 _PACS_.setupDownloadSeries = function() {
-  jQuery(".d_series")
-      .live(
-          'click',
+  $(document).off('click','.d_series')
+      .on(
+          'click','.d_series',
           function(event) {
-            var id = jQuery(this).attr('id');
+            var id = $(this).attr('id');
             var split_id = id.split('-');
             var stuid = split_id[0].replace(/\_/g, ".");
             var seuid = split_id[1].replace(/\_/g, ".");
@@ -453,14 +453,14 @@ _PACS_.setupDownloadSeries = function() {
             }
             if (full_1) {
               if (!_PACS_.studyStatus[stuid]) {
-                if (jQuery(fullname).length != 0) {
+                if ($(fullname).length != 0) {
                   $(fullname).prop('checked', true);
                 }
                 _PACS_.studyStatus[stuid] = !_PACS_.studyStatus[stuid];
               }
             } else {
               if (_PACS_.studyStatus[stuid]) {
-                if (jQuery(fullname).length != 0) {
+                if ($(fullname).length != 0) {
                   $(fullname).prop('checked', false);
                 }
                 _PACS_.studyStatus[stuid] = !_PACS_.studyStatus[stuid];
@@ -478,7 +478,7 @@ _PACS_.ajaxSimpleResults = function(data, force) {
   // if ajax returns something, process it
   if (data[0] != null) {
     // if no table, create it
-    if (jQuery('#S-RESULTS').length == 0 || force == true) {
+    if ($('#S-RESULTS').length == 0 || force == true) {
       _PACS_.simpleTable();
     }
     // fill the table
@@ -488,11 +488,11 @@ _PACS_.ajaxSimpleResults = function(data, force) {
     for (i = 0; i < numStudies; ++i) {
       append.push(_PACS_.simpleFormat(data[0], i));
     }
-    jQuery('#S-RESULTS').dataTable().fnAddData(append);
+    $('#S-RESULTS').dataTable().fnAddData(append);
   } else {
     // no studies found and not doing multiple mrns
     if (_PACS_.table == null) {
-      jQuery('#SC-RESULTS').html("No data found...");
+      $('#SC-RESULTS').html("No data found...");
     }
   }
 }
@@ -503,9 +503,9 @@ _PACS_.simpleTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
   content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
-  jQuery('#SC-RESULTS').html(content);
+  $('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
-  _PACS_.table = jQuery('#S-RESULTS')
+  _PACS_.table = $('#S-RESULTS')
       .dataTable(
           {
             "sDom" : "<'row-fluid'<'span6' il><'span6' f>r>t<'row-fluid'<'span6'><'span6'p>>",
@@ -569,7 +569,7 @@ _PACS_.simpleFormat = function(data, i) {
 _PACS_.ajaxSeries = function(studyUID, nTr) {
   var stuid = studyUID;
   if (nTr != null) {
-    jQuery('.control i', nTr).removeClass('icon-chevron-down').addClass(
+    $('.control i', nTr).removeClass('icon-chevron-down').addClass(
         'icon-chevron-up');
   }
   _PACS_.ajaxSeriesResults(_PACS_.cachedSeries[stuid], nTr);
@@ -582,7 +582,7 @@ _PACS_.ajaxSeriesResults = function(data, nTr) {
   var format = _PACS_.seriesFormat(data);
   var detailRown = _PACS_.table.fnOpen(nTr, format, 'details');
   // create dataTable from html table
-  jQuery('.table', detailRown).dataTable({
+  $('.table', detailRown).dataTable({
     "sDom" : "t",
     "aaSorting" : [ [ 1, 'desc' ] ],
     "bPaginate" : false,
@@ -592,7 +592,7 @@ _PACS_.ajaxSeriesResults = function(data, nTr) {
     } ],
     "bAutoWidth" : false
   });
-  jQuery('div.innerDetails', detailRown).slideDown();
+  $('div.innerDetails', detailRown).slideDown();
   _PACS_.openStudies.push(nTr);
 }
 /**
@@ -634,7 +634,7 @@ _PACS_.seriesFormat = function(data) {
   return content;
 }
 _PACS_.connectPull = function() {
-  jQuery("#PULL").live('click', function(event) {
+  $(document).off('click','#PULL').on('click', '#PULL', function(event) {
     _PACS_.ajaxPull();
   });
 }
@@ -670,21 +670,21 @@ _PACS_.ajaxPull = function() {
   // create user AETITLE
   param_container.push({
     name : 'aet',
-    value : '\\\"' + jQuery("#USER_AET").attr('value') + '\\\"',
+    value : '\\\"' + $("#USER_AET").attr('value') + '\\\"',
     type : 'string',
     target_type : 'feed'
   });
   // create SERVER IP
   param_container.push({
     name : 'serverip',
-    value : '\\\"' + jQuery("#SERVER_IP").attr('value') + '\\\"',
+    value : '\\\"' + $("#SERVER_IP").attr('value') + '\\\"',
     type : 'string',
     target_type : 'feed'
   });
   // create SERVER PORT
   param_container.push({
     name : 'serverport',
-    value : '\\\"' + jQuery("#SERVER_POR").attr('value') + '\\\"',
+    value : '\\\"' + $("#SERVER_POR").attr('value') + '\\\"',
     type : 'string',
     target_type : 'feed'
   });
@@ -713,7 +713,7 @@ _PACS_.ajaxPull = function() {
   var _feed_name = (new Date()).toLocaleString();
   window.console.log(param);
   // send to the launcher
-  jQuery.ajax({
+  $.ajax({
     type : "POST",
     url : "controller/launcher-web.php",
     dataType : "text",
@@ -726,7 +726,7 @@ _PACS_.ajaxPull = function() {
     },
     success : function(data) {
       //close modal
-      window.parent.jQuery().toastmessage('showSuccessToast', '<h5>Job started.</h5>'
+      window.parent.$().toastmessage('showSuccessToast', '<h5>Job started.</h5>'
           + 'Plugin: <b>' + plugin + '</b><br>' + 'Name: <b>'
           + _feed_name + '</b>');
       // close modal
