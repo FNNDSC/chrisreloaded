@@ -30,19 +30,23 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName) {
   var _visible_panel = jQuery('#panel_' + _pluginName);
   var _definedInteractive = _visible_panel.attr('data-interactive');
   if (_definedInteractive != "") {
-    jQuery('#plugin_submit').addClass('disabled');
-    // modify css
+    //home page
     jQuery('#opaqueoverlay').removeClass('container');
     jQuery('#opaqueoverlay').addClass('container-fluid');
-    //
     jQuery('#home').removeClass('row');
     jQuery('#home').addClass('row-fluid');
+    
+    // welcome and plugin caroussel
     jQuery('#left').removeClass('span4');
     jQuery('#left').addClass('span2');
-    //
+    jQuery('#plugin_submit').addClass('disabled');
+    
+    // activity feed
     jQuery('#right').removeClass('span8');
     jQuery('#right').addClass('span3');
     jQuery('#right > div > label').hide();
+    
+    // interactive plugin
     // load content via ajax + plugin name
     jQuery
         .ajax({
@@ -52,7 +56,6 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName) {
           dataType : "text",
           success : function(data) {
             jQuery('#center').html(data);
-            // show interactive plugin div
             jQuery('#center').show();
           }
         });
@@ -60,19 +63,24 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName) {
   }
 }
 _PLUGIN_.cleanInteractiveLayout = function() {
+  //home page
   jQuery('#opaqueoverlay').addClass('container');
   jQuery('#opaqueoverlay').removeClass('container-fluid');
-  //
   jQuery('#home').addClass('row');
   jQuery('#home').removeClass('row-fluid');
+  
+  // welcome and plugin caroussel
   jQuery('#left').addClass('span4');
   jQuery('#left').removeClass('span2');
-  //
+  jQuery('#plugin_submit').removeClass('disabled');
+  
+  // activity feed
   jQuery('#right').addClass('span8');
   jQuery('#right').removeClass('span3');
   jQuery('#right > div > label').show();
+  
+  // interactive plugin
   jQuery('#center').hide();
-  jQuery('#plugin_submit').removeClass('disabled');
 }
 /**
  * Setup the javascript when document is ready (finshed loading)
