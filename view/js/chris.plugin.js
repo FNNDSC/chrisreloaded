@@ -26,6 +26,54 @@ _PLUGIN_.hideBatchDrop = function() {
   // style="vertical-align:sub;"/>')
   _visible_panel.find('.parameter_batchdrop').hide();
 }
+_PLUGIN_.setupInteractiveLayout = function(_pluginName) {
+  var _visible_panel = jQuery('#panel_' + _pluginName);
+  var _definedInteractive = _visible_panel.attr('data-interactive');
+  if (_definedInteractive != "") {
+    jQuery('#plugin_submit').addClass('disabled');
+    // modify css
+    jQuery('#opaqueoverlay').removeClass('container');
+    jQuery('#opaqueoverlay').addClass('container-fluid');
+    //
+    jQuery('#home').removeClass('row');
+    jQuery('#home').addClass('row-fluid');
+    jQuery('#left').removeClass('span4');
+    jQuery('#left').addClass('span2');
+    //
+    jQuery('#right').removeClass('span8');
+    jQuery('#right').addClass('span3');
+    jQuery('#right > div > label').hide();
+    // load content via ajax + plugin name
+    jQuery
+        .ajax({
+          type : "POST",
+          url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
+              + _pluginName + "/widget/index.html",
+          dataType : "text",
+          success : function(data) {
+            jQuery('#center').html(data);
+            // show interactive plugin div
+            jQuery('#center').show();
+          }
+        });
+
+  }
+}
+_PLUGIN_.cleanInteractiveLayout = function() {
+  jQuery('#opaqueoverlay').addClass('container');
+  jQuery('#opaqueoverlay').removeClass('container-fluid');
+  //
+  jQuery('#home').addClass('row');
+  jQuery('#home').removeClass('row-fluid');
+  jQuery('#left').addClass('span4');
+  jQuery('#left').removeClass('span2');
+  //
+  jQuery('#right').addClass('span8');
+  jQuery('#right').removeClass('span3');
+  jQuery('#right > div > label').show();
+  jQuery('#center').hide();
+  jQuery('#plugin_submit').removeClass('disabled');
+}
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -96,61 +144,14 @@ jQuery(document)
                     // reset to default
                     jQuery('#plugin_cancel').click();
                     jQuery('.plugin_panel').hide();
-                    // clean up after interactive
-                    //
-                    jQuery('#opaqueoverlay').addClass('container');
-                    jQuery('#opaqueoverlay').removeClass('container-fluid');
-                    //
-                    jQuery('#home').addClass('row');
-                    jQuery('#home').removeClass('row-fluid');
-                    jQuery('#left').addClass('span4');
-                    jQuery('#left').removeClass('span2');
-                    //
-                    jQuery('#right').addClass('span8');
-                    jQuery('#right').removeClass('span3');
-                    jQuery('#right > div > label').show();
-                    jQuery('#center').hide();
-                    
-                    jQuery('#plugin_submit').removeClass('disabled');
-                    
-                    
+                    // clean up after interactive plugin
+                    _PLUGIN_.cleanInteractiveLayout();
                     var _new_plugin_id = jQuery('.carousel-inner').children()
                         .first().attr('id');
                     jQuery('#panel_' + _new_plugin_id).show();
                     // if interactive plugin calling, give control to the plugin
-                    // check if this plugin has a predefined memory
-                    var _visible_panel = jQuery('#panel_' + _new_plugin_id);
-                    var _definedInteractive = _visible_panel
-                        .attr('data-interactive');
-                    if (_definedInteractive != "") {
-                      jQuery('#plugin_submit').addClass('disabled');
-                      // modify css
-                      jQuery('#opaqueoverlay').removeClass('container');
-                      jQuery('#opaqueoverlay').addClass('container-fluid');
-                      //
-                      jQuery('#home').removeClass('row');
-                      jQuery('#home').addClass('row-fluid');
-                      jQuery('#left').removeClass('span4');
-                      jQuery('#left').addClass('span2');
-                      //
-                      jQuery('#right').removeClass('span8');
-                      jQuery('#right').addClass('span3');
-                      jQuery('#right > div > label').hide();
-                      // load content via ajax + plugin name
-                      // http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]=widget/index.html
-                      jQuery
-                          .ajax({
-                            type : "POST",
-                            url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
-                                + _new_plugin_id + "/widget/index.html",
-                            dataType : "text",
-                            success : function(data) {
-                              jQuery('#center').html(data);
-                            }
-                          });
-                      // show interactive plugin div
-                      jQuery('#center').show();
-                    }
+                    _PLUGIN_.setupInteractiveLayout(_new_plugin_id);
+
                     // now reset all jobs
                     _BATCH_.reset();
                   });
@@ -178,72 +179,22 @@ jQuery(document)
                 // by hiding the old plugin
                 jQuery('#panel_' + _old_plugin_id).hide();
                 // clean up after interactive plugin
-                jQuery('#opaqueoverlay').addClass('container');
-                jQuery('#opaqueoverlay').removeClass('container-fluid');
-                //
-                jQuery('#home').addClass('row');
-                jQuery('#home').removeClass('row-fluid');
-                jQuery('#left').addClass('span4');
-                jQuery('#left').removeClass('span2');
-                //
-                jQuery('#right').addClass('span8');
-                jQuery('#right').removeClass('span3');
-                jQuery('#right > div > label').show();
-                
-
-                $("#center").die();
-                jQuery('#center').hide();
-                
-                // re-able icon
-                jQuery('#plugin_submit').removeClass('disabled');
+                _PLUGIN_.cleanInteractiveLayout();
               });
           // the new one
-          jQuery('#pipelines')
-              .bind(
-                  'slid',
-                  function() {
-                    // update UI
-                    var _new_plugin_id = jQuery(".carousel-inner").children(
-                        '.active').attr('id');
-                    // by showing the new plugin
-                    jQuery('#panel_' + _new_plugin_id).show();
-                    // if interactive plugin calling, give control to the plugin
-                    // check if this plugin has a predefined memory
-                    var _visible_panel = jQuery('#panel_' + _new_plugin_id);
-                    var _definedInteractive = _visible_panel
-                        .attr('data-interactive');
-                    if (_definedInteractive != "") {
-                      jQuery('#plugin_submit').addClass('disabled');
-                      // modify css
-                      jQuery('#opaqueoverlay').removeClass('container');
-                      jQuery('#opaqueoverlay').addClass('container-fluid');
-                      //
-                      jQuery('#home').removeClass('row');
-                      jQuery('#home').addClass('row-fluid');
-                      jQuery('#left').removeClass('span4');
-                      jQuery('#left').addClass('span2');
-                      //
-                      jQuery('#right').removeClass('span8');
-                      jQuery('#right').addClass('span3');
-                      jQuery('#right > div > label').hide();
-                      // load content via ajax + plugin name
-                      // http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]=widget/index.html
-                      jQuery
-                          .ajax({
-                            type : "POST",
-                            url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
-                                + _new_plugin_id + "/widget/index.html",
-                            dataType : "text",
-                            success : function(data) {
-                              jQuery('#center').html(data);
-                            }
-                          });
-                      // show interactive plugin div
-                      jQuery('#center').show();
-                    }
-                    // now reset all jobs
-                    _BATCH_.reset();
-                  });
+          jQuery('#pipelines').bind(
+              'slid',
+              function() {
+                // update UI
+                var _new_plugin_id = jQuery(".carousel-inner").children(
+                    '.active').attr('id');
+                // by showing the new plugin
+                jQuery('#panel_' + _new_plugin_id).show();
+                // if interactive plugin calling, give control to the plugin
+                _PLUGIN_.setupInteractiveLayout(_new_plugin_id);
+                // now reset all jobs
+                _BATCH_.reset();
+              });
           jQuery(".parameter_dropzone").droppable({
             activeClass : "parameter_dropzone_active",
             hoverClass : "parameter_dropzone_hover",
