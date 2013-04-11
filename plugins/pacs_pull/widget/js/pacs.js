@@ -154,6 +154,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
       if (nb_queries == _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus) {
         $("#plugin_submit").removeClass('btn-warning').addClass('btn-primary');
         $("#plugin_submit").html('Search');
+        $('#plugin_submit').removeClass('disabled');
         _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus = 0;
       }
     },

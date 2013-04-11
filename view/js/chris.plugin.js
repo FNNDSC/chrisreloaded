@@ -442,8 +442,7 @@ jQuery(document)
                   if (_cli == false) {
                     // setup view layout
                     _PLUGIN_.setupInteractiveLayout(_plugin_name, _jobs);
-                    jQuery('#plugin_submit_wait').hide();
-                    jQuery('#plugin_submit_play').show();
+                    jQuery('#plugin_submit').removeClass('disabled');
                     return;
                   }
                   else{
