@@ -69,8 +69,6 @@ $post_filter['PerformedStationAETitle'] = is_set($_POST['PACS_PSAET']);
 $post_filter['StudyDescription'] = is_set($_POST['PACS_STU_DES']);
 $post_filter['SeriesDescription'] = is_set($_POST['PACS_SER_DES']);
 
-// @todo write json file for a nice plugin
-
 // return value
 echo json_encode(PACS::postFilter("all",$all_query, $post_filter));
 

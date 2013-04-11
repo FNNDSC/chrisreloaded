@@ -294,13 +294,13 @@ if ($handle = opendir($study_directory)) {
 
               // delete file
               $logFile .= 'delete: '.$study_directory.'/'.$entry.'/'.$sub_entry.PHP_EOL;
-              unlink($study_directory.'/'.$entry.'/'.$sub_entry);
+              //unlink($study_directory.'/'.$entry.'/'.$sub_entry);
             }
           }
           closedir($sub_handle);
           // delete directory
           $logFile .= 'delete: '.$study_directory.'/'.$entry.PHP_EOL;
-          rmdir($study_directory.'/'.$entry);
+          //rmdir($study_directory.'/'.$entry);
         }
       }
     }
@@ -328,9 +328,12 @@ if ($handle = opendir($study_directory)) {
           {
             $emailTo .= ','.$userResult['User'][0]->email;
           }
+          elseif (filter_var($entry2, FILTER_VALIDATE_EMAIL)){
+            $emailTo .= ','.$entry2;
+          }
         }
         // delete the temp file
-        unlink($study_directory.'/'.$entry2);
+        //unlink($study_directory.'/'.$entry2);
       }
     }
   }
@@ -338,7 +341,7 @@ if ($handle = opendir($study_directory)) {
 
   // delete directory
   $logFile .= 'delete: '.$study_directory.PHP_EOL;
-  rmdir($study_directory);
+  //rmdir($study_directory);
 }
 
 // add warning if we didn't receive all the expected files
