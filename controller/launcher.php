@@ -26,7 +26,6 @@
  *                        dev@babyMRI.org
  *
  */
-//define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
 require_once (dirname(dirname(__FILE__)).'/config.inc.php');

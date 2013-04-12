@@ -42,34 +42,32 @@ $serverip = is_set($_POST['SERVER_IP'],'134.174.12.21');
 $serverport = is_set($_POST['SERVER_POR'],'104');
 // user aetitle
 $useraetitle = is_set($_POST['USER_AET'],'FNNDSC-CHRISTEST');
-// instantiate PACS class
-$pacs = new PACS($serverip, $serverport, $useraetitle);
+// patient id
+$patientid = is_set($_POST['PACS_MRN']);
+// patient name
+$patientname = is_set($_POST['PACS_NAM']);
+// study date
+$studydate = is_set($_POST['PACS_DAT']);
+// modality
+$modality = is_set($_POST['PACS_MOD']);
+// station
+$station = is_set($_POST['PACS_PSAET']);
+// study description
+$studydescription = is_set($_POST['PACS_STU_DES']);
+// series description
+$seriesdescription = is_set($_POST['PACS_SER_DES']);
 
-// create study filters
-$study_parameter = Array();
-$study_parameter['PatientID'] = is_set($_POST['PACS_MRN']);
-$study_parameter['PatientName'] = is_set($_POST['PACS_NAM']);
-$study_parameter['PatientBirthDate'] = '';
-$study_parameter['StudyDate'] = is_set($_POST['PACS_DAT']);
-$study_parameter['StudyDescription'] = '';
-$study_parameter['ModalitiesInStudy'] = is_set($_POST['PACS_MOD']);
-$study_parameter['PerformedStationAETitle'] = '';
-
-// create series filters
-$series_parameter = Array();
-$series_parameter['NumberOfSeriesRelatedInstances'] = '';
-$series_parameter['SeriesDescription'] = '';
-
-// run query
-$all_query = $pacs->queryAll($study_parameter, $series_parameter, null);
-
-// post filter
-$post_filter = Array();
-$post_filter['PerformedStationAETitle'] = is_set($_POST['PACS_PSAET']);
-$post_filter['StudyDescription'] = is_set($_POST['PACS_STU_DES']);
-$post_filter['SeriesDescription'] = is_set($_POST['PACS_SER_DES']);
-
-// return value
-echo json_encode(PACS::postFilter("all",$all_query, $post_filter));
-
+// The following variables have to be defined to be picked up
+// by launcher.php
+// $serverip
+// $serverport
+// $useraetitle
+// $patientid
+// $patientname
+// $studydate
+// $modality
+// $station
+// $studydescription
+// $studydescription
+include('query.php');
 ?>
