@@ -217,10 +217,9 @@ $post_filter['PerformedStationAETitle'] = $station;
 $post_filter['StudyDescription'] = $studydescription;
 $post_filter['SeriesDescription'] = $seriesdescription;
 
+$output = json_encode(PACS::postFilter("all",$all_query, $post_filter));
+
 if($commandline_mode){
   // output to file?
-}
-else{
-  echo json_encode(PACS::postFilter("all",$all_query, $post_filter));
 }
 ?>

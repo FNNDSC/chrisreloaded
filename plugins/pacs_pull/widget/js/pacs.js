@@ -102,6 +102,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.cleanResults = function() {
     $('#S-RESULTS').remove();
   }
 }
+
 _CHRIS_INTERACTIVE_PLUGIN_.preProcessMRN = function() {
   console.log(_CHRIS_INTERACTIVE_PLUGIN_);
   var mrns = _CHRIS_INTERACTIVE_PLUGIN_._param["mrn"].split(/\s+/g);
@@ -111,6 +112,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.preProcessMRN = function() {
   }
   return [ mrns, nb_mrns ];
 }
+
 _CHRIS_INTERACTIVE_PLUGIN_.preProcessDate = function() {
   var dates = _CHRIS_INTERACTIVE_PLUGIN_._param["studydate"].split(/\-/g);
   var nb_dates = dates.length;
@@ -161,8 +163,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
       PACS_PSAET : _CHRIS_INTERACTIVE_PLUGIN_._param["station"]
     },
     success : function(data) {
-      console.log("query finished");
-      console.log(data);
+      window.console.log("query finished");
+      window.console.log(data);
       $("#PACS-RESULTS").show('blind', 100);
       // data simple visualization
       _CHRIS_INTERACTIVE_PLUGIN_.ajaxAdvancedResults(data);
@@ -179,6 +181,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
       }
     },
     error : function(xhr, textStatus, error) {
+      window.console.log("error finished");
       _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus++;
       $("#plugin_submit").html(
           '<i class="icon-refresh rotating_class"></i> <span> '

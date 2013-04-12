@@ -57,6 +57,9 @@ $studydescription = is_set($_POST['PACS_STU_DES']);
 // series description
 $seriesdescription = is_set($_POST['PACS_SER_DES']);
 
+// could split date/mrns here!
+// but status not updated in real time on client side....
+
 // The following variables have to be defined to be picked up
 // by launcher.php
 // $serverip
@@ -69,5 +72,14 @@ $seriesdescription = is_set($_POST['PACS_SER_DES']);
 // $station
 // $studydescription
 // $studydescription
+
+// we silent the Output Buffer
+// if not, query.php returns the json output + "#!/usr/bin/php"
+// the json output is then corrupted
+// then the pacs.js do not understand the answer
+ob_start();
 include('query.php');
+ob_end_clean();
+
+echo $output;
 ?>
