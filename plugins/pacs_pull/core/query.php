@@ -28,7 +28,7 @@
  */
 
 // include the configuration
-require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
+//require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
 require_once '../pacs.class.php';
 
 // check if we are invoked by commandline
@@ -39,11 +39,11 @@ if ($commandline_mode) {
   // parse the options if we are in commandline mode
 
   // define the options
-  $shortopts = "s:p:a:i::n::d::m::t::y::e::h";
+  $shortopts = "s::p::a::i::n::d::m::t::y::e::h";
   $longopts  = array(
-      "serverip:",     // Required value
-      "serverport",    // Required value
-      "aetitle",       // Required value
+      "serverip::",     // Required value
+      "serverport::",    // Required value
+      "aetitle::",       // Required value
       "patientid::",   // Optional value
       "username::",    // Optional value
       "studydate::",
@@ -63,8 +63,8 @@ if ($commandline_mode) {
     return;
   }
   
-  //if no command provided, exit
-  $serverip = '';
+//if no command provided, exit
+  $serverip = '134.174.12.21';
   if( array_key_exists('s', $options))
   {
     $serverip = $options['s'];
@@ -73,14 +73,9 @@ if ($commandline_mode) {
   {
     $serverip = $options['$serverip'];
   }
-  else{
-    echo "no serverip provided!";
-    echo "\n";
-    return;
-  }
   
   //if no command provided, exit
-  $serverport = '';
+  $serverport = '104';
   if( array_key_exists('p', $options))
   {
     $serverport = $options['p'];
@@ -89,14 +84,9 @@ if ($commandline_mode) {
   {
     $serverport = $options['$serverport'];
   }
-  else{
-    echo "no serverport provided!";
-    echo "\n";
-    return;
-  }
   
   //if no command provided, exit
-  $aetitle = '';
+  $aetitle = 'FNNDSC-CHRIS';
   if( array_key_exists('a', $options))
   {
     $aetitle = $options['a'];
@@ -104,11 +94,6 @@ if ($commandline_mode) {
   elseif (array_key_exists('$aetitle', $options))
   {
     $aetitle = $options['$aetitle'];
-  }
-  else{
-    echo "no aetitle provided!";
-    echo "\n";
-    return;
   }
   
   //if no command provided, exit
@@ -221,5 +206,6 @@ $output = json_encode(PACS::postFilter("all",$all_query, $post_filter));
 
 if($commandline_mode){
   // output to file?
+  echo $output;
 }
 ?>
