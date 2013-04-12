@@ -27,60 +27,63 @@ _PLUGIN_.hideBatchDrop = function() {
   _visible_panel.find('.parameter_batchdrop').hide();
 }
 _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
-  // home page
-  jQuery('#opaqueoverlay').removeClass('container');
-  jQuery('#opaqueoverlay').addClass('container-fluid');
-  jQuery('#home').removeClass('row');
-  jQuery('#home').addClass('row-fluid');
-  // welcome and plugin caroussel
-  jQuery('#left').removeClass('span4');
-  jQuery('#left').addClass('span2');
-  jQuery('#plugin_submit').addClass('disabled');
-  // activity feed
-  jQuery('#right').removeClass('span8');
-  jQuery('#right').addClass('span3');
-  jQuery('#right > div > label').hide();
-  
-  console.log("HI");
-  
-  // interactive plugin
-  // load content via ajax + plugin name
-  jQuery
-      .ajax({
-        type : "POST",
-        url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
-            + _pluginName + "/widget/index.html",
-        dataType : "text",
-        success : function(data) {
-          jQuery('#center').html(data);
-          jQuery('#center').show();
-          
-          console.log("HELLO");
-          console.log(_params);
-          // pass parameters
-          _CHRIS_INTERACTIVE_PLUGIN_.parameters(_params);
-          // start view
-          _CHRIS_INTERACTIVE_PLUGIN_.start();
-        }
+  var windows_width = jQuery(window).width() - 40;
+  // store value
+  jQuery('#opaqueoverlay').data('width', jQuery('#opaqueoverlay').css('width'));
+  jQuery('#right').data('width', jQuery('#right').css('width'));
+  // prepare sequence of transitions
+  jQuery('#opaqueoverlay').on(
+      "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
+      function() {
+        jQuery('#right').css('width', '450px');
       });
+  jQuery('#right')
+      .on(
+          "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
+          function() {
+            jQuery
+                .ajax({
+                  type : "POST",
+                  url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
+                      + _pluginName + "/widget/index.html",
+                  dataType : "text",
+                  success : function(data) {
+                    jQuery('#center').html(data);
+                    jQuery('#center').show('blind');
+                    // pass parameters
+                    _CHRIS_INTERACTIVE_PLUGIN_.parameters(_params);
+                    // start view
+                    _CHRIS_INTERACTIVE_PLUGIN_.start();
+                    // unbind transitions
+                    jQuery('#opaqueoverlay')
+                        .off(
+                            "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
+                    jQuery('#right')
+                        .off(
+                            "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
+                  }
+                });
+          });
+  // GO!
+  // 1- extend background
+  jQuery('#opaqueoverlay').css('width', windows_width);
 }
-
 _PLUGIN_.cleanInteractiveLayout = function() {
-  // home page
-  jQuery('#opaqueoverlay').addClass('container');
-  jQuery('#opaqueoverlay').removeClass('container-fluid');
-  jQuery('#home').addClass('row');
-  jQuery('#home').removeClass('row-fluid');
-  // welcome and plugin caroussel
-  jQuery('#left').addClass('span4');
-  jQuery('#left').removeClass('span2');
-  jQuery('#plugin_submit').removeClass('disabled');
-  // activity feed
-  jQuery('#right').addClass('span8');
-  jQuery('#right').removeClass('span3');
-  jQuery('#right > div > label').show();
   // interactive plugin
-  jQuery('#center').hide();
+  jQuery('#center:visible').hide('blind', function() {
+    jQuery('#right')
+    .on(
+        "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
+        function() {
+          jQuery('#opaqueoverlay').css('width',
+              jQuery('#opaqueoverlay').data('width'));
+          jQuery('#right')
+              .off(
+                  "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
+        });
+    
+    jQuery('#right').css('width', jQuery('#right').data('width'));
+  });
 }
 /**
  * Setup the javascript when document is ready (finshed loading)
@@ -269,8 +272,9 @@ jQuery(document)
                 // reset all jobs
                 _BATCH_.reset();
               });
-          jQuery('#plugin_submit').on(
+          $(document).on(
               'click',
+              '#plugin_submit',
               function(e) {
                 // fire it up!!
                 // prevent scrolling up
@@ -432,22 +436,22 @@ jQuery(document)
                 jQuery('#plugin_submit_wait').show();
                 jQuery(this).addClass('disabled');
                 var _feed_name = (new Date()).toLocaleString();
-                
                 // if interactive plugin calling, give control to the plugin
                 // and return before launching
-                var _cli = false;
-                var _definedInteractive = _visible_panel
+                // if namespace doesnt exist or force false
+                var _definedInteractive = jQuery(_visible_panel.parent()[0])
                     .attr('data-interactive');
                 if (_definedInteractive != "") {
-                  if (_cli == false) {
+                  if (typeof _CHRIS_INTERACTIVE_PLUGIN_ == 'undefined'
+                      || _CHRIS_INTERACTIVE_PLUGIN_.force == false) {
                     // setup view layout
                     _PLUGIN_.setupInteractiveLayout(_plugin_name, _jobs);
                     jQuery('#plugin_submit').removeClass('disabled');
                     return;
-                  }
-                  else{
+                  } else {
                     // get new parameters
                     _jobs = _CHRIS_INTERACTIVE_PLUGIN_.parameters();
+                    _CHRIS_INTERACTIVE_PLUGIN_.force = false;
                   }
                 }
                 // send to the launcher

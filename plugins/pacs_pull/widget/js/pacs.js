@@ -2,6 +2,7 @@
  * Define the _CHRIS_INTERACTIVE_PLUGIN_ namespace
  */
 var _CHRIS_INTERACTIVE_PLUGIN_ = _CHRIS_INTERACTIVE_PLUGIN_ || {};
+// store values for convenience - interactive
 _CHRIS_INTERACTIVE_PLUGIN_._param = {
   mrn : "",
   name : "",
@@ -17,36 +18,55 @@ _CHRIS_INTERACTIVE_PLUGIN_._param = {
   feedid : "",
   userid : ""
 };
+// store indices for convenience CLI
+_CHRIS_INTERACTIVE_PLUGIN_._param_ind = {
+  mrn : -1,
+  name : -1,
+  studydate : -1,
+  modality : -1,
+  station : -1,
+  studydesc : -1,
+  seriesdesc : -1,
+  aet : -1,
+  serverip : -1,
+  serverport : -1,
+  listseries : -1,
+  feedid : -1,
+  userid : -1
+};
 _CHRIS_INTERACTIVE_PLUGIN_._parameters = null;
+_CHRIS_INTERACTIVE_PLUGIN_.force = false;
+
 // attach chris interactive plugin helper methods
 // given an object, create the associated variable
 _CHRIS_INTERACTIVE_PLUGIN_.parameters = function(_iparameters) {
   if (typeof _iparameters != 'undefined') {
     _CHRIS_INTERACTIVE_PLUGIN_._parameters = _iparameters;
     for ( var i = 0; i < _iparameters[0].length; i++) {
-      // unescape strings (2 firsts 2 lasts)
+      // store values
       if (_iparameters[0][i].type == "string") {
+        // unescape strings (2 firsts 2 lasts)
         _CHRIS_INTERACTIVE_PLUGIN_._param[_iparameters[0][i].name] = _iparameters[0][i].value
             .substr(2, _iparameters[0][i].value.length - 4);
       } else {
         _CHRIS_INTERACTIVE_PLUGIN_._param[_iparameters[0][i].name] = _iparameters[0][i].value;
       }
+      // store indices
+      _CHRIS_INTERACTIVE_PLUGIN_._param_ind[_iparameters[0][i].name] = i;
     }
   } else {
-    // escape strings
-    // list = '\\"'+list+'\\"';
     return _CHRIS_INTERACTIVE_PLUGIN_._parameters;
   }
 };
 /**
  * Bind the simple search input field to the simple search button.
  */
-$('#pacs_form').submit(function(e) {
-  e.preventDefault();
-  if (e.which == 13) {
-    $("#plugin_submit").click();
-  }
-});
+//$('#pacs_form').submit(function(e) {
+//  e.preventDefault();
+//  if (e.which == 13) {
+//    $("#plugin_submit").click();
+//  }
+//});
 /**
  * Show/hide the advanced parameters div on click
  */
@@ -718,10 +738,12 @@ _CHRIS_INTERACTIVE_PLUGIN_.connectPull = function() {
 }
 _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   // get list to pull fron cache!
-  var list = _CHRIS_INTERACTIVE_PLUGIN_._param["listseries"];
+  var list = "\\\"";
+  _CHRIS_INTERACTIVE_PLUGIN_._param["listseries"];
   for ( var study_key in _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries) {
     for ( var j = 0; j < _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"].length; j++) {
       if (_CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"][j] == true) {
+        console.log('if');
         list += _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["StudyInstanceUID"][j]
             + ","
             + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["SeriesInstanceUID"][j]
@@ -729,7 +751,24 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
       }
     }
   }
+  list += "\\\"";
+  var _list_in = _CHRIS_INTERACTIVE_PLUGIN_._param_ind['listseries'];
+  if (_list_in == -1) {
+    // if doesn't exist, push it!
+    _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].push({
+      name : "listseries",
+      value : list,
+      type : "string",
+      target_type : 'feed'
+    });
+    _CHRIS_INTERACTIVE_PLUGIN_._param_ind['listseries'] = _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].length - 1;
+  } else {
+    _CHRIS_INTERACTIVE_PLUGIN_._parameters[0][_list_in].value = list;
+  }
+  
   // trigger submit with "True"
+  _CHRIS_INTERACTIVE_PLUGIN_.force = true;
+  $("#plugin_submit").click();
 }
 /**
  * Setup the javascript when document is ready (finshed loading)
@@ -757,14 +796,12 @@ $(document).ready(function() {
   _CHRIS_INTERACTIVE_PLUGIN_.openStudies = [];
   // connect button
   // show/hide the advanced parameters on click
-  // _CHRIS_INTERACTIVE_PLUGIN_.connectShowAdvancedParameters();
   // connect button for
   // query server through ajax for given set of parameters
-  // _CHRIS_INTERACTIVE_PLUGIN_.connectAjaxSearch();
   _CHRIS_INTERACTIVE_PLUGIN_.studyView();
   _CHRIS_INTERACTIVE_PLUGIN_.seriesView();
   _CHRIS_INTERACTIVE_PLUGIN_.setupDetailStudy();
   _CHRIS_INTERACTIVE_PLUGIN_.setupDownloadStudy();
   _CHRIS_INTERACTIVE_PLUGIN_.setupDownloadSeries();
-  // _CHRIS_INTERACTIVE_PLUGIN_.connectPull();
+  _CHRIS_INTERACTIVE_PLUGIN_.connectPull();
 });

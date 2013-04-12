@@ -106,3 +106,35 @@ select,textarea,.btn {
 #action_ui {
 	display: none;
 }
+
+#opaqueoverlay {
+	-webkit-transition:500ms linear;
+  -moz-transition:500ms linear;
+  -o-transition:500ms linear;
+  -ms-transition:500ms linear;
+  transition:500ms linear;
+}
+
+#home {
+  -webkit-transition:500ms linear;
+  -moz-transition:500ms linear;
+  -o-transition:500ms linear;
+  -ms-transition:500ms linear;
+  transition:500ms linear;
+}
+
+#left {
+  -webkit-transition:500ms linear;
+  -moz-transition:500ms linear;
+  -o-transition:500ms linear;
+  -ms-transition:500ms linear;
+  transition:500ms linear;
+}
+
+#right {
+  -webkit-transition:500ms linear;
+  -moz-transition:500ms linear;
+  -o-transition:500ms linear;
+  -ms-transition:500ms linear;
+  transition:500ms;
+}
