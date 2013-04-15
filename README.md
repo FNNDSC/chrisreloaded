@@ -5,6 +5,8 @@ The Children's Hospital Radiology Information System.
 
 ### Change log ###
 
+current - **r1.7**
+
 2013 04 15 - **r1.6**
 * Fix critical bug where notes got lost when multiple lines of text was saved.
 
