@@ -5,7 +5,8 @@ The Children's Hospital Radiology Information System.
 
 ### Change log ###
 
-current - **r1.6**
+2013 04 15 - **r1.6**
+* Fix critical bug where notes got lost when multiple lines of text was saved.
 
 2013 04 09 - **r1.5**
 * Introduce a step setting for Plugin.DOUBLE parameters
