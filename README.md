@@ -8,6 +8,7 @@ The Children's Hospital Radiology Information System.
 current - **r1.7**
 * Add onclick for the modal overlay which sometimes used to block the complete ChRIS application when an XTK preview failed.
 * Fix all missing gfx errors in the console.
+* Fix resizing issue when window height is so small that the statistics panel is hidden.
 
 2013 04 15 - **r1.6**
 * Fix critical bug where notes got lost when multiple lines of text was saved.
