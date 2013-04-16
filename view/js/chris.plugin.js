@@ -69,6 +69,8 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
   jQuery('#opaqueoverlay').css('width', windows_width);
 }
 _PLUGIN_.cleanInteractiveLayout = function() {
+  // back to original layout + clean namespace
+  _CHRIS_INTERACTIVE_PLUGIN_ = undefined;
   // interactive plugin
   jQuery('#center:visible').hide('blind', function() {
     jQuery('#right')
@@ -439,17 +441,36 @@ jQuery(document)
                 // if interactive plugin calling, give control to the plugin
                 // and return before launching
                 // if namespace doesnt exist or force false
+                
+                console.log('SUBMIT CALLED');
                 var _definedInteractive = jQuery(_visible_panel.parent()[0])
                     .attr('data-interactive');
                 if (_definedInteractive != "") {
-                  if (typeof _CHRIS_INTERACTIVE_PLUGIN_ == 'undefined'
-                      || _CHRIS_INTERACTIVE_PLUGIN_.force == false) {
+                  if (typeof _CHRIS_INTERACTIVE_PLUGIN_ == 'undefined') {
                     // setup view layout
+                    console.log('setup view');
                     _PLUGIN_.setupInteractiveLayout(_plugin_name, _jobs);
                     jQuery('#plugin_submit').removeClass('disabled');
+                    jQuery('#plugin_submit_wait').hide();
+                    jQuery('#plugin_submit_play').show();
                     return;
-                  } else {
+                  }
+                  else if(_CHRIS_INTERACTIVE_PLUGIN_.force == false){
+                    // load new parameters
+                    console.log('load params');
+                    _CHRIS_INTERACTIVE_PLUGIN_.parameters(_jobs);
+                    // start view
+                    _CHRIS_INTERACTIVE_PLUGIN_.start();
+                    jQuery('#plugin_submit').removeClass('disabled');
+                    jQuery('#plugin_submit_wait').hide();
+                    jQuery('#plugin_submit_play').show();
+                    return;
+                  }
+                    else {
                     // get new parameters
+                      console.log('get params');
+                      console.log(_CHRIS_INTERACTIVE_PLUGIN_);
+                      console.log(_CHRIS_INTERACTIVE_PLUGIN_.force);
                     _jobs = _CHRIS_INTERACTIVE_PLUGIN_.parameters();
                     _CHRIS_INTERACTIVE_PLUGIN_.force = false;
                   }

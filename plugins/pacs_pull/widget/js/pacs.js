@@ -41,6 +41,9 @@ _CHRIS_INTERACTIVE_PLUGIN_.force = false;
 // given an object, create the associated variable
 _CHRIS_INTERACTIVE_PLUGIN_.parameters = function(_iparameters) {
   if (typeof _iparameters != 'undefined') {
+    // clean local parameters
+    
+    // copy new parameters
     _CHRIS_INTERACTIVE_PLUGIN_._parameters = _iparameters;
     for ( var i = 0; i < _iparameters[0].length; i++) {
       // store values
@@ -84,15 +87,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.connectShowAdvancedParameters = function() {
           $("#show_advanced").html(
               '<i class="icon-chevron-up"></i><b>Advanced parameters</b>');
         }
-      });
-}
-/**
- * Start ajax search on click
- */
-_CHRIS_INTERACTIVE_PLUGIN_.connectAjaxSearch = function() {
-  $(document).off('click', "#plugin_submit").on('click', "#plugin_submit",
-      function(event) {
-        _CHRIS_INTERACTIVE_PLUGIN_.ajaxSearch();
       });
 }
 _CHRIS_INTERACTIVE_PLUGIN_.cleanResults = function() {
@@ -169,27 +163,27 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
       // data simple visualization
       _CHRIS_INTERACTIVE_PLUGIN_.ajaxAdvancedResults(data);
       _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus++;
-      $("#plugin_submit").html(
+      $("#PULL").html(
           '<i class="icon-refresh rotating_class"></i> <span> '
               + parseInt(100 * _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus
                   / nb_queries) + '%</span>');
       if (nb_queries == _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus) {
-        $("#plugin_submit").removeClass('btn-warning').addClass('btn-primary');
-        $("#plugin_submit").html('Search');
-        $('#plugin_submit').removeClass('disabled');
+        $("#PULL").removeClass('btn-warning').addClass('btn-primary');
+        $("#PULL").html('Pull Selection');
+        $('#PULL').removeClass('disabled');
         _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus = 0;
       }
     },
     error : function(xhr, textStatus, error) {
       window.console.log("error finished");
       _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus++;
-      $("#plugin_submit").html(
+      $("#PULL").html(
           '<i class="icon-refresh rotating_class"></i> <span> '
               + parseInt(100 * _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus
                   / nb_queries) + '%</span>');
       if (nb_queries == _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus) {
-        $("#plugin_submit").removeClass('btn-warning').addClass('btn-primary');
-        $("#plugin_submit").html('Search');
+        $("#PULL").removeClass('btn-warning').addClass('btn-primary');
+        $("#PULL").html('Search');
         _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus = 0;
       }
     }
@@ -217,9 +211,9 @@ _CHRIS_INTERACTIVE_PLUGIN_.start = function() {
   var nb_queries = nb_mrns * nb_dates;
   // keep reference to current object for the ajax response
   // modify class
-  $("#plugin_submit").removeClass('btn-primary').addClass('btn-warning');
+  $("#PULL").removeClass('btn-primary').addClass('btn-warning');
   // modify content
-  $("#plugin_submit").html(
+  $("#PULL").html(
       '<i class="icon-refresh rotating_class"></i> <span> '
           + parseInt(100 * _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus / nb_queries)
           + '%</span>');
@@ -771,6 +765,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   
   // trigger submit with "True"
   _CHRIS_INTERACTIVE_PLUGIN_.force = true;
+  console.log('submitting!');
   $("#plugin_submit").click();
 }
 /**
