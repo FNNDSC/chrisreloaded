@@ -27,8 +27,10 @@
  *
  */
 
+define('__CHRIS_ENTRY_POINT__', 666);
+
 // include the configuration
-//require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
+require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
 require_once '../pacs.class.php';
 
 // check if we are invoked by commandline
@@ -43,7 +45,7 @@ if ($commandline_mode) {
   $longopts  = array(
       "serverip::",     // Required value
       "serverport::",    // Required value
-      "aetitle::",       // Required value
+      "useraetitle::",       // Required value
       "patientid::",   // Optional value
       "username::",    // Optional value
       "studydate::",
@@ -86,14 +88,14 @@ if ($commandline_mode) {
   }
   
   //if no command provided, exit
-  $aetitle = 'FNNDSC-CHRIS';
+  $useraetitle = 'FNNDSC-CHRIS';
   if( array_key_exists('a', $options))
   {
-    $aetitle = $options['a'];
+    $useraetitle = $options['a'];
   }
-  elseif (array_key_exists('$aetitle', $options))
+  elseif (array_key_exists('useraetitle', $options))
   {
-    $aetitle = $options['$aetitle'];
+    $useraetitle = $options['useraetitle'];
   }
   
   //if no command provided, exit
