@@ -41,7 +41,7 @@ _CHRIS_.scalePanels = function() {
   if (jQuery(window).height() <= 600) {
     // hide the statistics panel
     jQuery('#information').hide();
-    _pluginpanelsize += 173;
+    _pluginpanelsize += 131;
   } else {
     // show it
     jQuery('#information').show();
