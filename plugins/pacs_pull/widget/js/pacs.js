@@ -734,6 +734,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.connectPull = function() {
   $(document).off('click', '#PULL').on('click', '#PULL', function(event) {
     // modify button icon
     $("#PULL").removeClass('btn-success').addClass('btn-warning');
+    $('#PULL').addClass('disabled');
     $("#PULL").html('<i class="icon-refresh rotating_class"></i>');
     _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull();
   });
@@ -772,6 +773,12 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   _CHRIS_INTERACTIVE_PLUGIN_.force = true;
   console.log('submitting!');
   $("#plugin_submit").click();
+}
+
+_CHRIS_INTERACTIVE_PLUGIN_.submitted = function(){
+  $("#PULL").removeClass('btn-warning').addClass('btn-primary');
+  $("#PULL").html('Pull Selection');
+  $('#PULL').removeClass('disabled');
 }
 /**
  * Setup the javascript when document is ready (finshed loading)

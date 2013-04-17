@@ -26,9 +26,31 @@ _PLUGIN_.hideBatchDrop = function() {
   // style="vertical-align:sub;"/>')
   _visible_panel.find('.parameter_batchdrop').hide();
 }
+_PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
+  if (typeof _CHRIS_INTERACTIVE_PLUGIN_ == 'undefined') {
+    // setup view layout
+    _PLUGIN_.setupInteractiveLayout(_plugin_name, _jobs);
+    jQuery('#plugin_submit').removeClass('disabled');
+    jQuery('#plugin_submit_wait').hide();
+    jQuery('#plugin_submit_play').show();
+    return null;
+  } else if (_CHRIS_INTERACTIVE_PLUGIN_.force == false) {
+    // load new parameters
+    _CHRIS_INTERACTIVE_PLUGIN_.parameters(_jobs);
+    // start view
+    _CHRIS_INTERACTIVE_PLUGIN_.start();
+    jQuery('#plugin_submit').removeClass('disabled');
+    jQuery('#plugin_submit_wait').hide();
+    jQuery('#plugin_submit_play').show();
+    return null;
+  } else {
+    // get new parameters
+    _CHRIS_INTERACTIVE_PLUGIN_.force = false;
+    return _CHRIS_INTERACTIVE_PLUGIN_.parameters();
+  }
+}
 _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
-  var windows_width = jQuery(window).width() - 40;
-  // store value
+  // store width value
   jQuery('#opaqueoverlay').data('width', jQuery('#opaqueoverlay').css('width'));
   jQuery('#right').data('width', jQuery('#right').css('width'));
   // prepare sequence of transitions
@@ -65,29 +87,38 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
                 });
           });
   // GO!
-  // 1- extend background
-  jQuery('#opaqueoverlay').css('width', windows_width);
+  // 1- modify background width
+  // 2- modify right width
+  // 3- load plugin
+  // 4- show center
+  var _windows_width = jQuery(window).width() - 40;
+  jQuery('#opaqueoverlay').css('width', _windows_width);
 }
 _PLUGIN_.cleanInteractiveLayout = function() {
-  // back to original layout + clean namespace
+  // clean namespace
   _CHRIS_INTERACTIVE_PLUGIN_ = undefined;
-  // interactive plugin
-  jQuery('#center:visible').hide('blind', function() {
-    jQuery('#right')
-    .on(
-        "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
-        function() {
-          jQuery('#opaqueoverlay').css('width',
-              jQuery('#opaqueoverlay').data('width'));
-          jQuery('#right')
-              .off(
-                  "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
-        });
-    
-    jQuery('#right').css('width', jQuery('#right').data('width'));
-  });
+  // back to original layout
+  // GO!
+  // 1- hide center
+  // 2- modify right width
+  // 3- modify background width
+  jQuery('#center:visible')
+      .hide(
+          'blind',
+          function() {
+            jQuery('#right')
+                .on(
+                    "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
+                    function() {
+                      jQuery('#opaqueoverlay').css('width',
+                          jQuery('#opaqueoverlay').data('width'));
+                      jQuery('#right')
+                          .off(
+                              "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
+                    });
+            jQuery('#right').css('width', jQuery('#right').data('width'));
+          });
 }
-
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -442,38 +473,15 @@ jQuery(document)
                 // if interactive plugin calling, give control to the plugin
                 // and return before launching
                 // if namespace doesnt exist or force false
-                
-                console.log('SUBMIT CALLED');
                 var _definedInteractive = jQuery(_visible_panel.parent()[0])
                     .attr('data-interactive');
                 if (_definedInteractive != "") {
-                  if (typeof _CHRIS_INTERACTIVE_PLUGIN_ == 'undefined') {
-                    // setup view layout
-                    console.log('setup view');
-                    _PLUGIN_.setupInteractiveLayout(_plugin_name, _jobs);
-                    jQuery('#plugin_submit').removeClass('disabled');
-                    jQuery('#plugin_submit_wait').hide();
-                    jQuery('#plugin_submit_play').show();
+                  var _parameters = _PLUGIN_.submitInteractive(_plugin_name,
+                      _jobs);
+                  if (_parameters == null) {
                     return;
-                  }
-                  else if(_CHRIS_INTERACTIVE_PLUGIN_.force == false){
-                    // load new parameters
-                    console.log('load params');
-                    _CHRIS_INTERACTIVE_PLUGIN_.parameters(_jobs);
-                    // start view
-                    _CHRIS_INTERACTIVE_PLUGIN_.start();
-                    jQuery('#plugin_submit').removeClass('disabled');
-                    jQuery('#plugin_submit_wait').hide();
-                    jQuery('#plugin_submit_play').show();
-                    return;
-                  }
-                    else {
-                    // get new parameters
-                      console.log('get params');
-                      console.log(_CHRIS_INTERACTIVE_PLUGIN_);
-                      console.log(_CHRIS_INTERACTIVE_PLUGIN_.force);
-                    _jobs = _CHRIS_INTERACTIVE_PLUGIN_.parameters();
-                    _CHRIS_INTERACTIVE_PLUGIN_.force = false;
+                  } else {
+                    _jobs = _parameters;
                   }
                 }
                 // send to the launcher
@@ -497,6 +505,11 @@ jQuery(document)
                     jQuery('#plugin_submit').removeClass('disabled');
                     jQuery('#plugin_submit_wait').hide();
                     jQuery('#plugin_submit_play').show();
+                    // if interactive plugin, we might want to cleanup the ui
+                    if (_definedInteractive != ""
+                        && typeof _CHRIS_INTERACTIVE_PLUGIN_ != 'undefined') {
+                      _CHRIS_INTERACTIVE_PLUGIN_.submitted();
+                    }
                   }
                 });
               });
