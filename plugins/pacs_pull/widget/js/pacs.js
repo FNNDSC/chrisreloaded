@@ -3,49 +3,22 @@
  */
 var _CHRIS_INTERACTIVE_PLUGIN_ = _CHRIS_INTERACTIVE_PLUGIN_ || {};
 // store values for convenience - interactive
-_CHRIS_INTERACTIVE_PLUGIN_._param = {
-  mrn : "",
-  name : "",
-  studydate : "",
-  modality : "",
-  station : "",
-  studydesc : "",
-  seriesdesc : "",
-  aet : "",
-  serverip : "",
-  serverport : "",
-  listseries : "",
-  feedid : "",
-  userid : ""
-};
+_CHRIS_INTERACTIVE_PLUGIN_._param = {};
 // store indices for convenience CLI
-_CHRIS_INTERACTIVE_PLUGIN_._param_ind = {
-  mrn : -1,
-  name : -1,
-  studydate : -1,
-  modality : -1,
-  station : -1,
-  studydesc : -1,
-  seriesdesc : -1,
-  aet : -1,
-  serverip : -1,
-  serverport : -1,
-  listseries : -1,
-  feedid : -1,
-  userid : -1
-};
+_CHRIS_INTERACTIVE_PLUGIN_._param_ind = {};
+// store original parameters
 _CHRIS_INTERACTIVE_PLUGIN_._parameters = null;
+// store force flag
 _CHRIS_INTERACTIVE_PLUGIN_.force = false;
-
 // attach chris interactive plugin helper methods
 // given an object, create the associated variable
 _CHRIS_INTERACTIVE_PLUGIN_.parameters = function(_iparameters) {
   if (typeof _iparameters != 'undefined') {
     // clean local parameters
-    for (var key in _CHRIS_INTERACTIVE_PLUGIN_._param){
+    for ( var key in _CHRIS_INTERACTIVE_PLUGIN_._param) {
       _CHRIS_INTERACTIVE_PLUGIN_._param[key] = "";
     }
-    for (var key in _CHRIS_INTERACTIVE_PLUGIN_._param_ind){
+    for ( var key in _CHRIS_INTERACTIVE_PLUGIN_._param_ind) {
       _CHRIS_INTERACTIVE_PLUGIN_._param_ind[key] = -1;
     }
     // copy new parameters
@@ -69,12 +42,12 @@ _CHRIS_INTERACTIVE_PLUGIN_.parameters = function(_iparameters) {
 /**
  * Bind the simple search input field to the simple search button.
  */
-//$('#pacs_form').submit(function(e) {
-//  e.preventDefault();
-//  if (e.which == 13) {
-//    $("#plugin_submit").click();
-//  }
-//});
+// $('#pacs_form').submit(function(e) {
+// e.preventDefault();
+// if (e.which == 13) {
+// $("#plugin_submit").click();
+// }
+// });
 /**
  * Show/hide the advanced parameters div on click
  */
@@ -101,18 +74,32 @@ _CHRIS_INTERACTIVE_PLUGIN_.cleanResults = function() {
     $('#S-RESULTS').remove();
   }
 }
-
+_CHRIS_INTERACTIVE_PLUGIN_.getParam = function(parameter) {
+  if (typeof _CHRIS_INTERACTIVE_PLUGIN_._param[parameter] != 'undefined') {
+    return _CHRIS_INTERACTIVE_PLUGIN_._param[parameter];
+  }
+  return "";
+};
+_CHRIS_INTERACTIVE_PLUGIN_.getInd = function(parameter) {
+  if (typeof _CHRIS_INTERACTIVE_PLUGIN_._param[parameter] != 'undefined') {
+    return _CHRIS_INTERACTIVE_PLUGIN_._param_ind[parameter];
+  }
+  return -1;
+};
 _CHRIS_INTERACTIVE_PLUGIN_.preProcessMRN = function() {
-  var mrns = _CHRIS_INTERACTIVE_PLUGIN_._param["mrn"].split(/\s+/g);
+  var mrns = _CHRIS_INTERACTIVE_PLUGIN_.getParam("mrn");
+  // split it!
+  mrns = mrns.split(/\s+/g);
   var nb_mrns = mrns.length;
   if (nb_mrns >= 2 && mrns[nb_mrns - 1] == "") {
     nb_mrns--;
   }
   return [ mrns, nb_mrns ];
 }
-
 _CHRIS_INTERACTIVE_PLUGIN_.preProcessDate = function() {
-  var dates = _CHRIS_INTERACTIVE_PLUGIN_._param["studydate"].split(/\-/g);
+  var dates = _CHRIS_INTERACTIVE_PLUGIN_.getParam("studydate");
+  // split it
+  dates = dates.split(/\-/g);
   var nb_dates = dates.length;
   // list all dates to be queried
   if (nb_dates >= 2 && dates[1] != "") {
@@ -145,18 +132,18 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
     url : "plugins/pacs_pull/core/pacs_query.php",
     dataType : "json",
     data : {
-      USER_AET : _CHRIS_INTERACTIVE_PLUGIN_._param["aet"],
-      SERVER_IP : _CHRIS_INTERACTIVE_PLUGIN_._param["serverip"],
-      SERVER_POR : _CHRIS_INTERACTIVE_PLUGIN_._param["serverport"],
+      USER_AET : _CHRIS_INTERACTIVE_PLUGIN_.getParam("aet"),
+      SERVER_IP : _CHRIS_INTERACTIVE_PLUGIN_.getParam("serverip"),
+      SERVER_POR : _CHRIS_INTERACTIVE_PLUGIN_.getParam("serverport"),
       PACS_MRN : mrn,
-      PACS_NAM : _CHRIS_INTERACTIVE_PLUGIN_._param["name"],
-      PACS_MOD : _CHRIS_INTERACTIVE_PLUGIN_._param["modality"],
+      PACS_NAM : _CHRIS_INTERACTIVE_PLUGIN_.getParam("name"),
+      PACS_MOD : _CHRIS_INTERACTIVE_PLUGIN_.getParam("modality"),
       PACS_DAT : date,
       PACS_ACC_NUM : '',
-      PACS_STU_DES : _CHRIS_INTERACTIVE_PLUGIN_._param["studydesc"],
-      PACS_SER_DES : _CHRIS_INTERACTIVE_PLUGIN_._param["seriesdesc"],
+      PACS_STU_DES : _CHRIS_INTERACTIVE_PLUGIN_.getParam("studydesc"),
+      PACS_SER_DES : _CHRIS_INTERACTIVE_PLUGIN_.getParam("seriesdesc"),
       PACS_STU_UID : '',
-      PACS_PSAET : _CHRIS_INTERACTIVE_PLUGIN_._param["station"]
+      PACS_PSAET : _CHRIS_INTERACTIVE_PLUGIN_.getParam("station")
     },
     success : function(data) {
       $("#PACS-RESULTS").show('blind', 100);
@@ -734,7 +721,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.connectPull = function() {
 _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   // get list to pull fron cache!
   var list = "\\\"";
-  _CHRIS_INTERACTIVE_PLUGIN_._param["listseries"];
+  _CHRIS_INTERACTIVE_PLUGIN_.getParam("listseries");
   for ( var study_key in _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries) {
     for ( var j = 0; j < _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"].length; j++) {
       if (_CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"][j] == true) {
@@ -746,7 +733,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
     }
   }
   list += "\\\"";
-  var _list_in = _CHRIS_INTERACTIVE_PLUGIN_._param_ind['listseries'];
+  var _list_in = _CHRIS_INTERACTIVE_PLUGIN_.getInd('listseries');
   if (_list_in == -1) {
     // if doesn't exist, push it!
     _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].push({
@@ -755,17 +742,15 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
       type : "string",
       target_type : 'feed'
     });
-    _CHRIS_INTERACTIVE_PLUGIN_._param_ind['listseries'] = _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].length - 1;
+    _CHRIS_INTERACTIVE_PLUGIN_.getInd('listseries') = _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].length - 1;
   } else {
     _CHRIS_INTERACTIVE_PLUGIN_._parameters[0][_list_in].value = list;
   }
-  
   // trigger submit with "True"
   _CHRIS_INTERACTIVE_PLUGIN_.force = true;
   $("#plugin_submit").click();
 }
-
-_CHRIS_INTERACTIVE_PLUGIN_.submitted = function(){
+_CHRIS_INTERACTIVE_PLUGIN_.submitted = function() {
   $("#PULL").removeClass('btn-warning').addClass('btn-primary');
   $("#PULL").html('Pull Selection');
   $('#PULL').removeClass('disabled');
