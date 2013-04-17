@@ -58,6 +58,14 @@ _PREVIEW_.start = function(renderertype, filetype, filepath) {
   // show modal
   jQuery('#PREVIEWMODAL').modal();
   
+  // add callbacks to get out of the overlay when the preview crashed
+  jQuery('.modal-backdrop').on('click', function(e) {
+  
+    _PREVIEW_.destroy();
+    jQuery(this).remove();
+    
+  });
+  
 }
 _PREVIEW_.preview = function() {
 
@@ -160,6 +168,41 @@ _PREVIEW_.preview = function() {
   }
   
 }
+_PREVIEW_.destroy = function() {
+
+  // empty description
+  jQuery('#PREVIEWLABEL').html("");
+  
+
+  if (_PREVIEW_.filetype == 'volume') {
+
+    try {
+      // destroy slider
+      jQuery("#PREVIEWSLIDER").slider("destroy");
+    } catch(e) {
+      
+    }
+    
+  }
+  
+  // delete XTK stuff
+  if (_PREVIEW_.renderer != null) {
+
+    _PREVIEW_.renderer.destroy();
+    delete _PREVIEW_.renderer;
+    _PREVIEW_.renderer = null;
+  }
+  if (_PREVIEW_.object != null) {
+    delete _PREVIEW_.object;
+    _PREVIEW_.object = null;
+  }
+  
+  // remove the text class
+  jQuery('#PREVIEWMODAL').removeClass('largePreview');
+  jQuery('#textPreview').remove();
+  clearInterval(_PREVIEW_.refresher);
+   
+}
 jQuery(document).ready(function() {
 
   jQuery('#AUTOREFRESH').toggleButtons({
@@ -186,31 +229,7 @@ jQuery(document).ready(function() {
   // connect the 'hidden' event
   jQuery('#PREVIEWMODAL').on('hidden', function() {
 
-    // empty description
-    jQuery('#PREVIEWLABEL').html("");
-    
-    if (_PREVIEW_.filetype == 'volume') {
-      
-      // destroy slider
-      jQuery("#PREVIEWSLIDER").slider("destroy");
-      
-    }
-    
-    // delete XTK stuff
-    if (_PREVIEW_.renderer != null) {
-      _PREVIEW_.renderer.destroy();
-      delete _PREVIEW_.renderer;
-      _PREVIEW_.renderer = null;
-    }
-    if (_PREVIEW_.object != null) {
-      delete _PREVIEW_.object;
-      _PREVIEW_.object = null;
-    }
-    
-    // remove the text class
-    jQuery('#PREVIEWMODAL').removeClass('largePreview');
-    jQuery('#textPreview').remove();
-    clearInterval(_PREVIEW_.refresher);
+    _PREVIEW_.destroy();
     
   });
 });

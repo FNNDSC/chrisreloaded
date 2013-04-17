@@ -202,7 +202,11 @@ if (!$loggedIn) {
           // here we store content to a file
           $name = joinPaths(CHRIS_USERS, $parameters[0]);
 
-          $ssh_connection->exec("echo ".$parameters[1]." >> ".$name);
+          // make sure to escape line breaks etc.
+          $content = escapeshellarg($parameters[1]);
+
+          // replace file contents
+          $ssh_connection->exec("echo ".$content." > ".$name);
 
           $result['result'] = $name.' written.';
 
