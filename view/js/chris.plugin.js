@@ -49,51 +49,6 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     return _CHRIS_INTERACTIVE_PLUGIN_.parameters();
   }
 }
-_PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
-  // store width value
-  jQuery('#opaqueoverlay').data('width', jQuery('#opaqueoverlay').css('width'));
-  jQuery('#right').data('width', jQuery('#right').css('width'));
-  // prepare sequence of transitions
-  jQuery('#opaqueoverlay').on(
-      "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
-      function() {
-        jQuery('#right').css('width', '450px');
-      });
-  jQuery('#right')
-      .on(
-          "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
-          function() {
-            jQuery
-                .ajax({
-                  type : "POST",
-                  url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
-                      + _pluginName + "/widget/index.html",
-                  dataType : "text",
-                  success : function(data) {
-                    jQuery('#center').html(data);
-                    jQuery('#center').show('blind');
-                    // pass parameters
-                    _CHRIS_INTERACTIVE_PLUGIN_.parameters(_params);
-                    // start view
-                    _CHRIS_INTERACTIVE_PLUGIN_.start();
-                    // unbind transitions
-                    jQuery('#opaqueoverlay')
-                        .off(
-                            "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
-                    jQuery('#right')
-                        .off(
-                            "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
-                  }
-                });
-          });
-  // GO!
-  // 1- modify background width
-  // 2- modify right width
-  // 3- load plugin
-  // 4- show center
-  var _windows_width = jQuery(window).width() - 40;
-  jQuery('#opaqueoverlay').css('width', _windows_width);
-}
 _PLUGIN_.cleanInteractiveLayout = function() {
   // clean namespace
   _CHRIS_INTERACTIVE_PLUGIN_ = undefined;
@@ -118,6 +73,54 @@ _PLUGIN_.cleanInteractiveLayout = function() {
                     });
             jQuery('#right').css('width', jQuery('#right').data('width'));
           });
+}
+_PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
+  // store width value
+  jQuery('#opaqueoverlay').data('width', jQuery('#opaqueoverlay').css('width'));
+  jQuery('#right').data('width', jQuery('#right').css('width'));
+  // connect close button
+  jQuery(document).off('click', '#close_interactive_plugin').on('click',
+      '#close_interactive_plugin', _PLUGIN_.cleanInteractiveLayout);
+  // prepare sequence of transitions
+  jQuery('#opaqueoverlay').on(
+      "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
+      function() {
+        jQuery('#right').css('width', '450px');
+      });
+  jQuery('#right')
+      .on(
+          "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
+          function() {
+            jQuery
+                .ajax({
+                  type : "POST",
+                  url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
+                      + _pluginName + "/widget/index.html",
+                  dataType : "text",
+                  success : function(data) {
+                    jQuery('.interactive_plugin_content').html(data);
+                    jQuery('#center').show('blind');
+                    // pass parameters
+                    _CHRIS_INTERACTIVE_PLUGIN_.parameters(_params);
+                    // start view
+                    _CHRIS_INTERACTIVE_PLUGIN_.start();
+                    // unbind transitions
+                    jQuery('#opaqueoverlay')
+                        .off(
+                            "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
+                    jQuery('#right')
+                        .off(
+                            "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
+                  }
+                });
+          });
+  // GO!
+  // 1- modify background width
+  // 2- modify right width
+  // 3- load plugin
+  // 4- show center
+  var _windows_width = jQuery(window).width() - 40;
+  jQuery('#opaqueoverlay').css('width', _windows_width);
 }
 /**
  * Setup the javascript when document is ready (finshed loading)

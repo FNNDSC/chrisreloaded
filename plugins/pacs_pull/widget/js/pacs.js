@@ -771,7 +771,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   
   // trigger submit with "True"
   _CHRIS_INTERACTIVE_PLUGIN_.force = true;
-  console.log('submitting!');
   $("#plugin_submit").click();
 }
 
