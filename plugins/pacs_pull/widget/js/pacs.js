@@ -42,7 +42,12 @@ _CHRIS_INTERACTIVE_PLUGIN_.force = false;
 _CHRIS_INTERACTIVE_PLUGIN_.parameters = function(_iparameters) {
   if (typeof _iparameters != 'undefined') {
     // clean local parameters
-    
+    for (var key in _CHRIS_INTERACTIVE_PLUGIN_._param){
+      _CHRIS_INTERACTIVE_PLUGIN_._param[key] = "";
+    }
+    for (var key in _CHRIS_INTERACTIVE_PLUGIN_._param_ind){
+      _CHRIS_INTERACTIVE_PLUGIN_._param_ind[key] = -1;
+    }
     // copy new parameters
     _CHRIS_INTERACTIVE_PLUGIN_._parameters = _iparameters;
     for ( var i = 0; i < _iparameters[0].length; i++) {

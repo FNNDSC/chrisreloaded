@@ -87,6 +87,7 @@ _PLUGIN_.cleanInteractiveLayout = function() {
     jQuery('#right').css('width', jQuery('#right').data('width'));
   });
 }
+
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
