@@ -47,7 +47,7 @@ if ($commandline_mode) {
       "serverport::",    // Required value
       "useraetitle::",       // Required value
       "patientid::",   // Optional value
-      "username::",    // Optional value
+      "patientname::",    // Optional value
       "studydate::",
       "modality::",    // Optional value
       "studydescription::",    // Optional value
@@ -117,7 +117,7 @@ if ($commandline_mode) {
   }
   elseif (array_key_exists('patientname', $options))
   {
-    $patientname = $options['username'];
+    $patientname = $options['patientname'];
   }
 
   // is $studydate given?
