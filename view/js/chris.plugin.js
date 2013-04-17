@@ -26,6 +26,9 @@ _PLUGIN_.hideBatchDrop = function() {
   // style="vertical-align:sub;"/>')
   _visible_panel.find('.parameter_batchdrop').hide();
 }
+/**
+ * Process submit coming from an interactive plugin
+ */
 _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
   if (typeof _CHRIS_INTERACTIVE_PLUGIN_ == 'undefined') {
     // setup view layout
@@ -49,6 +52,10 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     return _CHRIS_INTERACTIVE_PLUGIN_.parameters();
   }
 }
+
+/**
+ * Cleanup the layout after an interactive plugin
+ */
 _PLUGIN_.cleanInteractiveLayout = function() {
   // clean namespace
   _CHRIS_INTERACTIVE_PLUGIN_ = undefined;
@@ -74,6 +81,10 @@ _PLUGIN_.cleanInteractiveLayout = function() {
             jQuery('#right').css('width', jQuery('#right').data('width'));
           });
 }
+
+/**
+ * Setup the layout before an interactive plugin
+ */
 _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
   // store width value
   jQuery('#opaqueoverlay').data('width', jQuery('#opaqueoverlay').css('width'));
@@ -94,7 +105,7 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
             jQuery
                 .ajax({
                   type : "POST",
-                  url : "http://chris/nicolas/api.php?action=get&what=file&parameters[]=plugin&parameters[]="
+                  url : "api.php?action=get&what=file&parameters[]=plugin&parameters[]="
                       + _pluginName + "/widget/index.html",
                   dataType : "text",
                   success : function(data) {

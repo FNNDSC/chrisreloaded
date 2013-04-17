@@ -103,7 +103,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.cleanResults = function() {
 }
 
 _CHRIS_INTERACTIVE_PLUGIN_.preProcessMRN = function() {
-  console.log(_CHRIS_INTERACTIVE_PLUGIN_);
   var mrns = _CHRIS_INTERACTIVE_PLUGIN_._param["mrn"].split(/\s+/g);
   var nb_mrns = mrns.length;
   if (nb_mrns >= 2 && mrns[nb_mrns - 1] == "") {
@@ -141,8 +140,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.preProcessDate = function() {
   return [ dates, nb_dates ];
 }
 _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
-  console.log("start finished");
-  console.log(_CHRIS_INTERACTIVE_PLUGIN_._param["aet"]);
   $.ajax({
     type : "POST",
     url : "plugins/pacs_pull/core/pacs_query.php",
@@ -162,8 +159,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
       PACS_PSAET : _CHRIS_INTERACTIVE_PLUGIN_._param["station"]
     },
     success : function(data) {
-      window.console.log("query finished");
-      window.console.log(data);
       $("#PACS-RESULTS").show('blind', 100);
       // data simple visualization
       _CHRIS_INTERACTIVE_PLUGIN_.ajaxAdvancedResults(data);
@@ -180,7 +175,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
       }
     },
     error : function(xhr, textStatus, error) {
-      window.console.log("error finished");
       _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus++;
       $("#PULL").html(
           '<i class="icon-refresh rotating_class"></i> <span> '
@@ -198,7 +192,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
  * Setup the ajaxSearch action
  */
 _CHRIS_INTERACTIVE_PLUGIN_.start = function() {
-  console.log("HI START");
   _CHRIS_INTERACTIVE_PLUGIN_.cleanResults();
   // clean delete cache
   _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries = {};
@@ -223,7 +216,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.start = function() {
           + parseInt(100 * _CHRIS_INTERACTIVE_PLUGIN_.ajaxStatus / nb_queries)
           + '%</span>');
   var i = 0;
-  console.log("before if");
   if (nb_mrns >= 2) {
     // loop through mrns
     for (i = 0; i < nb_mrns; i++) {
@@ -746,7 +738,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   for ( var study_key in _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries) {
     for ( var j = 0; j < _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"].length; j++) {
       if (_CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"][j] == true) {
-        console.log('if');
         list += _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["StudyInstanceUID"][j]
             + ","
             + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["SeriesInstanceUID"][j]
@@ -786,7 +777,6 @@ $(document).ready(function() {
   //
   // Global variables
   //
-  console.log("READY");
   // is study checked?
   _CHRIS_INTERACTIVE_PLUGIN_.studyStatus = {};
   // keep track of the job status
