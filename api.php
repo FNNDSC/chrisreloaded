@@ -64,7 +64,6 @@ $result = array(
 //
 // validate the credentials
 //
-
 // check if a token was passed
 $loggedIn = false;
 if (isset($_GET['token'])) {
@@ -81,7 +80,6 @@ if (isset($_GET['token'])) {
   $loggedIn = SecurityC::login();
 
 }
-
 if (!$loggedIn) {
 
   // invalid credentials
@@ -257,9 +255,10 @@ if (!$loggedIn) {
         } else if($what == 'feed_search'){
           $result['result'] = FeedC::searchClient($_SESSION['userid'], $parameters[0]);
         } else if($what == 'file') {
-
-          // here we don't create JSON but just pass thru the file content
           $name = joinPaths(CHRIS_USERS, $parameters);
+
+          // enable cross origin requests
+          header("Access-Control-Allow-Origin: *");
 
           // if the file does not exist, just die
           if (!is_file($name)) {

@@ -29,8 +29,8 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
-require_once (dirname(dirname(dirname(__FILE__))).'/config.inc.php');
-require_once '../pacs_pull/pacs.class.php';
+require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
+require_once '../pacs.class.php';
 
 // convenience method to check if variable is set or not
 function is_set($variable, $value = '') {
@@ -42,36 +42,44 @@ $serverip = is_set($_POST['SERVER_IP'],'134.174.12.21');
 $serverport = is_set($_POST['SERVER_POR'],'104');
 // user aetitle
 $useraetitle = is_set($_POST['USER_AET'],'FNNDSC-CHRISTEST');
-// instantiate PACS class
-$pacs = new PACS($serverip, $serverport, $useraetitle);
+// patient id
+$patientid = is_set($_POST['PACS_MRN']);
+// patient name
+$patientname = is_set($_POST['PACS_NAM']);
+// study date
+$studydate = is_set($_POST['PACS_DAT']);
+// modality
+$modality = is_set($_POST['PACS_MOD']);
+// station
+$station = is_set($_POST['PACS_PSAET']);
+// study description
+$studydescription = is_set($_POST['PACS_STU_DES']);
+// series description
+$seriesdescription = is_set($_POST['PACS_SER_DES']);
 
-// create study filters
-$study_parameter = Array();
-$study_parameter['PatientID'] = is_set($_POST['PACS_MRN']);
-$study_parameter['PatientName'] = is_set($_POST['PACS_NAM']);
-$study_parameter['PatientBirthDate'] = '';
-$study_parameter['StudyDate'] = is_set($_POST['PACS_DAT']);
-$study_parameter['StudyDescription'] = '';
-$study_parameter['ModalitiesInStudy'] = is_set($_POST['PACS_MOD']);
-$study_parameter['PerformedStationAETitle'] = '';
+// could split date/mrns here!
+// but status not updated in real time on client side....
 
-// create series filters
-$series_parameter = Array();
-$series_parameter['NumberOfSeriesRelatedInstances'] = '';
-$series_parameter['SeriesDescription'] = '';
+// The following variables have to be defined to be picked up
+// by launcher.php
+// $serverip
+// $serverport
+// $useraetitle
+// $patientid
+// $patientname
+// $studydate
+// $modality
+// $station
+// $studydescription
+// $studydescription
 
-// run query
-$all_query = $pacs->queryAll($study_parameter, $series_parameter, null);
+// we silent the Output Buffer
+// if not, query.php returns the json output + "#!/usr/bin/php"
+// the json output is then corrupted
+// then the pacs.js do not understand the answer
+ob_start();
+include('query.php');
+ob_end_clean();
 
-// post filter
-$post_filter = Array();
-$post_filter['PerformedStationAETitle'] = is_set($_POST['PACS_PSAET']);
-$post_filter['StudyDescription'] = is_set($_POST['PACS_STU_DES']);
-$post_filter['SeriesDescription'] = is_set($_POST['PACS_SER_DES']);
-
-// @todo write json file for a nice plugin
-
-// return value
-echo json_encode(PACS::postFilter("all",$all_query, $post_filter));
-
+echo $output;
 ?>

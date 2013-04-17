@@ -36,7 +36,7 @@
   ${FEED_DATA_PREVIEW}
 
   <div id='home' class="row">
-   <div class="span4">
+   <div id="left" class="span4">
     <div class="well" id='information'
      style='padding-top: 10px; padding-bottom: 12px;'>
      <!-- GREETING -->
@@ -69,12 +69,32 @@
     </div>
     ${PLUGIN}
    </div>
-
-   <div class="span8 pull-right">
+   <!-- We load css here because jquery do not apply it... :/ -->
+   <div id="center" style="display: none; margin-left: 20px;
+  float: left;">
+   <div class="interactive_plugin_title" style="height:22px; padding:10px;border-top: 1px solid;
+  border-bottom: 1px solid;
+  border-color: #e3e3e3;
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+  background-color: whiteSmoke;
+  "> <span style="font-size: 16px; font-weight: bold;">Interactive Plugin</span> <span class="pull-right"> <span id="close_interactive_plugin" class="btn-small btn-primary" style="cursor: pointer;">Close Interactive Plugin <i class="icon-remove icon-white"></i></span> </span></div>
+      <div class="interactive_plugin_content" style="background-color: whiteSmoke;overflow-y: scroll;"></div>
+          <div class='interactive_plugin_footer' style="  border-bottom-right-radius: 4px;
+  border-bottom-left-radius: 4px;
+  background-color: #fff;
+  border-bottom: 1px solid;
+  border-color: #e3e3e3;
+  height: 5px;"></div> 
+</div>
+   
+   <div id="right" class="span8 pull-right">
     <div class="feed_title">
      <span style="font-size: 16px; font-weight: bold;">Activity
       Feed</span> <sub>( <a href="#">Me</a> / <b>All </b>)
-     </sub><label class="checkbox inline feed_header_small"
+     </sub>
+     <span style="display: none;">
+      <label class="checkbox inline feed_header_small"
       style='margin-left: 10px; padding-top: 0px; margin-top: -5px;'>
       <input type="checkbox" class="feed_fav_check"
       style='opacity: 0.6;' value="1" checked> Favorites
@@ -89,7 +109,7 @@
      </label> <label class="checkbox inline feed_header_small"
       style='padding-top: 0px; margin-top: -5px;'> <input
       type="checkbox" class="feed_sea_check" value="0"> Search
-     </label> <span class="pull-right" style=''> <input
+     </label>      </span> <span class="pull-right" style=''> <input
       class="feed_search_input" type="text" placeholder="Search..."
       style='height: 10px; line-height: 12px; width: 135px; font-size: 11px;'>
      </span>

@@ -91,11 +91,22 @@ class PACS_Pull(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = PACS_Pull()
-  plugin.add_parameter('Input', Plugin.STRING, '--mrn', action='store', dest='MRN', help='MRN to be pulled (mrn1 mrn2 mrn3 etc.)')
-  plugin.add_parameter('Input', Plugin.STRING, '--aet', action='store', default='AETITLE', dest='USER_AET', help='User AETitle')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--serverport', action='store', default='104', dest='SERVER_PORT', help='Server Port')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--listseries', action='store', dest='LIST_SERIES', help='Series to be downloaded: "study_uid,series_uid study_uid,series_uid, etc."')
+  
+  # this is an interactive plugin
+  plugin.interactive = True
+  
+  # define the parameters
+  plugin.add_parameter('Simple parameters', Plugin.STRING, '--mrn', action='store', dest='MRN', help='MRN to be pulled')
+  plugin.add_parameter('Simple parameters', Plugin.STRING, '--name', action='store', dest='NAME', help='NAME to be pulled')
+  plugin.add_parameter('Simple parameters', Plugin.STRING, '--studydate', action='store', dest='DATE', help='DATE to be pulled')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--modality', action='store', default='MR', dest='MOD', help='MODality to be pulled')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--station', action='store', dest='STA', help='STAtion to be pulled')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--studydesc', action='store', dest='STUD', help='STUdy Description to be pulled')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--seriesdesc', action='store', dest='SERD', help='SERies Description to be pulled')
+  plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--aet', action='store', default='FNNDSC-CHRIS', dest='USER_AET', help='User AETitle')
+  plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')
+  plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--serverport', action='store', default='104', dest='SERVER_PORT', help='Server Port')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--listseries', action='store', dest='LIST_SERIES', help='Series to be downloaded: "study_uid,series_uid study_uid,series_uid, etc."')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--userid', action='store', default="{USER_ID}", dest='USER_ID', help='User ID')
   plugin.launch(sys.argv)

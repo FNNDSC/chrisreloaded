@@ -37,6 +37,11 @@ _CHRIS_.scalePanels = function() {
   // configure screen size related parameters
   var _pluginpanelsize = jQuery(window).height()-447;
   var _feedcontentsize = jQuery(window).height()-129;  
+  var _interactivepluginsize = jQuery(window).height()-129;
+  // right panel: 300px + well: 40px
+  // left panel: 450px + well: 40px
+  var _interactivepluginwidth = jQuery(window).width()-300 - 450 - 40 - 40;
+  var _opaqueoverlaywidth = jQuery(window).width()- 40;
   
   if (jQuery(window).height() <= 600) {
     // hide the statistics panel
@@ -53,6 +58,16 @@ _CHRIS_.scalePanels = function() {
   jQuery('.feed_content').css('min-height', _feedcontentsize);
   jQuery('.feed_content').css('height', _feedcontentsize);
   jQuery('.feed_content').css('max-height', _feedcontentsize);
+  jQuery('.interactive_plugin_content').css('min-height', _interactivepluginsize);
+  jQuery('.interactive_plugin_content').css('height', _interactivepluginsize);
+  jQuery('.interactive_plugin_content').css('max-height', _interactivepluginsize);
+  jQuery('#center').css('min-width', _interactivepluginwidth);
+  jQuery('#center').css('width', _interactivepluginwidth);
+  jQuery('#center').css('max-width', _interactivepluginwidth);
+  if(jQuery('#center').is(":visible")){
+    // resize opaque overlay if interactive plugin (#center) is visible
+    jQuery('#opaqueoverlay').css('width', _opaqueoverlaywidth);
+  }
   
 };
 
