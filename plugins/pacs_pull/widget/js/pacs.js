@@ -721,7 +721,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.connectPull = function() {
 _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   // get list to pull fron cache!
   var list = "\\\"";
-  _CHRIS_INTERACTIVE_PLUGIN_.getParam("listseries");
   for ( var study_key in _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries) {
     for ( var j = 0; j < _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"].length; j++) {
       if (_CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"][j] == true) {
@@ -742,14 +741,17 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
       type : "string",
       target_type : 'feed'
     });
-    _CHRIS_INTERACTIVE_PLUGIN_.getInd('listseries') = _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].length - 1;
+    _CHRIS_INTERACTIVE_PLUGIN_._param_ind['listseries'] = _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].length - 1;
   } else {
     _CHRIS_INTERACTIVE_PLUGIN_._parameters[0][_list_in].value = list;
   }
+  
   // trigger submit with "True"
   _CHRIS_INTERACTIVE_PLUGIN_.force = true;
   $("#plugin_submit").click();
 }
+
+
 _CHRIS_INTERACTIVE_PLUGIN_.submitted = function() {
   $("#PULL").removeClass('btn-warning').addClass('btn-primary');
   $("#PULL").html('Pull Selection');
