@@ -38,6 +38,8 @@ _CHRIS_.scalePanels = function() {
   var _pluginpanelsize = jQuery(window).height()-447;
   var _feedcontentsize = jQuery(window).height()-129;  
   var _interactivepluginsize = jQuery(window).height()-129;
+  // right panel: 300px + well: 40px
+  // left panel: 450px + well: 40px
   var _interactivepluginwidth = jQuery(window).width()-300 - 450 - 40 - 40;
   var _opaqueoverlaywidth = jQuery(window).width()- 40;
   
@@ -62,7 +64,7 @@ _CHRIS_.scalePanels = function() {
   jQuery('#center').css('min-width', _interactivepluginwidth);
   jQuery('#center').css('width', _interactivepluginwidth);
   jQuery('#center').css('max-width', _interactivepluginwidth);
-  if($('#center').is(":visible")){
+  if(jQuery('#center').is(":visible")){
     // resize opaque overlay if interactive plugin (#center) is visible
     jQuery('#opaqueoverlay').css('width', _opaqueoverlaywidth);
   }

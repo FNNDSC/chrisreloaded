@@ -94,7 +94,8 @@ if __name__ == "__main__":
   
   # this is an interactive plugin
   plugin.interactive = True
-      
+  
+  # define the parameters
   plugin.add_parameter('Simple parameters', Plugin.STRING, '--mrn', action='store', dest='MRN', help='MRN to be pulled')
   plugin.add_parameter('Simple parameters', Plugin.STRING, '--name', action='store', dest='NAME', help='NAME to be pulled')
   plugin.add_parameter('Simple parameters', Plugin.STRING, '--studydate', action='store', dest='DATE', help='DATE to be pulled')
