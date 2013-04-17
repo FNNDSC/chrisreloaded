@@ -52,7 +52,6 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     return _CHRIS_INTERACTIVE_PLUGIN_.parameters();
   }
 }
-
 /**
  * Cleanup the layout after an interactive plugin
  */
@@ -81,7 +80,6 @@ _PLUGIN_.cleanInteractiveLayout = function() {
             jQuery('#right').css('width', jQuery('#right').data('width'));
           });
 }
-
 /**
  * Setup the layout before an interactive plugin
  */
@@ -105,8 +103,7 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
             jQuery
                 .ajax({
                   type : "POST",
-                  url : "api.php?action=get&what=file&parameters[]=plugin&parameters[]="
-                      + _pluginName + "/widget/index.html",
+                  url : "plugins/" + _pluginName + "/widget/index.html",
                   dataType : "text",
                   success : function(data) {
                     jQuery('.interactive_plugin_content').html(data);

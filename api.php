@@ -255,35 +255,7 @@ if (!$loggedIn) {
         } else if($what == 'feed_search'){
           $result['result'] = FeedC::searchClient($_SESSION['userid'], $parameters[0]);
         } else if($what == 'file') {
-          if(count($parameters) == 2){
-            // parameter 0: BASE directory
-            switch ($parameters[0]){
-              case "css":
-                $name = joinPaths(CHRIS_VIEW_FOLDER,'css', $parameters[1]);
-                header("Content-type: text/css", true);
-                break;
-              case "js":
-                $name = joinPaths(CHRIS_VIEW_FOLDER, 'js', $parameters[1]);
-                break;
-              case "plugin":
-                $name = joinPaths(CHRIS_PLUGINS_FOLDER, $parameters[1]);
-                break;
-              case "cssP":
-                $name = joinPaths(CHRIS_PLUGINS_FOLDER, $parameters[1]);
-                header("Content-type: text/css", true);
-                break;
-              case "jsP":
-                $name = joinPaths(CHRIS_PLUGINS_FOLDER, $parameters[1]);
-                break;
-              default:
-                $name = joinPaths(CHRIS_USERS, $parameters[1]);
-                break;
-            }
-          }
-          else{
-            $name = joinPaths(CHRIS_USERS, $parameters);
-          }
-
+          $name = joinPaths(CHRIS_USERS, $parameters);
 
           // enable cross origin requests
           header("Access-Control-Allow-Origin: *");
