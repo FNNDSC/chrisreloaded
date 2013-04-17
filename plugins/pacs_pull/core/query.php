@@ -25,6 +25,12 @@
  *              http://childrenshospital.org/FNNDSC/
  *                        dev@babyMRI.org
  *
+ *
+ * Quick example:
+ *
+ *      ./query.php --studydate=20130416 --modality=MR
+ *
+ *
  */
 
 define('__CHRIS_ENTRY_POINT__', 666);
