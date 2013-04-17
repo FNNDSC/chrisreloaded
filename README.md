@@ -6,6 +6,7 @@ The Children's Hospital Radiology Information System.
 ### Change log ###
 
 current - **r1.7**
+* Add interactive plugin support 0.1 (needs the parameters() function to be included automatically)
 * Add onclick for the modal overlay which sometimes used to block the complete ChRIS application when an XTK preview failed.
 * Fix all missing gfx errors in the console.
 * Fix resizing issue when window height is so small that the statistics panel is hidden.
