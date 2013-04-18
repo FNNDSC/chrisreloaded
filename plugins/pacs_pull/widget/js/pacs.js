@@ -537,7 +537,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.simpleTable = function() {
     "sDom" : "<'row-fluid'<'span6'l><'span6' f>r>t<'row-fluid'<'span6'i>p>",
     "sPaginationType" : "bootstrap",
     "oLanguage" : {
-      "sLengthMenu" : " (_MENU_ per page)",
+      "sLengthMenu" : " Show _MENU_ results",
       "sInfo" : "Showing _START_ to _END_ of _TOTAL_ results "
     },
     "aoColumnDefs" : [ {
