@@ -130,7 +130,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
 /**
  * Setup the ajaxSearch action
  */
-_CHRIS_INTERACTIVE_PLUGIN_.start = function() {
+_CHRIS_INTERACTIVE_PLUGIN_.init = function() {
   _CHRIS_INTERACTIVE_PLUGIN_.cleanResults();
   // clean delete cache
   _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries = {};

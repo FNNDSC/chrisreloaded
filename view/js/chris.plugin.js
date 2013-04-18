@@ -41,7 +41,7 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     // load new parameters
     _CHRIS_INTERACTIVE_PLUGIN_.parameters(_jobs);
     // start view
-    _CHRIS_INTERACTIVE_PLUGIN_.start();
+    _CHRIS_INTERACTIVE_PLUGIN_.init();
     jQuery('#plugin_submit').removeClass('disabled');
     jQuery('#plugin_submit_wait').hide();
     jQuery('#plugin_submit_play').show();
@@ -56,6 +56,10 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
  * Cleanup the layout after an interactive plugin
  */
 _PLUGIN_.cleanInteractiveLayout = function() {
+  // clean if necessary
+  if (typeof _CHRIS_INTERACTIVE_PLUGIN_ != 'undefined') {
+    _CHRIS_INTERACTIVE_PLUGIN_.destroy();
+  }
   // clean namespace
   _CHRIS_INTERACTIVE_PLUGIN_ = {};
   _CHRIS_INTERACTIVE_PLUGIN_ = undefined;
@@ -103,7 +107,7 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
           function() {
             jQuery
                 .ajax({
-                  type : "POST",
+                  type : "GET",
                   url : "plugins/" + _pluginName + "/widget/index.html",
                   dataType : "text",
                   success : function(data) {
@@ -112,7 +116,7 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
                     // pass parameters
                     _CHRIS_INTERACTIVE_PLUGIN_.parameters(_params);
                     // start view
-                    _CHRIS_INTERACTIVE_PLUGIN_.start();
+                    _CHRIS_INTERACTIVE_PLUGIN_.init();
                     // unbind transitions
                     jQuery('#opaqueoverlay')
                         .off(

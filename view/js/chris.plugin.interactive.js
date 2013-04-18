@@ -37,3 +37,15 @@ _CHRIS_INTERACTIVE_PLUGIN_.parameters = function(_iparameters) {
     return _CHRIS_INTERACTIVE_PLUGIN_._parameters;
   }
 };
+// initialize plugin
+// called when clik on "plugin_submit", after parameters are passed
+_CHRIS_INTERACTIVE_PLUGIN_.init = function() {
+};
+//destroy plugin
+// if one want to unbind events, etc.
+//called before destroying namespace and layout
+_CHRIS_INTERACTIVE_PLUGIN_.destroy = function() {
+};
+// call one CLI job has been successfully submitted
+_CHRIS_INTERACTIVE_PLUGIN_.submitted = function() {
+};
