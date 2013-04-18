@@ -128,8 +128,11 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
   // 2- modify right width
   // 3- load plugin
   // 4- show center
+  // load JS and go!
   var _windows_width = jQuery(window).width() - 40;
-  jQuery('#opaqueoverlay').css('width', _windows_width);
+  _CHRIS_UTILS_.loadScript("view/js/chris.plugin.interactive.js", function() {
+    jQuery('#opaqueoverlay').css('width', _windows_width)
+  });
 }
 /**
  * Setup the javascript when document is ready (finshed loading)

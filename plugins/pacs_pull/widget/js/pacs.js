@@ -1,12 +1,5 @@
-/**
- * Bind the simple search input field to the simple search button.
- */
-// $('#pacs_form').submit(function(e) {
-// e.preventDefault();
-// if (e.which == 13) {
-// $("#plugin_submit").click();
-// }
-// });
+// setup namespace
+var _CHRIS_INTERACTIVE_PLUGIN_ = _CHRIS_INTERACTIVE_PLUGIN_ || {};
 /**
  * Show/hide the advanced parameters div on click
  */
