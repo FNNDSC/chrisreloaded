@@ -195,26 +195,28 @@ _CHRIS_INTERACTIVE_PLUGIN_.start = function() {
 _CHRIS_INTERACTIVE_PLUGIN_.advancedTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
   var i = 0;
-  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>Location</th><th>files</th><th></th></tr></thead><tbody>';
+  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>Location</th><th>Files</th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   // update html with table
   $('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
-  _CHRIS_INTERACTIVE_PLUGIN_.table = $('#S-RESULTS')
-      .dataTable(
-          {
-            "sDom" : "<'row-fluid'<'span6'l ><'span6'f>r>t<'row-fluid'<'span6'i>p>",
-            "sPaginationType" : "bootstrap",
-            "oLanguage" : {
-              "sLengthMenu" : " Show _MENU_ results",
-              "sInfo" : "Showing _START_ to _END_ of _TOTAL_ results "
-            },
-            "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
-            iDisplayStart : 0,
-            iDisplayLength : 10,
-            "aaSorting" : [ [ 1, 'desc' ] ],
-            "bAutoWidth" : false
-          });
+  _CHRIS_INTERACTIVE_PLUGIN_.table = $('#S-RESULTS').dataTable({
+    "sDom" : "<'row-fluid'<'span6'l ><'span6'f>r>t<'row-fluid'<'span6'i>p>",
+    "sPaginationType" : "bootstrap",
+    "oLanguage" : {
+      "sLengthMenu" : " Show _MENU_ results",
+      "sInfo" : "Showing _START_ to _END_ of _TOTAL_ results "
+    },
+    "aoColumnDefs" : [ {
+      "bSortable" : false,
+      "aTargets" : [ 9 ]
+    } ],
+    "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
+    iDisplayStart : 0,
+    iDisplayLength : 10,
+    "aaSorting" : [ [ 1, 'desc' ] ],
+    "bAutoWidth" : false
+  });
   $('#S-RESULTS_info').addClass('pull-left');
   $('#S-RESULTS_length').addClass('pull-left');
   $('#S-RESULTS_length > label').css('font-size', '12px');
@@ -531,21 +533,23 @@ _CHRIS_INTERACTIVE_PLUGIN_.simpleTable = function() {
   content += '</tbody></table>';
   $('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
-  _CHRIS_INTERACTIVE_PLUGIN_.table = $('#S-RESULTS')
-      .dataTable(
-          {
-            "sDom" : "<'row-fluid'<'span6'l><'span6' f>r>t<'row-fluid'<'span6'i>p>",
-            "sPaginationType" : "bootstrap",
-            "oLanguage" : {
-              "sLengthMenu" : " (_MENU_ per page)",
-              "sInfo" : "Showing _START_ to _END_ of _TOTAL_ results "
-            },
-            "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
-            iDisplayStart : 0,
-            iDisplayLength : 10,
-            "bAutoWidth" : false,
-            "aaSorting" : [ [ 1, 'desc' ] ],
-          });
+  _CHRIS_INTERACTIVE_PLUGIN_.table = $('#S-RESULTS').dataTable({
+    "sDom" : "<'row-fluid'<'span6'l><'span6' f>r>t<'row-fluid'<'span6'i>p>",
+    "sPaginationType" : "bootstrap",
+    "oLanguage" : {
+      "sLengthMenu" : " (_MENU_ per page)",
+      "sInfo" : "Showing _START_ to _END_ of _TOTAL_ results "
+    },
+    "aoColumnDefs" : [ {
+      "bSortable" : false,
+      "aTargets" : [ 7 ]
+    } ],
+    "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
+    iDisplayStart : 0,
+    iDisplayLength : 10,
+    "aaSorting" : [ [ 1, 'desc' ] ],
+    "bAutoWidth" : false
+  });
   $('#S-RESULTS_info').addClass('pull-left');
   $('#S-RESULTS_length').addClass('pull-left');
   $('#S-RESULTS_length > label').css('font-size', '12px');
@@ -635,7 +639,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.seriesFormat = function(data) {
   var i = 0;
   // Create the "details" (i.e. series) html content
   // innerDetails used for slide in/out
-  var content = '<div class="innerDetails"><table class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Series Desc.</th><th class="span2"># files</th><th class="span1"></th></tr></thead><tbody>';
+  var content = '<div class="innerDetails"><table class="table table-bordered" cellmarging="0" cellpadding="0" cellspacing="0" border="0"><thead><tr><th>Series Desc.</th><th class="span2">Files</th><th class="span1"></th></tr></thead><tbody>';
   for (i = 0; i < nb_results; ++i) {
     // replace '.' by '_' (. is invalid for the id)
     var stuid = data.StudyInstanceUID[i].replace(/\./g, "_");
@@ -700,13 +704,10 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   } else {
     _CHRIS_INTERACTIVE_PLUGIN_._parameters[0][_list_in].value = list;
   }
-  
   // trigger submit with "True"
   _CHRIS_INTERACTIVE_PLUGIN_.force = true;
   $("#plugin_submit").click();
 }
-
-
 _CHRIS_INTERACTIVE_PLUGIN_.submitted = function() {
   $("#PULL").removeClass('btn-warning').addClass('btn-primary');
   $("#PULL").html('Pull Selection');
