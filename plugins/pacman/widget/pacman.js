@@ -503,8 +503,21 @@ Pacman.Map = function(size) {
       ctx.stroke();
     }
   }
+  
+  function cloneObject(obj){
+    var i, newObj = (obj instanceof Array) ? [] : {};
+    for (i in obj) {
+        if (obj[i] && typeof obj[i] === "object") {
+            newObj[i] = cloneObject(obj[i]);
+        } else {
+            newObj[i] = obj[i];
+        }
+    }
+    return newObj;
+};
+  
   function reset() {
-    map = Pacman.MAP.slice();
+    map = cloneObject(Pacman.MAP);
     height = map.length;
     width = map[0].length;
   }
