@@ -203,27 +203,25 @@ _CHRIS_INTERACTIVE_PLUGIN_.advancedTable = function() {
   _CHRIS_INTERACTIVE_PLUGIN_.table = $('#S-RESULTS')
       .dataTable(
           {
-            "sDom" : "<'row-fluid'<'span6' il ><'span6'f>r>t<'row-fluid'<'span6'><'span6'p>>",
+            "sDom" : "<'row-fluid'<'span6'l ><'span6'f>r>t<'row-fluid'<'span6'i>p>",
             "sPaginationType" : "bootstrap",
             "oLanguage" : {
-              "sLengthMenu" : " (_MENU_ per page)",
+              "sLengthMenu" : " Show _MENU_ results",
               "sInfo" : "Showing _START_ to _END_ of _TOTAL_ results "
             },
             "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
             iDisplayStart : 0,
             iDisplayLength : 10,
-            "aoColumnDefs" : [ {
-              "bSortable" : false,
-              "aTargets" : [ 9 ]
-            } ],
             "aaSorting" : [ [ 1, 'desc' ] ],
             "bAutoWidth" : false
           });
   $('#S-RESULTS_info').addClass('pull-left');
-  $('#S-RESULTS_length').addClass('pull-right');
+  $('#S-RESULTS_length').addClass('pull-left');
   $('#S-RESULTS_length > label').css('font-size', '12px');
   $('#S-RESULTS_filter').addClass('pull-right');
   $('#S-RESULTS_filter > label').css('font-size', '12px');
+  $('.dataTables_paginate').addClass('pull-right');
+  $('.dataTables_paginate').css('margin', '0px');
 }
 _CHRIS_INTERACTIVE_PLUGIN_.jsonConcat = function(json1, json2) {
   for ( var key in json2) {
@@ -536,7 +534,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.simpleTable = function() {
   _CHRIS_INTERACTIVE_PLUGIN_.table = $('#S-RESULTS')
       .dataTable(
           {
-            "sDom" : "<'row-fluid'<'span6' il><'span6' f>r>t<'row-fluid'<'span6'><'span6'p>>",
+            "sDom" : "<'row-fluid'<'span6'l><'span6' f>r>t<'row-fluid'<'span6'i>p>",
             "sPaginationType" : "bootstrap",
             "oLanguage" : {
               "sLengthMenu" : " (_MENU_ per page)",
@@ -545,18 +543,16 @@ _CHRIS_INTERACTIVE_PLUGIN_.simpleTable = function() {
             "aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
             iDisplayStart : 0,
             iDisplayLength : 10,
-            "aoColumnDefs" : [ {
-              "bSortable" : false,
-              "aTargets" : [ 7 ]
-            } ],
             "bAutoWidth" : false,
             "aaSorting" : [ [ 1, 'desc' ] ],
           });
   $('#S-RESULTS_info').addClass('pull-left');
-  $('#S-RESULTS_length').addClass('pull-right');
+  $('#S-RESULTS_length').addClass('pull-left');
   $('#S-RESULTS_length > label').css('font-size', '12px');
   $('#S-RESULTS_filter').addClass('pull-right');
   $('#S-RESULTS_filter > label').css('font-size', '12px');
+  $('.dataTables_paginate').addClass('pull-right');
+  $('.dataTables_paginate').css('margin', '0px');
 }
 /**
  * Reformat data after 'Advanced' AJAX query to fit the dataTable standard.
