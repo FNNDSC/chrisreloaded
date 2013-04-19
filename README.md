@@ -5,7 +5,9 @@ The Children's Hospital Radiology Information System.
 
 ### Change log ###
 
-current - **r2.0**
+current - **r2.1**
+
+2013 04 19 - **r2.0**
 * Add interactive plugin support
 * Add interactive Pacs Pull plugin
 * Add PACMAN 
