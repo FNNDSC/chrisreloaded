@@ -6,6 +6,7 @@ The Children's Hospital Radiology Information System.
 ### Change log ###
 
 current - **r2.1**
+* Code clean up
 * Add "Hello World" interactive plugin
 * Bug fix in PACMAN interactive plugin
 
