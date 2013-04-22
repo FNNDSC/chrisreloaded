@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+# _           _ _                            _     _ 
+#| |         | | |                          | |   | |
+#| | _   ____| | | ___     _ _ _  ___   ____| | _ | |
+#| || \ / _  ) | |/ _ \   | | | |/ _ \ / ___) |/ || |
+#| | | ( (/ /| | | |_| |  | | | | |_| | |   | ( (_| |
+#|_| |_|\____)_|_|\___/    \____|\___/|_|   |_|\____|
+#                                                    
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+from plugin import Plugin
+
+class hello_world_interactive( Plugin ):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  Plugin.TITLE = 'Hello World Interactive Plugin'
+  Plugin.CATEGORY = 'Tutorial'
+  Plugin.DESCRIPTION = 'Write text to HTML output'
+  Plugin.DOCUMENTATION = 'http://wiki'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.1'
+
+  def run( self, options ):
+      print 'No CLI actions, I am a pure interactive plugin'    
+
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = hello_world_interactive()
+
+  # this in an interactive plugin
+  plugin.interactive = True
+  
+  plugin.launch( sys.argv )
