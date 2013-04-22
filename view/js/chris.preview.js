@@ -20,7 +20,7 @@ _PREVIEW_.start = function(renderertype, filetype, filepath) {
     // text preview
     jQuery('#PREVIEWSLIDER').show();
     jQuery('#AUTOREFRESH').show();
-    jQuery('#AUTOREFRESH').toggleButtons('setState', true);
+    jQuery('#AUTOREFRESH').toggleButtons('setState', false);
     jQuery('#BR_OVER').hide();
     jQuery('#PREVIEWMODAL').addClass('largePreview');
     
