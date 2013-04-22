@@ -931,9 +931,16 @@ var PACMAN = (function() {
   }
   ;
   function stop() {
+    // stop main loop
+    window.clearInterval(timer);
     // unbind events
     document.removeEventListener("keydown", keyDown, true);
     document.removeEventListener("keypress", keyPress, true);
+    // delete objects
+    audio = null;
+    map = null;
+    user = null;
+    PACMAN = null;
   }
   ;
   return {
