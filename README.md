@@ -5,6 +5,8 @@ The Children's Hospital Radiology Information System.
 
 ### Change log ###
 
+current - **r2.2**
+
 2013 05 07 - **r2.1**
 * Add .error to files preview
 * Clean up code
