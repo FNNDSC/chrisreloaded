@@ -28,7 +28,7 @@ class Fetal_Moco( Plugin ):
 
   def run( self, options ):
 
-    cmd = '/chb/arch/Linux64/packages/fetal_moco/reconstruction '+options.output+'/out.nii 3 ' + options.Template + ' ' + options.Scan1 + ' ' + options.Scan2 + ' id id id -iterations ' + str(options.Iterations) + ' -sigma ' + str(options.Sigma) + ' -resolution ' + str(options.Resolution) + ' -multires ' + str(options.Multires) + ' -delta ' + str(options.Delta) + ' -lambda ' + str(options.Lambda) + ' -lastIter ' + str(options.LastIter)
+    cmd = os.environ['ENV_FETALMOCO_DIR']+'/reconstruction '+options.output+'/out.nii 3 ' + options.Template + ' ' + options.Scan1 + ' ' + options.Scan2 + ' id id id -iterations ' + str(options.Iterations) + ' -sigma ' + str(options.Sigma) + ' -resolution ' + str(options.Resolution) + ' -multires ' + str(options.Multires) + ' -delta ' + str(options.Delta) + ' -lambda ' + str(options.Lambda) + ' -lastIter ' + str(options.LastIter)
     print cmd
     os.system(cmd)    
 

@@ -68,9 +68,9 @@ define('CHRIS_LOG', '/chb/users/chris/dev/log/');
 
 // known scanners and contact information
 define('CHRIS_SCANNERS', serialize(array(
-    "MRC25948" => "borjan.gagoski@childrens.harvard.edu",
-    "MRWAL2" => "borjan.gagoski@childrens.harvard.edu",
-    "MR1" => "borjan.gagoski@childrens.harvard.edu")));
+"MRC25948" => "borjan.gagoski@childrens.harvard.edu",
+"MRWAL2" => "borjan.gagoski@childrens.harvard.edu",
+"MR1" => "borjan.gagoski@childrens.harvard.edu")));
 
 // cluster
 define('CLUSTER_HOST', 'rc-goldfinger');
@@ -87,6 +87,10 @@ define('ENV_TMP_DIR', '/chb/tmp');
 define('ENV_CLUSTER_TMP_DIR', '/chb/pices/tmp');
 define('ENV_FYBORG_DIR', '/chb/arch/scripts');
 define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2');
+define('ENV_CONNECTOME_DIR', '/chb/users/nicolas.rannou/gitroot/scripts');
+define('ENV_FETALMOCO_DIR', '/chb/arch/Linux64/packages/fetal_moco');
+define('ENV_FREESURFER_SCRIPT', '/chb/arch/scripts/chb-fs');
+define('ENV_TRACTOGRAPHY_DIR', '/chb/arch/scripts/');
 
 
 // TESTING

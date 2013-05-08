@@ -33,7 +33,7 @@ class MRIConvert( Plugin ):
     # migrate data
     # create temp dir
     import tempfile, shutil, subprocess
-    tempdir = tempfile.mkdtemp( 'free', 'surf', '/chb/pices/tmp' )
+    tempdir = tempfile.mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
     shutil.copytree( os.path.dirname(options.input), tempdir + '/mri') 
     
     # grab just the file name

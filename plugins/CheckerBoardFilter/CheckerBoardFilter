@@ -3,7 +3,7 @@ DIR=`dirname $0`
 
 ARGUMENTS=$@
 
-export LD_LIBRARY_PATH=/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2:/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2/cli-modules
+export LD_LIBRARY_PATH=$ENV_SLICER_DIR:$ENV_SLICER_DIR/cli-modules
 RETURN=`$DIR/$EXECUTABLE $ARGUMENTS`
 
 # now replace the category
