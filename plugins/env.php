@@ -44,7 +44,17 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 // so a bash command like
 //  $ eval `php setupEnv.sh`
 // defines the environment variables
+if ($commandline_mode) {
 
+  $packages = unserialize(CHRIS_PACKAGES);
+
+  foreach ($packages as $name=>$path) {
+
+     echo 'export '.$name.'='.$path.';';
+
+  }
+
+}
 
 // in include mode, we can just use the following functions
 
