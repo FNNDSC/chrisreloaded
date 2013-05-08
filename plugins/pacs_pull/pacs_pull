@@ -39,7 +39,7 @@ class PACS_Pull(Plugin):
     print Plugin.TITLE
     print Plugin.VERSION
     # if "MRN" provided, split on "white spaces" and loop through them
-    if options.MRN:
+    if options.MRN == 666:
       list_mrn = options.MRN.strip().split(" ");
       for mrn in list_mrn:
         print mrn
