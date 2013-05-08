@@ -128,6 +128,10 @@ class PluginC implements PluginControllerInterface {
 
     // probe for the ui xml
     $p_xml = array();
+
+    // setup the environment (based on defined package paths)
+    setupEnvironment();
+
     // note: we also redirect stderr here to get the full output
     exec($p_executable.' --xml 2>&1', $p_xml);
 

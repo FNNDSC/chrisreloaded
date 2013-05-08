@@ -80,6 +80,15 @@ define('CLUSTER_USERNAME', 'chris');
 define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND}');
 define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
 
+//
+// ENVIRONMENT CONFIGURATION
+//
+define('ENV_TMP_DIR', '/chb/tmp');
+define('ENV_CLUSTER_TMP_DIR', '/chb/pices/tmp');
+define('ENV_FYBORG_DIR', '/chb/arch/scripts');
+define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2');
+
+
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
 define('SIMPLETEST_HTML_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/html_chris.php'));
@@ -99,6 +108,9 @@ if(defined('CHRIS_CONFIG_DEBUG')) {
 // setup phpseclib for SSH access
 set_include_path(get_include_path() . PATH_SEPARATOR . joinPaths(CHRIS_LIB_FOLDER, 'phpseclib', 'phpseclib'));
 
+// generate CHRIS_PACKAGES (this has to happen after PACKAGE_SLICER_DIR etc. were configured
+require_once(joinPaths(CHRIS_PLUGINS_FOLDER,'env.php'));
+define('CHRIS_PACKAGES', serialize(buildEnvironment()));
 
 // FLAG showing that the config was parsed
 define('CHRIS_CONFIG_PARSED', true);
