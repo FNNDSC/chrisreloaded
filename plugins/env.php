@@ -46,12 +46,14 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 // defines the environment variables
 if ($commandline_mode) {
 
-  $packages = unserialize(CHRIS_PACKAGES);
+  if (defined('CHRIS_PACKAGES')) {
+    $packages = unserialize(CHRIS_PACKAGES);
 
-  foreach ($packages as $name=>$path) {
+    foreach ($packages as $name=>$path) {
 
-     echo 'export '.$name.'='.$path.';';
+       echo 'export '.$name.'='.$path.';';
 
+    }
   }
 
 }
