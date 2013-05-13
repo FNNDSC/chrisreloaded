@@ -638,8 +638,20 @@ class FeedC implements FeedControllerInterface {
 
     if($feedResult['Feed'][0]->status != 100) {
 
+      // grab the PID of this feed
+      $metaMapper = new Mapper('Meta');
+      $metaMapper->filter('name = (?)', 'pid');
+      $metaMapper->filter('target_id != (?)', $feedResult['Feed'][0]->id);
+      $metaResult = $metaMapper->get();
+
       // job is running or queued
       $cluster_kill_command = str_replace("{FEED_ID}", $feedResult['Feed'][0]->id, CLUSTER_KILL);
+
+      if (count($metaResult['Meta']) >= 1) {
+        // also replace the PID (in case we have a locally executed job
+        $cluster_kill_command = str_replace("{PID}", $metaResult['Meta'][0]->value, $cluster_kill_command);
+      }
+
       $ssh_connection->exec($cluster_kill_command);
 
       // set status to canceled
