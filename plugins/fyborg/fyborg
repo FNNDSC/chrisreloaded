@@ -21,9 +21,11 @@
 import os, sys
 sys.path.append( os.path.join( os.path.dirname( __file__ ), '../' ) )
 from plugin import Plugin
-sys.path.append( '/chb/arch/scripts' )
-sys.path.append( '/chb/arch/scripts/fyborg' )
-sys.path.append( '/chb/arch/scripts/fyborg/_common' )
+
+scripts_dir = os.environ['ENV_FYBORG_DIR']
+sys.path.append( scripts_dir )
+sys.path.append( os.path.join( scripts_dir, 'fyborg' ) )
+sys.path.append( os.path.join( scripts_dir, 'fyborg', '_common' ) )
 try:
   from fyconn import *
 except:
@@ -45,7 +47,7 @@ class Fyborg( Plugin ):
     # copy input and dti to one temp folder
     # and run fyborg on it
     import tempfile, shutil, subprocess
-    tempdir = tempfile.mkdtemp( 'fy', 'borg', '/chb/tmp' )
+    tempdir = tempfile.mkdtemp( 'fy', 'borg', os.environ['ENV_TMP_DIR'] )
     shutil.copytree( options.Freesurfer, tempdir + '/T1' )
     shutil.copytree( options.DTI, tempdir + '/DTI' )
     # cmd = ''

@@ -231,6 +231,10 @@ $setStatus = joinPaths(CHRIS_CONTROLLER_FOLDER, 'set_status.php');
 $setStatus .= ' '.$feed_id;
 
 $ssh->exec('mkdir -p '.$job_path);
+
+// also include the environment setup in the runfile
+$ssh->exec("echo 'eval `php ".joinPaths(CHRIS_PLUGINS_FOLDER,'env.php')."`' >> ".$runfile);
+
 if($status != 100) $ssh->exec('echo "'.$setStatus.' 1" >> '.$runfile);
 $ssh->exec('echo "'.$command.'" >> '.$runfile);
 if($status != 100) $ssh->exec('echo "'.$setStatus.' +'.$status_step.'" >> '.$runfile);

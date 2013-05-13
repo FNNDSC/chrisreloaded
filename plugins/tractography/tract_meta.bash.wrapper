@@ -1,5 +1,3 @@
 #!/bin/bash
-source ~/.bash_profile
-ss
-source chb-fs stable
+source $ENV_FREESURFER_SCRIPT stable
 $1

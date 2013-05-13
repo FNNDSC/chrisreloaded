@@ -1,7 +1,5 @@
 #!/bin/bash
-source ~/.bash_profile
-ss
-source chb-fsstable
+source $ENV_FREESURFER_SCRIPT stable
 echo 
 date
 echo "-------------------------------"

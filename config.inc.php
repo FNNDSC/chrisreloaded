@@ -39,6 +39,7 @@ define('CHRIS_VERSION', '2.2-EXPERIMENTAL');
 define('CHRIS_MAINTENANCE', false);
 
 // admin email
+define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
 define('CHRIS_ADMIN_EMAIL', 'chris@babymri.org');
 define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.org');
 define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.org');
@@ -68,9 +69,9 @@ define('CHRIS_LOG', '/chb/users/chris/dev/log/');
 
 // known scanners and contact information
 define('CHRIS_SCANNERS', serialize(array(
-    "MRC25948" => "borjan.gagoski@childrens.harvard.edu",
-    "MRWAL2" => "borjan.gagoski@childrens.harvard.edu",
-    "MR1" => "borjan.gagoski@childrens.harvard.edu")));
+"MRC25948" => "borjan.gagoski@childrens.harvard.edu",
+"MRWAL2" => "borjan.gagoski@childrens.harvard.edu",
+"MR1" => "borjan.gagoski@childrens.harvard.edu")));
 
 // cluster
 define('CLUSTER_HOST', 'rc-goldfinger');
@@ -79,6 +80,20 @@ define('CLUSTER_USERNAME', 'chris');
 // and {COMMAND} with the command to schedule
 define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND}');
 define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
+
+//
+// ENVIRONMENT CONFIGURATION
+//
+define('ENV_TMP_DIR', '/chb/tmp');
+define('ENV_CLUSTER_TMP_DIR', '/chb/pices/tmp');
+define('ENV_FYBORG_DIR', '/chb/arch/scripts');
+define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current');
+define('ENV_CONNECTOME_SCRIPT', '/chb/users/nicolas.rannou/gitroot/scripts/connectome_meta.bash');
+define('ENV_FETALMOCO_DIR', '/chb/arch/Linux64/packages/fetal_moco');
+define('ENV_FREESURFER_SCRIPT', '/chb/arch/scripts/chb-fs');
+define('ENV_TRACTOGRAPHY_SCRIPT', '/chb/arch/scripts/tract_meta.bash');
+define('ENV_DICOMDIRSEND_SCRIPT', '/chb/arch/scripts/dicom_dirSend.bash');
+
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
@@ -99,6 +114,9 @@ if(defined('CHRIS_CONFIG_DEBUG')) {
 // setup phpseclib for SSH access
 set_include_path(get_include_path() . PATH_SEPARATOR . joinPaths(CHRIS_LIB_FOLDER, 'phpseclib', 'phpseclib'));
 
+// generate CHRIS_PACKAGES (this has to happen after PACKAGE_SLICER_DIR etc. were configured
+require_once(joinPaths(CHRIS_PLUGINS_FOLDER,'env.php'));
+define('CHRIS_PACKAGES', serialize(buildEnvironment()));
 
 // FLAG showing that the config was parsed
 define('CHRIS_CONFIG_PARSED', true);

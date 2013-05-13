@@ -60,7 +60,7 @@ class PACS_Push(Plugin):
     # process!!
     print '======================================='
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
-    command = ' \'/chb/arch/scripts/dicom_dirSend.bash -v 10';
+    command = ' \''+os.environ['ENV_DICOMDIRSEND_SCRIPT']+' -v 10';
     if options.ANONYM:
       command += ' -A'
     command += ' -h ' + options.HOST;

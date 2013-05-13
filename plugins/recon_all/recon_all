@@ -36,7 +36,7 @@ class recon_all( Plugin ):
       # migrate data
       # create temp dir
       import tempfile, shutil, subprocess
-      tempdir = tempfile.mkdtemp( 'free', 'surf', '/chb/pices/tmp' )
+      tempdir = tempfile.mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
       shutil.copytree( options.MRI, tempdir + '/MRI' )
       # create link for preview during running
       os.symlink( tempdir + '/MRI', options.output + '/Freesurfer' )
