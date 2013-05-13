@@ -125,7 +125,7 @@ class UserC implements UserControllerInterface {
         $uid = $ssh->exec('echo $UID');
         // returns 0 since the user table doesnt have auto increment
         UserC::create($uid, $username);
-        
+
         return $uid;
       }
 
@@ -150,7 +150,7 @@ class UserC implements UserControllerInterface {
     $userObject->id = strval($uid);
     $userObject->username = $username;
     $userObject->password = 'password';
-    $userObject->email = $username.'@childrens.harvard.edu';
+    $userObject->email = $username.CHRIS_MAIL_SUFFIX;
     return Mapper::add($userObject);
 
   }

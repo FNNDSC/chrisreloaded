@@ -39,6 +39,7 @@ define('CHRIS_VERSION', '2.2-EXPERIMENTAL');
 define('CHRIS_MAINTENANCE', false);
 
 // admin email
+define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
 define('CHRIS_ADMIN_EMAIL', 'chris@babymri.org');
 define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.org');
 define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.org');
