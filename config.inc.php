@@ -87,10 +87,11 @@ define('ENV_TMP_DIR', '/chb/tmp');
 define('ENV_CLUSTER_TMP_DIR', '/chb/pices/tmp');
 define('ENV_FYBORG_DIR', '/chb/arch/scripts');
 define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2');
-define('ENV_CONNECTOME_DIR', '/chb/users/nicolas.rannou/gitroot/scripts');
+define('ENV_CONNECTOME_SCRIPT', '/chb/users/nicolas.rannou/gitroot/scripts/connectome_meta.bash');
 define('ENV_FETALMOCO_DIR', '/chb/arch/Linux64/packages/fetal_moco');
 define('ENV_FREESURFER_SCRIPT', '/chb/arch/scripts/chb-fs');
-define('ENV_TRACTOGRAPHY_DIR', '/chb/arch/scripts/');
+define('ENV_TRACTOGRAPHY_SCRIPT', '/chb/arch/scripts/tract_meta.bash');
+define('ENV_DICOMDIRSEND_SCRIPT', '/chb/arch/scripts/dicom_dirSend.bash');
 
 
 // TESTING
