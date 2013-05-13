@@ -86,7 +86,7 @@ define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
 define('ENV_TMP_DIR', '/chb/tmp');
 define('ENV_CLUSTER_TMP_DIR', '/chb/pices/tmp');
 define('ENV_FYBORG_DIR', '/chb/arch/scripts');
-define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current/lib/Slicer-4.2');
+define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current');
 define('ENV_CONNECTOME_SCRIPT', '/chb/users/nicolas.rannou/gitroot/scripts/connectome_meta.bash');
 define('ENV_FETALMOCO_DIR', '/chb/arch/Linux64/packages/fetal_moco');
 define('ENV_FREESURFER_SCRIPT', '/chb/arch/scripts/chb-fs');
