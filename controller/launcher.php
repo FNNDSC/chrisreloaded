@@ -235,9 +235,9 @@ $ssh->exec('mkdir -p '.$job_path);
 // also include the environment setup in the runfile
 $ssh->exec("echo 'eval `php ".joinPaths(CHRIS_PLUGINS_FOLDER,'env.php')."`' >> ".$runfile);
 
-if($status != 100) $ssh->exec('echo "'.$setStatus.' 1" >> '.$runfile);
+if($status != 100) $ssh->exec('echo "'.$setStatus.' 1'.' > /dev/null 2> /dev/null" >> '.$runfile);
 $ssh->exec('echo "'.$command.'" >> '.$runfile);
-if($status != 100) $ssh->exec('echo "'.$setStatus.' +'.$status_step.'" >> '.$runfile);
+if($status != 100) $ssh->exec('echo "'.$setStatus.' +'.$status_step.' > /dev/null 2> /dev/null" >> '.$runfile);
 
 $ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
 //$ssh->exec("chmod +x $runfile;");
