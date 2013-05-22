@@ -14,7 +14,7 @@
 #
 
 # import the plugin.py superclass
-import os, sys
+import os, sys, time
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
@@ -24,13 +24,15 @@ class hello_world_interactive( Plugin ):
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
   Plugin.TITLE = 'Hello World Interactive Plugin'
   Plugin.CATEGORY = 'Tutorial'
-  Plugin.DESCRIPTION = 'Write text to HTML output'
+  Plugin.DESCRIPTION = 'Present main ChRIS interactive plugin functionnalities'
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
   def run( self, options ):
-      print 'No CLI actions, I am a pure interactive plugin'    
+      print 'I am sleeping 10s!'
+      time.sleep(10)
+      print 'I am done sleeping!'
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -38,5 +40,8 @@ if __name__ == "__main__":
 
   # this in an interactive plugin
   plugin.interactive = True
+  
+  # parameters passed from the ui
+  plugin.add_parameter('name', Plugin.STRING, '--name', action='store', dest='NAME', help='Your name')
   
   plugin.launch( sys.argv )

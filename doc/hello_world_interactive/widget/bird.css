@@ -1,0 +1,29 @@
+/*
+  Credits to http://www.tortorse.com/demo/css3angrybirds.html
+*/
+
+#redbird{position:relative;width:200px;height:220px;}
+#head{position:absolute;width:200px;height:200px;border:2px solid #000;border-radius:100px;background:#FF0A0E;z-index:1;}
+#head:after{content:'';position:absolute;width:200px;height:200px;bottom:-2px;left:-2px;border:2px solid #000;border-radius:100px;}
+.eye{width:50px;height:50px;border:1px solid #000;border-radius:25px;background:#fff;position:absolute;top:70px;}
+.eye:after{content:'';width:20px;height:20px;background:#000;position:absolute;border-radius:10px;top:15px;}
+#left_eye{left:48px;}
+#right_eye{right:48px;}
+#left_eye:after{left:20px;}
+#right_eye:after{right:20px;}
+.brow{width:75px;height:20px;background:#000;position:absolute;top:60px;}
+#left_brow{left:27px;-moz-transform: rotate(10deg);-webkit-transform: rotate(10deg);}
+#right_brow{right:27px;-moz-transform: rotate(-10deg);-webkit-transform: rotate(-10deg);}
+#white{width:120px;height:120px;border-radius:60px;background:#fff;position:absolute;bottom:-60px;left:40px;}
+#hair{width:60px;height:20px;border:2px solid #000;border-radius:30px;background:#FF0A0E;position:absolute;-moz-transform: rotate(7deg);-webkit-transform: rotate(7deg);left:45px;top:-10px;z-index:0}
+#hair:before{width:60px;height:20px;content:'';border:2px solid #000;border-radius:30px;background:#FF0A0E;position:absolute;-moz-transform: rotate(45deg);-webkit-transform: rotate(45deg);left:15px;top:-15px;z-index:0}
+
+#mouth{width:50px;height:50px;background:#F2A624;position:absolute;bottom:40px;left:75px;-moz-transform: rotate(45deg);-webkit-transform: rotate(45deg);border:1px solid #000;}
+#mouth:before{content:'';width:60px;height:1px;border-top:1px solid #000;position:absolute;-moz-transform: rotate(-45deg);-webkit-transform: rotate(-45deg);top:20px;left:0;z-index:2;}
+#tail{width:40px;height:10px;background:#000;position:absolute;top:130px;top:130px;left:-14px;}
+#tail:before{content:'';width:40px;height:10px;background:#000;position:absolute;left:0;-moz-transform: rotate(45deg);-webkit-transform: rotate(45deg);}
+#tail:after{content:'';width:40px;height:10px;background:#000;position:absolute;left:10;-moz-transform: rotate(-45deg);-webkit-transform: rotate(-45deg);}
+
+#redbird:hover {
+  cursor:pointer;
+}
