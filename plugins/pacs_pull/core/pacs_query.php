@@ -30,7 +30,8 @@ define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
 require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
-require_once '../pacs.class.php';
+// include pacs helper
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs.helper.php'));
 
 // convenience method to check if variable is set or not
 function is_set($variable, $value = '') {

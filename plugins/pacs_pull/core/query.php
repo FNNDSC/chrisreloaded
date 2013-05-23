@@ -37,7 +37,8 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
 require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
-require_once '../pacs.class.php';
+// include pacs helper
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs.helper.php'));
 
 // check if we are invoked by commandline
 $commandline_mode = (php_sapi_name() == 'cli');

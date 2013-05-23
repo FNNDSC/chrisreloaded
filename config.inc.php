@@ -81,6 +81,12 @@ define('CLUSTER_USERNAME', 'chris');
 define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND}');
 define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
 
+// DICOM LISTENER
+define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
+define('DICOM_DCMTK_FINDSCU', '/usr/bin/findscu');
+define('DICOM_DCMTK_MOVESCU', '/usr/bin/movescu');
+define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
+
 //
 // ENVIRONMENT CONFIGURATION
 //

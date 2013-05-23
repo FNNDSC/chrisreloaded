@@ -29,11 +29,13 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the chris configuration
-require_once (dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
+require_once (dirname(dirname( __FILE__ )).'/config.inc.php');
 // include chris db interface
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 // include chris mapper interface
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'mapper.class.php'));
+// include pacs helper
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs.helper.php'));
 // include chris data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
 // include chris data models
@@ -46,9 +48,6 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'patient.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 // include chris data models
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
-
-// include pacs helper
-require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/pacs.class.php'));
 
 
 // send email to admin

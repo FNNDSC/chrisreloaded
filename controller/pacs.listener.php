@@ -30,7 +30,7 @@
 if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 // include the configuration file
 if(!defined('CHRIS_CONFIG_PARSED'))
-  require_once(dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
+  require_once(dirname(dirname ( __FILE__ )).'/config.inc.php');
 
 // create log file
 $logFile = joinPaths(CHRIS_LOG,date('YmdHis').'-pacs_pull_listen.log');
@@ -79,7 +79,10 @@ fclose($fh);
 $output = exec($listen_command);
 
 // move data from output directory!
-$move_command = dirname ( __FILE__ ).'/move.php -d '.$tmpdirname;
+$move_command = dirname ( __FILE__ ).'/pacs.handler.php -d '.$tmpdirname;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $move_command);
+fclose($fh);
 // write log
 $startReportPretty = "=========================================". PHP_EOL;
 $report = date('Y-m-d h:i:s'). ' ---> Start moving data...'. PHP_EOL;

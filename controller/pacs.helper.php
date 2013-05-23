@@ -26,9 +26,10 @@
  *
  */
 // include the chris configuration
-require_once (dirname(dirname(dirname ( __FILE__ ))).'/config.inc.php');
+require_once (dirname(dirname( __FILE__ )).'/config.inc.php');
 // include the PACS Pull configuration file
-require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/config.php'));
+// each plugin should be able to define it
+// require_once (joinPaths(CHRIS_PLUGINS_FOLDER, 'pacs_pull/config.php'));
 
 // interface
 interface PACSInterface
@@ -94,27 +95,6 @@ class PACS implements PACSInterface {
   private $command_param = Array();
 
   /**
-   * DCMTK FindSCU binary location.
-   *
-   * @var string $findscu
-   */
-  private $findscu = null;
-
-  /**
-   * DCMTK MoveSCU binary location.
-   *
-   * @var string $movescu
-   */
-  private $movescu = null;
-
-  /**
-   * DCMTK EchoSCU binary location.
-   *
-   * @var string $echoscu
-   */
-  private $echoscu = null;
-
-  /**
    * The constructor.
    * Instantiate a PACS object with the given parameters.
    *
@@ -126,9 +106,6 @@ class PACS implements PACSInterface {
     $this->server_ip = $server_ip;
     $this->server_port = $server_port;
     $this->user_aet = $user_aet;
-    $this->findscu = '/usr/bin/findscu';
-    $this->movescu = '/usr/bin/movescu';
-    $this->echoscu = '/usr/bin/echoscu';
   }
 
   /**
@@ -142,7 +119,7 @@ class PACS implements PACSInterface {
    * @snippet test.pacs.class.php testPing()
    */
   public function ping($timeout = 5){
-    $command = $this->echoscu.' -to '.$timeout.' ';
+    $command = DICOM_DCMTK_ECHOSCU.' -to '.$timeout.' ';
 
     $this->_finishCommand($command);
     // execute the command, format it into a nice json and return it
@@ -205,7 +182,7 @@ class PACS implements PACSInterface {
       // dcmtk findcsu binaries
       // -xi: proposed transmission transfer syntaxes:
       // propose implicit VR little endian TS only
-      $command = $this->findscu.' -xi';
+      $command = DICOM_DCMTK_FINDSCU.' -xi';
 
       // if MRN provided, we query at Patient Root level (-P)
       if (array_key_exists('PatientID',$this->command_param) && $this->command_param['PatientID'] != '')
@@ -247,7 +224,7 @@ class PACS implements PACSInterface {
       // dcmtk findcsu binaries
       // -xi: proposed transmission transfer syntaxes:
       // propose implicit VR little endian TS only
-      $command = $this->findscu.' -xi';
+      $command = DICOM_DCMTK_FINDSCU.' -xi';
       $command .= ' -S';
       $command .= ' --aetitle '.$this->user_aet;
 
@@ -281,7 +258,7 @@ class PACS implements PACSInterface {
       // dcmtk findcsu binaries
       // -xi: proposed transmission transfer syntaxes:
       // propose implicit VR little endian TS only
-      $command = $this->findscu.' -xi';
+      $command = DICOM_DCMTK_FINDSCU.' -xi';
       $command .= ' -S';
       $command .= ' --aetitle '.$this->user_aet;
 
@@ -558,9 +535,9 @@ class PACS implements PACSInterface {
     {
       $output = Array();
       foreach($target['StudyInstanceUID'] as $value){
-        $query = $this->movescu;
+        $query = DICOM_DCMTK_MOVESCU;
         $query .= ' --aetitle '.$this->user_aet;
-        $query .= ' --move '.DEST_AETITLE;
+        $query .= ' --move '.DICOM_DESTINATION_AETITLE;
         $query .= ' --study ';
         $query .= ' -k QueryRetrieveLevel=STUDY';
         $query .= ' -k StudyInstanceUID='.$value;
@@ -591,9 +568,9 @@ class PACS implements PACSInterface {
   public function moveSeries(){
     if ((array_key_exists('StudyInstanceUID',$this->command_param) && $this->command_param['StudyInstanceUID'] != null) && (array_key_exists('SeriesInstanceUID',$this->command_param) && $this->command_param['SeriesInstanceUID'] != null) && $this->user_aet != null)
     {
-      $command = $this->movescu.' -S';
+      $command = DICOM_DCMTK_MOVESCU.' -S';
       $command .= ' --aetitle '.$this->user_aet;
-      $command .= ' --move '.DEST_AETITLE;
+      $command .= ' --move '.DICOM_DESTINATION_AETITLE;
       $command .= ' -k QueryRetrieveLevel=SERIES';
       $command .= ' -k StudyInstanceUID='.$this->command_param['StudyInstanceUID'];
       $command .= ' -k SeriesInstanceUID='.$this->command_param['SeriesInstanceUID'];
