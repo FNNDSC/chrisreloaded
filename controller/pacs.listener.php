@@ -44,7 +44,7 @@ while(!file_exists($logFile)){
 $fullReport = '';
 
 // CREATE UNIQUE DIRECTORY
-$tmpdirname = CHRIS_TMP.date('Ymdhis');
+$tmpdirname = CHRIS_TMP.'/'.date('Ymdhis');
 
 while(!is_dir($tmpdirname)){
   if(mkdir($tmpdirname)){
