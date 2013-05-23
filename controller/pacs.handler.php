@@ -197,7 +197,7 @@ if ($handle = opendir($study_directory)) {
               // Create the patient directory
               //
               $logFile .= '**** FILESYSTEM processing ****'.PHP_EOL;
-              $patientdirname = CHRIS_DATA.$process_file['PatientID'][0].'-'.$patient_chris_id;
+              $patientdirname = CHRIS_DATA.'/'.$process_file['PatientID'][0].'-'.$patient_chris_id;
               // create folder if doesnt exists
               if(!is_dir($patientdirname)){
                 mkdir($patientdirname);

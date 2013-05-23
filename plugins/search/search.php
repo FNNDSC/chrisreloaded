@@ -230,11 +230,11 @@ if(count($mapperResults[$type]) >= 1){
         // create data soft links
         $dataObject->description.'-'.$dataObject->name;
         $name = '';
-        if(file_exists(CHRIS_DATA.$fs_location.'/'.$value->description.'-'.$value->name.'-'.$value->id))
+        if(file_exists(CHRIS_DATA.'/'.$fs_location.'/'.$value->description.'-'.$value->name.'-'.$value->id))
         {
           $name = $value->description.'-'.$value->name.'-'.$value->id;
         }
-        else if(file_exists(CHRIS_DATA.$fs_location.'/'.$value->name.'-'.$value->id)){
+        else if(file_exists(CHRIS_DATA.'/'.$fs_location.'/'.$value->name.'-'.$value->id)){
           // legacy, old dicom listener
           $name = $value->name.'-'.$value->id;
         }
@@ -248,10 +248,10 @@ if(count($mapperResults[$type]) >= 1){
             mkdir($studydir);
           }
 
-          $target = CHRIS_DATA.$fs_location.'/'.$name;
+          $target = CHRIS_DATA.'/'.$fs_location.'/'.$name;
           $destination = $studydir.'/'.$name;
 
-          $processLog .= CHRIS_DATA.$fs_location.'/'.$name.PHP_EOL;
+          $processLog .= CHRIS_DATA.'/'.$fs_location.'/'.$name.PHP_EOL;
           $processLog .= $studydir.'/'.$name.PHP_EOL;
 
           // create sof link

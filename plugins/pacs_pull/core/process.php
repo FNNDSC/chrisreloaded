@@ -458,7 +458,7 @@ mkdir($studydirname);
 }
 
 // create data soft links
-$targetbase = CHRIS_DATA.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
+$targetbase = CHRIS_DATA.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
 $series_dir_name = $dataResult['Data'][0]->description .'-'. $dataResult['Data'][0]->name;
 $seriesdirnametarget = $targetbase .'/'.$study_dir_name .'/'.$series_dir_name.'-'.$dataResult['Data'][0]->id;
 $seriesdirnamelink = $datadirname .'/'.$study_dir_name .'/'.$series_dir_name.'-'.$dataResult['Data'][0]->id;
