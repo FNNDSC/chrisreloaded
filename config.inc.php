@@ -67,7 +67,7 @@ define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
 define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
 define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
-define('CHRIS_LOG', joinPaths(CHRIS_HOME, 'log') . '/');
+define('CHRIS_LOG', joinPaths(CHRIS_HOME, 'log'));
 
 // known scanners and contact information
 define('CHRIS_SCANNERS', serialize(array(
