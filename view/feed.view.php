@@ -141,7 +141,7 @@ class FeedV implements ObjectViewInterface {
     $d = new Template('feed_data_browser.html');
     $feed_folder = joinPaths($username,$object->plugin, $object->name.'-'.$object->id);
     if (file_exists($feed_folder)) {
-      $feed_subfolders = scandir(CHRIS_USERS.$feed_folder);
+      $feed_subfolders = scandir(CHRIS_USERS.'/'.$feed_folder);
       natcasesort($feed_subfolders);
 
       // get rid of eventual notes.html or index.html files

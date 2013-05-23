@@ -26,7 +26,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
 
 $_POST['dir'] = urldecode($_POST['dir']);
-$root = CHRIS_USERS;
+$root = CHRIS_USERS.'/';
 $path = $root . $_POST['dir'];
 
 if(is_link($path)){
