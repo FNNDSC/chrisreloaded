@@ -80,10 +80,6 @@ $output = exec($listen_command);
 
 // move data from output directory!
 $move_command = dirname ( __FILE__ ).'/pacs.handler.php -d '.$tmpdirname;
-$fh = fopen($logFile, 'a')  or die("can't open file");
-fwrite($fh, $move_command);
-fclose($fh);
-// write log
 $startReportPretty = "=========================================". PHP_EOL;
 $report = date('Y-m-d h:i:s'). ' ---> Start moving data...'. PHP_EOL;
 $report .= $move_command. PHP_EOL;
