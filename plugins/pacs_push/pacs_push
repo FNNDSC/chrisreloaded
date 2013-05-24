@@ -72,7 +72,6 @@ class PACS_Push(Plugin):
     command = current_dir + '/dicom_dirSend.bash.wrapper ' + command + '\''
     print 'command:'
     print command
-    os.system(command)
     output = os.system(command)
     print output
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Finish pushing...'
