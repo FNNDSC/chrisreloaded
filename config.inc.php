@@ -94,6 +94,7 @@ define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
 //
 define('ENV_TMP_DIR', '/chb/tmp');
 define('ENV_CLUSTER_TMP_DIR', '/chb/pices/tmp');
+define('ENV_SCRIPT_DIR', '/chb/arch/scripts');
 define('ENV_FYBORG_DIR', '/chb/arch/scripts');
 define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current');
 define('ENV_CONNECTOME_SCRIPT', '/chb/users/nicolas.rannou/gitroot/scripts/connectome_meta.bash');
