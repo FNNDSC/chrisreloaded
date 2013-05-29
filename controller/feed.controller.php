@@ -341,9 +341,9 @@ class FeedC implements FeedControllerInterface {
         FeedC::addMetaS($new_id, 'sharer_id', (string)$ownerid, 'simple');
 
         // link files on file system
-        $targetDirectory = CHRIS_USERS.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feed_id;
+        $targetDirectory = CHRIS_USERS.'/'.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feed_id;
 
-        $destinationDirectory = CHRIS_USERS.$targetname.'/'.$feedResult['Feed'][0]->plugin;
+        $destinationDirectory = CHRIS_USERS.'/'.$targetname.'/'.$feedResult['Feed'][0]->plugin;
         if(!is_dir($destinationDirectory)){
           // 777? 775
           $old = umask();
@@ -562,13 +562,13 @@ class FeedC implements FeedControllerInterface {
     $masterfeedMapper = new Mapper('Feed');
     $masterfeedMapper->filter('id = (?)', $master_id);
     $masterfeedResult = $masterfeedMapper->get();
-    $masterfeedDirectory = joinPaths(CHRIS_USERS.$username, $masterfeedResult['Feed'][0]->plugin, $masterfeedResult['Feed'][0]->name.'-'.$masterfeedResult['Feed'][0]->id);
+    $masterfeedDirectory = joinPaths(CHRIS_USERS.'/'.$username, $masterfeedResult['Feed'][0]->plugin, $masterfeedResult['Feed'][0]->name.'-'.$masterfeedResult['Feed'][0]->id);
 
     // grab the slave feed folder
     $slavefeedMapper = new Mapper('Feed');
     $slavefeedMapper->filter('id = (?)', $slave_id);
     $slavefeedResult = $slavefeedMapper->get();
-    $slavefeedDirectory = joinPaths(CHRIS_USERS.$username, $slavefeedResult['Feed'][0]->plugin, $slavefeedResult['Feed'][0]->name.'-'.$slavefeedResult['Feed'][0]->id);
+    $slavefeedDirectory = joinPaths(CHRIS_USERS.'/'.$username, $slavefeedResult['Feed'][0]->plugin, $slavefeedResult['Feed'][0]->name.'-'.$slavefeedResult['Feed'][0]->id);
 
 
     // find the slave feed folders
@@ -717,8 +717,8 @@ class FeedC implements FeedControllerInterface {
     Mapper::update($feedResult['Feed'][0], $id);
 
     // rename feed folder
-    $old_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $old_name.'-'.$feedResult['Feed'][0]->id);
-    $new_path = joinPaths(CHRIS_USERS.$username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
+    $old_path = joinPaths(CHRIS_USERS.'/'.$username, $feedResult['Feed'][0]->plugin, $old_name.'-'.$feedResult['Feed'][0]->id);
+    $new_path = joinPaths(CHRIS_USERS.'/'.$username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
 
     if(!is_link($new_path) and !file_exists($new_path)){
       $ssh_connection->exec('ln -s '.$old_path.' '.$new_path);
@@ -741,7 +741,7 @@ class FeedC implements FeedControllerInterface {
         $user = Mapper::getStatic('User', $feed->user_id);
         $user = $user['User'][0];
 
-        $link_path = joinPaths(CHRIS_USERS.$user->username, $feed->plugin, $feed->name.'-'.$feed->id);
+        $link_path = joinPaths(CHRIS_USERS.'/'.$user->username, $feed->plugin, $feed->name.'-'.$feed->id);
 
         // remove old link
         unlink($link_path);
