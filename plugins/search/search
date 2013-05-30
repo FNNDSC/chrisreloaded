@@ -26,13 +26,26 @@ import datetime as d
 class search(Plugin):
   '''
   '''
-  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  Plugin.AUTHORS = 'dev@babyMRI.org'
   Plugin.TITLE = 'Search'
-  Plugin.CATEGORY = 'Search'
-  Plugin.DESCRIPTION = 'Search in the Database'
-  Plugin.DOCUMENTATION = 'http://wiki'
+  Plugin.CATEGORY = 'System'
+  Plugin.DESCRIPTION = '''
+  Search for a match in the database.<br/>
+  It returns all datasets and patients that match the input field.<br/>
+  Only supports single string search yet.<br/>
+  We compare the search string to:
+  <ul>
+  <li><b>Patient:</b> Name, DOB (yyyy-mm-dd), MRN, Sex, Age</li>
+  <li><b>Series:</b> Description, Location, Modality, Date (yyyy-mm-dd)</li>
+  </ul>
+  <b>Example</b><br/>
+  <b>Search: <i>1982</i></b> will return patients born in <i>1982</i>, patient whose MRN contains <i>1982</i>, series where description contains <i>1982</i><br/>
+  <b>Search: <i>MR CT</i></b> will return patients whose name contains <i>MR</i>, series where description contains <i>MR</i>, series where modality contains <i>MR</i>
+  '''
+  
+  Plugin.DOCUMENTATION = 'https://github.com/FNNDSC/chrisreloaded/wiki/Plugin-search'
   Plugin.LICENSE = 'Opensource (MIT)'
-  Plugin.VERSION = '0.2'
+  Plugin.VERSION = '0.3'
 
   def run(self, options):
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -46,40 +59,7 @@ class search(Plugin):
     search_command = current_dir + "/search.php"
     #output directory
     search_command += " -o " + options.output
-    if options.NAME:
-      #name
-      search_command += " -n " + options.NAME
-    if options.DOB:
-      #dob
-      search_command += " -d " + options.DOB
-    if options.ID:
-      #uid=MRN
-      search_command += " -i " + options.ID
-    if options.SEX:
-      #sex
-      search_command += " -s " + options.SEX
-    if options.DESCRIPTION:
-      #description
-      search_command += " -1 " + options.DESCRIPTION
-    if options.LOCATION:
-      #location
-      search_command += " -2 " + options.LOCATION
-    if options.AGEMIN:
-      #agemin
-      search_command += " -3 " + options.AGEMIN
-    if options.AGEMAX:
-      #agemax
-      search_command += " -4 " + options.AGEMAX
-    if options.MODALITY:
-      #modality
-      search_command += " -5 " + options.MODALITY
-    if options.DATEMIN:
-      #datemin
-      search_command += " -6 " + options.DATEMIN
-    if options.DATEMAX:
-      #datemax
-      search_command += " -7 " + options.DATEMAX
-      
+    search_command += " -i " + options.Search
     print 'command:'
     print search_command
     search_output = os.system(search_command)
@@ -102,18 +82,8 @@ class search(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = search()
-  plugin.add_parameter('Patient', Plugin.STRING, '--name', action='store', default='', dest='NAME', help='Name of the patient')
-  plugin.add_parameter('Patient', Plugin.STRING, '--dob', action='store', default='', dest='DOB', help='Date Of Birth of the patient')
-  plugin.add_parameter('Patient', Plugin.STRING, '--id', action='store', default='', dest='ID', help='UID of the patient')
-  plugin.add_parameter('Patient', Plugin.STRING, '--sex', action='store', default='', dest='SEX', help='Sex of the patient')
   
-  plugin.add_parameter('Data', Plugin.STRING, '--desc', action='store', default='', dest='DESCRIPTION', help='Characters contained in data description or name')
-  plugin.add_parameter('Data', Plugin.STRING, '--location', action='store', default='', dest='LOCATION', help='Where the data was acquired')
-  plugin.add_parameter('Data', Plugin.STRING, '--agemin', action='store', default='', dest='AGEMIN', help='Age of the patient at scan date')
-  plugin.add_parameter('Data', Plugin.STRING, '--agemax', action='store', default='', dest='AGEMAX', help='Age of the patient at scan date')
-  plugin.add_parameter('Data', Plugin.STRING, '--modality', action='store', default='', dest='MODALITY', help='Modality')
-  plugin.add_parameter('Data', Plugin.STRING, '--datemin', action='store', default='', dest='DATEMIN', help='Scan date')
-  plugin.add_parameter('Data', Plugin.STRING, '--datemax', action='store', default='', dest='DATEMAX', help='Scan date')
+  plugin.add_parameter('Search', Plugin.STRING, '--search', action='store', default='', dest='Search', help='String to search on')
   
   plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
   
