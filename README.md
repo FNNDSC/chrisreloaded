@@ -6,6 +6,13 @@ The Children's Hospital Radiology Information System.
 ### Change log ###
 
 current - **r2.2**
+* new plugins interface
+* about panel in plugins
+* scrollbar in plugin panel is shown only if needed
+* hello world interactive shows how to interact with input data
+* hello world interactive showcases power of interactive plugins
+* introduce environment variables in config file for easy deployement/maintenance
+* bug fixes
 
 2013 05 07 - **r2.1**
 * Add .error to files preview
