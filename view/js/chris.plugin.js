@@ -4,8 +4,8 @@
 var _PLUGIN_ = _PLUGIN_ || {};
 _PLUGIN_.showBatchDrop = function() {
   // grab the visible plugin panel
-  var _visible_panel = jQuery('.plugin_panel :visible');
-  var _plugin_name = _visible_panel.parent().attr('id').replace('panel_', '');
+  var _visible_panel = jQuery('.plugin_panel:visible');
+  var _plugin_name = _visible_panel.attr('id').replace('panel_', '');
   _visible_panel.find('.parameter_dropzone').width(125);
   _visible_panel.find('.parameter_batchdrop').html(
       '<i class="icon-plus" style="vertical-align:sub;"/>')
@@ -19,8 +19,8 @@ _PLUGIN_.showBatchDrop = function() {
 }
 _PLUGIN_.hideBatchDrop = function() {
   // grab the visible plugin panel
-  var _visible_panel = jQuery('.plugin_panel :visible');
-  var _plugin_name = _visible_panel.parent().attr('id').replace('panel_', '');
+  var _visible_panel = jQuery('.plugin_panel:visible');
+  var _plugin_name = _visible_panel.attr('id').replace('panel_', '');
   _visible_panel.find('.parameter_dropzone').width(160);
   // _visible_panel.find('.parameter_batchdrop').html('<i class="icon-plus"
   // style="vertical-align:sub;"/>')
@@ -286,7 +286,7 @@ jQuery(document)
                 // prevent scrolling up
                 e.preventDefault();
                 // grab the visible plugin panel
-                var _visible_panel = jQuery('.plugin_panel :visible');
+                var _visible_panel = jQuery('.plugin_panel:visible');
                 _parameter_rows = _visible_panel.find('.parameter_row');
                 // loop through all parameter rows
                 _parameter_rows.each(function(i) {
@@ -336,8 +336,8 @@ jQuery(document)
                   return;
                 }
                 // grab the visible plugin panel
-                var _visible_panel = jQuery('.plugin_panel :visible');
-                var _plugin_name = _visible_panel.parent().attr('id').replace(
+                var _visible_panel = jQuery('.plugin_panel:visible');
+                var _plugin_name = _visible_panel.attr('id').replace(
                     'panel_', '');
                 var _parameter_rows = _visible_panel.find('.parameter_row');
                 var _output_rows = _visible_panel.find('.output_row');
@@ -473,14 +473,14 @@ jQuery(document)
                 }
                 // check if this plugin has a predefined status
                 var _status = 0;
-                var _definedStatus = jQuery(_visible_panel.parent()[0]).attr(
+                var _definedStatus = jQuery(_visible_panel[0]).attr(
                     'data-status');
                 if (_definedStatus) {
                   _status = _definedStatus;
                 }
                 // check if this plugin has a predefined memory
                 var _memory = 0;
-                var _definedMemory = jQuery(_visible_panel.parent()[0]).attr(
+                var _definedMemory = jQuery(_visible_panel[0]).attr(
                     'data-memory');
                 if (_definedMemory) {
                   _memory = _definedMemory;
@@ -492,7 +492,7 @@ jQuery(document)
                 // if interactive plugin calling, give control to the plugin
                 // and return before launching
                 // if namespace doesnt exist or force false
-                var _definedInteractive = jQuery(_visible_panel.parent()[0])
+                var _definedInteractive = jQuery(_visible_panel[0])
                     .attr('data-interactive');
                 if (_definedInteractive != "") {
                   var _parameters = _PLUGIN_.submitInteractive(_plugin_name,
@@ -592,15 +592,6 @@ jQuery(document)
                               var _hidden_panel = (jQuery(w).attr(
                                   'hidden-panel') == 'true');
                               if (_hidden_panel) {
-                                // hide this panel
-                                jQuery(w).prev().hide();
-                                // and never add it to the active tabs
-                                return;
-                              }
-                              // check if this is an output only panel
-                              var _only_output = (jQuery(w).find(
-                                  '.parameter_row').length == 0);
-                              if (_only_output) {
                                 // hide this panel
                                 jQuery(w).prev().hide();
                                 // and never add it to the active tabs

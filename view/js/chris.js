@@ -35,7 +35,7 @@ _CHRIS_.updateStatistics = function() {
 _CHRIS_.scalePanels = function() {
 
   // configure screen size related parameters
-  var _pluginpanelsize = jQuery(window).height()-447;
+  var _pluginpanelsize = jQuery(window).height()-417;
   var _feedcontentsize = jQuery(window).height()-129;  
   var _interactivepluginsize = jQuery(window).height()-129;
   // right panel: 300px + well: 40px

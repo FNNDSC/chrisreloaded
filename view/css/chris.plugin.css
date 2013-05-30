@@ -80,7 +80,7 @@
 
 #cart_parameters {
 	margin-top: -1px;
-	padding: 5px;
+/* 	padding: 5px; */
 	border-top: 1px solid;
 	border-bottom: 1px solid;
 	border-color: #e3e3e3;
@@ -103,8 +103,9 @@
 }
 
 .plugin_panel {
-	padding: 10px;
-	overflow-y: scroll;
+/* 	padding: 10px; */
+/* 	overflow-y: scroll; */
+  overflow:auto;
 	max-height: 290px;
 }
 

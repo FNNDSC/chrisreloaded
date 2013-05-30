@@ -99,8 +99,9 @@ _BATCH_.show = function(flag, p) {
 _BATCH_.updateMenu = function() {
 
   // grab the visible plugin panel
-  var _visible_panel = jQuery('.plugin_panel :visible');
-  var _plugin_name = _visible_panel.parent().attr('id').replace('panel_', '');
+  var _visible_panel = jQuery('.plugin_panel:visible');
+  
+  var _plugin_name = _visible_panel.attr('id').replace('panel_', '');
   
   if (_BATCH_.jobs.length < 2) {
     jQuery('#batch_' + _plugin_name).empty();

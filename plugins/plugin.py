@@ -99,9 +99,20 @@ class Plugin( argparse.ArgumentParser ):
     xml += '<license>' + Plugin.LICENSE + '</license>\n'
     xml += '<contributor>' + Plugin.AUTHORS + '</contributor>\n'
     xml += '<version>' + Plugin.VERSION + '</version>\n'
-
+    
+    # create the help channel
+    xml += '<help advanced="true" hidden="false">'
+    xml += '<title>' + Plugin.TITLE + '</title>\n'
+    xml += '<authors>' + Plugin.AUTHORS + '</authors>\n'
+    xml += '<category>' + Plugin.CATEGORY + '</category>\n'
+    xml += '<description>' + Plugin.DESCRIPTION + '</description>\n'
+    xml += '<documentation>' + Plugin.DOCUMENTATION + '</documentation>\n'
+    xml += '<license>' + Plugin.LICENSE + '</license>\n'
+    xml += '<version>' + Plugin.VERSION + '</version>\n'
+    xml += '</help>\n'
+    
     # create the output channel
-    xml += '<parameters>\n'
+    xml += '<parameters hidden="true">\n'
     xml += '<label>Output Parameters</label>\n'
     xml += '<directory>\n'
     xml += '<channel>output</channel>\n'
