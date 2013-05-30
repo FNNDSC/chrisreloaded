@@ -6,6 +6,7 @@ The Children's Hospital Radiology Information System.
 ## Change log ##
 
 ### current - **r2.2** ###
+* new 'validate' plugin method
 * add link to chris website in the navigation toolbar
 * search plugin part of system category
 * new search plugin (0.3) which only takes 1 search string
