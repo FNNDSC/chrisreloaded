@@ -35,6 +35,9 @@ class tractography(Plugin):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
+    # we expect a directory as input
+    options.dti = self.validate('directory', options.dti);
+    
     # create/format input directory to fit connectome_meta requierements
     input_dir = os.path.join(options.output, 'input')
     # create input directory

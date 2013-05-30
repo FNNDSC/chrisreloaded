@@ -46,6 +46,11 @@ class Fyborg( Plugin ):
   def run( self, options ):
     # copy input and dti to one temp folder
     # and run fyborg on it
+    
+    # we expect directories as input
+    options.Freesurfer = self.validate('directory', options.Freesurfer);
+    options.DTI = self.validate('directory', options.DTI);
+    
     import tempfile, shutil, subprocess
     tempdir = tempfile.mkdtemp( 'fy', 'borg', os.environ['ENV_TMP_DIR'] )
     shutil.copytree( options.Freesurfer, tempdir + '/T1' )

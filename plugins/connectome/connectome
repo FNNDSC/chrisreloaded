@@ -32,6 +32,10 @@ class connectome(Plugin):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
+    # we expect directories as input
+    options.dti = self.validate('directory', options.dti);
+    options.t1 = self.validate('directory', options.t1);
+    
     # create/format input directory to fit connectome_meta requierements
     input_dir = os.path.join(options.output, 'input')
     # create input directory

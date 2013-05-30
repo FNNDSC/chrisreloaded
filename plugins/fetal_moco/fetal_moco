@@ -27,6 +27,11 @@ class Fetal_Moco( Plugin ):
   Plugin.VERSION = '0.1'
 
   def run( self, options ):
+      
+    # we expect files as input
+    options.Template = self.validate('file', options.Template, 'nii');
+    options.Scan1 = self.validate('file', options.Scan1, 'nii');
+    options.Scan2 = self.validate('file', options.Scan2, 'nii');
 
     cmd = os.environ['ENV_FETALMOCO_DIR']+'/reconstruction '+options.output+'/out.nii 3 ' + options.Template + ' ' + options.Scan1 + ' ' + options.Scan2 + ' id id id -iterations ' + str(options.Iterations) + ' -sigma ' + str(options.Sigma) + ' -resolution ' + str(options.Resolution) + ' -multires ' + str(options.Multires) + ' -delta ' + str(options.Delta) + ' -lambda ' + str(options.Lambda) + ' -lastIter ' + str(options.LastIter)
     print cmd

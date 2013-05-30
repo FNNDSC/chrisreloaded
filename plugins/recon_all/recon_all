@@ -29,6 +29,9 @@ class recon_all( Plugin ):
   def run( self, options ):
 
     current_dir = os.path.dirname( os.path.abspath( __file__ ) )
+    
+    # we expect a directory as input
+    options.MRI = self.validate('directory', options.MRI);
 
     # grab the first dicom input file
     files = [d for d in os.listdir( options.MRI ) if not os.path.isdir( d ) and os.path.splitext( d )[1] == '.dcm']

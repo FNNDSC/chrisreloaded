@@ -41,6 +41,9 @@ class PACS_Push(Plugin):
     print Plugin.TITLE
     print Plugin.VERSION
     
+    # we expect directory as input
+    options.DIR = self.validate('directory', options.DIR);
+    
     # create/format input directory to fit connectome_meta requierements
     input_dir = os.path.join(options.output, 'input')
     # create input directory

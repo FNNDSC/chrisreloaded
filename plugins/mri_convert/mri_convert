@@ -30,6 +30,9 @@ class MRIConvert( Plugin ):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
+    # we expect file as input
+    options.input = self.validate('file', options.input);
+    
     # migrate data
     # create temp dir
     import tempfile, shutil, subprocess

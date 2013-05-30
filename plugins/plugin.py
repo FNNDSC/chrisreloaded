@@ -27,7 +27,7 @@
  */
 '''
 import argparse
-import sys
+import sys, os
 
 class Plugin( argparse.ArgumentParser ):
   '''
@@ -238,3 +238,24 @@ class Plugin( argparse.ArgumentParser ):
       # run the plugin
       self.run( options )
 
+  def validate(self, expected, provided, extension='dcm'):
+      '''
+      Convenience method to get directory or file name from a directory or a
+      file name.
+      We can use this method to ensure the plugin will work even the user
+      provides a directory instead of a file and vice-versa
+      '''
+      if expected == 'directory':
+        # we were not provided a directory, get file parent directory
+        if os.path.isfile(provided):
+          provided = os.path.dirname(provided)
+        return provided
+      else:
+        # we were not provided a directory, get file parent directory
+        if os.path.isdir(provided):
+          # find first file with good extension
+          for files in os.listdir(provided):
+            if files.endswith(extension):
+              provided = os.path.join(provided, files)
+              break
+        return provided
