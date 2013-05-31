@@ -6,17 +6,19 @@ The Children's Hospital Radiology Information System.
 ## Change log ##
 
 ### current - **r2.2** ###
-* new 'validate' plugin method
-* add link to chris website in the navigation toolbar
-* search plugin part of system category
-* new search plugin (0.3) which only takes 1 search string
-* new plugins interface
-* about panel in plugins
-* scrollbar in plugin panel is shown only if needed
-* hello world interactive shows how to interact with input data
-* hello world interactive showcases power of interactive plugins
-* introduce environment variables in config file for easy deployement/maintenance
-* bug fixes
+* Update all plugins documentation
+* Fix pacs_pull plugin, (MRN bug: where all data-sets are downloaded if MRN is provided)
+* Add 'validate' plugin method
+* Add link to chris website in the navigation toolbar
+* Change search plugin category to system
+* Enhance search plugin (0.3 - only takes 1 search string)
+* Enhance plugins interface
+* Add about panel in plugins
+* Show scrollbar in plugin panel only if needed
+* Enhance hello world interactive to describe interaction with input data
+* Enhance hello world interactive to showcases power of interactive plugins
+* Introduce environment variables in config file for easy deployement/maintenance
+* Fix several bugs
 
 ### 2013 05 07 - **r2.1** ###
 * Add .error to files preview
