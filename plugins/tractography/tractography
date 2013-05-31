@@ -26,8 +26,15 @@ class tractography(Plugin):
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
   Plugin.TITLE = 'Tractography'
   Plugin.CATEGORY = 'Diffusion'
-  Plugin.DESCRIPTION = 'Generate .trk file from DTI images'
-  Plugin.DOCUMENTATION = 'http://wiki'
+  Plugin.DESCRIPTION = '''
+  Perform a tractography reconstruction (DTK) on the input data.<br/>
+  <b>Usage</b><br/>
+  1. Drag and drop a directory containing the diffusion images from the feed panel to the input dti field.<br/>
+  2. Tune the parameters.<br/>
+  3. Start the plugin.
+  '''
+    
+  Plugin.DOCUMENTATION = 'https://github.com/FNNDSC/chrisreloaded/wiki/Plugin-tractography'
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
