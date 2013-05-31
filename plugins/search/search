@@ -26,12 +26,12 @@ import datetime as d
 class search(Plugin):
   '''
   '''
-  Plugin.AUTHORS = 'dev@babyMRI.org'
+  Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
   Plugin.TITLE = 'Search'
   Plugin.CATEGORY = 'System'
   Plugin.DESCRIPTION = '''
   Search for a match in the database.<br/>
-  It returns all datasets and patients that match the input field.<br/>
+  It returns all data-sets that match the input field.<br/>
   Only supports single string search yet.<br/>
   We compare the search string to:
   <ul>
