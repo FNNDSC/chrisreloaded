@@ -23,7 +23,7 @@ from plugin import Plugin
 class tractography(Plugin):
   '''
   '''
-  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
   Plugin.TITLE = 'Tractography'
   Plugin.CATEGORY = 'Diffusion'
   Plugin.DESCRIPTION = '''

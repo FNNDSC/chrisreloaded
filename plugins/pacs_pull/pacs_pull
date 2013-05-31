@@ -25,66 +25,59 @@ import datetime as d
 class PACS_Pull(Plugin):
   '''
   '''
-  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
   Plugin.TITLE = 'PACS_pull'
   Plugin.CATEGORY = 'PACS'
-  Plugin.DESCRIPTION = 'Pull data from your PACS to our ChRIS server.'
-  Plugin.DOCUMENTATION = 'http://wiki'
+  Plugin.DESCRIPTION = '''
+  Pull data from a PACS system to your ChRIS server.<br/>
+  Retrieve data based on:
+  <ul>
+  <li><b>Patient:</b> MRN, Name</li>
+  <li><b>Series:</b> Date, Modality, Station, Study description, Series description</li>
+  </ul>
+  
+  Advanced queries mechanism to search over:
+  
+  <ul>
+  <li><b>Multiple patients:</b>in the MRN field, multiple MRN separated by a white space (MRN1 MRN2 MRN2 ...)</li>
+  <li><b>Multiple days:</b> in the DATE field, start and end date separated by a dash (yyyymmdd-yyyymmdd)</li>
+  </ul>
+  <b>Example</b><br/>
+  <b>Date:</b> <b>20130101-20130501</b> returns all data-sets acquired between 01-01-2013 and 05-01-2013. <br/>
+  <b>Name:</b> <b>Nico</b> returns all data-sets where the patient first or last name is Nico. It will <b>NOT</b> return anything if the patient name contains Nico, for instance, Nicolas.
+  '''
+
+  Plugin.DOCUMENTATION = 'https://github.com/FNNDSC/chrisreloaded/wiki/Plugin-pacs-pull'
   Plugin.LICENSE = 'Opensource (MIT)'
-  Plugin.VERSION = '0.2'
+  Plugin.VERSION = '0.3'
 
   def run(self, options):
     current_dir = os.path.dirname(os.path.abspath(__file__))
     
     print Plugin.TITLE
     print Plugin.VERSION
-    # if "MRN" provided, split on "white spaces" and loop through them
-    if options.MRN == 666:
-      list_mrn = options.MRN.strip().split(" ");
-      for mrn in list_mrn:
-        print mrn
-        # process!!
-        print '======================================='
-        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
-        command = current_dir + "/core/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -m " + mrn + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -y MR " + " -o " + options.output
-        print 'command:'
-        print command
-        output = os.system(command)
-        print 'output:'
-        print output
+    print options.LIST_SERIES
+    list_series = options.LIST_SERIES.strip().split(" ");
+    for pair in list_series:
+      study, series = pair.split(",");
+      # process!!
+      print '======================================='
+      print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
+      command = current_dir + "/core/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -o " + options.output + " -d " + study + " -e " + series 
+      print 'command:'
+      print command
+      output = os.system(command)
+      print 'output:'
+      print output
     
-        # evaluate processing step
-        if output == 0:
-          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
-          print '(see process.log for more information)'
-        else:
-          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
-          print 'EXIT pacs_pull plugin NOW'
-          print '(see process.log for more information)'
-    # else if "LIST_SERIES" provided, loop through them 
-    elif options.LIST_SERIES:
-      print options.LIST_SERIES
-      list_series = options.LIST_SERIES.strip().split(" ");
-      for pair in list_series:
-        study, series = pair.split(",");
-        # process!!
-        print '======================================='
-        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
-        command = current_dir + "/core/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -o " + options.output + " -d " + study + " -e " + series 
-        print 'command:'
-        print command
-        output = os.system(command)
-        print 'output:'
-        print output
-    
-        # evaluate processing step
-        if output == 0:
-          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
-          print '(see process.log for more information)'
-        else:
-          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
-          print 'EXIT pacs_pull plugin NOW'
-          print '(see process.log for more information)'
+      # evaluate processing step
+      if output == 0:
+        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
+        print '(see process.log for more information)'
+      else:
+        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
+        print 'EXIT pacs_pull plugin NOW'
+        print '(see process.log for more information)'
       
 
         
