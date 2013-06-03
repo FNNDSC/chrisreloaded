@@ -1,6 +1,36 @@
 <xsl:stylesheet version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+	<xsl:template name="help">
+		<h3 class='panel_title'>Help</h3>
+		<div class='panel_content' data-advanced="true" hidden-panel="false"
+			style='padding-top: 2px;padding-left: 2px;'>
+
+			<xsl:copy-of select="description" />
+			<br />
+			<span
+				style="display:block;border-top:solid 1px #9B8888; width:90%;padding-top:2px; margin-top:2px;font-size:xx-small">
+				<b>
+					<xsl:value-of select="title" />
+					plugin
+				</b>
+				(v
+				<xsl:value-of select="version" />
+				-
+				<a target="_blank" style='color:#0000FF;text-decoration:underline;'>
+					<xsl:attribute name="href"><xsl:value-of
+						select="documentation-url" /></xsl:attribute>
+					website
+				</a>
+				)
+
+				<br />
+				<b>Authors: </b>
+				<xsl:value-of select="contributor" />
+			</span>
+		</div>
+	</xsl:template>
+
 	<!-- start matching at 'executable' element -->
 	<xsl:template match="executable">
 		<div class='plugin_panel' style='display:none'>
@@ -19,46 +49,12 @@
 
 			<div class='panelgroup'>
 				<!-- process the about blocks -->
-				<xsl:apply-templates select="help" />
+				<xsl:call-template name="help" />
 				<!-- process the parameters blocks -->
 				<xsl:apply-templates select="parameters" />
 			</div>
 		</div>
 	</xsl:template>
-
-	<!-- Match the 'help' element and create the help group -->
-	<xsl:template match="help">
-		<!-- The panel title -->
-		<h3 class='panel_title'>Help</h3>
-		<div class='panel_content' style='padding-top: 2px;padding-left: 2px;'>
-			<xsl:attribute name="data-advanced"><xsl:value-of select="@advanced" /></xsl:attribute>
-			<xsl:attribute name="hidden-panel"><xsl:value-of select="@hidden" /></xsl:attribute>
-			<xsl:copy-of select="description" />
-			<br />
-			<span
-				style="display:block;border-top:solid 1px #9B8888; width:90%;padding-top:2px; margin-top:2px;font-size:xx-small">
-				<b>
-					<xsl:value-of select="title" />
-					plugin
-				</b>
-				(v
-				<xsl:value-of select="version" />
-				-
-				<a target="_blank" style='color:#0000FF;text-decoration:underline;'>
-					<xsl:attribute name="href"><xsl:value-of
-						select="documentation" /></xsl:attribute>
-					website
-				</a>
-				)
-
-				<br />
-				<b>Authors: </b>
-				<xsl:value-of select="authors" />
-			</span>
-
-		</div>
-	</xsl:template>
-
 
 	<!-- Match the 'parameters' element and create the parameter groups -->
 	<xsl:template match="parameters">
