@@ -7,7 +7,8 @@ The Children's Hospital Radiology Information System.
 
 ### current - **r2.2** ###
 * Update all plugins documentation
-* Fix pacs_pull plugin, (MRN bug: where all data-sets are downloaded if MRN is provided)
+* Fix pacs_pull plugin (MRN bug: MRN string was not cleanned and might create bug if contains dangerous characters such as spaces)
+* Fix pacs_pull plugin (MRN bug: where all data-sets are downloaded if MRN is provided)
 * Add 'validate' plugin method
 * Add link to chris website in the navigation toolbar
 * Change search plugin category to system
