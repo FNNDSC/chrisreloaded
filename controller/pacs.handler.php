@@ -105,6 +105,11 @@ if ($handle = opendir($study_directory)) {
             if($sub_entry != "." && $sub_entry != ".." && is_file($study_directory.'/'.$entry.'/'.$sub_entry)){
               $process_file = PACS::process($study_directory.'/'.$entry.'/'.$sub_entry);
 
+              if (array_key_exists('PatientID',$process_file))
+              {
+                $process_file['PatientID'][0] = sanitize($process_file['PatientID'][0]);
+              }
+
               $db = DB::getInstance();
               $logFile .= '**** DB processing ****'.PHP_EOL;
               //get patient id
@@ -228,15 +233,15 @@ if ($handle = opendir($study_directory)) {
               if(!is_dir($datadirname)){
                 mkdir($datadirname);
                 $logFile .= 'MKDIR: '.$datadirname.PHP_EOL;
-                
+
                 $myFile = $datadirname.'/0.info';
                 $fh = fopen($myFile, 'a');
-                
+
                 // Add Patient information
                 fwrite($fh, '---------------------------'.PHP_EOL.'    GENERAL INFORMATION    '.PHP_EOL.'---------------------------'.PHP_EOL);
                 foreach($process_file as $key => $value)
                   fwrite($fh, $key.' : '.$value[0].PHP_EOL);
-                
+
                 // Add Image information
                 fwrite($fh, PHP_EOL.'---------------------------'.PHP_EOL.'    IMAGE INFORMATION    '.PHP_EOL.'---------------------------'.PHP_EOL);
                 // create the 0.info file, which contains more information about the data
@@ -246,8 +251,8 @@ if ($handle = opendir($study_directory)) {
                 $command .= '"';
                 $command_output = shell_exec($command);
                 fwrite($fh, $command_output);
-                
-                
+
+
                 fclose($fh);
               }
               else{

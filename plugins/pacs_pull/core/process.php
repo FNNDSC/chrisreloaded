@@ -190,7 +190,8 @@ $addPatientLog .= 'Patient table locked on WRITE...'.PHP_EOL;
 $addPatientLog .= 'Find patient in DB...'.PHP_EOL;
 
 $patientMapper = new Mapper('Patient');
-$patientMapper->filter('uid = (?)',$results[0]['PatientID'][0]);
+$patientIDSanitized = sanitize($results[0]['PatientID'][0]);
+$patientMapper->filter('uid = (?)',$patientIDSanitized);
 $patientResult = $patientMapper->get();
 $patient_chris_id = -1;
 // create patient if doesn't exist
@@ -203,7 +204,7 @@ $date = $results[0]['PatientBirthDate'][0];
 $datetime =  substr($date, 0, 4).'-'.substr($date, 4, 2).'-'.substr($date, 6, 2);
 $patientObject->dob = $datetime;
 $patientObject->sex = $results[0]['PatientSex'][0];
-$patientObject->uid = $results[0]['PatientID'][0];
+$patientObject->uid = $patientIDSanitized;
 // add the patient model and get its id
 $patient_chris_id = Mapper::add($patientObject);
 
