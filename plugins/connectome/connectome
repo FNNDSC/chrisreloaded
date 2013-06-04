@@ -20,11 +20,18 @@ from plugin import Plugin
 class connectome(Plugin):
   '''
   '''
-  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
   Plugin.TITLE = 'Connectome'
   Plugin.CATEGORY = 'Diffusion'
-  Plugin.DESCRIPTION = 'Run the connectome pipeline'
-  Plugin.DOCUMENTATION = 'http://wiki'
+  Plugin.DESCRIPTION = '''
+  Perform a full diffusion MRI processing pipeline, from raw Diffusion/T1/T2 data to multi-resolution connection matrices.<br/>
+  <b>Usage</b><br/>
+  1. Drag and drop a directory containing the diffusion images from the feed panel to the input dti field.<br/>
+  2. Drag and drop a directory containing the structural images from the feed panel to the input t1 field.<br/>
+  3. Tune the parameters.<br/>
+  4. Start the plugin.
+  '''
+  Plugin.DOCUMENTATION = 'https://github.com/FNNDSC/chrisreloaded/wiki/Plugin-connectome'
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
