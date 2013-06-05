@@ -92,16 +92,27 @@ define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
 //
 // ENVIRONMENT CONFIGURATION
 //
+# globals
 define('ENV_TMP_DIR', '/chb/tmp');
 define('ENV_CLUSTER_TMP_DIR', '/chb/pices/tmp');
 define('ENV_SCRIPT_DIR', '/chb/arch/scripts');
-define('ENV_FYBORG_DIR', '/chb/arch/scripts');
-define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current');
-define('ENV_CONNECTOME_SCRIPT', '/chb/users/nicolas.rannou/gitroot/scripts/connectome_meta.bash');
-define('ENV_FETALMOCO_DIR', '/chb/arch/Linux64/packages/fetal_moco');
 define('ENV_FREESURFER_SCRIPT', '/chb/arch/scripts/chb-fs');
-define('ENV_TRACTOGRAPHY_SCRIPT', '/chb/arch/scripts/tract_meta.bash');
+define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current');
+define('ENV_DTK_DIR', '/home/chris/packages/dtk');
+# pacs push
 define('ENV_DICOMDIRSEND_SCRIPT', '/chb/arch/scripts/dicom_dirSend.bash');
+# tractography
+define('ENV_TRACTOGRAPHY_SCRIPT', '/chb/arch/scripts/tract_meta.bash');
+# connectome pipeline
+define('ENV_CONNECTOME_SCRIPT', '/chb/users/nicolas.rannou/gitroot/scripts/connectome_meta.bash');
+define('ENV_MRICRON_DIR', '/home/chris/packages/mricron');
+define('ENV_CMP_DIR', '/home/chris/packages/cmp110/lib/python');
+define('ENV_FSL_SCRIPT', '/chb/pices/arch/x86_64-Linux/packages/fsl/etc/fslconf/fsl.sh');
+#fyborg
+define('ENV_FYBORG_DIR', '/chb/arch/scripts');
+# fetal moco
+define('ENV_FETALMOCO_DIR', '/chb/arch/Linux64/packages/fetal_moco');
+
 
 
 // TESTING
