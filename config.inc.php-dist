@@ -111,7 +111,7 @@ define('ENV_CMP_DIR', '/home/chris/packages/cmp110/lib/python');
 #fyborg
 define('ENV_FYBORG_DIR', '/home/chris/packages/fyborg');
 # fetal moco
-define('ENV_FETALMOCO_DIR', '/chb/arch/Linux64/packages/fetal_moco');
+define('ENV_FETALMOCO_DIR', '/home/chris/packages/fetal_moco');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
