@@ -33,12 +33,15 @@ if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 require_once(dirname(__FILE__).'/controller/_util.inc.php');
 
 // version
-define('CHRIS_VERSION', '2.1');
+define('CHRIS_VERSION', '2.2-EXPERIMENTAL');
 
 // maintenance mode
 define('CHRIS_MAINTENANCE', false);
 
+define('CHRIS_HOME', '/home/chris');
+
 // admin email
+define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
 define('CHRIS_ADMIN_EMAIL', 'chris@example.com');
 define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@example.com');
 define('CHRIS_DICOM_EMAIL_FROM', 'dicom@example.com');
@@ -61,10 +64,10 @@ define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
 
 // chris file system
-define('CHRIS_DATA', '/chb/users/chris/data/');
-define('CHRIS_TMP', '/chb/users/chris/tmp/');
-define('CHRIS_USERS', '/chb/users/chris/users/');
-define('CHRIS_LOG', '/chb/users/chris/log/');
+define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
+define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
+define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
+define('CHRIS_LOG', joinPaths(CHRIS_HOME, 'log'));
 
 // known scanners and contact information
 define('CHRIS_SCANNERS', serialize(array(
@@ -77,8 +80,38 @@ define('CLUSTER_HOST', 'localhost');
 define('CLUSTER_USERNAME', 'chris');
 // we replace {MEMORY} with a memory requirement
 // and {COMMAND} with the command to schedule
-define('CLUSTER_RUN', '{COMMAND}');
-define('CLUSTER_KILL', '');
+define('CLUSTER_RUN', 'nohup {COMMAND}');
+define('CLUSTER_KILL', 'kill -9 {PID}');
+
+// DICOM LISTENER
+define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
+define('DICOM_DCMTK_FINDSCU', '/usr/bin/findscu');
+define('DICOM_DCMTK_MOVESCU', '/usr/bin/movescu');
+define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
+
+//
+// ENVIRONMENT CONFIGURATION
+//
+# globals
+define('ENV_TMP_DIR', '/tmp');
+define('ENV_CLUSTER_TMP_DIR', '/tmp');
+define('ENV_SCRIPT_DIR', '/home/chris/packages/scripts');
+define('ENV_FREESURFER_SCRIPT', '/home/chris/packages/scripts/freesurfer.sh');
+define('ENV_SLICER_DIR', '/home/chris/packages/Slicer-4.2.2');
+define('ENV_DTK_DIR', '/home/chris/packages/dtk');
+define('ENV_FSL_SCRIPT', '/etc/fsl/5.0/fsl.sh');
+# pacs push
+define('ENV_DICOMDIRSEND_SCRIPT', '/home/chris/packages/scripts/dicom_dirSend.bash');
+# tractography
+define('ENV_TRACTOGRAPHY_SCRIPT', '/home/chris/packages/scripts/tract_meta.bash');
+# connectome pipeline
+define('ENV_CONNECTOME_SCRIPT', '/home/chris/packages/scripts/connectome_meta.bash');
+define('ENV_MRICRON_DIR', '/home/chris/packages/mricron');
+define('ENV_CMP_DIR', '/home/chris/packages/cmp110/lib/python');
+#fyborg
+define('ENV_FYBORG_DIR', '/home/chris/packages/fyborg');
+# fetal moco
+define('ENV_FETALMOCO_DIR', '/home/chris/packages/fetal_moco');
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
@@ -99,6 +132,9 @@ if(defined('CHRIS_CONFIG_DEBUG')) {
 // setup phpseclib for SSH access
 set_include_path(get_include_path() . PATH_SEPARATOR . joinPaths(CHRIS_LIB_FOLDER, 'phpseclib', 'phpseclib'));
 
+// generate CHRIS_PACKAGES (this has to happen after PACKAGE_SLICER_DIR etc. were configured
+require_once(joinPaths(CHRIS_PLUGINS_FOLDER,'env.php'));
+define('CHRIS_PACKAGES', serialize(buildEnvironment()));
 
 // FLAG showing that the config was parsed
 define('CHRIS_CONFIG_PARSED', true);
