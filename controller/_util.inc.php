@@ -55,7 +55,11 @@ function joinPaths($args) {
  * @todo use regular expressions to replace everything in one command
  */
 function sanitize($dirty){
+  
+  // remove trailing spaces
+  $dirty = trim($dirty);
 
+  // repalce characters
   $dangerous_characters = array(' ', '>', '<', '/', '?', '&', '#', '\\', '%', '(', ')', ',', '+', '*', '-', ':', '^');
   $clean = str_replace ($dangerous_characters, '_', $dirty);
 
