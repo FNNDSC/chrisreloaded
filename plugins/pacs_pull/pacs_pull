@@ -58,7 +58,7 @@ class PACS_Pull(Plugin):
     print Plugin.VERSION
     print options.LIST_SERIES
     list_series = options.LIST_SERIES.strip().split(" ");
-    if list_series.size:
+    if not list_series:
       for pair in list_series:
         study, series = pair.split(",");
         # process!!
