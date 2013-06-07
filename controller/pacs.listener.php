@@ -102,6 +102,18 @@ $fh = fopen($logFile, 'a')  or die("can't open file");
 fwrite($fh, $startReportPretty);
 fclose($fh);
 
+// clean up the log files
+$startReportPretty = "************************************************". PHP_EOL;
+$fullReport .= date('Y-m-d h:i:s'). ' ---> Cleaning up the log files older than 5 days...'. PHP_EOL;
+$clean_command = 'find '.CHRIS_LOG.' -type f -mtime +5 -exec rm {} \;';
+$output = exec($clean_command);
+$startReportPretty .= $clean_command;
+$startReportPretty .= $output;
+$startReportPretty .= "************************************************". PHP_EOL;
+$fh = fopen($logFile, 'a')  or die("can't open file");
+fwrite($fh, $startReportPretty);
+fclose($fh);
+
 // finish listening
 // write log
 $startReportPretty = "************************************************". PHP_EOL;
