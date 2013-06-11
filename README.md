@@ -12,6 +12,7 @@ The Children's Hospital Radiology Information System.
 * Add 'validate' plugin method
 * Add link to chris website in the navigation toolbar
 * Change search plugin category to system
+* Enhance search plugin (0.3 - supports white spaces as 'OR' operator)
 * Enhance search plugin (0.3 - only takes 1 search string)
 * Enhance plugins interface
 * Add about panel in plugins
