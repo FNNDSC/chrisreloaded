@@ -39,6 +39,7 @@ class PACS_Pull(Plugin):
   Advanced queries mechanism to search over:
   
   <ul>
+  <li><b>Full Name:</b> in the NAME field, Lastname^Firstname</li>
   <li><b>Multiple patients:</b>in the MRN field, multiple MRN separated by a white space (MRN1 MRN2 MRN2 ...)</li>
   <li><b>Multiple days:</b> in the DATE field, start and end date separated by a dash (yyyymmdd-yyyymmdd)</li>
   </ul>
@@ -58,7 +59,7 @@ class PACS_Pull(Plugin):
     print Plugin.VERSION
     print options.LIST_SERIES
     list_series = options.LIST_SERIES.strip().split(" ");
-    if not list_series:
+    if list_series:
       for pair in list_series:
         study, series = pair.split(",");
         # process!!
