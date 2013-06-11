@@ -93,6 +93,4 @@ if __name__ == "__main__":
   
   plugin.add_parameter('Search', Plugin.STRING, '--search', action='store', default='', dest='Search', help='String to search on')
   
-  plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
-  
   plugin.launch(sys.argv)
