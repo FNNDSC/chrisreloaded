@@ -53,30 +53,38 @@ class search(Plugin):
     print Plugin.TITLE
     print Plugin.VERSION
 
-    # preprocess!!
-    print '======================================='
-    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start DB search...'
-    search_command = current_dir + "/search.php"
-    #output directory
-    search_command += " -o " + options.output
-    search_command += " -i " + options.Search
-    print 'command:'
-    print search_command
-    search_output = os.system(search_command)
-    print 'output:'
-    print search_output
+    # split search string on spaces
+    sList = options.Search.strip().split();
     
-    # evaluate pre_processing step
-    # should return 0, if not, an issue occured, do not go to the next step
-    if search_output == 0:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> DB search: SUCCESS'
-        print 'EXIT search plugin NOW'
-        print '(see search.log for more information)'
-    else:
-        print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> DB search: FAILURE'
-        print 'EXIT search plugin NOW'
-        print '(see pre_process.log for more information)'
-        return
+    if not sList:
+        sList.append('');
+
+    for s in sList:
+      # go!!
+      print '======================================='
+      print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start DB search...'
+      print  'Search String: ' + s
+      search_command = current_dir + "/search.php"
+      #output directory
+      search_command += " -o " + options.output
+      search_command += " -i " + s
+      print 'command:'
+      print search_command
+      search_output = os.system(search_command)
+      print 'output:'
+      print search_output
+    
+      # evaluate pre_processing step
+      # should return 0, if not, an issue occured, do not go to the next step
+      if search_output == 0:
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> DB search: SUCCESS'
+          print 'EXIT search plugin NOW'
+          print '(see search.log for more information)'
+      else:
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> DB search: FAILURE'
+          print 'EXIT search plugin NOW'
+          print '(see pre_process.log for more information)'
+          return
         
 
 # ENTRYPOINT

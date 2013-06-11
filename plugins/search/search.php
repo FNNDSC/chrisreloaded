@@ -91,46 +91,49 @@ $processLog .= date('Y-m-d h:i:s'). ' ---> Create SQL query...'.PHP_EOL;
 $mapper = new Mapper('Patient');
 $mapper->ljoin('Data_Patient', 'patient.id = Data_Patient.patient_id')->ljoin('Data', 'Data_Patient.data_id = data.id')->ljoin('Data_Study', 'data.id = Data_Study.data_id')->ljoin('Study', 'Data_Study.study_id = study.id');
 
-$mapper->filter('', '', 0, 'OR');
 
- $mapper->filter('patient.name LIKE CONCAT("%",?,"%")', $input, 1, 'OR');
-$processLog .= 'name: '. $input.PHP_EOL;
+if($input != ''){
+  $mapper->filter('', '', 0, 'OR');
 
-$mapper->filter('patient.dob LIKE CONCAT("%",?,"%")', $input, 2, 'OR');
-$processLog .= 'dob: '. $input.PHP_EOL;
+  $mapper->filter('patient.name LIKE CONCAT("%",?,"%")', $input, 1, 'OR');
+  $processLog .= 'name: '. $input.PHP_EOL;
 
-$mapper->filter('patient.uid LIKE CONCAT("%",?,"%")', $input, 3, 'OR');
-$processLog .= 'uid: '. $input.PHP_EOL;
+  $mapper->filter('patient.dob LIKE CONCAT("%",?,"%")', $input, 2, 'OR');
+  $processLog .= 'dob: '. $input.PHP_EOL;
 
-$mapper->filter('patient.sex LIKE CONCAT("%",?,"%")', $input, 4, 'OR');
-$processLog .= 'sex: '. $input.PHP_EOL;
+  $mapper->filter('patient.uid LIKE CONCAT("%",?,"%")', $input, 3, 'OR');
+  $processLog .= 'uid: '. $input.PHP_EOL;
 
-$mapper->filter('data.description LIKE CONCAT("%",?,"%")', $input, 5, 'OR');
-$processLog .= 'description: '. $input.PHP_EOL;
+  $mapper->filter('patient.sex LIKE CONCAT("%",?,"%")', $input, 4, 'OR');
+  $processLog .= 'sex: '. $input.PHP_EOL;
 
-$mapper->filter('study.location LIKE CONCAT("%",?,"%")', $input, 6, 'OR');
-$processLog .= 'location: '. $input.PHP_EOL;
+  $mapper->filter('data.description LIKE CONCAT("%",?,"%")', $input, 5, 'OR');
+  $processLog .= 'description: '. $input.PHP_EOL;
 
-$mapper->filter('study.modality LIKE CONCAT("%",?,"%")', $input, 7, 'OR');
-$processLog .= 'modality: '. $input.PHP_EOL; 
+  $mapper->filter('study.location LIKE CONCAT("%",?,"%")', $input, 6, 'OR');
+  $processLog .= 'location: '. $input.PHP_EOL;
 
-$mapper->filter('study.date LIKE CONCAT("%",?,"%")', $input, 8, 'OR');
-$processLog .= 'date: '. $input.PHP_EOL;
+  $mapper->filter('study.modality LIKE CONCAT("%",?,"%")', $input, 7, 'OR');
+  $processLog .= 'modality: '. $input.PHP_EOL;
 
-$mapper->filter('study.age LIKE CONCAT("%",?,"%")', $input, 9, 'OR');
-$processLog .= 'age: '. $input.PHP_EOL;
+  $mapper->filter('study.date LIKE CONCAT("%",?,"%")', $input, 8, 'OR');
+  $processLog .= 'date: '. $input.PHP_EOL;
 
-/* $mapper->filter('study.age >= (?)', $input);
-$processLog .= 'agemin: '. $input.PHP_EOL;
+  $mapper->filter('study.age LIKE CONCAT("%",?,"%")', $input, 9, 'OR');
+  $processLog .= 'age: '. $input.PHP_EOL;
 
-$mapper->filter('study.age <= (?)', $input);
-$processLog .= 'agemax: '. $input.PHP_EOL; */
+  /* $mapper->filter('study.age >= (?)', $input);
+   $processLog .= 'agemin: '. $input.PHP_EOL;
 
-/*   $mapper->filter('study.date >= (?)', $input);
- $processLog .= 'datemin: '. $input.PHP_EOL;
+  $mapper->filter('study.age <= (?)', $input);
+  $processLog .= 'agemax: '. $input.PHP_EOL; */
 
-$mapper->filter('study.date <= (?)', $input);
-$processLog .= 'datemax: '. $input.PHP_EOL; */
+  /*   $mapper->filter('study.date >= (?)', $input);
+   $processLog .= 'datemin: '. $input.PHP_EOL;
+
+  $mapper->filter('study.date <= (?)', $input);
+  $processLog .= 'datemax: '. $input.PHP_EOL; */
+}
 
 $fh = fopen($logFile, 'a')  or die("can't open file");
 fwrite($fh, $processLog);
