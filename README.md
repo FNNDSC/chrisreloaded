@@ -1,7 +1,12 @@
 ChRIS reloaded
 ==============
 
-The Children's Hospital Radiology Information System.
+ChRIS: Children's Research Integration System.
+
+ChRIS is an "end-to-end" web-based system for collecting, processing, and sharing raw and processing medical image data. It is loosely based on a "twitter"-type UI paradigm. Users have "feeds" that track interaction with the system. Feeds contain "posts" that are containers for data of any sort, i.e. raw DICOM images, Nifti volumes, FreeSurfer outputs, etc. ChRIS also offers "plugins" that process "posts". Data within a post can be dragged into a plugin, and processed.
+
+In most cases, the plugin will spawn a job out on an appropriately configured cluster resource. In the simplest case, the job will simply run on the machine in which the ChRIS instance has been deployed.
+
 
 ## Change log ##
 
