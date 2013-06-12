@@ -32,16 +32,17 @@ class search(Plugin):
   Plugin.DESCRIPTION = '''
   Search for a match in the database.<br/>
   It returns all data-sets that match the input field.<br/>
-  Only supports single string search yet.<br/>
+  Supports multiple string search.<br/>
   We compare the search string to:
   <ul>
   <li><b>Patient:</b> Name, DOB (yyyy-mm-dd), MRN, Sex, Age</li>
   <li><b>Series:</b> Description, Location, Modality, Date (yyyy-mm-dd)</li>
   </ul>
   <b>Example</b><br/>
+  <b>Search: <i>432334 654423</i></b> will return all matches for first OR second string<br/>
   <b>Search: <i>1982</i></b> will return patients born in <i>1982</i>, patient whose MRN contains <i>1982</i>, series where description contains <i>1982</i><br/>
   <b>Search: <i>MR CT</i></b> will return patients whose name contains <i>MR</i>, series where description contains <i>MR</i>, series where modality contains <i>MR</i>
-  '''
+ '''
   
   Plugin.DOCUMENTATION = 'https://github.com/FNNDSC/chrisreloaded/wiki/Plugin-search'
   Plugin.LICENSE = 'Opensource (MIT)'
