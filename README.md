@@ -10,13 +10,17 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 
 ## Change log ##
 
-### current - **r2.2** ###
+### current - **r2.3** ###
+
+### 2013 06 12 - **r2.2** ###
 * Update all plugins documentation
+* Fix sanitize function (add white space stripping)
 * Fix pacs_pull plugin (MRN bug: MRN string was not cleanned and might create bug if contains dangerous characters such as spaces)
 * Fix pacs_pull plugin (MRN bug: where all data-sets are downloaded if MRN is provided)
 * Add 'validate' plugin method
 * Add link to chris website in the navigation toolbar
 * Change search plugin category to system
+* Enhance search plugin (0.3 - run as a regular plugin (do not run locally anymore))
 * Enhance search plugin (0.3 - supports white spaces as 'OR' operator)
 * Enhance search plugin (0.3 - only takes 1 search string)
 * Enhance plugins interface
