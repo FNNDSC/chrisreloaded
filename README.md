@@ -10,8 +10,6 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 
 ## Change log ##
 
-### current - **r2.3** ###
-
 ### 2013 06 12 - **r2.2** ###
 * Update all plugins documentation
 * Fix sanitize function (add white space stripping)
