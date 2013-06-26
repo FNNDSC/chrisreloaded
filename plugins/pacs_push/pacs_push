@@ -65,7 +65,7 @@ class PACS_Push(Plugin):
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
     command = ' \''+os.environ['ENV_DICOMDIRSEND_SCRIPT']+' -v 10';
     if options.ANONYM:
-      command += ' -A'
+      command += ' -P -k'
     command += ' -h ' + options.HOST;
     command += ' -p ' + options.PORT;
     if not options.EXT == "*":
