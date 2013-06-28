@@ -138,3 +138,7 @@ select,textarea,.btn {
   -ms-transition:500ms linear;
   transition:500ms;
 }
+
+.well{
+	 background-color: #FFF;
+}
