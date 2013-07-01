@@ -11,6 +11,7 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current - **r2.3** ###
+* Clean up the user interace (less padding, squared designed, dark grey/white theme) 
 
 ### 2013 06 12 - **r2.2** ###
 * Update all plugins documentation
