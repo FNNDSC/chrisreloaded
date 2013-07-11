@@ -33,7 +33,7 @@ if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 require_once(dirname(__FILE__).'/controller/_util.inc.php');
 
 // version
-define('CHRIS_VERSION', '2.3');
+define('CHRIS_VERSION', '2.4-EXPERIMENTAL');
 
 // maintenance mode
 define('CHRIS_MAINTENANCE', false);

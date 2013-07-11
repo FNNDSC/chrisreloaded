@@ -10,6 +10,8 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 
 ## Change log ##
 
+### current - **r2.4** ###
+
 ### 2013 07 11 - **r2.3** ###
 * Clean up the user interace (less padding, squared designed, dark grey/white theme) 
 * Correct anonimyzation in PACS Push plugin
