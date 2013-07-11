@@ -273,7 +273,6 @@
 .feed_sea_header {
 	color: #FFF;
 	background: #353535;
-	  border-top: 1px solid;
   border-bottom: 1px solid;
   border-color: #8D8D8D;
 }
@@ -281,7 +280,6 @@
 .feed_fav_header {
 	 color: #FFF;
 	background: #353535;
-	  border-top: 1px solid;
   border-bottom: 1px solid;
   border-color: #8D8D8D;
 }
@@ -289,7 +287,6 @@
 .feed_run_header {
 	 color: #FFF;
 	background: #353535;
-	  border-top: 1px solid;
   border-bottom: 1px solid;
   border-color: #8D8D8D;
 }
@@ -297,7 +294,6 @@
 .feed_fin_header {
 	 color: #FFF;
 	background: #353535;
-	  border-top: 1px solid;
   border-bottom: 1px solid;
   border-color: #8D8D8D;
 }
