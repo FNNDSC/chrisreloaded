@@ -65,7 +65,7 @@ fclose($fh);
 
 // we now have a unique directory to be processed
 // create tmp file #a.aet to know who is the owner of the file
-$listen_command = '/usr/bin/storescp -id +xa -od "' . $tmpdirname . '" -xcr "touch '.$tmpdirname.'/#c;touch '.$tmpdirname.'/#a" -pm -ss RX';
+$listen_command = '/usr/bin/storescp -id -od "' . $tmpdirname . '" -xcr "touch '.$tmpdirname.'/#c;touch '.$tmpdirname.'/#a" -pm -ss RX';
 //write log
 $startReportPretty = "=========================================". PHP_EOL;
 $report = date('Y-m-d h:i:s'). ' ---> Start receiving data...'. PHP_EOL;
