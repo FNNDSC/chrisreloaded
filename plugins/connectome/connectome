@@ -70,7 +70,7 @@ class connectome(Plugin):
       os.symlink(os.path.join(options.t1, t1_file), os.path.join(input_dir, t1_file))
     
     #base command
-    command = ' \''+os.environ['ENV_CONNECTOME_SCRIPT'];
+    command = ' \''+os.environ['ENV_CONNECTOME_META_SCRIPT'];
 
     command += ' --tract-meta-stages 12'
     

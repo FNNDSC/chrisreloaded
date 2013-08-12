@@ -104,7 +104,8 @@ define('ENV_DICOMDIRSEND_SCRIPT', '/chb/arch/scripts/dicom_dirSend.bash');
 # tractography
 define('ENV_TRACTOGRAPHY_SCRIPT', '/chb/arch/scripts/tract_meta.bash');
 # connectome pipeline
-define('ENV_CONNECTOME_SCRIPT', '/chb/users/nicolas.rannou/gitroot/scripts/connectome_meta.bash');
+define('ENV_CONNECTOME_SCRIPT', '/chb/arch/scripts/chb-connectome');
+define('ENV_CONNECTOME_META_SCRIPT', '/chb/arch/scripts/connectome_meta.bash');
 define('ENV_MRICRON_DIR', '/home/chris/packages/mricron');
 define('ENV_CMP_DIR', '/home/chris/packages/cmp110/lib/python');
 define('ENV_FSL_SCRIPT', '/chb/pices/arch/x86_64-Linux/packages/fsl/etc/fslconf/fsl.sh');
