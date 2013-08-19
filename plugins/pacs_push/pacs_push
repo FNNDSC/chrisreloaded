@@ -65,6 +65,8 @@ class PACS_Push(Plugin):
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
     command = ' \''+os.environ['ENV_DICOMDIRSEND_SCRIPT']+' -v 10';
     if options.ANONYM:
+      command += ' -A -k'
+    elif options.PANONYM:
       command += ' -P -k'
     command += ' -h ' + options.HOST;
     command += ' -p ' + options.PORT;
@@ -87,5 +89,6 @@ if __name__ == "__main__":
   plugin.add_parameter('Advanced', Plugin.STRING, '--port', action='store', default='10502', dest='PORT', help='Target Port')
   plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='dcm', dest='EXT', help='Extension of files to be pushed')
   plugin.add_parameter('Advanced', Plugin.STRING, '--aetitle', action='store', default='CHRIS2', dest='AETITLE', help='Calling AETitle')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--panonymize', default=False, action='store_true', dest='PANONYM', help='Partially anonymize the dataset')
   plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Anonymize the dataset')
   plugin.launch(sys.argv)
