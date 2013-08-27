@@ -47,5 +47,5 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
 _CHRIS_INTERACTIVE_PLUGIN_.destroy = function() {
 };
 // call one CLI job has been successfully submitted
-_CHRIS_INTERACTIVE_PLUGIN_.submitted = function() {
+_CHRIS_INTERACTIVE_PLUGIN_.submitted = function(val) {
 };

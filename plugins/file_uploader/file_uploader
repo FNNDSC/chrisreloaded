@@ -75,9 +75,10 @@ if __name__ == "__main__":
   
   # this is an interactive plugin
   plugin.interactive = True
+  # no cluster job monitoring to mark a feed instantly as done
+  plugin.status = 100
   
   # define the parameters
-  
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--listseries', action='store', dest='LIST_SERIES', help='Series to be downloaded: "study_uid,series_uid study_uid,series_uid, etc."')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--userid', action='store', default="{USER_ID}", dest='USER_ID', help='User ID')
