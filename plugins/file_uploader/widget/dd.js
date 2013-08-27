@@ -88,6 +88,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.handleFiles(files);
           xhr.onload = function(e) {window.console.log("loaded...");};
 
          var data = new FormData();
+         data.append('targetFeed', _CHRIS_INTERACTIVE_PLUGIN_.targetFeed);
         
          for(var i = 0, len = files.length; i < len; i++) {
            // Stop people trying to upload massive files don't need for demo to work

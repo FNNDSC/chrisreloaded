@@ -43,31 +43,9 @@ class File_Uploader(Plugin):
     
     print Plugin.TITLE
     print Plugin.VERSION
-    # print options.LIST_SERIES
-    # list_series = options.LIST_SERIES.strip().split(" ");
-    # if list_series:
-    #   for pair in list_series:
-    #     study, series = pair.split(",");
-    #     # process!!
-    #     print '======================================='
-    #     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
-    #     command = current_dir + "/core/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -o " + options.output + " -d " + study + " -e " + series 
-    #     print 'command:'
-    #     print command
-    #     output = os.system(command)
-    #     print 'output:'
-    #     print output
-    
-    #     # evaluate processing step
-    #     if output == 0:
-    #       print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
-    #       print '(see process.log for more information)'
-    #     else:
-    #       print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
-    #       print 'EXIT pacs_pull plugin NOW'
-    #       print '(see process.log for more information)'
-      
 
+    # set permissions of output to 775
+    os.chmod(options.output, '775')
         
 # ENTRYPOINT
 if __name__ == "__main__":
