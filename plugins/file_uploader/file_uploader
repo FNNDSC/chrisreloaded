@@ -43,9 +43,6 @@ class File_Uploader(Plugin):
     
     print Plugin.TITLE
     print Plugin.VERSION
-
-    # set permissions of output to 775
-    os.chmod(options.output, '775')
         
 # ENTRYPOINT
 if __name__ == "__main__":

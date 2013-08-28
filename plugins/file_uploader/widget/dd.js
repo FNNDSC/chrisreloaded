@@ -83,16 +83,16 @@ _CHRIS_INTERACTIVE_PLUGIN_.handleFiles(files);
 
          console.log(files);
 
-         var xhr = new XMLHttpRequest();
-          xhr.open('POST', 'plugins/file_uploader/widget/file.listener.php', true);
-          xhr.onload = function(e) {window.console.log("loaded...");};
-
-         var data = new FormData();
-         data.append('targetFeed', _CHRIS_INTERACTIVE_PLUGIN_.targetFeed);
-        
+       
          for(var i = 0, len = files.length; i < len; i++) {
            // Stop people trying to upload massive files don't need for demo to work
-           if(files[i].size < 83886080) {
+           // 100Mb limit
+
+//sudo vim /etc/php5/apache2/php.ini 
+//[toor@chris:x86_64-Linux]/var$>sudo service apache2 restart
+           // upload_max_filesize = 2M
+           // post_max_size = 2M
+           if(files[i].size < 838860800) {
             
              domElements = [
                document.createElement('div'),
@@ -107,8 +107,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.handleFiles(files);
              _CHRIS_INTERACTIVE_PLUGIN_.dropListing.appendChild(filesFragment);
             
              // Use xhr to send files to server async both Chrome and Safari support xhr2 upload and progress events
-             _CHRIS_INTERACTIVE_PLUGIN_.processXHR(files[i], _CHRIS_INTERACTIVE_PLUGIN_.count, xhr);
-             data.append(files[i].name, files[i]);
+             _CHRIS_INTERACTIVE_PLUGIN_.processXHR(files[i], _CHRIS_INTERACTIVE_PLUGIN_.count);
+
 
              _CHRIS_INTERACTIVE_PLUGIN_.count++;
            } else {
@@ -116,13 +116,23 @@ _CHRIS_INTERACTIVE_PLUGIN_.handleFiles(files);
            }
          }
 
-         // GO!
-         xhr.send(data);
-
 
        }
       
-       _CHRIS_INTERACTIVE_PLUGIN_.processXHR = function (file, index, xhr) {
+       _CHRIS_INTERACTIVE_PLUGIN_.processXHR = function (file, index) {
+                 var xhr = new XMLHttpRequest();
+          xhr.open('POST', 'api.php', true);
+
+          xhr.onload = function(e) {window.console.log("loaded...");};
+
+         var data = new FormData();
+         data.append('targetFeed', _CHRIS_INTERACTIVE_PLUGIN_.targetFeed);
+         data.append('action', 'add');
+         data.append('what', 'file');
+         data.append(file.name, file);
+
+         window.console.log(data);
+
          var  container = document.getElementById("item"+index),
            loader;
            fileUpload = xhr.upload,
@@ -155,4 +165,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.handleFiles(files);
          fileUpload.addEventListener("error", function(evt) {
            console.log("error: " + evt.code);
          }, false);
+
+
+         // GO!
+         xhr.send(data);
        };
