@@ -1,11 +1,5 @@
 /* Drag N Drop*/
 
-#homedropmask {
-  position:absolute;
-  width: 100%;
-  height: 100%;
-}
-
 #drop-widget{
 	  display: none;
 	    margin-left: -20px;

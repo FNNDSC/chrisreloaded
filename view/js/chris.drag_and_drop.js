@@ -10,20 +10,69 @@ _DRAG_AND_DROP_.init = function() {
   _DRAG_AND_DROP_.dropListing = document.getElementById("drop-list");
   _DRAG_AND_DROP_.dropArea = document.getElementById("information");
   _DRAG_AND_DROP_.dropMaskArea = document.getElementById("information");
-  _DRAG_AND_DROP_.headerDrop = document.getElementById("drop-header");
   _DRAG_AND_DROP_.count = 0;
   _DRAG_AND_DROP_.countStyle = 0;
   _DRAG_AND_DROP_.targetFiles = null;
+  _DRAG_AND_DROP_.mousein = false;
 
   // attach events
-  _DRAG_AND_DROP_.dropMaskArea.addEventListener("dragenter",_DRAG_AND_DROP_.onDragEnter, false);
-  _DRAG_AND_DROP_.dropMaskArea.addEventListener("dragleave",_DRAG_AND_DROP_.onDrageLeave, false);
+  window.addEventListener("mouseout",function() {
+    window.console.log(_DRAG_AND_DROP_.mousein);
+      _DRAG_AND_DROP_.mousein = false;
+    }, false);
+
+  window.addEventListener("mousein", _DRAG_AND_DROP_.onMousein, false);
+    window.addEventListener("mouseout", _DRAG_AND_DROP_.onMouseout, false);
+
+// window.onmouseout = function() {
+//     window.console.log(_DRAG_AND_DROP_.mousein);
+//       _DRAG_AND_DROP_.mousein = false;
+//     }
+//     window.onmousein = function() {
+
+//       _DRAG_AND_DROP_.mousein = true;
+//     }
+//   addEvent(document, 'mouseout', function(evt) {
+//   if (evt.toElement == null && evt.relatedTarget == null) {
+//   _DRAG_AND_DROP_.mousein = false;
+//   }
+// });
+
+//     addEvent(document, 'mousein', function(evt) {
+//   if (evt.toElement == null && evt.relatedTarget == null) {
+//   _DRAG_AND_DROP_.mousein = true;
+//   }
+// });
+
+//   $(document).mouseout(function(){
+//   _DRAG_AND_DROP_.mousein = false;
+
+//   window.console.log(_DRAG_AND_DROP_.mousein);
+// });
+// $(document).mouseover(function(){
+//   _DRAG_AND_DROP_.mousein = true;
+//     window.console.log(_DRAG_AND_DROP_.mousein);
+// });
+  _DRAG_AND_DROP_.body.addEventListener("dragenter",_DRAG_AND_DROP_.onDragEnter, false);
+  _DRAG_AND_DROP_.body.addEventListener("dragleave",_DRAG_AND_DROP_.onDrageLeave, false);
+  // window.addEventListener("dragenter",_DRAG_AND_DROP_.onDragEnter, false);
+  // window.addEventListener("dragleave",_DRAG_AND_DROP_.onDrageLeave, false);
   _DRAG_AND_DROP_.dropMaskArea.addEventListener("dragover",_DRAG_AND_DROP_.onDragOver, false);
-  _DRAG_AND_DROP_.dropMaskArea.addEventListener("drop", _DRAG_AND_DROP_.onDrop, false);
-  _DRAG_AND_DROP_.dropMaskArea.addEventListener("dragend", _DRAG_AND_DROP_.onDrop, false);
+  _DRAG_AND_DROP_.dropArea.addEventListener("drop", _DRAG_AND_DROP_.onDrop, false);
+  _DRAG_AND_DROP_.dropArea.addEventListener("dragend", _DRAG_AND_DROP_.onDrop, false);
 
     jQuery(document).off('click', '#closeDrop').on('click', '#drop-close', _DRAG_AND_DROP_.onCloseDrop);
 }
+
+_DRAG_AND_DROP_.onMousein = function() {
+    window.console.log(_DRAG_AND_DROP_.mousein);
+      _DRAG_AND_DROP_.mousein = true;
+    }
+
+_DRAG_AND_DROP_.onMouseout = function() {
+    window.console.log(_DRAG_AND_DROP_.mousein);
+      _DRAG_AND_DROP_.mousein = false;
+    }
 
 // important in chrome, if not drag and drop do NOT work
 _DRAG_AND_DROP_.onCloseDrop = function (e) {
@@ -61,21 +110,25 @@ _DRAG_AND_DROP_.onDragEnter = function (e) {
   e.stopPropagation();
   e.preventDefault();
 
-  // _DRAG_AND_DROP_.dropArea.style.border = "5px dashed grey";
+   _DRAG_AND_DROP_.dropArea.style.border = "5px dashed grey";
 };
 
 _DRAG_AND_DROP_.onDrageLeave = function (e) {
   e.stopPropagation();
   e.preventDefault();
+  window.console.log(_DRAG_AND_DROP_.mousein);
+  if(!_DRAG_AND_DROP_.mousein){
 
-  // _CHRIS_.dropArea.style.border = "1px solid #8D8D8D";
+   _DRAG_AND_DROP_.dropArea.style.border = "1px solid #8D8D8D";
+
+ }
 };
 
 _DRAG_AND_DROP_.onDrop = function (e) {
   e.stopPropagation();
   e.preventDefault();
   // reset style
-  // _CHRIS_.dropArea.style.border = "1px solid #8D8D8D";
+   _DRAG_AND_DROP_.dropArea.style.border = "1px solid #8D8D8D";
 
   if(_DRAG_AND_DROP_.count == 0){
     // store reference to files
