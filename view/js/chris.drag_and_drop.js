@@ -69,14 +69,14 @@ _DRAG_AND_DROP_.onDrageLeave = function (e, parent) {
   if ((mouseY > 0 && mouseY < window.innerHeight) && (mouseX > 0 && mouseX < window.innerWidth))
     return;
 
-  _DRAG_AND_DROP_.dropArea.style.border = "1px solid #8D8D8D";
+  _DRAG_AND_DROP_.dropArea.style.border = "1px solid #E3E3E3";
 };
 
 _DRAG_AND_DROP_.onDrop = function (e) {
   e.stopPropagation();
   e.preventDefault();
   // reset style
-   _DRAG_AND_DROP_.dropArea.style.border = "1px solid #8D8D8D";
+   _DRAG_AND_DROP_.dropArea.style.border = "1px solid #E3E3E3";
 
   if(_DRAG_AND_DROP_.count == 0){
     // store reference to files
@@ -245,10 +245,6 @@ _DRAG_AND_DROP_.processXHR = function (file, index) {
   // GO!
   xhr.send(data);
 };
-
-
-
-
 
 jQuery(document).ready(function() {
   
