@@ -36,6 +36,10 @@ _CHRIS_.scalePanels = function() {
 
   // configure screen size related parameters
   var _pluginpanelsize = jQuery(window).height()-417;
+  if(jQuery('#drop-widget').is(":visible")){
+     _pluginpanelsize -= jQuery("#drop-widget").height();
+   }
+
   var _feedcontentsize = jQuery(window).height()-129;  
   var _interactivepluginsize = jQuery(window).height()-129;
   // right panel: 300px + well: 40px
@@ -117,8 +121,7 @@ jQuery(document).ready(function() {
   });
   
   // activate polling of new statistics
-  setInterval(_CHRIS_.updateStatistics, 5000);
-  
+  setInterval(_CHRIS_.updateStatistics, 5000); 
   
 });
 

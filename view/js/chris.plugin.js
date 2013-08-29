@@ -527,7 +527,7 @@ jQuery(document)
                     // if interactive plugin, we might want to cleanup the ui
                     if (_definedInteractive != ""
                         && typeof _CHRIS_INTERACTIVE_PLUGIN_ != 'undefined') {
-                      _CHRIS_INTERACTIVE_PLUGIN_.submitted();
+                      _CHRIS_INTERACTIVE_PLUGIN_.submitted(data);
                     }
                   }
                 });

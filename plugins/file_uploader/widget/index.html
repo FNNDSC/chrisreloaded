@@ -7,40 +7,19 @@
 <meta name="description" content="">
 <meta name="author" content="">
 
+<link rel="stylesheet" type="text/css" href="plugins/file_uploader/widget/css/style.css">
+
 </head>
-
 <body>
-
- <div class="container-fluid">
-  <p>Description...</p>
   
-  <p><strong>Upload Files:</strong> <input type="file" name="filesToUpload" id="filesToUpload" multiple="" onChange="makeFileList();" /></p>
-  
-  <p>
-    <strong>Files You Selected:</strong>
-  </p>
-  <ul id="fileList"><li>No Files Selected</li></ul>
-  
-  <script type="text/javascript">
-    function makeFileList() {
-      var input = document.getElementById("filesToUpload");
-      var ul = document.getElementById("fileList");
-      while (ul.hasChildNodes()) {
-        ul.removeChild(ul.firstChild);
-      }
-      for (var i = 0; i < input.files.length; i++) {
-        var li = document.createElement("li");
-        li.innerHTML = input.files[i].name;
-        ul.appendChild(li);
-      }
-      if(!ul.hasChildNodes()) {
-        var li = document.createElement("li");
-        li.innerHTML = 'No Files Selected';
-        ul.appendChild(li);
-      }
-    }
-  </script>
-    
- </div>
+  <div id="drop">
+    <div id="dropmask"></div>
+    <h1>Drop files here</h1>
+    <h3>To upload them to the server</h3>
+  </div>
+  <div id="output-listing01"></div>
 </body>
+
+<script src="plugins/file_uploader/widget/js/logic.js"></script>
+
 </html>

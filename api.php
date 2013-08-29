@@ -38,6 +38,7 @@ require_once ('config.inc.php');
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'security.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'file.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'token.controller.php'));
 
@@ -155,6 +156,15 @@ if (!$loggedIn) {
 
     // check actions
     switch($action) {
+      case "add":
+        if ($what == 'file') {
+          $ssh_connection = new Net_SSH2(CLUSTER_HOST);
+          if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
+            die('Login Failed');
+          }
+          $result['result'] = FileC::add($_POST['targetFeed'], $_FILES, $ssh_connection);
+        }
+        break;
       case "count":
         if ($what == 'feed') {
           $result['result'] = FeedC::getCount($_SESSION['userid']);
