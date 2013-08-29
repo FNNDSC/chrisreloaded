@@ -49,7 +49,7 @@ if __name__ == "__main__":
   plugin = File_Uploader()
   
   # this is an interactive plugin
-  # plugin.interactive = True
+  plugin.interactive = True
   # no cluster job monitoring to mark a feed instantly as done
   plugin.status = 100
   

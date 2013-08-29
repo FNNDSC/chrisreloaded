@@ -207,37 +207,39 @@ _DRAG_AND_DROP_.processXHR = function (file, index) {
   }, false);
         
   fileUpload.addEventListener("load", function(event) {
-         loaderIndicator = container.firstChild.nextSibling.firstChild;
-        loaderIndicator.style.width = "100%";
+    container.firstChild.nextSibling.style.borderColor = "#fff";
+    loaderIndicator = container.firstChild.nextSibling.firstChild;
+    loaderIndicator.style.width = "100%";
 
 
-   // green checkmark
+    // green checkmark
     var successSpan =  document.createElement('span');
     successSpan.innerHTML = '&#10003;';
     container.firstChild.appendChild(successSpan);
 
-      var _pluginpanelsize = jQuery(window).height()-417;
-      _pluginpanelsize -= jQuery("#drop-widget").height();
-      jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
+    var _pluginpanelsize = jQuery(window).height()-417;
+    _pluginpanelsize -= jQuery("#drop-widget").height();
+    jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
+    jQuery('.plugin_panel').css('height', _pluginpanelsize);
+    jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
 
     console.log("xhr upload of "+container.id+" complete");
   }, false);
         
   fileUpload.addEventListener("error", function(evt) {
-         loaderIndicator = container.firstChild.nextSibling.firstChild;
-        loaderIndicator.style.width = "100%";
+    container.firstChild.nextSibling.style.borderColor = "#fff";
+    loaderIndicator = container.firstChild.nextSibling.firstChild;
+    loaderIndicator.style.width = "100%";
     // red cross
     var errorSpan =  document.createElement('span');
     errorSpan.innerHTML = '&#10007;';
     container.firstChild.appendChild(errorSpan);
 
-          var _pluginpanelsize = jQuery(window).height()-417;
-      _pluginpanelsize -= jQuery("#drop-widget").height();
-      jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
+    var _pluginpanelsize = jQuery(window).height()-417;
+    _pluginpanelsize -= jQuery("#drop-widget").height();
+    jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
+    jQuery('.plugin_panel').css('height', _pluginpanelsize);
+    jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
 
     console.log("error: " + evt.code);
   }, false);

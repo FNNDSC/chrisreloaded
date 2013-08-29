@@ -28,8 +28,10 @@
   border: 1px solid #999999; 
   background: rgba(0 0 0 0); 
   display: inline-block; 
-  top: 1px;
-  height:3px;*/
+  top: 1px;*/
+  border: 1px solid #353535; 
+    background: rgba(0 0 0 0); 
+  height:1px;
 
 /*  margin-left: -1px;*/
 }

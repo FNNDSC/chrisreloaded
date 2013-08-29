@@ -5,6 +5,13 @@
 var _CHRIS_INTERACTIVE_PLUGIN_ = _CHRIS_INTERACTIVE_PLUGIN_ || {};
 
 _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
+  // turn OFF chris Drag and Drop
+  _DRAG_AND_DROP_.body.removeEventListener("dragenter",_DRAG_AND_DROP_.onDragEnter, false);
+  _DRAG_AND_DROP_.body.removeEventListener("dragleave",_DRAG_AND_DROP_.onDrageLeave, false);
+  _DRAG_AND_DROP_.dropMaskArea.removeEventListener("dragover",_DRAG_AND_DROP_.onDragOver, false);
+  _DRAG_AND_DROP_.dropArea.removeEventListener("drop", _DRAG_AND_DROP_.onDrop, false);
+  _DRAG_AND_DROP_.dropArea.removeEventListener("dragend", _DRAG_AND_DROP_.onDrop, false);
+
   // set global variables
   _CHRIS_INTERACTIVE_PLUGIN_.body = document.getElementsByTagName("body")[0];
   _CHRIS_INTERACTIVE_PLUGIN_.dropListing = document.getElementById("output-listing01");
@@ -34,6 +41,23 @@ _CHRIS_INTERACTIVE_PLUGIN_.submitted = function(val) {
 
   _CHRIS_INTERACTIVE_PLUGIN_.handleFiles(_CHRIS_INTERACTIVE_PLUGIN_.targetFiles);
 
+}
+
+_CHRIS_INTERACTIVE_PLUGIN_.destroy = function() {
+  // turn OFF plugin Drag and Drop
+  _CHRIS_INTERACTIVE_PLUGIN_.dropMaskArea.removeEventListener("dragenter",_CHRIS_INTERACTIVE_PLUGIN_.onDragEnter, false);
+  _CHRIS_INTERACTIVE_PLUGIN_.dropMaskArea.removeEventListener("dragleave",_CHRIS_INTERACTIVE_PLUGIN_.onDrageLeave, false);
+  _CHRIS_INTERACTIVE_PLUGIN_.dropMaskArea.removeEventListener("dragexit",_CHRIS_INTERACTIVE_PLUGIN_.onDrageLeave, false);
+  _CHRIS_INTERACTIVE_PLUGIN_.dropMaskArea.removeEventListener("dragover",_CHRIS_INTERACTIVE_PLUGIN_.onDragOver, false);
+  _CHRIS_INTERACTIVE_PLUGIN_.dropMaskArea.removeEventListener("drop", _CHRIS_INTERACTIVE_PLUGIN_.onDrop, false);
+  _CHRIS_INTERACTIVE_PLUGIN_.dropMaskArea.removeEventListener("dragend", _CHRIS_INTERACTIVE_PLUGIN_.onDrop, false);
+
+    // turn ON chris Drag and Drop
+  _DRAG_AND_DROP_.body.addEventListener("dragenter",_DRAG_AND_DROP_.onDragEnter, false);
+  _DRAG_AND_DROP_.body.addEventListener("dragleave",_DRAG_AND_DROP_.onDrageLeave, false);
+  _DRAG_AND_DROP_.dropMaskArea.addEventListener("dragover",_DRAG_AND_DROP_.onDragOver, false);
+  _DRAG_AND_DROP_.dropArea.addEventListener("drop", _DRAG_AND_DROP_.onDrop, false);
+  _DRAG_AND_DROP_.dropArea.addEventListener("dragend", _DRAG_AND_DROP_.onDrop, false);
 }
 
 // important in chrome, if not drag and drop do NOT work
@@ -96,7 +120,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.handleStyle = function (files) {
         document.createElement('span')];
             
       domElements[1].appendChild(document.createTextNode(files[i].name + " (" + Math.round((files[i].size/1024*100000)/100000)+"K) "));
-      domElements[0].id = "item"+_CHRIS_INTERACTIVE_PLUGIN_.countStyle;
+      domElements[0].id = "itemPlugin"+_CHRIS_INTERACTIVE_PLUGIN_.countStyle;
       domElements[0].appendChild(domElements[1]);
             
       filesFragment.appendChild(domElements[0]);
@@ -106,7 +130,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.handleStyle = function (files) {
           document.createElement('div'),
           document.createElement('div')];
         
-      progressDomElements[0].className = "loader01";
+      progressDomElements[0].className = "loader01Plugin";
       progressDomElements[0].appendChild(progressDomElements[1]);
       domElements[0].appendChild(progressDomElements[0]);
 
@@ -138,8 +162,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.processXHR = function (file, index) {
   data.append('what', 'file');
   data.append(file.name, file);
 
-  var container = document.getElementById("item"+index);
-  var loader = document.getElementsByClassName("loader01");
+  var container = document.getElementById("itemPlugin"+index);
+  var loader = document.getElementsByClassName("loader01Plugin");
   var fileUpload = xhr.upload;
         
   fileUpload.addEventListener("progress", function(event) {
