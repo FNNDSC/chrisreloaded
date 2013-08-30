@@ -60,13 +60,6 @@
 
 .feed:hover { /* gradient*/
 	background: #eee; /* for non-css3 browsers */
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#eeeeee',
-		endColorstr='#ffffff' );
-	/*for IE*/
-	background: -webkit-gradient(linear, left top, left bottom, from(#eee),
-		to(#fff) ); /*for webkit browsers*/
-	background: -moz-linear-gradient(top, #eee, #fff);
-	/* for firefox 3.6+ */
 }
 
 .feed_header {
