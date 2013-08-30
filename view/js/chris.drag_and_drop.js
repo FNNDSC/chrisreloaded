@@ -130,46 +130,36 @@ _DRAG_AND_DROP_.handleStyle = function (files) {
   _DRAG_AND_DROP_.dropWidget.style.display = "block";
        
   for(var i = 0, len = files.length; i < len; i++) {
-    // Stop people trying to upload massive files don't need for demo to work
-    // 100Mb limit
-    //sudo vim /etc/php5/apache2/php.ini 
-    //[toor@chris:x86_64-Linux]/var$>sudo service apache2 restart
-    // upload_max_filesize = 100M
-    // post_max_size = 120M
-    if(files[i].size < 838860800) {
-      domElements = [
+    domElements = [
+      document.createElement('div'),
+      document.createElement('span')];
+            
+    domElements[1].appendChild(document.createTextNode(files[i].name + " (" + Math.round((files[i].size/1024*100000)/100000)+"K)  "));
+    domElements[0].id = "item"+_DRAG_AND_DROP_.countStyle;
+    domElements[0].appendChild(domElements[1]);
+            
+    filesFragment.appendChild(domElements[0]);
+
+    // progress bar
+    var progressDomElements = [
         document.createElement('div'),
-        document.createElement('span')];
-            
-      domElements[1].appendChild(document.createTextNode(files[i].name + " (" + Math.round((files[i].size/1024*100000)/100000)+"K)  "));
-      domElements[0].id = "item"+_DRAG_AND_DROP_.countStyle;
-      domElements[0].appendChild(domElements[1]);
-            
-      filesFragment.appendChild(domElements[0]);
-
-      // progress bar
-      var progressDomElements = [
-          document.createElement('div'),
-          document.createElement('div')];
+        document.createElement('div')];
         
-      progressDomElements[0].className = "loader01";
-      progressDomElements[0].appendChild(progressDomElements[1]);
-      domElements[0].appendChild(progressDomElements[0]);
+    progressDomElements[0].className = "loader01";
+    progressDomElements[0].appendChild(progressDomElements[1]);
+    domElements[0].appendChild(progressDomElements[0]);
 
-      _DRAG_AND_DROP_.dropListing.appendChild(filesFragment);
+    _DRAG_AND_DROP_.dropListing.appendChild(filesFragment);
 
-      // update plugin_panel width
+    // update plugin_panel width
 
-      var _pluginpanelsize = jQuery(window).height()-417;
-      _pluginpanelsize -= jQuery("#drop-widget").height();
-      jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
+    var _pluginpanelsize = jQuery(window).height()-417;
+    _pluginpanelsize -= jQuery("#drop-widget").height();
+    jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
+    jQuery('.plugin_panel').css('height', _pluginpanelsize);
+    jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
 
-      _DRAG_AND_DROP_.countStyle++;
-    } else {
-        alert("The file you are trying to upload is too BIG (100Mb max)");
-    }
+    _DRAG_AND_DROP_.countStyle++;
   }
 };
 
@@ -183,56 +173,87 @@ _DRAG_AND_DROP_.handleFiles = function (files) {
 };
       
 _DRAG_AND_DROP_.processXHR = function (file, index) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'api.php', true);
-
-  var data = new FormData();
-  data.append('targetFeed', _DRAG_AND_DROP_.targetFeed);
-  data.append('action', 'add');
-  data.append('what', 'file');
-  data.append(file.name, file);
 
   var container = document.getElementById("item"+index);
   var loader = document.getElementsByClassName("loader01");
-  var fileUpload = xhr.upload;
-        
-  fileUpload.addEventListener("progress", function(event) {
-    if (event.lengthComputable) {
-      var percentage = Math.round((event.loaded * 100) / event.total),
-      loaderIndicator = container.firstChild.nextSibling.firstChild;
-      if (percentage < 100) {
-        loaderIndicator.style.width = percentage + "%";
+
+  // GO!
+  // Stop people trying to upload massive files don't need for demo to work
+  // 100Mb limit
+  //sudo vim /etc/php5/apache2/php.ini 
+  //[toor@chris:x86_64-Linux]/var$>sudo service apache2 restart
+  // upload_max_filesize = 100M = 104857600 Bytes
+  // post_max_size = 120M
+  if(file.size < 104857600) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'api.php', true);
+    var fileUpload = xhr.upload;
+
+    var data = new FormData();
+    data.append('targetFeed', _DRAG_AND_DROP_.targetFeed);
+    data.append('action', 'add');
+    data.append('what', 'file');
+    data.append(file.name, file);
+       
+    fileUpload.addEventListener("progress", function(event) {
+      if (event.lengthComputable) {
+        var percentage = Math.round((event.loaded * 100) / event.total),
+        loaderIndicator = container.firstChild.nextSibling.firstChild;
+        if (percentage < 100) {
+          loaderIndicator.style.width = percentage + "%";
+        }
       }
-    }
-  }, false);
+    }, false);
         
-  fileUpload.addEventListener("load", function(event) {
-    container.firstChild.nextSibling.style.borderColor = "#fff";
-    loaderIndicator = container.firstChild.nextSibling.firstChild;
-    loaderIndicator.style.width = "100%";
+    fileUpload.addEventListener("load", function(event) {
+      container.firstChild.nextSibling.style.borderColor = "#fff";
+      loaderIndicator = container.firstChild.nextSibling.firstChild;
+      loaderIndicator.style.width = "100%";
 
 
-    // green checkmark
-    var successSpan =  document.createElement('span');
-    successSpan.innerHTML = '&#10003;';
-    container.firstChild.appendChild(successSpan);
+      // blue checkmark
+      var successSpan =  document.createElement('span');
+      successSpan.innerHTML = '&#10003;';
+      successSpan.style.color = '#8ED2FF';
+      container.firstChild.appendChild(successSpan);
 
-    var _pluginpanelsize = jQuery(window).height()-417;
-    _pluginpanelsize -= jQuery("#drop-widget").height();
-    jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
-    jQuery('.plugin_panel').css('height', _pluginpanelsize);
-    jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
+      var _pluginpanelsize = jQuery(window).height()-417;
+      _pluginpanelsize -= jQuery("#drop-widget").height();
+      jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
+      jQuery('.plugin_panel').css('height', _pluginpanelsize);
+      jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
 
-    console.log("xhr upload of "+container.id+" complete");
-  }, false);
+      console.log("xhr upload of "+container.id+" complete");
+    }, false);
         
-  fileUpload.addEventListener("error", function(evt) {
+    fileUpload.addEventListener("error", function(evt) {
+      container.firstChild.nextSibling.style.borderColor = "#fff";
+      loaderIndicator = container.firstChild.nextSibling.firstChild;
+      loaderIndicator.style.width = "100%";
+      // red cross
+      var errorSpan =  document.createElement('span');
+      errorSpan.innerHTML = '&#10007;';
+      errorSpan.style.color = 'salmon';
+      container.firstChild.appendChild(errorSpan);
+
+      var _pluginpanelsize = jQuery(window).height()-417;
+      _pluginpanelsize -= jQuery("#drop-widget").height();
+      jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
+      jQuery('.plugin_panel').css('height', _pluginpanelsize);
+      jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
+
+      console.log("error: " + evt.code);
+    }, false);
+
+    xhr.send(data);
+  } else {
     container.firstChild.nextSibling.style.borderColor = "#fff";
     loaderIndicator = container.firstChild.nextSibling.firstChild;
     loaderIndicator.style.width = "100%";
     // red cross
     var errorSpan =  document.createElement('span');
-    errorSpan.innerHTML = '&#10007;';
+    errorSpan.innerHTML = '&#10007; (File too big)';
+    errorSpan.style.color = 'salmon';
     container.firstChild.appendChild(errorSpan);
 
     var _pluginpanelsize = jQuery(window).height()-417;
@@ -240,12 +261,8 @@ _DRAG_AND_DROP_.processXHR = function (file, index) {
     jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
     jQuery('.plugin_panel').css('height', _pluginpanelsize);
     jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
+  }
 
-    console.log("error: " + evt.code);
-  }, false);
-
-  // GO!
-  xhr.send(data);
 };
 
 jQuery(document).ready(function() {

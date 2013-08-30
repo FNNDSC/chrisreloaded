@@ -108,38 +108,29 @@ _CHRIS_INTERACTIVE_PLUGIN_.handleStyle = function (files) {
   _CHRIS_INTERACTIVE_PLUGIN_.dropListing.style.display = "block";
        
   for(var i = 0, len = files.length; i < len; i++) {
-    // Stop people trying to upload massive files don't need for demo to work
-    // 100Mb limit
-    //sudo vim /etc/php5/apache2/php.ini 
-    //[toor@chris:x86_64-Linux]/var$>sudo service apache2 restart
-    // upload_max_filesize = 100M
-    // post_max_size = 120M
-    if(files[i].size < 838860800) {
-      domElements = [
+
+    domElements = [
+      document.createElement('div'),
+      document.createElement('span')];
+            
+    domElements[1].appendChild(document.createTextNode(files[i].name + " (" + Math.round((files[i].size/1024*100000)/100000)+"K) "));
+    domElements[0].id = "itemPlugin"+_CHRIS_INTERACTIVE_PLUGIN_.countStyle;
+    domElements[0].appendChild(domElements[1]);
+            
+    filesFragment.appendChild(domElements[0]);
+
+    // progress bar
+    var progressDomElements = [
         document.createElement('div'),
-        document.createElement('span')];
-            
-      domElements[1].appendChild(document.createTextNode(files[i].name + " (" + Math.round((files[i].size/1024*100000)/100000)+"K) "));
-      domElements[0].id = "itemPlugin"+_CHRIS_INTERACTIVE_PLUGIN_.countStyle;
-      domElements[0].appendChild(domElements[1]);
-            
-      filesFragment.appendChild(domElements[0]);
-
-      // progress bar
-      var progressDomElements = [
-          document.createElement('div'),
-          document.createElement('div')];
+        document.createElement('div')];
         
-      progressDomElements[0].className = "loader01Plugin";
-      progressDomElements[0].appendChild(progressDomElements[1]);
-      domElements[0].appendChild(progressDomElements[0]);
+    progressDomElements[0].className = "loader01Plugin";
+    progressDomElements[0].appendChild(progressDomElements[1]);
+    domElements[0].appendChild(progressDomElements[0]);
 
-      _CHRIS_INTERACTIVE_PLUGIN_.dropListing.appendChild(filesFragment);
+    _CHRIS_INTERACTIVE_PLUGIN_.dropListing.appendChild(filesFragment);
 
-      _CHRIS_INTERACTIVE_PLUGIN_.countStyle++;
-    } else {
-        alert("The file you are trying to upload is too BIG (100Mb max)");
-    }
+    _CHRIS_INTERACTIVE_PLUGIN_.countStyle++;
   }
 };
 
@@ -153,51 +144,67 @@ _CHRIS_INTERACTIVE_PLUGIN_.handleFiles = function (files) {
 };
       
 _CHRIS_INTERACTIVE_PLUGIN_.processXHR = function (file, index) {
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'api.php', true);
-
-  var data = new FormData();
-  data.append('targetFeed', _CHRIS_INTERACTIVE_PLUGIN_.targetFeed);
-  data.append('action', 'add');
-  data.append('what', 'file');
-  data.append(file.name, file);
-
   var container = document.getElementById("itemPlugin"+index);
   var loader = document.getElementsByClassName("loader01Plugin");
-  var fileUpload = xhr.upload;
-        
-  fileUpload.addEventListener("progress", function(event) {
-    if (event.lengthComputable) {
-      var percentage = Math.round((event.loaded * 100) / event.total),
-      loaderIndicator = container.firstChild.nextSibling.firstChild;
-      if (percentage < 100) {
-        loaderIndicator.style.width = percentage + "%";
-      }
-    }
-  }, false);
-        
-  fileUpload.addEventListener("load", function(event) {
-   loader[index].style.display = "none";
-   // green checkmark
-    var successSpan =  document.createElement('span');
-    successSpan.style.color = 'greenyellow';
-    successSpan.innerHTML = '&#10003;';
-    container.appendChild(successSpan);
 
-    console.log("xhr upload of "+container.id+" complete");
-  }, false);
+  // Stop people trying to upload massive files don't need for demo to work
+  // 100Mb limit
+  //sudo vim /etc/php5/apache2/php.ini 
+  //[toor@chris:x86_64-Linux]/var$>sudo service apache2 restart
+  // upload_max_filesize = 100M = 104857600 Bytes
+  // post_max_size = 120M
+  if(file.size < 104857600) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'api.php', true);
+    var fileUpload = xhr.upload;
+
+    var data = new FormData();
+    data.append('targetFeed', _CHRIS_INTERACTIVE_PLUGIN_.targetFeed);
+    data.append('action', 'add');
+    data.append('what', 'file');
+    data.append(file.name, file);
+
+    fileUpload.addEventListener("progress", function(event) {
+      if (event.lengthComputable) {
+        var percentage = Math.round((event.loaded * 100) / event.total),
+        loaderIndicator = container.firstChild.nextSibling.firstChild;
+        if (percentage < 100) {
+          loaderIndicator.style.width = percentage + "%";
+        }
+      }
+    }, false);
         
-  fileUpload.addEventListener("error", function(evt) {
+    fileUpload.addEventListener("load", function(event) {
+     loader[index].style.display = "none";
+     // green checkmark
+      var successSpan =  document.createElement('span');
+      successSpan.style.color = '#8ED2FF';
+      successSpan.innerHTML = '&#10003;';
+      container.appendChild(successSpan);
+
+      console.log("xhr upload of "+container.id+" complete");
+    }, false);
+        
+    fileUpload.addEventListener("error", function(evt) {
+      loader[index].style.display = "none";
+      // red cross
+      var errorSpan =  document.createElement('span');
+      errorSpan.style.color = 'salmon';
+      errorSpan.innerHTML = '&#10007;';
+      container.appendChild(errorSpan);
+
+      console.log("error: " + evt.code);
+    }, false);
+
+    // GO!
+    xhr.send(data);    
+
+  } else {
     loader[index].style.display = "none";
     // red cross
     var errorSpan =  document.createElement('span');
     errorSpan.style.color = 'salmon';
-    errorSpan.innerHTML = '&#10007;';
+    errorSpan.innerHTML = '&#10007; (File too big)';
     container.appendChild(errorSpan);
-
-    console.log("error: " + evt.code);
-  }, false);
-
-  // GO!
-  xhr.send(data);
+  }
 };
