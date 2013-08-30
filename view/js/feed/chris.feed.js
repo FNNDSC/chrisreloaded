@@ -277,7 +277,7 @@ _FEED_.ajaxUpdate = function() {
           }
           var newFeeds = _FEED_.finFeeds[0].length + _FEED_.runFeeds[0].length;
           if (newFeeds > 0) {
-            jQuery('.feed_update').html('Click here to show ' +
+            jQuery('.feed_update').html('Click here to see ' +
                 newFeeds + ' new feed' + _FEED_.hasS(newFeeds));
             if (!jQuery('.feed_update').is(':visible')) {
               jQuery('.feed_update').show('blind', 100);
