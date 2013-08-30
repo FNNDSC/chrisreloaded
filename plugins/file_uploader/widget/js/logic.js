@@ -178,7 +178,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.processXHR = function (file, index) {
      loader[index].style.display = "none";
      // green checkmark
       var successSpan =  document.createElement('span');
-      successSpan.style.color = '#6097BB';
+      successSpan.style.color = '#009DE9';
       successSpan.innerHTML = '&#10003;';
       container.appendChild(successSpan);
 

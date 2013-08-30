@@ -214,7 +214,7 @@ _DRAG_AND_DROP_.processXHR = function (file, index) {
       // blue checkmark
       var successSpan =  document.createElement('span');
       successSpan.innerHTML = '&#10003;';
-      successSpan.style.color = '#6097BB';
+      successSpan.style.color = '#009DE9';
       container.firstChild.appendChild(successSpan);
 
       var _pluginpanelsize = jQuery(window).height()-417;
