@@ -85,7 +85,7 @@ class FeedV implements ObjectViewInterface {
     $status_text = '<font color=red>Running <i class="icon-refresh rotating_class"></i></font>';
     // ('.$object->status.'%)
     if ($object->status == 100) {
-      $status_text = '<font color=green>Done</font>';
+      $status_text = '<font color=#6097BB>Done</font>';
     } else if ($object->status == 101) {
       $status_text = '<font color=darkred>Canceled</font>';
     }

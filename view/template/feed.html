@@ -10,8 +10,17 @@
 				class='feed_type'>${PLUGIN}</span>&nbsp;&nbsp; <span
 				class='feed_username feed_header_small'>${USERNAME}</span></span><span
 				class="pull-right"> <span class="feed_time feed_header_small">Some
-					time ago..</span><span class="btn-group pull-right show_me">
-					<button class="btn btn-mini feed_btn feed_share" tabindex="-1">
+					time ago..</span><span class="pull-right show_me">&nbsp;
+					<a class="feed_share"><i class="${SHARE_ICON}"></i></a>
+								<a class="feed_favorite"><i
+								class="${FAVORITE_ICON}"></i></a>
+								<a class="feed_archive"><i
+								class="${ARCHIVE_ICON}"></i></a>
+<span style="${CANCEL}">
+								<a class="feed_cancel"><i
+									class="icon-ban-circle disabled"></i></a></span>
+
+<!-- 					<button class="btn btn-mini feed_btn feed_share" tabindex="-1">
 						<i class="${SHARE_ICON}" style='height: 12px;'></i>
 					</button>
 					<button class="btn btn-mini dropdown-toggle feed_btn"
@@ -22,13 +31,13 @@
 						<li><a class="feed_share"><i
 								class="${SHARE_ICON}"></i>&nbsp;Share</a></li>
 						<li><a class="feed_favorite"><i
-								class="${FAVORITE_ICON}"></i>&nbsp;<span>${FAVORITE_TEXT}</span></a></li>
+								class="${FAVORITE_ICON}"></i>&nbsp;<span>${FAVORITE_TEXT}</span></a></li> -->
 						<!--       <li class="divider"></li> -->
-						<li><a class="feed_archive"><i
+<!-- 						<li><a class="feed_archive"><i
 								class="${ARCHIVE_ICON}"></i>&nbsp;<span>${ARCHIVE_TEXT}</span></a></li>
 
 						<li style="${CANCEL}"><a class="feed_cancel"><span><i
-									class="icon-ban-circle disabled"></i></span>&nbsp;Cancel </a></li>
+									class="icon-ban-circle disabled"></i></span>&nbsp;Cancel </a></li> -->
 						<!-- 
       <li><a href="#"><span class="feed_archive"><i
          class="icon-refresh"></i></span> Restart </a></li>
@@ -49,7 +58,7 @@
          class=" icon-thumbs-up"></i></span> Like</a></li> -->
 
 						<!--       <li><a href="#"><i class="icon-fire"></i>&nbsp;Report bug </a></li> -->
-					</ul>
+					<!-- </ul> -->
 			</span>
 
 			</span>

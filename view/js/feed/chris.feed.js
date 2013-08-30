@@ -210,7 +210,7 @@ _FEED_.ajaxUpdate = function() {
                             if (data['new']['status'][i] == 100) {
                               
                               jQuery(this).find('.feed_status').html(
-                                  'Status: <font color=green>Done</font>');
+                                  'Status: <font color=#6097BB>Done</font>');
                               
                             } else {
                              // hide cancel option
