@@ -10,12 +10,16 @@
 <link rel="stylesheet" type="text/css" href="plugins/file_uploader/widget/css/style.css">
 
 </head>
+
 <body>
   
   <div id="drop">
     <div id="dropmask"></div>
-    <h1>Drop files here</h1>
-    <h3>To upload them to the server</h3>
+    <h1>Drop or
+      <input type="file" multiple="multiple" id="fileToUpload" onchange="_CHRIS_INTERACTIVE_PLUGIN_.onUpload(event);" style="display: none;"/>
+      <a href="#" id="fileToUploadLink" onclick="document.getElementById('fileToUpload').click();" style="cursor:pointer; display: inline-block; position:relative;" > upload </a> files!
+    </h1>
+    <h3>... to the server</h3>
   </div>
   <div id="output-listing01"></div>
 </body>

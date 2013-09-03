@@ -81,6 +81,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.onDrageLeave = function (e) {
 };
 
 _CHRIS_INTERACTIVE_PLUGIN_.onDrop = function (e) {
+
   e.stopPropagation();
   e.preventDefault();
   // reset style
@@ -99,6 +100,27 @@ _CHRIS_INTERACTIVE_PLUGIN_.onDrop = function (e) {
   // do sth with those files!
   _CHRIS_INTERACTIVE_PLUGIN_.handleStyle(e.dataTransfer.files);
   _CHRIS_INTERACTIVE_PLUGIN_.handleFiles(e.dataTransfer.files);
+};
+
+
+_CHRIS_INTERACTIVE_PLUGIN_.onUpload = function (e) {
+
+  e.stopPropagation();
+  e.preventDefault();
+
+  if(_CHRIS_INTERACTIVE_PLUGIN_.count == 0){
+    // store reference to files
+    _CHRIS_INTERACTIVE_PLUGIN_.targetFiles = e.target.files;
+    // style output (for user interaction)
+    _CHRIS_INTERACTIVE_PLUGIN_.handleStyle(e.target.files);
+    // create the feed
+    _CHRIS_INTERACTIVE_PLUGIN_.force = true;
+    document.getElementById("plugin_submit").click();
+    return;
+  }
+  // do sth with those files!
+  _CHRIS_INTERACTIVE_PLUGIN_.handleStyle(e.target.files);
+  _CHRIS_INTERACTIVE_PLUGIN_.handleFiles(e.target.files);
 };
 
 _CHRIS_INTERACTIVE_PLUGIN_.handleStyle = function (files) {

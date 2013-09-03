@@ -31,7 +31,7 @@ class File_Uploader(Plugin):
   Plugin.TITLE = 'File Uploader'
   Plugin.CATEGORY = 'System'
   Plugin.DESCRIPTION = '''
-  Drag and drop files here to upload them to the server. Limit is 100Mb per file.
+  Drag and drop files here to upload them to the server. Limit is 100MB per file.
   '''
 
   Plugin.DOCUMENTATION = 'https://github.com/FNNDSC/chrisreloaded/wiki/Plugin-file-uploader'

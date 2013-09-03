@@ -49,7 +49,13 @@
 }
 
 #dropmask {
+  margin-top: -30px;
   position:absolute;
   width: 100%;
   height: 100%;
+}
+
+#fileToUploadLink:hover{
+  background-color: white;
+  color: #009DE9; 
 }
