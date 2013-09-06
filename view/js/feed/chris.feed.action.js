@@ -309,6 +309,10 @@ _FEED_.feed_tag = function() {
         jQuery('#TAGMODAL').outerWidth() / 2 * -1);
         jQuery('#TAGMODAL').modal();
 
+        jQuery('#TAGMODAL').on('shown', function() {
+          _TAG_.load();
+        });
+
         //update modal content
 
         // and attach callbacks

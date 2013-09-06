@@ -53,7 +53,7 @@
  </div>
  <div class="modal-body" style='padding:0px;overflow-y:hidden;max-height:100%;'>
 
-<div style="padding-left:5px; padding-right:5px;"><h4 style="display:inline-block;">Name &nbsp;</h4><input id='tagname'> <h4 style="display:inline-block;">&nbsp; Color &nbsp;</h4> <input type="color" id='tagcolor' style="margin-bottom:0px;"> <h4 id="createTag" onclick="createTag()"> Create tag! </h4>
+<div style="padding-left:5px; padding-right:5px;"><h4 style="display:inline-block;">Name &nbsp;</h4><input id='tagname'> <h4 style="display:inline-block;">&nbsp; Color &nbsp;</h4> <input type="color" id='tagcolor' style="margin-bottom:0px;"> <h4 id="createTag" onclick="_TAG_.createTag()"> Create tag! </h4>
 
 <!--   <h4 style="display:inline-block;color:#fff; background-color: #009DE9; padding:5px; border-radius: 2px;" onclick="loadTags()"> Load tags!(dev)</h4> -->
 
@@ -67,26 +67,57 @@
   </div>
   <div class="modal-footer" style="background-color:#009DE9; color: #fff; border-radius: 2px; padding-top:0px;">
 <!--   <h4 id='feedClose'>Close</h4> -->
-  <h4 id='feedTag' onclick="feedTag()">Tag feed!</h4>
+  <h4 id='feedTag' onclick="_TAG_.feedTag()">Tag feed!</h4>
  </div>
 </div>
 
 <script>
+var _TAG_ = _TAG_ || {};
+
 // on open, load tags for this user and store then in an array
-var tags = [{id:0, name:'Ne',color:'#ff0000'},
-            {id:1, name:'Feed2', color:'#00ff00'},
-            {id:2, name:'edfgdfged_3', color:'#90f020'}];
-var selectedTagID = '';
+_TAG_.tags = [];
+_TAG_.selectedTagID = '';
 
-loadTags = function(){
-  // xhr to server -> userid to get tags
-  // parse tags and update container
-  for (var i = 0; i < tags.length; i++) {
-    createTagElement(tags[i]);
+// _TAG_.loadTags = function(){
+//   // xhr to server -> userid to get tags
+//   // push to server through API.php
+
+// };
+
+_TAG_.load = function(){
+
+  // clean gui
+  var tagslist = document.querySelector('#tagslist');
+  while (tagslist.hasChildNodes()) {
+    tagslist.removeChild(tagslist.lastChild);
+  }
+
+  // load user's tags from db
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'api.php', true);
+
+  var data = new FormData();
+  data.append('action', 'get');
+  data.append('what', 'tag');
+
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+      
+      // update _TAG_.tags
+      _TAG_.tags = JSON.parse(xhr.responseText).result.Tag;
+
+      // parse tags and update container
+      for (var i = 0; i < _TAG_.tags.length; i++) {
+        _TAG_.createTagElement(_TAG_.tags[i]);
+      };
+    }
   };
-};
 
-createTagElement = function(tagObject){
+  // GO!
+  xhr.send(data);
+}
+
+_TAG_.createTagElement = function(tagObject){
   // create new span element
     var tagSpan = document.createElement('span');
     tagSpan.setAttribute('id', 'tag-'+tagObject.id);
@@ -94,15 +125,13 @@ createTagElement = function(tagObject){
     tagSpan.classList.add('label');
     tagSpan.onclick = function(e){
       e.stopPropagation();
-      window.console.log('im clicked!');
-      if(selectedTagID != ''){
+      if(_TAG_.selectedTagID != ''){
         // clean style
-        window.console.log(selectedTagID);
-        var target = document.querySelector('#'+selectedTagID);
+        var target = document.querySelector('#'+_TAG_.selectedTagID);
         target.style.border = 'none';
       }
       e.srcElement.style.border = '2px solid #999';
-      selectedTagID = e.srcElement.id;
+      _TAG_.selectedTagID = e.srcElement.id;
     };
 
     Object.keys(tagObject).forEach(function(value) {
@@ -128,16 +157,16 @@ createTagElement = function(tagObject){
         var spanElt = e.srcElement.parentElement;
 
         // delete from the js array
-        for (var i = 0; i < tags.length; i++) {
-          if(tags[i] != null && spanElt.id.substring(4) == tags[i].id){
-            tags[i] = null;
+        for (var i = 0; i < _TAG_.tags.length; i++) {
+          if(_TAG_.tags[i] != null && spanElt.id.substring(4) == _TAG_.tags[i].id){
+            _TAG_.tags[i] = null;
             break;
           }
         };
 
         // reest selection
-        if(selectedTagID == spanElt.id){
-          selectedTagID = '';
+        if(_TAG_.selectedTagID == spanElt.id){
+          _TAG_.selectedTagID = '';
         };
         
       // delete tag from DB
@@ -164,7 +193,7 @@ createTagElement = function(tagObject){
     tagSpan.appendChild(deleteImg);
     // set color
     tagSpan.style.backgroundColor = tagSpan.getAttribute("data-chris-tag_color");
-    tagSpan.style.color = invertColor(tagSpan.getAttribute("data-chris-tag_color"));
+    tagSpan.style.color = _TAG_.invertColor(tagSpan.getAttribute("data-chris-tag_color"));
     tagSpan.style.textShadow = 'none';
     // add it to dom
     var tagslist = document.querySelector('#tagslist');
@@ -172,7 +201,7 @@ createTagElement = function(tagObject){
 }
 
 // on click create tag
-createTag = function(){
+_TAG_.createTag = function(){
   // get color
   var tagcolor = document.querySelector('#tagcolor');
   // get name
@@ -181,8 +210,8 @@ createTag = function(){
     // if name do not exist
     var unique = true;
     // if name exists
-    for (var i = 0; i < tags.length; i++) {
-      if(tags[i] != null && tagname.value == tags[i].name){
+    for (var i = 0; i < _TAG_.tags.length; i++) {
+      if(_TAG_.tags[i] != null && tagname.value == _TAG_.tags[i].name){
         unique = false;
         break;
       }
@@ -209,10 +238,10 @@ createTag = function(){
             name:tagname.value,
             color:tagcolor.value};
           // add to list
-          tags.push(tagObj);
+          _TAG_.tags.push(tagObj);
         
           // create element and add to dom
-          createTagElement(tagObj);
+          _TAG_.createTagElement(tagObj);
         }
       };
 
@@ -228,13 +257,13 @@ createTag = function(){
   }
 };
 
-feedTag = function(){
+_TAG_.feedTag = function(){
   // call __FEED__.feedTag($feediD, $tagID)
   // create tag!
 }
 
 //http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
-hexToRgb = function(hex) {
+_TAG_.hexToRgb = function(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
         r: parseInt(result[1], 16),
@@ -244,9 +273,9 @@ hexToRgb = function(hex) {
 }
 
 
-invertColor = function(hexnum){
+_TAG_.invertColor = function(hexnum){
   // to rgb
-  var rgb = hexToRgb(hexnum);
+  var rgb = _TAG_.hexToRgb(hexnum);
 
   if(rgb.r + rgb.g + rgb.b > 300){
     return '#000000'

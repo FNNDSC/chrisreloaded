@@ -295,6 +295,10 @@ if (!$loggedIn) {
 
           $result['result'] = UserC::get();
 
+        } else if($what == 'tag'){
+
+          $result['result'] = TagC::get($_SESSION['userid']);
+
         } else if($what == 'token') {
 
           $result['result'] = TokenC::create();

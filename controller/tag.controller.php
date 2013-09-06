@@ -47,6 +47,9 @@ interface TagControllerInterface
   static public function remove($userID, $tagId);
   // Update tag in DB
   static public function update($userID, $tagId, $tagName, $tagColor);
+  // Get all tags for one user
+  static public function get($userID);
+
 }
 
 /**
@@ -81,6 +84,17 @@ class TagC implements TagControllerInterface {
   static public function update($userID, $tagId, $tagName, $tagColor){
 
     return -1;
+  }
+
+  /**
+   *
+   */
+  static public function get($userID){
+
+    $tagMapper = new Mapper('Tag');
+    $tagMapper->filter('user_id=(?)', $userID);
+    
+    return $tagMapper->get();
   }
 
 }
