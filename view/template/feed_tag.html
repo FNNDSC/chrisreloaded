@@ -1,6 +1,7 @@
 <style>
 .tag{
-  margin:3px;
+  margin:5px;
+  padding:3px;
 }
 
 .tag:hover{
@@ -61,7 +62,7 @@
  </div>
   <div style='height:351px; width:100%;'>
   <div style="width:100%; color:#fff; background-color: #009DE9; padding:5px;margin:0px;"><h4 style="margin:0px;">Select tag:</h4></div>
-  <div id="tagslist" style="width:100%; height:100%;padding:10px;">
+  <div id="tagslist" style="width:100%; height:321px;">
   <!--<span data-chris-tag_id="0" class="label" style="background-color:red;">New <img class="feed_edit_icon focus" src="view/gfx/jigsoar-icons/light/16_edit_page.png"><img class="feed_edit_icon focus" src="view/gfx/jigsoar-icons/light/16_close.png"></span>&nbsp;<span data-chris-tag_id="1" class="label" style="background-color:blue;">New <img class="feed_edit_icon focus" src="view/gfx/jigsoar-icons/light/16_edit_page.png"> <img class="feed_edit_icon focus" src="view/gfx/jigsoar-icons/light/16_close.png"></span></span>-->
   </div>
   </div>
@@ -78,21 +79,9 @@ var _TAG_ = _TAG_ || {};
 _TAG_.tags = [];
 _TAG_.selectedTagID = '';
 
-// _TAG_.loadTags = function(){
-//   // xhr to server -> userid to get tags
-//   // push to server through API.php
-
-// };
-
-_TAG_.load = function(){
-
-  // clean gui
-  var tagslist = document.querySelector('#tagslist');
-  while (tagslist.hasChildNodes()) {
-    tagslist.removeChild(tagslist.lastChild);
-  }
-
-  // load user's tags from db
+_TAG_.loadTags = function(){
+  // xhr to server -> userid to get tags
+  // push to server through API.php
   var xhr = new XMLHttpRequest();
   xhr.open('POST', 'api.php', true);
 
@@ -102,7 +91,13 @@ _TAG_.load = function(){
 
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-      
+
+      // clean gui
+      var tagslist = document.querySelector('#tagslist');
+      while (tagslist.hasChildNodes()) {
+        tagslist.removeChild(tagslist.lastChild);
+      }
+
       // update _TAG_.tags
       _TAG_.tags = JSON.parse(xhr.responseText).result.Tag;
 
@@ -115,6 +110,16 @@ _TAG_.load = function(){
 
   // GO!
   xhr.send(data);
+};
+
+_TAG_.load = function(){
+
+  window.console.log('Tags load...');
+  // clean gui
+  // load tag from db
+  // fill _TAG_.tags
+  // load tags
+  _TAG_.loadTags();
 }
 
 _TAG_.createTagElement = function(tagObject){
