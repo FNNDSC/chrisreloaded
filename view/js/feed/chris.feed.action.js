@@ -296,6 +296,49 @@ _FEED_.feed_cancel = function() {
         });
       });
 }
+_FEED_.feed_tag = function() {
+  jQuery(document).on(
+      'click',
+      '.feed_tag',
+      function(e) {
+        // modify
+        e.stopPropagation();
+        // modal with feed id + user id
+        jQuery('#TAGMODAL').addClass('largePreview');
+        jQuery('#TAGMODAL').css('margin-left',
+        jQuery('#TAGMODAL').outerWidth() / 2 * -1);
+        jQuery('#TAGMODAL').modal();
+
+        //update modal content
+
+        // and attach callbacks
+        // get feed id
+        // var feedElt = jQuery(this).closest('.feed');
+        // var feedID = feedElt.attr('data-chris-feed_id');
+        // var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
+        // // api.php add to favorites
+        // jQuery.ajax({
+        //   type : "POST",
+        //   url : "api.php?action=set&what=feed_cancel&id=" + feedID,
+        //   dataType : "json",
+        //   success : function(data) {
+        //     jQuery(allElts).each(
+        //         function() {
+        //           var elt = jQuery(this);
+        //           if (elt.parent().hasClass('feed_sea_content')
+        //               || elt.find('i').hasClass('icon-star')) {
+        //             // this feed is favorited or is inside search div, meaning
+        //             // that we don't
+        //             // hide it
+        //             return;
+        //           }
+        //           // hide the div
+        //           elt.hide('blind', 'slow');
+        //         });
+        //   }
+        // });
+      });
+}
 _FEED_.slicedrop = function(el) {
     
     var _token = '';
@@ -349,6 +392,7 @@ _FEED_.slicedrop_dicom = function(el) {
  */
 jQuery(document).ready(function() {
   _FEED_.feed_share();
+  _FEED_.feed_tag();
   _FEED_.feed_favorite();
   _FEED_.feed_archive();
   _FEED_.feed_rename();

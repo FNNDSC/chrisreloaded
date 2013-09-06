@@ -69,6 +69,7 @@ function homePage() {
   $t -> replace('RUNNING_COUNT', FeedC::getRunningCount($_SESSION['userid']));
   $t -> replace('PLUGIN', PluginC::getHTML());
   $t -> replace('FEED_ALL', FeedC::getAllHTML($_SESSION['userid']));
+  $t -> replace('FEED_TAG', 'feed_tag.html');
   $t -> replace('FEED_DATA_PREVIEW', 'feed_data_preview.html');
   $t -> replace('DRAG_AND_DROP', 'drag_and_drop.html');
   $t -> replace('FOOTER', 'footer.html');

@@ -1,0 +1,259 @@
+<style>
+.tag{
+  margin:3px;
+}
+
+.tag:hover{
+  cursor:pointer;
+}
+
+#createTag{
+  display:inline-block;
+  color:#fff;
+  background-color: #009DE9;
+  padding:5px;
+  border-radius: 2px;
+}
+
+#createTag:hover{
+  cursor:pointer;
+}
+
+#feedTag{
+  display:inline-block;
+  color:#009DE9;
+  background-color: #fff;
+  padding:5px;
+  border-radius: 2px;
+}
+
+#feedTag:hover{
+  cursor:pointer;
+}
+
+#feedClose{
+  display:inline-block;
+  color:#009DE9;
+  background-color: #fff;
+  padding:5px;
+  border-radius: 2px;
+}
+
+#feedClose:hover{
+  cursor:pointer;
+}
+
+</style>
+
+
+<div id="TAGMODAL" class="modal hide fade" tabindex="-1" role="dialog"
+ aria-labelledby="TAGLABEL" aria-hidden="true" style='height:500px;overflow:hidden'>
+ <div class="modal-header" style="background-color:#009DE9; color: #fff; border-radius: 2px;">
+<h3>Tag creator</h3>
+ </div>
+ <div class="modal-body" style='padding:0px;overflow-y:hidden;max-height:100%;'>
+
+<div style="padding-left:5px; padding-right:5px;"><h4 style="display:inline-block;">Name &nbsp;</h4><input id='tagname'> <h4 style="display:inline-block;">&nbsp; Color &nbsp;</h4> <input type="color" id='tagcolor' style="margin-bottom:0px;"> <h4 id="createTag" onclick="createTag()"> Create tag! </h4>
+
+<!--   <h4 style="display:inline-block;color:#fff; background-color: #009DE9; padding:5px; border-radius: 2px;" onclick="loadTags()"> Load tags!(dev)</h4> -->
+
+  </div>
+ </div>
+  <div style='height:351px; width:100%;'>
+  <div style="width:100%; color:#fff; background-color: #009DE9; padding:5px;margin:0px;"><h4 style="margin:0px;">Select tag:</h4></div>
+  <div id="tagslist" style="width:100%; height:100%;padding:10px;">
+  <!--<span data-chris-tag_id="0" class="label" style="background-color:red;">New <img class="feed_edit_icon focus" src="view/gfx/jigsoar-icons/light/16_edit_page.png"><img class="feed_edit_icon focus" src="view/gfx/jigsoar-icons/light/16_close.png"></span>&nbsp;<span data-chris-tag_id="1" class="label" style="background-color:blue;">New <img class="feed_edit_icon focus" src="view/gfx/jigsoar-icons/light/16_edit_page.png"> <img class="feed_edit_icon focus" src="view/gfx/jigsoar-icons/light/16_close.png"></span></span>-->
+  </div>
+  </div>
+  <div class="modal-footer" style="background-color:#009DE9; color: #fff; border-radius: 2px; padding-top:0px;">
+<!--   <h4 id='feedClose'>Close</h4> -->
+  <h4 id='feedTag' onclick="feedTag()">Tag feed!</h4>
+ </div>
+</div>
+
+<script>
+// on open, load tags for this user and store then in an array
+var tags = [{id:0, name:'Ne',color:'#ff0000'},
+            {id:1, name:'Feed2', color:'#00ff00'},
+            {id:2, name:'edfgdfged_3', color:'#90f020'}];
+var selectedTagID = '';
+
+loadTags = function(){
+  // xhr to server -> userid to get tags
+  // parse tags and update container
+  for (var i = 0; i < tags.length; i++) {
+    createTagElement(tags[i]);
+  };
+};
+
+createTagElement = function(tagObject){
+  // create new span element
+    var tagSpan = document.createElement('span');
+    tagSpan.setAttribute('id', 'tag-'+tagObject.id);
+    tagSpan.classList.add('tag');
+    tagSpan.classList.add('label');
+    tagSpan.onclick = function(e){
+      e.stopPropagation();
+      window.console.log('im clicked!');
+      if(selectedTagID != ''){
+        // clean style
+        window.console.log(selectedTagID);
+        var target = document.querySelector('#'+selectedTagID);
+        target.style.border = 'none';
+      }
+      e.srcElement.style.border = '2px solid #999';
+      selectedTagID = e.srcElement.id;
+    };
+
+    Object.keys(tagObject).forEach(function(value) {
+      tagSpan.setAttribute('data-chris-tag_'+value, tagObject[value]);
+    });
+
+    // fill it!
+    // add text
+    var textNode = document.createTextNode(tagSpan.getAttribute("data-chris-tag_name"));
+    // add icons
+    // edit
+    // var editImg=document.createElement("img");
+    // editImg.classList.add('focus');
+    // editImg.setAttribute('src', 'view/gfx/jigsoar-icons/light/16_edit_page.png');
+    // delete
+    var deleteImg=document.createElement("img");
+    deleteImg.classList.add('focus');
+    deleteImg.setAttribute('src', 'view/gfx/jigsoar-icons/light/16_close.png');
+    deleteImg.onclick = function(e){
+      e.stopPropagation();
+      r = window.confirm("The tag will be deleted!");
+      if (r){
+        var spanElt = e.srcElement.parentElement;
+
+        // delete from the js array
+        for (var i = 0; i < tags.length; i++) {
+          if(tags[i] != null && spanElt.id.substring(4) == tags[i].id){
+            tags[i] = null;
+            break;
+          }
+        };
+
+        // reest selection
+        if(selectedTagID == spanElt.id){
+          selectedTagID = '';
+        };
+        
+      // delete tag from DB
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'api.php', true);
+
+      var data = new FormData();
+      data.append('action', 'remove');
+      data.append('what', 'tag');
+      data.append('tagid', spanElt.id.substring(4));
+      // GO!
+      xhr.send(data);
+
+      // delete the tag from the GUI
+      (spanElt.parentNode).removeChild(spanElt);
+      }
+      else{
+        // nothing
+      }
+    };
+    // fill span
+    tagSpan.appendChild(textNode);
+    //tagSpan.appendChild(editImg);
+    tagSpan.appendChild(deleteImg);
+    // set color
+    tagSpan.style.backgroundColor = tagSpan.getAttribute("data-chris-tag_color");
+    tagSpan.style.color = invertColor(tagSpan.getAttribute("data-chris-tag_color"));
+    tagSpan.style.textShadow = 'none';
+    // add it to dom
+    var tagslist = document.querySelector('#tagslist');
+    tagslist.appendChild(tagSpan);
+}
+
+// on click create tag
+createTag = function(){
+  // get color
+  var tagcolor = document.querySelector('#tagcolor');
+  // get name
+  var tagname = document.querySelector('#tagname');
+  if(tagname.value != ''){
+    // if name do not exist
+    var unique = true;
+    // if name exists
+    for (var i = 0; i < tags.length; i++) {
+      if(tags[i] != null && tagname.value == tags[i].name){
+        unique = false;
+        break;
+      }
+    };
+    
+    if(unique){
+      // push to server through API.php
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', 'api.php', true);
+
+      var data = new FormData();
+      data.append('action', 'add');
+      data.append('what', 'tag');
+      data.append('tagname', tagname.value);
+      data.append('tagcolor', tagcolor.value);
+
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+
+          var tagid = JSON.parse(xhr.responseText).result;
+
+          // based on object size for now...
+          var tagObj = {id:tagid,
+            name:tagname.value,
+            color:tagcolor.value};
+          // add to list
+          tags.push(tagObj);
+        
+          // create element and add to dom
+          createTagElement(tagObj);
+        }
+      };
+
+      // GO!
+      xhr.send(data);  
+    }
+    else{
+      window.alert('Tag name already exists!');
+    }
+  }
+  else{
+    window.alert('Tag name is empty!');
+  }
+};
+
+feedTag = function(){
+  // call __FEED__.feedTag($feediD, $tagID)
+  // create tag!
+}
+
+//http://stackoverflow.com/questions/5623838/rgb-to-hex-and-hex-to-rgb
+hexToRgb = function(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+}
+
+
+invertColor = function(hexnum){
+  // to rgb
+  var rgb = hexToRgb(hexnum);
+
+  if(rgb.r + rgb.g + rgb.b > 300){
+    return '#000000'
+  }
+  return '#ffffff';
+}
+
+</script>
+
+

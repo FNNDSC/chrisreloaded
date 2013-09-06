@@ -92,6 +92,8 @@ class FeedV implements ObjectViewInterface {
 
     $share_icon = 'icon-share-alt';
 
+    $tag_icon = 'icon-tag';
+
     $archive_icon = 'icon-remove';
     $archive_text = 'Archive';
     if ($object->archive == '1') {
@@ -131,6 +133,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
     $t -> replace('SHARE_ICON', $share_icon);
+    $t -> replace('TAG_ICON', $tag_icon);
     $t -> replace('ARCHIVE_ICON', $archive_icon);
     $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_ICON', $favorite_icon);
