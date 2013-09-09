@@ -36,6 +36,8 @@ require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_tag.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'tag.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
@@ -60,6 +62,8 @@ interface FeedControllerInterface
   static public function updateName($id, $name, &$ssh_connection);
   // cancel the job
   static public function cancel($id, &$ssh_connection);
+  // tag/untag a feed
+  static public function tag($feedid, $tagid, $remove);
 }
 
 /**
@@ -758,5 +762,45 @@ class FeedC implements FeedControllerInterface {
 
   }
 
+  // tag a feed
+  // add untag feature
+  static public function tag($feedid, $tagid, $remove){
+
+    if($remove == 'false'){
+      // is tag feed already?
+      $feedtagMapper = new Mapper('Feed_Tag');
+      $feedtagMapper->filter('feed_id=(?)', $feedid);
+      $feedtagMapper->filter('tag_id=(?)', $tagid);
+    
+      $feedtadResults = $feedtagMapper->get();
+
+      if(count($feedtadResults['Feed_Tag']) >= 1){
+        return -1;
+      }
+
+      $tagObject = new Feed_Tag();
+      $tagObject->feed_id = $feedid;
+      $tagObject->tag_id = $tagid;
+
+      return Mapper::add($tagObject);
+
+    }
+    else{
+      // is tag feed already?
+      $feedtagMapper = new Mapper('Feed_Tag');
+      $feedtagMapper->filter('feed_id=(?)', $feedid);
+      $feedtagMapper->filter('tag_id=(?)', $tagid);
+    
+      $feedtadResults = $feedtagMapper->get();
+
+      if(count($feedtadResults['Feed_Tag']) >= 1){
+        Mapper::delete('Feed_Tag', $feedtadResults['Feed_Tag'][0]->id);
+        return 1;
+      }
+
+      return -1;
+
+    }
+  }
 }
 ?>

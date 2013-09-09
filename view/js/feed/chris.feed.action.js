@@ -297,12 +297,79 @@ _FEED_.feed_cancel = function() {
       });
 }
 _FEED_.feed_tag = function() {
+    jQuery(document).on(
+      'click',
+      '.inmodal',
+      function(e) {
+       e.stopPropagation();
+       if(_MODALTAG_.selectedTagID != ''){
+         // clean style
+         var target = document.querySelector('#'+_MODALTAG_.selectedTagID);
+         target.style.border = 'none';
+       }
+       e.srcElement.style.border = '2px solid #999';
+       _MODALTAG_.selectedTagID = e.srcElement.id;
+      });
+
+    jQuery(document).on(
+      'click',
+      '.inmodal > img',
+      function(e) {
+        e.stopPropagation();
+        r = window.confirm("The tag will be deleted!");
+        if (r){
+          var spanElt = e.srcElement.parentElement;
+
+          // delete from the js array
+          for (var i = 0; i < _MODALTAG_.tags.length; i++) {
+            if(_MODALTAG_.tags[i] != null && spanElt.id.substring(4) == _MODALTAG_.tags[i].id){
+              _MODALTAG_.tags[i] = null;
+              break;
+            }
+          };
+
+          // reest selection
+          if(_MODALTAG_.selectedTagID == spanElt.id){
+            _MODALTAG_.selectedTagID = '';
+          };
+        
+        // delete tag from DB
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'api.php', true);
+
+        var data = new FormData();
+        data.append('action', 'remove');
+        data.append('what', 'tag');
+        data.append('tagid', spanElt.id.substring(4));
+        // GO!
+        xhr.send(data);
+
+        // delete from all feeds
+        var targets = document.querySelectorAll("[data-chris-tag_id='"+spanElt.id.substring(4)+"']");
+        for (var i = 0, len = targets.length; i < len; i++) {
+
+          (targets[i].parentNode).removeChild(targets[i]);
+        }
+
+        // // delete the tag from the GUI
+        // (spanElt.parentNode).removeChild(spanElt);
+        }
+        else{
+          // nothing
+        }
+      });
+
   jQuery(document).on(
       'click',
       '.feed_tag',
       function(e) {
         // modify
         e.stopPropagation();
+
+        // get feed id
+        var feedElt = jQuery(this).closest('.feed');
+        var feedID = feedElt.attr('data-chris-feed_id');
+
         // modal with feed id + user id
         jQuery('#TAGMODAL').addClass('largePreview');
         jQuery('#TAGMODAL').css('margin-left',
@@ -310,39 +377,51 @@ _FEED_.feed_tag = function() {
         jQuery('#TAGMODAL').modal();
 
         jQuery('#TAGMODAL').on('shown', function() {
-          _TAG_.load();
+          // pass feed to add tags directly?
+          _MODALTAG_.load(feedID, jQuery('#TAGMODAL'));
         });
-
-        //update modal content
-
-        // and attach callbacks
-        // get feed id
-        // var feedElt = jQuery(this).closest('.feed');
-        // var feedID = feedElt.attr('data-chris-feed_id');
-        // var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
-        // // api.php add to favorites
-        // jQuery.ajax({
-        //   type : "POST",
-        //   url : "api.php?action=set&what=feed_cancel&id=" + feedID,
-        //   dataType : "json",
-        //   success : function(data) {
-        //     jQuery(allElts).each(
-        //         function() {
-        //           var elt = jQuery(this);
-        //           if (elt.parent().hasClass('feed_sea_content')
-        //               || elt.find('i').hasClass('icon-star')) {
-        //             // this feed is favorited or is inside search div, meaning
-        //             // that we don't
-        //             // hide it
-        //             return;
-        //           }
-        //           // hide the div
-        //           elt.hide('blind', 'slow');
-        //         });
-        //   }
-        // });
       });
+
+  jQuery(document).on(
+      'click',
+      '.infeed > img',
+      function(e) {
+        // modify
+        e.stopPropagation();
+
+        var feedElt = jQuery(this).closest('.feed');
+        var feedID = feedElt.attr('data-chris-feed_id');
+
+        var tagElt = jQuery(this).closest('.tag');
+        var tagID = tagElt.attr('data-chris-tag_id');
+
+        var tag = this;
+
+        //
+        // remove in db, then remove in ui
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'api.php', true);
+
+        var data = new FormData();
+        data.append('action', 'set');
+        data.append('what', 'tag');
+        data.append('feedid', feedID);
+        data.append('tagid', tagID);
+        data.append('remove', true);
+
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
+
+            jQuery(tag).parent().remove();
+          }
+        };
+
+        // GO!
+        xhr.send(data);  
+      });
+
 }
+
 _FEED_.slicedrop = function(el) {
     
     var _token = '';

@@ -65,8 +65,20 @@ class TagC implements TagControllerInterface {
     $tagObject->user_id = $userID;
     $tagObject->name = $tagName;
     $tagObject->color = $tagColor;
+    $tagsID = Mapper::add($tagObject);
 
-    return Mapper::add($tagObject);
+    $tags = '';
+    // loop through results and create html
+    $n = new Template('feed_tag.html');
+    $n->replace('USER_ID', $userID);
+    $n->replace('TAG_ID', $tagsID);
+    $n->replace('TAG_NAME', $tagName);
+    $n->replace('TAG_COLOR', $tagColor);
+    $n->replace('TEXT_COLOR', invertColor($tagColor));
+    $n->replace('LOCATION', 'inmodal');
+    $tags .= $n;
+
+    return array('tagshtml'=>$tags, 'tags'=>$tagsID);
   }
 
     /**
@@ -93,8 +105,24 @@ class TagC implements TagControllerInterface {
 
     $tagMapper = new Mapper('Tag');
     $tagMapper->filter('user_id=(?)', $userID);
-    
-    return $tagMapper->get();
+    $tagresults = $tagMapper->get();
+
+    $tags = '';
+    // loop through results and create html
+    if(count($tagresults['Tag']) >= 1){
+      foreach($tagresults['Tag'] as $key => $value){
+        $n = new Template('feed_tag.html');
+        $n->replace('USER_ID', $userID);
+        $n->replace('TAG_ID', $value->id);
+        $n->replace('TAG_NAME', $value->name);
+        $n->replace('TAG_COLOR', $value->color);
+        $n->replace('TEXT_COLOR', invertColor($value->color));
+        $n->replace('LOCATION', 'inmodal');
+        $tags .= $n;
+      }
+    }
+
+    return array('tagshtml'=>$tags, 'tags'=>$tagresults);
   }
 
 }

@@ -190,7 +190,10 @@ if (!$loggedIn) {
         }
         break;
       case "set":
-        if ($what == 'feed_favorite') {
+       if($what == 'tag'){
+          $result['result'] = FeedC::tag($_POST['feedid'], $_POST['tagid'], $_POST['remove']);
+        }
+        else if ($what == 'feed_favorite') {
           $result['result'] = FeedC::favorite($id);
         }
         else if($what == 'feed_share'){
