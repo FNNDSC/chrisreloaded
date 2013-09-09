@@ -9,10 +9,11 @@
 <script type="text/javascript" src="view/js/jquery.apprise.min.js"></script>
 <script type="text/javascript" src="view/js/jquery.touchpunch.js"></script>
 <script type="text/javascript" src="view/js/jquery.toggle.buttons.js"></script>
+<script src="lib/select2-3.4.2/select2.js"></script>
+
 
 <!-- XTK -->
 <script type="text/javascript" src="view/js/xtk_edge.js"></script>
-
 
 <!-- GOOGLE ANALYTICS -->
 <script type="text/javascript">

@@ -50,6 +50,8 @@ interface TagControllerInterface
   // Get all tags for one user
   static public function get($userID);
 
+  static public function getTagsList();
+
 }
 
 /**
@@ -125,5 +127,21 @@ class TagC implements TagControllerInterface {
     return array('tagshtml'=>$tags, 'tags'=>$tagresults);
   }
 
+static public function getTagsList(){
+          $n = new Template('tags_list.html');
+
+          $tags = '<option value="All">All</option>';
+
+              $tagMapper = new Mapper('Tag');
+    $tagMapper->filter('user_id=(?)', $_SESSION['userid']);
+    $tagresults = $tagMapper->get();
+
+          foreach($tagresults['Tag'] as $key => $value){
+            $tags .= '<option value="'.$value->name.'">'.$value->name.'</option>';
+      }
+
+    $n -> replace('TAGS_LIST', $tags);
+    return $n;
+  }
 }
 ?>

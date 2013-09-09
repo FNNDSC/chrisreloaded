@@ -122,6 +122,18 @@ jQuery(document).ready(function() {
   
   // activate polling of new statistics
   setInterval(_CHRIS_.updateStatistics, 5000); 
+
+function format(state) {
+
+            // set color
+            return state.text;
+        }
+
+$("#e1").select2({
+            formatResult: format,
+            formatSelection: format,
+            escapeMarkup: function(m) { return m; }
+        });
   
 });
 

@@ -126,6 +126,10 @@ _MODALTAG_.feedTag = function(){
              color:tagcolor.value};
            // add to list
            _MODALTAG_.tags.push(tagObj);
+           // add to search combo box
+           var tagslist = document.querySelector('#e1');
+           tagslist.innerHTML += '<option value="'+tagname.value+'">'+tagname.value+'</option>';
+
          }
        };
 

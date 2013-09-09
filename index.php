@@ -41,6 +41,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'plugin.controller.php'));
 require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'tag.controller.php'));
 
 // create the login page
 function loginPage() {
@@ -70,6 +71,7 @@ function homePage() {
   $t -> replace('PLUGIN', PluginC::getHTML());
   $t -> replace('FEED_ALL', FeedC::getAllHTML($_SESSION['userid']));
   $t -> replace('FEED_TAG', 'modal_tag.html');
+  $t -> replace('TAGS_LIST', TagC::getTagsList());
   $t -> replace('FEED_DATA_PREVIEW', 'feed_data_preview.html');
   $t -> replace('DRAG_AND_DROP', 'drag_and_drop.html');
   $t -> replace('FOOTER', 'footer.html');
