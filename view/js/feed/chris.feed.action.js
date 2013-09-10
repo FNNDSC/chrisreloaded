@@ -391,13 +391,10 @@ _FEED_.feed_tag = function() {
 
         var feedElt = jQuery(this).closest('.feed');
         var feedID = feedElt.attr('data-chris-feed_id');
-
+        var allFeedsElts = jQuery('[data-chris-feed_id=' + feedID + ']');
         var tagElt = jQuery(this).closest('.tag');
         var tagID = tagElt.attr('data-chris-tag_id');
 
-        var tag = this;
-
-        //
         // remove in db, then remove in ui
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'api.php', true);
@@ -411,8 +408,10 @@ _FEED_.feed_tag = function() {
 
         xhr.onreadystatechange = function() {
           if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 0)) {
-
-            jQuery(tag).parent().remove();
+            jQuery(allFeedsElts).each(function() {
+              var tag = jQuery(this).find('[data-chris-tag_id=' + tagID + ']');
+              jQuery(tag).remove();
+            });
           }
         };
 

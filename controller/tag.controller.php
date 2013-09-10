@@ -128,20 +128,16 @@ class TagC implements TagControllerInterface {
   }
 
 static public function getTagsList(){
-          $n = new Template('tags_list.html');
-
-          $tags = '<option value="All">All</option>';
-
-              $tagMapper = new Mapper('Tag');
-    $tagMapper->filter('user_id=(?)', $_SESSION['userid']);
-    $tagresults = $tagMapper->get();
-
-          foreach($tagresults['Tag'] as $key => $value){
-            $tags .= '<option value="'.$value->name.'">'.$value->name.'</option>';
-      }
-
-    $n -> replace('TAGS_LIST', $tags);
-    return $n;
+  $n = new Template('tags_list.html');
+  $tagMapper = new Mapper('Tag');
+  $tagMapper->filter('user_id=(?)', $_SESSION['userid']);
+  $tagresults = $tagMapper->get();
+  $tags = '';
+  foreach($tagresults['Tag'] as $key => $value){
+    $tags .= '<option value="'.$value->name.'" data-backgroundcolor="'.$value->color.'" data-color="'.invertColor($value->color).'">'.$value->name.'</option>';
+  }
+  $n -> replace('TAGS_LIST', $tags);
+  return $n;
   }
 }
 ?>

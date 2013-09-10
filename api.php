@@ -276,7 +276,13 @@ if (!$loggedIn) {
         } else if($what == 'feed_previous'){
           $result['result'] = FeedC::scrollClient($_SESSION['userid'], $parameters[0], 5);
         } else if($what == 'feed_search'){
-          $result['result'] = FeedC::searchClient($_SESSION['userid'], $parameters[0]);
+          // if 'TAGPLUGIN flan, we do a quick search'
+          if(isset ($parameters[1]) && $parameters[1] == 'TAGPLUGIN' ){
+            $result['result'] = FeedC::searchTagPlugin($_SESSION['userid'], $parameters[0]);
+            }
+          else{
+            $result['result'] = FeedC::searchClient($_SESSION['userid'], $parameters[0]);
+          }
         } else if($what == 'file') {
           $name = joinPaths(CHRIS_USERS, $parameters);
 

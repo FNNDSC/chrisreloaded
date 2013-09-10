@@ -123,17 +123,18 @@ jQuery(document).ready(function() {
   // activate polling of new statistics
   setInterval(_CHRIS_.updateStatistics, 5000); 
 
-function format(state) {
+  function format(state) {
+    var originalOption = state.element;
+    return '<span style="color:'+$(originalOption).data('color')+'; background-color:'+$(originalOption).data('backgroundcolor')+';">'+state.text+'</span>';
+  }
 
-            // set color
-            return state.text;
-        }
-
-$("#e1").select2({
+  $("#filtertagplugin").select2({
+            placeholder: "Filter feeds",
+            allowClear: true,
             formatResult: format,
             formatSelection: format,
             escapeMarkup: function(m) { return m; }
-        });
+  });
   
 });
 

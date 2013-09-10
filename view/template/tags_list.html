@@ -1,5 +1,10 @@
-<span>SHOW TAGS: 
-<select id="e1" style="width:25%">
-        ${TAGS_LIST}
-    </select>
-    </span>
+<span><select id="filtertagplugin" style="width:300px; margin-top:-5px;margin-right:5px;" multiple>
+  <option></option>
+    <optgroup label='Tags'>
+      ${TAGS_LIST}
+    </optgroup>
+    <optgroup label='Plugins'>
+      ${PLUGINS_LIST}
+    </optgroup>
+  </select>
+</span>

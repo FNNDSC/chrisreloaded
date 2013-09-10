@@ -445,7 +445,105 @@ _FEED_.scrollBottom = function() {
         }
       });
 }
+
+_FEED_.searchP = [];
+_FEED_.searchT = [];
+
 _FEED_.search = function() {
+
+   $("#filtertagplugin").on("change", function(e) {
+
+    if (e.val.length > 0) {
+      // keep track of tags and plugin filters
+      if(typeof e.added != 'undefined' && e.added.element[0].parentElement.label == 'Tags'){
+        _FEED_.searchT.push(e.added.id);
+      }
+      else if (typeof e.added != 'undefined'){
+        _FEED_.searchP.push(e.added.id);
+      }
+      else if(typeof e.removed != 'undefined' && e.removed.element[0].parentElement.label == 'Tags'){
+        var index = _FEED_.searchT.indexOf(e.removed.id);
+        _FEED_.searchT.splice(index, 1);
+      }
+      else{
+        var index = _FEED_.searchP.indexOf(e.removed.id);
+        _FEED_.searchP.splice(index, 1);
+      }
+
+      // check checkbox
+      if (!jQuery('.feed_sea_check').attr('checked')) {
+        jQuery('.feed_sea_check').click();
+      }
+      // uncheck checkbox
+      if (jQuery('.feed_fav_check').attr('checked')) {
+        jQuery('.feed_fav_check').click();
+      }
+      // uncheck checkbox
+      if (jQuery('.feed_run_check').attr('checked')) {
+        jQuery('.feed_run_check').click();
+      }
+      // uncheck checkbox
+      if (jQuery('.feed_fin_check').attr('checked')) {
+        jQuery('.feed_fin_check').click();
+      }
+      // run ajax query
+      _FEED_.searchTagPluginAjax(_FEED_.searchT, _FEED_.searchP);
+    } else {
+      // clean search
+      _FEED_.searchP = [];
+      _FEED_.searchT = [];
+      // check checkbox
+      if (jQuery('.feed_sea_check').attr('checked')) {
+        jQuery('.feed_sea_check').click();
+      }
+      if (!jQuery('.feed_fav_check').attr('checked')) {
+        jQuery('.feed_fav_check').click();
+      }
+      if (!jQuery('.feed_run_check').attr('checked')) {
+        jQuery('.feed_run_check').click();
+      }
+      if (!jQuery('.feed_fin_check').attr('checked')) {
+        jQuery('.feed_fin_check').click();
+      }
+    }
+  });
+
+_FEED_.searchTagPluginAjax = function(tags, plugins) {
+  // wait div
+  jQuery('.feed_sea_content').html('<div style="text-align: center;background-color: #ffffff;"><b>SEARCHING <i class="icon-refresh rotating_class"></i></b></div>');
+  // ajax call
+  _FEED_.searchXHR = jQuery.ajax({
+    type : 'POST',
+    url : 'api.php',
+      data : {
+      action : 'get',
+      what : 'feed_search',
+      parameters : [ [tags, plugins], 'TAGPLUGIN' ]
+      },
+    dataType : "json",
+    success : function(data) {
+      data = data['result'];
+      old_Feeds = '';
+      var length_done = data['content'].length;
+      if (length_done > 0) {
+        var i = 0;
+        while (i <= length_done - 1) {
+          // if id in new delete it!
+          old_Feeds += data['content'][i];
+          i++;
+        }
+      }
+      else{
+        old_Feeds = '<div style="text-align: center;background-color: #ffffff;"><b>Oups... No match found...</b></div>'
+      }
+      jQuery('.feed_sea_content').html(old_Feeds);
+      _FEED_.updateTime();
+      _FEED_.activateDraggableIcons();
+      _FEED_.activateDroppableIcons();
+    }
+  });
+}
+
   jQuery('.feed_search_input').keyup(function(event) {
     clearTimeout($.data(this, 'timer'));
     if (event.which == 13) {

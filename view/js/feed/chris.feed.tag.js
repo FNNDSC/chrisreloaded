@@ -60,8 +60,6 @@ _MODALTAG_.feedTag = function(){
 
         var tagid = JSON.parse(xhr.responseText).result;
         // if not already applied, update ui
-        // window.console.log(JSON.parse(xhr.responseText));
-
         if(tagid != -1){
 
           var tag = document.querySelector("#"+_MODALTAG_.selectedTagID).cloneNode(true);
@@ -127,9 +125,8 @@ _MODALTAG_.feedTag = function(){
            // add to list
            _MODALTAG_.tags.push(tagObj);
            // add to search combo box
-           var tagslist = document.querySelector('#e1');
-           tagslist.innerHTML += '<option value="'+tagname.value+'">'+tagname.value+'</option>';
-
+           var tagslist1 = document.querySelector('#filtertagplugin optgroup');
+           tagslist1.innerHTML += '<option value="'+tagname.value+'" data-backgroundcolor="'+JSON.parse(xhr.responseText).result.tagshtml.split('"')[13].split(' ')[1].split(';')[0]+'" data-color="'+JSON.parse(xhr.responseText).result.tagshtml.split('"')[13].split(' ')[3].split(';')[0]+'">'+tagname.value+'</option>';
          }
        };
 
