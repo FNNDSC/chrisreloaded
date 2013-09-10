@@ -11,6 +11,9 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current - **r2.4** ###
+* Search on tags and plugins
+* Tag feeds (and all underlying functionnalities)
+* Drap and Drop/upload files to server
 * Fix connectome PATH issue (cmp not found)
 
 ### 2013 07 11 - **r2.3** ###
