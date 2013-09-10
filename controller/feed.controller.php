@@ -36,6 +36,8 @@ require_once (joinPaths(CHRIS_VIEW_FOLDER, 'feed.view.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_data.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed_tag.model.php'));
+require_once (joinPaths(CHRIS_MODEL_FOLDER, 'tag.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data.model.php'));
@@ -60,6 +62,11 @@ interface FeedControllerInterface
   static public function updateName($id, $name, &$ssh_connection);
   // cancel the job
   static public function cancel($id, &$ssh_connection);
+  // tag/untag a feed
+  static public function tag($feedid, $tagid, $remove);
+  // search on tag and plugin\
+  static public function parseTagPlugin(&$feedtagResults, &$count, &$feed_list, &$feed_update);
+  static public function searchTagPlugin($user_id, $searchString);
 }
 
 /**
@@ -285,6 +292,94 @@ class FeedC implements FeedControllerInterface {
     return $feed_update;
   }
 
+  // helper to search tag plugin
+  static public function parseTagPlugin(&$feedtagResults, &$count, &$feed_list, &$feed_update){
+    // get all feeds which have been created since last upload
+    foreach ($feedtagResults['Feed'] as $key => $value) {
+      if($count == 0){
+        $feed_list[$value->id] = $count + 1;
+        $feed_update['content'][] = (string)FeedV::getHTML($value);
+      }
+      else{
+        if(isset($feed_list[$value->id]) && $feed_list[$value->id] == $count){
+          $feed_list[$value->id]++;
+          $feed_update['content'][] = (string)FeedV::getHTML($value);
+        }
+        else{
+          unset($feed_list[$value->id]);
+        }
+      }
+    }
+  }
+
+  // search on tags and plugins
+  static public function searchTagPlugin($user_id, $searchString){
+    // output container
+    $feed_update = Array();
+    $feed_update['content'] = Array();
+    $feed_list = Array();
+    $count = 0;
+    $skip = false;
+
+    // search on tags first
+    if(isset($searchString[0])){
+
+      foreach ($searchString[0] as $keyT => $valueT) {
+        // init
+        $feed_update['content'] = Array();
+        // get tag ID
+        $tagMapper = new Mapper('Tag');
+        $tagMapper->filter('name=(?)', $valueT);
+        $tagResults = $tagMapper->get();
+
+        if(count($tagResults['Tag']) >= 1){
+          $feedtagMapper= new Mapper('Feed');
+          $feedtagMapper->join('Feed_Tag', 'feed.id = feed_tag.feed_id')->filter('feed_tag.tag_id=(?)', $tagResults['Tag'][0]->id);
+          $feedtagResults = $feedtagMapper->get();
+
+          if(count($feedtagResults['Feed']) >= 1){
+            FeedC::parseTagPlugin($feedtagResults, $count, $feed_list, $feed_update);
+          }
+          else{
+            // empty content
+            $skip = true;
+            $feed_update['content'] = Array();
+            break;
+          }
+        }
+        $count++;
+      }
+    }
+
+    // search on plugins next if necessary
+    if(isset($searchString[1]) && !$skip){
+    
+      foreach ($searchString[1] as $keyT => $valueT) {
+        // init
+        $feed_update['content'] = Array();
+        // get tag ID
+        $tagMapper = new Mapper('Feed');
+        $tagMapper->filter('user_id=(?)', $user_id)->filter('plugin=(?)', $valueT);
+        $tagResults = $tagMapper->get();
+
+        if(count($tagResults['Feed']) >= 1){
+          FeedC::parseTagPlugin($feedtagResults, $count, $feed_list, $feed_update);
+        }
+        else {
+          // empty content
+          $skip = true;
+          $feed_update['content'] = Array();
+          break;
+        }
+
+        $count++;
+      }
+    }
+
+    return $feed_update;
+}
+
+  // share a feed
   static public function share($feed_id, $ownerid, $ownername, $targetname, &$ssh_connection){
     // get target user id
     $userMapper = new Mapper('User');
@@ -758,5 +853,45 @@ class FeedC implements FeedControllerInterface {
 
   }
 
+  // tag a feed
+  // add untag feature
+  static public function tag($feedid, $tagid, $remove){
+
+    if($remove == 'false'){
+      // is tag feed already?
+      $feedtagMapper = new Mapper('Feed_Tag');
+      $feedtagMapper->filter('feed_id=(?)', $feedid);
+      $feedtagMapper->filter('tag_id=(?)', $tagid);
+    
+      $feedtadResults = $feedtagMapper->get();
+
+      if(count($feedtadResults['Feed_Tag']) >= 1){
+        return -1;
+      }
+
+      $tagObject = new Feed_Tag();
+      $tagObject->feed_id = $feedid;
+      $tagObject->tag_id = $tagid;
+
+      return Mapper::add($tagObject);
+
+    }
+    else{
+      // is tag feed already?
+      $feedtagMapper = new Mapper('Feed_Tag');
+      $feedtagMapper->filter('feed_id=(?)', $feedid);
+      $feedtagMapper->filter('tag_id=(?)', $tagid);
+    
+      $feedtadResults = $feedtagMapper->get();
+
+      if(count($feedtadResults['Feed_Tag']) >= 1){
+        Mapper::delete('Feed_Tag', $feedtadResults['Feed_Tag'][0]->id);
+        return 1;
+      }
+
+      return -1;
+
+    }
+  }
 }
 ?>

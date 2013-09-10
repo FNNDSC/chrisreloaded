@@ -52,6 +52,8 @@ interface PluginControllerInterface
   // get the icon of a plugin
   static public function getIcon($plugin);
 
+  static public function getPluginsList();
+
 }
 
 /**
@@ -191,6 +193,22 @@ class PluginC implements PluginControllerInterface {
     $p_icon = $p_folder_relative . DIRECTORY_SEPARATOR . 'plugin.png';
 
     return $p_icon;
+
+  }
+
+  static public function getPluginsList() {
+
+    $htmlContent = '';
+
+    $plugins = PluginC::discover();
+
+    // loop through the names
+    foreach ($plugins as $p) {
+      //$htmlContent .= '<option value="'.$p['name'].'">'.$p['name'].'</option>';
+      $htmlContent .= '<option value="'.$p['name'].'" data-backgroundcolor="#009DE9" data-color="#ffffff">'.$p['name'].'</option>';
+    }
+
+    return $htmlContent;
 
   }
 

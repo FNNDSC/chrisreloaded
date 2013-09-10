@@ -92,6 +92,8 @@ class FeedV implements ObjectViewInterface {
 
     $share_icon = 'icon-share-alt';
 
+    $tag_icon = 'icon-tag';
+
     $archive_icon = 'icon-remove';
     $archive_text = 'Archive';
     if ($object->archive == '1') {
@@ -131,6 +133,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
     $t -> replace('SHARE_ICON', $share_icon);
+    $t -> replace('TAG_ICON', $tag_icon);
     $t -> replace('ARCHIVE_ICON', $archive_icon);
     $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_ICON', $favorite_icon);
@@ -163,6 +166,26 @@ class FeedV implements ObjectViewInterface {
     $d -> replace('PATIENT_ID', 'fake_patient_id');
     $d -> replace('DATA_ID', 'fake_data_id');
     $t -> replace('DATA_BROWSER', $d);
+
+    // set tags
+    $feedtagMapper= new Mapper('Feed_Tag');
+    $feedtagMapper->join('Tag', 'feed_tag.tag_id = tag.id')->filter('feed_tag.feed_id=(?)', $object->id);
+    $feedtagResults = $feedtagMapper->get();
+    $feedtags = '';
+    if(count($feedtagResults['Feed_Tag']) >= 1){
+      foreach($feedtagResults['Tag'] as $key => $value){
+        $n = new Template('feed_tag.html');
+        $n->replace('USER_ID', $object->user_id);
+        $n->replace('TAG_ID', $value->id);
+        $n->replace('TAG_NAME', $value->name);
+        $n->replace('TAG_COLOR', $value->color);
+        $n->replace('TEXT_COLOR', invertColor($value->color));
+        $n->replace('LOCATION', 'infeed');
+        $feedtags .= $n;
+      }
+    }
+
+    $t -> replace('TAGS', $feedtags);
 
     // notes
     $n = new Template('feed_notes.html');

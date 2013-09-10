@@ -142,3 +142,9 @@ select,textarea,.btn {
 .well{
 	 background-color: #FFF;
 }
+
+#close_interactive_plugin:hover {
+	cursor:pointer;
+	background-color:grey;
+
+}

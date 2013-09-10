@@ -40,6 +40,7 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'data.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'file.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'tag.controller.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'token.controller.php'));
 
 // ssh - to be removed when user::controller works
@@ -163,6 +164,15 @@ if (!$loggedIn) {
             die('Login Failed');
           }
           $result['result'] = FileC::add($_POST['targetFeed'], $_FILES, $ssh_connection);
+        } else if($what == 'tag'){
+          // user_id, tagname, tagcolor
+          $result['result'] = TagC::add($_SESSION['userid'], $_POST['tagname'], $_POST['tagcolor']);
+        }
+        break;
+      case "remove":
+        if($what == 'tag'){
+          // user_id, tag_id
+          $result['result'] = TagC::remove($_SESSION['userid'], $_POST['tagid']);
         }
         break;
       case "count":
@@ -180,7 +190,10 @@ if (!$loggedIn) {
         }
         break;
       case "set":
-        if ($what == 'feed_favorite') {
+       if($what == 'tag'){
+          $result['result'] = FeedC::tag($_POST['feedid'], $_POST['tagid'], $_POST['remove']);
+        }
+        else if ($what == 'feed_favorite') {
           $result['result'] = FeedC::favorite($id);
         }
         else if($what == 'feed_share'){
@@ -263,7 +276,13 @@ if (!$loggedIn) {
         } else if($what == 'feed_previous'){
           $result['result'] = FeedC::scrollClient($_SESSION['userid'], $parameters[0], 5);
         } else if($what == 'feed_search'){
-          $result['result'] = FeedC::searchClient($_SESSION['userid'], $parameters[0]);
+          // if 'TAGPLUGIN flan, we do a quick search'
+          if(isset ($parameters[1]) && $parameters[1] == 'TAGPLUGIN' ){
+            $result['result'] = FeedC::searchTagPlugin($_SESSION['userid'], $parameters[0]);
+            }
+          else{
+            $result['result'] = FeedC::searchClient($_SESSION['userid'], $parameters[0]);
+          }
         } else if($what == 'file') {
           $name = joinPaths(CHRIS_USERS, $parameters);
 
@@ -284,6 +303,10 @@ if (!$loggedIn) {
         } else if($what == 'users') {
 
           $result['result'] = UserC::get();
+
+        } else if($what == 'tag'){
+
+          $result['result'] = TagC::get($_SESSION['userid']);
 
         } else if($what == 'token') {
 
