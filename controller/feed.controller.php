@@ -363,7 +363,7 @@ class FeedC implements FeedControllerInterface {
         $tagResults = $tagMapper->get();
 
         if(count($tagResults['Feed']) >= 1){
-          FeedC::parseTagPlugin($feedtagResults, $count, $feed_list, $feed_update);
+          FeedC::parseTagPlugin($tagResults, $count, $feed_list, $feed_update);
         }
         else {
           // empty content
