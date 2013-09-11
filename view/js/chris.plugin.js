@@ -248,8 +248,15 @@ jQuery(document)
                     jQuery('.plugin_panel').hide();
                     // clean up after interactive plugin
                     _PLUGIN_.cleanInteractiveLayout();
-                    var _new_plugin_id = jQuery('.carousel-inner').children()
-                        .first().attr('id');
+                    var _new_plugin_id = '';
+
+                    if(_pluginSelector == ''){
+                      _new_plugin_id = jQuery('.carousel-inner').children().first().attr('id');
+                    }
+                    else{
+                      _new_plugin_id = jQuery('.carousel-inner').children(_pluginSelector).attr('id');
+                    }
+
                     jQuery('#panel_' + _new_plugin_id).show();
                     // now reset all jobs
                     _BATCH_.reset();
