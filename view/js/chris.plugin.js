@@ -145,7 +145,7 @@ jQuery(document)
     .ready(
         function() {
           // parse all categories
-          _PLUGIN_.categories = [ '-- Show all --' ];
+          _PLUGIN_.categories = [];
           jQuery('.plugin_panel').each(function(i, v) {
             var _category = jQuery(v).attr('data-category');
             // propagate all categories to the carousel items
@@ -167,35 +167,73 @@ jQuery(document)
           jQuery('.carousel-inner').children().clone()
               .appendTo('#cart_storage');
           // fill the category combobox
+          jQuery('#cart_categories').append('<option></option>');
           var _categorieslength = _PLUGIN_.categories.length;
           for ( var p = 0; p < _categorieslength; p++) {
-            jQuery('#cart_categories').append(
-                '<option>' + _PLUGIN_.categories[p] + '</option>');
+            // optgroups
+            var groupContent = '';
+            groupContent += '<optgroup label="'+_PLUGIN_.categories[p]+'">';
+            // loop through plugins
+            jQuery('#cart_storage').children('[data-category="' + _PLUGIN_.categories[p] + '"]').each(function( key, value ) {
+              groupContent += '<option value="'+jQuery(this).attr('id')+'">' + jQuery(this).attr('id') + '</option>';
+            });
+
+            groupContent += '</optgroup>';
+            jQuery('#cart_categories').append(groupContent);
           }
+
+          // create select elt
+          $("#cart_categories").select2({
+                placeholder: "Select a plugin",
+                allowClear: true
+            });
+
+          // click on sidse to go to next, on change
+
           // configure the category callback
           jQuery('#cart_categories')
               .bind(
                   'change',
-                  function() {
-                    var _new_category = jQuery('#cart_categories').val();
-                    // remove all
-                    jQuery('.carousel-inner').empty();
-                    // configure the selector
-                    var _selector = '[data-category="' + _new_category + '"]';
-                    // and a special case for show all
-                    if (_new_category == '-- Show all --') {
-                      // this means, show all :)
-                      _selector = '';
+                  function(e) {
+
+                    var _categorySelector = '';
+                    var _pluginSelector = '';
+                    if (e.val.length > 0) {
+                      // set category + active plugin
+                      // show one plugin
+                      _categorySelector = '[data-category="' + e.added.element[0].parentElement.label + '"]';
+                      _pluginSelector = '#' + e.val;
                     }
+                    else {
+                      //'show all'; == 'show first'
+                    }
+
+                    // var _new_category = jQuery('#cart_categories').val();
+                    // remove all
+                     jQuery('.carousel-inner').empty();
+                    // // configure the selector
+                    // var _selector = '[data-category="' + _new_category + '"]';
+                    // // and a special case for show all
+                    // if (_new_category == '-- Show all --') {
+                    //   // this means, show all :)
+                    //   _selector = '';
+                    // }
                     // now move all the matching ones back
-                    jQuery('#cart_storage').children(_selector).clone()
+                    jQuery('#cart_storage').children(_categorySelector).clone()
                         .appendTo('.carousel-inner');
                     // remove all the active classes
                     jQuery('.carousel-inner').children('.active').removeClass(
                         'active');
                     // and activate the first one
+                    // 
+                    if(_pluginSelector == ''){
                     jQuery('.carousel-inner').children().first().addClass(
                         'active');
+                    }
+                    else{
+                    jQuery('.carousel-inner').children(_pluginSelector).addClass(
+                        'active');
+                  }
                     // for only one matching plugin, remove the arrows to avoid
                     // a deadlock
                     // in the carousel stack
@@ -216,6 +254,7 @@ jQuery(document)
                     // now reset all jobs
                     _BATCH_.reset();
                   });
+
           // set default plugin to the first one
           var _first_plugin = jQuery("#search");
           var _first_plugin_id = _first_plugin.attr('id');
@@ -227,6 +266,7 @@ jQuery(document)
           jQuery('#pipelines').carousel({
             interval : false
           });
+
           // show/hide panels on sliding of the carousel
           // the old one
           jQuery('#pipelines').bind(
@@ -253,6 +293,8 @@ jQuery(document)
                 jQuery('#panel_' + _new_plugin_id).show();
                 // now reset all jobs
                 _BATCH_.reset();
+                // update drop down
+                $("#cart_categories").select2("val", _new_plugin_id);
               });
           jQuery(".parameter_dropzone").droppable({
             activeClass : "parameter_dropzone_active",

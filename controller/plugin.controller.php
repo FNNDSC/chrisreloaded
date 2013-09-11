@@ -205,7 +205,7 @@ class PluginC implements PluginControllerInterface {
     // loop through the names
     foreach ($plugins as $p) {
       //$htmlContent .= '<option value="'.$p['name'].'">'.$p['name'].'</option>';
-      $htmlContent .= '<option value="'.$p['name'].'" data-backgroundcolor="#009DE9" data-color="#ffffff">'.$p['name'].'</option>';
+      $htmlContent .= '<option value="'.$p['name'].'">'.$p['name'].'</option>';
     }
 
     return $htmlContent;
