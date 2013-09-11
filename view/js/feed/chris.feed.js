@@ -510,7 +510,7 @@ _FEED_.search = function() {
 
 _FEED_.searchTagPluginAjax = function(tags, plugins) {
   // wait div
-  jQuery('.feed_sea_content').html('<div style="text-align: center;background-color: #ffffff;"><b>SEARCHING <i class="icon-refresh rotating_class"></i></b></div>');
+  jQuery('.feed_sea_content').html('<div style="text-align: center;background-color: #ffffff;padding: 20px 0px;"><b>SEARCHING <i class="icon-refresh rotating_class"></i></b></div>');
   // ajax call
   _FEED_.searchXHR = jQuery.ajax({
     type : 'POST',
@@ -534,7 +534,7 @@ _FEED_.searchTagPluginAjax = function(tags, plugins) {
         }
       }
       else{
-        old_Feeds = '<div style="text-align: center;background-color: #ffffff;"><b>Oups... No match found...</b></div>'
+        old_Feeds = '<div style="text-align: center;background-color: #ffffff; padding: 20px 0px;"><b>Ooops... No match found...</b></div>'
       }
       jQuery('.feed_sea_content').html(old_Feeds);
       _FEED_.updateTime();
