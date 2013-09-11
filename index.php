@@ -70,11 +70,11 @@ function homePage() {
   $t -> replace('RUNNING_COUNT', FeedC::getRunningCount($_SESSION['userid']));
   $t -> replace('PLUGIN', PluginC::getHTML());
   $t -> replace('FEED_ALL', FeedC::getAllHTML($_SESSION['userid']));
-  $t -> replace('FEED_TAG', 'modal_tag.html');
+  $t -> replace('MODAL_DDROP', 'modal_ddrop.html');
+  $t -> replace('MODAL_TAG', 'modal_tag.html');
   $t -> replace('TAGS_LIST', TagC::getTagsList());
   $t -> replace('PLUGINS_LIST', PluginC::getPluginsList());
-  $t -> replace('FEED_DATA_PREVIEW', 'feed_data_preview.html');
-  $t -> replace('DRAG_AND_DROP', 'drag_and_drop.html');
+  $t -> replace('MODAL_PREVIEW', 'feed_data_preview.html');
   $t -> replace('FOOTER', 'footer.html');
   $t -> replace('JAVASCRIPT_LIBS', 'javascript.libs.php');
   $t -> replace('JAVASCRIPT_CHRIS', 'javascript.chris.html');

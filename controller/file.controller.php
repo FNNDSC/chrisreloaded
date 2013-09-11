@@ -73,7 +73,7 @@ class FileC implements FileControllerInterface {
     $resultsUser = $mapper->get();
 
     // target directory
-    $dir = CHRIS_USERS.'/'.$resultsUser['User'][0]->username.'/file_uploader/'.$resultsFeed['Feed'][0]->name.'-'.$resultsFeed['Feed'][0]->id.'/';
+    $dir = CHRIS_USERS.'/'.$resultsUser['User'][0]->username.'/file_browser/'.$resultsFeed['Feed'][0]->name.'-'.$resultsFeed['Feed'][0]->id.'/';
 
     $ssh_connection->exec('chmod 777 '.$dir);
 

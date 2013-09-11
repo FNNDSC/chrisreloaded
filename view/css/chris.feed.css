@@ -310,6 +310,7 @@
 
 .focus:hover {
 	opacity: 1;
+	cursor:pointer;
 }
 
 .feed:hover .show_me {

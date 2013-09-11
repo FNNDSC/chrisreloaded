@@ -36,9 +36,6 @@ _CHRIS_.scalePanels = function() {
 
   // configure screen size related parameters
   var _pluginpanelsize = jQuery(window).height()-417;
-  if(jQuery('#drop-widget').is(":visible")){
-     _pluginpanelsize -= jQuery("#drop-widget").height();
-   }
 
   var _feedcontentsize = jQuery(window).height()-129;  
   var _interactivepluginsize = jQuery(window).height()-129;

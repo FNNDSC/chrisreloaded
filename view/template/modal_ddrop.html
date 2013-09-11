@@ -1,0 +1,35 @@
+<div id="DDROPMODAL" class="modal hide fade" tabindex="-1" role="dialog"
+ aria-labelledby="DDROPLABEL" aria-hidden="true" style='height:500px;overflow:hidden'>
+ <div class="modal-header" style="background-color:#009DE9; color: #fff;border-bottom: none;">
+ <div id="ddropModalClose" style="float: right;display: inline-block;" onclick="_DRAG_AND_DROP_.onCloseDrop();">
+  <img class="" src="view/gfx/jigsoar-icons/light/24_close.png">
+</div>
+
+<h3>DRAG AND DROP!</h3>
+ </div>
+ <div class="modal-body" style='padding:0px;overflow-y:hidden;max-height:100%;height:401px;'>
+
+
+  <div id="drop-widget" >
+    <div id="drop-header">
+
+    <h1>Drop or
+      <input type="file" multiple="multiple" id="fileToUploadModal" onchange="_DRAG_AND_DROP_.onUpload(event);" style="display: none;"/>
+      <a id="fileToUploadLinkModal" onclick="document.getElementById('fileToUploadModal').click();" style="cursor:pointer; display: inline-block; position:relative;" > upload </a> files
+    </h1>
+    <h3>to the server</h3>
+
+     </div>
+     <div style="color:#fff; background-color: #009DE9; padding:5px;margin:0px;"><h4 style="margin:0px;">Files uploaded:</h4></div>
+    <div id="drop-list">
+    </div>
+</div>
+
+  </div>
+  <div class="modal-footer" style="background-color:#009DE9; color: #fff; padding-top:0px;border-top: none;">
+<!--   <h4 id='cancelDDrop' onclick="_DRAG_AND_DROP_.onCloseDrop();">Cancel</h4> -->
+  <h4 id='finishDDrop' onclick="_DRAG_AND_DROP_.onCloseDrop();">Finish</h4>
+ </div>
+</div>
+
+

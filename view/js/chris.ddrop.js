@@ -4,12 +4,15 @@
 var _DRAG_AND_DROP_ = _DRAG_AND_DROP_ || {};
 
 _DRAG_AND_DROP_.init = function() {
+  // reference to modal
+  _DRAG_AND_DROP_.modal = jQuery('#DDROPMODAL');
+
   // set global variables
   _DRAG_AND_DROP_.body = document.getElementsByTagName("body")[0];
-  _DRAG_AND_DROP_.dropWidget = document.getElementById("drop-widget");
   _DRAG_AND_DROP_.dropListing = document.getElementById("drop-list");
-  _DRAG_AND_DROP_.dropArea = document.getElementById("information");
-  _DRAG_AND_DROP_.dropMaskArea = document.getElementById("information");
+  _DRAG_AND_DROP_.dropArea = document.getElementById("drop-widget");
+  _DRAG_AND_DROP_.dropMaskArea = document.getElementById("drop-widget");
+  _DRAG_AND_DROP_.header = document.getElementById("drop-header");
   _DRAG_AND_DROP_.count = 0;
   _DRAG_AND_DROP_.countStyle = 0;
   _DRAG_AND_DROP_.targetFiles = null;
@@ -19,17 +22,9 @@ _DRAG_AND_DROP_.init = function() {
   _DRAG_AND_DROP_.dropMaskArea.addEventListener("dragover",_DRAG_AND_DROP_.onDragOver, false);
   _DRAG_AND_DROP_.dropArea.addEventListener("drop", _DRAG_AND_DROP_.onDrop, false);
   _DRAG_AND_DROP_.dropArea.addEventListener("dragend", _DRAG_AND_DROP_.onDrop, false);
-
-  jQuery(document).off('click', '#closeDrop').on('click', '#drop-close', _DRAG_AND_DROP_.onCloseDrop);
 }
 
-// important in chrome, if not drag and drop do NOT work
-_DRAG_AND_DROP_.onCloseDrop = function (e) {
-  e.stopPropagation();
-  e.preventDefault();
-  
-  _DRAG_AND_DROP_.dropWidget.style.display = "none";
-
+_DRAG_AND_DROP_.onCloseDrop = function () {
   while(_DRAG_AND_DROP_.dropListing.firstChild) {
     _DRAG_AND_DROP_.dropListing.removeChild(_DRAG_AND_DROP_.dropListing.firstChild);
   }
@@ -39,11 +34,8 @@ _DRAG_AND_DROP_.onCloseDrop = function (e) {
   _DRAG_AND_DROP_.countStyle = 0;
   _DRAG_AND_DROP_.targetFiles = null;
 
-  var _pluginpanelsize = jQuery(window).height()-417;
-  jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
-  jQuery('.plugin_panel').css('height', _pluginpanelsize);
-  jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
-
+  // close modal
+  _DRAG_AND_DROP_.modal.modal('hide');
 };
 
 
@@ -53,30 +45,47 @@ _DRAG_AND_DROP_.onDragOver = function (e) {
   e.preventDefault();
 };
 
+_DRAG_AND_DROP_.start = function(){
+  jQuery('#DDROPMODAL').addClass('largePreview');
+  jQuery('#DDROPMODAL').css('margin-left',
+  jQuery('#DDROPMODAL').outerWidth() / 2 * -1);
+  jQuery('#DDROPMODAL').modal();
+}
+
 _DRAG_AND_DROP_.onDragEnter = function (e) {
   e.stopPropagation();
   e.preventDefault();
-  _DRAG_AND_DROP_.dropArea.style.border = "5px dashed grey";
+
+  // header style!
+  _DRAG_AND_DROP_.header.style.border = "5px dashed #FFF";
+
+  // show modal!
+  _DRAG_AND_DROP_.start();
+
 };
 
-_DRAG_AND_DROP_.onDrageLeave = function (e, parent) {
+_DRAG_AND_DROP_.onDrageLeave = function (e) {
   e.stopPropagation();
   e.preventDefault();
 
   // modify border only when leave the main window
   mouseX = e.clientX;
   mouseY = e.clientY;
-  if ((mouseY > 0 && mouseY < window.innerHeight) && (mouseX > 0 && mouseX < window.innerWidth))
+  if ((mouseY > 0 && mouseY < window.innerHeight) && (mouseX > 0 && mouseX < window.innerWidth) || (e.screenX == 0 && e.screenY == 0))
     return;
 
-  _DRAG_AND_DROP_.dropArea.style.border = "1px solid #E3E3E3";
+  window.console.log('LEAVE');
+    window.console.log(e);
+  // header style!
+  _DRAG_AND_DROP_.header.style.border = "none";
 };
 
 _DRAG_AND_DROP_.onDrop = function (e) {
   e.stopPropagation();
   e.preventDefault();
-  // reset style
-   _DRAG_AND_DROP_.dropArea.style.border = "1px solid #E3E3E3";
+
+  // header style!
+  _DRAG_AND_DROP_.header.style.border = "none";
 
   if(_DRAG_AND_DROP_.count == 0){
     // store reference to files
@@ -103,7 +112,7 @@ _DRAG_AND_DROP_.onDrop = function (e) {
                    url : "controller/launcher-web.php",
                    dataType : "text",
                    data : {
-                     FEED_PLUGIN : 'file_uploader',
+                     FEED_PLUGIN : 'file_browser',
                      FEED_NAME : _feed_name,
                      FEED_PARAM : _param,
                      FEED_STATUS : 100,
@@ -126,9 +135,7 @@ _DRAG_AND_DROP_.onDrop = function (e) {
 _DRAG_AND_DROP_.handleStyle = function (files) {
   var filesFragment = document.createDocumentFragment();
   var domElements = [];
-        
-  _DRAG_AND_DROP_.dropWidget.style.display = "block";
-       
+              
   for(var i = 0, len = files.length; i < len; i++) {
     domElements = [
       document.createElement('div'),
@@ -151,14 +158,6 @@ _DRAG_AND_DROP_.handleStyle = function (files) {
 
     _DRAG_AND_DROP_.dropListing.appendChild(filesFragment);
 
-    // update plugin_panel width
-
-    var _pluginpanelsize = jQuery(window).height()-417;
-    _pluginpanelsize -= jQuery("#drop-widget").height();
-    jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
-    jQuery('.plugin_panel').css('height', _pluginpanelsize);
-    jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
-
     _DRAG_AND_DROP_.countStyle++;
   }
 };
@@ -171,6 +170,57 @@ _DRAG_AND_DROP_.handleFiles = function (files) {
       _DRAG_AND_DROP_.count++;
   }
 };
+
+_DRAG_AND_DROP_.onUpload = function (e) {
+
+  e.stopPropagation();
+  e.preventDefault();
+
+  if(_DRAG_AND_DROP_.count == 0){
+    // store reference to files
+    _DRAG_AND_DROP_.targetFiles = e.target.files;
+    // style output (for user interaction)
+    _DRAG_AND_DROP_.handleStyle(e.target.files);
+    // create the feed
+    // start job and hook calback
+    var _feed_name = (new Date()).toLocaleString();
+    var _output = [];
+    _output.push([]);
+    _output[0].push({
+                      name : 'output',
+                      value : '',
+                      type : 'simple',
+                      target_type : 'feed'
+                    });
+
+        var _param = [];
+    _param.push([]);
+
+    jQuery.ajax({
+                   type : "POST",
+                   url : "controller/launcher-web.php",
+                   dataType : "text",
+                   data : {
+                     FEED_PLUGIN : 'file_browser',
+                     FEED_NAME : _feed_name,
+                     FEED_PARAM : _param,
+                     FEED_STATUS : 100,
+                     FEED_MEMORY : 512,
+                     FEED_OUTPUT : _output
+                   },
+                   success : function(data) {
+   _DRAG_AND_DROP_.targetFeed = data.split("\n")[1];
+
+   _DRAG_AND_DROP_.handleFiles(_DRAG_AND_DROP_.targetFiles);
+                   }
+                 });
+    return;
+  }
+  // do sth with those files!
+  _DRAG_AND_DROP_.handleStyle(e.target.files);
+  _DRAG_AND_DROP_.handleFiles(e.target.files);
+};
+
       
 _DRAG_AND_DROP_.processXHR = function (file, index) {
 
@@ -217,12 +267,6 @@ _DRAG_AND_DROP_.processXHR = function (file, index) {
       successSpan.style.color = '#009DE9';
       container.firstChild.appendChild(successSpan);
 
-      var _pluginpanelsize = jQuery(window).height()-417;
-      _pluginpanelsize -= jQuery("#drop-widget").height();
-      jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
-
       console.log("xhr upload of "+container.id+" complete");
     }, false);
         
@@ -235,12 +279,6 @@ _DRAG_AND_DROP_.processXHR = function (file, index) {
       errorSpan.innerHTML = '&#10007;';
       errorSpan.style.color = 'salmon';
       container.firstChild.appendChild(errorSpan);
-
-      var _pluginpanelsize = jQuery(window).height()-417;
-      _pluginpanelsize -= jQuery("#drop-widget").height();
-      jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('height', _pluginpanelsize);
-      jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
 
       console.log("error: " + evt.code);
     }, false);
@@ -256,11 +294,6 @@ _DRAG_AND_DROP_.processXHR = function (file, index) {
     errorSpan.style.color = 'salmon';
     container.firstChild.appendChild(errorSpan);
 
-    var _pluginpanelsize = jQuery(window).height()-417;
-    _pluginpanelsize -= jQuery("#drop-widget").height();
-    jQuery('.plugin_panel').css('min-height', _pluginpanelsize);
-    jQuery('.plugin_panel').css('height', _pluginpanelsize);
-    jQuery('.plugin_panel').css('max-height', _pluginpanelsize);
   }
 
 };
@@ -269,5 +302,4 @@ jQuery(document).ready(function() {
   
   // turn on drag and drop
   _DRAG_AND_DROP_.init();
-
 });
