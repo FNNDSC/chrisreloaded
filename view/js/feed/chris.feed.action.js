@@ -2,14 +2,127 @@
  * Define the FEED namespace
  */
 var _FEED_ = _FEED_ || {};
+
+_FEED_.singleAction = function(el){
+  // if 3 parent has class "feed_header_line_one", we go for a single action
+  if($(el).parent().parent().parent().hasClass('feed_header_line_one')){
+    return true;
+  }
+
+  return false;
+}
+
+_FEED_.feed_check_action = function(id){
+  var allElts = jQuery('div[data-chris-feed_id=' + id + ']');
+
+  jQuery(allElts).each(function(){
+    $(this).attr('data-chris-feed_checked', 'true');
+    $(this).find('.feed_uncheck').css('display', 'block');
+    $(this).find('.feed_header').css('backgroundColor', 'rgba(53, 53, 53, 0.7)');
+    $(this).find('.feed_header').css('color', '#FFF');
+  });
+}
+
+_FEED_.feed_ucheck_action = function(id){
+  window.console.log(id);
+  var allElts = jQuery('div[data-chris-feed_id=' + id + ']');
+        window.console.log(allElts);
+  jQuery(allElts).each(function(){
+            window.console.log($(this)[0]);
+    $(this).attr('data-chris-feed_checked', 'false');
+    $(this).find('.feed_uncheck').css('display', 'none');
+    $(this).find('.feed_header').css('backgroundColor', '');
+    $(this).find('.feed_header').css('color', '');
+  });
+}
+
+_FEED_.feed_check = function() {
+    jQuery(document).on(
+      'click',
+      '.cat_check',
+      function(event) {
+        event.stopPropagation();
+        event.preventDefault(); 
+        var allElts = jQuery(this).parent().parent().find('.feed');
+        jQuery(allElts).each(function(){
+            _FEED_.feed_check_action($(this).attr('data-chris-feed_id'));
+          });
+      });
+
+    jQuery(document).on(
+      'click',
+      '.cat_ucheck',
+      function(event) {
+        event.stopPropagation();
+        event.preventDefault(); 
+        var allElts = jQuery(this).parent().parent().parent().find('.feed');
+                window.console.log(jQuery(this));
+        window.console.log(allElts);
+        jQuery(allElts).each(function(){
+            _FEED_.feed_ucheck_action($(this).attr('data-chris-feed_id'));
+          });
+      });
+
+  jQuery(document).on(
+      'click',
+      '.feed_check',
+      function(event) {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        // get id, apply to all
+        var feedElt = jQuery(this).closest('.feed');
+        var feedID = feedElt.attr('data-chris-feed_id');
+        _FEED_.feed_check_action(feedID);
+
+      });
+
+  jQuery(document).on(
+      'click',
+      '.feed_uncheck',
+      function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // get id, apply to all
+        var feedElt = jQuery(this).closest('.feed');
+        var feedID = feedElt.attr('data-chris-feed_id');
+        _FEED_.feed_ucheck_action(feedID);
+
+      });
+
+}
+
 _FEED_.feed_share = function() {
   jQuery(document).on(
       'click',
       '.feed_share',
       function(e) {
+
+        // modify
+        e.stopPropagation();
+
         // get feed id
-        var feedElt = jQuery(this).closest('.feed');
-        var feedID = feedElt.attr('data-chris-feed_id');
+        var feedIDs = [];
+
+        // is single action?
+        if(_FEED_.singleAction(this)){
+          var feedElt = jQuery(this).closest('.feed');
+          feedIDs.push(feedElt.attr('data-chris-feed_id'));
+        }
+        else{
+          // get all checked elements
+          var allElts = jQuery(this).parent().parent().parent().find('div[data-chris-feed_checked=true]');
+          // loop though all elements
+          jQuery(allElts).each(function(){
+            var feedID = $(this).attr('data-chris-feed_id');
+            if(feedIDs.indexOf(feedID) == -1){
+              feedIDs.push(feedID);
+            }
+          });
+        }
+
         apprise('<h5>Which user do you want to share this feed with?</h5>', {
           'input' : new Date()
         },
@@ -20,9 +133,14 @@ _FEED_.feed_share = function() {
                 // send to the launcher
                 jQuery.ajax({
                   type : "POST",
-                  url : "api.php?action=set&what=feed_share&id=" + feedID
-                      + "&parameters[]=" + _user_name,
+                  url : "api.php",
                   dataType : "json",
+                  data : {
+                    action : 'set',
+                    what : 'feed_share',
+                    id : feedIDs,
+                    parameters : _user_name
+                  },
                   success : function(data) {
                     if (data['result'] == '') {
                       jQuery()
@@ -60,15 +178,10 @@ _FEED_.feed_share = function() {
         e.stopPropagation();
       });
 }
-_FEED_.feed_favorite = function() {
-  jQuery(document).on(
-      'click',
-      '.feed_favorite',
-      function(e) {
-        // modify
-        e.stopPropagation();
+
+_FEED_.feed_favorite_action = function(el){
         // get feed id
-        var feedElt = jQuery(this).closest('.feed');
+        var feedElt = jQuery(el).closest('.feed');
         var feedID = feedElt.attr('data-chris-feed_id');
         var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
         // api.php add to favorites
@@ -136,17 +249,42 @@ _FEED_.feed_favorite = function() {
                 });
           }
         });
-      });
 }
-_FEED_.feed_archive = function() {
+
+_FEED_.feed_favorite = function() {
   jQuery(document).on(
       'click',
-      '.feed_archive',
+      '.feed_favorite',
       function(e) {
         // modify
         e.stopPropagation();
+
+        // is single action?
+        if(_FEED_.singleAction(this)){
+          _FEED_.feed_favorite_action(this);
+        }
+        else{
+          // get all checked elements
+          //get target
+          var allElts = jQuery(this).parent().parent().parent().find('div[data-chris-feed_checked=true]');
+          // loop though all elements
+          var  processedFeeds = [];
+          jQuery(allElts).each(function(){
+            var feedID = $(this).attr('data-chris-feed_id');
+            if(processedFeeds.indexOf(feedID) == -1){
+            _FEED_.feed_favorite_action(this);
+            processedFeeds.push(feedID);
+            }
+          });
+        }
+
+
+      });
+}
+
+_FEED_.feed_archive_action = function(el){
         // get feed id
-        var feedElt = jQuery(this).closest('.feed');
+        var feedElt = jQuery(el).closest('.feed');
         var feedID = feedElt.attr('data-chris-feed_id');
         var allElts = jQuery('div[data-chris-feed_id=' + feedID + ']');
         // api.php add to favorites
@@ -194,14 +332,46 @@ _FEED_.feed_archive = function() {
                         if (data['result'] == "1") {
                           jQuery(elt).hide('blind', 'slow', function() {
                             jQuery(this).remove();
+                            // get one more feed
+                            if( jQuery('.feed_fin').height() < jQuery('.feed_content').height()){
+                              _FEED_.getPreviousFeed(1);
+                            }           
                           });
                         }
                       }
                     });
           }
         });
-      });
 }
+
+_FEED_.feed_archive = function() {
+  jQuery(document).on(
+      'click',
+      '.feed_archive',
+      function(e) {
+        // modify
+        e.stopPropagation();
+
+        // is single action?
+        if(_FEED_.singleAction(this)){
+          _FEED_.feed_archive_action(this);
+        }
+        else{
+          // get all checked elements
+          var allElts = jQuery(this).parent().parent().parent().find('div[data-chris-feed_checked=true]');
+          // loop though all elements
+          var processedFeeds = [];
+          jQuery(allElts).each(function(){
+            var feedID = $(this).attr('data-chris-feed_id');
+            if(processedFeeds.indexOf(feedID) == -1){
+            _FEED_.feed_archive_action(this);
+            processedFeeds.push(feedID);
+          }
+        });
+      }
+    });
+}
+
 _FEED_.feed_rename = function() {
   jQuery(document).on('keypress', '.feed_name_edit', function(e) {
     // if not enter, do not save
@@ -367,8 +537,24 @@ _FEED_.feed_tag = function() {
         e.stopPropagation();
 
         // get feed id
-        var feedElt = jQuery(this).closest('.feed');
-        var feedID = feedElt.attr('data-chris-feed_id');
+        var feedIDs = [];
+
+        // is single action?
+        if(_FEED_.singleAction(this)){
+          var feedElt = jQuery(this).closest('.feed');
+          feedIDs.push(feedElt.attr('data-chris-feed_id'));
+        }
+        else{
+          // get all checked elements
+          var allElts = jQuery(this).parent().parent().parent().find('div[data-chris-feed_checked=true]');
+          // loop though all elements
+          jQuery(allElts).each(function(){
+            var feedID = $(this).attr('data-chris-feed_id');
+            if(feedIDs.indexOf(feedID) == -1){
+              feedIDs.push(feedID);
+            }
+          });
+        }
 
         // modal with feed id + user id
         jQuery('#TAGMODAL').addClass('largePreview');
@@ -378,7 +564,7 @@ _FEED_.feed_tag = function() {
 
         jQuery('#TAGMODAL').on('shown', function() {
           // pass feed to add tags directly?
-          _MODALTAG_.load(feedID, jQuery('#TAGMODAL'));
+          _MODALTAG_.load(feedIDs, jQuery('#TAGMODAL'));
         });
       });
 
@@ -479,4 +665,5 @@ jQuery(document).ready(function() {
   _FEED_.feed_archive();
   _FEED_.feed_rename();
   _FEED_.feed_cancel();
+  _FEED_.feed_check();
 });

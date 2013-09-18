@@ -202,7 +202,7 @@ if (!$loggedIn) {
           if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
             die('Login Failed');
           }
-          $result['result'] = FeedC::share($id, $result['userid'], $result['username'], $parameters[0], $ssh_connection);
+          $result['result'] = FeedC::share($id, $result['userid'], $result['username'], $parameters, $ssh_connection);
         }
         else if($what == 'feed_archive'){
           $result['result'] = FeedC::archive($id);
@@ -274,7 +274,7 @@ if (!$loggedIn) {
         if ($what == 'feed_updates') {
           $result['result'] = FeedC::updateClient($_SESSION['userid'], $parameters[0]);
         } else if($what == 'feed_previous'){
-          $result['result'] = FeedC::scrollClient($_SESSION['userid'], $parameters[0], 5);
+          $result['result'] = FeedC::scrollClient($_SESSION['userid'], $parameters[0], $parameters[1]);
         } else if($what == 'feed_search'){
           // if 'TAGPLUGIN flan, we do a quick search'
           if(isset ($parameters[1]) && $parameters[1] == 'TAGPLUGIN' ){

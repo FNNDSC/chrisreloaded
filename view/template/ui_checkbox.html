@@ -1,0 +1,62 @@
+<div class='cat_check' data-chris-ui-checkbox='false' class="chris_uchecked" style='display="block";
+margin-left: 5px;
+margin-top: 4px;
+float: left;
+width: 11px;
+height: 11px;
+background-color: #FFF;
+color:#009DE9;
+font-size: 24px;
+position:relative;
+' onclick='var checked = this.getAttribute("data-chris-ui-checkbox");
+if(checked == "true"){
+// uncheck!
+this.childNodes[1].style.display = "none";
+// update attribute
+this.setAttribute("data-chris-ui-checkbox", "false");
+}
+else{
+// check!
+this.childNodes[1].style.display = "block";
+// update attribute
+this.setAttribute("data-chris-ui-checkbox", "true");
+}
+'>
+
+<span class='cat_ucheck' style='display:none;cursor:default;position:absolute;width:100%;height:100%;top:0px;left:0px;margin-left:-3px;margin-top:-5px;'>
+✓
+</span>
+
+</div>
+<!-- 
+<div class="chris_checked">
+<div style='
+position: absolute;
+height: 100%;
+width: 100%;
+margin-left: -1px;
+margin-top: -1px;
+margin-right: 1px;
+margin-bottom:1px;
+display: block;
+
+border-style: solid;
+border-width: 1px;
+border-color: grey;
+'>✓</div>
+
+<div style='
+position: absolute;
+left: 0px;
+height: 100%;
+width: 100%;
+font-size: 24px;
+text-align: center;
+color: #009DE9;
+margin-left: -2px;
+margin-top: -3px;
+display: block;
+'>✓</div>
+
+</div>
+</div> -->
