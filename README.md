@@ -11,9 +11,12 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current - **r2.4** ###
-* Search on tags and plugins
+* Search for plugin
+* Select feeds and apply group actions (tag, favorite, etc.)
+* Search for feed on tags and plugins
 * Tag feeds (and all underlying functionnalities)
-* Drap and Drop/upload files to server
+* Drag and Drop/upload files to server (100MB/file max)
+* New feeds color vanishes to hint user
 * Fix connectome PATH issue (cmp not found)
 
 ### 2013 07 11 - **r2.3** ###
