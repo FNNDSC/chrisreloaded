@@ -183,7 +183,8 @@ class FeedC implements FeedControllerInterface {
           break;
         }
         $feed_update['new']['id'][] = $value->id;
-        $feed_update['new']['content'][] = (string)FeedV::getHTML($value);
+        // Feed View tag!
+        $feed_update['new']['content'][] = (string)FeedV::getHTML($value, 'feed_shine');
         $feed_update['new']['status'][] = $value->status;
         $new_ids[] = $value->id;
       }

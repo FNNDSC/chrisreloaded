@@ -47,13 +47,16 @@ _MODALTAG_.feedTagSuccess = function(tagid, feedid){
   // if not already applied, update ui
   if(tagid != -1){
 
-    var tag = document.querySelector("#"+_MODALTAG_.selectedTagID).cloneNode(true);
-    tag.classList.remove('inmodal');
-    tag.classList.add('infeed');
-    tag.style.border = 'none';
+    var feed = document.querySelectorAll("div[data-chris-feed_id='"+feedid+"']");
+    var test = feed.length;
+    for (var i=0; i<test; i++){
+      var tag = document.querySelector("#"+_MODALTAG_.selectedTagID).cloneNode(true);
+      tag.classList.remove('inmodal');
+      tag.classList.add('infeed');
+      tag.style.border = 'none';
 
-    var feed = document.querySelectorAll("[data-chris-feed_id='"+feedid+"']")[0];
-    feed.children[0].children[1].children[0].insertBefore(tag);
+      feed[i].children[0].children[1].children[0].insertBefore(tag);
+    }
   }   
 }
 

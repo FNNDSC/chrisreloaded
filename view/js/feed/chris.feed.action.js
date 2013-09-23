@@ -18,17 +18,14 @@ _FEED_.feed_check_action = function(id){
   jQuery(allElts).each(function(){
     $(this).attr('data-chris-feed_checked', 'true');
     $(this).find('.feed_uncheck').css('display', 'block');
-    $(this).find('.feed_header').css('backgroundColor', 'rgba(53, 53, 53, 0.7)');
-    $(this).find('.feed_header').css('color', '#FFF');
+    $(this).find('.feed_header').css('backgroundColor', 'rgba(255, 255, 0, 0.3)');
+    $(this).find('.feed_header').css('color', '#353535');
   });
 }
 
 _FEED_.feed_ucheck_action = function(id){
-  window.console.log(id);
   var allElts = jQuery('div[data-chris-feed_id=' + id + ']');
-        window.console.log(allElts);
   jQuery(allElts).each(function(){
-            window.console.log($(this)[0]);
     $(this).attr('data-chris-feed_checked', 'false');
     $(this).find('.feed_uncheck').css('display', 'none');
     $(this).find('.feed_header').css('backgroundColor', '');
@@ -43,24 +40,20 @@ _FEED_.feed_check = function() {
       function(event) {
         event.stopPropagation();
         event.preventDefault(); 
-        var allElts = jQuery(this).parent().parent().find('.feed');
-        jQuery(allElts).each(function(){
-            _FEED_.feed_check_action($(this).attr('data-chris-feed_id'));
-          });
-      });
 
-    jQuery(document).on(
-      'click',
-      '.cat_ucheck',
-      function(event) {
-        event.stopPropagation();
-        event.preventDefault(); 
-        var allElts = jQuery(this).parent().parent().parent().find('.feed');
-                window.console.log(jQuery(this));
-        window.console.log(allElts);
-        jQuery(allElts).each(function(){
-            _FEED_.feed_ucheck_action($(this).attr('data-chris-feed_id'));
+        // get value
+        var checked = jQuery(this).attr("data-chris-ui-checkbox");
+        var allElts = jQuery(this).parent().parent().find('.feed');
+        if(checked == "true"){
+          jQuery(allElts).each(function(){
+              _FEED_.feed_check_action($(this).attr('data-chris-feed_id'));
           });
+        }
+        else{
+          jQuery(allElts).each(function(){
+              _FEED_.feed_ucheck_action($(this).attr('data-chris-feed_id'));
+          });
+        }
       });
 
   jQuery(document).on(
@@ -277,8 +270,54 @@ _FEED_.feed_favorite = function() {
             }
           });
         }
+      });
 
+    // search favorite
+    jQuery(document).on(
+      'click',
+      '.sfeed_favorite',
+      function(e) {
+        // modify
+        e.stopPropagation();
 
+        // get all un-favorite checked elements
+        var shortcut = jQuery(this).parent().parent().parent().find('div[data-chris-feed_checked=true]');
+        var allElts = shortcut.filter(function() {
+          return $(this).find('.icon-star-empty').length === 1;
+        });
+        // loop though all elements
+        var  processedFeeds = [];
+        jQuery(allElts).each(function(){
+        var feedID = $(this).attr('data-chris-feed_id');
+          if(processedFeeds.indexOf(feedID) == -1 ){
+            _FEED_.feed_favorite_action(this);
+            processedFeeds.push(feedID);
+          }
+        });
+      });
+
+        // search favorite
+    jQuery(document).on(
+      'click',
+      '.sfeed_ufavorite',
+      function(e) {
+        // modify
+        e.stopPropagation();
+
+        // get all un-checked elements
+        var shortcut = jQuery(this).parent().parent().parent().find('div[data-chris-feed_checked=true]');
+        var allElts = shortcut.filter(function() {
+          return $(this).find('.icon-star').length === 1;
+        });
+        // loop though all elements
+        var  processedFeeds = [];
+        jQuery(allElts).each(function(){
+        var feedID = $(this).attr('data-chris-feed_id');
+          if(processedFeeds.indexOf(feedID) == -1 ){
+            _FEED_.feed_favorite_action(this);
+            processedFeeds.push(feedID);
+          }
+        });
       });
 }
 
@@ -370,6 +409,54 @@ _FEED_.feed_archive = function() {
         });
       }
     });
+
+      // search favorite
+    jQuery(document).on(
+      'click',
+      '.sfeed_archive',
+      function(e) {
+        // modify
+        e.stopPropagation();
+
+        // get all un-favorite checked elements
+        var shortcut = jQuery(this).parent().parent().parent().find('div[data-chris-feed_checked=true]');
+        var allElts = shortcut.filter(function() {
+          return $(this).find('.icon-remove').length === 1;
+        });
+        // loop though all elements
+        var  processedFeeds = [];
+        jQuery(allElts).each(function(){
+        var feedID = $(this).attr('data-chris-feed_id');
+          if(processedFeeds.indexOf(feedID) == -1 ){
+            _FEED_.feed_archive_action(this);
+            processedFeeds.push(feedID);
+          }
+        });
+      });
+
+        // search favorite
+    jQuery(document).on(
+      'click',
+      '.sfeed_uarchive',
+      function(e) {
+        // modify
+        e.stopPropagation();
+
+        // get all un-checked elements
+        var shortcut = jQuery(this).parent().parent().parent().find('div[data-chris-feed_checked=true]');
+        var allElts = shortcut.filter(function() {
+          return $(this).find('.icon-plus').length === 1;
+        });
+        // loop though all elements
+        var  processedFeeds = [];
+        jQuery(allElts).each(function(){
+        var feedID = $(this).attr('data-chris-feed_id');
+          if(processedFeeds.indexOf(feedID) == -1 ){
+            _FEED_.feed_archive_action(this);
+            processedFeeds.push(feedID);
+          }
+        });
+      });
 }
 
 _FEED_.feed_rename = function() {

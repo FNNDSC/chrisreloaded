@@ -331,9 +331,42 @@
   bottom: 0px;
   height: 100%;
   width: 100%;
-  font-size: 48px;
-  line-height: 48px;
-  text-align: center;
-  background-color:rgba(53, 53, 53, 0.85);
+  font-size: 24px;
+/*  line-height: 48px;
+  text-align: center;*/
+  background-color:rgba(250, 255, 124, 0.8);
   display:none;
+}
+
+@keyframes "feed_shine" {
+ from{background-color: rgba(0, 157, 233, .5);}
+ to{background-color: #FFF;}
+}
+
+@-moz-keyframes feed_shine {
+ from{background-color: rgba(0, 157, 233, .5);}
+ to{background-color: #FFF;}
+}
+
+@-webkit-keyframes "feed_shine" {
+ from{background-color: rgba(0, 157, 233, .5);}
+ to{background-color: #FFF;}
+}
+
+@-ms-keyframes "feed_shine" {
+ from{background-color: rgba(0, 157, 233, .5);}
+ to{background-color: #FFF;}
+}
+
+@-o-keyframes "feed_shine" {
+ from{background-color: rgba(0, 157, 233, .5);}
+ to{background-color: #FFF;}
+}
+
+.feed_shine {
+  -webkit-animation: feed_shine 4s linear;
+  -moz-animation: feed_shine 4s linear;
+  -ms-animation: feed_shine 4s linear;
+  -o-animation: feed_shine 4s linear;
+  animation: feed_shine 4s linear;
 }

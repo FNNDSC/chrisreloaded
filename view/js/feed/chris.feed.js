@@ -463,13 +463,27 @@ _FEED_.search = function() {
 
    $("#filtertagplugin").on("change", function(e) {
 
+    window.console.log(e);
+
     if (e.val.length > 0) {
       // keep track of tags and plugin filters
       if(typeof e.added != 'undefined' && e.added.element[0].parentElement.label == 'Tags'){
         _FEED_.searchT.push(e.added.id);
+        var shortname = e.added.id;
+        var shortcut = $('.select2-search-choice > div > span').filter(function() {
+          return $(this).text() === shortname;
+        });
+        var color = shortcut.css('background-color');
+        shortcut.parent().parent().css('background-color', color);
       }
       else if (typeof e.added != 'undefined'){
         _FEED_.searchP.push(e.added.id);
+        var shortname = e.added.id;
+        var shortcut = $('.select2-search-choice > div > span').filter(function() {
+          return $(this).text() === shortname;
+        });
+        var color = shortcut.css('background-color');
+        shortcut.parent().parent().css('background-color', color);
       }
       else if(typeof e.removed != 'undefined' && e.removed.element[0].parentElement.label == 'Tags'){
         var index = _FEED_.searchT.indexOf(e.removed.id);
@@ -545,7 +559,7 @@ _FEED_.searchTagPluginAjax = function(tags, plugins) {
             data['content'][i] = data['content'][i].replace('<span class="feed_uncheck">✓</span>', '<span class="feed_uncheck" style="display:block;">✓</span>');
             data['content'][i] = data['content'][i].replace('data-chris-feed_status', 'data-chris-feed_checked="true" data-chris-feed_status');
             data['content'][i] = data['content'][i].replace('data-chris-feed_status', 'data-chris-feed_checked="true" data-chris-feed_status');
-            data['content'][i] = data['content'][i].replace("<div class='feed_header'>", "<div class='feed_header' style='background-color:rgba(53, 53, 53, 0.7); color:#FFF;'>");
+            data['content'][i] = data['content'][i].replace("<div class='feed_header'>", "<div class='feed_header' style='background-color:rgba(255, 255, 0, 0.3); color:#FFF;'>");
           }
 
           // if id in new delete it!

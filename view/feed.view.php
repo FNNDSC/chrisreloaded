@@ -50,7 +50,7 @@ class FeedV implements ObjectViewInterface {
    * @param Feed $object object to be converted to HMTL.
    * @return string HTML representation of the object
    */
-  public static function getHTML($object){
+  public static function getHTML($object, $shine = ''){
     // Format username
     $username = FeedV::_getUsername($object->user_id);
     $username_displayed = ucwords($username);
@@ -140,6 +140,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('FAVORITE_TEXT', $favorite_text);
     $t -> replace('CANCEL', $cancel);
     $t -> replace('EDIT_ICON', $edit_icon);
+    $t -> replace('FEED_SHINE', $shine);
     // set data browser
     $d = new Template('feed_data_browser.html');
     $feed_folder = joinPaths($username,$object->plugin, $object->name.'-'.$object->id);
