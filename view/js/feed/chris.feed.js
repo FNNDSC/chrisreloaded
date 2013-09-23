@@ -411,37 +411,47 @@ _FEED_.update_onclick = function() {
         _FEED_.activateDroppableIcons();
       });
 }
+
+_FEED_.getPreviousFeed = function(nb){
+  //
+  // ajax call
+  jQuery.ajax({
+    type : "POST",
+    url : "api.php",
+    dataType : "json",
+    data :{
+      action : 'get',
+      what : 'feed_previous',
+      parameters : [ _FEED_.oldest, nb ]
+    },
+    success : function(data) {
+      data = data['result'];
+      // update oldest feed
+      _FEED_.oldest = data['feed_old'];
+      old_Feeds = '';
+      var length_done = data['content'].length;
+      if (length_done > 0) {
+        var i = 0;
+        while (i <= length_done - 1) {
+          // if id in new delete it!
+          old_Feeds += data['content'][i];
+          i++;
+        }
+      }
+      jQuery('.feed_fin_content').append(old_Feeds);
+      _FEED_.updateTime();
+      jQuery('.feed_content').bind('scroll');
+      _FEED_.activateDraggableIcons();
+       _FEED_.activateDroppableIcons();
+    }
+  });
+}
+
 _FEED_.scrollBottom = function() {
   jQuery('.feed_content').scroll(
       function() {
         if ($(this)[0].scrollHeight - $(this).scrollTop() <= $(this).height()) {
-          // ajax call
-          jQuery.ajax({
-            type : "POST",
-            url : "api.php?action=get&what=feed_previous&parameters[]="
-                + _FEED_.oldest,
-            dataType : "json",
-            success : function(data) {
-              data = data['result'];
-              // update oldest feed
-              _FEED_.oldest = data['feed_old'];
-              old_Feeds = '';
-              var length_done = data['content'].length;
-              if (length_done > 0) {
-                var i = 0;
-                while (i <= length_done - 1) {
-                  // if id in new delete it!
-                  old_Feeds += data['content'][i];
-                  i++;
-                }
-              }
-              jQuery('.feed_fin_content').append(old_Feeds);
-              _FEED_.updateTime();
-              jQuery('.feed_content').bind('scroll');
-              _FEED_.activateDraggableIcons();
-              _FEED_.activateDroppableIcons();
-            }
-          });
+          _FEED_.getPreviousFeed(5);
         }
       });
 }
@@ -453,13 +463,27 @@ _FEED_.search = function() {
 
    $("#filtertagplugin").on("change", function(e) {
 
+    window.console.log(e);
+
     if (e.val.length > 0) {
       // keep track of tags and plugin filters
       if(typeof e.added != 'undefined' && e.added.element[0].parentElement.label == 'Tags'){
         _FEED_.searchT.push(e.added.id);
+        var shortname = e.added.id;
+        var shortcut = $('.select2-search-choice > div > span').filter(function() {
+          return $(this).text() === shortname;
+        });
+        var color = shortcut.css('background-color');
+        shortcut.parent().parent().css('background-color', color);
       }
       else if (typeof e.added != 'undefined'){
         _FEED_.searchP.push(e.added.id);
+        var shortname = e.added.id;
+        var shortcut = $('.select2-search-choice > div > span').filter(function() {
+          return $(this).text() === shortname;
+        });
+        var color = shortcut.css('background-color');
+        shortcut.parent().parent().css('background-color', color);
       }
       else if(typeof e.removed != 'undefined' && e.removed.element[0].parentElement.label == 'Tags'){
         var index = _FEED_.searchT.indexOf(e.removed.id);
@@ -528,8 +552,19 @@ _FEED_.searchTagPluginAjax = function(tags, plugins) {
       if (length_done > 0) {
         var i = 0;
         while (i <= length_done - 1) {
+
+          // if element exists and is checked
+          if($('div[data-chris-feed_id="'+data['id'][i]+'"]').attr('data-chris-feed_checked') == "true"){
+            // apply 'checked' style
+            data['content'][i] = data['content'][i].replace('<span class="feed_uncheck">✓</span>', '<span class="feed_uncheck" style="display:block;">✓</span>');
+            data['content'][i] = data['content'][i].replace('data-chris-feed_status', 'data-chris-feed_checked="true" data-chris-feed_status');
+            data['content'][i] = data['content'][i].replace('data-chris-feed_status', 'data-chris-feed_checked="true" data-chris-feed_status');
+            data['content'][i] = data['content'][i].replace("<div class='feed_header'>", "<div class='feed_header' style='background-color:rgba(255, 255, 0, 0.3); color:#FFF;'>");
+          }
+
           // if id in new delete it!
           old_Feeds += data['content'][i];
+
           i++;
         }
       }
@@ -640,6 +675,7 @@ _FEED_.activateDraggableIcons = function() {
         helper : "clone",
         appendTo : "body",
         zIndex : 2500,
+        delay : 150,
         start : function(event, ui) {
           // disable all feed dropzones
           $(".feed").droppable('option', 'disabled', true)

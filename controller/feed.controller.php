@@ -62,9 +62,11 @@ interface FeedControllerInterface
   static public function updateName($id, $name, &$ssh_connection);
   // cancel the job
   static public function cancel($id, &$ssh_connection);
+  // share a feed
+  static public function share($feed_ids, $ownerid, $ownername, $targetname, &$ssh_connection);
   // tag/untag a feed
   static public function tag($feedid, $tagid, $remove);
-  // search on tag and plugin\
+  // search on tag and plugin
   static public function parseTagPlugin(&$feedtagResults, &$count, &$feed_list, &$feed_update);
   static public function searchTagPlugin($user_id, $searchString);
 }
@@ -181,7 +183,8 @@ class FeedC implements FeedControllerInterface {
           break;
         }
         $feed_update['new']['id'][] = $value->id;
-        $feed_update['new']['content'][] = (string)FeedV::getHTML($value);
+        // Feed View tag!
+        $feed_update['new']['content'][] = (string)FeedV::getHTML($value, 'feed_shine');
         $feed_update['new']['status'][] = $value->status;
         $new_ids[] = $value->id;
       }
@@ -299,11 +302,13 @@ class FeedC implements FeedControllerInterface {
       if($count == 0){
         $feed_list[$value->id] = $count + 1;
         $feed_update['content'][] = (string)FeedV::getHTML($value);
+        $feed_update['id'][] = (string)$value->id;
       }
       else{
         if(isset($feed_list[$value->id]) && $feed_list[$value->id] == $count){
           $feed_list[$value->id]++;
           $feed_update['content'][] = (string)FeedV::getHTML($value);
+          $feed_update['id'][] = (string)$value->id;
         }
         else{
           unset($feed_list[$value->id]);
@@ -316,6 +321,7 @@ class FeedC implements FeedControllerInterface {
   static public function searchTagPlugin($user_id, $searchString){
     // output container
     $feed_update = Array();
+    $feed_update['id'] = Array(); 
     $feed_update['content'] = Array();
     $feed_list = Array();
     $count = 0;
@@ -343,6 +349,7 @@ class FeedC implements FeedControllerInterface {
           else{
             // empty content
             $skip = true;
+            $feed_update['id'] = Array();
             $feed_update['content'] = Array();
             break;
           }
@@ -356,6 +363,7 @@ class FeedC implements FeedControllerInterface {
     
       foreach ($searchString[1] as $keyT => $valueT) {
         // init
+        $feed_update['id'] = Array();
         $feed_update['content'] = Array();
         // get tag ID
         $tagMapper = new Mapper('Feed');
@@ -368,6 +376,7 @@ class FeedC implements FeedControllerInterface {
         else {
           // empty content
           $skip = true;
+          $feed_update['id'] = Array();
           $feed_update['content'] = Array();
           break;
         }
@@ -380,97 +389,99 @@ class FeedC implements FeedControllerInterface {
 }
 
   // share a feed
-  static public function share($feed_id, $ownerid, $ownername, $targetname, &$ssh_connection){
-    // get target user id
-    $userMapper = new Mapper('User');
-    $userMapper->filter('username = (?)', $targetname);
-    $userResult = $userMapper->get();
+  static public function share($feed_ids, $ownerid, $ownername, $targetname, &$ssh_connection){
+    foreach( $feed_ids as $feed_id){
+      // get target user id
+      $userMapper = new Mapper('User');
+      $userMapper->filter('username = (?)', $targetname);
+      $userResult = $userMapper->get();
 
-    if(count($userResult['User']) >= 1){
-      // get feed to be shared
-      $feedMapper = new Mapper('Feed');
-      $feedMapper->filter('id = (?)', $feed_id);
-      $feedResult = $feedMapper->get();
+      if(count($userResult['User']) >= 1){
+        // get feed to be shared
+        $feedMapper = new Mapper('Feed');
+        $feedMapper->filter('id = (?)', $feed_id);
+        $feedResult = $feedMapper->get();
 
-      if(count($feedResult['Feed']) >= 1){
-        $feedResult['Feed'][0]->id = 0;
-        $feedResult['Feed'][0]->user_id = $userResult['User'][0]->id;
-        $feedResult['Feed'][0]->time = microtime(true);
-        $feedResult['Feed'][0]->favorite = 0;
-        $new_id = Mapper::add($feedResult['Feed'][0]);
+        if(count($feedResult['Feed']) >= 1){
+          $feedResult['Feed'][0]->id = 0;
+          $feedResult['Feed'][0]->user_id = $userResult['User'][0]->id;
+          $feedResult['Feed'][0]->time = microtime(true);
+          $feedResult['Feed'][0]->favorite = 0;
+          $new_id = Mapper::add($feedResult['Feed'][0]);
 
-        // get parameters, owner meta information
-        $metaMapper = new Mapper('Meta');
-        // OR confiton between all filters
-        $metaMapper->filter('', '', 0, 'OR');
-        // first filters
-        $metaMapper->filter('name = (?)', 'root_id', 1);
-        $metaMapper->filter('target_id = (?)', $feed_id, 1);
-        $metaMapper->filter('target_type = (?)', 'feed', 1);
-        // second filters
-        $metaMapper->filter('name = (?)', 'parameters', 2);
-        $metaMapper->filter('target_id = (?)', $feed_id, 2);
-        $metaMapper->filter('target_type = (?)', 'feed', 2);
-        // second filters
-        $metaMapper->filter('name = (?)', 'pid', 3);
-        $metaMapper->filter('target_id = (?)', $feed_id, 3);
-        $metaMapper->filter('target_type = (?)', 'feed', 3);
-        // get results
-        $metaResult = $metaMapper->get();
-        // for earch result, create same meta with different target id
-        if(count($metaResult['Meta']) >= 1){
-          foreach($metaResult['Meta'] as $k0 => $v0){
-            $v0->id = 0;
-            $v0->target_id = $new_id;
+          // get parameters, owner meta information
+          $metaMapper = new Mapper('Meta');
+          // OR confiton between all filters
+          $metaMapper->filter('', '', 0, 'OR');
+          // first filters
+          $metaMapper->filter('name = (?)', 'root_id', 1);
+          $metaMapper->filter('target_id = (?)', $feed_id, 1);
+          $metaMapper->filter('target_type = (?)', 'feed', 1);
+          // second filters
+          $metaMapper->filter('name = (?)', 'parameters', 2);
+          $metaMapper->filter('target_id = (?)', $feed_id, 2);
+          $metaMapper->filter('target_type = (?)', 'feed', 2);
+          // second filters
+          $metaMapper->filter('name = (?)', 'pid', 3);
+          $metaMapper->filter('target_id = (?)', $feed_id, 3);
+          $metaMapper->filter('target_type = (?)', 'feed', 3);
+          // get results
+          $metaResult = $metaMapper->get();
+          // for earch result, create same meta with different target id
+          if(count($metaResult['Meta']) >= 1){
+            foreach($metaResult['Meta'] as $k0 => $v0){
+              $v0->id = 0;
+              $v0->target_id = $new_id;
 
-            // make sure to properly update the root_id
-            if ($v0->name == 'root_id') {
-              $v0->value = $feed_id;
+              // make sure to properly update the root_id
+              if ($v0->name == 'root_id') {
+                $v0->value = $feed_id;
+              }
+
+              Mapper::add($v0);
             }
-
-            Mapper::add($v0);
           }
+
+          // add sharer
+          FeedC::addMetaS($new_id, 'sharer_id', (string)$ownerid, 'simple');
+
+          // link files on file system
+          $targetDirectory = CHRIS_USERS.'/'.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feed_id;
+
+          $destinationDirectory = CHRIS_USERS.'/'.$targetname.'/'.$feedResult['Feed'][0]->plugin;
+          if(!is_dir($destinationDirectory)){
+            // 777? 775
+            $old = umask();
+            umask(0000);
+            mkdir($destinationDirectory, 0775, true);
+            umask($old);
+          }
+
+          $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
+
+          // just a link?
+          symlink($targetDirectory, $destinationDirectory);
+ 
+          // we need to change the permission of the target directory to 777 (as the owner)
+          // so that the other user can write to this folder
+          // but only if the targetDirectory is a directory and not a link (a link means it was re-shared)
+          if (is_dir($targetDirectory)) {
+            $ssh_connection->exec('chmod -R 777 '.$targetDirectory);
+          }
+
+          //if(!is_dir($destinationDirectory)){
+          //  recurse_copy($targetDirectory, $destinationDirectory);
+          //}
         }
-
-        // add sharer
-        FeedC::addMetaS($new_id, 'sharer_id', (string)$ownerid, 'simple');
-
-        // link files on file system
-        $targetDirectory = CHRIS_USERS.'/'.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feed_id;
-
-        $destinationDirectory = CHRIS_USERS.'/'.$targetname.'/'.$feedResult['Feed'][0]->plugin;
-        if(!is_dir($destinationDirectory)){
-          // 777? 775
-          $old = umask();
-          umask(0000);
-          mkdir($destinationDirectory, 0775, true);
-          umask($old);
+        else{
+          return "Invalid feed id: ". $feed_id;
         }
-
-        $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
-
-        // just a link?
-        symlink($targetDirectory, $destinationDirectory);
-
-        // we need to change the permission of the target directory to 777 (as the owner)
-        // so that the other user can write to this folder
-        // but only if the targetDirectory is a directory and not a link (a link means it was re-shared)
-        if (is_dir($targetDirectory)) {
-          $ssh_connection->exec('chmod -R 777 '.$targetDirectory);
-        }
-
-        //if(!is_dir($destinationDirectory)){
-        //  recurse_copy($targetDirectory, $destinationDirectory);
-        //}
       }
       else{
-        return "Invalid feed id: ". $feed_id;
+        return "Invalid target name: ". $targetname;
       }
-      return '';
     }
-    else{
-      return "Invalid target name: ". $targetname;
-    }
+    return '';
   }
 
   /**

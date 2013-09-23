@@ -80,6 +80,8 @@ function homePage() {
   $t -> replace('JAVASCRIPT_CHRIS', 'javascript.chris.html');
   $t -> replace('USERNAME', ucfirst($_SESSION['username']));
   $t -> replace('CHRIS_VERSION', CHRIS_VERSION);
+  // ui
+  $t -> replace('CHRIS_UI_CHECKBOX', 'ui_checkbox.html');
 
   if (CHRIS_MAINTENANCE) {
     $t -> replace('MAINTENANCE', 'display:block');
