@@ -336,6 +336,7 @@ class FeedC implements FeedControllerInterface {
         // get tag ID
         $tagMapper = new Mapper('Tag');
         $tagMapper->filter('name=(?)', $valueT);
+        $tagMapper->order('time');
         $tagResults = $tagMapper->get();
 
         if(count($tagResults['Tag']) >= 1){
@@ -368,6 +369,7 @@ class FeedC implements FeedControllerInterface {
         // get tag ID
         $tagMapper = new Mapper('Feed');
         $tagMapper->filter('user_id=(?)', $user_id)->filter('plugin=(?)', $valueT);
+        $tagMapper->order('time');
         $tagResults = $tagMapper->get();
 
         if(count($tagResults['Feed']) >= 1){

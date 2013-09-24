@@ -339,27 +339,27 @@
 }
 
 @keyframes "feed_shine" {
- from{background-color: rgba(0, 157, 233, .5);}
+ from{background-color: rgba(255, 255, 0, 0.3);}
  to{background-color: #FFF;}
 }
 
 @-moz-keyframes feed_shine {
- from{background-color: rgba(0, 157, 233, .5);}
+ from{background-color: rgba(255, 255, 0, 0.3);}
  to{background-color: #FFF;}
 }
 
 @-webkit-keyframes "feed_shine" {
- from{background-color: rgba(0, 157, 233, .5);}
+ from{background-color: rgba(255, 255, 0, 0.3);}
  to{background-color: #FFF;}
 }
 
 @-ms-keyframes "feed_shine" {
- from{background-color: rgba(0, 157, 233, .5);}
+ from{background-color: rgba(255, 255, 0, 0.3);}
  to{background-color: #FFF;}
 }
 
 @-o-keyframes "feed_shine" {
- from{background-color: rgba(0, 157, 233, .5);}
+ from{background-color: rgba(255, 255, 0, 0.3);}
  to{background-color: #FFF;}
 }
 
