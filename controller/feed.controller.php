@@ -336,12 +336,12 @@ class FeedC implements FeedControllerInterface {
         // get tag ID
         $tagMapper = new Mapper('Tag');
         $tagMapper->filter('name=(?)', $valueT);
-        $tagMapper->order('time');
         $tagResults = $tagMapper->get();
 
         if(count($tagResults['Tag']) >= 1){
           $feedtagMapper= new Mapper('Feed');
           $feedtagMapper->join('Feed_Tag', 'feed.id = feed_tag.feed_id')->filter('feed_tag.tag_id=(?)', $tagResults['Tag'][0]->id);
+          $feedtagMapper->order('time');
           $feedtagResults = $feedtagMapper->get();
 
           if(count($feedtagResults['Feed']) >= 1){
