@@ -36,7 +36,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
   // .. and attach the single-file dicom in .NRRD format
   // this works with gzip/gz/raw encoded NRRD files but XTK also supports other
   // formats like MGH/MGZ
-  volume.file = 'plugins/image_viewer/widget/data/recon.nii';
+  volume.file = 'plugins/viewer/widget/data/recon.nii';
   
   // add the volume in the main renderer
   // we choose the sliceX here, since this should work also on
