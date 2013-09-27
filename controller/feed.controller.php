@@ -333,28 +333,23 @@ class FeedC implements FeedControllerInterface {
       foreach ($searchString[0] as $keyT => $valueT) {
         // init
         $feed_update['content'] = Array();
-        // get tag ID
-        $tagMapper = new Mapper('Tag');
-        $tagMapper->filter('name=(?)', $valueT);
-        $tagResults = $tagMapper->get();
 
-        if(count($tagResults['Tag']) >= 1){
-          $feedtagMapper= new Mapper('Feed');
-          $feedtagMapper->join('Feed_Tag', 'feed.id = feed_tag.feed_id')->filter('feed_tag.tag_id=(?)', $tagResults['Tag'][0]->id);
-          $feedtagMapper->order('time');
-          $feedtagResults = $feedtagMapper->get();
+        $feedtagMapper= new Mapper('Feed');
+        $feedtagMapper->join('Feed_Tag', 'feed.id = feed_tag.feed_id')->join('Tag', 'feed_tag.tag_id = tag.id')->filter('tag.user_id=(?)', $user_id)->filter('tag.name=(?)', $valueT);
+        $feedtagMapper->order('time');
+        $feedtagResults = $feedtagMapper->get();
 
-          if(count($feedtagResults['Feed']) >= 1){
-            FeedC::parseTagPlugin($feedtagResults, $count, $feed_list, $feed_update);
-          }
-          else{
-            // empty content
-            $skip = true;
-            $feed_update['id'] = Array();
-            $feed_update['content'] = Array();
-            break;
-          }
+        if(count($feedtagResults['Feed']) >= 1){
+          FeedC::parseTagPlugin($feedtagResults, $count, $feed_list, $feed_update);
         }
+        else{
+          // empty content
+          $skip = true;
+          $feed_update['id'] = Array();
+          $feed_update['content'] = Array();
+          break;
+        }
+        
         $count++;
       }
     }
