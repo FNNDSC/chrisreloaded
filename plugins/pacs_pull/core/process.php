@@ -274,9 +274,9 @@ $data_chris_id = $dataResult['Data'][0]->id;
 $addDataLog .= 'Data exists...'.PHP_EOL;
 // if no nb_files provided, update this field in db
 if($dataResult['Data'][0]->nb_files == 0 && $results[1]['NumberOfSeriesRelatedInstances'][$key] > 0){
-$dataObject->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
+$dataResult['Data'][0]->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
 // Update database and get object
-Mapper::update($dataObject, $data_chris_id);
+Mapper::update($dataResult['Data'][0], $data_chris_id);
 $addDataLog .= 'Update data number of files...'.PHP_EOL;
 $addDataLog .= '0 -> '.$dataResult['Data'][0]->nb_files.PHP_EOL;
 }
