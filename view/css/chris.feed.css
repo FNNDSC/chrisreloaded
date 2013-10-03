@@ -37,10 +37,9 @@
 
 .feed {
 	margin-top: -1px;
-	margin-right:20px;
 	padding-right: 2px;
-  border-top: 1px solid;
-  border-bottom: 1px solid;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
 	border-color: #8D8D8D;
 	background-color: #FFF;
 }
