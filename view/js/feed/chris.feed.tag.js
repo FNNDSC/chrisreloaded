@@ -127,6 +127,18 @@ _MODALTAG_.createTag = function(){
 
           var tagid = JSON.parse(xhr.responseText).result.tags;
 
+          // select tag
+          if(_MODALTAG_.selectedTagID != ''){
+            // clean style
+            var target = document.querySelector('#'+_MODALTAG_.selectedTagID);
+            target.classList.remove('tagselected');
+          }
+
+          var target = document.querySelector('#tag-'+tagid);
+          target.classList.add('tagselected');
+          _MODALTAG_.selectedTagID = 'tag-' + tagid;
+
+
           // based on object size for now...
           var tagObj = {id:tagid,
             name:tagname.value,
