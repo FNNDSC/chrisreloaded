@@ -48,7 +48,7 @@ if ($commandline_mode) {
   // parse the options if we are in commandline mode
 
   // define the options
-  $shortopts = "s::p::a::i::n::d::m::t::y::e::h";
+  $shortopts = "s::p::a::i::n::d::m::t::y::e::x::h";
   $longopts  = array(
       "serverip::",     // Required value
       "serverport::",    // Required value
@@ -60,6 +60,7 @@ if ($commandline_mode) {
       "studydescription::",    // Optional value
       "seriesdescription::",    // Optional value
       "station::",
+      "sex::",
       "help"    // Optional value
   );
 
@@ -127,6 +128,17 @@ if ($commandline_mode) {
     $patientname = $options['patientname'];
   }
 
+  // is $patientsex given?
+  $patientsex = '';
+  if( array_key_exists('x', $options))
+  {
+    $patientsex = $options['x'];
+  }
+  elseif (array_key_exists('patientsex', $options))
+  {
+    $patientsex = $options['patientsex'];
+  }
+
   // is $studydate given?
   $studydate = '';
   if( array_key_exists('d', $options))
@@ -192,6 +204,7 @@ $study_parameter = Array();
 $study_parameter['PatientID'] = $patientid;
 $study_parameter['PatientName'] = $patientname;
 $study_parameter['PatientBirthDate'] = '';
+$study_parameter['PatientSex'] = '';
 $study_parameter['StudyDate'] = $studydate;
 $study_parameter['StudyDescription'] = '';
 $study_parameter['ModalitiesInStudy'] = $modality;
@@ -207,6 +220,7 @@ $all_query = $pacs->queryAll($study_parameter, $series_parameter, null);
 
 // post filter
 $post_filter = Array();
+$post_filter['PatientSex'] = $patientsex;
 $post_filter['PerformedStationAETitle'] = $station;
 $post_filter['StudyDescription'] = $studydescription;
 $post_filter['SeriesDescription'] = $seriesdescription;

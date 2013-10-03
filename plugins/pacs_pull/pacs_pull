@@ -94,6 +94,7 @@ if __name__ == "__main__":
   plugin.add_parameter('Simple parameters', Plugin.STRING, '--mrn', action='store', dest='MRN', help='MRN to be pulled')
   plugin.add_parameter('Simple parameters', Plugin.STRING, '--name', action='store', dest='NAME', help='NAME to be pulled')
   plugin.add_parameter('Simple parameters', Plugin.STRING, '--studydate', action='store', dest='DATE', help='DATE to be pulled')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--sex', action='store', dest='SEX', help='SEX of the patient')
   plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--modality', action='store', default='MR', dest='MOD', help='MODality to be pulled')
   plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--station', action='store', dest='STA', help='STAtion to be pulled')
   plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--studydesc', action='store', dest='STUD', help='STUdy Description to be pulled')

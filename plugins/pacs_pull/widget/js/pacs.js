@@ -89,6 +89,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
       SERVER_POR : _CHRIS_INTERACTIVE_PLUGIN_.getParam("serverport"),
       PACS_MRN : mrn,
       PACS_NAM : _CHRIS_INTERACTIVE_PLUGIN_.getParam("name"),
+      PACS_SEX : _CHRIS_INTERACTIVE_PLUGIN_.getParam("sex"),
       PACS_MOD : _CHRIS_INTERACTIVE_PLUGIN_.getParam("modality"),
       PACS_DAT : date,
       PACS_ACC_NUM : '',

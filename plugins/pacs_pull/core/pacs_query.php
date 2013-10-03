@@ -47,6 +47,8 @@ $useraetitle = is_set($_POST['USER_AET'],'FNNDSC-CHRISTEST');
 $patientid = is_set($_POST['PACS_MRN']);
 // patient name
 $patientname = is_set($_POST['PACS_NAM']);
+// patient sex
+$patientsex = is_set($_POST['PACS_SEX']);
 // study date
 $studydate = is_set($_POST['PACS_DAT']);
 // modality
@@ -68,6 +70,7 @@ $seriesdescription = is_set($_POST['PACS_SER_DES']);
 // $useraetitle
 // $patientid
 // $patientname
+// $patientsex
 // $studydate
 // $modality
 // $station
