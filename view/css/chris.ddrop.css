@@ -72,8 +72,8 @@ padding-bottom:30px;
 
 #finishDDrop:hover{
   cursor:pointer;
-    color:green;
-  opacity: 0.8;
+  color:#353535;
+  outline: 1px solid #353535;
 }
 
 #cancelDDrop{

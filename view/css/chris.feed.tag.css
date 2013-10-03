@@ -17,7 +17,9 @@
 
 #createTag:hover{
   cursor:pointer;
-  opacity: 0.8;
+  color:#353535;
+  outline: 1px solid #353535;
+/*  opacity: 0.8;*/
 }
 
 #feedTag{
@@ -30,21 +32,11 @@
 
 #feedTag:hover{
   cursor:pointer;
-  opacity: 0.8;
-}
-
-#feedTag{
-  display:inline-block;
-  color:#009DE9;
-  background-color: #fff;
-  padding:5px;
-  border-radius: 2px;
-}
-
-#feedTag:hover{
-  cursor:pointer;
-    color:green;
-  opacity: 0.8;
+  color:#353535;
+  outline: 1px solid #353535;
+/*  color:green;
+  outline: 1px solid green;*/
+/*  opacity: 0.8;*/
 }
 
 #cancelTag{
@@ -58,13 +50,14 @@
 
 #cancelTag:hover{
   cursor:pointer;
-  color:red;
-  opacity: 0.8;
+  color:#353535;
+  outline: 1px solid #353535;
+/*  opacity: 0.8;*/
 }
 
-.focus_tag:hover{
+/*.focus_tag:hover{
   background: grey;
-}
+}*/
 
 #tagModalClose:hover{
   cursor:pointer;
@@ -73,6 +66,10 @@
 .inmodal {
   opacity: 1;
   margin: 6px;
+}
+
+.inmodal:hover {
+  outline: 1px solid #353535;
 }
 
 .infeed {
@@ -84,7 +81,7 @@
 }
 
 .tagselected {
-
+  outline: 1px solid #353535;
   -webkit-box-shadow: 0 -4px 0px 0px #009DE9;
   -moz-box-shadow: 0 -4px 0px 0px #009DE9;
   box-shadow: 0 8px -4px 0px #009DE9;

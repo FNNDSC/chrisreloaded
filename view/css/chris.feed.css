@@ -311,6 +311,7 @@
 
 .focus:hover {
 	opacity: 1;
+	outline: 1px solid #353535;
 	cursor:pointer;
 }
 
