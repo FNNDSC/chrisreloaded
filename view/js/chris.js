@@ -122,7 +122,8 @@ jQuery(document).ready(function() {
 
   function format(state) {
     var originalOption = state.element;
-    return '<span style="color:'+$(originalOption).data('color')+'; background-color:'+$(originalOption).data('backgroundcolor')+';">'+state.text+'</span>';
+    //return '<span style="color:'+$(originalOption).data('color')+'; background-color:'+$(originalOption).data('backgroundcolor')+';">'+state.text+'</span>';
+    return '<span data-fontcolor='+$(originalOption).data("color")+' style="padding-left:2px; border-left: thick solid '+$(originalOption).data('backgroundcolor')+';">'+state.text+'</span>';
   }
 
   $("#filtertagplugin").select2({

@@ -473,8 +473,10 @@ _FEED_.search = function() {
         var shortcut = $('.select2-search-choice > div > span').filter(function() {
           return $(this).text() === shortname;
         });
-        var color = shortcut.css('background-color');
+        var color = shortcut.css('borderLeftColor');
+        var font = shortcut.attr('data-fontcolor');
         shortcut.parent().parent().css('background-color', color);
+        shortcut.parent().parent().css('color', font);
       }
       else if (typeof e.added != 'undefined'){
         _FEED_.searchP.push(e.added.id);
@@ -482,8 +484,10 @@ _FEED_.search = function() {
         var shortcut = $('.select2-search-choice > div > span').filter(function() {
           return $(this).text() === shortname;
         });
-        var color = shortcut.css('background-color');
+        var color = shortcut.css('borderLeftColor');
+        var font = shortcut.attr('data-fontcolor');
         shortcut.parent().parent().css('background-color', color);
+        shortcut.parent().parent().css('color', font);
       }
       else if(typeof e.removed != 'undefined' && e.removed.element[0].parentElement.label == 'Tags'){
         var index = _FEED_.searchT.indexOf(e.removed.id);
