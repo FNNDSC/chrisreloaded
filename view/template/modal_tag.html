@@ -1,24 +1,24 @@
 <div id="TAGMODAL" class="modal hide fade" tabindex="-1" role="dialog"
  aria-labelledby="TAGLABEL" aria-hidden="true" style='height:500px;overflow:hidden'>
- <div class="modal-header" style="background-color:#009DE9; color: #fff;border-bottom: none;">
+ <div class="modal-header" style="background-color:#353535; color: #fff;border-bottom: none;">
  <div id="tagModalClose" style="float: right;display: inline-block;" onclick="_MODALTAG_.modal.modal('hide');">
   <img class="" src="view/gfx/jigsoar-icons/light/24_close.png">
 </div>
 
 <h3>Tag creator</h3>
  </div>
- <div class="modal-body" style='padding:0px;overflow-y:hidden;max-height:100%;'>
+ <div class="modal-body" style='padding:0px;overflow-y:hidden;max-height:100%;min-height:80px;background:lightgrey;'>
 
-<div style="padding-left:5px; padding-right:5px;"><h4 style="display:inline-block;">Name &nbsp;</h4><input id='tagname'> <h4 style="display:inline-block;">&nbsp; Color &nbsp;</h4> <input type="color" id='tagcolor' style="margin-bottom:0px;"> <h4 id="createTag" onclick="_MODALTAG_.createTag()"> Create tag! </h4>
+<div style="padding-left:5px; padding-right:10px;padding-top:15px;"><h4 style="display:inline-block;">Name &nbsp;</h4><input id='tagname'> <h4 style="display:inline-block;">&nbsp; Color &nbsp;</h4> <input type="color" id='tagcolor' style="margin-bottom:5px;"> <h4 id="createTag" onclick="_MODALTAG_.createTag()"> Create tag </h4>
 
   </div>
  </div>
-  <div style='height:351px; width:100%;'>
+  <div style='height:321px; width:100%;'>
   <div style="width:100%; color:#fff; background-color: #009DE9; padding:5px;margin:0px;"><h4 style="margin:0px;">Select tag:</h4></div>
   <div id="tagslist" style="width:100%; height:321px;">
   </div>
   </div>
-  <div class="modal-footer" style="background-color:#009DE9; color: #fff; padding-top:0px;border-top: none;">
+  <div class="modal-footer" style="background-color:#353535; color: #fff; padding-top:0px;border-top: none;">
   <h4 id='cancelTag' onclick="_MODALTAG_.modal.modal('hide');">Exit</h4>
   <h4 id='feedTag' onclick="_MODALTAG_.feedTag();">Tag feed</h4>
  </div>

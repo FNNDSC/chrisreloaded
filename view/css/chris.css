@@ -148,3 +148,18 @@ select,textarea,.btn {
 	background-color:grey;
 
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-corner {
+  height: 0;
+  display: none;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background: #676767;
+}

@@ -49,7 +49,7 @@
 	color: #fff;
   text-align: center;
 /*	  border: 1px solid #8D8D8D;*/
-	  background: #353535;
+	  background: lightgrey;
 padding-top:25px;
 padding-bottom:30px;
 }
@@ -64,16 +64,18 @@ padding-bottom:30px;
 
 #finishDDrop{
   display:inline-block;
-  color:#009DE9;
-  background-color: #fff;
+  color:#fff;
+  background-color: #353535;
   padding:5px;
   border-radius: 2px;
+  outline: 1px solid #fff;
 }
 
 #finishDDrop:hover{
   cursor:pointer;
   color:#353535;
-  outline: 1px solid #353535;
+  background-color:#fff;
+  outline: none;
 }
 
 #cancelDDrop{
