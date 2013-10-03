@@ -52,8 +52,8 @@ _MODALTAG_.feedTagSuccess = function(tagid, feedid){
     for (var i=0; i<test; i++){
       var tag = document.querySelector("#"+_MODALTAG_.selectedTagID).cloneNode(true);
       tag.classList.remove('inmodal');
+      tag.classList.remove('tagselected');
       tag.classList.add('infeed');
-      tag.style.border = 'none';
 
       feed[i].children[0].children[1].children[0].insertBefore(tag);
     }

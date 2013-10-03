@@ -71,6 +71,7 @@
 
 .inmodal {
   opacity: 1;
+  margin: 6px;
 }
 
 .infeed {
@@ -79,4 +80,12 @@
 
 .infeed:hover {
   opacity: 1;
+}
+
+.tagselected {
+
+  -webkit-box-shadow: 0 -4px 0px 0px #009DE9;
+  -moz-box-shadow: 0 -4px 0px 0px #009DE9;
+  box-shadow: 0 8px -4px 0px #009DE9;
+
 }

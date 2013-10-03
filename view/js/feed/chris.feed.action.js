@@ -562,10 +562,15 @@ _FEED_.feed_tag = function() {
        if(_MODALTAG_.selectedTagID != ''){
          // clean style
          var target = document.querySelector('#'+_MODALTAG_.selectedTagID);
-         target.style.border = 'none';
+         target.classList.remove('tagselected');
        }
-       e.srcElement.style.border = '2px solid #999';
-       _MODALTAG_.selectedTagID = e.srcElement.id;
+       if(_MODALTAG_.selectedTagID != e.srcElement.id){
+         e.srcElement.classList.add('tagselected');
+         _MODALTAG_.selectedTagID = e.srcElement.id;
+       }
+       else{
+         _MODALTAG_.selectedTagID = '';
+       }
       });
 
     jQuery(document).on(
