@@ -463,8 +463,6 @@ _FEED_.search = function() {
 
    $("#filtertagplugin").on("change", function(e) {
 
-    window.console.log(e);
-
     if (e.val.length > 0) {
       // keep track of tags and plugin filters
       if(typeof e.added != 'undefined' && e.added.element[0].parentElement.label == 'Tags'){
