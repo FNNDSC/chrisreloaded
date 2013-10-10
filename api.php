@@ -308,6 +308,19 @@ if (!$loggedIn) {
 
           $result['result'] = TagC::get($_SESSION['userid']);
 
+        } else if($what == 'directory_content'){
+          
+          // user connects
+          // $ssh_connection = new Net_SSH2(CLUSTER_HOST);
+          // if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
+          //   die('Login Failed');
+          // }
+          //$result['result'] = $ssh_connection->exec('/usr/bin/php5 '.CHRIS_CONTROLLER_FOLDER.'/feed.browser.connector.php -d '.$_POST['dir']);
+          //echo $_POST["dir"];
+          $output = array();
+          exec('/usr/bin/php5 '.CHRIS_CONTROLLER_FOLDER.'/feed.browser.connector.php -d '.$_POST['dir'], $output);
+          $result['result'] =  implode($output);
+
         } else if($what == 'token') {
 
           $result['result'] = TokenC::create();

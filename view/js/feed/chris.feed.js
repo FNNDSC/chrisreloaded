@@ -55,7 +55,7 @@ _FEED_.onclick = function(details, more) {
   var _folder = _file_browser.attr('data-folder');
   _file_browser.fileTree({
     root : _folder,
-    script : 'controller/feed.browser.connector.php'
+    script : 'api.php?action=get&what=directory_content' //controller/feed.browser.connector.php'
   }, _FEED_.preview);
   // }
   // also create the multi accordion
@@ -463,8 +463,6 @@ _FEED_.search = function() {
 
    $("#filtertagplugin").on("change", function(e) {
 
-    window.console.log(e);
-
     if (e.val.length > 0) {
       // keep track of tags and plugin filters
       if(typeof e.added != 'undefined' && e.added.element[0].parentElement.label == 'Tags'){
@@ -745,7 +743,7 @@ _FEED_.activateDroppableIcons = function() {
                 _file_browser.attr('data-folder', _folder);
                 _file_browser.fileTree({
                   root : _folder,
-                  script : 'controller/feed.browser.connector.php'
+                  script : 'api.php?action=get&what=directory_content'
                 }, _FEED_.preview);
               } else {
                 jQuery().toastmessage('showErrorToast',
