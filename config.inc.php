@@ -80,7 +80,7 @@ define('CLUSTER_HOST', 'rc-goldfinger');
 define('CLUSTER_USERNAME', 'chris');
 // we replace {MEMORY} with a memory requirement
 // and {COMMAND} with the command to schedule
-define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND}');
+define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND} < /dev/null & echo $!;');
 define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
 
 // DICOM LISTENER
