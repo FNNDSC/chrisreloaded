@@ -258,7 +258,7 @@ if ($status == 100) {
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
   $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
   $cluster_command = str_replace("{COMMAND}", "/bin/bash ".$runfile, $cluster_command);
-  $pid = $ssh->exec($cluster_command." < /dev/null & echo $!;");
+  $pid = $ssh->exec($cluster_command);
 }
 
 // attach pid to feed
