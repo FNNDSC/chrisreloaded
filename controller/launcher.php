@@ -188,7 +188,7 @@ if($feed_id == -1){
 }
 
 // create the feed directory
-$user_path = joinPaths(CHRIS_USERS, $username);
+$user_path = joinPaths(CHRIS_NET, joinPaths(CHRIS_USERS, $username));
 $plugin_path = joinPaths($user_path, $plugin_name);
 $feed_path = joinPaths($plugin_path, $feedname.'-'.$feed_id);
 
@@ -221,19 +221,30 @@ $host = CLUSTER_HOST;
 if ($status == 100) {
   $host = 'localhost';
 }
+else{
+  $command = joinPaths(CHRIS_NET, $command);
+}
 
 $ssh = new Net_SSH2($host);
 if (!$ssh->login($username, $password)) {
   die('Login Failed');
 }
 
-$setStatus = joinPaths(CHRIS_CONTROLLER_FOLDER, 'set_status.php');
+$setStatus = '';
+if ($status == 100) {
+  $setStatus .= joinPaths(CHRIS_CONTROLLER_FOLDER, 'set_status.php');
+}
+else{
+  $setStatus .= joinPaths(CHRIS_NET, joinPaths(CHRIS_CONTROLLER_FOLDER, 'set_status.php'));
+}
+
 $setStatus .= ' '.$feed_id;
 
 $ssh->exec('mkdir -p '.$job_path);
 
 // also include the environment setup in the runfile
-$ssh->exec("echo 'eval `php ".joinPaths(CHRIS_PLUGINS_FOLDER,'env.php')."`' >> ".$runfile);
+if($status == 100) $ssh->exec("echo 'eval `php ".joinPaths(CHRIS_PLUGINS_FOLDER,'env.php')."`' >> ".$runfile);
+if($status != 100) $ssh->exec("echo 'eval `php ".joinPaths(CHRIS_NET, joinPaths(CHRIS_PLUGINS_FOLDER,'env.php'))."`' >> ".$runfile);
 
 if($status != 100) $ssh->exec('echo "'.$setStatus.' 1'.' > /dev/null 2> /dev/null" >> '.$runfile);
 $ssh->exec('echo "'.$command.'" >> '.$runfile);
