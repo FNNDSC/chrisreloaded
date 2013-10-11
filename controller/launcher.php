@@ -231,10 +231,7 @@ if (!$ssh->login($username, $password)) {
 }
 
 $setStatus = '';
-if ($status == 100) {
-  $setStatus .= joinPaths(CHRIS_CONTROLLER_FOLDER, 'set_status.php');
-}
-else{
+if ($status != 100) {
   $setStatus .= joinPaths(CHRIS_NET, joinPaths(CHRIS_CONTROLLER_FOLDER, 'set_status.php'));
 }
 
