@@ -40,6 +40,7 @@ define('CHRIS_MAINTENANCE', false);
 
 define('CHRIS_HOME', '/chb/users/chris/dev');
 define('CHRIS_NET', '/');
+define('CHRIS_URL', 'http://chris/nicolas');
 
 // admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');

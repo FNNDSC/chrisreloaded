@@ -190,6 +190,9 @@ if (!$loggedIn) {
         }
         break;
       case "set":
+        if($what == 'feed_status'){
+          $result['result'] = FeedC::status($_POST['feedid'], $_POST['status']);
+        }
        if($what == 'tag'){
           $result['result'] = FeedC::tag($_POST['feedid'], $_POST['tagid'], $_POST['remove']);
         }

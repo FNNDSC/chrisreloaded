@@ -32,16 +32,6 @@ if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 if(!defined('CHRIS_CONFIG_PARSED'))
   require_once(dirname(dirname(__FILE__)).'/config.inc.php');
 
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'db.class.php'));
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'mapper.class.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'meta.model.php'));
-require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
-
-# inputs
-#  feed id
-#  status increase
-
 if (count($argv)<3) {
   die("USAGE: set_status.php FEED_ID STATUS or +STATUS_INCREASE\n");
 }
@@ -49,100 +39,37 @@ if (count($argv)<3) {
 $feed_id = $argv[1];
 $status = $argv[2];
 
-// get $db instance
-$db = DB::getInstance();
-$db->lock('feed', 'WRITE');
 
-// grab the feed
-$feedResult = Mapper::getStatic('Feed', $feed_id);
+if(function_exists("curl_init")){
 
-if (count($feedResult['Feed']) == 0) {
-  $db->unlock();
-  die('Invalid feed id.');
+  echo "Using curl...\n";
+  $myvars = 'action=set';
+  $myvars = '&what=feed_status';
+  $myvars = '&feedid='.$feed_id;
+  $myvars = '&status='.$status;
+
+  $ch = curl_init( CHRIS_URL.'/api.php' );
+  curl_setopt( $ch, CURLOPT_POST, 1);
+  curl_setopt( $ch, CURLOPT_POSTFIELDS, $myvars);
+  curl_setopt( $ch, CURLOPT_FOLLOWLOCATION, 1);
+  curl_setopt( $ch, CURLOPT_HEADER, 0);
+  curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
+
+  $response = curl_exec( $ch );
 }
+else if(function_exists("mysqli_init")){
 
-# grab old status
-$old_status = $feedResult['Feed'][0]->status;
-
-if ($status{0} == '+') {
-
-  // increasing mode
-
-  echo "Increasing status of feed $feed_id by $status...\n";
-
-  # increase status
-  $status = $old_status + $status;
-
-} else {
-
-  // set mode
-
-  if ($old_status >= $status || $status > 100) {
-    $db->unlock();
-    die("Ignoring setting the status since the old status $old_status >= the new status $status or the old status >= 100.\n");
-  } else {
-
-    echo "Setting status of feed $feed_id to $status...\n";
-
-  }
+  echo "Using mysqli...\n";
+  // curl not working, thry to set status though controller
+  require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
+  FeedC::status($feed_id, $status);
 
 }
+else{
 
-# clamp the addition
-if ($status >= 100) {
-  $status = 100;
+  echo "Using nothing...\n";
+  die('Can not set the status.');
 
-  $startTime = $feedResult['Feed'][0]->time;
-  $endTime = microtime(true);
-  $duration = $endTime - $startTime;
-
-  $feedResult['Feed'][0]->time = $endTime;
-  $feedResult['Feed'][0]->duration = $duration;
 }
-
-# push to database
-
-$feedResult['Feed'][0]->status = $status;
-Mapper::update($feedResult['Feed'][0], $feed_id);
-
-$db->unlock();
-
-# update related shared feeds
-$relatedMapper = new Mapper('Feed');
-$relatedMapper->join('Meta', 'Meta.target_id = Feed.id')->filter('Meta.name = (?)', 'root_id')->filter('Meta.value = (?)',$feedResult['Feed'][0]->id)->filter('Feed.id != (?)',$feedResult['Feed'][0]->id); 
-$relatedResult = $relatedMapper->get();
-
-foreach($relatedResult['Feed'] as $key => $value){
-  $relatedResult['Feed'][$key]->time = $feedResult['Feed'][0]->time;
-  $relatedResult['Feed'][$key]->duration = $feedResult['Feed'][0]->duration;
-  $relatedResult['Feed'][$key]->status = $feedResult['Feed'][0]->status;
-  
-  Mapper::update($relatedResult['Feed'][$key], $relatedResult['Feed'][$key]->id);
-}
-  
-# send email if status == 100
-if ($status == 100) {
-  // user's email
-  $userMapper = new Mapper('User');
-  $userMapper->filter('user.id = (?)', $feedResult['Feed'][0]->user_id);
-  $userResult = $userMapper->get();
-
-  // if nothing in DB yet, return -1
-  if(count($userResult['User']) > 0)
-  {
-    $subject = "ChRIS2 - " . $feedResult['Feed'][0]->plugin ." plugin finished";
-
-    $message = "Hello " . $userResult['User'][0]->username . "," . PHP_EOL. PHP_EOL;
-    $message .= "Your results are available at:" . PHP_EOL;
-    $message .= joinPaths(CHRIS_USERS, $userResult['User'][0]->username, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id) . PHP_EOL. PHP_EOL;
-    $message .= "Thank you for using ChRIS.";
-
-    echo "Sending email to ".$userResult['User'][0]->email." since the status == 100.\n";
-
-    // get user email address
-    email(CHRIS_PLUGIN_EMAIL_FROM, $userResult['User'][0]->email, $subject, $message);
-  }
-}
-
 echo "New status == $status. Done.\n";
 ?>
