@@ -68,11 +68,18 @@ $result = array(
 //
 // check if a token was passed
 $loggedIn = false;
-if (isset($_GET['token'])) {
+
+if (isset($_GET['token'])){
+  $token = $_GET['token'];
+} else if (isset($_POST['token'])) {
+  $token = $_POST['token'];
+}
+
+if (isset($token)) {
 
   // token provided
 
-  $loggedIn = TokenC::validate($_GET['token']);
+  $loggedIn = TokenC::validate($token);
 
 } else {
 
