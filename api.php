@@ -82,6 +82,7 @@ if (isset($_GET['token'])) {
   $loggedIn = SecurityC::login();
 
 }
+
 if (!$loggedIn) {
 
   // invalid credentials

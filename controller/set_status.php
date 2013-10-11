@@ -38,15 +38,17 @@ if (count($argv)<3) {
 
 $feed_id = $argv[1];
 $status = $argv[2];
+$token = $argv[3];
 
 
 if(function_exists("curl_init")){
 
   echo "Using curl...\n";
   $myvars = 'action=set';
-  $myvars = '&what=feed_status';
-  $myvars = '&feedid='.$feed_id;
-  $myvars = '&status='.$status;
+  $myvars .= '&what=feed_status';
+  $myvars .= '&feedid='.$feed_id;
+  $myvars .= '&status='.$status;
+  $myvars .= '&token='.$token;
 
   $ch = curl_init( CHRIS_URL.'/api.php' );
   curl_setopt( $ch, CURLOPT_POST, 1);
@@ -56,11 +58,14 @@ if(function_exists("curl_init")){
   curl_setopt( $ch, CURLOPT_RETURNTRANSFER, 1);
 
   $response = curl_exec( $ch );
+
+  echo $response;
 }
 else if(function_exists("mysqli_init")){
 
   echo "Using mysqli...\n";
   // curl not working, thry to set status though controller
+  // should use tokens here too...
   require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
   FeedC::status($feed_id, $status);
 

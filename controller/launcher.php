@@ -39,6 +39,8 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'token.controller.php'));
+
 require_once ('Net/SSH2.php');
 
 // check if we are invoked by commandline
@@ -243,9 +245,17 @@ $ssh->exec('mkdir -p '.$job_path);
 if($status == 100) $ssh->exec("echo 'eval `php ".joinPaths(CHRIS_PLUGINS_FOLDER,'env.php')."`' >> ".$runfile);
 if($status != 100) $ssh->exec("echo 'eval `php ".joinPaths(CHRIS_NET, joinPaths(CHRIS_PLUGINS_FOLDER,'env.php'))."`' >> ".$runfile);
 
-if($status != 100) $ssh->exec('echo "'.$setStatus.' 1'.' > /dev/null 2> /dev/null" >> '.$runfile);
+if($status != 100){
+  $start_token = TokenC::create();
+  $ssh->exec('echo "'.$setStatus.' 1'.' '.$start_token.' > /dev/null 2> /dev/null" >> '.$runfile);
+}
+
 $ssh->exec('echo "'.$command.'" >> '.$runfile);
-if($status != 100) $ssh->exec('echo "'.$setStatus.' +'.$status_step.' > /dev/null 2> /dev/null" >> '.$runfile);
+
+if($status != 100){
+  $end_token = TokenC::create();
+  $ssh->exec('echo "'.$setStatus.' +'.$status_step.' '.$end_token.' > /dev/null 2> /dev/null" >> '.$runfile);
+}
 
 $ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
 //$ssh->exec("chmod +x $runfile;");
