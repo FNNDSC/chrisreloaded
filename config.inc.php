@@ -39,7 +39,6 @@ define('CHRIS_VERSION', '2.4-EXPERIMENTAL');
 define('CHRIS_MAINTENANCE', false);
 
 define('CHRIS_HOME', '/chb/users/chris/dev');
-define('CHRIS_NET', '/');
 define('CHRIS_URL', 'http://chris/nicolas');
 
 // admin email
@@ -55,6 +54,13 @@ define('SQL_USERNAME', 'chris');
 define('SQL_PASSWORD', 'YOURPASSWORD');
 define('SQL_DATABASE', 'chrisdev');
 
+// chris file system
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, '../../nicolas.rannou/gitroot/chrisreloaded'));
+define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
+define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
+define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
+define('CHRIS_LOG', joinPaths(CHRIS_HOME, 'log'));
+
 // PATH configuration
 define('CHRIS_WWWROOT', dirname(__FILE__));
 define('CHRIS_MODEL_FOLDER', joinPaths(CHRIS_WWWROOT,'model'));
@@ -63,13 +69,8 @@ define('CHRIS_TEMPLATE_FOLDER', joinPaths(CHRIS_VIEW_FOLDER,'template'));
 define('CHRIS_CONTROLLER_FOLDER', joinPaths(CHRIS_WWWROOT,'controller'));
 define('CHRIS_LIB_FOLDER', joinPaths(CHRIS_WWWROOT,'lib'));
 define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
+define('CHRIS_PLUGINS_FOLDER_NET', joinPaths(CHRIS_SRC,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
-
-// chris file system
-define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
-define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
-define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
-define('CHRIS_LOG', joinPaths(CHRIS_HOME, 'log'));
 
 // known scanners and contact information
 define('CHRIS_SCANNERS', serialize(array(

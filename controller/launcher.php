@@ -190,7 +190,7 @@ if($feed_id == -1){
 }
 
 // create the feed directory
-$user_path = joinPaths(CHRIS_NET, joinPaths(CHRIS_USERS, $username));
+$user_path = joinPaths(CHRIS_USERS, $username);
 $plugin_path = joinPaths($user_path, $plugin_name);
 $feed_path = joinPaths($plugin_path, $feedname.'-'.$feed_id);
 
@@ -223,9 +223,6 @@ $host = CLUSTER_HOST;
 if ($status == 100) {
   $host = 'localhost';
 }
-else{
-  $command = joinPaths(CHRIS_NET, $command);
-}
 
 $ssh = new Net_SSH2($host);
 if (!$ssh->login($username, $password)) {
@@ -240,8 +237,7 @@ if ($status != 100) {
 $ssh->exec('mkdir -p '.$job_path);
 
 // also include the environment setup in the runfile
-if($status == 100) $ssh->exec("echo 'eval `php ".joinPaths(CHRIS_PLUGINS_FOLDER,'env.php')."`' >> ".$runfile);
-if($status != 100) $ssh->exec("echo 'eval `php ".joinPaths(CHRIS_NET, joinPaths(CHRIS_PLUGINS_FOLDER,'env.php'))."`' >> ".$runfile);
+$ssh->exec("echo 'eval `php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')."`' >> ".$runfile);
 
 if($status != 100){
   $start_token = TokenC::create();
