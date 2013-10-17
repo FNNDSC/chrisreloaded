@@ -234,10 +234,8 @@ if (!$ssh->login($username, $password)) {
 
 $setStatus = '';
 if ($status != 100) {
-  $setStatus .= joinPaths(CHRIS_NET, joinPaths(CHRIS_CONTROLLER_FOLDER, 'set_status.php'));
+  $setStatus .= '/usr/bin/curl --data ';
 }
-
-$setStatus .= ' '.$feed_id;
 
 $ssh->exec('mkdir -p '.$job_path);
 
@@ -247,14 +245,14 @@ if($status != 100) $ssh->exec("echo 'eval `php ".joinPaths(CHRIS_NET, joinPaths(
 
 if($status != 100){
   $start_token = TokenC::create();
-  $ssh->exec('echo "'.$setStatus.' 1'.' '.$start_token.' > /dev/null 2> /dev/null" >> '.$runfile);
+  $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > /dev/null 2> /dev/null" >> '.$runfile);
 }
 
 $ssh->exec('echo "'.$command.'" >> '.$runfile);
 
 if($status != 100){
   $end_token = TokenC::create();
-  $ssh->exec('echo "'.$setStatus.' +'.$status_step.' '.$end_token.' > /dev/null 2> /dev/null" >> '.$runfile);
+$ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > /dev/null 2> /dev/null" >> '.$runfile);
 }
 
 $ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
