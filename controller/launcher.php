@@ -231,7 +231,7 @@ if (!$ssh->login($username, $password)) {
 
 $setStatus = '';
 if ($status != 100) {
-  $setStatus .= '/usr/bin/curl --data ';
+  $setStatus .= '/usr/bin/curl -k --data ';
 }
 
 $ssh->exec('mkdir -p '.$job_path);

@@ -10,6 +10,9 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 
 ## Change log ##
 
+### 2013 10 18 **r2.5** ###
+* Add -k to CURL
+
 ### 2013 10 18 **r2.4** ###
 * First version of the Viewer plugin
 * Add Patient Sex to Pacs Pull plugin
