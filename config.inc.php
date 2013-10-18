@@ -39,7 +39,8 @@ define('CHRIS_VERSION', '2.6-EXPERIMENTAL');
 define('CHRIS_MAINTENANCE', false);
 
 define('CHRIS_HOME', '/chb/users/chris/dev');
-define('CHRIS_URL', 'http://chris/nicolas');
+define('CHRIS_TRANSFER_PROTOCOL', 'http');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/nicolas');
 
 // admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');

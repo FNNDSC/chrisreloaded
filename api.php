@@ -354,7 +354,7 @@ if (!$loggedIn) {
             // 1. create a token
             $token = TokenC::create();
             // 2. generate url (including the token)
-            $url = "http://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?token=".$token."&action=download&what=file&parameters=".joinPaths($parameters,basename($df));
+            $url = CHRIS_TRANSFER_PROTOCOL."://".$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']."?token=".$token."&action=download&what=file&parameters=".joinPaths($parameters,basename($df));
             // 3. attach to output
             $output['volume']['file'][] = $url;
 
