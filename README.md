@@ -11,6 +11,9 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current - **r2.4** ###
+* First version of the Viewer plugin
+* Add Patient Sex to Pacs Pull plugin
+* Update Feed status using CURLS + token
 * Search for plugin
 * Select feeds and apply group actions (tag, favorite, etc.)
 * Search for feed on tags and plugins
