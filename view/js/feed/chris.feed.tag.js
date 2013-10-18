@@ -54,8 +54,8 @@ _MODALTAG_.feedTagSuccess = function(tagid, feedid){
       tag.classList.remove('inmodal');
       tag.classList.remove('tagselected');
       tag.classList.add('infeed');
-
-      feed[i].children[0].children[1].children[0].insertBefore(tag);
+      var theLastChild = feed[i].children[0].children[1].children[1];
+      feed[i].children[0].children[1].insertBefore(tag, theLastChild);
     }
   }   
 }

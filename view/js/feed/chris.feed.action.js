@@ -469,7 +469,6 @@ _FEED_.feed_rename = function() {
     jQuery(this).trigger('blur');
   });
   jQuery(document).on('blur', '.feed_name_edit', function(e) {
-    // window.console.log('enter pressed');
     var _value = jQuery(this).val();
     var _label = jQuery(this).prev();
     var _icon = jQuery(this).next();
@@ -564,9 +563,9 @@ _FEED_.feed_tag = function() {
          var target = document.querySelector('#'+_MODALTAG_.selectedTagID);
          target.classList.remove('tagselected');
        }
-       if(_MODALTAG_.selectedTagID != e.srcElement.id){
-         e.srcElement.classList.add('tagselected');
-         _MODALTAG_.selectedTagID = e.srcElement.id;
+       if(_MODALTAG_.selectedTagID != e.target.id){
+         e.target.classList.add('tagselected');
+         _MODALTAG_.selectedTagID = e.target.id;
        }
        else{
          _MODALTAG_.selectedTagID = '';
@@ -580,7 +579,7 @@ _FEED_.feed_tag = function() {
         e.stopPropagation();
         r = window.confirm("The tag will be deleted!");
         if (r){
-          var spanElt = e.srcElement.parentElement;
+          var spanElt = e.target.parentElement;
 
           // delete from the js array
           for (var i = 0; i < _MODALTAG_.tags.length; i++) {
@@ -627,6 +626,14 @@ _FEED_.feed_tag = function() {
       function(e) {
         // modify
         e.stopPropagation();
+
+      //check if color input is supported, warn user, ideally should be invisble to the user...
+      if (!Modernizr.inputtypes.color) {
+        // no native support for <input type="date"> :(
+        alert('Your browser does not appear to support "colors input type".\nhttp://caniuse.com/#feat=input-color\nUse Chrome 20+ for the best labbook experience.');
+        $("#tagcolor").val('#000000');
+        $("#tagcolorhelp").show();
+      }
 
         // get feed id
         var feedIDs = [];

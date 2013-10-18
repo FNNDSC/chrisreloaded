@@ -9,8 +9,10 @@
 <script type="text/javascript" src="view/js/jquery.apprise.min.js"></script>
 <script type="text/javascript" src="view/js/jquery.touchpunch.js"></script>
 <script type="text/javascript" src="view/js/jquery.toggle.buttons.js"></script>
+<!-- Seach boxes-->
 <script src="lib/select2-3.4.2/select2.js"></script>
-
+<!-- Feature detection-->
+<script type="text/javascript" src="view/js/modernizr-2.6.2.js"></script>
 
 <!-- XTK -->
 <script type="text/javascript" src="view/js/xtk_edge.js"></script>
