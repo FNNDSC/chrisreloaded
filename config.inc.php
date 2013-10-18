@@ -61,6 +61,7 @@ define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
 define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
 define('CHRIS_LOG', joinPaths(CHRIS_HOME, 'log'));
+define('CHRIS_LIBS', joinPaths(CHRIS_HOME, 'lib'));
 
 // PATH configuration
 define('CHRIS_WWWROOT', dirname(__FILE__));
@@ -99,6 +100,9 @@ define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
 # globals
 define('ENV_TMP_DIR', '/chb/tmp');
 define('ENV_CLUSTER_TMP_DIR', '/chb/pices/tmp');
+define('ENV_PYTHONPATH', joinPaths(CHRIS_LIBS, 'pymodules/:$PYTHONPATH'));
+
+
 define('ENV_SCRIPT_DIR', '/chb/arch/scripts');
 define('ENV_FREESURFER_SCRIPT', '/chb/arch/scripts/chb-fs');
 define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current');

@@ -73,6 +73,12 @@ function buildEnvironment() {
     // check if this is an external package configuration
     if (substr($constant,0,4)=="ENV_") {
 
+      if($constant == "ENV_PYTHONPATH"){
+
+        $constant = "PYTHONPATH";
+
+      }
+
       // this is a package env variable
 
       $packages[$constant] = $value;
