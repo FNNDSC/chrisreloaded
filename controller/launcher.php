@@ -237,7 +237,7 @@ if ($status != 100) {
 $ssh->exec('mkdir -p '.$job_path);
 
 // also include the environment setup in the runfile
-$ssh->exec("echo 'eval `php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')."`' >> ".$runfile);
+$ssh->exec("php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')." >> ".$runfile);
 
 if($status != 100){
   $start_token = TokenC::create();
