@@ -458,7 +458,7 @@ class PACS implements PACSInterface {
     // else, finish splitting and append value to result array
     else{
       $value = split('\]', $tmpsplit[1]);
-      $array[$field][] = utf8_encode(trim$value[0]));
+      $array[$field][] = utf8_encode(trim($value[0]));
     }
 
     ++$i;
