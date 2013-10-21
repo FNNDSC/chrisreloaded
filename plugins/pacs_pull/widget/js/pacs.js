@@ -305,7 +305,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.advancedCaching = function(data, i) {
     study.SeriesDescription.push((data[1].SeriesDescription[i] == null) ? "nvp"
         : data[1].SeriesDescription[i]);
     study.PerformedStationAETitle
-        .push((data[0].PerformedStationAETitle[index] == null) ? "nvp"
+        .push((typeof(data[0].PerformedStationAETitle) == "undefined" || data[0].PerformedStationAETitle[index] == null) ? "nvp"
             : data[0].PerformedStationAETitle[index]);
     study.NumberOfSeriesRelatedInstances
         .push(data[1].NumberOfSeriesRelatedInstances[i]);
@@ -333,7 +333,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.advancedFormat = function(data, i) {
   sub.push(((data[1].SeriesDescription[i] == null) ? "nvp"
       : data[1].SeriesDescription[i]).replace(/\>/g, "&gt").replace(/\</g,
       "&lt").replace(/\_/g, " "));
-  sub.push(((data[0].PerformedStationAETitle[index] == null) ? "nvp"
+  sub.push(((typeof(data[0].PerformedStationAETitle) == "undefined" || data[0].PerformedStationAETitle[index] == null) ? "nvp"
       : data[0].PerformedStationAETitle[index]).replace(/\>/g, "&gt").replace(
       /\</g, "&lt"));
   sub.push(data[1].NumberOfSeriesRelatedInstances[i]);
@@ -567,8 +567,13 @@ _CHRIS_INTERACTIVE_PLUGIN_.simpleFormat = function(data, i) {
       .replace(/\_/g, " "));
   sub.push(data.StudyDate[i]);
   sub.push(data.ModalitiesInStudy[i]);
-  sub.push(data.PerformedStationAETitle[i].replace(/\>/g, "&gt").replace(/\</g,
+  if(typeof(data[0].PerformedStationAETitle) == "undefined"){
+    sub.push("nvp");
+  }
+  else{
+    sub.push(data.PerformedStationAETitle[i].replace(/\>/g, "&gt").replace(/\</g,
       "&lt").replace(/\_/g, " "));
+  }
   // if study cached, check status of series to update icon
   var cached = stuid in _CHRIS_INTERACTIVE_PLUGIN_.studyStatus;
   var status = 0;
