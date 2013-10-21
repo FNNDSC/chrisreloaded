@@ -567,7 +567,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.simpleFormat = function(data, i) {
       .replace(/\_/g, " "));
   sub.push(data.StudyDate[i]);
   sub.push(data.ModalitiesInStudy[i]);
-  if(typeof(data[0].PerformedStationAETitle) == "undefined"){
+  if(typeof(data.PerformedStationAETitle) == "undefined"){
     sub.push("nvp");
   }
   else{
