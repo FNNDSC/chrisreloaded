@@ -52,6 +52,8 @@ interface PluginControllerInterface
   // get the icon of a plugin
   static public function getIcon($plugin);
 
+  static public function getConfiguration($plugin);
+
   static public function getPluginsList();
 
 }
@@ -135,7 +137,15 @@ class PluginC implements PluginControllerInterface {
     setupEnvironment();
 
     // note: we also redirect stderr here to get the full output
-    exec($p_executable.' --xml 2>&1', $p_xml);
+
+    $configuration = '';
+    $config = PluginC::getConfiguration($plugin);
+
+    if($config != false){
+      $configuration = ' --configuration='.escapeshellarg(json_encode($config));
+    }
+
+    exec($p_executable.' --xml'.$configuration.' 2>&1', $p_xml);
 
     $p_xml = implode($p_xml);
 
@@ -157,7 +167,7 @@ class PluginC implements PluginControllerInterface {
 
     // replace plugin name variable
     $html = str_replace('${PLUGIN_NAME}', $plugin, $html);
-    // .. and the executable
+    // ... and the executable
     $html = str_replace('${PLUGIN_EXECUTABLE}', $p_executable, $html);
 
     return $html;
@@ -194,6 +204,23 @@ class PluginC implements PluginControllerInterface {
 
     return $p_icon;
 
+  }
+
+  /**
+   * Get the configuration of a given plugin.
+   *
+   * @param string $plugin The plugin name.
+   * @return array The full path to the plugin executable.
+   */
+  static public function getConfiguration($plugin) {
+
+    // get the configuration file
+    $username = ucfirst($_SESSION['username']);
+    $user_path = joinPaths(CHRIS_USERS, strtolower($username));
+
+    $ini_array = parse_ini_file(joinPaths($user_path,".chris.conf"), true);
+
+    return (isset($ini_array[$plugin])? $ini_array[$plugin]: false);
   }
 
   static public function getPluginsList() {

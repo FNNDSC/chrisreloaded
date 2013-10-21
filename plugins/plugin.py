@@ -27,6 +27,7 @@
  */
 '''
 import argparse
+import json
 import sys, os
 
 class Plugin( argparse.ArgumentParser ):
@@ -46,6 +47,7 @@ class Plugin( argparse.ArgumentParser ):
     '''
     super( Plugin, self ).__init__( description=Plugin.DESCRIPTION )
     self.add_argument( '--xml', action='store_true', dest='xml', default=False, help='show xml description of parameters (default: FALSE)' )
+    self.add_argument( '--configuration', action='store', dest='configuration', default="", help='show plugin user specific parameters configuration (default: "")' )
     self.add_argument( '--icon', action='store_true', dest='icon', default=False, help='show the description of this plugin (default: FALSE)' )
     self.add_argument( '--description', action='store_true', dest='description', default=False, help='show the icon path of this plugin (default: FALSE)' )
     self.add_argument( '--output', action='store', dest='output', help='the output directory' )
@@ -74,11 +76,17 @@ class Plugin( argparse.ArgumentParser ):
     self.print_help()
     sys.exit( 2 )
 
-  def xml( self ):
+  def xml( self, configuration = "" ):
     '''
     Generate the XML user interface for this
     plugin.
     '''
+
+    #store configuration;
+    config = {}
+    if(configuration != ""):
+      config = json.loads(configuration);
+
     xml = '<?xml version="1.0" encoding="utf-8"?>\n'
 
     # extra parameters for the executable
@@ -142,7 +150,11 @@ class Plugin( argparse.ArgumentParser ):
           xml += '<constraints><step>'+str(step)+'</step></constraints>'
 
         if parameter[3]:
-          xml += '<default>' + str( parameter[3] ) + '</default>'
+          if parameter[2][2:] in config:
+            xml += '<default>' + str( config[parameter[2][2:]] ) + '</default>'            
+          else :
+            xml += '<default>' + str( parameter[3] ) + '</default>'
+
 
         if parameter[4]:
           xml += '<description>' + str( parameter[4] ) + '</description>'
@@ -222,7 +234,10 @@ class Plugin( argparse.ArgumentParser ):
 
     if ( options.xml ):
       # print the xml
-      print( self.xml() )
+      if( options.configuration ):
+        print( self.xml(options.configuration) )
+      else:
+        print( self.xml() )
     else:
       # run the plugin
       self.run( options )
