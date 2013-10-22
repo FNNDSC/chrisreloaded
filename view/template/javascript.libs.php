@@ -2,7 +2,6 @@
 <script type="text/javascript"
  src="view/js/jquery-ui-1.8.23.custom.min.js"></script>
 
-<script type="text/javascript" src="view/js/jquery.backstretch.min.js"></script>
 <script type="text/javascript" src="view/js/jquery.toastmessage.js"></script>
 <script type="text/javascript" src="view/js/jquery.filetree.js"></script>
 <script type="text/javascript" src="view/js/jquery.multi-accordion-1.5.3.js"></script>

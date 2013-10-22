@@ -6,7 +6,10 @@
  content='width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0' />
 <title>ChRIS</title> ${CSS}
 </head>
-<body>
+<body  style="background: url(${BACKGROUND}) no-repeat center center fixed;  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;">
 
  <div id='maintenance' style='${MAINTENANCE}'>
   <div id='maintenance_label'>
@@ -42,7 +45,6 @@
    <div id="left" class="span4">
     <div class="well" id='information'
      style='padding-top: 10px; padding-bottom: 12px;'>
-<!--          <div id="homedropmask"></div> -->
      <!-- GREETING -->
      <span style='font-size: 14px; margin-left: -10px;'>Welcome
       back, <span style="font-weight: bold;">${USERNAME}</span>!

@@ -537,7 +537,9 @@ jQuery(document)
                 jQuery('#plugin_submit_play').hide();
                 jQuery('#plugin_submit_wait').show();
                 jQuery(this).addClass('disabled');
-                var _feed_name = (new Date()).toLocaleString();
+                var now = new Date();
+                var _feed_name = now.getMonth() + "-" + now.getDate() + "-" + now.getFullYear() + " " 
+               + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                 // if interactive plugin calling, give control to the plugin
                 // and return before launching
                 // if namespace doesnt exist or force false

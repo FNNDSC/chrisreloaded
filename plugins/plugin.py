@@ -47,7 +47,7 @@ class Plugin( argparse.ArgumentParser ):
     '''
     super( Plugin, self ).__init__( description=Plugin.DESCRIPTION )
     self.add_argument( '--xml', action='store_true', dest='xml', default=False, help='show xml description of parameters (default: FALSE)' )
-    self.add_argument( '--configuration', action='store', dest='configuration', default="", help='show plugin user specific parameters configuration (default: "")' )
+    self.add_argument( '--configuration', action='store', dest='configuration', default="", help='custom userconfiguration in JSON format (default: "")' )
     self.add_argument( '--icon', action='store_true', dest='icon', default=False, help='show the description of this plugin (default: FALSE)' )
     self.add_argument( '--description', action='store_true', dest='description', default=False, help='show the icon path of this plugin (default: FALSE)' )
     self.add_argument( '--output', action='store', dest='output', help='the output directory' )
@@ -82,7 +82,7 @@ class Plugin( argparse.ArgumentParser ):
     plugin.
     '''
 
-    #store configuration;
+    #read/format configuration;
     config = {}
     if(configuration != ""):
       config = json.loads(configuration);
@@ -150,8 +150,10 @@ class Plugin( argparse.ArgumentParser ):
           xml += '<constraints><step>'+str(step)+'</step></constraints>'
 
         if parameter[3]:
+          # if element has a user specific configuration, use the provided value
           if parameter[2][2:] in config:
-            xml += '<default>' + str( config[parameter[2][2:]] ) + '</default>'            
+            xml += '<default>' + str( config[parameter[2][2:]] ) + '</default>'
+          # else use the default value       
           else :
             xml += '<default>' + str( parameter[3] ) + '</default>'
 

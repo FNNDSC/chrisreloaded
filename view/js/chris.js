@@ -135,6 +135,3 @@ jQuery(document).ready(function() {
   });
   
 });
-
-// activate backstretch
-jQuery.backstretch('view/gfx/background1.jpg');

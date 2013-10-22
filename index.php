@@ -62,13 +62,23 @@ function loginPage() {
 
 // create the homepage
 function homePage() {
+  // read user configuration file
+  $user_configuration = getConfiguration();
+
   $t = new Template('home.html');
+
+  // check for custom background
+  $bg = "view/gfx/background1.jpg";
+  if(isset($user_configuration['general']) && isset($user_configuration['general']['background'])){
+    $bg = $user_configuration['general']['background'];
+  }
+  $t -> replace('BACKGROUND', $bg);
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
   $t -> replace('DATA_COUNT', DataC::getCount($_SESSION['userid']));
   $t -> replace('FEED_COUNT', FeedC::getCount($_SESSION['userid']));
   $t -> replace('RUNNING_COUNT', FeedC::getRunningCount($_SESSION['userid']));
-  $t -> replace('PLUGIN', PluginC::getHTML());
+  $t -> replace('PLUGIN', PluginC::getHTML($user_configuration));
   $t -> replace('FEED_ALL', FeedC::getAllHTML($_SESSION['userid']));
   $t -> replace('MODAL_DDROP', 'modal_ddrop.html');
   $t -> replace('MODAL_TAG', 'modal_tag.html');

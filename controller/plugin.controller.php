@@ -19,7 +19,7 @@
  *                     R  E  L  O  A  D  E  D
  *
  * (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
- *                   Boston Children's Hospital
+ *                   Boston Children's Hospital$user_configuration
  *
  *              http://childrenshospital.org/FNNDSC/
  *                        dev@babyMRI.org
@@ -38,21 +38,19 @@ require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
 interface PluginControllerInterface
 {
   // get HTML representation of the plugins widget
-  static public function getHTML();
+  static public function getHTML($user_configuration);
 
   // discover all available plugins
   static public function discover();
 
   // get the UI of a plugin (HTML/JS)
-  static public function getUI($plugin);
+  static public function getUI($plugin, $user_configuration);
 
   // get the executable path of a plugin
   static public function getExecutable($plugin);
 
   // get the icon of a plugin
   static public function getIcon($plugin);
-
-  static public function getConfiguration($plugin);
 
   static public function getPluginsList();
 
@@ -65,12 +63,14 @@ class PluginC implements PluginControllerInterface {
 
   /**
    * Get HTML representation of the plugins widget
+   * @param array $user_configuration User specific configuration.
    * @return string
    */
-  static public function getHTML(){
+  static public function getHTML($user_configuration){
 
     // discover the plugins and create the plugin widget
-    return PluginV::getHTML(PluginC::discover());
+    // get carroussel
+    return PluginV::getHTML(PluginC::discover(), $user_configuration);
 
   }
 
@@ -124,9 +124,10 @@ class PluginC implements PluginControllerInterface {
    * it to HTML/JS.
    *
    * @param string $plugin The plugin name.
+   * @param array $user_configuration User specific configuration.
    * @return string The resulting HTML UI representation.
    */
-  static public function getUI($plugin) {
+  static public function getUI($plugin, $user_configuration) {
 
     $p_executable = PluginC::getExecutable($plugin);
 
@@ -139,7 +140,7 @@ class PluginC implements PluginControllerInterface {
     // note: we also redirect stderr here to get the full output
 
     $configuration = '';
-    $config = PluginC::getConfiguration($plugin);
+    $config = (isset($user_configuration[$plugin])? $user_configuration[$plugin]: false);;
 
     if($config != false){
       $configuration = ' --configuration='.escapeshellarg(json_encode($config));
@@ -204,23 +205,6 @@ class PluginC implements PluginControllerInterface {
 
     return $p_icon;
 
-  }
-
-  /**
-   * Get the configuration of a given plugin.
-   *
-   * @param string $plugin The plugin name.
-   * @return array The full path to the plugin executable.
-   */
-  static public function getConfiguration($plugin) {
-
-    // get the configuration file
-    $username = ucfirst($_SESSION['username']);
-    $user_path = joinPaths(CHRIS_USERS, strtolower($username));
-
-    $ini_array = parse_ini_file(joinPaths($user_path,".chris.conf"), true);
-
-    return (isset($ini_array[$plugin])? $ini_array[$plugin]: false);
   }
 
   static public function getPluginsList() {
