@@ -220,7 +220,7 @@ $command .= ' > '.$job_path.'/chris.log 2> '.$job_path.'/chris.err';
 $runfile = joinPaths($job_path, 'chris.run');
 $host = CLUSTER_HOST;
 
-if ($status == 100 || $force_chris_local) {
+if ($status == 100) {
   $host = 'localhost';
 }
 

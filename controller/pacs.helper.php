@@ -128,7 +128,8 @@ class PACS implements PACSInterface {
    */
   public function ping($timeout = 5){
     $command = DICOM_DCMTK_ECHOSCU.' -to '.$timeout.' ';
-
+    $command .= ' -aec '.$this->user_aec;
+    $command .= ' -aet '.$this->user_aet;
     $this->_finishCommand($command);
     // execute the command, format it into a nice json and return it
     return $this->_executeAndFormat($command);
