@@ -73,6 +73,7 @@ define('CHRIS_LIB_FOLDER', joinPaths(CHRIS_WWWROOT,'lib'));
 define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_NET', joinPaths(CHRIS_SRC,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
+define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search');
 
 // known scanners and contact information
 define('CHRIS_SCANNERS', serialize(array(

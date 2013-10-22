@@ -538,7 +538,8 @@ jQuery(document)
                 jQuery('#plugin_submit_wait').show();
                 jQuery(this).addClass('disabled');
                 var now = new Date();
-                var _feed_name = now.getMonth() + "-" + now.getDate() + "-" + now.getFullYear() + " " 
+                var month = now.getMonth() + 1;
+                var _feed_name =  month + "-" + now.getDate() + "-" + now.getFullYear() + " " 
                + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                 // if interactive plugin calling, give control to the plugin
                 // and return before launching

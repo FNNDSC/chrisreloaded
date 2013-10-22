@@ -220,7 +220,7 @@ $command .= ' > '.$job_path.'/chris.log 2> '.$job_path.'/chris.err';
 $runfile = joinPaths($job_path, 'chris.run');
 $host = CLUSTER_HOST;
 
-if ($status == 100) {
+if ($status == 100 || $force_chris_local) {
   $host = 'localhost';
 }
 
@@ -261,11 +261,26 @@ $arguments .= ' -c "'.$runfile.'"';
 $arguments .= ' -u "'.$username.'"';
 $arguments .= ' -p "'.$password.'"';
 $arguments .= ' -o "'.$feed_path.'"';
-if ($status == 100) {
+
+// do we force this plugin to run locally as chris?
+$force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
+
+if ($force_chris_local) {
+  // get user group id
+  $groupID =  $ssh->exec("id -g");
+  // open permissions so user can see its plugin running
+  system('umask 0022;/bin/bash '.$runfile.';');
+  // update group and permissions
+  system("/bin/chgrp -R $groupID $feed_path");
+  system("/bin/chmod o-rx,g+w -R $feed_path");
+  $pid = -1;
+} else if ($status == 100 ) {
   // run locally
   $ssh->exec("/bin/bash ".$runfile);
   $pid = -1;
-} else {
+}
+else
+{
   // run on cluster and return pid
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
   $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
