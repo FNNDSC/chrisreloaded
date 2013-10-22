@@ -55,7 +55,7 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user_data.model.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 
 // define the options
-$shortopts = "u:f:m:s:p:a:o:d:e:y:";
+$shortopts = "u:f:m:s:p:a:c:o:d:e:y:";
 
 $options = getopt($shortopts);
 
@@ -68,6 +68,7 @@ if(isset($options['m'])){
 $server = $options['s'];
 $port = $options['p'];
 $aetitle = $options['a'];
+$aec = $options['c'];
 $output_dir = $options['o'];
 
 $study_uid = "";
@@ -102,7 +103,7 @@ $fh = fopen($logFile, 'a')  or die("can't open file");
 fwrite($fh, $instateLog);
 fclose($fh);
 
-$pacs = new PACS($server, $port, $aetitle);
+$pacs = new PACS($server, $port, $aetitle, $aec);
 
 //
 // 3- TEST CONNECTION
@@ -367,7 +368,7 @@ $addDataLog .= 'Map data to its study...'.PHP_EOL;
 // move series (data)
 $try = 0;
 while($request_data && ($try < 5)){
-$pacs2 = new PACS($server, $port, $aetitle);
+$pacs2 = new PACS($server, $port, $aetitle, $aec);
 echo $server.PHP_EOL;
 echo $port.PHP_EOL;
 echo $aetitle.PHP_EOL;

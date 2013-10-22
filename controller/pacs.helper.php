@@ -35,7 +35,7 @@ require_once (dirname(dirname( __FILE__ )).'/config.inc.php');
 interface PACSInterface
 {
   // constructor with 3 parameters
-  public function __construct($server_ip, $server_port, $user_aet = null);
+  public function __construct($server_ip, $server_port, $user_aet = null, $user_aec = null);
   // method to png server
   public function ping($timeout);
   // method to add parameters to the query
@@ -67,11 +67,18 @@ interface PACSInterface
 class PACS implements PACSInterface {
 
   /**
-   * User AE Title
+   * Calling AE Title
    *
    * @var string $user_aet
    */
   private $user_aet = null;
+
+  /**
+   * Called AE Title
+   *
+   * @var string $user_aet
+   */
+  private $user_aec = null;
 
   /**
    * Server IP.
@@ -102,10 +109,11 @@ class PACS implements PACSInterface {
    * @param[in] $server_port Port of the PACS.
    * @param[in] $user_aet User AE Title.
    */
-  public function __construct($server_ip, $server_port, $user_aet = null) {
+  public function __construct($server_ip, $server_port, $user_aet = null, $user_aec = null) {
     $this->server_ip = $server_ip;
     $this->server_port = $server_port;
     $this->user_aet = $user_aet;
+    $this->user_aec = $user_aec;
   }
 
   /**
@@ -192,7 +200,8 @@ class PACS implements PACSInterface {
       else{
         $command .= ' -S';
       }
-      $command .= ' --aetitle '.$this->user_aet;
+      $command .= ' -aec '.$this->user_aec;
+      $command .= ' -aet '.$this->user_aet;
 
       // add base parameters
       $this->addParameter('QueryRetrieveLevel', 'STUDY');
@@ -226,7 +235,8 @@ class PACS implements PACSInterface {
       // propose implicit VR little endian TS only
       $command = DICOM_DCMTK_FINDSCU.' -xi';
       $command .= ' -S';
-      $command .= ' --aetitle '.$this->user_aet;
+      $command .= ' -aec '.$this->user_aec;
+      $command .= ' -aet '.$this->user_aet;
 
       // add base parameters
       $this->addParameter('QueryRetrieveLevel', 'SERIES');
@@ -260,7 +270,8 @@ class PACS implements PACSInterface {
       // propose implicit VR little endian TS only
       $command = DICOM_DCMTK_FINDSCU.' -xi';
       $command .= ' -S';
-      $command .= ' --aetitle '.$this->user_aet;
+      $command .= ' -aec '.$this->user_aec;
+      $command .= ' -aet '.$this->user_aet;
 
       // add base parameters
       $this->addParameter('QueryRetrieveLevel', 'IMAGE');
@@ -536,7 +547,8 @@ class PACS implements PACSInterface {
       $output = Array();
       foreach($target['StudyInstanceUID'] as $value){
         $query = DICOM_DCMTK_MOVESCU;
-        $query .= ' --aetitle '.$this->user_aet;
+        $query .= ' -aec '.$this->user_aec;
+        $query .= ' -aet '.$this->user_aet;
         $query .= ' --move '.DICOM_DESTINATION_AETITLE;
         $query .= ' --study ';
         $query .= ' -k QueryRetrieveLevel=STUDY';
@@ -569,7 +581,8 @@ class PACS implements PACSInterface {
     if ((array_key_exists('StudyInstanceUID',$this->command_param) && $this->command_param['StudyInstanceUID'] != null) && (array_key_exists('SeriesInstanceUID',$this->command_param) && $this->command_param['SeriesInstanceUID'] != null) && $this->user_aet != null)
     {
       $command = DICOM_DCMTK_MOVESCU.' -S';
-      $command .= ' --aetitle '.$this->user_aet;
+      $command .= ' -aec '.$this->user_aec;
+      $command .= ' -aet '.$this->user_aet;
       $command .= ' --move '.DICOM_DESTINATION_AETITLE;
       $command .= ' -k QueryRetrieveLevel=SERIES';
       $command .= ' -k StudyInstanceUID='.$this->command_param['StudyInstanceUID'];

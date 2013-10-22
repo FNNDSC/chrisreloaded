@@ -48,11 +48,12 @@ if ($commandline_mode) {
   // parse the options if we are in commandline mode
 
   // define the options
-  $shortopts = "s::p::a::i::n::d::m::t::y::e::x::h";
+  $shortopts = "s::p::a::c::i::n::d::m::t::y::e::x::h";
   $longopts  = array(
       "serverip::",     // Required value
       "serverport::",    // Required value
       "useraetitle::",       // Required value
+      "useraec::",
       "patientid::",   // Optional value
       "patientname::",    // Optional value
       "studydate::",
@@ -104,6 +105,17 @@ if ($commandline_mode) {
   elseif (array_key_exists('useraetitle', $options))
   {
     $useraetitle = $options['useraetitle'];
+  }
+
+  // user alled aetitle
+  $useraec = 'ANY';
+  if( array_key_exists('c', $options))
+  {
+    $useraec = $options['c'];
+  }
+  elseif (array_key_exists('useraec', $options))
+  {
+    $useraec = $options['useraec'];
   }
   
   //if no command provided, exit
@@ -197,8 +209,7 @@ if ($commandline_mode) {
 }
 
 // instantiate PACS class
-$pacs = new PACS($serverip, $serverport, $useraetitle);
-
+$pacs = new PACS($serverip, $serverport, $useraetitle, $useraec);
 // create study filters
 $study_parameter = Array();
 $study_parameter['PatientID'] = $patientid;

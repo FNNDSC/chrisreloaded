@@ -43,6 +43,8 @@ $serverip = is_set($_POST['SERVER_IP'],'134.174.12.21');
 $serverport = is_set($_POST['SERVER_POR'],'104');
 // user aetitle
 $useraetitle = is_set($_POST['USER_AET'],'FNNDSC-CHRISTEST');
+// user caetitle
+$useraec = is_set($_POST['USER_AEC'],'ANY');
 // patient id
 $patientid = is_set($_POST['PACS_MRN']);
 // patient name

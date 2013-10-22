@@ -85,6 +85,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.queryDayAll = function(mrn, date, nb_queries) {
     dataType : "json",
     data : {
       USER_AET : _CHRIS_INTERACTIVE_PLUGIN_.getParam("aet"),
+      USER_AEC : _CHRIS_INTERACTIVE_PLUGIN_.getParam("aec"),
       SERVER_IP : _CHRIS_INTERACTIVE_PLUGIN_.getParam("serverip"),
       SERVER_POR : _CHRIS_INTERACTIVE_PLUGIN_.getParam("serverport"),
       PACS_MRN : mrn,
