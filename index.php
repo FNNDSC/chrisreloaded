@@ -70,7 +70,11 @@ function homePage() {
   // check for custom background
   $bg = "view/gfx/background1.jpg";
   if(isset($user_configuration['general']) && isset($user_configuration['general']['background'])){
-    $bg = $user_configuration['general']['background'];
+    $prefix = '';
+    if(dirname($user_configuration['general']['background']) == '.'){
+      $prefix .= 'users/' . $_SESSION['username'] . '/config/';
+    }
+    $bg = $prefix.$user_configuration['general']['background'];
   }
   $t -> replace('BACKGROUND', $bg);
   $t -> replace('CSS', 'css.html');
