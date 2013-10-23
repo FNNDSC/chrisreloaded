@@ -51,7 +51,7 @@ if ($commandline_mode) {
 
     foreach ($packages as $name=>$path) {
 
-       echo 'export '.$name.'='.$path.';';
+       echo 'export '.$name.'='.$path.';'.PHP_EOL;
 
     }
   }
