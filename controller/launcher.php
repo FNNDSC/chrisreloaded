@@ -237,23 +237,22 @@ if ($status != 100) {
 $ssh->exec('mkdir -p '.$job_path);
 
 // also include the environment setup in the runfile
-$ssh->exec("php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')." >> ".$runfile);
+system("php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')." >> ".$runfile);
 
 if($status != 100){
   $start_token = TokenC::create();
-  $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > /dev/null 2> /dev/null" >> '.$runfile);
+  system('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > /dev/null 2> /dev/null" >> '.$runfile);
 }
 
-$ssh->exec('echo "'.$command.'" >> '.$runfile);
+system('echo "'.$command.'" >> '.$runfile);
 
 if($status != 100){
   $end_token = TokenC::create();
-$ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > /dev/null 2> /dev/null" >> '.$runfile);
+  system('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > /dev/null 2> /dev/null" >> '.$runfile);
 }
 
-$ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
-//$ssh->exec("chmod +x $runfile;");
-
+system("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
+system("chmod o+rx,g+rx $runfile");
 
 $arguments = ' -l '.$job_path;
 $arguments .= ' -m '.$memory;
@@ -269,10 +268,9 @@ if ($force_chris_local) {
   // get user group id
   $groupID =  $ssh->exec("id -g");
   // open permissions so user can see its plugin running
-  system('umask 0022;/bin/bash '.$runfile.';');
-  // update group and permissions
-  system("/bin/chgrp -R $groupID $feed_path");
-  system("/bin/chmod o-rx,g+w -R $feed_path");
+  $command = "umask 0022;/bin/bash $runfile;  /bin/chgrp -R $groupID $feed_path; /bin/chmod g+w -R $feed_path";
+  $nohup_wrap = 'nohup bash -c "'.$command.'" > /dev/null 2>&1 &';
+  system($nohup_wrap);
   $pid = -1;
 } else if ($status == 100 ) {
   // run locally
