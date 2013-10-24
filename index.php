@@ -72,10 +72,11 @@ function homePage() {
   if(isset($user_configuration['general']) && isset($user_configuration['general']['background'])){
     $prefix = '';
     if(dirname($user_configuration['general']['background']) == '.'){
-      $prefix .= 'users/' . $_SESSION['username'] . '/config/';
+      $prefix .= 'users/' . $_SESSION['username'] . '/'.CHRIS_USERS_CONFIG_DIR.'/';
     }
     $bg = $prefix.$user_configuration['general']['background'];
   }
+  
   $t -> replace('BACKGROUND', $bg);
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');

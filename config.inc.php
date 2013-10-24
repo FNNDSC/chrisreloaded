@@ -63,6 +63,10 @@ define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
 define('CHRIS_LOG', joinPaths(CHRIS_HOME, 'log'));
 define('CHRIS_LIBS', joinPaths(CHRIS_HOME, 'lib'));
 
+// chris user configuration
+define('CHRIS_USERS_CONFIG_DIR', 'config');
+define('CHRIS_USERS_CONFIG_FILE', '.chris.conf');
+
 // PATH configuration
 define('CHRIS_WWWROOT', dirname(__FILE__));
 define('CHRIS_MODEL_FOLDER', joinPaths(CHRIS_WWWROOT,'model'));

@@ -188,7 +188,8 @@ function getConfiguration(){
     // get the configuration file
     $username = ucfirst($_SESSION['username']);
     $user_path = joinPaths(CHRIS_USERS, strtolower($username));
-    $config_file = joinPaths($user_path,".chris.conf");
+    $config_file = joinPaths($user_path,CHRIS_USERS_CONFIG_DIR);
+    $config_file = joinPaths($config_file,CHRIS_USERS_CONFIG_FILE);
     $config = file_exists($config_file)? parse_ini_file($config_file, true) : array();
     return $config;
   }
