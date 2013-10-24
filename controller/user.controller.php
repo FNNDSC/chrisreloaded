@@ -122,9 +122,18 @@ class UserC implements UserControllerInterface {
       }
       // else add user in the database
       else{
-        $uid = $ssh->exec('echo $UID');
-        // returns 0 since the user table doesnt have auto increment
-        UserC::create($uid, $username);
+        $uid = $ssh->exec('id -u '.$username);
+
+        $report = "=========================================". PHP_EOL;
+        $report .= date('Y-m-d h:i:s'). ' ---> New user logging in...'. PHP_EOL;
+        $report .= $username. PHP_EOL;
+        $report .= $uid. PHP_EOL;
+
+        // log logging information
+        $logFile = joinPaths(CHRIS_LOG,'new_user.log');
+        $fh = fopen($logFile, 'a')  or die("can't open file");
+        fwrite($fh, $report);
+        fclose($fh);
 
         $user_path = joinPaths(CHRIS_USERS, $username);
         // create home directory (if does't exist)
