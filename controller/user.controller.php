@@ -136,7 +136,7 @@ class UserC implements UserControllerInterface {
 
         // create config directory
         $user_config_path = joinPaths($user_path, CHRIS_USERS_CONFIG_DIR);
-        if(!file_exists($user_path)){
+        if(!file_exists($user_config_path)){
 
           $ssh->exec("mkdir $user_config_path;chmod 775 $user_config_path;");
 
