@@ -31,6 +31,3 @@ jQuery(document).ready(
       }
       
     });
-
-// activate backstretch
-jQuery.backstretch('view/gfx/background1.jpg');

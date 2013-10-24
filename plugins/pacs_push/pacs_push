@@ -50,6 +50,7 @@ class PACS_Push(Plugin):
     if not os.path.exists(input_dir):
       os.makedirs(input_dir)
       
+    # more logic needed here to get all files
     # get dcm images
     dcm_files = [e for e in os.listdir(options.DIR) if not os.path.isdir(e)]
     # check incoming dti directory
