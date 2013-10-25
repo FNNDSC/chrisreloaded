@@ -10,11 +10,10 @@ body,html { /* 	background: url( */
 
 #firstlogin {
   position: absolute;
-  background: rgba(0, 0, 0, 0.2);
-  width: 100%;
+  background: rgba(0, 0, 0, 0.6);
   height: 100%;
   top: 0px;
-  margin-left: -15px;
+  margin-left: 0px;
   z-index: 999999;
   display: none;
 }
