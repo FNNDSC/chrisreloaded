@@ -135,6 +135,9 @@ class UserC implements UserControllerInterface {
         fwrite($fh, $report);
         fclose($fh);
 
+        // returns 0 since the user table doesnt have auto increment
+        UserC::create($uid, $username);
+
         $user_path = joinPaths(CHRIS_USERS, $username);
         // create home directory (if does't exist)
         if(!file_exists($user_path)){
