@@ -3,6 +3,41 @@
  */
 var _CHRIS_ = _CHRIS_ || {};
 
+_CHRIS_.showTips = function(){
+  jQuery('#firstlogin').show();
+            
+  // install the callbacks for the tutorial
+  _TUTORIAL_ = 1;
+
+
+  $(document).off('click', '#tutcancel').on('click', '#tutcancel', function() {$('#firstlogin').hide()});
+  $(document).off('click', '#tutnext').on('click', '#tutnext',function() {
+              
+    $('#tut'+_TUTORIAL_).hide();
+    _TUTORIAL_++;
+              
+    if (_TUTORIAL_>3) {
+      _TUTORIAL_ = 1;
+    }              
+              
+    $('#tut'+_TUTORIAL_).show();
+            
+            
+  });
+  $(document).off('click', '#tutprev').on('click', '#tutprev',function() {
+              
+    $('#tut'+_TUTORIAL_).hide();
+              _TUTORIAL_--;
+              
+    if (_TUTORIAL_<1) {
+      _TUTORIAL_ = 3;
+    }              
+              
+    $('#tut'+_TUTORIAL_).show();
+              
+  });
+}
+
 _CHRIS_.updateStatistics = function() {
   
   jQuery.ajax({
