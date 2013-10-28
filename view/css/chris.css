@@ -18,6 +18,93 @@ body,html { /* 	background: url( */
   display: none;
 }
 
+@keyframes "startchris" {
+ 0% {
+    -webkit-box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+    box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+ 50% {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+ }
+ 100% {
+    -webkit-box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+    box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+
+}
+
+@-moz-keyframes startchris {
+ 0% {
+   box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+ 50% {
+   box-shadow: none;
+ }
+ 100% {
+   box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+
+}
+
+@-webkit-keyframes "startchris" {
+ 0% {
+   -webkit-box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+   box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+ 50% {
+   -webkit-box-shadow: none;
+   box-shadow: none;
+ }
+ 100% {
+   -webkit-box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+   box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+
+}
+
+@-ms-keyframes "startchris" {
+ 0% {
+   box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+ 50% {
+   box-shadow: none;
+ }
+ 100% {
+   box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+
+}
+
+@-o-keyframes "startchris" {
+ 0% {
+   box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+ 50% {
+   box-shadow: none;
+ }
+ 100% {
+   box-shadow: 0 0 10px #fff, 0 0 20px #00d2ff;
+ }
+
+}
+
+#tutcancel {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  height:108px;
+  width:183px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  box-sizing: border-box;
+
+  -webkit-animation: startchris 2s linear infinite;
+  -moz-animation: startchris 2s linear infinite;
+  -ms-animation: startchris 2s linear infinite;
+  -o-animation: startchris 2s linear infinite;
+  animation: startchris 2s linear infinite;
+}
+
 #maintenance {
 	position: absolute;
 	background: rgba(0, 0, 0, 0.8);
