@@ -9,8 +9,14 @@ _CHRIS_.showTips = function(){
   // install the callbacks for the tutorial
   _TUTORIAL_ = 1;
 
+  $(document).off('click', '#tutcancel').on('click', '#tutcancel', function() {
 
-  $(document).off('click', '#tutcancel').on('click', '#tutcancel', function() {$('#firstlogin').hide()});
+    $('#tut'+_TUTORIAL_).hide();
+    $('#firstlogin').hide();
+    _TUTORIAL_ = 1;
+    $('#tut'+_TUTORIAL_).show();
+    
+  });
   $(document).off('click', '#tutnext').on('click', '#tutnext',function() {
               
     $('#tut'+_TUTORIAL_).hide();
@@ -27,7 +33,7 @@ _CHRIS_.showTips = function(){
   $(document).off('click', '#tutprev').on('click', '#tutprev',function() {
               
     $('#tut'+_TUTORIAL_).hide();
-              _TUTORIAL_--;
+    _TUTORIAL_--;
               
     if (_TUTORIAL_<1) {
       _TUTORIAL_ = 3;
