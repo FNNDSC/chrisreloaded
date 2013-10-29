@@ -50,6 +50,7 @@ require_once ('Net/SSH2.php');
 header("Access-Control-Allow-Origin: *");
 
 // return values
+date_default_timezone_set(CHRIS_TIMEZONE);
 $start_time = new DateTime();
 $result = array(
     'status' => 'not-processed',
