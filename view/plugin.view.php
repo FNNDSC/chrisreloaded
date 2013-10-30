@@ -72,14 +72,14 @@ class PluginV implements ObjectViewInterface {
 
   }
 
-    public static function getHTML($object, $user_configuration=null){
+    public static function getHTML($object){
     $t = new Template('plugin.html');
     $t -> replace('PLUGIN_CAROUSEL', PluginV::getCarousel($object));
 
     $plugin_parameters = '';
     foreach ($object as $p) {
 
-      $plugin_parameters .= PluginC::getUI($p['name'], $user_configuration);
+      $plugin_parameters .= PluginC::getUI($p['name']);
 
     }
 

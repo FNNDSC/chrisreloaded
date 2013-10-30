@@ -46,6 +46,8 @@ interface UserControllerInterface
   static public function login($username, $password);
   // Create new user
   static public function create($uid, $username);
+  // Update user email
+  static public function setEmail($uid, $email);
 }
 
 /**
@@ -189,6 +191,29 @@ class UserC implements UserControllerInterface {
     $userObject->password = 'password';
     $userObject->email = $username.CHRIS_MAIL_SUFFIX;
     return Mapper::add($userObject);
+
+  }
+
+  /**
+   * Set a user email address.
+   *
+   * @param string $uid
+   * @param string $email
+   */
+  static public function setEmail($uid, $email) {
+
+      $userMapper = new Mapper('User');
+      $userMapper->filter('id=(?)', $uid);
+      $userResults = $userMapper->get();
+
+      // if user exist, return its id
+      if(isset($userResults['User'][0])) {
+
+        // update email address
+        $userResults['User'][0]->email = $email;
+        Mapper::update($userResults['User'][0], $uid);
+
+      }
 
   }
 

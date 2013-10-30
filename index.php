@@ -62,28 +62,15 @@ function loginPage() {
 
 // create the homepage
 function homePage() {
-  // read user configuration file
-  $user_configuration = getConfiguration();
 
   $t = new Template('home.html');
-
-  // check for custom background
-  $bg = "view/gfx/background1.jpg";
-  if(isset($user_configuration['general']) && isset($user_configuration['general']['background'])){
-    $prefix = '';
-    if(dirname($user_configuration['general']['background']) == '.'){
-      $prefix .= 'users/' . $_SESSION['username'] . '/'.CHRIS_USERS_CONFIG_DIR.'/';
-    }
-    $bg = $prefix.$user_configuration['general']['background'];
-  }
-  
-  $t -> replace('BACKGROUND', $bg);
+  $t -> replace('BACKGROUND', $_SESSION['userconf']['general']['background']);
   $t -> replace('CSS', 'css.html');
   $t -> replace('NAVBAR', 'navbar.html');
   $t -> replace('DATA_COUNT', DataC::getCount($_SESSION['userid']));
   $t -> replace('FEED_COUNT', FeedC::getCount($_SESSION['userid']));
   $t -> replace('RUNNING_COUNT', FeedC::getRunningCount($_SESSION['userid']));
-  $t -> replace('PLUGIN', PluginC::getHTML($user_configuration));
+  $t -> replace('PLUGIN', PluginC::getHTML());
   $t -> replace('FEED_ALL', FeedC::getAllHTML($_SESSION['userid']));
   $t -> replace('MODAL_DDROP', 'modal_ddrop.html');
   $t -> replace('MODAL_TAG', 'modal_tag.html');
@@ -133,6 +120,26 @@ if (SecurityC::login_attempt()) {
     exit();
 
   }
+
+  // update user-specific configuration
+
+  // BACKGROUND
+  if(isset($_SESSION['userconf']['general']) && isset($_SESSION['userconf']['general']['background'])){
+    $prefix = '';
+    if(dirname($_SESSION['userconf']['general']['background']) == '.'){
+      $prefix .= 'users/' . $_SESSION['username'] . '/'.CHRIS_USERS_CONFIG_DIR.'/';
+    }
+    $_SESSION['userconf']['general']['background'] = $prefix.$_SESSION['userconf']['general']['background'];
+  }
+  else{
+    $_SESSION['userconf']['general']['background'] = "view/gfx/fnndsc_1920x1200.jpg";
+  }
+
+  // EMAIL ADDRESS
+  if(isset($_SESSION['userconf']['general']) && isset($_SESSION['userconf']['general']['email'])){
+    UserC::setEmail($_SESSION['userid'], $_SESSION['userconf']['general']['email']);
+  }
+  
 
   // show the homepage
   echo homePage();

@@ -38,13 +38,13 @@ require_once (joinPaths(CHRIS_VIEW_FOLDER, 'plugin.view.php'));
 interface PluginControllerInterface
 {
   // get HTML representation of the plugins widget
-  static public function getHTML($user_configuration);
+  static public function getHTML();
 
   // discover all available plugins
   static public function discover();
 
   // get the UI of a plugin (HTML/JS)
-  static public function getUI($plugin, $user_configuration);
+  static public function getUI($plugin);
 
   // get the executable path of a plugin
   static public function getExecutable($plugin);
@@ -63,14 +63,13 @@ class PluginC implements PluginControllerInterface {
 
   /**
    * Get HTML representation of the plugins widget
-   * @param array $user_configuration User specific configuration.
    * @return string
    */
-  static public function getHTML($user_configuration){
+  static public function getHTML(){
 
     // discover the plugins and create the plugin widget
     // get carroussel
-    return PluginV::getHTML(PluginC::discover(), $user_configuration);
+    return PluginV::getHTML(PluginC::discover());
 
   }
 
@@ -127,7 +126,7 @@ class PluginC implements PluginControllerInterface {
    * @param array $user_configuration User specific configuration.
    * @return string The resulting HTML UI representation.
    */
-  static public function getUI($plugin, $user_configuration) {
+  static public function getUI($plugin) {
 
     $p_executable = PluginC::getExecutable($plugin);
 
@@ -140,7 +139,7 @@ class PluginC implements PluginControllerInterface {
     // note: we also redirect stderr here to get the full output
 
     $configuration = '';
-    $config = (isset($user_configuration[$plugin])? $user_configuration[$plugin]: false);;
+    $config = (isset($_SESSION['userconf'][$plugin])? $_SESSION['userconf'][$plugin]: false);;
 
     if($config != false){
       $configuration = ' --configuration='.escapeshellarg(json_encode($config));
