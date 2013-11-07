@@ -19,6 +19,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.parameters = function(_iparameters) {
     for ( var key in _CHRIS_INTERACTIVE_PLUGIN_._param_ind) {
       _CHRIS_INTERACTIVE_PLUGIN_._param_ind[key] = -1;
     }
+    // clean up old parameters
+    _CHRIS_INTERACTIVE_PLUGIN_._param = {};
     // copy new parameters
     _CHRIS_INTERACTIVE_PLUGIN_._parameters = _iparameters;
     for ( var i = 0; i < _iparameters[0].length; i++) {

@@ -1,0 +1,33 @@
+# the PACS PULL plugin requires some setup:
+
+# 1- Setup the DICOM listener
+We typically use xinet to listen for incoming data from the PACS.
+Here is an example of setup on the listening machine.
+In this case, the PACS will push data to port 10502 on our listening machine.
+
+toor@chris:~ $>cat /etc/xinetd.d/christestlistener 
+service christestlistener
+{
+   socket_type         = stream
+   wait                = no
+   user                = chris
+   group               = ellengp
+   log_on_success      = HOST DURATION
+   log_on_failure      = HOST
+   server              = /chb/users/chris/src/chrisreloaded/frontend/plugins/plugin/pacs_pull/listen.php
+   disable             = no
+   port                = 10502
+}
+
+toor@chris:~ $>cat /etc/services
+...
+...
+# Local services
+christestlistener      10502/tcp   # DICOM - CHRIS TEST listener
+christestlistener      10502/udp   # DICOM - CHRIS TEST listener
+
+toor@chris:~ $>service xinetd restart
+
+Enjoy the PACS PULL plugin.
+
+See the PACS plugin suite for more PACS plugins.
