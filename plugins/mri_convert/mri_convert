@@ -45,8 +45,13 @@ class MRIConvert( Plugin ):
     # replace the extension
     basename_new = os.path.splitext(basename)[0] + '.' + options.format
     
-    # launch recon-all
+    print('tempdir = %s' % tempdir)
+    print('options.output = %s' % options.output)
+    
+    self.history_mark(inputfile = options.input, outputdir=options.output)
+        
     cmd = 'cd ' + options.output +';' + current_dir + '/mri_convert.wrapper ' + os.path.join(tempdir+'/mri', basename) + ' ' + os.path.join(tempdir, basename_new)
+    print('cmd = %s' % cmd)
     os.system(cmd)
     
     shutil.copyfile(os.path.join(tempdir, basename_new), os.path.join(options.output, basename_new))
