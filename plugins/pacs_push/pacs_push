@@ -49,17 +49,26 @@ class PACS_Push(Plugin):
     # create input directory
     if not os.path.exists(input_dir):
       os.makedirs(input_dir)
-      
-    # more logic needed here to get all files
-    # get dcm images
-    dcm_files = [e for e in os.listdir(options.DIR) if not os.path.isdir(e)]
-    # check incoming dti directory
+    
+    # list all files down the tree
+    dcm_files = []
+
+    # Follow links required since most of chris data from feeds is linked to data/MRN/STUDY/SERIES/
+    for root, dirs, files in os.walk(options.DIR, topdown=False, followlinks=True):
+      for name in files:
+        dcm_files.append(os.path.join(root, name))
+
+    # if no files, we exit
     if not len(dcm_files) > 0:
       print options.DIR + ' doesn\'t contain any files' 
       sys.exit(0)
       
+    # create link to all files
+    # if a file with the same name already exists in the input directory, we do not do anything
     for dcm_file in dcm_files:
-      os.symlink(os.path.join(options.DIR, dcm_file), os.path.join(input_dir, dcm_file))
+      destination = os.path.join(input_dir, os.path.basename(dcm_file))
+      if not os.path.isfile(destination):
+        os.symlink(dcm_file, destination)
 
     # process!!
     print '======================================='
