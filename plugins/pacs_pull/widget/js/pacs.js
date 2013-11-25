@@ -28,10 +28,14 @@ _CHRIS_INTERACTIVE_PLUGIN_.cleanResults = function() {
 }
 _CHRIS_INTERACTIVE_PLUGIN_.getParam = function(parameter) {
   if (typeof _CHRIS_INTERACTIVE_PLUGIN_._param[parameter] != 'undefined') {
+    if(_CHRIS_INTERACTIVE_PLUGIN_._param[parameter] == "")
+      return '1';
+
     return _CHRIS_INTERACTIVE_PLUGIN_._param[parameter];
   }
   return "";
 };
+
 _CHRIS_INTERACTIVE_PLUGIN_.getInd = function(parameter) {
   if (typeof _CHRIS_INTERACTIVE_PLUGIN_._param[parameter] != 'undefined') {
     return _CHRIS_INTERACTIVE_PLUGIN_._param_ind[parameter];
@@ -319,15 +323,24 @@ _CHRIS_INTERACTIVE_PLUGIN_.advancedCaching = function(data, i) {
  * Reformat data after 'Advanced' AJAX query to fit the dataTable standard.
  */
 _CHRIS_INTERACTIVE_PLUGIN_.advancedFormat = function(data, i) {
+  var anon = _CHRIS_INTERACTIVE_PLUGIN_.getParam("anonymize");
   var index = data[0].StudyInstanceUID.indexOf(data[1].StudyInstanceUID[i]);
   var stuid = data[1].StudyInstanceUID[i];
   var serid = data[1].SeriesInstanceUID[i];
   var id = stuid.replace(/\./g, "_") + '-' + serid.replace(/\./g, "_");
   var sub = Array();
-  sub.push(data[0].PatientName[index].replace(/\^/g, " ").replace(/\_/g, " "));
-  sub.push(data[0].PatientID[index]);
-  sub.push(data[0].PatientBirthDate[index]);
-  sub.push(data[0].StudyDate[index]);
+  if(anon == ""){
+    sub.push(data[0].PatientName[index].replace(/\^/g, " ").replace(/\_/g, " "));
+    sub.push(data[0].PatientID[index]);
+    sub.push(data[0].PatientBirthDate[index]);
+    sub.push(data[0].StudyDate[index]);
+  }
+  else{
+    sub.push("XXXXXX");
+    sub.push("XXXXXX");
+    sub.push("XXXXXX");
+    sub.push("XXXXXX");
+  }
   sub.push(data[0].ModalitiesInStudy[index]);
   sub.push(data[0].StudyDescription[index].replace(/\>/g, "&gt").replace(/\</g,
       "&lt").replace(/\_/g, " "));
@@ -524,7 +537,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxSimpleResults = function(data, force) {
  */
 _CHRIS_INTERACTIVE_PLUGIN_.simpleTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
-  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Desc.</th><th>Study Date</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
+  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Study Desc.</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
   content += '</tbody></table>';
   $('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
@@ -557,16 +570,28 @@ _CHRIS_INTERACTIVE_PLUGIN_.simpleTable = function() {
  * Reformat data after 'Advanced' AJAX query to fit the dataTable standard.
  */
 _CHRIS_INTERACTIVE_PLUGIN_.simpleFormat = function(data, i) {
+  var anon = _CHRIS_INTERACTIVE_PLUGIN_.getParam("anonymize");
+
   var stuid = data.StudyInstanceUID[i];
   var sub = Array();
-  sub.push('<div id="' + stuid.replace(/\./g, "_")
-      + '" class="control"><i class="icon-chevron-down"></i> '
-      + data.PatientName[i].replace(/\^/g, " ").replace(/\_/g, " ") + '</div>');
-  sub.push(data.PatientID[i]);
-  sub.push(data.PatientBirthDate[i]);
+  if(anon == ""){
+    sub.push('<div id="' + stuid.replace(/\./g, "_")
+        + '" class="control"><i class="icon-chevron-down"></i> '
+        + data.PatientName[i].replace(/\^/g, " ").replace(/\_/g, " ") + '</div>');
+    sub.push(data.PatientID[i]);
+    sub.push(data.PatientBirthDate[i]);
+    sub.push(data.StudyDate[i]);
+  }
+  else{
+    sub.push('<div id="' + stuid.replace(/\./g, "_")
+        + '" class="control"><i class="icon-chevron-down"></i>XXXXXX</div>'); 
+    sub.push('XXXXXX');
+    sub.push('XXXXXX');
+    sub.push('XXXXXX');
+  } 
+
   sub.push(data.StudyDescription[i].replace(/\>/g, "&gt").replace(/\</g, "&lt")
       .replace(/\_/g, " "));
-  sub.push(data.StudyDate[i]);
   sub.push(data.ModalitiesInStudy[i]);
   if(typeof(data.PerformedStationAETitle) == "undefined"){
     sub.push("nvp");
