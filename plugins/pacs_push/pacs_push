@@ -43,44 +43,34 @@ class PACS_Push(Plugin):
     
     # we expect directory as input
     options.DIR = self.validate('directory', options.DIR);
-    
-    # create/format input directory to fit connectome_meta requierements
-    input_dir = os.path.join(options.output, 'input')
-    # create input directory
-    if not os.path.exists(input_dir):
-      os.makedirs(input_dir)
-      
-    # more logic needed here to get all files
-    # get dcm images
-    dcm_files = [e for e in os.listdir(options.DIR) if not os.path.isdir(e)]
-    # check incoming dti directory
-    if not len(dcm_files) > 0:
-      print options.DIR + ' doesn\'t contain any files' 
-      sys.exit(0)
-      
-    for dcm_file in dcm_files:
-      os.symlink(os.path.join(options.DIR, dcm_file), os.path.join(input_dir, dcm_file))
 
-    # process!!
-    print '======================================='
-    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
-    command = ' \''+os.environ['ENV_DICOMDIRSEND_SCRIPT']+' -v 10';
-    if options.ANONYM:
-      command += ' -A -k'
-    elif options.PANONYM:
-      command += ' -P -k'
-    command += ' -h ' + options.HOST;
-    command += ' -p ' + options.PORT;
-    if not options.EXT == "*":
-      command += ' -E ' + options.EXT;
-    command += ' -a ' + options.AETITLE;
-    command += ' ' + input_dir;
-    command = current_dir + '/dicom_dirSend.bash.wrapper ' + command + '\''
-    print 'command:'
-    print command
-    output = os.system(command)
-    print output
-    print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Finish pushing...'
+    # create link to input directory
+    os.symlink(options.DIR, os.path.join(options.output, os.path.basename(options.DIR)))
+    
+    # Follow links required since most of chris data from feeds is linked to data/MRN/STUDY/SERIES/
+    for root, dirs, files in os.walk(options.DIR, topdown=False, followlinks=True):
+      for name in dirs:
+        target = os.path.join(root, name)
+        # process!!
+        print '======================================='
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
+        command = ' \''+os.environ['ENV_DICOMDIRSEND_SCRIPT']+' -v 10';
+        if options.ANONYM:
+          command += ' -A -O ' + anon_dir
+        elif options.PANONYM:
+          command += ' -P -O ' + anon_dir
+        command += ' -h ' + options.HOST;
+        command += ' -p ' + options.PORT;
+        if not options.EXT == "*":
+          command += ' -E ' + options.EXT;
+        command += ' -a ' + options.AETITLE;
+        command += ' ' + target;
+        command = current_dir + '/dicom_dirSend.bash.wrapper ' + command + '\''
+        print 'command:'
+        print command
+        output = os.system(command)
+        print output
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Finish pushing...'
         
 # ENTRYPOINT
 if __name__ == "__main__":

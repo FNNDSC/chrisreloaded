@@ -11,6 +11,9 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current **r2.6** ###
+* User-specific settings
+* Pacs_push pushes all images, including the one in subdirectories
+* Find_session v1.0 (for MGH folks)
 
 ### 2013 10 18 **r2.5** ###
 * Add -k to CURL
