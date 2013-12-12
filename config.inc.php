@@ -35,6 +35,7 @@ require_once(dirname(__FILE__).'/controller/_util.inc.php');
 // version
 define('CHRIS_VERSION', '2.6-EXPERIMENTAL');
 define('CHRIS_TIMEZONE', 'America/New_York');
+date_default_timezone_set(CHRIS_TIMEZONE);
 
 // maintenance mode
 define('CHRIS_MAINTENANCE', false);
