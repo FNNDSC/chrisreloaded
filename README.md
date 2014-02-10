@@ -11,6 +11,7 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current **r2.6** ###
+* Update list of characters to be sanitized ("'")
 * Pacs_pull anonymize option (for demos)
 * User-specific settings
 * Pacs_push pushes all images, including the one in subdirectories
