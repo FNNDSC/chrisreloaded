@@ -29,7 +29,7 @@
 define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the chris configuration
-require_once (dirname(dirname( __FILE__ )).'/config.inc.php');
+require_once (dirname(dirname(dirname(dirname( __FILE__ )))).'/config.inc.php');
 // include chris db interface
 require_once(joinPaths(CHRIS_CONTROLLER_FOLDER,'db.class.php'));
 // include chris mapper interface
@@ -50,12 +50,12 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'data_patient.model.php'));
 
 
 // main function
-$shortopts = "d:";
+$shortopts = "d:l:";
 $options = getopt($shortopts);
 
 // local vars
 $output_directory = $options['d'];
-$study_directory = $options['d'].'/input';
+$study_directory = $options['d'].'/'.$options['l'];
 
 // parse files in directory to know who we should email
 if ($handle2 = opendir($study_directory)) {
@@ -64,7 +64,8 @@ if ($handle2 = opendir($study_directory)) {
   while (false !== ($entry2 = readdir($handle2))) {
     if($entry2 != "." && $entry2 != ".."){
       // get DCM file information
-      $process_file = PACS::process($study_directory.'/'.$entry);
+
+      $process_file = PACS::process($study_directory.'/'.$entry2);
       
       // find location in DB
       // process series (data)
@@ -72,6 +73,7 @@ if ($handle2 = opendir($study_directory)) {
       $waiting = true;
       $counter = 0;
       while($waiting && $counter < 20){
+          echo "-->".$counter."<--";
         // check if *ALL* data is there
         $dataMapper = new Mapper('Data');
         $dataMapper->filter('uid = (?)',$process_file['SeriesInstanceUID'][0]);
@@ -120,6 +122,7 @@ if ($handle2 = opendir($study_directory)) {
           $waiting = false;
         }
         else{
+          echo "TIMEOUT.......";
           sleep(2);
           $counter++;
         }
