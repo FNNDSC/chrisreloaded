@@ -220,7 +220,10 @@ $command .= ' > '.$job_path.'/chris.log 2> '.$job_path.'/chris.err';
 $runfile = joinPaths($job_path, 'chris.run');
 $host = CLUSTER_HOST;
 
-if ($status == 100) {
+// do we force this plugin to run locally as chris?
+$force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
+
+if ($status == 100 || $force_chris_local) {
   $host = 'localhost';
 }
 
@@ -260,9 +263,6 @@ $arguments .= ' -c "'.$runfile.'"';
 $arguments .= ' -u "'.$username.'"';
 $arguments .= ' -p "'.$password.'"';
 $arguments .= ' -o "'.$feed_path.'"';
-
-// do we force this plugin to run locally as chris?
-$force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
 
 if ($force_chris_local) {
   // get user group id
