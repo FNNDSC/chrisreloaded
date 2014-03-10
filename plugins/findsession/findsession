@@ -38,7 +38,7 @@ class Findsession(Plugin):
 
   def run(self, options):
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    
+
     print Plugin.TITLE
     print Plugin.VERSION
     print options.LIST_DIRECTORIES
@@ -48,7 +48,7 @@ class Findsession(Plugin):
       for directory in list_directories:
         print '======================================='
         print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
-        command = current_dir + "/../pacs_push/pacs_push --directory " + directory + " --host " + options.HOST + " --port " + options.PORT + " --extension " + options.EXTENSION + " --aetitle " + options.AETITLE + " --output " + options.output 
+        command = current_dir + "/../pacs_push/pacs_push --directory " + directory + " --host " + options.HOST + " --port " + options.PORT + " --extension '*' --aetitle " + options.AETITLE + " --output " + options.output 
         print 'command:'
         print command
         output = os.system(command)
@@ -57,7 +57,7 @@ class Findsession(Plugin):
     
         print '======================================='
         print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
-        command = current_dir + "/core/process.php -d " + options.output
+        command = current_dir + "/core/process.php -d " + options.output + " -l " + os.path.basename(os.path.normpath(directory))
         print 'command:'
         print command
         output = os.system(command)
@@ -94,6 +94,5 @@ if __name__ == "__main__":
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--listdirectories', action='store', dest='LIST_DIRECTORIES', help='Directories to be pushed to ChRIS')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--host', action='store', default='kaos.nmr.mgh.harvard.edu',  dest='HOST', help='Target host')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--port', action='store', default='10402', dest='PORT', help='Target port')
-  plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--extension', action='store', default="dcm", dest='EXTENSION', help='Files to be pushed')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--aetitle', action='store', default="default", dest='AETITLE', help='User AETITLE')
   plugin.launch(sys.argv)

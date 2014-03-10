@@ -72,14 +72,26 @@ if ($handle2 = opendir($study_directory)) {
       // wait for all files to be received
       $waiting = true;
       $counter = 0;
-      while($waiting && $counter < 20){
-          echo "-->".$counter."<--";
+      $timeout = 10; //(10s)
+      $maxtimeout = 3600; //(3600s)
+        
+      echo "file: ".$study_directory.'/'.$entry2.PHP_EOL;
+      echo "series uid: ".$process_file['SeriesInstanceUID'][0].PHP_EOL;
+
+      if( $process_file['SeriesInstanceUID'][0] == ''){
+        echo "no series uid - skipping file".PHP_EOL;
+        $counter = $maxtimeout;
+      }
+
+      while($waiting && $counter < $maxtimeout){
         // check if *ALL* data is there
         $dataMapper = new Mapper('Data');
         $dataMapper->filter('uid = (?)',$process_file['SeriesInstanceUID'][0]);
         $dataMapper->filter('nb_files = status','');
+
         $dataResult = $dataMapper->get();
         if(count($dataResult['Data']) > 0){
+          echo "--> data found <--".PHP_EOL;
           //
           // DATA HAS ARRIVED
           //
@@ -122,9 +134,9 @@ if ($handle2 = opendir($study_directory)) {
           $waiting = false;
         }
         else{
-          echo "TIMEOUT.......";
-          sleep(2);
-          $counter++;
+          echo "TIMEOUT ".$counter."/".$maxtimeout.PHP_EOL;
+          sleep($timeout);
+          $counter += $timeout;
         }
       }
     }
