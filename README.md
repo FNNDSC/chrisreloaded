@@ -1,16 +1,23 @@
 ChRIS reloaded
 ==============
 
-ChRIS: Children's Research Integration System.
+Developed at Boston Children's Hospital in the Fetal-Neonatal Neuroimaging and Developmental Science Center, _ChRIS_ (**Ch**ildren's **R**esearch **I**ntegration **S**ystem), is a novel web-based data storage and data processing workflow manager that provides strict data security while also facilitating secure, realtime interactive collaboration over the Internet and internal Intranets. Although _ChRIS_ can manage any datatype, it is uniquely suited to medical image data, providing the ability to seamlessly collect data from typical sources found in hospitals (such as Picture Archive and Communications Systems, PACS), import from CDs/DVDs, users desktops, etc. _ChRIS_ not only manages data collection and organization, but it also provides a large (and expanding) library of pipelines to analyze imported data. This library is easily extensible via a simple plugin mechanism, and _ChRIS_ also provides the ability to directly interact with compute clusters for data analysis. Moreover, a wide variety of 2D, 3D, and 4D medical image data formats are natively supported and can be directly visualized and manipulated within the browser.
 
-ChRIS is an "end-to-end" web-based system for collecting, processing, and sharing raw and processing medical image data. It is loosely based on a "twitter"-type UI paradigm. Users have "feeds" that track interaction with the system. Feeds contain "posts" that are containers for data of any sort, i.e. raw DICOM images, Nifti volumes, FreeSurfer outputs, etc. ChRIS also offers "plugins" that process "posts". Data within a post can be dragged into a plugin, and processed.
+![alt_tag](https://raw.github.com/FNNDSC/chrisreloaded/master/doc/images/1_feed.png)
 
-In most cases, the plugin will spawn a job out on an appropriately configured cluster resource. In the simplest case, the job will simply run on the machine in which the ChRIS instance has been deployed.
+Using a modern Web 2.0 inspired design -- see Figure above -- the system focuses on simplicity -- both in ease of use and in accessibility. End users will immediately recognize a facebook/twitter/gmail inspired interface, with a central news-type “feed” containing a persistent record of activity in the system, and plugins that can process “feeds”. Plugins are the mechanism by which users create feeds, and plugins are available for importing data, performing various analytical processing on data, and also providing detailed visualization of data and results -- all within the single-context approach of the _ChRIS_ user interface. Actual processing of data is not usually performed by _ChRIS_, but by bundled applications that are connected to the feeds through a plugin mechanism. _ChRIS_ also provides the ability to natively integrate to High Performance Computing (HPC) resources, allowing users to process data on powerful clusters without needing to manage data and results or worry about the transfer and management of data between local computers and the remote HPC.
+
+As seen in the Figure, a "feed" view on the right contains a historical log of activity feeds on the system, and in this particular view, a "Search" plugin or activity is shown on the right. This plugin can be used to search data that has already been downloaded into the _ChRIS_ system.
+
+_ChRIS_ is an "end-to-end" web-based system for collecting, processing, and sharing raw and processing medical image data. It is loosely based on a "twitter"-type UI paradigm. Users have "feeds" that track interaction with the system. Feeds contain "posts" that are containers for data of any sort, i.e. raw DICOM images, Nifti volumes, FreeSurfer outputs, etc. _ChRIS_ also offers "plugins" that process "posts". Data within a post can be dragged into a plugin, and processed.
+
+In most cases, the plugin will spawn a job out on an appropriately configured cluster resource. In the absence of a cluser, or for certain plugins (like filesystem access, search, and others) _ChRIS_ itself will run the job on the machine it is deployed on (i.e. the web server).
 
 
 ## Change log ##
 
 ### current **r2.7** ###
+* Add 'mosix_test' plugin
 
 ### 2014 02 10 **r2.6** ###
 * Update list of characters to be sanitized ("'")
