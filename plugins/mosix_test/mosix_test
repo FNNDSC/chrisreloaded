@@ -23,7 +23,7 @@ import tempfile, shutil, subprocess
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class file_browser( Plugin ):
+class mosix_test( Plugin ):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -63,8 +63,8 @@ done
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = file_browser()
+  plugin = mosix_test()
   plugin.add_parameter( 'Input', Plugin.STRING, '--timeout', action='store', dest='timeout', help='Load timeout (seconds)' )
   plugin.add_parameter( 'Input', Plugin.STRING, '--instances', action='store', dest='instances', help='Load intances' )
-  plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
+#  plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
   plugin.launch( sys.argv )
