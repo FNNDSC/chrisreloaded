@@ -24,47 +24,56 @@ sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
 class mosix_test( Plugin ):
-  '''
-  '''
-  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
-  Plugin.TITLE = 'mosix_test'
-  Plugin.CATEGORY = 'System'
-  Plugin.DESCRIPTION = 'Spawn multiple mosix load tests'
-  Plugin.DOCUMENTATION = 'http://wiki'
-  Plugin.LICENSE = 'Opensource (MIT)'
-  Plugin.VERSION = '0.1'
+    '''
+    '''
+    Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+    Plugin.TITLE = 'mosix_test'
+    Plugin.CATEGORY = 'System'
+    Plugin.DESCRIPTION = 'Spawn multiple mosix load tests'
+    Plugin.DOCUMENTATION = 'http://wiki'
+    Plugin.LICENSE = 'Opensource (MIT)'
+    Plugin.VERSION = '0.1'
 
-  def run( self, options ):
+    def run( self, options ):
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
+        current_dir = os.path.dirname(os.path.abspath(__file__))
 
-    # Write a custom script to filesystem and execute...
-    tmpdir 		= tempfile.mkdtemp('mosix', 'test', os.environ['ENV_CLUSTER_TMP_DIR'])
-    testshell 	= '%s/test.sh' % tmpdir
-    f 			= open(testshell, 'w')
-    timeout 	= options.timeout
-    instances 	= options.instances
+        # Write a custom script to filesystem and execute...
+        tmpdir      = tempfile.mkdtemp('mosix', 'test', os.environ['ENV_CLUSTER_TMP_DIR'])
+        testshell   = '%s/test.sh' % tmpdir
+        f           = open(testshell, 'w')
+        instances   = options.instances
+        scheduler   = options.scheduler
+        loadTest    = options.loadTest
 
-    script 		= '''#!/bin/bash
+        script      = '''#!/bin/bash
 
 for i in $(seq 1 %s) ; do 
-	/bin/mosbatch -b -q /bin/mostestload -t %s &
+    %s %s &
 done
-    ''' % (instances, timeout)
+      ''' % (instances, scheduler, loadTest)
 
-    f.write(script)
-    f.close()
-    st = os.stat(testshell)
-    os.chmod(testshell, st.st_mode | 0115)
-    cmd = 'cd %s ; %s' % (tmpdir, testshell)
-    print cmd
-    os.system(cmd)
+        f.write(script)
+        f.close()
+        st = os.stat(testshell)
+        os.chmod(testshell, st.st_mode | 0115)
+        cmd = 'cd %s ; %s' % (tmpdir, testshell)
+        print cmd
+        os.system(cmd)
+
+        if not options.debug:
+            shutil.rmtree(tmpdir)
 
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = mosix_test()
-  plugin.add_parameter( 'Input', Plugin.STRING, '--timeout', action='store', dest='timeout', help='Load timeout (seconds)' )
-  plugin.add_parameter( 'Input', Plugin.STRING, '--instances', action='store', dest='instances', help='Load intances' )
-#  plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
-  plugin.launch( sys.argv )
+    plugin = mosix_test()
+    plugin.add_parameter( 'Input', Plugin.STRING, '--instances',  action='store', dest='instances', help='Load intances' )
+    plugin.add_parameter( 'Input', Plugin.STRING, '--scheduler',  action='store', dest='scheduler', help='Scheduler command to use', default="/bin/mosrun -b -q" )
+    plugin.add_parameter( 'Input', Plugin.STRING, '--loadTest',   action='store', dest='loadTest',  help='Load command to use', default="/bin/mostestload -t 10" )
+
+    plugin.add_parameter('General (Advanced)', Plugin.BOOLEAN, '--debug', default=False, action='store_true', dest='debug', help='If TRUE, do not remove tmp directory.')
+
+
+    # plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
+    plugin.launch( sys.argv )
