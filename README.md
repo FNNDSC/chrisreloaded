@@ -17,6 +17,7 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current **r2.7** ###
+* Add 'mosix_test' plugin
 
 ### 2014 02 10 **r2.6** ###
 * Update list of characters to be sanitized ("'")
