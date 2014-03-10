@@ -247,7 +247,7 @@ if($status != 100){
   $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > /dev/null 2> /dev/null" >> '.$runfile);
 }
 
-$ssh->exec('echo "'.$command.'" >> '.$runfile);
+$ssh->exec('bash -c \' echo "'.$command.'" >> '.$runfile.'\'');
 
 if($status != 100){
   $end_token = TokenC::create();
@@ -267,14 +267,15 @@ $arguments .= ' -o "'.$feed_path.'"';
 if ($force_chris_local) {
   // get user group id
   $groupID =  $ssh->exec("id -g");
+  $groupID = trim($groupID);
   // open permissions so user can see its plugin running
-  $command = "umask 0022;/bin/bash $runfile;  /bin/chgrp -R $groupID $feed_path; /bin/chmod g+w -R $feed_path";
-  $nohup_wrap = 'nohup bash -c "'.$command.'" > /dev/null 2>&1 &';
+  $local_command = "/bin/bash umask 0022;/bin/bash $runfile;  /bin/chgrp -R $groupID $feed_path; /bin/chmod g+w -R $feed_path";
+  $nohup_wrap = 'bash -c \'nohup bash -c "'.$local_command.'" > /dev/null 2>&1 &\'';
   $ssh->exec($nohup_wrap);
   $pid = -1;
 } else if ($status == 100 ) {
   // run locally
-  $ssh->exec("/bin/bash ".$runfile);
+  $ssh->exec('bash -c \' /bin/bash '.$runfile.'\'');
   $pid = -1;
 }
 else
@@ -291,8 +292,6 @@ $metaObject = new Meta();
 $metaObject->name = "pid";
 $metaObject->value = $pid;
 FeedC::addMeta($feed_id, Array(0 => $metaObject));
-
-//echo $output;
 
 echo $feed_id;
 ?>
