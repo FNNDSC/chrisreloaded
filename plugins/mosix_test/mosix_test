@@ -26,13 +26,13 @@ from plugin import Plugin
 class mosix_test( Plugin ):
     '''
     '''
-    Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
-    Plugin.TITLE = 'mosix_test'
-    Plugin.CATEGORY = 'System'
-    Plugin.DESCRIPTION = 'Spawn multiple mosix load tests'
-    Plugin.DOCUMENTATION = 'http://wiki'
-    Plugin.LICENSE = 'Opensource (MIT)'
-    Plugin.VERSION = '0.1'
+    Plugin.AUTHORS          = 'FNNDSC (dev@babyMRI.org)'
+    Plugin.TITLE            = 'mosix_test'
+    Plugin.CATEGORY         = 'System'
+    Plugin.DESCRIPTION      = 'Spawn multiple mosix load tests'
+    Plugin.DOCUMENTATION    = 'http://wiki'
+    Plugin.LICENSE          = 'Opensource (MIT)'
+    Plugin.VERSION          = '0.1'
 
     def run( self, options ):
 
@@ -45,6 +45,14 @@ class mosix_test( Plugin ):
         instances   = options.instances
         scheduler   = options.scheduler
         loadTest    = options.loadTest
+
+        runKey      = options.runKey
+        if runKey != 'fnndsc': 
+            b_canTest   = False
+            print('Invalid runKey supplied! Test aborted...')
+        else:
+            b_canTest = True
+            print('runKey OK -- test continuing...')
 
         script      = '''#!/bin/bash
 
@@ -59,7 +67,7 @@ done
         os.chmod(testshell, st.st_mode | 0115)
         cmd = 'cd %s ; %s' % (tmpdir, testshell)
         print cmd
-        os.system(cmd)
+        if b_canTest: os.system(cmd)
 
         if not options.debug:
             shutil.rmtree(tmpdir)
@@ -72,7 +80,8 @@ if __name__ == "__main__":
     plugin.add_parameter( 'Input', Plugin.STRING, '--scheduler',  action='store', dest='scheduler', help='Scheduler command to use', default="/bin/mosrun -b -q" )
     plugin.add_parameter( 'Input', Plugin.STRING, '--loadTest',   action='store', dest='loadTest',  help='Load command to use', default="/bin/mostestload -t 10" )
 
-    plugin.add_parameter('General (Advanced)', Plugin.BOOLEAN, '--debug', default=False, action='store_true', dest='debug', help='If TRUE, do not remove tmp directory.')
+    plugin.add_parameter('General (Advanced)', Plugin.BOOLEAN, '--debug',  default=False, action='store_true', dest='debug', help='If TRUE, do not remove tmp directory.')
+    plugin.add_parameter('General (Advanced)', Plugin.STRING,  '--runKey', action='store', dest='runKey', help='Execution key (needed to run test)')
 
 
     # plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
