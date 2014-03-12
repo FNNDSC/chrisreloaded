@@ -17,7 +17,8 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current **r2.7** ###
-* Add 'mosix_test' plugin
+* Add 'mosix_test' plugin (with runKey -- needed to actually run plugin)
+* Add 'zip' plugin
 * Run all commands though bash -c
 * Update most of file system interactions are going though ssh, to do it as logged-in user
 * FindSession orders pushed files by  mrn/study/series
