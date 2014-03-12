@@ -53,11 +53,16 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 // send email to admin
 // should be more generic to email user after plugins has finished too
 
-function sendEmail(&$patientInfo, &$dataLocation, &$emailTo){
+function sendEmail(&$patientInfo, &$dataLocation, &$emailTo, &$link){
   // start email:
   $message = 'Dear ChRIS user,'.PHP_EOL;
   $message .= 'You have a new incoming series available at:'.PHP_EOL.PHP_EOL;
   $message .= 'Output directory: '.$dataLocation.PHP_EOL.PHP_EOL;
+
+  if($link != ''){ 
+    $message .= "Please click on the following link to create a new feed for this data: ".PHP_EOL;
+    $message .= $link.PHP_EOL.PHP_EOL;
+  }
 
   // patient information
   $message .= '===== Patient ====='.PHP_EOL;
@@ -86,7 +91,7 @@ $options = getopt($shortopts);
 
 $study_directory = $options['d'];
 $emailTo = CHRIS_DICOM_EMAIL_TO;
-
+$link = '';
 // open log file
 $logFile = '';
 
@@ -215,19 +220,19 @@ if ($handle = opendir($study_directory)) {
               //
               // Create the study directory
               //
-              $patientdirname .= '/'.$study_description.'-'.$study_chris_id;
-              if(!is_dir($patientdirname)){
-                mkdir($patientdirname);
-                $logFile .= 'MKDIR: '.$patientdirname.PHP_EOL;
+              $studydirname = $patientdirname.'/'.$study_description.'-'.$study_chris_id;
+              if(!is_dir($studydirname)){
+                mkdir($studydirname);
+                $logFile .= 'MKDIR: '.$studydirname.PHP_EOL;
               }
               else{
-                $logFile .= $patientdirname.' already exists'.PHP_EOL;
+                $logFile .= $studydirname.' already exists'.PHP_EOL;
               }
 
               //
               // Create the data directory
               //
-              $datadirname = $patientdirname.'/'.$series_description.'-'.$data_chris_id;
+              $datadirname = $studydirname.'/'.$series_description.'-'.$data_chris_id;
 
               // create folder if doesnt exists
               if(!is_dir($datadirname)){
@@ -323,7 +328,7 @@ if ($handle = opendir($study_directory)) {
           $emailTo .= ','.$chris_scanners[$entry2];
         }
         else{
-          // if user exists, add him to the mailing list
+         // if user exists, add him to the mailing list
           $userMapper = new Mapper('User');
           $userMapper->filter('username = (?)',$entry2);
           $userResult = $userMapper->get();
@@ -332,8 +337,18 @@ if ($handle = opendir($study_directory)) {
           {
             $emailTo .= ','.$userResult['User'][0]->email;
           }
-          elseif (filter_var($entry2, FILTER_VALIDATE_EMAIL)){
-            $emailTo .= ','.$entry2;
+          elseif (filter_var($username, FILTER_VALIDATE_EMAIL)){
+            $emailTo .= ','.$username;
+          }
+          elseif($entry2 == 'emaillink'){
+            $link = CHRIS_URL."/index.php?";
+            $link .= "launch_plugin=1";
+            $link .= "&plugin=file_browser";
+            $feedname = $process_file['PatientID'][0];
+            $link .= "&feedname=$feedname";
+            $link .= "&directory=$patientdirname";
+
+            $logFile .= 'emaillink: '.$link.PHP_EOL;
           }
         }
         // delete the temp file
@@ -369,7 +384,7 @@ foreach($received as $key => $value){
   }
 }
 
-sendEmail($process_file, $datadirname, $emailTo);
+sendEmail($process_file, $datadirname, $emailTo, $link);
 
 echo $logFile;
 
