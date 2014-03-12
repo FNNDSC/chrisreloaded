@@ -18,8 +18,10 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 
 ### current **r2.7** ###
 * Add 'mosix_test' plugin
+* Run all commands though bash -c
 * Update most of file system interactions are going though ssh, to do it as logged-in user
 * FindSession orders pushed files by  mrn/study/series
+* Pacs_push sends actions to dicom listener (emaillink)
 * Pacs_push recursive push and anonymization fixed
 * Update XTK to XTK Edge (2014-03-10) without reslicing for DICOM images
 

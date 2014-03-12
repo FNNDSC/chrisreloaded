@@ -96,7 +96,7 @@ function homePage() {
 
 // check if this is a logout attempt
 if (SecurityC::logout_attempt()) {
-
+  echo 'LOGOUT ATTEMP'.PHP_EOL;
   // perform the logout
   SecurityC::logout();
   exit();
@@ -121,8 +121,47 @@ if (SecurityC::login_attempt()) {
 
   }
 
-  // update user-specific configuration
+  // check if query required
+  $parsed_url = parse_url($_SERVER["REQUEST_URI"]);
+  // we have args, let's have a look at them
+  if(isset($parsed_url['query']) && !empty($parsed_url['query'])){
+    // if anything, might want to CURL it :)
+    foreach (explode('&', $parsed_url['query']) as $chunk) {
+      $param = explode("=", $chunk);
 
+      if ($param) {
+        $parameter_name = urldecode($param[0]);
+        $$parameter_name = urldecode($param[1]);
+      }
+    }
+    
+    if(isset($launch_plugin) && $launch_plugin == 1){
+      // need the following defined
+      //echo $plugin.PHP_EOL;
+      //echo $script.PHP_EOL;
+      //echo $feedname.PHP_EOL;
+      //echo $directory.PHP_EOL;
+      $command = PluginC::getExecutable(sanitize($plugin.PHP_EOL));
+      $command .= ' --dir \"'.$directory.'\"';
+      $command .= ' --output {OUTPUT}/';
+      //echo $command.PHP_EOL;
+      $status = 100;
+      $username = $_SESSION['username'];
+      $password = $_SESSION['password'];
+      $feed_id = -1;
+      $jobid = '';
+      $memory = 2048; 
+
+      // import launcher.php
+      include('controller/launcher.php');
+    }
+
+    // then clean URL, back to main entry point
+    header("Location: ?");
+    exit();
+  }
+
+  // update user-specific configuration
   // BACKGROUND
   if(isset($_SESSION['userconf']['general']) && isset($_SESSION['userconf']['general']['background'])){
     $prefix = '';
