@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+#
+#      _       
+#     (_)      
+#  _____ _ __  
+# |_  / | '_ \ 
+#  / /| | |_) |
+# /___|_| .__/ 
+#       | |    
+#       |_|    
+#
+# (c) 2014 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys, stat
+import tempfile, shutil, subprocess
+
+sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+from plugin import Plugin
+
+class zip( Plugin ):
+    '''
+    '''
+    Plugin.AUTHORS          = 'FNNDSC (dev@babyMRI.org)'
+    Plugin.TITLE            = 'zip'
+    Plugin.CATEGORY         = 'System'
+    Plugin.DESCRIPTION      = 'zip up data directory'
+    Plugin.DOCUMENTATION    = 'http://wiki'
+    Plugin.LICENSE          = 'Opensource (MIT)'
+    Plugin.VERSION          = '0.1'
+
+    def run( self, options ):
+
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+
+        tmpdir      = tempfile.mkdtemp('zip', 'chris', os.environ['ENV_CLUSTER_TMP_DIR'])
+        zipname     = os.path.basename(options.input)
+        zipnamezip  = '%s.zip' % zipname
+        destdir     = '%s/%s' % (tmpdir, zipname)
+        print('Copying tree from ' + options.input + ' to ' + destdir)
+        shutil.copytree (options.input, destdir)
+        cmd         = 'cd ' + tmpdir + '; zip -r %s.zip %s' % (zipname, zipname)
+
+        print(cmd)
+        os.system(cmd)
+
+        print('copying %s to %s\n' % (zipnamezip, os.path.join(options.output, zipnamezip)))
+        shutil.copyfile(os.path.join(tmpdir, zipnamezip), os.path.join(options.output, zipnamezip))
+
+        shutil.rmtree(tmpdir)
+
+
+# ENTRYPOINT
+if __name__ == "__main__":
+    plugin = zip()
+    plugin.add_parameter( 'Input', Plugin.IMAGE, '--input', action='store', dest='input', help='the directory to zip' )
+
+
+    # plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
+    plugin.launch( sys.argv )
