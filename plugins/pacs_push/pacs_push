@@ -35,7 +35,7 @@ class PACS_Push(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.3'
   
-  def push(self, options, current_dir, root, name):
+  def push(self, options, current_dir, root, name, suffix):
     print '======================================='
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
 
@@ -62,6 +62,9 @@ class PACS_Push(Plugin):
       command += ' -E ' + options.EXT;
 
     command += ' -a ' + options.AETITLE;
+
+    if not suffix == "":
+      command += ' -c ' + suffix;
     command += ' ' + target;
     command = current_dir + '/dicom_dirSend.bash.wrapper ' + command + '\''
     print 'command:'
@@ -81,16 +84,25 @@ class PACS_Push(Plugin):
 
     # create link to input directory
     os.symlink(options.DIR, os.path.join(options.output, os.path.basename(options.DIR)))
-   
-    # push current directory
-    self.push(options, current_dir, options.DIR, '')
+  
+    suffix = '' 
 
     # push subdirectories 
     # Follow links required since most of chris data from feeds is linked to data/MRN/STUDY/SERIES/
     for root, dirs, files in os.walk(options.DIR, topdown=False, followlinks=True):
-      for name in dirs:
+      for i, name in enumerate(dirs):
+        # we want the last push to create a new feeds for the pushed user id
+        if(i == len(dirs) - 1):
+          suffix = options.CAETITLE;
+
         # process!!
-        self.push(options, current_dir, root, name)
+        self.push(options, current_dir, root, name, suffix)
+
+    if( suffix == ''):
+      suffix = options.CAETITLE
+
+    # push current directory
+    self.push(options, current_dir, options.DIR, '', suffix)
         
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -99,7 +111,8 @@ if __name__ == "__main__":
   plugin.add_parameter('Advanced', Plugin.STRING, '--host', action='store', default='pretoria.tch.harvard.edu', dest='HOST', help='Target Host')
   plugin.add_parameter('Advanced', Plugin.STRING, '--port', action='store', default='10502', dest='PORT', help='Target Port')
   plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='*', dest='EXT', help='Extension of files to be pushed')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--aetitle', action='store', default='CHRIS2', dest='AETITLE', help='Calling AETitle')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--aetitle', action='store', default='CHRIS2', dest='AETITLE', help='Called AETitle')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--caetitle', action='store', default='emaillink', dest='CAETITLE', help='Calling AETitle')
   plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--panonymize', default=False, action='store_true', dest='PANONYM', help='Partially anonymize the dataset')
   plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Anonymize the dataset')
   plugin.launch(sys.argv)

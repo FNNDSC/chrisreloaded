@@ -25,7 +25,7 @@ jQuery(document).ready(
         } else {
           
           // some easteregg
-          alert('Hi ' + _command);
+          //alert('Hi ' + _command);
           
         }
       }
