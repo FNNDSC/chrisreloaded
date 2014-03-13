@@ -16,6 +16,8 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 
 ## Change log ##
 
+### Current **r2.8** ###
+
 ### 2014 03 13 **r2.7** ###
 * Fix bug on launching a batch and incorrect tracking of job status
 * Add 'mosix_test' plugin (with runKey -- needed to actually run plugin)
