@@ -18,6 +18,9 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 
 ### Current **r2.8** ###
 
+### 2014 03 13 **r2.7.2** ###
+* Fix bug on _chrisRun_ permissions
+
 ### 2014 03 13 **r2.7.1** ###
 * Fix bug on cluster/localhost select
 * Add $HOSTNAME output to chris.std
