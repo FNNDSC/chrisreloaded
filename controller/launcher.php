@@ -205,7 +205,12 @@ if($jobid != ''){
 }
 
 // Setup directories (including ssh/host vars)
+// do we force this plugin to run locally as chris?
+$force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
 $host = CLUSTER_HOST;
+if ($status == 100 || $force_chris_local) {
+  $host = 'localhost';
+}
 $ssh = new Net_SSH2($host);
 if (!$ssh->login($username, $password)) {
   die('Login Failed');
@@ -229,7 +234,7 @@ FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
 FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 
 // append the log files to the command
-$command .= ' > '.$job_path_output.'/chris.std 2> '.$job_path_output.'/chris.err';
+$command .= ' >> '.$job_path_output.'/chris.std 2> '.$job_path_output.'/chris.err';
 
 // create the chris.run file
 $runfile = joinPaths($job_path_output, 'chris.run');
@@ -237,12 +242,6 @@ $runfile = joinPaths($job_path_output, 'chris.run');
 // dprint($of, "command = $command\n");
 // dprint($of, "runfile = $runfile\n");
 
-// do we force this plugin to run locally as chris?
-$force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
-
-if ($status == 100 || $force_chris_local) {
-  $host = 'localhost';
-}
 
 $setStatus = '';
 if ($status != 100) {
@@ -257,6 +256,7 @@ if($status != 100){
   $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" >> '.$runfile);
 }
 
+$ssh->exec('bash -c \'echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$job_path_output.'/chris.std" >> '.$runfile.'\'');
 $ssh->exec('bash -c \' echo "'.$command.'" >> '.$runfile.'\'');
 
 if($status != 100){
