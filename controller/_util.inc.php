@@ -194,4 +194,20 @@ function getConfiguration(){
     return $config;
   }
 
+# Create and return a unique temp dir in $dir with $prefix
+function tempdir(&$ssh, $dir = false, $prefix = '_chrisRun-') {
+    $tempfile=tempnam($dir, $prefix);
+    if (file_exists($tempfile)) { unlink($tempfile); }
+    $ssh->exec('mkdir -p '.$tempfile);
+    if (is_dir($tempfile)) { return $tempfile; }
+}
+
+# Simple debug console that writes $content to $outstem.
+function dprint($outstem, $content) {
+    $f = fopen($outstem, "a");
+    fwrite($f, $content);
+    fclose($f);
+}
+
+
 ?>
