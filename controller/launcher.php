@@ -43,6 +43,10 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'token.controller.php'));
 
 require_once ('Net/SSH2.php');
 
+ob_start();
+$of = tempnam(sys_get_temp_dir(), 'PHPconsole-');
+
+
 // check if we are invoked by commandline
 $commandline_mode = (php_sapi_name() == 'cli');
 
@@ -200,6 +204,17 @@ if($jobid != ''){
   $job_path .= '/'.$jobid;
 }
 
+// Setup directories (including ssh/host vars)
+$host = CLUSTER_HOST;
+$ssh = new Net_SSH2($host);
+if (!$ssh->login($username, $password)) {
+  die('Login Failed');
+}
+$ssh->exec('mkdir -p '.$job_path);
+// dprint($of, "job_path = $job_path\n");
+$job_path_output = tempdir($ssh, $job_path);
+// dprint($of, "job_path_output = $job_path_output\n");
+
 // replace ${OUTPUT} pattern in the command and in the parameters
 $command = str_replace("{OUTPUT}", $job_path, $command);
 $command = str_replace("{FEED_ID}", $feed_id, $command);
@@ -214,11 +229,13 @@ FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
 FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 
 // append the log files to the command
-$command .= ' > '.$job_path.'/chris.log 2> '.$job_path.'/chris.err';
+$command .= ' > '.$job_path_output.'/chris.std 2> '.$job_path_output.'/chris.err';
 
 // create the chris.run file
-$runfile = joinPaths($job_path, 'chris.run');
-$host = CLUSTER_HOST;
+$runfile = joinPaths($job_path_output, 'chris.run');
+
+// dprint($of, "command = $command\n");
+// dprint($of, "runfile = $runfile\n");
 
 // do we force this plugin to run locally as chris?
 $force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
@@ -227,31 +244,24 @@ if ($status == 100 || $force_chris_local) {
   $host = 'localhost';
 }
 
-$ssh = new Net_SSH2($host);
-if (!$ssh->login($username, $password)) {
-  die('Login Failed');
-}
-
 $setStatus = '';
 if ($status != 100) {
   $setStatus .= '/usr/bin/curl -k --data ';
 }
-
-$ssh->exec('mkdir -p '.$job_path);
 
 // also include the environment setup in the runfile
 $ssh->exec("php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')." >> ".$runfile);
 
 if($status != 100){
   $start_token = TokenC::create();
-  $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > /dev/null 2> /dev/null" >> '.$runfile);
+  $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" >> '.$runfile);
 }
 
 $ssh->exec('bash -c \' echo "'.$command.'" >> '.$runfile.'\'');
 
 if($status != 100){
   $end_token = TokenC::create();
-  $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > /dev/null 2> /dev/null" >> '.$runfile);
+  $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
 }
 
 $ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
