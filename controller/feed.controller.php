@@ -70,7 +70,7 @@ interface FeedControllerInterface
   static public function parseTagPlugin(&$feedtagResults, &$count, &$feed_list, &$feed_update);
   static public function searchTagPlugin($user_id, $searchString);
 
-  static public function status($feed_id, $status);
+  static public function status($feed_id, $status, $op);
 }
 
 /**
@@ -904,7 +904,7 @@ class FeedC implements FeedControllerInterface {
     }
   }
 
-  static public function status($feedid, $status){
+  static public function status($feedid, $status, $op){
 
     // get $db instance
     $db = DB::getInstance();
@@ -921,16 +921,19 @@ class FeedC implements FeedControllerInterface {
     # grab old status
     $old_status = $feedResult['Feed'][0]->status;
 
-   if ($status{0} == '+') {
+    $type = gettype($status);
+    echo "Performing '$op' with value '$status' on current status '$old_status'\n";
+
+   if ($op == 'inc') {
 
       // increasing mode
 
-      echo "Increasing status of feed $feedid by $status...\n";
-
+      echo "Increasing status of feed $feedid by $status... ";
       # increase status
       $status = $old_status + $status;
 
-    } else {
+    } 
+    if ($op == 'set') {
 
       // set mode
 
@@ -939,13 +942,13 @@ class FeedC implements FeedControllerInterface {
         die("Ignoring setting the status since the old status $old_status >= the new status $status or the old status >= 100.\n");
       } else {
 
-        echo "Setting status of feed $feedid to $status...\n";
+        echo "Setting status of feed $feedid to $status... ";
 
       }
 
     }
-
-    # clamp the addition
+   echo "status now $status.\n";
+   # clamp the addition
    if ($status >= 100) {
       $status = 100;
 
@@ -994,7 +997,7 @@ class FeedC implements FeedControllerInterface {
         $message .= joinPaths(CHRIS_USERS, $userResult['User'][0]->username, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id) . PHP_EOL. PHP_EOL;
         $message .= "Thank you for using ChRIS.";
 
-        echo "Sending email to ".$userResult['User'][0]->email." since the status == 100.\n";
+        echo "Sending email to ".$userResult['User'][0]->email." since the status is '$status'%.\n";
 
         // get user email address
         email(CHRIS_PLUGIN_EMAIL_FROM, $userResult['User'][0]->email, $subject, $message);
