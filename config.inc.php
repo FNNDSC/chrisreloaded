@@ -33,16 +33,16 @@ if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 require_once(dirname(__FILE__).'/controller/_util.inc.php');
 
 // version
-define('CHRIS_VERSION', '2.8-experimental');
+define('CHRIS_VERSION', '2.7.1');
 define('CHRIS_TIMEZONE', 'America/New_York');
 date_default_timezone_set(CHRIS_TIMEZONE);
 
 // maintenance mode
 define('CHRIS_MAINTENANCE', false);
 
-define('CHRIS_HOME', '/chb/users/chris/dev');
+define('CHRIS_HOME', '/neuro/users/chris/dev');
 define('CHRIS_TRANSFER_PROTOCOL', 'http');
-define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/nicolas');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/rudolph');
 
 // admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
@@ -58,7 +58,7 @@ define('SQL_PASSWORD', 'YOURPASSWORD');
 define('SQL_DATABASE', 'chrisdev');
 
 // chris file system
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, '../../nicolas.rannou/gitroot/chrisreloaded'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'rudolph'));
 define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
 define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
@@ -88,7 +88,7 @@ define('CHRIS_SCANNERS', serialize(array(
 "MR1" => "borjan.gagoski@childrens.harvard.edu")));
 
 // cluster
-define('CLUSTER_HOST', 'rc-goldfinger');
+define('CLUSTER_HOST', 'rc-golden');
 define('CLUSTER_USERNAME', 'chris');
 // we replace {MEMORY} with a memory requirement
 // and {COMMAND} with the command to schedule
@@ -96,7 +96,7 @@ define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND
 define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
 
 // DICOM LISTENER
-define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
+define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRIS');
 define('DICOM_DCMTK_FINDSCU', '/usr/bin/findscu');
 define('DICOM_DCMTK_MOVESCU', '/usr/bin/movescu');
 define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
@@ -105,29 +105,29 @@ define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
 // ENVIRONMENT CONFIGURATION
 //
 # globals
-define('ENV_TMP_DIR', '/chb/tmp');
-define('ENV_CLUSTER_TMP_DIR', '/chb/pices/tmp');
+define('ENV_TMP_DIR', '/neuro/tmp');
+define('ENV_CLUSTER_TMP_DIR', '/neuro/tmp');
 define('ENV_PYTHONPATH', joinPaths(CHRIS_LIBS, 'pymodules/:$PYTHONPATH'));
 
 
-define('ENV_SCRIPT_DIR', '/chb/arch/scripts');
-define('ENV_FREESURFER_SCRIPT', '/chb/arch/scripts/chb-fs');
-define('ENV_SLICER_DIR', '/chb/arch/Linux64/packages/Slicer4/current');
-define('ENV_DTK_DIR', '/home/chris/packages/dtk');
+define('ENV_SCRIPT_DIR', '/neuro/arch/scripts');
+define('ENV_FREESURFER_SCRIPT', '/neuro/arch/scripts/neuro-fs');
+define('ENV_SLICER_DIR', '/neuro/arch/Linux64/packages/Slicer4/current');
+define('ENV_DTK_DIR', '/neuro/arch/x86_64-Linux/bin');
 # pacs push
-define('ENV_DICOMDIRSEND_SCRIPT', '/chb/arch/scripts/dicom_dirSend.bash');
+define('ENV_DICOMDIRSEND_SCRIPT', '/neuro/arch/scripts/dicom_dirSend.bash');
 # tractography
-define('ENV_TRACTOGRAPHY_SCRIPT', '/chb/arch/scripts/tract_meta.bash');
+define('ENV_TRACTOGRAPHY_SCRIPT', '/neuro/arch/scripts/tract_meta.bash');
 # connectome pipeline
-define('ENV_CONNECTOME_SCRIPT', '/chb/arch/scripts/chb-connectome');
+define('ENV_CONNECTOME_SCRIPT', '/neuro/arch/scripts/chb-connectome');
 define('ENV_CONNECTOME_META_SCRIPT', '/chb/arch/scripts/connectome_meta.bash');
 define('ENV_MRICRON_DIR', '/home/chris/packages/mricron');
 define('ENV_CMP_DIR', '/home/chris/packages/cmp110/lib/python');
-define('ENV_FSL_SCRIPT', '/chb/pices/arch/x86_64-Linux/packages/fsl/etc/fslconf/fsl.sh');
+define('ENV_FSL_SCRIPT', '/neuro/arch/x86_64-Linux/packages/fsl/etc/fslconf/fsl.sh');
 #fyborg
-define('ENV_FYBORG_DIR', '/chb/arch/scripts');
+define('ENV_FYBORG_DIR', '/neuro/arch/scripts');
 # fetal moco
-define('ENV_FETALMOCO_DIR', '/chb/arch/Linux64/packages/fetal_moco');
+define('ENV_FETALMOCO_DIR', '/neuro/arch/Linux64/packages/fetal_moco');
 
 
 
