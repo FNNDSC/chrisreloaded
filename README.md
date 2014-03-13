@@ -17,6 +17,7 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current **r2.7** ###
+* Fix bug on launching a batch and incorrect tracking of job status
 * Add 'mosix_test' plugin (with runKey -- needed to actually run plugin)
 * Add 'zip' plugin
 * Run all commands though bash -c
