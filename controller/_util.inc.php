@@ -199,7 +199,7 @@ function tempdir(&$ssh, $dir = false, $prefix = '_chrisRun_') {
     // $dirname  = uniqid($prefix, false);
     $dirname  = $prefix;
     $tempdir  = joinPaths($dir, $dirname);
-    $message = $ssh->exec('bash -c \'mkdir -p '.$tempdir.'\'');
+    $message = $ssh->exec('bash -c \'umask 0002 ; mkdir -p '.$tempdir.'\'');
     # empty return message on mkdir means success
     if ($message == '') { return $tempdir; }
     echo '_chrisRun_ could not be created in dir $dir -- possible permission issue: '.$message.PHP_EOL;
