@@ -43,8 +43,10 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'token.controller.php'));
 
 require_once ('Net/SSH2.php');
 
-ob_start();
-$of = tempnam(sys_get_temp_dir(), 'PHPconsole-');
+// tempnam actually creates a file in addition to 
+// generating a name.
+// $of = tempnam(sys_get_temp_dir(), 'PHPconsole-');
+// if (file_exists($tempfile)) { unlink($tempfile); }
 
 
 // check if we are invoked by commandline
@@ -245,7 +247,7 @@ $runfile = joinPaths($job_path_output, 'chris.run');
 
 $setStatus = '';
 if ($status != 100) {
-  $setStatus .= '/usr/bin/curl -k --data ';
+  $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl -k --data ';
 }
 
 // also include the environment setup in the runfile
