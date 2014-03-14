@@ -217,7 +217,7 @@ $ssh = new Net_SSH2($host);
 if (!$ssh->login($username, $password)) {
   die('Login Failed');
 }
-$ssh->exec('mkdir -p '.$job_path);
+$ssh->exec('umask 0002 ; mkdir -p '.$job_path);
 // dprint($of, "job_path = $job_path\n");
 $job_path_output = tempdir($ssh, $job_path);
 // dprint($of, "job_path_output = $job_path_output\n");
@@ -256,6 +256,8 @@ if ($status != 100) {
 
 // also include the environment setup in the runfile
 $ssh->exec("php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')." >> ".$runfile);
+
+$ssh->exec('bash -c \' echo "umask 0002" >> '.$runfile.'\'');
 
 if($status != 100){
   $start_token = TokenC::create();
