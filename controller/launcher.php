@@ -246,7 +246,11 @@ $runfile = joinPaths($job_path_output, 'chris.run');
 
 
 $setStatus = '';
+// retry 5 times with a 5 seconds delay
+// connection timeout: 5s
+// max query time: 30
 if ($status != 100) {
+//  $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
   $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl -k --data ';
 }
 
