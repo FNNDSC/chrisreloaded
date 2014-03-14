@@ -120,9 +120,9 @@ define('ENV_DICOMDIRSEND_SCRIPT', '/neuro/arch/scripts/dicom_dirSend.bash');
 define('ENV_TRACTOGRAPHY_SCRIPT', '/neuro/arch/scripts/tract_meta.bash');
 # connectome pipeline
 define('ENV_CONNECTOME_SCRIPT', '/neuro/arch/scripts/chb-connectome');
-define('ENV_CONNECTOME_META_SCRIPT', '/chb/arch/scripts/connectome_meta.bash');
-define('ENV_MRICRON_DIR', '/home/chris/packages/mricron');
-define('ENV_CMP_DIR', '/home/chris/packages/cmp110/lib/python');
+define('ENV_CONNECTOME_META_SCRIPT', '/neuro/arch/scripts/connectome_meta.bash');
+define('ENV_MRICRON_DIR', '/neuro/arch/x86_64-Linux/packages/mricron');
+define('ENV_CMP_DIR', '/neuro/arch/packages/x86_64-Linux/cmp110/lib/python');
 define('ENV_FSL_SCRIPT', '/neuro/arch/x86_64-Linux/packages/fsl/etc/fslconf/fsl.sh');
 #fyborg
 define('ENV_FYBORG_DIR', '/neuro/arch/scripts');
