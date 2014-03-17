@@ -83,6 +83,7 @@ class PACS_Push(Plugin):
 
     chrisRunDir   = os.environ['ENV_CHRISRUN_DIR']
     str_exitCode  = str(shell.exitCode())
+    misc.file_writeOnce(os.path.join(chrisRunDir, 'command.log'), command)
     misc.file_writeOnce(os.path.join(chrisRunDir, 'exitCode.log'), str_exitCode)
     if str_exitCode != "0":
       misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
