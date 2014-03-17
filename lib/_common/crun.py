@@ -315,8 +315,12 @@ class crun(object):
         if self._b_runCmd:
             self._str_stdout, self._str_stderr, self._exitCode    = \
                     misc.shell(self._str_shellCmd, **kwargs)
-        if self._b_echoStdOut: sys.stdout.write(self._str_stdout)
-        if self._b_echoStdErr: sys.stderr.write(self._str_stderr)
+        if self._b_echoStdOut: 
+            sys.stdout.write(self._str_stdout)
+            sys.stdout.flush()
+        if self._b_echoStdErr: 
+            sys.stderr.write(self._str_stderr)
+            sys.stderr.flush()
         return self._str_stdout, self._str_stderr, self._exitCode
     
 
