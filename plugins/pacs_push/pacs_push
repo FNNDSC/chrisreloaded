@@ -20,8 +20,11 @@
 # import the plugin.py superclass
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
 from plugin import Plugin
 
+from  _common import crun
+from  _common import systemMisc as misc 
 import datetime as d
 
 class PACS_Push(Plugin):
@@ -67,10 +70,25 @@ class PACS_Push(Plugin):
       command += ' -c ' + suffix;
     command += ' ' + target;
     command = current_dir + '/dicom_dirSend.bash.wrapper ' + command + '\''
-    print 'command:'
-    print command
-    output = os.system(command)
-    print output
+
+    # Use the crun shell mechanism
+    shell = crun.crun()
+    shell.echo(False)
+    shell.echoStdOut(True)
+    shell.echoStdErr(True)
+    shell.detach(False)
+    shell.waitForChild(True)
+
+    shell(command)
+
+    chrisRunDir   = os.environ['ENV_CHRISRUN_DIR']
+    str_exitCode  = str(shell.exitCode())
+    misc.file_writeOnce(os.path.join(chrisRunDir, 'exitCode.log'), str_exitCode)
+    if str_exitCode != "0":
+      misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
+
+    # output = os.system(command)
+    # print output
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Finish pushing...'
 
   def run(self, options):
@@ -83,7 +101,8 @@ class PACS_Push(Plugin):
     options.DIR = self.validate('directory', options.DIR);
 
     # create link to input directory
-    os.symlink(options.DIR, os.path.join(options.output, os.path.basename(options.DIR)))
+    if not os.path.islink(os.path.join(options.output, os.path.basename(options.DIR))):
+      os.symlink(options.DIR, os.path.join(options.output, os.path.basename(options.DIR)))
   
     suffix = '' 
 
