@@ -256,6 +256,8 @@ if ($status != 100) {
 
 // also include the environment setup in the runfile
 $ssh->exec("php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')." >> ".$runfile);
+// and the actual chris.run dir
+$ssh->exec('bash -c \' echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$runfile.'\'');
 
 $ssh->exec('bash -c \' echo "umask 0002" >> '.$runfile.'\'');
 
