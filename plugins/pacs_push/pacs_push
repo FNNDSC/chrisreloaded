@@ -88,6 +88,14 @@ class PACS_Push(Plugin):
     if str_exitCode != "0":
       misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
 
+    # If partial anon, write a mail file containing MRN and anon val
+    if options.PANONYM:
+      chrisStd = os.path.join(chrisRunDir, 'chris.std')
+      if os.path.isfile(chrisStd):
+        str_MRN2anon = "cat %s | sed '/^\s*$/d' | sort | uniq -c | sort -n | tail -n 1" % chrisStd
+        shell(str_MRN2anon)
+        misc.file_writeOnce(os.path.join(chrisRunDir, 'mail.log'), shell.stdout().strip())
+
     # output = os.system(command)
     # print output
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Finish pushing...'
