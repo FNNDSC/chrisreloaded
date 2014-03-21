@@ -24,7 +24,7 @@ class MRIConvert( Plugin ):
   Plugin.DESCRIPTION = 'Convert an MRI volume to a different format'
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
-  Plugin.VERSION = '0.1'
+  Plugin.VERSION = '0.2'
 
   def run( self, options ):
 
