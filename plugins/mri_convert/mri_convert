@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#                                                            _           
+#                                                            _
 # FREESURFER MRI_CONVERT
 #
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
@@ -16,46 +16,51 @@ sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
 class MRIConvert( Plugin ):
-  '''
-  '''
-  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
-  Plugin.TITLE = 'Freesurfer MRI Convert'
-  Plugin.CATEGORY = 'Freesurfer'
-  Plugin.DESCRIPTION = 'Convert an MRI volume to a different format'
-  Plugin.DOCUMENTATION = 'http://wiki'
-  Plugin.LICENSE = 'Opensource (MIT)'
-  Plugin.VERSION = '0.2'
+    '''
+    '''
+    Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+    Plugin.TITLE = 'Freesurfer MRI Convert'
+    Plugin.CATEGORY = 'Freesurfer'
+    Plugin.DESCRIPTION = 'Convert an MRI volume to a different format'
+    Plugin.DOCUMENTATION = 'http://wiki'
+    Plugin.LICENSE = 'Opensource (MIT)'
+    Plugin.VERSION = '0.1'
 
-  def run( self, options ):
+    def run( self, options ):
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    
-    # we expect file as input
-    options.input = self.validate('file', options.input);
-    
-    # migrate data
-    # create temp dir
-    import tempfile, shutil, subprocess
-    tempdir = tempfile.mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
-    shutil.copytree( os.path.dirname(options.input), tempdir + '/mri') 
-    
-    # grab just the file name
-    basename = os.path.basename(options.input)
-    
-    # replace the extension
-    basename_new = os.path.splitext(basename)[0] + '.' + options.format
-    
-    # launch recon-all
-    cmd = 'cd ' + options.output +';' + current_dir + '/mri_convert.wrapper ' + os.path.join(tempdir+'/mri', basename) + ' ' + os.path.join(tempdir, basename_new)
-    os.system(cmd)
-    
-    shutil.copyfile(os.path.join(tempdir, basename_new), os.path.join(options.output, basename_new))
-    
-    shutil.rmtree( tempdir )
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # migrate data
+        # create temp dir
+        import tempfile, shutil, subprocess
+        tempdir = tempfile.mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
+        if os.path.isfile(options.input):
+          #copy the directory tree starting from the file parent directory
+          copyDir = os.path.dirname(options.input)
+          shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
+        else:
+          #copy the full directory tree that has been pased
+          copyDir = options.input
+          shutil.copytree(copyDir, tempdir + '/mri')
+        paths = self.getFilePaths(tempdir + '/mri')
+        for path in paths:         
+          if path.endswith('dcm'):
+            # the output file name is the parent directory name
+            basename_new = os.path.basename(os.path.dirname(path)) + '.' + options.format
+          else:
+            # grab just the file name
+            basename = os.path.basename(path)
+            # replace the extension
+            basename_new = os.path.splitext(basename)[0] + '.' + options.format
+          # launch mri_convert
+          cmd = 'cd ' + options.output +';' + current_dir + '/mri_convert.wrapper ' + path + ' ' + os.path.join(tempdir, basename_new) 
+          os.system(cmd)
+          shutil.copyfile(os.path.join(tempdir, basename_new), os.path.join(options.output, basename_new))
+        shutil.rmtree(tempdir)
+
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = MRIConvert()
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--input', action='store', dest='input', help='the image to convert' )
-  plugin.add_parameter( 'Output', Plugin.STRING, '--format', action='store', dest='format', default='nii', help='the format to convert to (defined by extension)' )
-  plugin.launch( sys.argv )
+    plugin = MRIConvert()
+    plugin.add_parameter( 'Input', Plugin.IMAGE, '--input', action='store', dest='input', help='the image to convert' )
+    plugin.add_parameter( 'Output', Plugin.STRING, '--format', action='store', dest='format', default='nii', help='the format to convert to (defined by extension)' )
+    plugin.launch( sys.argv )

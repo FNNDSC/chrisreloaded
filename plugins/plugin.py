@@ -265,3 +265,31 @@ class Plugin( argparse.ArgumentParser ):
               provided = os.path.join(provided, files)
               break
         return provided
+
+  def getFilePaths(self, rootDir, extensions=['dcm', 'nii', 'mgh']):
+      '''
+      Convenience method that searches the directory tree looking for input files with appropriate extensions
+      and returns a list of file names.
+      It only returns the first dcm file in a directory. For other extensions it returns all
+      files in the directory.
+      '''
+      paths = []
+      # find files with good extension within nested dirs
+      queue = [rootDir];
+      while queue:
+        rootDir = queue.pop(0)
+        dirList = os.listdir(rootDir);
+        dcmFound = False
+        for entry in dirList:
+          path = os.path.join(rootDir, entry)
+          if os.path.isfile(path):
+            for extension in extensions:
+              if path.endswith(extension):
+                if (not extension == 'dcm') or (extension == 'dcm' and not dcmFound):
+                  paths.append(path)
+                  if extension == 'dcm':
+                    dcmFound = True
+                  break 
+          else:
+            queue.append(path)
+      return paths  
