@@ -275,10 +275,10 @@ class Plugin( argparse.ArgumentParser ):
       '''
       paths = []
       # find files with good extension within nested dirs
-      queue = [rootDir];
+      queue = [rootDir]
       while queue:
         rootDir = queue.pop(0)
-        dirList = os.listdir(rootDir);
+        dirList = os.listdir(rootDir)
         dcmFound = False
         for entry in dirList:
           path = os.path.join(rootDir, entry)

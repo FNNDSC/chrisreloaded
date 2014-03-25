@@ -33,16 +33,20 @@ class MRIConvert( Plugin ):
         # create temp dir
         import tempfile, shutil, subprocess
         tempdir = tempfile.mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
-        if os.path.isfile(options.input):
-          #copy the directory tree starting from the file parent directory
+        if os.path.isfile(options.input) and options.input.endswith('dcm'):
+          #copy the directory content 
           copyDir = os.path.dirname(options.input)
           shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
+        elif os.path.isfile(options.input) and not options.input.endswith('dcm'):
+          copyDir = os.path.dirname(options.input)
+          os.mkdir(tempdir + '/mri/')
+          os.mkdir(tempdir + '/mri/' + os.path.basename(copyDir))
+          shutil.copy(options.input, tempdir + '/mri/' + os.path.basename(copyDir))
         else:
-          #copy the full directory tree that has been pased
           copyDir = options.input
-          shutil.copytree(copyDir, tempdir + '/mri')
+          shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
         paths = self.getFilePaths(tempdir + '/mri')
-        for path in paths:         
+        for path in paths:
           if path.endswith('dcm'):
             # the output file name is the parent directory name
             basename_new = os.path.basename(os.path.dirname(path)) + '.' + options.format
