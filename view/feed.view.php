@@ -90,6 +90,28 @@ class FeedV implements ObjectViewInterface {
       $status_text = '<font color=darkred>Canceled</font>';
     }
 
+    $feed_status = 'feed_success';
+    $feed_folder = joinPaths(CHRIS_USERS, $username,$object->plugin, $object->name.'-'.$object->id);
+    if ($handle = opendir($feed_folder)) {
+
+      while (false !== ($entry = readdir($handle))) {
+
+        if($entry != "." && $entry != ".."){
+
+          $match = glob($feed_folder.'/'.$entry.'/_chrisRun_/ERR*');
+          if(count($match)){
+            $feed_status = 'feed_failure';
+            break;
+          }
+
+          if($feed_status == 'feed_failure'){
+            break;
+          }
+
+        }
+      }
+    }
+
     $share_icon = 'icon-share-alt';
 
     $tag_icon = 'icon-tag';
@@ -126,6 +148,7 @@ class FeedV implements ObjectViewInterface {
     }
     $t -> replace('IMAGE_SRC', $feed_gfx64);
     $t -> replace('USERNAME', $username_displayed);
+    $t -> replace('FEED_STATUS', $feed_status);
     $t -> replace('FEED_NAME', $object->name);
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
     $t -> replace('TIME_FORMATED', $object->time);
