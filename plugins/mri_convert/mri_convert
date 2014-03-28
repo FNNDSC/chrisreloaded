@@ -10,10 +10,19 @@
 #                        dev@babyMRI.org
 #
 
+
 # import the plugin.py superclass
 import os, sys
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
+
+import shutil
+from tempfile import mkdtemp
+#import crun shell utility module
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
+
 
 class MRIConvert( Plugin ):
     '''
@@ -31,8 +40,7 @@ class MRIConvert( Plugin ):
         current_dir = os.path.dirname(os.path.abspath(__file__))
         # migrate data
         # create temp dir
-        import tempfile, shutil, subprocess
-        tempdir = tempfile.mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
+        tempdir = mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
         if os.path.isfile(options.input) and options.input.endswith('dcm'):
           #copy the directory content 
           copyDir = os.path.dirname(options.input)
@@ -45,20 +53,33 @@ class MRIConvert( Plugin ):
         else:
           copyDir = options.input
           shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
-        paths = self.getFilePaths(tempdir + '/mri')
+        #execute mri_convert on all MRI volumes within the input tree
+        chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
+        shell = crun.crun()
+        shell.echo(False)
+        shell.echoStdOut(True)
+        shell.echoStdErr(True)
+        shell.detach(False)
+        shell.waitForChild(True)
+        l_extensions = options.extensions.split(',')
+        paths = self.getFilePaths(tempdir + '/mri', l_extensions)
         for path in paths:
           if path.endswith('dcm'):
             # the output file name is the parent directory name
             basename_new = os.path.basename(os.path.dirname(path)) + '.' + options.format
           else:
             # grab just the file name
-            basename = os.path.basename(path)
-            # replace the extension
-            basename_new = os.path.splitext(basename)[0] + '.' + options.format
+            basename = os.path.splitext(os.path.basename(path))[0]
+            # add output extension
+            basename_new = basename + '.' + options.format
           # launch mri_convert
           cmd = 'cd ' + options.output +';' + current_dir + '/mri_convert.wrapper ' + path + ' ' + os.path.join(tempdir, basename_new) 
-          os.system(cmd)
-          shutil.copyfile(os.path.join(tempdir, basename_new), os.path.join(options.output, basename_new))
+          shell(cmd)
+          if str(shell.exitCode()) != "0":
+            misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-dev-' + basename_new + '.err'), 'Plugin returned error!\n%s' % shell.stderr())
+            misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-user-' + basename_new + '.err'), 'mri_convert could not convert file %s' % basename_new)
+          else:
+            shutil.copyfile(os.path.join(tempdir, basename_new), os.path.join(options.output, basename_new))
         shutil.rmtree(tempdir)
 
 
@@ -67,4 +88,5 @@ if __name__ == "__main__":
     plugin = MRIConvert()
     plugin.add_parameter( 'Input', Plugin.IMAGE, '--input', action='store', dest='input', help='the image to convert' )
     plugin.add_parameter( 'Output', Plugin.STRING, '--format', action='store', dest='format', default='nii', help='the format to convert to (defined by extension)' )
+    plugin.add_parameter( '(Advanced) extensions', Plugin.STRING, '--extensions', action='store', dest='extensions', default='nii,mgz,dcm,mgh', help='input extensions to parse (comma separated)' )
     plugin.launch( sys.argv )
