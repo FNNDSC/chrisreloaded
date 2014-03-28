@@ -63,7 +63,7 @@
 }
 
 .feed.feed_failure:hover {
-	background: rgb(255, 77, 77);
+	background: rgb(255, 44, 44);
 }
 
 .feed_header {
@@ -381,5 +381,9 @@
 }
 
 .feed_failure{
-    background-color: rgb(255, 115, 115);
+    background-color: rgb(255, 77, 77);
+}
+
+.feed_failure, .feed_failure .feed_header_small{
+    color: black!important;
 }
