@@ -1,0 +1,4 @@
+#!/bin/bash
+source $ENV_FREESURFER_SCRIPT dev
+
+echo "mri_deface $@" | sh -v
