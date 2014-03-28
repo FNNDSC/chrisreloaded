@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+#
+#                                                            _
+# FREESURFER MRI_DEFACE
+#
+# (c) 2014 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+from plugin import Plugin
+
+class MRIDeface( Plugin ):
+    '''
+    '''
+    Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+    Plugin.TITLE = 'Freesurfer MRI Deface'
+    Plugin.CATEGORY = 'Freesurfer'
+    Plugin.DESCRIPTION = 'Deface an MRI volume, i.e. remove the facial features to further de-identify the data'
+    Plugin.DOCUMENTATION = 'http://wiki'
+    Plugin.LICENSE = 'Opensource (MIT)'
+    Plugin.VERSION = '0.1'
+
+    def run( self, options ):
+
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        # migrate data
+        # create temp dir
+        import tempfile, shutil, subprocess
+        tempdir = tempfile.mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
+        if os.path.isfile(options.input) and options.input.endswith('dcm'):
+          #copy the directory content 
+          copyDir = os.path.dirname(options.input)
+          shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
+        elif os.path.isfile(options.input) and not options.input.endswith('dcm'):
+          copyDir = os.path.dirname(options.input)
+          os.mkdir(tempdir + '/mri/')
+          os.mkdir(tempdir + '/mri/' + os.path.basename(copyDir))
+          shutil.copy(options.input, tempdir + '/mri/' + os.path.basename(copyDir))
+        else:
+          copyDir = options.input
+          shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
+        paths = self.getFilePaths(tempdir + '/mri')
+        for path in paths:
+          if path.endswith('dcm'):
+            # the output file name is the parent directory name
+            basename_new = options.prefix + os.path.basename(os.path.dirname(path)) + '.' + options.format
+          else:
+            # grab just the file name
+            basename = os.path.basename(path)
+            # replace the extension
+            basename_new = options.prefix + os.path.splitext(basename)[0] + '.' + options.format
+          # launch mri_convert
+          cmd = 'cd ' + options.output +';' + current_dir + '/mri_deface.wrapper ' + path + ' \$FREESURFER_HOME/average/talairach_mixed_with_skull.gca \$FREESURFER_HOME/average/face.gca ' + os.path.join(tempdir, basename_new) 
+          print("cmd = %s" % cmd)
+          os.system(cmd)
+          shutil.copyfile(os.path.join(tempdir, basename_new), os.path.join(options.output, basename_new))
+        shutil.rmtree(tempdir)
+
+
+# ENTRYPOINT
+if __name__ == "__main__":
+    plugin = MRIDeface()
+    plugin.add_parameter( 'Input', Plugin.IMAGE, '--input', action='store', dest='input', help='the image to convert' )
+    plugin.add_parameter( 'Output', Plugin.STRING, '--format', action='store', dest='format', default='nii', help='the format to convert to (defined by extension)' )
+    plugin.add_parameter( 'Advanced', Plugin.STRING, '--prefix', action='store', dest='prefix', default='defaced-', help='a prefix to add to the defaced volume name' )
+    plugin.launch( sys.argv )
