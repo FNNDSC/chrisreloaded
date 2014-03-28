@@ -273,14 +273,15 @@ $addDataLog .= 'Data doesn\'t exist...'.PHP_EOL;
 else{
 $data_chris_id = $dataResult['Data'][0]->id;
 $addDataLog .= 'Data exists...'.PHP_EOL;
+// always update nb of files for safety (sometimes the pacs returns smaller number of file...)
 // if no nb_files provided, update this field in db
-if($dataResult['Data'][0]->nb_files == 0 && $results[1]['NumberOfSeriesRelatedInstances'][$key] > 0){
+//if($dataResult['Data'][0]->nb_files == 0 && $results[1]['NumberOfSeriesRelatedInstances'][$key] > 0){
 $dataResult['Data'][0]->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
 // Update database and get object
 Mapper::update($dataResult['Data'][0], $data_chris_id);
 $addDataLog .= 'Update data number of files...'.PHP_EOL;
 $addDataLog .= '0 -> '.$dataResult['Data'][0]->nb_files.PHP_EOL;
-}
+//}
 // if data is there and files have been received, we will not query it
 if($dataResult['Data'][0]->nb_files == $dataResult['Data'][0]->status){
 $request_data = false;
