@@ -13,18 +13,15 @@
 
 # import the plugin.py superclass
 import os, sys
-sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
-
-import shutil
-from tempfile import mkdtemp
-#import crun shell utility module
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
-from  _common import crun
-from  _common import systemMisc as misc 
+# import the FsPlugin superclass for Freesurfer plugins
+from fsplugin import FsPlugin
+#import utilities
+import itertools
 
 
-class MRIConvert( Plugin ):
+class MRIConvert(FsPlugin):
     '''
     '''
     Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -35,52 +32,19 @@ class MRIConvert( Plugin ):
     Plugin.LICENSE = 'Opensource (MIT)'
     Plugin.VERSION = '0.1'
 
-    def run( self, options ):
-
+    def run(self, options):
+        # create temp dir and migrate data
+        self.copyDataToTempDir(options)
+        # execute mri_convert on all MRI volumes within the input tree
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        # migrate data
-        # create temp dir
-        tempdir = mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
-        if os.path.isfile(options.input) and options.input.endswith('dcm'):
-          #copy the directory content 
-          copyDir = os.path.dirname(options.input)
-          shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
-        elif os.path.isfile(options.input) and not options.input.endswith('dcm'):
-          copyDir = os.path.dirname(options.input)
-          os.mkdir(tempdir + '/mri/')
-          os.mkdir(tempdir + '/mri/' + os.path.basename(copyDir))
-          shutil.copy(options.input, tempdir + '/mri/' + os.path.basename(copyDir))
-        else:
-          copyDir = options.input
-          shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
-        #execute mri_convert on all MRI volumes within the input tree
-        chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
-        shell = crun.crun()
-        shell.echo(False)
-        shell.echoStdOut(True)
-        shell.echoStdErr(True)
-        shell.detach(False)
-        shell.waitForChild(True)
-        l_extensions = options.extensions.split(',')
-        paths = self.getFilePaths(tempdir + '/mri', l_extensions)
-        for path in paths:
-          if path.endswith('dcm'):
-            # the output file name is the parent directory name
-            basename_new = os.path.basename(os.path.dirname(path)) + '.' + options.format
-          else:
-            # grab just the file name
-            basename = os.path.splitext(os.path.basename(path))[0]
-            # add output extension
-            basename_new = basename + '.' + options.format
-          # launch mri_convert
-          cmd = 'cd ' + options.output +';' + current_dir + '/mri_convert.wrapper ' + path + ' ' + os.path.join(tempdir, basename_new) 
-          shell(cmd)
-          if str(shell.exitCode()) != "0":
-            misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-dev-' + basename_new + '.err'), 'Plugin returned error!\n%s' % shell.stderr())
-            misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-user-' + basename_new + '.err'), 'mri_convert could not convert file %s' % basename_new)
-          else:
-            shutil.copyfile(os.path.join(tempdir, basename_new), os.path.join(options.output, basename_new))
-        shutil.rmtree(tempdir)
+        cmds = []
+        for inFile, outFileName in itertools.izip(self.inputFilePaths, self.outputFileNames):
+          cmd = 'cd ' + options.output +';' + current_dir + '/mri_convert.wrapper ' + inFile + ' ' + os.path.join(self.tempdir, outFileName)
+          cmds.append(cmd)
+        userErrorStr = 'mri_convert could not convert file'
+        self.execCmd(options, userErrorStr, cmds)
+        # remove temp dir
+        self.removeTempDir()
 
 
 # ENTRYPOINT
