@@ -46,6 +46,8 @@ interface UserControllerInterface
   static public function login($username, $password);
   // Create new user
   static public function create($uid, $username);
+  // Setup the user directory as needed
+  static public function setupDir($username);
   // Update user email
   static public function setEmail($uid, $email);
 }
@@ -118,6 +120,9 @@ class UserC implements UserControllerInterface {
       // if user exist, return its id
       if(isset($userResults['User'][0])) {
 
+        // setup directory if needed
+        UserC::setupDir($username);
+
         // valid user
         return $userResults['User'][0]->id;
 
@@ -139,32 +144,9 @@ class UserC implements UserControllerInterface {
 
         // returns 0 since the user table doesnt have auto increment
         UserC::create($uid, $username);
+        // setup directory if needed
+        UserC::setupDir($username);
 
-        $user_path = joinPaths(CHRIS_USERS, $username);
-        // create home directory (if does't exist)
-        if(!file_exists($user_path)){
-
-          $ssh->exec("mkdir $user_path;chmod 775 $user_path;");
-
-        }
-
-        // create config directory
-        $user_config_path = joinPaths($user_path, CHRIS_USERS_CONFIG_DIR);
-        if(!file_exists($user_config_path)){
-
-          $ssh->exec("mkdir $user_config_path;chmod 775 $user_config_path;");
-
-        }
-
-        // add default configuration file
-        $user_config_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_FILE);
-        $chris_config_file = joinPaths(CHRIS_SRC, CHRIS_USERS_CONFIG_FILE);
-        if(!file_exists($user_config_file)){
-
-          $ssh->exec("cp  $chris_config_file $user_config_file;chmod 660 $user_config_file;");
-
-        }
-        
         return $uid;
       }
 
@@ -173,6 +155,48 @@ class UserC implements UserControllerInterface {
     // invalid credentials
     return -1;
 
+  }
+
+  /**
+   * Setup the configuration directory.
+   *
+   * @param string $username
+   */
+  static public function setupDir($username) {
+
+    $user_path = joinPaths(CHRIS_USERS, $username);
+
+    // create home directory (if does't exist)
+    if(!file_exists($user_path)){
+
+      $ssh->exec("mkdir $user_path;chmod 775 $user_path;");
+
+    }
+
+    // create config directory  (if does't exist)
+    $user_config_path = joinPaths($user_path, CHRIS_USERS_CONFIG_DIR);
+    if(!file_exists($user_config_path)){
+
+      $ssh->exec("mkdir $user_config_path;chmod 775 $user_config_path;");
+
+    }
+
+    // add default configuration file  (if does't exist)
+    $user_config_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_FILE);
+    $chris_config_file = joinPaths(CHRIS_SRC, CHRIS_USERS_CONFIG_FILE);
+    if(!file_exists($user_config_file)){
+
+      $ssh->exec("cp  $chris_config_file $user_config_file;chmod 660 $user_config_file;");
+
+    }
+
+    // generate ssh key for passwordless ssh  (if does't exist)
+    $user_key_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_SSHKEY);
+    if(!file_exists($user_key_file)){
+        
+      $ssh->exec('ssh-keygen -t rsa -N "" -f '.$user_key_file.'; cat '.$user_key_file.'.pub >> ~/.ssh/authorized_keys;');
+
+    }
   }
 
   /**
