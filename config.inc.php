@@ -42,7 +42,7 @@ define('CHRIS_MAINTENANCE', false);
 
 define('CHRIS_HOME', '/neuro/users/chris/dev');
 define('CHRIS_TRANSFER_PROTOCOL', 'http');
-define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/rudolph');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/nicolas');
 
 // admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
@@ -58,7 +58,7 @@ define('SQL_PASSWORD', 'YOURPASSWORD');
 define('SQL_DATABASE', 'chrisdev');
 
 // chris file system
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'rudolph'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'nicolas'));
 define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
 define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
@@ -68,6 +68,7 @@ define('CHRIS_LIBS', joinPaths(CHRIS_HOME, 'lib'));
 // chris user configuration
 define('CHRIS_USERS_CONFIG_DIR', 'config');
 define('CHRIS_USERS_CONFIG_FILE', '.chris.conf');
+define('CHRIS_USERS_CONFIG_SSHKEY', 'id_rsa');
 
 // PATH configuration
 define('CHRIS_WWWROOT', dirname(__FILE__));
@@ -89,6 +90,7 @@ define('CHRIS_SCANNERS', serialize(array(
 
 // cluster
 define('CLUSTER_HOST', 'rc-golden');
+define('CLUSTER_TYPE', 'MOSIX');
 define('CLUSTER_USERNAME', 'chris');
 // we replace {MEMORY} with a memory requirement
 // and {COMMAND} with the command to schedule
@@ -96,7 +98,7 @@ define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND
 define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
 
 // DICOM LISTENER
-define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRIS');
+define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
 define('DICOM_DCMTK_FINDSCU', '/usr/bin/findscu');
 define('DICOM_DCMTK_MOVESCU', '/usr/bin/movescu');
 define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
