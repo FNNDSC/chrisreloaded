@@ -47,7 +47,7 @@ interface UserControllerInterface
   // Create new user
   static public function create($uid, $username);
   // Setup the user directory as needed
-  static public function setupDir($username);
+  static public function setupDir($username, &$ssh);
   // Update user email
   static public function setEmail($uid, $email);
 }
@@ -121,7 +121,7 @@ class UserC implements UserControllerInterface {
       if(isset($userResults['User'][0])) {
 
         // setup directory if needed
-        UserC::setupDir($username);
+        UserC::setupDir($username, $ssh);
 
         // valid user
         return $userResults['User'][0]->id;
@@ -145,7 +145,7 @@ class UserC implements UserControllerInterface {
         // returns 0 since the user table doesnt have auto increment
         UserC::create($uid, $username);
         // setup directory if needed
-        UserC::setupDir($username);
+        UserC::setupDir($username, $ssh);
 
         return $uid;
       }
@@ -162,7 +162,7 @@ class UserC implements UserControllerInterface {
    *
    * @param string $username
    */
-  static public function setupDir($username) {
+  static public function setupDir($username, &$ssh) {
 
     $user_path = joinPaths(CHRIS_USERS, $username);
 
