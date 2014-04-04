@@ -16,7 +16,7 @@ import os, sys
 sys.path.append(os.path.dirname(__file__))
 from plugin import Plugin
 #import utilities
-import shutil, itertools
+import shutil, itertools, time, subprocess
 from tempfile import mkdtemp
 sys.path.append(os.path.join(os.path.dirname(__file__), '../lib'))
 from  _common import crun
@@ -75,17 +75,65 @@ class FsPlugin(Plugin):
         if (cmdList is None):
             raise ValueError("A list of cmd strings must be passed on")
         chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
-        shell = crun.crun()
-        shell.echo(False)
-        shell.echoStdOut(True)
-        shell.echoStdErr(True)
-        shell.detach(False)
-        shell.waitForChild(True)
-        for cmd, outFileName in itertools.izip(cmdList, self.outputFileNames):
-          shell(cmd)
-          if str(shell.exitCode()) != "0":
-            misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-dev-' + outFileName + '.err'), 'Plugin returned error!\n%s' % shell.stderr())
-            misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-user-' + outFileName + '.err'), userErrStr + ' ' + outFileName)
+        cmdIds = []
+        exitCodeFilePaths = [];
+        envFile = open(chrisRunDir + '/chris.env')
+        envStr = envFile.read()
+        envFile.close()
+        for cmd, outFileName in itertools.izip(cmdList, self.outputFileNames):  
+          #create stderr, stdout, and exit code log for each cmd execution
+          ix = outFileName.rfind('.')
+          cmdId = outFileName[:ix]
+          cmdIds.append(cmdId)
+          out = '%s/%s' % (chrisRunDir, cmdId)
+          exitCodeFilePaths.append(out + '-exitCode.log')
+          cmd = '%s 2>%s.err >%s.std || (echo $? > %s-exitCode.log);touch %s.log' % (cmd, out, out, out, out)
+          misc.file_writeOnce(out + '.run', envStr + '\n' + cmd)
+          os.system('chmod 755 ' + out + '.run')
+        remUser = os.environ['ENV_REMOTEUSER']
+        clType = os.environ['ENV_CLUSTERTYPE']
+        remHost = os.environ['ENV_REMOTEHOST']
+        remUserId = os.environ['ENV_REMOTEUSERIDENTITY']
+        if clType == 'MOSIX':
+            shell = crun.crun_hpc_mosix(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
+        elif clType == 'HP-LSF':
+            shell = crun.crun_hpc_lsf(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
+        elif clType == 'torque-based':
+            shell = crun.crun_hpc_launchpad(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
+        else:
+            raise ValueError('Unknown cluster type')
+        for cmdId in cmdIds:
+          shell("/bin/bash " + chrisRunDir + '/' + cmdId + '.run', waitForChild=shell.waitForChild(), stdoutflush=True, stderrflush=True)
+          time.sleep(0.5)
+        #execute while loop until all cmds have written a file with a name cmdId.log in the chris run dir
+        allHaveWritten = False
+        while not allHaveWritten:
+          dirList = os.listdir(chrisRunDir)
+          #list of cmd ids found in the chris run dir 
+          foundCmdIds = []
+          for cmdId in cmdIds:
+            for name in dirList:
+              if name == cmdId + '.log':
+                foundCmdIds.append(cmdId)
+                #remove found dummy log file
+                os.remove(chrisRunDir + '/' + name)
+                break;
+          if len(foundCmdIds) == len(cmdIds):
+            allHaveWritten = True
+          else:
+            for cmdId in foundCmdIds:
+              #remove already found ids
+              cmdIds.remove(cmdId)
+            time.sleep(10)
+        for path, outFileName in itertools.izip(exitCodeFilePaths, self.outputFileNames):  
+          # check for existence of chrisRunDir/cmdId-exitCode.log
+          if os.path.isfile(path):
+            rfile = open(path)
+            if rfile.read(1) == "0":
+              shutil.copyfile(os.path.join(self.tempdir, outFileName), os.path.join(options.output, outFileName))
+            else:
+              misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-user-' + outFileName + '.err'), userErrStr + ' ' + outFileName)
+            rfile.close()
           else:
             shutil.copyfile(os.path.join(self.tempdir, outFileName), os.path.join(options.output, outFileName))
-        
+            

@@ -54,6 +54,10 @@ class crun(object):
             'action'        : 'trying to access the scheduler queue, ',
             'error'         : 'no handler for this cluster type has been derived.',
             'exitCode'      : 10},
+        'emailFail'   : {
+            'action'        : 'attempting to send notification email, ',
+            'error'         : 'sending failed. Perhaps host is not email configured?',
+            'exitCode'      : 20},
     }
 
     def description(self, *args):
@@ -234,6 +238,7 @@ class crun(object):
                                                 #+ strcmd with single quotes
         self._str_remoteHost    = ""
         self._str_remoteUser    = ""
+        self._str_remoteUserIdentity = ""
         self._str_remotePasswd  = ""
         self._str_remotePort    = "22"
 
@@ -258,7 +263,7 @@ class crun(object):
                 if len(l_remoteHost) == 2:
                     self._str_remotePort = l_remoteHost[1]
             if key == "remoteUser":     self._str_remoteUser    = value
-            if key == "remotePasswd":   self._str_remotePasswd  = value
+            if key == "remoteUserIdentity":   self._str_remoteUserIdentity = value
         
     
     def __call__(self, str_cmd, **kwargs):
@@ -300,16 +305,27 @@ class crun(object):
         self._str_shellCmd      = '%s %s' % (   self._str_shellCmd,
                                                 str_embeddedDetach)
         if self._b_sshDo and len(self._str_remoteHost):
-           self._str_shellCmd   = 'ssh -p %s %s@%s  "%s" %s' % (
-                                                    self._str_remotePort,
-                                                    self._str_remoteUser,
-                                                    self._str_remoteHost,
-                                                    self._str_shellCmd,
-                                                    str_sshDetach)
+           if not self._str_remoteUserIdentity:
+               self._str_shellCmd   = 'ssh -p %s %s@%s  "%s" %s' % (
+                   self._str_remotePort,
+                   self._str_remoteUser,
+                   self._str_remoteHost,
+                   self._str_shellCmd,
+                   str_sshDetach)
+           else:
+                self._str_shellCmd   = 'ssh -p %s -i %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s  "%s" %s' % (
+                   self._str_remotePort,
+                   self._str_remoteUserIdentity,
+                   self._str_remoteUser,
+                   self._str_remoteHost,
+                   self._str_shellCmd,
+                   str_sshDetach)
+
+           print self._str_shellCmd
+               
         if self._b_disassociate:
             self._str_shellCmd  = "( %s ) &" % self._str_shellCmd
         ret                     = 0
-        if self._b_detach and self._b_schedulerSet: self._str_shellCmd += " &"
 
         if self._b_echoCmd: sys.stdout.write('%s\n' % self._str_shellCmd)
         if self._b_runCmd:
@@ -352,6 +368,12 @@ class crun(object):
         self._b_waitForChild            = True
         if len(args):
             self._b_waitForChild        = args[0]
+
+    def cmd(self, *args):
+        if len(args):
+            self._str_shellCmd = args[0]
+        else:
+            return self._str_shellCmd
 
     def echo(self, *args):
         self._b_echoCmd         = True
@@ -432,7 +454,7 @@ class crun(object):
             if key == 'remoteUser':     self._str_remoteUser    = value
             if key == 'remoteHost':     self._str_remoteHost    = value
             if key == 'remotePort':     self._str_remotePort    = value
-            if key == "passwd":         self._str_remotePasswd  = value
+            if key == "remoteUserIdentity": self._str_remoteUserIdentity  = value
 
 class crun_hpc(crun):
     '''
@@ -588,6 +610,11 @@ class crun_hpc_launchpad(crun_hpc):
         self._str_scheduleCmd           = ''
         self._str_scheduleArgs          = ''
 
+        #configuration
+        self._b_detach = False
+        self._b_disassociate = False
+        self._b_waitForChild = True
+
     def __call__(self, str_cmd, **kwargs):
         self.scheduleArgs()
         if len(self._str_workingDir):
@@ -620,7 +647,8 @@ class crun_hpc_launchpad(crun_hpc):
         if self._b_sshDo and len(self._str_remoteHost):
             shellQueue  = crun( remoteHost=self._str_remoteHost,
                                 remotePort=self._str_remotePort,
-                                remoteUser=self._str_remoteUser)
+                                remoteUser=self._str_remoteUser,
+                                remoteUserIdentity = self._str_remoteUserIdentity)
             str_user    = self._str_remoteUser
         else:
             shellQueue  = crun()
@@ -666,6 +694,11 @@ class crun_hpc_lsf(crun_hpc):
         self._str_scheduleCmd           = ''
         self._str_scheduleArgs          = ''
 
+        #configuration
+        self._b_detach = False
+        self._b_disassociate = False
+        self._b_waitForChild = True
+
     def __call__(self, str_cmd, **kwargs):
         if len(self._str_workingDir):
             str_cmd = "cd %s ; %s" % (self._str_workingDir, str_cmd)
@@ -707,7 +740,8 @@ class crun_hpc_lsf(crun_hpc):
         if self._b_sshDo and len(self._str_remoteHost):
             shellQueue  = crun( remoteHost=self._str_remoteHost,
                                 remotePort=self._str_remotePort,
-                                remoteUser=self._str_remoteUser)
+                                remoteUser=self._str_remoteUser,
+                                remoteUserIdentity = self._str_remoteUserIdentity)
             str_user    = self._str_remoteUser
         else:
             shellQueue  = crun()
@@ -782,6 +816,11 @@ class crun_hpc_mosix(crun_hpc):
         self._str_scheduler             = 'mosbatch'
         self._str_scheduleCmd           = ''
         self._str_scheduleArgs          = ''
+
+        #configuration
+        self._b_detach = True
+        self._b_disassociate = True
+        self._b_waitForChild = False
         
     def __call__(self, str_cmd, **kwargs):
         self.scheduleArgs()
@@ -870,7 +909,8 @@ class crun_hpc_mosix(crun_hpc):
         if self._b_sshDo and len(self._str_remoteHost):
             shellQueue  = crun( remoteHost=self._str_remoteHost,
                                 remotePort=self._str_remotePort,
-                                remoteUser=self._str_remoteUser)
+                                remoteUser=self._str_remoteUser,
+                                remoteUserIdentity = self._str_remoteUserIdentity)
             str_user    = self._str_remoteUser
         else:
             shellQueue  = crun()
@@ -891,7 +931,11 @@ class crun_hpc_mosix(crun_hpc):
                                           int(str_processRunningCount)
         str_processCompletedCount       = str(completedCount)
         str_processCompletedCount       = shellQueue.stdout().strip()
-        if str_processInSchedulerCount == '0': self.email_send()
+        if str_processInSchedulerCount == '0': 
+            try:
+                self.email_send()
+            except:
+                pass
         return (str_processPendingCount,
                 str_processRunningCount, 
                 str_processInSchedulerCount,

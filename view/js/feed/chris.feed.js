@@ -38,6 +38,7 @@ _FEED_.preview = function(file) {
   case 'LOG':
   case 'ERR':
   case 'ERROR':
+  case 'ENV':
   case 'STD':
   case 'JS':
   case 'INFO':

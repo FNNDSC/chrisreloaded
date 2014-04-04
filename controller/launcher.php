@@ -238,7 +238,8 @@ FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 // append the log files to the command
 $command .= ' >> '.$job_path_output.'/chris.std 2> '.$job_path_output.'/chris.err';
 
-// create the chris.run file
+// create the chris.env and chris.run file
+$envfile = joinPaths($job_path_output, 'chris.env');
 $runfile = joinPaths($job_path_output, 'chris.run');
 
 // dprint($of, "command = $command\n");
@@ -254,12 +255,19 @@ if ($status != 100) {
   $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl -k --data ';
 }
 
-// also include the environment setup in the runfile
-$ssh->exec("php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')." >> ".$runfile);
+// also include the environment setup in the env file
+$ssh->exec("php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')." >> ".$envfile);
 // and the actual chris.run dir
-$ssh->exec('bash -c \' echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$runfile.'\'');
+$ssh->exec('bash -c \' echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$envfile.'\'');
+$ssh->exec('bash -c \' echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile.'\'');
+$ssh->exec('bash -c \' echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile.'\'');
+$ssh->exec('bash -c \' echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile.'\'');
+$user_key_file = joinPaths(CHRIS_USERS, $username, CHRIS_USERS_CONFIG_DIR, CHRIS_USERS_CONFIG_SSHKEY);
+$ssh->exec('bash -c \' echo "export ENV_REMOTEUSERIDENTITY='.$user_key_file.'" >>  '.$envfile.'\'');
 
-$ssh->exec('bash -c \' echo "umask 0002" >> '.$runfile.'\'');
+$ssh->exec('bash -c \' echo "umask 0002" >> '.$envfile.'\'');
+
+$ssh->exec('bash -c \' echo "source '.$envfile.';" >> '.$runfile.'\'');
 
 if($status != 100){
   $start_token = TokenC::create();
