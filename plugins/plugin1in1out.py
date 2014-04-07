@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 #                                                            _
-# FREESURFER ABSTRACT PLUGIN SUPERCLASS
+# ABSTRACT BASE PLUGIN CLASS THAT IMPLEMENTS THE 1-INPUT-1-OUTPUT EXECUTION MODEL
 #
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
 #                   Boston Children's Hospital
@@ -16,21 +16,21 @@ import os, sys
 sys.path.append(os.path.dirname(__file__))
 from plugin import Plugin
 #import utilities
-import shutil, itertools, time, subprocess
+import shutil, itertools, time
 from tempfile import mkdtemp
 sys.path.append(os.path.join(os.path.dirname(__file__), '../lib'))
 from  _common import crun
 from  _common import systemMisc as misc 
 
 
-class FsPlugin(Plugin):
+class Plugin1In1Out(Plugin):
     '''
-      Base class for Freesurfer plugins (makes it easier to create new
-      Freesurfer plugins).
+      Base class for plugins with an execution model in which one output file is generated for each
+      input (eg.Freesurfer plugins).
     '''
 
     def __init__(self):
-        super(FsPlugin, self).__init__()
+        super(Plugin1In1Out, self).__init__()
         self.tempdir = ''
         # List of full paths to the input files
         self.inputFilePaths = []
@@ -72,8 +72,16 @@ class FsPlugin(Plugin):
         shutil.rmtree(self.tempdir)
     
     def execCmd(self, options, userErrStr='Plugin returned error!', cmdList=None):
+        """
+        This method executes a list of commands (eg. mri_convert) either by scheduling them on a cluster
+        or just running them locally depending on Chris configuration
+        """
         if (cmdList is None):
             raise ValueError("A list of cmd strings must be passed on")
+        #supported cluster types
+        clType = os.environ['ENV_CLUSTERTYPE']
+        if clType not in ['local', 'MOSIX', 'HP-LSF', 'torque-based']:
+            raise ValueError('Unknown cluster type')
         chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
         cmdIds = []
         exitCodeFilePaths = [];
@@ -87,44 +95,54 @@ class FsPlugin(Plugin):
           cmdIds.append(cmdId)
           out = '%s/%s' % (chrisRunDir, cmdId)
           exitCodeFilePaths.append(out + '-exitCode.log')
-          cmd = '%s 2>%s.err >%s.std || (echo $? > %s-exitCode.log);touch %s.log' % (cmd, out, out, out, out)
+          if clType == 'local':
+              cmd = '%s 2>%s.err >%s.std || (echo $? > %s-exitCode.log)' % (cmd, out, out, out)
+          else:
+              #write a dummy cmdId.log file too (this is used later to block the python process until all jobs have finished)
+              cmd = '%s 2>%s.err >%s.std || (echo $? > %s-exitCode.log);touch %s.log' % (cmd, out, out, out, out)
           misc.file_writeOnce(out + '.run', envStr + '\n' + cmd)
           os.system('chmod 755 ' + out + '.run')
-        remUser = os.environ['ENV_REMOTEUSER']
-        clType = os.environ['ENV_CLUSTERTYPE']
-        remHost = os.environ['ENV_REMOTEHOST']
-        remUserId = os.environ['ENV_REMOTEUSERIDENTITY']
-        if clType == 'MOSIX':
-            shell = crun.crun_hpc_mosix(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
-        elif clType == 'HP-LSF':
-            shell = crun.crun_hpc_lsf(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
-        elif clType == 'torque-based':
-            shell = crun.crun_hpc_launchpad(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
+        if clType == 'local':
+            #jobs are not scheduled on a cluster but run locally
+            shell = crun.crun()
+            shell.echo(False)
+            shell.waitForChild(True)
+            for cmdId in cmdIds:
+                shell("/bin/bash " + chrisRunDir + '/' + cmdId + '.run')
         else:
-            raise ValueError('Unknown cluster type')
-        for cmdId in cmdIds:
-          shell("/bin/bash " + chrisRunDir + '/' + cmdId + '.run', waitForChild=shell.waitForChild(), stdoutflush=True, stderrflush=True)
-          time.sleep(0.5)
-        #execute while loop until all cmds have written a file with a name cmdId.log in the chris run dir
-        allHaveWritten = False
-        while not allHaveWritten:
-          dirList = os.listdir(chrisRunDir)
-          #list of cmd ids found in the chris run dir 
-          foundCmdIds = []
-          for cmdId in cmdIds:
-            for name in dirList:
-              if name == cmdId + '.log':
-                foundCmdIds.append(cmdId)
-                #remove found dummy log file
-                os.remove(chrisRunDir + '/' + name)
-                break;
-          if len(foundCmdIds) == len(cmdIds):
-            allHaveWritten = True
-          else:
-            for cmdId in foundCmdIds:
-              #remove already found ids
-              cmdIds.remove(cmdId)
-            time.sleep(10)
+            #jobs are scheduled on a cluster
+            remUser = os.environ['ENV_REMOTEUSER']
+            remHost = os.environ['ENV_REMOTEHOST']
+            remUserId = os.environ['ENV_REMOTEUSERIDENTITY']
+            if clType == 'MOSIX':
+                shell = crun.crun_hpc_mosix(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
+            elif clType == 'HP-LSF':
+                shell = crun.crun_hpc_lsf(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
+            elif clType == 'torque-based':
+                shell = crun.crun_hpc_launchpad(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
+            for cmdId in cmdIds:
+              shell("/bin/bash " + chrisRunDir + '/' + cmdId + '.run', stdoutflush=True, stderrflush=True)
+              time.sleep(0.5)
+            #execute while loop until all cmds have written a file with a name cmdId.log in the chris run dir
+            allHaveWritten = False
+            while not allHaveWritten:
+              dirList = os.listdir(chrisRunDir)
+              #list of cmd ids found in the chris run dir 
+              foundCmdIds = []
+              for cmdId in cmdIds:
+                for name in dirList:
+                  if name == cmdId + '.log':
+                    foundCmdIds.append(cmdId)
+                    #remove found dummy log file
+                    os.remove(chrisRunDir + '/' + name)
+                    break;
+              if len(foundCmdIds) == len(cmdIds):
+                allHaveWritten = True
+              else:
+                for cmdId in foundCmdIds:
+                  #remove already found ids
+                  cmdIds.remove(cmdId)
+                time.sleep(10)
         for path, outFileName in itertools.izip(exitCodeFilePaths, self.outputFileNames):  
           # check for existence of chrisRunDir/cmdId-exitCode.log
           if os.path.isfile(path):
@@ -132,7 +150,8 @@ class FsPlugin(Plugin):
             if rfile.read(1) == "0":
               shutil.copyfile(os.path.join(self.tempdir, outFileName), os.path.join(options.output, outFileName))
             else:
-              misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-user-' + outFileName + '.err'), userErrStr + ' ' + outFileName)
+              ix = outFileName.rfind('.')
+              misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-user-' + outFileName[:ix] + '.err'), userErrStr + ' ' + outFileName)
             rfile.close()
           else:
             shutil.copyfile(os.path.join(self.tempdir, outFileName), os.path.join(options.output, outFileName))

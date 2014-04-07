@@ -15,13 +15,13 @@
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
-# import the FsPlugin superclass for Freesurfer plugins
-from fsplugin import FsPlugin
+# import the Plugin1In1Out base class that implements the 1-input-1-output execution model 
+from plugin1in1out import Plugin1In1Out
 #import utilities
 import itertools
 
 
-class MRIConvert(FsPlugin):
+class MRIConvert(Plugin1In1Out):
     '''
     '''
     Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'

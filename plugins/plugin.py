@@ -266,7 +266,7 @@ class Plugin( argparse.ArgumentParser ):
               break
         return provided
 
-  def getFilePaths(self, rootDir, extensions=['dcm', 'nii', 'mgh']):
+  def getFilePaths(self, rootDir, extensions=['dcm', 'nii', 'mgz']):
       '''
       Convenience method that searches the directory tree looking for input files with appropriate extensions
       and returns a list of file names.
@@ -292,4 +292,5 @@ class Plugin( argparse.ArgumentParser ):
                   break 
           else:
             queue.append(path)
-      return paths  
+      return paths
+
