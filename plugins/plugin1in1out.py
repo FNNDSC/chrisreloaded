@@ -78,16 +78,13 @@ class Plugin1In1Out(Plugin):
         """
         if (cmdList is None):
             raise ValueError("A list of cmd strings must be passed on")
-        #supported cluster types
-        clType = os.environ['ENV_CLUSTERTYPE']
-        if clType not in ['local', 'MOSIX', 'HP-LSF', 'torque-based']:
-            raise ValueError('Unknown cluster type')
-        chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
         cmdIds = []
         exitCodeFilePaths = [];
+        chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
         envFile = open(chrisRunDir + '/chris.env')
         envStr = envFile.read()
         envFile.close()
+        clType = os.environ['ENV_CLUSTERTYPE']
         for cmd, outFileName in itertools.izip(cmdList, self.outputFileNames):  
           #create stderr, stdout, and exit code log for each cmd execution
           ix = outFileName.rfind('.')
@@ -114,12 +111,7 @@ class Plugin1In1Out(Plugin):
             remUser = os.environ['ENV_REMOTEUSER']
             remHost = os.environ['ENV_REMOTEHOST']
             remUserId = os.environ['ENV_REMOTEUSERIDENTITY']
-            if clType == 'MOSIX':
-                shell = crun.crun_hpc_mosix(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
-            elif clType == 'HP-LSF':
-                shell = crun.crun_hpc_lsf(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
-            elif clType == 'torque-based':
-                shell = crun.crun_hpc_launchpad(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)
+            shell = eval('crun.' + clType.lower() + '(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)')
             for cmdId in cmdIds:
               shell("/bin/bash " + chrisRunDir + '/' + cmdId + '.run', stdoutflush=True, stderrflush=True)
               time.sleep(0.5)
