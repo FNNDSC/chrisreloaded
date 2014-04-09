@@ -91,7 +91,8 @@ define('CHRIS_SCANNERS', serialize(array(
 
 // cluster
 define('CLUSTER_HOST', 'rc-golden');
-define('CLUSTER_TYPE', 'MOSIX');
+// Cluster type: crun_hpc_mosix or crun_hpc_lsf or crun_hpc_launchpad or local 
+define('CLUSTER_TYPE', 'crun_hpc_mosix');
 define('CLUSTER_USERNAME', 'chris');
 // we replace {MEMORY} with a memory requirement
 // and {COMMAND} with the command to schedule
