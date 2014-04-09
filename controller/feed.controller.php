@@ -993,8 +993,18 @@ class FeedC implements FeedControllerInterface {
         $subject = "ChRIS2 - " . $feedResult['Feed'][0]->plugin ." plugin finished";
 
         $message = "Hello " . $userResult['User'][0]->username . "," . PHP_EOL. PHP_EOL;
-        $message .= "Your results are available at:" . PHP_EOL;
-        $message .= joinPaths(CHRIS_USERS, $userResult['User'][0]->username, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id) . PHP_EOL. PHP_EOL;
+        $message .= "Your results are available at:" . PHP_EOL . PHP_EOL;
+        $dirRoot = joinPaths(CHRIS_USERS, $userResult['User'][0]->username, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
+        $dataDir = array_diff(scandir($dirRoot), array('..', '.'));
+        foreach ($dataDir as $dir) {
+          $mailFilePath = $dirRoot . '/' . $dir . '/_chrisRun_/' . 'chris.mail';
+          if (file_exists($mailFilePath)) {
+            $mailContents = file_get_contents($mailFilePath);
+            $message .= $dirRoot . '/' . $dir . PHP_EOL . $mailContents . PHP_EOL .PHP_EOL;
+          } else {
+            $message .= $dirRoot . '/' . $dir . PHP_EOL . PHP_EOL;
+          }
+        }
         $message .= "Thank you for using ChRIS.";
 
         echo "Sending email to ".$userResult['User'][0]->email." since the status is '$status'%.\n";

@@ -94,7 +94,7 @@ class PACS_Push(Plugin):
       if os.path.isfile(chrisStd):
         str_MRN2anon = "cat %s | sed '/^\s*$/d' | sort | uniq -c | sort -n | tail -n 1" % chrisStd
         shell(str_MRN2anon)
-        misc.file_writeOnce(os.path.join(chrisRunDir, 'mail.log'), shell.stdout().strip())
+        misc.file_writeOnce(os.path.join(chrisRunDir, 'chris.mail'), shell.stdout().strip())
 
     # output = os.system(command)
     # print output

@@ -42,6 +42,7 @@ _FEED_.preview = function(file) {
   case 'STD':
   case 'JS':
   case 'INFO':
+  case 'MAIL':
   case 'STATUS':
   case 'PARAM':
   case 'RUN':
