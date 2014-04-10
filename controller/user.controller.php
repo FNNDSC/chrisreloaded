@@ -194,7 +194,7 @@ class UserC implements UserControllerInterface {
     $user_key_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_SSHKEY);
     if(!file_exists($user_key_file)){
         
-      $ssh->exec('ssh-keygen -t rsa -N "" -f '.$user_key_file.'; mkdir ~/.ssh; cat '.$user_key_file.'.pub >> ~/.ssh/authorized_keys;');
+      $ssh->exec('ssh-keygen -t rsa -N "" -f '.$user_key_file.'; mkdir ~/.ssh; cat '.$user_key_file.'.pub >> ~/.ssh/authorized_keys;ssh-add;');
 
     }
   }
