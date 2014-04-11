@@ -346,8 +346,8 @@ if ($handle = opendir($study_directory)) {
             $link .= "&plugin=file_browser";
             $feedname = $process_file['PatientID'][0];
             $link .= "&feedname=$feedname";
-            $link .= "&directory=$patientdirname";
-
+            $command = "--dir=$patientdirname";
+            $link .= "&ncommand=".urlencode($command);
             $logFile .= 'emaillink: '.$link.PHP_EOL;
           }
         }

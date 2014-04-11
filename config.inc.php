@@ -42,7 +42,7 @@ define('CHRIS_MAINTENANCE', false);
 
 define('CHRIS_HOME', '/neuro/users/chris/dev');
 define('CHRIS_TRANSFER_PROTOCOL', 'http');
-define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/jorge');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/nicolas');
 
 // admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
@@ -59,7 +59,7 @@ define('SQL_DATABASE', 'chrisdev');
 
 // chris file system
 
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'nicolas'));
 define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
 define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
@@ -104,6 +104,15 @@ define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
 define('DICOM_DCMTK_FINDSCU', '/usr/bin/findscu');
 define('DICOM_DCMTK_MOVESCU', '/usr/bin/movescu');
 define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
+
+// remote chris
+// we specify the src code directory (containing the config file)
+define('CHRIS_REMOTE_ADD', serialize(array(
+"MGH" => "fnndsc:1148",
+"BCH" => "localhost")));
+define('CHRIS_REMOTE_SRC', serialize(array(
+"MGH" => "/home/chris/src/chrisreloaded",
+"BCH" => "/neuro/users/chris/src/chrisreloaed")));
 
 //
 // ENVIRONMENT CONFIGURATION

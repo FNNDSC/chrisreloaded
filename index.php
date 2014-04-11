@@ -140,11 +140,10 @@ if (SecurityC::login_attempt()) {
       //echo $plugin.PHP_EOL;
       //echo $script.PHP_EOL;
       //echo $feedname.PHP_EOL;
-      //echo $directory.PHP_EOL;
       $command = PluginC::getExecutable(sanitize($plugin.PHP_EOL));
-      $command .= ' --dir \"'.$directory.'\"';
+      $command .= ' '.$ncommand;
       $command .= ' --output {OUTPUT}/';
-      //echo $command.PHP_EOL;
+      echo $command.PHP_EOL;
       $status = 100;
       $username = $_SESSION['username'];
       $password = $_SESSION['password'];
