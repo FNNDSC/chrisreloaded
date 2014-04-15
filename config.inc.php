@@ -42,7 +42,7 @@ define('CHRIS_MAINTENANCE', false);
 
 define('CHRIS_HOME', '/neuro/users/chris/dev');
 define('CHRIS_TRANSFER_PROTOCOL', 'http');
-define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/jorge');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/nicolas');
 
 // admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
@@ -59,7 +59,7 @@ define('SQL_DATABASE', 'chrisdev');
 
 // chris file system
 
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'nicolas'));
 define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
 define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
@@ -81,7 +81,7 @@ define('CHRIS_LIB_FOLDER', joinPaths(CHRIS_WWWROOT,'lib'));
 define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_NET', joinPaths(CHRIS_SRC,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
-define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search');
+define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
 
 // known scanners and contact information
 define('CHRIS_SCANNERS', serialize(array(
@@ -104,6 +104,22 @@ define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
 define('DICOM_DCMTK_FINDSCU', '/usr/bin/findscu');
 define('DICOM_DCMTK_MOVESCU', '/usr/bin/movescu');
 define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
+
+// remote chris
+define('CHRIS_REMOTES', serialize(array(
+"MGH" => serialize(array(
+    "sshhost" => "fnndsc",
+    "sshport" => "1148",
+    "dicomhost" => "fnndsc",
+    "dicomport" => "10301",
+    "src"  => "/home/chris/src/chrisreloaded")),
+"BCH" => serialize(array(
+    "sshhost" => "localhost",
+    "sshport" => "22",
+    "dicomhost" => "pretoria",
+    "dicomport" => "10401",
+    "src"  => "/neuro/users/chris/dev/nicolas"))
+)));
 
 //
 // ENVIRONMENT CONFIGURATION
