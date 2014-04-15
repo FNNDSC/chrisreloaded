@@ -89,6 +89,7 @@ class PACS_Push(Plugin):
     remoteShell._str_remoteHost = data['sshhost'];
     remoteShell._str_remotePort = data['sshport'];
     remoteShell._str_remoteUser = 'chris';
+    remoteShell._b_sshDo = True;
     remoteShell.echo(False)
     remoteShell.echoStdOut(False)
     remoteShell.echoStdErr(False)
