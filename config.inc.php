@@ -111,7 +111,7 @@ define('CHRIS_REMOTES', serialize(array(
     "sshhost" => "fnndsc",
     "sshport" => "1148",
     "dicomhost" => "fnndsc",
-    "dicomport" => "1148",
+    "dicomport" => "10301",
     "src"  => "/home/chris/src/chrisreloaded")),
 "BCH" => serialize(array(
     "sshhost" => "localhost",
