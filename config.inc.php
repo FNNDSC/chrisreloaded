@@ -81,7 +81,7 @@ define('CHRIS_LIB_FOLDER', joinPaths(CHRIS_WWWROOT,'lib'));
 define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_NET', joinPaths(CHRIS_SRC,'plugins'));
 define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
-define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,chris_push');
+define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
 
 // known scanners and contact information
 define('CHRIS_SCANNERS', serialize(array(
@@ -108,14 +108,16 @@ define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
 // remote chris
 define('CHRIS_REMOTES', serialize(array(
 "MGH" => serialize(array(
-    "host" => "fnndsc",
+    "sshhost" => "fnndsc",
     "sshport" => "1148",
+    "dicomhost" => "fnndsc",
     "dicomport" => "1148",
     "src"  => "/home/chris/src/chrisreloaded")),
 "BCH" => serialize(array(
-    "host" => "localhost",
+    "sshhost" => "localhost",
     "sshport" => "22",
-    "dicomport" => "22",
+    "dicomhost" => "pretoria",
+    "dicomport" => "10401",
     "src"  => "/neuro/users/chris/dev/nicolas"))
 )));
 
