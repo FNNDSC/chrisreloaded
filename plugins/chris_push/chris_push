@@ -82,8 +82,8 @@ class PACS_Push(Plugin):
 
     # get path of tmp and plugin dirs on remote server
     print "-- Remote configuration: ---"
-    
-    command = current_dir + "/scripts/getInfo.php -f " + data['src'] + '/config.inc.php -t -p';
+ 
+    command = data['src'] + "/plugins/chris_push/scripts/getInfo.php -f " + data['src'] + '/config.inc.php -t -p'; 
  
     remoteShell = crun.crun()
     remoteShell._str_remoteHost = data['sshhost'];
