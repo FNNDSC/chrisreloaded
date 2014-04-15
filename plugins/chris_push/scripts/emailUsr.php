@@ -70,6 +70,8 @@ $link .= "launch_plugin=1";
 $link .= "&plugin=zip";
 $feedname = "ChRIS_Pushed";
 $link .= "&feedname=$feedname";
+$link .= "&status=0";
+$link .= "&status_step=100";
 $command = "--input=$zipfile --unzip";
 $link .= "&ncommand=".urlencode($command);
 

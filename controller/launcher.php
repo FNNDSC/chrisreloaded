@@ -42,6 +42,7 @@ require_once (joinPaths(CHRIS_MODEL_FOLDER, 'feed.model.php'));
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'token.controller.php'));
 
 require_once ('Net/SSH2.php');
+require_once('Crypt/RSA.php');
 
 // tempnam actually creates a file in addition to 
 // generating a name.
@@ -297,9 +298,23 @@ if ($force_chris_local) {
   $groupID =  $ssh->exec("id -g");
   $groupID = trim($groupID);
   // open permissions so user can see its plugin running
-  $local_command = "/bin/bash umask 0022;/bin/bash $runfile;  /bin/chgrp -R $groupID $feed_path; /bin/chmod g+w -R $feed_path";
+  $local_command = "/bin/chgrp -R $groupID $feed_path; /bin/chmod g+rxw -R $feed_path";
+  $ssh->exec($local_command);
+
+  unset($ssh);
+
+  # run command as locally ChRIS!
+  $ssh2 = new Net_SSH2('localhost');
+  $key = new Crypt_RSA();
+  $sshkey = joinPaths(CHRIS_HOME, '.ssh/id_rsa');
+  $key->loadKey(file_get_contents($sshkey));
+  if (!$ssh2->login('chris', $key)) {
+    exit('Login as ChRIS local user failed...!');
+  }
+
+  $local_command = "/bin/bash umask 0002;/bin/bash $runfile;";
   $nohup_wrap = 'bash -c \'nohup bash -c "'.$local_command.'" > /dev/null 2>&1 &\'';
-  $ssh->exec($nohup_wrap);
+  $ssh2->exec($nohup_wrap);
   $pid = -1;
 } else if ($status == 100 ) {
   // run locally

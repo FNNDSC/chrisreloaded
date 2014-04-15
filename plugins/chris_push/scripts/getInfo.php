@@ -51,21 +51,23 @@ $remote = '';
 if(isset($options['r'])){
 
     $remote = $options['r'];
-    $chris_remote_addresses = unserialize(CHRIS_REMOTE_ADD);
-    $chris_remote_sources = unserialize(CHRIS_REMOTE_SRC);
+    $chris_remotes = unserialize(CHRIS_REMOTES);
 
-    if(array_key_exists($remote, $chris_remote_addresses)){
-        echo $chris_remote_addresses[$remote].PHP_EOL;
-        echo $chris_remote_sources[$remote].PHP_EOL;
+    if(array_key_exists($remote, $chris_remotes)){
+        echo json_encode(unserialize($chris_remotes[$remote]));
+        return;
     }
 }
 
+$ouput = array();
 if(isset($options['t'])){
-    echo CHRIS_TMP.PHP_EOL;
+    $output['tmp'] = CHRIS_TMP;
 }
 
 if(isset($options['p'])){
-    echo CHRIS_PLUGINS_FOLDER.PHP_EOL;
+    $output['plugin'] = CHRIS_PLUGINS_FOLDER;
 }
+        
+echo json_encode($output);
 
 ?>
