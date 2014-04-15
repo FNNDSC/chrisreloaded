@@ -117,20 +117,34 @@ class PACS_Push(Plugin):
 
     # push subdirectories 
     # Follow links required since most of chris data from feeds is linked to data/MRN/STUDY/SERIES/
+    # Pushable directories are those containing files with any of the extensions in options.EXT
+    pushableDirs = []
+    extensions = tuple(options.EXT)
     for root, dirs, files in os.walk(options.DIR, topdown=False, followlinks=True):
+      for fileName in files:
+        if fileName.endswith(extensions):
+          pushableDirs.append(root)
+          break                
       for i, name in enumerate(dirs):
         # we want the last push to create a new feeds for the pushed user id
         if(i == len(dirs) - 1):
           suffix = options.CAETITLE;
 
         # process!!
-        self.push(options, current_dir, root, name, suffix)
+        pushDir = root + '/' + name
+        if pushDir in pushableDirs:
+          self.push(options, current_dir, root, name, suffix)
+          pushableDirs.remove(pushDir)
 
     if( suffix == ''):
       suffix = options.CAETITLE
 
     # push current directory
-    self.push(options, current_dir, options.DIR, '', suffix)
+    if options.DIR in pushableDirs:
+      self.push(options, current_dir, options.DIR, '', suffix)
+      pushableDirs.remove(options.DIR)
+
+    
         
 # ENTRYPOINT
 if __name__ == "__main__":
