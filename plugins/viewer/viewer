@@ -18,7 +18,7 @@ import os, sys, time
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class viewer( Plugin ):
+class Viewer(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -29,16 +29,16 @@ class viewer( Plugin ):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run( self, options ):
+  def run(self):
       print 'I am sleeping 10s!'
       time.sleep(10)
       print 'I am done sleeping!'
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = viewer()
+  plugin = Viewer()
 
   # this in an interactive plugin
   plugin.interactive = True
     
-  plugin.launch( sys.argv )
+  plugin.launch()

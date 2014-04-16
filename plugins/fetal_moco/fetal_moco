@@ -15,7 +15,7 @@ import os, sys
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class Fetal_Moco( Plugin ):
+class FetalMoco(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -26,9 +26,10 @@ class Fetal_Moco( Plugin ):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run( self, options ):
+  def run(self):
       
     # we expect files as input
+    options = self.options
     options.Template = self.validate('file', options.Template, 'nii');
     options.Scan1 = self.validate('file', options.Scan1, 'nii');
     options.Scan2 = self.validate('file', options.Scan2, 'nii');
@@ -40,7 +41,7 @@ class Fetal_Moco( Plugin ):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = Fetal_Moco()
+  plugin = FetalMoco()
   plugin.add_parameter( 'Input', Plugin.IMAGE, '--template', action='store', dest='Template', help='the template scan' )
   plugin.add_parameter( 'Input', Plugin.IMAGE, '--scan1', action='store', dest='Scan1', help='the first scan' )
   plugin.add_parameter( 'Input', Plugin.IMAGE, '--scan2', action='store', dest='Scan2', help='the second scan' )
@@ -53,4 +54,4 @@ if __name__ == "__main__":
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--delta', action='store', default=150, dest='Delta', help='Parameter to define what is an edge.' )
   plugin.add_parameter( 'Advanced', Plugin.DOUBLE, '--lambda', step=0.02, action='store', default=0.02, dest='Lambda', help='Smoothing parameter.' )
   plugin.add_parameter( 'Advanced', Plugin.DOUBLE, '--lastIter', step=0.01, action='store', default=0.01, dest='LastIter', help='Smoothing parameter for last iteration.' )
-  plugin.launch( sys.argv )
+  plugin.launch()

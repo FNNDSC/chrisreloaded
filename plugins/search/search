@@ -23,7 +23,7 @@ from plugin import Plugin
 
 import datetime as d
 
-class search(Plugin):
+class Search(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
@@ -48,9 +48,9 @@ class search(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.3'
 
-  def run(self, options):
+  def run(self):
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    
+    options = self.options
     print Plugin.TITLE
     print Plugin.VERSION
 
@@ -90,8 +90,8 @@ class search(Plugin):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = search()
+  plugin = Search()
   
   plugin.add_parameter('Search', Plugin.STRING, '--search', action='store', default='', dest='Search', help='String to search on')
   
-  plugin.launch(sys.argv)
+  plugin.launch()

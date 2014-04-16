@@ -28,7 +28,7 @@ from  _common import systemMisc as misc
 import json
 import datetime as d
 
-class PACS_Push(Plugin):
+class PACSPush(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -39,10 +39,11 @@ class PACS_Push(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.3'
   
-  def push(self, options, current_dir, root, name, suffix):
+  def push(self, current_dir, root, name, suffix):
     print '======================================='
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
 
+    options = self.options
     target = os.path.join(root, name)
     
     command = ' \''+os.environ['ENV_DICOMDIRSEND_SCRIPT']+' -v 10';
@@ -101,7 +102,8 @@ class PACS_Push(Plugin):
     # print output
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Finish pushing...'
 
-  def run(self, options):
+  def run(self):
+    options = self.options
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
     #####
@@ -165,7 +167,7 @@ class PACS_Push(Plugin):
         # process!!
         pushDir = root + '/' + name
         if pushDir in pushableDirs:
-          self.push(options, current_dir, root, name, suffix)
+          self.push(current_dir, root, name, suffix)
           pushableDirs.remove(pushDir)
 
     if( suffix == ''):
@@ -173,14 +175,14 @@ class PACS_Push(Plugin):
 
     # push current directory
     if options.DIR in pushableDirs:
-      self.push(options, current_dir, options.DIR, '', suffix)
+      self.push(current_dir, options.DIR, '', suffix)
       pushableDirs.remove(options.DIR)
 
     
         
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = PACS_Push()
+  plugin = PACSPush()
   plugin.add_parameter('Input', Plugin.IMAGE, '--directory', action='store', dest='DIR', help='Directory to be pushed')
   plugin.add_parameter('Parameters', Plugin.COMBOBOX, '--remote', values=['MGH', 'BCH'], action='store', default='MGH', dest='REMOTE', help='Remote DICOM instance')
   plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='dcm', dest='EXT', help='Extension of files to be pushed')
@@ -188,4 +190,4 @@ if __name__ == "__main__":
   plugin.add_parameter('Advanced', Plugin.STRING, '--caetitle', action='store', default='emaillink', dest='CAETITLE', help='Calling AETitle')
   plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--panonymize', default=True, action='store_true', dest='PANONYM', help='Partially anonymize the dataset')
   plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Anonymize the dataset')
-  plugin.launch(sys.argv)
+  plugin.launch()

@@ -32,9 +32,10 @@ class MRIDeface(Plugin1In1Out):
     Plugin.LICENSE = 'Opensource (MIT)'
     Plugin.VERSION = '0.1'
 
-    def run(self, options):
+    def run(self):
+        options = self.options
         # create temp dir and migrate data
-        self.copyDataToTempDir(options)
+        self.copyDataToTempDir()
         #execute mri_deface on all MRI volumes within the input tree
         current_dir = os.path.dirname(os.path.abspath(__file__))
         cmds = []
@@ -44,7 +45,7 @@ class MRIDeface(Plugin1In1Out):
           os.path.join(self.tempdir, outFileName) 
           cmds.append(cmd)
         userErrorStr = 'mri_deface could not deface file'
-        self.execCmd(options, userErrorStr, cmds)
+        self.execCmd(userErrorStr, cmds)
         # remove temp dir
         self.removeTempDir()
 
@@ -56,4 +57,4 @@ if __name__ == "__main__":
     plugin.add_parameter( 'Output', Plugin.STRING, '--format', action='store', dest='format', default='nii', help='the format to convert to (defined by extension)' )
     plugin.add_parameter( 'Advanced', Plugin.STRING, '--prefix', action='store', dest='prefix', default='defaced-', help='a prefix to add to the defaced volume name' )
     plugin.add_parameter( 'Advanced', Plugin.STRING, '--extensions', action='store', dest='extensions', default='nii,mgz,dcm,mgh', help='input extensions to parse (comma separated)' )
-    plugin.launch( sys.argv )
+    plugin.launch()

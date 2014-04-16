@@ -23,7 +23,7 @@ import tempfile, shutil, subprocess
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class mosix_test( Plugin ):
+class MosixTest(Plugin):
     '''
     '''
     Plugin.AUTHORS          = 'FNNDSC (dev@babyMRI.org)'
@@ -34,10 +34,10 @@ class mosix_test( Plugin ):
     Plugin.LICENSE          = 'Opensource (MIT)'
     Plugin.VERSION          = '0.1'
 
-    def run( self, options ):
+    def run(self):
 
         current_dir = os.path.dirname(os.path.abspath(__file__))
-
+        options = self.options
         # Write a custom script to filesystem and execute...
         tmpdir      = tempfile.mkdtemp('mosix', 'test', os.environ['ENV_CLUSTER_TMP_DIR'])
         testshell   = '%s/test.sh' % tmpdir
@@ -75,7 +75,7 @@ done
 
 # ENTRYPOINT
 if __name__ == "__main__":
-    plugin = mosix_test()
+    plugin = MosixTest()
     plugin.add_parameter( 'Input', Plugin.STRING, '--instances',  action='store', dest='instances', help='Load intances' )
     plugin.add_parameter( 'Input', Plugin.STRING, '--scheduler',  action='store', dest='scheduler', help='Scheduler command to use', default="/bin/mosrun -b -q" )
     plugin.add_parameter( 'Input', Plugin.STRING, '--loadTest',   action='store', dest='loadTest',  help='Load command to use', default="/bin/mostestload -t 10" )
@@ -85,4 +85,4 @@ if __name__ == "__main__":
 
 
     # plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
-    plugin.launch( sys.argv )
+    plugin.launch()

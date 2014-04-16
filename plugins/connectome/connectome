@@ -17,7 +17,7 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
 
-class connectome(Plugin):
+class Connectome(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
@@ -35,9 +35,10 @@ class connectome(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run(self, options):
+  def run(self):
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
+    options = self.options
     
     # we expect directories as input
     options.dti = self.validate('directory', options.dti);
@@ -145,7 +146,7 @@ class connectome(Plugin):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = connectome()
+  plugin = Connectome()
   #inputs
   plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='dti', help='the DTI scan')
   plugin.add_parameter('Input', Plugin.IMAGE, '--t1', action='store', dest='t1', help='the T1 scan')
@@ -177,4 +178,4 @@ if __name__ == "__main__":
   plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--inverty', default=False, action='store_true', dest='inverty', help='Invert Y gradient')
   plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertz', default=False, action='store_true', dest='invertz', help='Invert Z gradient')
   
-  plugin.launch(sys.argv)
+  plugin.launch()
