@@ -133,12 +133,11 @@ class CHRIS_Push(Plugin):
     # MAIL it!
     print "-- Email zip file link to remote user: ---"
     zipfile = ''
-    for base, dirs, files in os.walk(options.output):
-      for file in files:
-        fileName, fileExtension = os.path.splitext(file)
-        if fileExtension == ".zip":
-          zipfile = file
-          break
+    for file in os.listdir(options.output):
+      fileName, fileExtension = os.path.splitext(file)
+      if fileExtension == ".zip":
+        zipfile = file
+        break
 
     command = data2['plugin'] + "/chris_push/scripts/emailUsr.php -u " + options.USERNAME + ' -z ' + data2['tmp'] + '/' + zipfile;
     
