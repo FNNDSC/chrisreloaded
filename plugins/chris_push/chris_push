@@ -38,7 +38,8 @@ class CHRIS_Push(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run(self, options):
+  def run(self):
+    options = self.options
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start' + Plugin.TITLE + '...'
@@ -154,4 +155,4 @@ if __name__ == "__main__":
   plugin.add_parameter('Parameters', Plugin.IMAGE, '--directory', action='store', dest='DIR', help='Directory to be pushed')
   plugin.add_parameter('Parameters', Plugin.COMBOBOX, '--remote', values=['MGH', 'BCH'], action='store', default='MGH', dest='REMOTE', help='Remote CHRIS instance')
   plugin.add_parameter('Parameters', Plugin.STRING, '--user', action='store', default="username", dest='USERNAME', help='Recipient')
-  plugin.launch(sys.argv)
+  plugin.launch()
