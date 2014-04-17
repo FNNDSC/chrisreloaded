@@ -194,10 +194,17 @@ class UserC implements UserControllerInterface {
     $user_key_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_SSHKEY);
     if(!file_exists($user_key_file)){
         
-      $ssh->exec('ssh-keygen -t rsa -N "" -f '.$user_key_file.'; mkdir -p ~/.ssh; cat '.$user_key_file.'.pub >> ~/.ssh/authorized_keys;ssh-add;');
+      $ssh->exec('ssh-keygen -t rsa -N "" -f '.$user_key_file.';');
 
     }
-  }
+
+    // id_rsa.pub to user's authorized keys if needed
+    $ssh->exec('/bin/bash -c "mkdir -p ~/.ssh; (cat ~/.ssh/authorized_keys | grep \"$(cat '.$user_key_file.'.pub)\") || (cat '.$user_key_file.'.pub >> ~/.ssh/authorized_keys;ssh-add;)"');
+
+    // make sure the permissions are correct to allow ssh with id_rsa
+    $ssh->exec('chmod go-w ~/.ssh;chmod 600 ~/.ssh/authorized_keys;chown `whoami` ~/.ssh/authorized_keys;');
+ 
+ }
 
   /**
    * Create a new user.
