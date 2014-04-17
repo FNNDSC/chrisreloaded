@@ -57,6 +57,13 @@ class Zip(Plugin):
             print('Copying %s to %s\n' % (zipnamezip, os.path.join(options.output, zipnamezip)))
             shutil.copyfile(os.path.join(tmpdir, zipnamezip), os.path.join(options.output, zipnamezip))
         else:
+            # Use the crun shell mechanism
+            shell = crun.crun()
+            shell.echo(True)
+            shell.echoStdOut(True)
+            shell.echoStdErr(True)
+            shell.detach(False)
+            shell.waitForChild(True)
             zipnamezip  = os.path.basename(options.input)
             zipname     = os.path.splitext(zipnamezip)[0]
             unpackroot  = '%s/%s' % (tmpdir, zipname)
