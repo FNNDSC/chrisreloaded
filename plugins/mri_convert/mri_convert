@@ -43,7 +43,7 @@ class MRIConvert(Plugin1In1Out):
           cmd = 'cd ' + options.output + ';' + current_dir + '/mri_convert.wrapper ' + inFile + ' ' + os.path.join(self.tempdir, outFileName)
           cmds.append(cmd)
         userErrorStr = 'mri_convert could not convert file'
-        self.execCmd(userErrorStr, cmds)
+        self.execCmd(cmds, userErrorStr)
         # remove temp dir
         self.removeTempDir()
 

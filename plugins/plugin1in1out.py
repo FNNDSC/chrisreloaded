@@ -78,7 +78,7 @@ class Plugin1In1Out(Plugin):
         '''
         raise NotImplementedError("Plugin1In1Out.run()") 
     
-    def execCmd(self, userErrStr='Plugin returned error!', cmdList=None):
+    def execCmd(self, cmdList=None, userErrStr='Plugin returned error!'):
         """
         This method executes a list of commands (eg. mri_convert) either by scheduling them on a cluster
         or just running them locally depending on Chris configuration

@@ -45,7 +45,7 @@ class MRIDeface(Plugin1In1Out):
           os.path.join(self.tempdir, outFileName) 
           cmds.append(cmd)
         userErrorStr = 'mri_deface could not deface file'
-        self.execCmd(userErrorStr, cmds)
+        self.execCmd(cmds, userErrorStr)
         # remove temp dir
         self.removeTempDir()
 
