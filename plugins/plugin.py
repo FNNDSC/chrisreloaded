@@ -30,10 +30,19 @@ import argparse
 import json
 import sys, os
 
-class Plugin( argparse.ArgumentParser ):
+class Plugin(argparse.ArgumentParser):
   '''
   The super class for all valid ChRIS plugins.
   '''
+
+  AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  TITLE = ''
+  CATEGORY = ''
+  DESCRIPTION = None
+  DOCUMENTATION = ''
+  LICENSE = ''
+  VERSION = ''
+  
   IMAGE = 'image'
   INTEGER = 'integer'
   DOUBLE = 'double'
@@ -41,11 +50,13 @@ class Plugin( argparse.ArgumentParser ):
   STRING = 'string'
   COMBOBOX = 'string-enumeration'
 
-  def __init__( self ):
+  def __init__(self):
     '''
     The constructor of this plugin.
     '''
-    super( Plugin, self ).__init__( description=Plugin.DESCRIPTION )
+    if Plugin.DESCRIPTION is None:
+      raise ValueError("Plugin.DESCRIPTION must be set in your plugin code")
+    super( Plugin, self ).__init__(description=Plugin.DESCRIPTION)
     self.add_argument( '--xml', action='store_true', dest='xml', default=False, help='show xml description of parameters (default: FALSE)' )
     self.add_argument( '--configuration', action='store', dest='configuration', default="", help='custom userconfiguration in JSON format (default: "")' )
     self.add_argument( '--icon', action='store_true', dest='icon', default=False, help='show the description of this plugin (default: FALSE)' )
@@ -55,6 +66,7 @@ class Plugin( argparse.ArgumentParser ):
     # the custom parameter list
     self.__panels = []
     self.__parameters = []
+    self.options = []
 
     # the initial status
     self.status = 0
@@ -65,7 +77,7 @@ class Plugin( argparse.ArgumentParser ):
     # is it an inteactive plugin
     self.interactive = False
 
-  def error( self, message ):
+  def error(self, message):
     '''
     The error handler if wrong commandline arguments
     are specified.
@@ -76,7 +88,7 @@ class Plugin( argparse.ArgumentParser ):
     self.print_help()
     sys.exit( 2 )
 
-  def xml( self, configuration = "" ):
+  def xml(self, configuration = ""):
     '''
     Generate the XML user interface for this
     plugin.
@@ -174,14 +186,13 @@ class Plugin( argparse.ArgumentParser ):
 
     return xml
 
-  def run( self, options ):
+  def run(self):
     '''
-    Execute this plugin. Access to all passed
-    options is available. 
+    Execute this plugin (abstract method in this class). 
     '''
-    print( 'No action defined!' )
+    raise NotImplementedError("Plugin.run()")
 
-  def add_parameter( self, panel, type, *args, **kwargs ):
+  def add_parameter(self, panel, type, *args, **kwargs):
     '''
     Add a parameter to this plugin. The type let's the
     XML generator distinguish between different parameter
@@ -224,25 +235,24 @@ class Plugin( argparse.ArgumentParser ):
     # add the argument to the parser
     self.add_argument( *args, **kwargs )
 
-  def launch( self, args ):
+  def launch(self):
     '''
-    This method triggers the parsing of arguments.
-    
+    This method triggers the parsing of arguments.   
     The run() method gets called if not
      --xml
     are specified.
     '''
     options = self.parse_args()
-
-    if ( options.xml ):
+    self.options = options
+    if (options.xml):
       # print the xml
-      if( options.configuration ):
-        print( self.xml(options.configuration) )
+      if(options.configuration):
+        print(self.xml(options.configuration))
       else:
-        print( self.xml() )
+        print(self.xml())
     else:
       # run the plugin
-      self.run( options )
+      self.run()
 
   def validate(self, expected, provided, extension='dcm'):
       '''

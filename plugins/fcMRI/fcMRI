@@ -15,7 +15,7 @@ import os, sys
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class fcMRI( Plugin ):
+class FcMRI(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC - Mathieu Dehaes, PhD'
@@ -26,9 +26,10 @@ class fcMRI( Plugin ):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run( self, options ):
+  def run(self):
 
     # we expect file as input
+    options = self.options
     options.Functional = self.validate('file', options.Functional);
     
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +37,7 @@ class fcMRI( Plugin ):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = fcMRI()
+  plugin = FcMRI()
   # minimum required memory to start the plugin
   plugin.memory = 20480
 
@@ -57,4 +58,4 @@ if __name__ == "__main__":
   # Number of IC 
   plugin.add_parameter( 'ICA', Plugin.INTEGER, '--Number_of_ICA_components', default = -1, action='store', dest='Number_of_ICA_components', help='Automatic estimation (default = -1, recommended), otherwise specify the number of ICA components to extract' )
   
-  plugin.launch( sys.argv )
+  plugin.launch()

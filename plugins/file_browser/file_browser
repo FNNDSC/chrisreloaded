@@ -19,7 +19,7 @@ import os, sys
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class file_browser( Plugin ):
+class FileBrowser(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -30,14 +30,14 @@ class file_browser( Plugin ):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run( self, options ):
-
+  def run(self):
+    options = self.options
     current_dir = os.path.dirname(os.path.abspath(__file__))
     os.system('ln -s %s %s' % (options.DIR, options.output))
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = file_browser()
+  plugin = FileBrowser()
   plugin.add_parameter( 'Input', Plugin.STRING, '--dir', action='store', dest='DIR', help='directory to browse' )
   plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
-  plugin.launch( sys.argv )
+  plugin.launch()

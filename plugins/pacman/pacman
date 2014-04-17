@@ -35,7 +35,7 @@ class Pacman(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.2'
 
-  def run(self, options):
+  def run(self):
           print 'No CLI actions, I am a pure interactive plugin'
       
 
@@ -48,4 +48,4 @@ if __name__ == "__main__":
   plugin.interactive = True
   
   # define the parameters
-  plugin.launch(sys.argv)
+  plugin.launch()

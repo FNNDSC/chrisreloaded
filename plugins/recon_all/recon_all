@@ -15,7 +15,7 @@ import os, sys
 sys.path.append( os.path.join( os.path.dirname( __file__ ), '../' ) )
 from plugin import Plugin
 
-class recon_all( Plugin ):
+class ReconAll(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -26,10 +26,10 @@ class recon_all( Plugin ):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run( self, options ):
+  def run(self):
 
     current_dir = os.path.dirname( os.path.abspath( __file__ ) )
-    
+    options = self.options
     # we expect a directory as input
     options.MRI = self.validate('directory', options.MRI);
 
@@ -68,6 +68,6 @@ class recon_all( Plugin ):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = recon_all()
+  plugin = ReconAll()
   plugin.add_parameter( 'Input', Plugin.IMAGE, '--mri', action='store', dest='MRI', help='the mri scan to reconstruct' )
-  plugin.launch( sys.argv )
+  plugin.launch()

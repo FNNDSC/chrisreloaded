@@ -22,17 +22,8 @@ import os, sys
 sys.path.append( os.path.join( os.path.dirname( __file__ ), '../' ) )
 from plugin import Plugin
 
-scripts_dir = os.environ['ENV_FYBORG_DIR']
-sys.path.append( scripts_dir )
-sys.path.append( os.path.join( scripts_dir, 'fyborg' ) )
-sys.path.append( os.path.join( scripts_dir, 'fyborg', '_common' ) )
-try:
-  from fyconn import *
-except:
-  pass
 
-
-class Fyborg( Plugin ):
+class Fyborg(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -43,11 +34,20 @@ class Fyborg( Plugin ):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run( self, options ):
+  def run(self):
+    scripts_dir = os.environ['ENV_FYBORG_DIR']
+    sys.path.append( scripts_dir )
+    sys.path.append( os.path.join( scripts_dir, 'fyborg' ) )
+    sys.path.append( os.path.join( scripts_dir, 'fyborg', '_common' ) )
+    try:
+      from fyconn import FyborgLogic
+    except:
+      pass
     # copy input and dti to one temp folder
     # and run fyborg on it
     
     # we expect directories as input
+    options = self.options
     options.Freesurfer = self.validate('directory', options.Freesurfer);
     options.DTI = self.validate('directory', options.DTI);
     
@@ -74,4 +74,4 @@ if __name__ == "__main__":
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--radius', action='store', default=3, dest='Radius', help='the look-around Radius' )
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--min_length', action='store', default=20, dest='MinLength', help='the min. length in mm for length-filtering' )
   plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--max_length', action='store', default=200, dest='MaxLength', help='the max. length in mm for length-filtering' )
-  plugin.launch( sys.argv )
+  plugin.launch()

@@ -22,7 +22,7 @@ from plugin import Plugin
 
 import datetime as d
 
-class PACS_Pull(Plugin):
+class PACSPull(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
@@ -52,9 +52,9 @@ class PACS_Pull(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.3'
 
-  def run(self, options):
+  def run(self):
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    
+    options = self.options
     print Plugin.TITLE
     print Plugin.VERSION
     print options.LIST_SERIES
@@ -85,7 +85,7 @@ class PACS_Pull(Plugin):
         
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = PACS_Pull()
+  plugin = PACSPull()
   
   # this is an interactive plugin
   plugin.interactive = True
@@ -107,4 +107,4 @@ if __name__ == "__main__":
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--listseries', action='store', dest='LIST_SERIES', help='Series to be downloaded: "study_uid,series_uid study_uid,series_uid, etc."')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--userid', action='store', default="{USER_ID}", dest='USER_ID', help='User ID')
-  plugin.launch(sys.argv)
+  plugin.launch()

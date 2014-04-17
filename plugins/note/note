@@ -19,7 +19,7 @@ import os, sys
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
-class FileBrowser( Plugin ):
+class Note(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
@@ -30,8 +30,8 @@ class FileBrowser( Plugin ):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run( self, options ):
-
+  def run(self):
+    options = self.options
     f = open('%s/index.html' % options.output, 'w')
     f.write("""<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">""")
@@ -48,7 +48,7 @@ class FileBrowser( Plugin ):
 
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = FileBrowser()
+  plugin = Note()
   plugin.add_parameter( 'Note', Plugin.STRING, '--textBox', default='Enter some html here.', action='store', dest='noteHtml', help='add some html notes' )
   plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
-  plugin.launch( sys.argv )
+  plugin.launch()

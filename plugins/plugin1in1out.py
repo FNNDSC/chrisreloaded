@@ -37,7 +37,8 @@ class Plugin1In1Out(Plugin):
         # List of output file names (just their names, not the full output path)
         self.outputFileNames = []
         
-    def copyDataToTempDir(self, options):
+    def copyDataToTempDir(self):
+        options = self.options
         # create temp dir and migrate data
         tempdir = mkdtemp('free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'])
         if os.path.isfile(options.input) and options.input.endswith('dcm'):
@@ -70,8 +71,14 @@ class Plugin1In1Out(Plugin):
       
     def removeTempDir(self):
         shutil.rmtree(self.tempdir)
+
+    def run(self):
+        '''
+        Execute this plugin (abstract method in this class).
+        '''
+        raise NotImplementedError("Plugin1In1Out.run()") 
     
-    def execCmd(self, options, userErrStr='Plugin returned error!', cmdList=None):
+    def execCmd(self, cmdList=None, userErrStr='Plugin returned error!'):
         """
         This method executes a list of commands (eg. mri_convert) either by scheduling them on a cluster
         or just running them locally depending on Chris configuration
@@ -140,11 +147,11 @@ class Plugin1In1Out(Plugin):
           if os.path.isfile(path):
             rfile = open(path)
             if rfile.read(1) == "0":
-              shutil.copyfile(os.path.join(self.tempdir, outFileName), os.path.join(options.output, outFileName))
+              shutil.copyfile(os.path.join(self.tempdir, outFileName), os.path.join(self.options.output, outFileName))
             else:
               ix = outFileName.rfind('.')
               misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-user-' + outFileName[:ix] + '.err'), userErrStr + ' ' + outFileName)
             rfile.close()
           else:
-            shutil.copyfile(os.path.join(self.tempdir, outFileName), os.path.join(options.output, outFileName))
+            shutil.copyfile(os.path.join(self.tempdir, outFileName), os.path.join(self.options.output, outFileName))
             

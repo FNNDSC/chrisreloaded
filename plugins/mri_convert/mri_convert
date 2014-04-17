@@ -32,9 +32,10 @@ class MRIConvert(Plugin1In1Out):
     Plugin.LICENSE = 'Opensource (MIT)'
     Plugin.VERSION = '0.1'
 
-    def run(self, options):
+    def run(self):
+        options = self.options
         # create temp dir and migrate data
-        self.copyDataToTempDir(options)
+        self.copyDataToTempDir()
         # execute mri_convert on all MRI volumes within the input tree
         current_dir = os.path.dirname(os.path.abspath(__file__))
         cmds = []
@@ -42,7 +43,7 @@ class MRIConvert(Plugin1In1Out):
           cmd = 'cd ' + options.output + ';' + current_dir + '/mri_convert.wrapper ' + inFile + ' ' + os.path.join(self.tempdir, outFileName)
           cmds.append(cmd)
         userErrorStr = 'mri_convert could not convert file'
-        self.execCmd(options, userErrorStr, cmds)
+        self.execCmd(cmds, userErrorStr)
         # remove temp dir
         self.removeTempDir()
 
@@ -53,4 +54,4 @@ if __name__ == "__main__":
     plugin.add_parameter( 'Input', Plugin.IMAGE, '--input', action='store', dest='input', help='the image to convert' )
     plugin.add_parameter( 'Output', Plugin.STRING, '--format', action='store', dest='format', default='nii', help='the format to convert to (defined by extension)' )
     plugin.add_parameter( '(Advanced) extensions', Plugin.STRING, '--extensions', action='store', dest='extensions', default='nii,mgz,dcm,mgh', help='input extensions to parse (comma separated)' )
-    plugin.launch( sys.argv )
+    plugin.launch()

@@ -22,7 +22,7 @@ from plugin import Plugin
 
 import datetime as d
 
-class Findsession(Plugin):
+class FindSession(Plugin):
   '''
   '''
   Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
@@ -36,9 +36,9 @@ class Findsession(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.3'
 
-  def run(self, options):
+  def run(self):
     current_dir = os.path.dirname(os.path.abspath(__file__))
-
+    options = self.options
     print Plugin.TITLE
     print Plugin.VERSION
     print options.LIST_DIRECTORIES
@@ -76,7 +76,7 @@ class Findsession(Plugin):
         
 # ENTRYPOINT
 if __name__ == "__main__":
-  plugin = Findsession()
+  plugin = FindSession()
   
   # this is an interactive plugin
   plugin.interactive = True
@@ -95,4 +95,4 @@ if __name__ == "__main__":
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--host', action='store', default='kaos.nmr.mgh.harvard.edu',  dest='HOST', help='Target host')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--port', action='store', default='10402', dest='PORT', help='Target port')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--aetitle', action='store', default="default", dest='AETITLE', help='User AETITLE')
-  plugin.launch(sys.argv)
+  plugin.launch()
