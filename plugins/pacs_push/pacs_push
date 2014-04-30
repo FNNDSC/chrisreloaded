@@ -58,7 +58,12 @@ class PACSPush(Plugin):
     if options.ANONYM:
       command += ' -A -k -O ' + options.output + '/' + name + '-' + d.datetime.now().strftime("%Y%m%d%H%M%S%f") + '-anon'
     elif options.PANONYM:
-      command += ' -P -k -O ' + options.output + '/' + name + '-' + d.datetime.now().strftime("%Y%m%d%H%M%S%f") + '-anon'
+      command += ' -P '
+      if len(options.MRN_FORCE):
+        command += ' -M %s ' % options.MRN_FORCE
+      if len(options.SUBJ_FORCE):
+        command += ' -N %s ' % options.SUBJ_FORCE
+      command += ' -k -O ' + options.output + '/' + name + '-' + d.datetime.now().strftime("%Y%m%d%H%M%S%f") + '-anon'
 
     command += ' -h ' + options.HOST;
     command += ' -p ' + options.PORT;
@@ -189,5 +194,7 @@ if __name__ == "__main__":
   plugin.add_parameter('Advanced', Plugin.STRING, '--aetitle', action='store', default='CHRIS2', dest='AETITLE', help='Called AETitle')
   plugin.add_parameter('Advanced', Plugin.STRING, '--caetitle', action='store', default='emaillink', dest='CAETITLE', help='Calling AETitle')
   plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--panonymize', default=True, action='store_true', dest='PANONYM', help='Partially anonymize the dataset')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--MRN_force', action='store', default='', dest='MRN_FORCE', help='Override the MRN for anonymization')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--SUBJ_force', action='store', default='', dest='SUBJ_FORCE', help='Override subject name for anonymization')
   plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Anonymize the dataset')
   plugin.launch()
