@@ -26,32 +26,58 @@ class FetalMoco(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run(self):
-      
-    # we expect files as input
+  def run(self):     
+    # we expect a directory as input
     options = self.options
-    options.Template = self.validate('file', options.Template, 'nii');
-    options.Scan1 = self.validate('file', options.Scan1, 'nii');
-    options.Scan2 = self.validate('file', options.Scan2, 'nii');
+    options.ImageDir = self.validate('directory', options.ImageDir, 'nii');
+    #search for the subdirectory where the image files are actually located
+    inputFilePaths = self.getFilePaths(options.ImageDir, ['nii'])
+    if not inputFilePaths:
+      raise IOError("No .nii image file was found under directory " + options.ImageDir)
+    #assume all images are in the same directory (the directory of the first found .nii file)
+    options.ImageDir = os.path.dirname(inputFilePaths[0])
+    fileList = os.listdir(options.ImageDir)
+    if 'mask.nii' not in fileList:
+      raise IOError("No mask file 'mask.nii' was found in " + options.ImageDir)
+    fileList.remove('mask.nii')
+    imgList = []
+    templateName = ''
+    for fileName in fileList:
+      #build list of .nii image files and find the template image
+      if os.path.isfile(os.path.join(options.ImageDir, fileName)):
+        if fileName.lower().startswith('template') and fileName.endswith('.nii'):
+          templateName = fileName
+        elif fileName.endswith('.nii'):
+          imgList.append(fileName)
+    if not templateName:
+      raise IOError("No template file was found in " + options.ImageDir)
+    #make the template the first image
+    imgList.insert(0, templateName)
+    nImg = len(imgList)
+    cmd = os.environ['ENV_FETALMOCO_DIR'] + '/reconstruction ' + os.path.join(options.output, 'out.nii') 
+    cmd += ' ' + unicode(nImg) + ' '
+    for img in imgList:
+      cmd += os.path.join(options.ImageDir, img) + ' '
+    cmd += 'id ' * nImg
+    cmd += '-mask ' + os.path.join(options.ImageDir, 'mask.nii') + ' -thickness '
+    for img in imgList:
+      thick = img[img.rfind('-') + 1 : (len(img)-6)]
+      cmd += thick + ' '
+    cmd += '-debug -packages ' + '1 ' * nImg
+    #create link to input directory
+    if not os.path.islink(os.path.join(options.output, os.path.basename(options.ImageDir))):
+      os.symlink(options.ImageDir, os.path.join(options.output, os.path.basename(options.ImageDir)))
+    #create progress dir for itermediate output files
+    progressDir = os.path.join(options.output, 'progress')
+    if not os.path.exists(progressDir):
+      os.makedirs(progressDir)
+    cmd = 'cd ' + progressDir + ';' + cmd
+    os.system(cmd)
 
-    cmd = os.environ['ENV_FETALMOCO_DIR']+'/reconstruction '+options.output+'/out.nii 3 ' + options.Template + ' ' + options.Scan1 + ' ' + options.Scan2 + ' id id id -iterations ' + str(options.Iterations) + ' -sigma ' + str(options.Sigma) + ' -resolution ' + str(options.Resolution) + ' -multires ' + str(options.Multires) + ' -delta ' + str(options.Delta) + ' -lambda ' + str(options.Lambda) + ' -lastIter ' + str(options.LastIter)
-    print cmd
-    os.system(cmd)    
 
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = FetalMoco()
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--template', action='store', dest='Template', help='the template scan' )
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--scan1', action='store', dest='Scan1', help='the first scan' )
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--scan2', action='store', dest='Scan2', help='the second scan' )
-  plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--iterations', action='store', default=9, dest='Iterations', help='Number of registration-reconstruction iterations.' )
-  plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--sigma', action='store', default=12, dest='Sigma', help='Stdev for bias field. [mm]' )
-  plugin.add_parameter( 'Advanced', Plugin.DOUBLE, '--resolution', step=0.01, action='store', default=0.75, dest='Resolution', help='Isotropic resolution of the output volume.' )
-  plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--multires', action='store', default=3, dest='Multires', help='Multiresolution smoothing with given number of levels.' )
-  # average parameter crashes fetal moco
-  #plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--average', action='store', default=700, dest='Average', help='Average intensity value for stacks.' )
-  plugin.add_parameter( 'Advanced', Plugin.INTEGER, '--delta', action='store', default=150, dest='Delta', help='Parameter to define what is an edge.' )
-  plugin.add_parameter( 'Advanced', Plugin.DOUBLE, '--lambda', step=0.02, action='store', default=0.02, dest='Lambda', help='Smoothing parameter.' )
-  plugin.add_parameter( 'Advanced', Plugin.DOUBLE, '--lastIter', step=0.01, action='store', default=0.01, dest='LastIter', help='Smoothing parameter for last iteration.' )
+  plugin.add_parameter( 'Input', Plugin.IMAGE, '--imagedir', action='store', dest='ImageDir', help='The images directory' )
   plugin.launch()
