@@ -14,6 +14,9 @@
 import os, sys
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
 
 class FetalMoco(Plugin):
   '''
@@ -72,8 +75,15 @@ class FetalMoco(Plugin):
     if not os.path.exists(progressDir):
       os.makedirs(progressDir)
     cmd = 'cd ' + progressDir + ';' + cmd
-    os.system(cmd)
-
+    #os.system(cmd)
+    shell = crun.crun()
+    shell.echo(False)
+    shell.waitForChild(True)
+    shell(cmd)
+    str_exitCode = str(shell.exitCode())
+    chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
+    if str_exitCode != "0":
+      misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-out.err'), 'Plugin returned error!')
 
 
 # ENTRYPOINT
