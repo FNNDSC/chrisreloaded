@@ -16,7 +16,7 @@
 #
 
 # import the plugin.py superclass
-import os, sys
+import os, sys, shutil
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
 
@@ -58,7 +58,11 @@ class PACSPull(Plugin):
     print Plugin.TITLE
     print Plugin.VERSION
     print options.LIST_SERIES
-    list_series = options.LIST_SERIES.strip().split(" ");
+    
+    fh = open(options.LIST_SERIES, 'r' )
+    list_series = fh.readlines()
+    
+    #list_series = options.LIST_SERIES.strip().split(" ");
     if list_series:
       for pair in list_series:
         study, series = pair.split(",");
@@ -80,7 +84,7 @@ class PACSPull(Plugin):
           print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
           print 'EXIT pacs_pull plugin NOW'
           print '(see process.log for more information)'
-      
+      shutil.move(options.LIST_SERIES, options.output)
 
         
 # ENTRYPOINT
