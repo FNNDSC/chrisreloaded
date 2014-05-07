@@ -1,4 +1,0 @@
-#!/bin/bash
-PATH=$ENV_SCRIPT_DIR:$PATH
-source $ENV_FREESURFER_SCRIPT stable
-$1

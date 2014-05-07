@@ -23,7 +23,7 @@
  *
  *              http://childrenshospital.org/FNNDSC/
  *                        dev@babyMRI.org
- *
+
  */
 
 // prevent direct calls
@@ -42,7 +42,7 @@ define('CHRIS_MAINTENANCE', false);
 
 define('CHRIS_HOME', '/neuro/users/chris/dev');
 define('CHRIS_TRANSFER_PROTOCOL', 'http');
-define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/nicolas');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/jorge');
 
 // admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
@@ -59,7 +59,7 @@ define('SQL_DATABASE', 'chrisdev');
 
 // chris file system
 
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'nicolas'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
 define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
 define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
@@ -118,7 +118,7 @@ define('CHRIS_REMOTES', serialize(array(
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
-    "src"  => "/neuro/users/chris/dev/nicolas"))
+    "src"  => "/neuro/users/chris/dev/jorge"))
 )));
 
 //
@@ -126,30 +126,6 @@ define('CHRIS_REMOTES', serialize(array(
 //
 # globals
 define('ENV_TMP_DIR', '/neuro/tmp');
-define('ENV_CLUSTER_TMP_DIR', '/neuro/tmp');
-define('ENV_PYTHONPATH', joinPaths(CHRIS_LIBS, 'pymodules/:$PYTHONPATH'));
-
-
-define('ENV_SCRIPT_DIR', '/neuro/arch/scripts');
-define('ENV_FREESURFER_SCRIPT', '/neuro/arch/scripts/neuro-fs');
-define('ENV_SLICER_DIR', '/neuro/arch/Linux64/packages/Slicer4/current');
-define('ENV_DTK_DIR', '/neuro/arch/x86_64-Linux/bin');
-# pacs push
-define('ENV_DICOMDIRSEND_SCRIPT', '/neuro/arch/scripts/dicom_dirSend.bash');
-# tractography
-define('ENV_TRACTOGRAPHY_SCRIPT', '/neuro/arch/scripts/tract_meta.bash');
-# connectome pipeline
-define('ENV_CONNECTOME_SCRIPT', '/neuro/arch/scripts/chb-connectome');
-define('ENV_CONNECTOME_META_SCRIPT', '/neuro/arch/scripts/connectome_meta.bash');
-define('ENV_MRICRON_DIR', '/neuro/arch/x86_64-Linux/packages/mricron');
-define('ENV_CMP_DIR', '/neuro/arch/packages/x86_64-Linux/cmp110/lib/python');
-define('ENV_FSL_SCRIPT', '/neuro/arch/x86_64-Linux/packages/fsl/etc/fslconf/fsl.sh');
-#fyborg
-define('ENV_FYBORG_DIR', '/neuro/arch/scripts');
-# fetal moco
-define('ENV_FETALMOCO_DIR', '/neuro/arch/Linux64/packages/fetal_moco');
-
-
 
 // TESTING
 define('SIMPLETEST_CHRIS', joinPaths(CHRIS_WWWROOT,'testing/simpletest_chris.php'));
@@ -170,9 +146,6 @@ if(defined('CHRIS_CONFIG_DEBUG')) {
 // setup phpseclib for SSH access
 set_include_path(get_include_path() . PATH_SEPARATOR . joinPaths(CHRIS_LIB_FOLDER, 'phpseclib', 'phpseclib'));
 
-// generate CHRIS_PACKAGES (this has to happen after PACKAGE_SLICER_DIR etc. were configured
-require_once(joinPaths(CHRIS_PLUGINS_FOLDER,'env.php'));
-define('CHRIS_PACKAGES', serialize(buildEnvironment()));
 
 // FLAG showing that the config was parsed
 define('CHRIS_CONFIG_PARSED', true);

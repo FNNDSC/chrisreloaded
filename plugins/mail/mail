@@ -18,7 +18,7 @@
 
 # import the plugin.py superclass
 import os, sys
-sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
 
 import datetime
@@ -64,9 +64,9 @@ class Mail(Plugin):
 if __name__ == "__main__":
   _str_sender = "chris@chris.tch.harvard.edu"
   plugin = Mail()
-  plugin.add_parameter( 'To', Plugin.STRING, '--to', action='store', dest='To', help='recipient' )
-  plugin.add_parameter( 'From', Plugin.STRING, '--from', action='store', dest='From', help='sender', default=_str_sender )
-  plugin.add_parameter( 'Subject', Plugin.STRING, '--subj', action='store', dest='Subject', help='subject' )
-  plugin.add_parameter( 'Message', Plugin.STRING, '--msg', default='Email body', action='store', dest='Body', help='email body' )
+  plugin.add_parameter('To', Plugin.STRING, '--to', action='store', dest='To', help='recipient')
+  plugin.add_parameter('From', Plugin.STRING, '--from', action='store', dest='From', help='sender', default=_str_sender)
+  plugin.add_parameter('Subject', Plugin.STRING, '--subj', action='store', dest='Subject', help='subject')
+  plugin.add_parameter('Message', Plugin.STRING, '--msg', default='Email body', action='store', dest='Body', help='email body')
   plugin.status = 100 # no cluster job monitoring to mark a feed instantly as done
   plugin.launch()
