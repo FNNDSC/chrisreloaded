@@ -15,6 +15,7 @@
 
 # import the plugin.py superclass
 import os, sys, time
+
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
@@ -30,9 +31,58 @@ class Viewer(Plugin):
   Plugin.VERSION = '0.1'
 
   def run(self):
-      print 'I am sleeping 10s!'
-      time.sleep(10)
-      print 'I am done sleeping!'
+      sys.path.append( os.path.join(os.path.dirname(__file__), 'libs/pydicom-0.9.8/dicom') )
+      import dicom, json
+      print sys.path
+      print 'Go viewer!'
+      options = self.options
+
+      extension = ['dcm']
+
+      # filesDirectory = os.path.join(options.output, 'files')
+      # if not os.path.exists(filesDirectory):
+      #   os.makedirs(filesDirectory)
+
+      # need relative pathh
+
+      indexedData = {}
+
+      targets = []
+      for root, dirs, files in os.walk(options.DIRECTORY, topdown=False, followlinks=True):
+        for fileName in files:
+          if fileName.endswith(extension[0]):
+            # read file
+            ds = dicom.read_file(os.path.join(root, fileName))
+            # index file
+            if not ds.PatientID in indexedData:
+              indexedData[ds.PatientID] = {}
+
+            if not ds.StudyInstanceUID in indexedData[ds.PatientID]:
+              indexedData[ds.PatientID][ds.StudyInstanceUID] = {}
+
+            if not ds.SeriesInstanceUID in indexedData[ds.PatientID][ds.StudyInstanceUID]:
+              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID] = {}
+
+
+            # print indexedData
+            if not ds.SOPInstanceUID in indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
+              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = os.path.join(root, fileName)
+
+            # print("Patient id.......:", ds.PatientID)
+            # print("Study id.........:", ds.StudyInstanceUID)
+            # print("Series id.......:", ds.SeriesInstanceUID)
+
+      # create link to input directory
+      # if not os.path.islink(os.path.join(options.output, os.path.basename(options.DIR))):
+      #   os.symlink(options.DIR, os.path.join(options.output, os.path.basename(options.DIR)))
+
+
+      #print json.dumps(indexedData)
+      path = os.path.join(options.output, 'db.json')
+      print path
+      f = open(path,'w')
+      f.write(json.dumps(indexedData))
+      f.close()
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -40,5 +90,8 @@ if __name__ == "__main__":
 
   # this in an interactive plugin
   plugin.interactive = True
-    
+
+  plugin.add_parameter('Directory', Plugin.STRING, '--directory', action='store', dest='DIRECTORY', default='/neuro/users/chris/users/chris.test/data/dicom', help='Directory to be visualized')
+  plugin.add_parameter('FeedID', Plugin.STRING, '--feedid', action='store', dest='FEEDID', default='', help='Feed ID to be viewed')
+
   plugin.launch()
