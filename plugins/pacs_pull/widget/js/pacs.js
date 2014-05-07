@@ -704,34 +704,46 @@ _CHRIS_INTERACTIVE_PLUGIN_.connectPull = function() {
 }
 _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   // get list to pull fron cache!
-  var list = "\\\"";
+  var list = "";
   for ( var study_key in _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries) {
     for ( var j = 0; j < _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"].length; j++) {
       if (_CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"][j] == true) {
         list += _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["StudyInstanceUID"][j]
             + ","
             + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["SeriesInstanceUID"][j]
-            + " ";
+            + "\n";
       }
     }
   }
-  list += "\\\"";
-  var _list_in = _CHRIS_INTERACTIVE_PLUGIN_.getInd('listseries');
-  if (_list_in == -1) {
-    // if doesn't exist, push it!
-    _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].push({
-      name : "listseries",
-      value : list,
-      type : "string",
-      target_type : 'feed'
-    });
-    _CHRIS_INTERACTIVE_PLUGIN_._param_ind['listseries'] = _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].length - 1;
-  } else {
-    _CHRIS_INTERACTIVE_PLUGIN_._parameters[0][_list_in].value = list;
-  }
-  // trigger submit with "True"
-  _CHRIS_INTERACTIVE_PLUGIN_.force = true;
-  $("#plugin_submit").click();
+
+  var str_uniqueID = '_' + Math.random().toString(36) + '.txt';
+
+$.ajax({
+          type : "POST",
+          url : "plugins/pacs_pull/core/seriesUID_process.php",
+          data : {
+            UNIQUEID : str_uniqueID,
+            DATA : list
+          },
+          success : function(data) {
+            var _list_in = _CHRIS_INTERACTIVE_PLUGIN_.getInd('listseries');
+            if (_list_in == -1) {
+              // if doesn't exist, push it!
+              _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].push({
+                name : "listseries",
+                value : data,
+                type : "string",
+                target_type : 'feed'
+              });
+              _CHRIS_INTERACTIVE_PLUGIN_._param_ind['listseries'] = _CHRIS_INTERACTIVE_PLUGIN_._parameters[0].length - 1;
+            } else {
+              _CHRIS_INTERACTIVE_PLUGIN_._parameters[0][_list_in].value = list;
+            }
+            // trigger submit with "True"
+            _CHRIS_INTERACTIVE_PLUGIN_.force = true;
+            $("#plugin_submit").click();            
+          }
+        });
 }
 _CHRIS_INTERACTIVE_PLUGIN_.submitted = function() {
   $("#PULL").removeClass('btn-warning').addClass('btn-primary');
