@@ -111,6 +111,7 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
                   url : "plugins/" + _pluginName + "/widget/index.html",
                   dataType : "text",
                   success : function(data) {
+                    window.console.log(data);
                     jQuery('.interactive_plugin_content').html(data);
                     jQuery('#center').show('blind');
                     // pass parameters
