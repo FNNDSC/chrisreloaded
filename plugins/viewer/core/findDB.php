@@ -36,11 +36,44 @@ function is_set($variable, $value = '') {
   return isset($variable)?$variable:$value;
 }
 
+// here, we always need a session started to access username
+session_start();
+
 // exact match on subjectname
 $feed_id = is_set($_POST['FEED_ID']);
 
+// go through users' viewer feeds and find the matching ID!
+$username = $_SESSION['username'];
+$viewerFeeds = CHRIS_USERS.'/'.$username.'/viewer/';
+
+// Find relevant id
+$targetFeed = '';
+if ($handle = opendir($viewerFeeds)) {
+    while (false !== ($file = readdir($handle))) {
+    	// if match, we return!
+        if (preg_match("/-".$feed_id."/", $file)) {
+            $targetFeed = $file;
+            break;
+        }
+    }
+    closedir($handle);
+}
+
+// return relative path as well
 
 
-echo json_encode($feed_id);
+// return the db.json file content
+$content = '';
+if( $targetFeed != ''){
+	$dh  = opendir($viewerFeeds.'/'.$targetFeed);
+    while (false !== ($filename = readdir($dh))) {
+	    if($filename != '.' && $filename != '..'){
+		    $content = file_get_contents($viewerFeeds.'/'.$targetFeed.'/'.$filename.'/db.json');
+		    break;
+	    }
+    }
+}
+
+echo json_encode($content);
 
 ?>

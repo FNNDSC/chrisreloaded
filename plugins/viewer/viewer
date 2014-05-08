@@ -33,21 +33,20 @@ class Viewer(Plugin):
   def run(self):
       sys.path.append( os.path.join(os.path.dirname(__file__), 'libs/pydicom-0.9.8/dicom') )
       import dicom, json
-      print sys.path
-      print 'Go viewer!'
+
       options = self.options
 
       extension = ['dcm']
 
-      # filesDirectory = os.path.join(options.output, 'files')
-      # if not os.path.exists(filesDirectory):
-      #   os.makedirs(filesDirectory)
-
-      # need relative pathh
+      filesDirectory = 'files'
+      filesDirectoryFullPath = os.path.join(options.output, filesDirectory)
+      if not os.path.exists(filesDirectoryFullPath):
+        os.makedirs(filesDirectoryFullPath)
 
       indexedData = {}
 
       targets = []
+      index = 0
       for root, dirs, files in os.walk(options.DIRECTORY, topdown=False, followlinks=True):
         for fileName in files:
           if fileName.endswith(extension[0]):
@@ -66,20 +65,15 @@ class Viewer(Plugin):
 
             # print indexedData
             if not ds.SOPInstanceUID in indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
-              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = os.path.join(root, fileName)
+              newRelativeName = os.path.join(filesDirectory, fileName + '-' + str(index))
+              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = newRelativeName
 
-            # print("Patient id.......:", ds.PatientID)
-            # print("Study id.........:", ds.StudyInstanceUID)
-            # print("Series id.......:", ds.SeriesInstanceUID)
+              if not os.path.islink(os.path.join(options.output, newRelativeName)):
+                os.symlink(os.path.join(root, fileName), os.path.join(options.output, newRelativeName))
 
-      # create link to input directory
-      # if not os.path.islink(os.path.join(options.output, os.path.basename(options.DIR))):
-      #   os.symlink(options.DIR, os.path.join(options.output, os.path.basename(options.DIR)))
+              index += 1
 
-
-      #print json.dumps(indexedData)
       path = os.path.join(options.output, 'db.json')
-      print path
       f = open(path,'w')
       f.write(json.dumps(indexedData))
       f.close()
