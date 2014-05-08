@@ -19,7 +19,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.getInd = function(parameter) {
   return -1;
 };
 
-//
 _CHRIS_INTERACTIVE_PLUGIN_.submitted = function(data) {
   window.console.log('submitted');
   var res = data.match(/\d+/g);
