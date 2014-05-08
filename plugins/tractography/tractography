@@ -124,7 +124,7 @@ class Tractography(Plugin):
      
     #os.system(command)
     command = '/bin/bash -c " export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':' + self.envVars['ENV_DTK_DIR'] + \
-              ':$PATH;source ' + options.FreesurferScript + ' stable;' + command + ' "'
+              ':\$PATH;source ' + options.FreesurferScript + ' stable;' + command + ' "'
     print command
     # Use the crun shell mechanism
     shell = crun.crun()

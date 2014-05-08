@@ -52,8 +52,8 @@ class ReconAll(Plugin):
 
       # launch recon-all
       cmd = '/bin/bash -c " cd ' + tempdir + '/MRI' + ';source ' + options.FreesurferScript + ' stable;' +  \
-            'ln -s $FREESURFER_HOME/subjects/lh.EC_average .;ln -s $FREESURFER_HOME/subjects/rh.EC_average .;' + \
-            'ln -s $FREESURFER_HOME/subjects/V1_average .;ln -s $FREESURFER_HOME/subjects/fsaverage .;' + \
+            'ln -s \$FREESURFER_HOME/subjects/lh.EC_average .;ln -s \$FREESURFER_HOME/subjects/rh.EC_average .;' + \
+            'ln -s \$FREESURFER_HOME/subjects/V1_average .;ln -s \$FREESURFER_HOME/subjects/fsaverage .;' + \
             'recon-all -subject Freesurfer -i ' + os.path.join( tempdir + '/MRI', files[0] ) + ' -all -notalairach "'
       print cmd
       #os.system(cmd)

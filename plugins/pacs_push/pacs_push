@@ -75,7 +75,7 @@ class PACSPush(Plugin):
     if not suffix == "":
       command += ' -c ' + suffix;
     command += ' ' + target;
-    command = '/bin/bash -c " export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':$PATH;source ' + options.FreesurferScript + \
+    command = '/bin/bash -c " export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':\$PATH;source ' + options.FreesurferScript + \
               ' stable;' + command + ' "'
 
     # Use the crun shell mechanism

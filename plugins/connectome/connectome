@@ -143,10 +143,10 @@ class Connectome(Plugin):
     command += ' -f'
       
     command = '/bin/bash -c " export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':' + self.envVars['ENV_DTK_DIR'] + \
-              ':' + self.envVars['ENV_MRICRON_DIR'] + ':$PATH; export PYTHONPATH=' + self.envVars['ENV_CMP_DIR'] + \
-              ':$PYTHONPATH;source ' + self.envVars['ENV_CONNECTOME_SCRIPT'] + ';export DTDIR=' + \
+              ':' + self.envVars['ENV_MRICRON_DIR'] + ':\$PATH; export PYTHONPATH=' + self.envVars['ENV_CMP_DIR'] + \
+              ':\$PYTHONPATH;source ' + self.envVars['ENV_CONNECTOME_SCRIPT'] + ';export DTDIR=' + \
               self.envVars['ENV_DTK_DIR'] + ';export DSI_PATH=' + self.envVars['ENV_DTK_DIR'] + '/matrices' + \
-              ';export PATH=$DTDIR:$PATH;source ' + self.envVars['ENV_FSL_SCRIPT'] +';' + command + ' "'
+              ';export PATH=\$DTDIR:\$PATH;source ' + self.envVars['ENV_FSL_SCRIPT'] +';' + command + ' "'
     print command
     #os.system(cmd)
     shell = crun.crun()
