@@ -112,6 +112,8 @@ class FeedV implements ObjectViewInterface {
       }
     }
 
+    $view_icon = 'icon-eye-open';
+
     $share_icon = 'icon-share-alt';
 
     $tag_icon = 'icon-tag';
@@ -155,6 +157,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('PLUGIN', ucwords(str_replace('_',' ',$object->plugin)));
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
+    $t -> replace('VIEW_ICON', $view_icon);
     $t -> replace('SHARE_ICON', $share_icon);
     $t -> replace('TAG_ICON', $tag_icon);
     $t -> replace('ARCHIVE_ICON', $archive_icon);
