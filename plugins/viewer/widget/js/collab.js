@@ -10,32 +10,39 @@
  * - TogetherJS
  */
 
-function Collab = {
+function Collab(roomID) {
 
-	this.verson = 0.0;
+	this.version = 0.0;
+	this.roomID = roomID;
+
+	this.init();
 
 }
 
-// Collab.prototype.init = function(roomID){
+Collab.prototype.init = function(){
+
+	TogetherJSConfig_findRoom =  "chris" + this.feedID;
+	TogetherJSConfig_on = {
+		// connect everything
+        // ready: function(){_CHRIS_INTERACTIVE_PLUGIN_.togetherjsTestYO(threeD);}
+    };
+}
+
+Collab.prototype.connect = function(){
 
 
-// }
+}
 
-// Collab.prototype.connect = function(){
-
-
-// }
-
-// Collab.prototype.disconnet = function(){
+Collab.prototype.disconnet = function(){
 
 
-// }
+}
 
-// Collab.prototype.sayHi = function(){
+Collab.prototype.sayHi = function(){
 
-//   window.console.log('HI COLLAB');
+  window.console.log('HI COLLAB');
 
-// }
+}
 
 // _CHRIS_INTERACTIVE_PLUGIN_.togetherjsYO = function(feedID, threeD){
 

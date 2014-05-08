@@ -60,17 +60,28 @@ _CHRIS_INTERACTIVE_PLUGIN_.getDB = function(feedID){
             FEED_ID : feedID
         },
         success : function(data) {
-            _CHRIS_INTERACTIVE_PLUGIN_.startXTK(feedID, data);
+            _CHRIS_INTERACTIVE_PLUGIN_.startViewer(feedID, data);
         }
     });
 }
 
 
-_CHRIS_INTERACTIVE_PLUGIN_.startXTK = function(feedID, json){
+_CHRIS_INTERACTIVE_PLUGIN_.startViewer = function(feedID, json){
 
-    // collab = new Collab();
+    // create collab object
+    collab = new Collab(feedID);
+    // close the connection on the chris Kill function
+
+    // create viewer object
     viewer = new Viewer();
     viewer.init(json);
+
+    // hook them up!
+    // needs an interface!
+    // api: name, object
+    // collab will do the conversion for you
+    // viewer.onChange(name, obj) = collab.emit
+    // collab.receive = viewer.update(name, object)
 
   //_CHRIS_INTERACTIVE_PLUGIN_.togetherjsYO(feedID, threeD);
   

@@ -1,29 +1,27 @@
-<!-- <link rel="stylesheet" type="text/css" href="plugins/viewer/widget/style/main.css"> -->
+<link rel="stylesheet" type="text/css" href="plugins/viewer/widget/style/main.css">
 
-<!-- <button onclick="TogetherJS(this); return false;">Connect view</button> -->
+<div class="collaborate-btn">
+    <button onclick="TogetherJS(this); return false;">Collaborate</button>
+</div>
 
-<div id="33d"
-  style="background-color: #000; width: 100%; height: 70%;position:relative;"><div id="xcontroller" style="position:absolute;top:10px;right:10px;"></div></div>
+<div id="33d" class="3d-renderer" style="background-color: #000; width: 100%; height: 70%; position:relative;">
+	<div id="xcontroller" class="x-controller"></div>
+</div>
 
 <div style=" margin-left: 2%;width: 32%; height: 30%; float: left;">
-<div id="sliceZZ" style="background-color: #000;margin-left: 1px; margin-right: 1px;height:100%;border-top-width: 2px; border-top-style: solid; border-top-color: green; "
-  ></div>
+    <div id="sliceZZ" class="slice-Z"></div>
 </div>
 
-<div
-  style="width: 32%; height: 30%; float: left;">
-<div id="sliceXX" style="background-color: #000;margin-left: 2px; margin-right: 2px;height:100%;border-top-width: 2px; border-style: solid; border-top-color: yellow; border-right-width: 1px;border-left-width: 1px;border-right-color:#FFF; border-left-color:#FFF; "
-  ></div>
+<div style="width: 32%; height: 30%; float: left;">
+    <div id="sliceXX" class="slice-X"></div>
 </div>
-<div
-  style="margin-right: 2%;width: 32%; height: 30%; float: left;">
-<div id="sliceYY" style="background-color: #000;margin-left: 1px; margin-right: 1px;height:100%;border-top-width: 2px; border-top-style: solid; border-top-color: red; "
-  ></div>
+<div style="margin-right: 2%;width: 32%; height: 30%; float: left;">
+    <div id="sliceYY" class="slice-Y"></div>
 </div>
 
 <!-- Include the Collaboration -->
-<!-- <script src="https://togetherjs.com/togetherjs-min.js"></script>
-<script src="plugins/viewer/widget/js/collab.js"></script> -->
+<script src="https://togetherjs.com/togetherjs-min.js"></script>
+<script src="plugins/viewer/widget/js/collab.js"></script>
 <!-- NEEDS A COLLAB.JS for our collab object -->
 <!-- Include the Viewer -->
 <script type="text/javascript" src="plugins/viewer/widget/js/xtk_xdat.gui.js"></script>

@@ -60,7 +60,9 @@ if ($handle = opendir($viewerFeeds)) {
 }
 
 // return relative path as well
-
+// the following allows us to access the file directly
+// http://chris/nicolas/users/chris.test/viewer/5_8_2014_15_52_24-2033/0_2014-05-08-15-52-25/files/0001-1.3.12.2.1107.5.2.32.35201.2012070314083059706985466.dcm-51
+// or request the data through api. probably better but to be done later
 
 // return the db.json file content
 $content = '';
