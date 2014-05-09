@@ -87,6 +87,92 @@ _FEED_.feed_check = function() {
 
 }
 
+_FEED_.feed_view = function() {
+  jQuery(document).on(
+      'click',
+      '.feed_view',
+      function(e) {
+
+        // modify
+        e.stopPropagation();
+
+        // is single action?
+        var feedElt = jQuery(this).closest('.feed');
+
+        // is it a view feed?
+        var feedType = feedElt.attr('data-type');
+
+        var feedID = '';
+        
+        if(feedType == 'Viewer'){
+          feedID = feedElt.attr('data-chris-feed_id');
+        }
+
+        window.console.log(feedID);
+
+        // feed location relative to users
+        var feedFolder = feedElt.find('.file_browser').attr('data-folder');
+
+        window.console.log('feed id: ' + feedID);
+        window.console.log('feed type: ' + feedType);
+        window.console.log('feed folder: ' + feedFolder);
+
+        // start viewer interactive plugin - HOW?
+        // 1- show plugin
+        // 2- update params
+        // 3- GO
+        // 4- what if is already open?
+        // update viewer default values
+        var inputs = $("#panel_viewer .parameter_input");
+
+        jQuery(inputs).each(function(){
+
+            var flag = $(this).attr('data-flag');
+            var content = '';
+            if(flag == '--directory'){
+              content = feedFolder;
+            }
+            else{
+              content = feedID;
+            }
+
+            $(this).find('textarea').attr('data-default', content);
+            $(this).find('textarea').val(content);
+
+        });
+
+        // If I am already in the viewer plugin, this is not necessary
+        var _visible_panel = jQuery('.plugin_panel:visible');
+        var _plugin_name = _visible_panel.attr('id').replace('panel_', '');
+        var _plugin_interactive = _visible_panel.attr('data-interactive');
+
+        // if interactive and NOT viewer
+        if( _plugin_name != 'viewer' && _plugin_interactive == 'True'){
+          
+          // if interactive, listen for event to avoid timing issues
+          jQuery('.interactive_plugin_content').on("cleanInteractive",
+            function(e, param1, param2) {
+              jQuery('.interactive_plugin_content').off("cleanInteractive");
+              jQuery("#plugin_submit").click();
+            });
+
+          $("#cart_categories").val("viewer").change();
+        }
+        // if not interactive, not timing issue, all sequential
+        else if(_plugin_name != 'viewer' ){
+
+          $("#cart_categories").val("viewer").change();
+          $("#plugin_submit").click();
+
+        }
+        // if viewer
+        else{
+          $("#plugin_submit").click();
+        }
+
+      });
+}
+
 _FEED_.feed_share = function() {
   jQuery(document).on(
       'click',
@@ -758,6 +844,7 @@ _FEED_.slicedrop_dicom = function(el) {
  * Setup the javascript when document is ready (finshed loading)
  */
 jQuery(document).ready(function() {
+  _FEED_.feed_view();
   _FEED_.feed_share();
   _FEED_.feed_tag();
   _FEED_.feed_favorite();

@@ -39,6 +39,10 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
   // if FEED_ID is not null, we just want to LOOK at the feed (it exists already)
   // Call ajax here
   // force it to start!
+
+  window.console.log('init: ' + _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid"));
+
+
     if(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid") == ''){
         _CHRIS_INTERACTIVE_PLUGIN_.force = true;
         $("#plugin_submit").click();

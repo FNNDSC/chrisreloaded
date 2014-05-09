@@ -23,7 +23,7 @@ function Viewer(){
 
 Viewer.prototype.init = function(jsonFile){
 
-  window.console.log(jsonFile);
+  //window.console.log(jsonFile);
 
   // try to create and initialize a 3D render
   this.threeD = new X.renderer3D();
@@ -71,18 +71,19 @@ Viewer.prototype.init = function(jsonFile){
   //
   // the onShowtime method gets executed after all files were fully loaded and
   // just before the first rendering attempt
+  var self = this;
   this.sliceX.onShowtime = function() {
 
     // //
     // // add the volume to the other 3 renderers
     // //
-    // sliceY.add(volume);
-    // sliceY.render();
-    // sliceZ.add(volume);
-    // sliceZ.render();
+    self.sliceY.add(self.volume);
+    self.sliceY.render();
+    self.sliceZ.add(self.volume);
+    self.sliceZ.render();
     
-    // threeD.add(volume);
-    // threeD.render();
+    self.threeD.add(self.volume);
+    self.threeD.render();
     
     // // now the real GUI
     // var gui = new dat.GUI({ autoPlace: false });
