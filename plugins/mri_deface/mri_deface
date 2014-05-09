@@ -41,7 +41,7 @@ class MRIDeface(Plugin1In1Out):
         for inFile, outFileName in itertools.izip(self.inputFilePaths, self.outputFileNames):
           cmd = 'cd ' + options.output + ';source ' + options.FreesurferScript + \
           ' stable;mri_deface ' + inFile + \
-          ' \$FREESURFER_HOME/average/talairach_mixed_with_skull.gca \$FREESURFER_HOME/average/face.gca ' + \
+          ' $FREESURFER_HOME/average/talairach_mixed_with_skull.gca $FREESURFER_HOME/average/face.gca ' + \
           os.path.join(self.tempdir, outFileName)
           cmds.append(cmd)
         userErrorStr = 'mri_deface could not deface file'
