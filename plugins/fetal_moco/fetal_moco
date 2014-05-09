@@ -57,7 +57,7 @@ class FetalMoco(Plugin):
     #make the template the first image
     imgList.insert(0, templateName)
     nImg = len(imgList)
-    cmd = os.environ['ENV_FETALMOCO_DIR'] + '/reconstruction ' + os.path.join(options.output, 'out.nii') 
+    cmd = options.FetalMocoDir + '/reconstruction ' + os.path.join(options.output, 'out.nii') 
     cmd += ' ' + unicode(nImg) + ' '
     for img in imgList:
       cmd += os.path.join(options.ImageDir, img) + ' '
@@ -81,13 +81,14 @@ class FetalMoco(Plugin):
     shell.waitForChild(True)
     shell(cmd)
     str_exitCode = str(shell.exitCode())
-    chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
     if str_exitCode != "0":
-      misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-out.err'), 'Plugin returned error!')
+      misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
 
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = FetalMoco()
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--imagedir', action='store', dest='ImageDir', help='The images directory' )
+  plugin.add_parameter('Input', Plugin.IMAGE, '--imagedir', action='store', dest='ImageDir', help='The images directory')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--fetamocodir', action='store', dest='FetalMocoDir',
+                        default=plugin.envVars['ENV_FETALMOCO_DIR'], help='The images directory')
   plugin.launch()

@@ -19,6 +19,9 @@
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
 
 class Tractography(Plugin):
   '''
@@ -40,7 +43,6 @@ class Tractography(Plugin):
 
   def run(self):
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
     options = self.options
     # we expect a directory as input
     options.dti = self.validate('directory', options.dti);
@@ -62,7 +64,7 @@ class Tractography(Plugin):
       os.symlink(os.path.join(options.dti, dti_file), os.path.join(input_dir, dti_file))
       
     #base command
-    command = ' \''+os.environ['ENV_TRACTOGRAPHY_SCRIPT']+' -v 10 -f';
+    command = options.TractographyScript + ' -v 10 -f';
     
     #output
     command += ' -O ' + options.output
@@ -81,11 +83,13 @@ class Tractography(Plugin):
       
       
     #mask1
-    command += ' --m1 ' + options.m1 + ' --m1-lower-threshold ' + options.m1lowerthreshold + ' --m1-upper-threshold ' + options.m1upperthreshold
+    command += ' --m1 ' + options.m1 + ' --m1-lower-threshold ' + options.m1lowerthreshold + \
+               ' --m1-upper-threshold ' + options.m1upperthreshold
     
     #mask2
     if options.usem2:
-      command += ' --m2 ' + options.m2 + ' --m2-lower-threshold ' + options.m2lowerthreshold + ' --m2-upper-threshold ' + options.m2upperthreshold
+      command += ' --m2 ' + options.m2 + ' --m2-lower-threshold ' + options.m2lowerthreshold + \
+                 ' --m2-upper-threshold ' + options.m2upperthreshold
         
     #angle threshold
     command += ' --angle-threshold ' + options.anglethreshold
@@ -118,9 +122,23 @@ class Tractography(Plugin):
     if options.invertz:
       command += ' -Z'
      
-    command = current_dir + '/tract_meta.bash.wrapper ' + command + '\''
+    #os.system(command)
+    command = '/bin/bash -c " export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':' + self.envVars['ENV_DTK_DIR'] + \
+              ':\$PATH;source ' + options.FreesurferScript + ' stable;' + command + ' "'
     print command
-    os.system(command)
+    # Use the crun shell mechanism
+    shell = crun.crun()
+    shell.echo(False)
+    shell.echoStdOut(True)
+    shell.echoStdErr(True)
+    shell.detach(False)
+    shell.waitForChild(True)
+    shell(command)
+    chrisRunDir = self.chrisRunDir
+    str_exitCode = str(shell.exitCode())
+    if str_exitCode != "0":
+      misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
+    
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -131,29 +149,49 @@ if __name__ == "__main__":
   plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='dti', help='the dti scan')
   
   #general
-  plugin.add_parameter('General', Plugin.INTEGER, '--anglethreshold', default='35', action='store', dest='anglethreshold', help='Angle threshold filtering')
-  plugin.add_parameter('General', Plugin.COMBOBOX, '--recalgo', values=['FACT', '2nd_Order_Runga_Hutta', 'Interpolated_Streamline', 'Tensorline'], default='FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
-  plugin.add_parameter('General', Plugin.COMBOBOX, '--immodel', values=['DTI', 'HARDI'], default='DTI', action='store', dest='immodel', help='Image Model')
+  plugin.add_parameter('General', Plugin.INTEGER, '--anglethreshold', default='35', action='store',
+                       dest='anglethreshold', help='Angle threshold filtering')
+  plugin.add_parameter('General', Plugin.COMBOBOX, '--recalgo', values=['FACT', '2nd_Order_Runga_Hutta', 'Interpolated_Streamline', 'Tensorline'],
+                       default='FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
+  plugin.add_parameter('General', Plugin.COMBOBOX, '--immodel', values=['DTI', 'HARDI'], default='DTI', action='store', dest='immodel',
+                       help='Image Model')
   plugin.add_parameter('General', Plugin.BOOLEAN, '--eddy', default=False, action='store_true', dest='eddy', help='Run eddy correction')
   
   #Mask Filter
-  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.COMBOBOX, '--m1', values=['DWI', 'FA', 'ADC'], default='DWI', action='store', dest='m1', help='Volume to be used as 1st mask filter')
-  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.DOUBLE, '--m1lowerthreshold', default='0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
-  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.DOUBLE, '--m1upperthreshold', default='1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
+  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.COMBOBOX, '--m1', values=['DWI', 'FA', 'ADC'], default='DWI',
+                       action='store', dest='m1', help='Volume to be used as 1st mask filter')
+  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.DOUBLE, '--m1lowerthreshold', default='0', action='store',
+                       dest='m1lowerthreshold', help='Lower mask threshold')
+  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.DOUBLE, '--m1upperthreshold', default='1', action='store',
+                       dest='m1upperthreshold', help='Upper mask threshold')
   
   #2nd Mask Filter
-  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.BOOLEAN, '--usem2', default=False, action='store_true', dest='usem2', help='Use 2nd mask filter')
-  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.COMBOBOX, '--m2', values=['DWI', 'FA', 'ADC'], default='FA', action='store', dest='m2', help='Volume to be used as 2nd mask filter')
-  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.DOUBLE, '--m2lowerthreshold', default='0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
-  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.DOUBLE, '--m2upperthreshold', default='1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
+  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.BOOLEAN, '--usem2', default=False, action='store_true',
+                       dest='usem2', help='Use 2nd mask filter')
+  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.COMBOBOX, '--m2', values=['DWI', 'FA', 'ADC'], default='FA',
+                       action='store', dest='m2', help='Volume to be used as 2nd mask filter')
+  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.DOUBLE, '--m2lowerthreshold', default='0', action='store',
+                       dest='m1lowerthreshold', help='Lower mask threshold')
+  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.DOUBLE, '--m2upperthreshold', default='1', action='store',
+                       dest='m1upperthreshold', help='Upper mask threshold')
   
   # gradients
-  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--usegradient', default=False, action='store_true', dest='usegradient', help='Manually upload gradient')
-  plugin.add_parameter('Gradient (Advanced)', Plugin.IMAGE, '--gradient', action='store', dest='gradient', help='Gradient file')
-  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--useb0', default=False, action='store_true', dest='useb0', help='Manually specify number of B0 volumes')
-  plugin.add_parameter('Gradient (Advanced)', Plugin.INTEGER, '--b0', default='1', action='store', dest='b0', help='Number of B0 volumes')
-  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertx', default=False, action='store_true', dest='invertx', help='Invert X gradient')
-  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--inverty', default=False, action='store_true', dest='inverty', help='Invert Y gradient')
-  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertz', default=False, action='store_true', dest='invertz', help='Invert Z gradient')
-    
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--usegradient', default=False, action='store_true',
+                       dest='usegradient', help='Manually upload gradient')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.IMAGE, '--gradient', action='store',
+                       dest='gradient', help='Gradient file')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--useb0', default=False, action='store_true',
+                       dest='useb0', help='Manually specify number of B0 volumes')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.INTEGER, '--b0', default='1', action='store',
+                       dest='b0', help='Number of B0 volumes')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertx', default=False, action='store_true',
+                       dest='invertx', help='Invert X gradient')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--inverty', default=False, action='store_true',
+                       dest='inverty', help='Invert Y gradient')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertz', default=False, action='store_true',
+                       dest='invertz', help='Invert Z gradient')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--tractographyscript', action='store', dest='TractographyScript',
+                       default=plugin.envVars['ENV_TRACTOGRAPHY_SCRIPT'], help='The images directory')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
+                          default=plugin.envVars['ENV_FREESURFER_SCRIPT'], help='The images directory')
   plugin.launch()

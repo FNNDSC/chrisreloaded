@@ -37,10 +37,10 @@ class MRIConvert(Plugin1In1Out):
         # create temp dir and migrate data
         self.copyDataToTempDir()
         # execute mri_convert on all MRI volumes within the input tree
-        current_dir = os.path.dirname(os.path.abspath(__file__))
         cmds = []
         for inFile, outFileName in itertools.izip(self.inputFilePaths, self.outputFileNames):
-          cmd = 'cd ' + options.output + ';' + current_dir + '/mri_convert.wrapper ' + inFile + ' ' + os.path.join(self.tempdir, outFileName)
+          cmd = 'cd ' + options.output + ';source ' + options.FreesurferScript + \
+          ' stable; mri_convert ' + inFile + ' ' + os.path.join(self.tempdir, outFileName)
           cmds.append(cmd)
         userErrorStr = 'mri_convert could not convert file'
         self.execCmd(cmds, userErrorStr)
@@ -51,7 +51,12 @@ class MRIConvert(Plugin1In1Out):
 # ENTRYPOINT
 if __name__ == "__main__":
     plugin = MRIConvert()
-    plugin.add_parameter( 'Input', Plugin.IMAGE, '--input', action='store', dest='input', help='the image to convert' )
-    plugin.add_parameter( 'Output', Plugin.STRING, '--format', action='store', dest='format', default='nii', help='the format to convert to (defined by extension)' )
-    plugin.add_parameter( '(Advanced) extensions', Plugin.STRING, '--extensions', action='store', dest='extensions', default='nii,mgz,dcm,mgh', help='input extensions to parse (comma separated)' )
+    plugin.add_parameter('Input', Plugin.IMAGE, '--input', action='store', dest='input',
+                          help='the image to convert')
+    plugin.add_parameter('Output', Plugin.STRING, '--format', action='store', dest='format',
+                          default='nii', help='the format to convert to (defined by extension)')
+    plugin.add_parameter('(Advanced) extensions', Plugin.STRING, '--extensions', action='store',
+                          dest='extensions', default='nii,mgz,dcm,mgh', help='input extensions to parse (comma separated)')
+    plugin.add_parameter('Advanced', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
+                          default=plugin.envVars['ENV_FREESURFER_SCRIPT'], help='The images directory')
     plugin.launch()

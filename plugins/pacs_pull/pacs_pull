@@ -16,10 +16,12 @@
 #
 
 # import the plugin.py superclass
-import os, sys
+import os, sys, shutil
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
-
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
 import datetime as d
 
 class PACSPull(Plugin):
@@ -58,7 +60,11 @@ class PACSPull(Plugin):
     print Plugin.TITLE
     print Plugin.VERSION
     print options.LIST_SERIES
-    list_series = options.LIST_SERIES.strip().split(" ");
+    
+    fh = open(options.LIST_SERIES, 'r' )
+    list_series = fh.readlines()
+    
+    #list_series = options.LIST_SERIES.strip().split(" ");
     if list_series:
       for pair in list_series:
         study, series = pair.split(",");
@@ -68,19 +74,24 @@ class PACSPull(Plugin):
         command = current_dir + "/core/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -c " + options.USER_AEC + " -o " + options.output + " -d " + study + " -e " + series 
         print 'command:'
         print command
-        output = os.system(command)
+        #output = os.system(command)
+        shell = crun.crun()
+        shell.echo(False)
+        shell.waitForChild(True)
+        shell(command)
+        str_exitCode = str(shell.exitCode())
         print 'output:'
-        print output
-    
+        print str_exitCode
         # evaluate processing step
-        if output == 0:
-          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
-          print '(see process.log for more information)'
-        else:
+        if str_exitCode != "0":
+          misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
           print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
           print 'EXIT pacs_pull plugin NOW'
           print '(see process.log for more information)'
-      
+        else:
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
+          print '(see process.log for more information)'
+          shutil.move(options.LIST_SERIES, options.output)
 
         
 # ENTRYPOINT

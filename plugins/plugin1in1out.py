@@ -40,7 +40,7 @@ class Plugin1In1Out(Plugin):
     def copyDataToTempDir(self):
         options = self.options
         # create temp dir and migrate data
-        tempdir = mkdtemp('free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'])
+        tempdir = mkdtemp('free', 'surf', self.envVars['ENV_CLUSTER_TMP_DIR'])
         if os.path.isfile(options.input) and options.input.endswith('dcm'):
           # copy the directory content 
           copyDir = os.path.dirname(options.input)
@@ -87,11 +87,11 @@ class Plugin1In1Out(Plugin):
             raise ValueError("A list of cmd strings must be passed on")
         cmdIds = []
         exitCodeFilePaths = [];
-        chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
+        chrisRunDir = self.chrisRunDir
         envFile = open(chrisRunDir + '/chris.env')
         envStr = envFile.read()
         envFile.close()
-        clType = os.environ['ENV_CLUSTERTYPE']
+        clType = self.clusterType
         for cmd, outFileName in itertools.izip(cmdList, self.outputFileNames):  
           #create stderr, stdout, and exit code log for each cmd execution
           ix = outFileName.rfind('.')
@@ -115,9 +115,9 @@ class Plugin1In1Out(Plugin):
                 shell("/bin/bash " + chrisRunDir + '/' + cmdId + '.run')
         else:
             #jobs are scheduled on a cluster
-            remUser = os.environ['ENV_REMOTEUSER']
-            remHost = os.environ['ENV_REMOTEHOST']
-            remUserId = os.environ['ENV_REMOTEUSERIDENTITY']
+            remUser = self.remoteUser
+            remHost = self.remoteHost
+            remUserId = self.remoteUserIdentity
             shell = eval('crun.' + clType.lower() + '(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId)')
             for cmdId in cmdIds:
               shell("/bin/bash " + chrisRunDir + '/' + cmdId + '.run', stdoutflush=True, stderrflush=True)
