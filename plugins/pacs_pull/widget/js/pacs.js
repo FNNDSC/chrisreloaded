@@ -717,13 +717,15 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   }
 
   var str_uniqueID = '_' + Math.random().toString(36) + '.txt';
+  var cluster_tmp_dir = _CHRIS_INTERACTIVE_PLUGIN_.getParam("clustertmpdir");
 
 $.ajax({
           type : "POST",
           url : "plugins/pacs_pull/core/seriesUID_process.php",
           data : {
             UNIQUEID : str_uniqueID,
-            DATA : list
+            DATA : list,
+            CLUSTER: cluster_tmp_dir
           },
           success : function(data) {
             var _list_in = _CHRIS_INTERACTIVE_PLUGIN_.getInd('listseries');
