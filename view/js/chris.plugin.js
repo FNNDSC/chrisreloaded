@@ -61,7 +61,6 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
  */
 _PLUGIN_.cleanInteractiveLayout = function() {
 
-  window.console.log('CLEANING!');
   // clean if necessary
   if (typeof _CHRIS_INTERACTIVE_PLUGIN_ != 'undefined') {
     _CHRIS_INTERACTIVE_PLUGIN_.destroy();
@@ -88,12 +87,6 @@ _PLUGIN_.cleanInteractiveLayout = function() {
                           .off(
                               "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
 
-                      window.console.log('after: ' + jQuery('#opaqueoverlay').css('width'));
-                      window.console.log('after: ' + jQuery('#right').css('width'));
-
-                      jQuery('#opaqueoverlay').data('width', '00');
-                      jQuery('#right').data('width', '00');
-
                       jQuery(".interactive_plugin_content").trigger( "cleanInteractive", [ "Custom", "Event" ] );
 
                     });
@@ -104,15 +97,16 @@ _PLUGIN_.cleanInteractiveLayout = function() {
  * Setup the layout before an interactive plugin
  */
 _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
-  // store width value
-  window.console.log(jQuery('#right').data('width'));
-  if(typeof(jQuery('#right').data('width')) == 'undefined' || jQuery('#right').data('width') == '00'){
-      window.console.log('before: ' + jQuery('#opaqueoverlay').css('width'));
-      window.console.log('before: ' + jQuery('#right').css('width'));
+
+  // * store width value
+  // * we only set it the first time we start an interactive plugin
+  // * if we reset it all the time, timing issues when we go from 1 interactive
+  // to another interactive plugin
+  // * the values are updated if the window is resized
+  if(typeof(jQuery('#right').data('width')) == 'undefined'){
       jQuery('#opaqueoverlay').data('width', jQuery('#opaqueoverlay').css('width'));
       jQuery('#right').data('width', jQuery('#right').css('width'));
   }
-
 
   // connect close button
   jQuery(document).off('click', '#close_interactive_plugin').on('click',
