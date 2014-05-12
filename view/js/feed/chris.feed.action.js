@@ -91,12 +91,17 @@ _FEED_.feed_view = function() {
   jQuery(document).on(
       'click',
       '.feed_view',
-      function(e) {
+      _FEED_.feed_view_action);
+}
 
-        // modify
+_FEED_.feed_view_action = function(e, el){
+          // modify
         e.stopPropagation();
 
         // is single action?
+        window.console.log(jQuery(test));
+        // if full feed or not?
+        //if()
         var feedElt = jQuery(this).closest('.feed');
 
         // is it a view feed?
@@ -169,8 +174,6 @@ _FEED_.feed_view = function() {
         else{
           $("#plugin_submit").click();
         }
-
-      });
 }
 
 _FEED_.feed_share = function() {
