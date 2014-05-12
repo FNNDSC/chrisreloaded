@@ -115,6 +115,7 @@ if __name__ == "__main__":
   plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')
   plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--serverport', action='store', default='104', dest='SERVER_PORT', help='Server Port')
   plugin.add_parameter('Settings (advanced)', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Partially hide patient information')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--clustertmpdir', action='store', dest='CLUSTER', default=plugin.envVars['ENV_CLUSTER_TMP_DIR'], help='TMP DIR')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--listseries', action='store', dest='LIST_SERIES', help='Series to be downloaded: "study_uid,series_uid study_uid,series_uid, etc."')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--userid', action='store', default="{USER_ID}", dest='USER_ID', help='User ID')

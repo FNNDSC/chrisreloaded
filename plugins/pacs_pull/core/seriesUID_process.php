@@ -26,13 +26,6 @@
  *
  */
 
-define('__CHRIS_ENTRY_POINT__', 666);
-
-// include the configuration
-require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
-// include pacs helper
-require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'pacs.helper.php'));
-
 // convenience method to check if variable is set or not
 function is_set($variable, $value = '') {
   return isset($variable)?$variable:$value;
@@ -45,15 +38,18 @@ $uniqueID = is_set($_POST['UNIQUEID']);
 // seriesUIDlist
 $dataList = is_set($_POST['DATA']);
 
+// clustertmpdir
+$clusterTmpDir = is_set($_POST['CLUSTER']);
+
 
 if($uniqueID != '') {
-    $str_fileName = ENV_CLUSTER_TMP_DIR . '/' . $uniqueID;
+    $str_fileName = $clusterTmpDir . '/' . $uniqueID;
     $FH = fopen($str_fileName, 'w');
     fclose($FH);
 }
 
 if($dataList != '') {
-    $str_fileName = ENV_CLUSTER_TMP_DIR . '/' . $uniqueID;
+    $str_fileName = $clusterTmpDir . '/' . $uniqueID;
     file_put_contents($str_fileName, $dataList);
     
 }
