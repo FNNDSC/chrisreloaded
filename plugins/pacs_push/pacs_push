@@ -38,14 +38,14 @@ class PACSPush(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.3'
 
-  
+
   def push(self, root, name, suffix):
     print '======================================='
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
 
     options = self.options
     target = os.path.join(root, name)
-    
+
     command = options.DicomDirSendScript + ' -v 10';
 
     #special case for the top level directory anonymization
@@ -213,8 +213,8 @@ if __name__ == "__main__":
   plugin.add_parameter('Advanced (Network)', Plugin.STRING, '--host', action='store', default='', dest='HOST', help='Override PACS host')
   plugin.add_parameter('Advanced (Network)', Plugin.STRING, '--port', action='store', default='', dest='PORT', help='Override PACS port')
 
-  plugin.add_parameter('Advanced', Plugin.STRING, '--dicomdirsendscript', action='store', dest='DicomDirSendScript',
+  plugin.add_parameter('Advanced (Scripts)', Plugin.STRING, '--dicomdirsendscript', action='store', dest='DicomDirSendScript',
                        default=plugin.envVars['ENV_DICOMDIRSEND_SCRIPT'], help='The images directory')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
+  plugin.add_parameter('Advanced (Scripts)', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
                        default=plugin.envVars['ENV_FREESURFER_SCRIPT'], help='The images directory')
   plugin.launch()
