@@ -19,7 +19,9 @@
 import os, sys, shutil
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
-
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
 import datetime as d
 
 class PACSPull(Plugin):
@@ -72,19 +74,24 @@ class PACSPull(Plugin):
         command = current_dir + "/core/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -c " + options.USER_AEC + " -o " + options.output + " -d " + study + " -e " + series 
         print 'command:'
         print command
-        output = os.system(command)
+        #output = os.system(command)
+        shell = crun.crun()
+        shell.echo(False)
+        shell.waitForChild(True)
+        shell(command)
+        str_exitCode = str(shell.exitCode())
         print 'output:'
-        print output
-    
+        print str_exitCode
         # evaluate processing step
-        if output == 0:
-          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
-          print '(see process.log for more information)'
-        else:
+        if str_exitCode != "0":
+          misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
           print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
           print 'EXIT pacs_pull plugin NOW'
           print '(see process.log for more information)'
-      shutil.move(options.LIST_SERIES, options.output)
+        else:
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
+          print '(see process.log for more information)'
+          shutil.move(options.LIST_SERIES, options.output)
 
         
 # ENTRYPOINT
@@ -108,6 +115,7 @@ if __name__ == "__main__":
   plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')
   plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--serverport', action='store', default='104', dest='SERVER_PORT', help='Server Port')
   plugin.add_parameter('Settings (advanced)', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Partially hide patient information')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--clustertmpdir', action='store', dest='CLUSTER', default=plugin.envVars['ENV_CLUSTER_TMP_DIR'], help='TMP DIR')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--listseries', action='store', dest='LIST_SERIES', help='Series to be downloaded: "study_uid,series_uid study_uid,series_uid, etc."')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--userid', action='store', default="{USER_ID}", dest='USER_ID', help='User ID')

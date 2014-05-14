@@ -1,5 +1,4 @@
 #!/bin/bash
-source $ENV_FREESURFER_SCRIPT stable
 echo 
 date
 echo "-------------------------------"

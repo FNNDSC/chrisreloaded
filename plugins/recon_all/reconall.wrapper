@@ -1,7 +1,0 @@
-#!/bin/bash
-source $ENV_FREESURFER_SCRIPT stable
-ln -s $FREESURFER_HOME/subjects/lh.EC_average
-ln -s $FREESURFER_HOME/subjects/rh.EC_average
-ln -s $FREESURFER_HOME/subjects/V1_average
-ln -s $FREESURFER_HOME/subjects/fsaverage
-recon-all $@

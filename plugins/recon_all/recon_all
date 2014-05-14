@@ -14,6 +14,9 @@
 import os, sys
 sys.path.append( os.path.join( os.path.dirname( __file__ ), '../' ) )
 from plugin import Plugin
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
 
 class ReconAll(Plugin):
   '''
@@ -28,19 +31,19 @@ class ReconAll(Plugin):
 
   def run(self):
 
-    current_dir = os.path.dirname( os.path.abspath( __file__ ) )
+    current_dir = os.path.dirname(os.path.abspath(__file__))
     options = self.options
     # we expect a directory as input
     options.MRI = self.validate('directory', options.MRI);
 
     # grab the first dicom input file
-    files = [d for d in os.listdir( options.MRI ) if not os.path.isdir( d ) and os.path.splitext( d )[1] == '.dcm']
-    if len( files ) > 0:
+    files = [d for d in os.listdir(options.MRI) if not os.path.isdir(d) and os.path.splitext(d)[1] == '.dcm']
+    if len(files) > 0:
       # migrate data
       # create temp dir
       import tempfile, shutil, subprocess
-      tempdir = tempfile.mkdtemp( 'free', 'surf', os.environ['ENV_CLUSTER_TMP_DIR'] )
-      shutil.copytree( options.MRI, tempdir + '/MRI' )
+      tempdir = tempfile.mkdtemp('free', 'surf', self.envVars['ENV_CLUSTER_TMP_DIR'])
+      shutil.copytree(options.MRI, tempdir + '/MRI')
       # create link for preview during running
       os.symlink( tempdir + '/MRI', options.output + '/Freesurfer' )
       
@@ -48,26 +51,37 @@ class ReconAll(Plugin):
       os.chmod(tempdir, 0777)
 
       # launch recon-all
-      cmd = 'cd ' + tempdir + '/MRI' + ';' + current_dir + '/reconall.wrapper -subject Freesurfer -i ' + os.path.join( tempdir + '/MRI', files[0] ) + ' -all -notalairach'
+      cmd = '/bin/bash -c " cd ' + tempdir + '/MRI' + ';source ' + options.FreesurferScript + ' stable;' +  \
+            'ln -s \$FREESURFER_HOME/subjects/lh.EC_average .;ln -s \$FREESURFER_HOME/subjects/rh.EC_average .;' + \
+            'ln -s \$FREESURFER_HOME/subjects/V1_average .;ln -s \$FREESURFER_HOME/subjects/fsaverage .;' + \
+            'recon-all -subject Freesurfer -i ' + os.path.join( tempdir + '/MRI', files[0] ) + ' -all -notalairach "'
       print cmd
-      os.system( cmd )
-
-      # remove link
-      os.unlink( options.output + '/Freesurfer' )
-
-      # now copy the results back
-      shutil.copytree( tempdir + '/MRI/Freesurfer', options.output + '/Freesurfer' )
-      # and remove the temp dir
-      shutil.rmtree( tempdir )
-
+      #os.system(cmd)
+      shell = crun.crun()
+      shell.echo(False)
+      shell.waitForChild(True)
+      shell(cmd)
+      str_exitCode = str(shell.exitCode())
+      if str_exitCode != "0":
+        misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
+      else:
+        # remove link
+        os.unlink(options.output + '/Freesurfer')
+        # now copy the results back
+        shutil.copytree(tempdir + '/MRI/Freesurfer', options.output + '/Freesurfer')
+        # and remove the temp dir
+        shutil.rmtree(tempdir)
+        
     else:
       print options.MRI + ' doesn\'t contain any *.dcm files'
-      sys.exit( 0 )
+      sys.exit(0)
 
 
 
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = ReconAll()
-  plugin.add_parameter( 'Input', Plugin.IMAGE, '--mri', action='store', dest='MRI', help='the mri scan to reconstruct' )
+  plugin.add_parameter('Input', Plugin.IMAGE, '--mri', action='store', dest='MRI', help='the mri scan to reconstruct')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
+                          default=plugin.envVars['ENV_FREESURFER_SCRIPT'], help='The images directory')
   plugin.launch()

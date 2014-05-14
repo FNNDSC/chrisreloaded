@@ -26,11 +26,12 @@
  *
  */
 '''
-import argparse
-import json
 import sys, os
+import json
+from argparse import ArgumentParser
+from ConfigParser import SafeConfigParser
 
-class Plugin(argparse.ArgumentParser):
+class Plugin(ArgumentParser):
   '''
   The super class for all valid ChRIS plugins.
   '''
@@ -63,6 +64,35 @@ class Plugin(argparse.ArgumentParser):
     self.add_argument( '--description', action='store_true', dest='description', default=False, help='show the icon path of this plugin (default: FALSE)' )
     self.add_argument( '--output', action='store', dest='output', help='the output directory' )
 
+    #chris-related environment variables
+    if 'ENV_CHRISRUN_DIR' in os.environ:
+      self.chrisRunDir = os.environ['ENV_CHRISRUN_DIR']
+    else:
+      self.chrisRunDir = ''
+    if 'ENV_CLUSTERTYPE' in os.environ:
+      self.clusterType = os.environ['ENV_CLUSTERTYPE']
+    else:
+      self.clusterType = ''  
+    if 'ENV_REMOTEHOST' in os.environ:
+      self.remoteHost = os.environ['ENV_REMOTEHOST']
+    else:
+      self.remoteHost = ''
+    if 'ENV_REMOTEUSER' in os.environ:
+      self.remoteUser = os.environ['ENV_REMOTEUSER']
+    else:
+      self.remoteUser = '' 
+    if 'ENV_REMOTEUSERIDENTITY' in os.environ:
+      self.remoteUserIdentity = os.environ['ENV_REMOTEUSERIDENTITY']
+    else:
+      self.remoteUserIdentity = '' 
+    
+    #read plugin configuration file containing the requiered plugin environment variables
+    config = SafeConfigParser()
+    config.optionxform = str
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    config.read(os.path.join(current_dir, 'plugin.conf'))
+    self.envVars = config.defaults()
+    
     # the custom parameter list
     self.__panels = []
     self.__parameters = []
@@ -73,7 +103,7 @@ class Plugin(argparse.ArgumentParser):
     
     # the initial memory
     self.memory = 512
-    
+
     # is it an inteactive plugin
     self.interactive = False
 

@@ -16,6 +16,9 @@
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
 
 class Connectome(Plugin):
   '''
@@ -37,7 +40,6 @@ class Connectome(Plugin):
 
   def run(self):
 
-    current_dir = os.path.dirname(os.path.abspath(__file__))
     options = self.options
     
     # we expect directories as input
@@ -71,7 +73,7 @@ class Connectome(Plugin):
       os.symlink(os.path.join(options.t1, t1_file), os.path.join(input_dir, t1_file))
     
     #base command
-    command = ' \''+os.environ['ENV_CONNECTOME_META_SCRIPT'];
+    command = options.ConnectomeMetaScript;
 
     command += ' --tract-meta-stages 12'
     
@@ -140,9 +142,20 @@ class Connectome(Plugin):
     
     command += ' -f'
       
-    command = current_dir + '/connectome.wrapper ' + command + '\''
+    command = '/bin/bash -c " export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':' + self.envVars['ENV_DTK_DIR'] + \
+              ':' + self.envVars['ENV_MRICRON_DIR'] + ':\$PATH; export PYTHONPATH=' + self.envVars['ENV_CMP_DIR'] + \
+              ':\$PYTHONPATH;source ' + self.envVars['ENV_CONNECTOME_SCRIPT'] + ';export DTDIR=' + \
+              self.envVars['ENV_DTK_DIR'] + ';export DSI_PATH=' + self.envVars['ENV_DTK_DIR'] + '/matrices' + \
+              ';export PATH=\$DTDIR:\$PATH;source ' + self.envVars['ENV_FSL_SCRIPT'] +';' + command + ' "'
     print command
-    os.system(command)
+    #os.system(cmd)
+    shell = crun.crun()
+    shell.echo(False)
+    shell.waitForChild(True)
+    shell(command)
+    str_exitCode = str(shell.exitCode())
+    if str_exitCode != "0":
+      misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -177,5 +190,7 @@ if __name__ == "__main__":
   plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertx', default=False, action='store_true', dest='invertx', help='Invert X gradient')
   plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--inverty', default=False, action='store_true', dest='inverty', help='Invert Y gradient')
   plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertz', default=False, action='store_true', dest='invertz', help='Invert Z gradient')
-  
+
+  plugin.add_parameter('Advanced', Plugin.STRING, '--connectomemetacript', action='store', dest='ConnectomeMetaScript',
+                          default=plugin.envVars['ENV_CONNECTOME_META_SCRIPT'], help='The images directory')
   plugin.launch()

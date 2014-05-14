@@ -20,9 +20,8 @@
 # import the plugin.py superclass
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
-sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
 from plugin import Plugin
-
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
 from  _common import crun
 from  _common import systemMisc as misc
 import json
@@ -39,14 +38,15 @@ class PACSPush(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.3'
 
-  def push(self, current_dir, root, name, suffix):
+  
+  def push(self, root, name, suffix):
     print '======================================='
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
 
     options = self.options
     target = os.path.join(root, name)
-
-    command = ' \''+os.environ['ENV_DICOMDIRSEND_SCRIPT']+' -v 10';
+    
+    command = options.DicomDirSendScript + ' -v 10';
 
     #special case for the top level directory anonymization
     print name
@@ -57,14 +57,14 @@ class PACSPush(Plugin):
     print options
 
     if options.ANONYM:
-      command += ' -A -k -O ' + options.output + '/' + name + '-' + d.datetime.now().strftime("%Y%m%d%H%M%S%f") + '-anon'
+      command += ' -A -k -O ' + os.path.join(options.output, name) + '-' + d.datetime.now().strftime("%Y%m%d%H%M%S%f") + '-anon'
     elif options.PANONYM:
       command += ' -P '
       if len(options.MRN_FORCE):
         command += ' -M %s ' % options.MRN_FORCE
       if len(options.SUBJ_FORCE):
         command += ' -N %s ' % options.SUBJ_FORCE
-      command += ' -k -O ' + options.output + '/' + name + '-' + d.datetime.now().strftime("%Y%m%d%H%M%S%f") + '-anon'
+      command += ' -k -O ' + os.path.join(options.output, name) + '-' + d.datetime.now().strftime("%Y%m%d%H%M%S%f") + '-anon'
 
     command += ' -h ' + options.HOST;
     command += ' -p ' + options.PORT;
@@ -77,7 +77,8 @@ class PACSPush(Plugin):
     if not suffix == "":
       command += ' -c ' + suffix;
     command += ' ' + target;
-    command = current_dir + '/dicom_dirSend.bash.wrapper ' + command + '\''
+    command = '/bin/bash -c " export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':\$PATH;source ' + options.FreesurferScript + \
+              ' stable;' + command + ' "'
 
     # Use the crun shell mechanism
     shell = crun.crun()
@@ -86,11 +87,10 @@ class PACSPush(Plugin):
     shell.echoStdErr(True)
     shell.detach(False)
     shell.waitForChild(True)
-
     shell(command)
 
-    chrisRunDir   = os.environ['ENV_CHRISRUN_DIR']
-    str_exitCode  = str(shell.exitCode())
+    chrisRunDir = self.chrisRunDir
+    str_exitCode = str(shell.exitCode())
     misc.file_writeOnce(os.path.join(chrisRunDir, 'command.log'), command)
     misc.file_writeOnce(os.path.join(chrisRunDir, 'exitCode.log'), str_exitCode)
     if str_exitCode != "0":
@@ -184,7 +184,7 @@ class PACSPush(Plugin):
         # process!!
         pushDir = root + '/' + name
         if pushDir in pushableDirs:
-          self.push(current_dir, root, name, suffix)
+          self.push(root, name, suffix)
           pushableDirs.remove(pushDir)
 
     if( suffix == ''):
@@ -192,7 +192,7 @@ class PACSPush(Plugin):
 
     # push current directory
     if options.DIR in pushableDirs:
-      self.push(current_dir, options.DIR, '', suffix)
+      self.push(options.DIR, '', suffix)
       pushableDirs.remove(options.DIR)
 
 
@@ -213,4 +213,8 @@ if __name__ == "__main__":
   plugin.add_parameter('Advanced (Network)', Plugin.STRING, '--host', action='store', default='', dest='HOST', help='Override PACS host')
   plugin.add_parameter('Advanced (Network)', Plugin.STRING, '--port', action='store', default='', dest='PORT', help='Override PACS port')
 
+  plugin.add_parameter('Advanced', Plugin.STRING, '--dicomdirsendscript', action='store', dest='DicomDirSendScript',
+                       default=plugin.envVars['ENV_DICOMDIRSEND_SCRIPT'], help='The images directory')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
+                       default=plugin.envVars['ENV_FREESURFER_SCRIPT'], help='The images directory')
   plugin.launch()
