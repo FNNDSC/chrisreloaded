@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 #
 # CHRIS Push plugin for ChRIS reloaded
-#       _           _                          _       
-#      | |         (_)                        | |      
-#  ____| |__   ____ _  ___    ____  _   _  ___| |__    
-# / ___)  _ \ / ___) |/___)  |  _ \| | | |/___)  _ \   
-#( (___| | | | |   | |___ |  | |_| | |_| |___ | | | |  
-# \____)_| |_|_|   |_(___/   |  __/|____/(___/|_| |_|  
-#                            |_|                       
+#       _           _                          _
+#      | |         (_)                        | |
+#  ____| |__   ____ _  ___    ____  _   _  ___| |__
+# / ___)  _ \ / ___) |/___)  |  _ \| | | |/___)  _ \
+#( (___| | | | |   | |___ |  | |_| | |_| |___ | | | |
+# \____)_| |_|_|   |_(___/   |  __/|____/(___/|_| |_|
+#                            |_|
 #
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
 #                   Boston Children's Hospital
@@ -23,7 +23,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
 from plugin import Plugin
 
 from  _common import crun
-from  _common import systemMisc as misc 
+from  _common import systemMisc as misc
 import json
 import datetime as d
 
@@ -43,12 +43,12 @@ class CHRIS_Push(Plugin):
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start' + Plugin.TITLE + '...'
-    
+
     print Plugin.TITLE
     print Plugin.VERSION
 
     #####
-    # 
+    #
     # MUST RUN AS CHRIS
     # CHRIS MUST HAVE ACCESS TO TARGET FILE
     #
@@ -56,7 +56,7 @@ class CHRIS_Push(Plugin):
 
     # we expect directory as input
     options.DIR = self.validate('directory', options.DIR);
-    
+
     # is target valid?
     print "-- Remote information: ---"
 
@@ -73,22 +73,37 @@ class CHRIS_Push(Plugin):
     print command
 
     localShell(command)
-   
+
     json_data = localShell.stdout()
     data = json.loads(json_data)
 
-    print data['sshhost']
-    print data['sshport']
+    print "Configured host = %s" % data['sshhost']
+    print "Configured port = %s" % data['sshport']
     print data['src']
+
+    if len(options.HOST) and len(options.PORT):
+      options.SSHDEST  = True
+    else:
+      options.SSHDEST  = False
+
+    if not options.SSHDEST:
+      options.HOST = data['sshost']
+      options.PORT = data['sshport']
+    else:
+      print('SSHDEST override detected...')
+
+    print "Actual sshhost = %s" % options.HOST
+    print "Actual sshport = %s" % options.PORT
+
 
     # get path of tmp and plugin dirs on remote server
     print "-- Remote configuration: ---"
- 
-    command = data['src'] + "/plugins/chris_push/scripts/getInfo.php -f " + data['src'] + '/config.inc.php -t -p'; 
- 
+
+    command = data['src'] + "/plugins/chris_push/scripts/getInfo.php -f " + data['src'] + '/config.inc.php -t -p';
+
     remoteShell = crun.crun()
-    remoteShell._str_remoteHost = data['sshhost'];
-    remoteShell._str_remotePort = data['sshport'];
+    remoteShell._str_remoteHost = options.SSHHOST;
+    remoteShell._str_remotePort = options.SSHPORt;
     remoteShell._str_remoteUser = 'chris';
     remoteShell._b_sshDo = True;
     remoteShell.echo(False)
@@ -96,15 +111,15 @@ class CHRIS_Push(Plugin):
     remoteShell.echoStdErr(False)
     remoteShell.detach(False)
     remoteShell.waitForChild(True)
-  
+
     print '- remote ssh -'
     print command
 
     remoteShell(command)
-    
+
     json_data2 = remoteShell.stdout()
     data2 = json.loads(json_data2)
- 
+
     print data2['tmp']
     print data2['plugin']
 
@@ -113,20 +128,20 @@ class CHRIS_Push(Plugin):
     print "-- Go Zip plugin: ---"
 
     command = current_dir + "/../zip/zip --input " + options.DIR + " --output " + options.output
-   
+
     print '- local ssh -'
     print command
 
     localShell(command)
 
-    # 
+    #
     # SCP it to tmp!
     print "-- SCP zip file to remote tmp: ---"
 
-    command = "scp -P " +  data['sshport']  + " " + options.output + "*.zip chris@" + data['sshhost']  + ":"   + data2['tmp']
+    command = "scp -P " +  options.SSHPORT + " " + options.output + "*.zip chris@" + options.SSHHOST  + ":"   + data2['tmp']
 
     print '- local ssh -'
-    print command   
+    print command
 
     localShell(command)
 
@@ -141,18 +156,22 @@ class CHRIS_Push(Plugin):
         break
 
     command = data2['plugin'] + "/chris_push/scripts/emailUsr.php -u " + options.USERNAME + ' -z ' + data2['tmp'] + '/' + zipfile;
-    
+
     print '- remote ssh -'
     print command
 
     remoteShell(command)
 
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Finish...'
-        
+
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = CHRIS_Push()
   plugin.add_parameter('Parameters', Plugin.IMAGE, '--directory', action='store', dest='DIR', help='Directory to be pushed')
   plugin.add_parameter('Parameters', Plugin.COMBOBOX, '--remote', values=['MGH', 'BCH'], action='store', default='MGH', dest='REMOTE', help='Remote CHRIS instance')
   plugin.add_parameter('Parameters', Plugin.STRING, '--user', action='store', default="username", dest='USERNAME', help='Recipient')
+
+  plugin.add_parameter('Advanced (Network)', Plugin.STRING, '--host', action='store', default='', dest='HOST', help='Override host')
+  plugin.add_parameter('Advanced (Network)', Plugin.STRING, '--port', action='store', default='', dest='PORT', help='Override port')
+
   plugin.launch()
