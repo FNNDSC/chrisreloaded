@@ -16,7 +16,7 @@ sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
 from  _common import crun
-from  _common import systemMisc as misc 
+from  _common import systemMisc as misc
 
 class FetalMoco(Plugin):
   '''
@@ -29,7 +29,7 @@ class FetalMoco(Plugin):
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.1'
 
-  def run(self):     
+  def run(self):
     # we expect a directory as input
     options = self.options
     options.ImageDir = self.validate('directory', options.ImageDir, 'nii');
@@ -57,7 +57,7 @@ class FetalMoco(Plugin):
     #make the template the first image
     imgList.insert(0, templateName)
     nImg = len(imgList)
-    cmd = options.FetalMocoDir + '/reconstruction ' + os.path.join(options.output, 'out.nii') 
+    cmd = options.FetalMocoDir + '/reconstruction ' + os.path.join(options.output, 'out.nii')
     cmd += ' ' + unicode(nImg) + ' '
     for img in imgList:
       cmd += os.path.join(options.ImageDir, img) + ' '
@@ -90,5 +90,5 @@ if __name__ == "__main__":
   plugin = FetalMoco()
   plugin.add_parameter('Input', Plugin.IMAGE, '--imagedir', action='store', dest='ImageDir', help='The images directory')
   plugin.add_parameter('Advanced', Plugin.STRING, '--fetamocodir', action='store', dest='FetalMocoDir',
-                        default=plugin.envVars['ENV_FETALMOCO_DIR'], help='The images directory')
+                        default=plugin.envVars['ENV_FETALMOCO_DIR'], help='Moco app directory')
   plugin.launch()
