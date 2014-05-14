@@ -41,19 +41,23 @@ class FetalMoco(Plugin):
     options.ImageDir = os.path.dirname(inputFilePaths[0])
     fileList = os.listdir(options.ImageDir)
     if 'mask.nii' not in fileList:
-      raise IOError("No mask file 'mask.nii' was found in " + options.ImageDir)
+      misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!: \n' + errStr)
+      errStr = "No mask file 'mask.nii' was found in " + options.ImageDir
+      raise IOError(errStr)
     fileList.remove('mask.nii')
     imgList = []
     templateName = ''
     for fileName in fileList:
       #build list of .nii image files and find the template image
       if os.path.isfile(os.path.join(options.ImageDir, fileName)):
-        if fileName.lower().startswith('template') and fileName.endswith('.nii'):
+        if (fileName.lower().find('template') != -1) and fileName.endswith('.nii'):
           templateName = fileName
         elif fileName.endswith('.nii'):
           imgList.append(fileName)
     if not templateName:
-      raise IOError("No template file was found in " + options.ImageDir)
+      errStr = "No template file was found in " + options.ImageDir
+      misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!: \n' + errStr)
+      raise IOError(errStr)
     #make the template the first image
     imgList.insert(0, templateName)
     nImg = len(imgList)
