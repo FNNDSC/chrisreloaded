@@ -134,12 +134,14 @@ class FeedV implements ObjectViewInterface {
 
     $edit_icon = '';
     $cancel = '';
+    $view = "display:none";
     if ($object->status >= 100 || $shared_feed) {
       $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'>";
 
       // if the job is not queued or running, don't display the cancel icon
       // also if the feed was shared
       $cancel = "display:none";
+      $view = "";
     }
 
     $t = new Template('feed.html');
@@ -164,6 +166,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_ICON', $favorite_icon);
     $t -> replace('FAVORITE_TEXT', $favorite_text);
+    $t -> replace('VIEW', $view);
     $t -> replace('CANCEL', $cancel);
     $t -> replace('EDIT_ICON', $edit_icon);
     $t -> replace('FEED_SHINE', $shine);

@@ -19,6 +19,9 @@ import os, sys, time
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
 
+sys.path.append( os.path.join(os.path.dirname(__file__), 'libs/pydicom-0.9.8') )
+import dicom, json
+
 class Viewer(Plugin):
   '''
   '''
@@ -31,24 +34,23 @@ class Viewer(Plugin):
   Plugin.VERSION = '0.1'
 
   def run(self):
-      sys.path.append( os.path.join(os.path.dirname(__file__), 'libs/pydicom-0.9.8/dicom') )
-      import dicom, json
 
       options = self.options
 
       extension = ['dcm']
 
-      filesDirectory = 'files'
-      filesDirectoryFullPath = os.path.join(options.output, filesDirectory)
-      if not os.path.exists(filesDirectoryFullPath):
-        os.makedirs(filesDirectoryFullPath)
+      # create links only if we create a viewer feed
+      if options.LINKS:
+          dirname = os.path.basename(options.DIRECTORY)
+          print dirname
+          if not os.path.exists(os.path.join(options.output, dirname)):
+              os.symlink(options.DIRECTORY, os.path.join(options.output, dirname))
 
       indexedData = {}
 
-      targets = []
-      index = 0
-      for root, dirs, files in os.walk(options.DIRECTORY, topdown=False, followlinks=True):
+      for root, dirs, files in os.walk(options.output, topdown=False, followlinks=True):
         for fileName in files:
+          print fileName
           if fileName.endswith(extension[0]):
             # read file
             ds = dicom.read_file(os.path.join(root, fileName))
@@ -65,15 +67,11 @@ class Viewer(Plugin):
 
             # print indexedData
             if not ds.SOPInstanceUID in indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
-              newRelativeName = os.path.join(filesDirectory, fileName + '-' + str(index))
-              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = newRelativeName
+              # newRelativeName = os.path.join(filesDirectory, fileName + '-' + str(index))
+              relativePath = os.path.relpath(os.path.join(root, fileName), options.output)
+              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = relativePath
 
-              if not os.path.islink(os.path.join(options.output, newRelativeName)):
-                os.symlink(os.path.join(root, fileName), os.path.join(options.output, newRelativeName))
-
-              index += 1
-
-      path = os.path.join(options.output, 'db.json')
+      path = os.path.join(options.output, 'chris.json')
       f = open(path,'w')
       f.write(json.dumps(indexedData))
       f.close()
@@ -87,5 +85,10 @@ if __name__ == "__main__":
 
   plugin.add_parameter('Directory', Plugin.STRING, '--directory', action='store', dest='DIRECTORY', default='/neuro/users/chris/users/chris.test/data/dicom', help='Directory to be visualized')
   plugin.add_parameter('FeedID', Plugin.STRING, '--feedid', action='store', dest='FEEDID', default='', help='Feed ID to be viewed')
+  plugin.add_parameter('FeedType', Plugin.STRING, '--feedtype', default='', dest='FEEDTYPE', help='Help plugin to find the feed')
+
+  plugin.add_parameter('Create links', Plugin.BOOLEAN, '--links', default=False, action='store_true',dest='LINKS', help='Create links for the dataset')
+  # save json scene arg option, to parse json, put all files in new feed, generate new updated DB
+  # useful to import data from multiple feeds
 
   plugin.launch()

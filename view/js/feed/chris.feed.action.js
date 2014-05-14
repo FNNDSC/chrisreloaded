@@ -98,29 +98,25 @@ _FEED_.feed_view_action = function(e, el){
           // modify
         e.stopPropagation();
 
-        // is single action?
-        window.console.log(jQuery(test));
-        // if full feed or not?
-        //if()
-        var feedElt = jQuery(this).closest('.feed');
+         var feedType = '';
+         var feedID = '';
+         var feedFolder = '';
 
-        // is it a view feed?
-        var feedType = feedElt.attr('data-type');
+        // view whole feed or filebrowser directory?
+        if(typeof(el) == 'undefined'){
 
-        var feedID = '';
-        
-        if(feedType == 'Viewer'){
-          feedID = feedElt.attr('data-chris-feed_id');
+            var feedElt = jQuery(this).closest('.feed');
+
+            feedType = feedElt.attr('data-type');
+            feedID = feedElt.attr('data-chris-feed_id');
+            feedFolder = feedElt.find('.file_browser').attr('data-folder');
+            
         }
+        else{
 
-        window.console.log(feedID);
+            feedFolder = jQuery(el).parent().attr('data-full-path');
 
-        // feed location relative to users
-        var feedFolder = feedElt.find('.file_browser').attr('data-folder');
-
-        window.console.log('feed id: ' + feedID);
-        window.console.log('feed type: ' + feedType);
-        window.console.log('feed folder: ' + feedFolder);
+        }
 
         // start viewer interactive plugin - HOW?
         // 1- show plugin
@@ -128,6 +124,7 @@ _FEED_.feed_view_action = function(e, el){
         // 3- GO
         // 4- what if is already open?
         // update viewer default values
+
         var inputs = $("#panel_viewer .parameter_input");
 
         jQuery(inputs).each(function(){
@@ -137,13 +134,18 @@ _FEED_.feed_view_action = function(e, el){
             if(flag == '--directory'){
               content = feedFolder;
             }
-            else{
+            else if(flag == '--feedid'){
               content = feedID;
+            }
+            else if(flag == '--feedtype'){
+              content = feedType;
+            }
+            else{
+              content = '';
             }
 
             $(this).find('textarea').attr('data-default', content);
             $(this).find('textarea').val(content);
-
         });
 
         // If I am already in the viewer plugin, this is not necessary
@@ -162,6 +164,7 @@ _FEED_.feed_view_action = function(e, el){
             });
 
           $("#cart_categories").val("viewer").change();
+
         }
         // if not interactive, not timing issue, all sequential
         else if(_plugin_name != 'viewer' ){
@@ -172,7 +175,9 @@ _FEED_.feed_view_action = function(e, el){
         }
         // if viewer
         else{
+
           $("#plugin_submit").click();
+
         }
 }
 

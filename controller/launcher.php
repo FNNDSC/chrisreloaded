@@ -256,9 +256,7 @@ if ($status != 100) {
   $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl -k --data ';
 }
 
-// also include the environment setup in the env file
-$ssh->exec("php ".joinPaths(CHRIS_PLUGINS_FOLDER_NET,'env.php')." >> ".$envfile);
-// and the actual chris.run dir
+// also the actual chris.run dir
 $ssh->exec('bash -c \' echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$envfile.'\'');
 $ssh->exec('bash -c \' echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile.'\'');
 $ssh->exec('bash -c \' echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile.'\'');
@@ -278,12 +276,19 @@ if($status != 100){
 $ssh->exec('bash -c \'echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$job_path_output.'/chris.std" >> '.$runfile.'\'');
 $ssh->exec('bash -c \' echo "'.$command.'" >> '.$runfile.'\'');
 
+// generate the db.json file
+// to generate the db.json, we just call the viewer plugin with the correct input and ouput directories, $feed_path
+$viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
+$ssh->exec("echo '$viewer_plugin --directory $job_path --output $job_path;' >> $runfile;");
+
 if($status != 100){
   $end_token = TokenC::create();
   $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
 }
 
+// make sure to update file permissions
 $ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
+
 $ssh->exec("chmod o+rx,g+rx $runfile");
 
 $arguments = ' -l '.$job_path;

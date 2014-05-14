@@ -28,43 +28,92 @@ _CHRIS_INTERACTIVE_PLUGIN_.getInd = function(parameter) {
 
 _CHRIS_INTERACTIVE_PLUGIN_.submitted = function(data) {
     var res = data.match(/\d+/g);
-    _CHRIS_INTERACTIVE_PLUGIN_.getDB(res[0]);
+    //
+    //_CHRIS_INTERACTIVE_PLUGIN_.getJSON(res[0]);
 }
 
+_CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
 
+    if(typeof(collab) != 'undefined' && collab != null){
+        //collab.destroy();
+        collab = null;
+    }
 
+    if(typeof(viewer) != 'undefined' && viewer != null){
+        //viewer.destroy();
+        viewer = null;
+    }
+
+    // stop timeout if any
+}
 
 // when the html is loaded, we get the parameters from the plugin parameters
 _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
+
+   window.console.log(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid"));
+   window.console.log(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedtype"));
+   window.console.log(_CHRIS_INTERACTIVE_PLUGIN_.getParam("directory"));
+   window.console.log(_CHRIS_INTERACTIVE_PLUGIN_.getParam("links"));
+
+  // IF THERE IS AN ID, make sure to cleanup the scene and the collaboration
+  if(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid") != ''){
+    window.console.log('new visu + no new feed');
+    _CHRIS_INTERACTIVE_PLUGIN_.destroy();
+
+    // MIGHT NEED TO INTRODUCE TYPE AS WELL
+    _CHRIS_INTERACTIVE_PLUGIN_.getJSON(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid"), _CHRIS_INTERACTIVE_PLUGIN_.getParam("type"), '');
+    return;
+  }
+  else if(_CHRIS_INTERACTIVE_PLUGIN_.getParam("directory") != '' && _CHRIS_INTERACTIVE_PLUGIN_.getParam("links") == false){
+    window.console.log('same visu + new JSON');
+    // get more json from the directory and view it!
+    // MIGHT NEED TO INTRODUCE TYPE AS WELL
+    _CHRIS_INTERACTIVE_PLUGIN_.getJSON('', '', _CHRIS_INTERACTIVE_PLUGIN_.getParam("directory"));
+    return;
+  }
+  else if(_CHRIS_INTERACTIVE_PLUGIN_.getParam("directory") != '' && _CHRIS_INTERACTIVE_PLUGIN_.getParam("links") == true){
+    window.console.log('new visu + new feed');
+    _CHRIS_INTERACTIVE_PLUGIN_.destroy();
+
+    // create new feed
+    // _CHRIS_INTERACTIVE_PLUGIN_.force = true;
+    // $("#plugin_submit").click();
+    return;
+  }
+
+  window.console.log('Ouups... Something went wrong during the initializaton. ');
   // if FEED_ID is not null, we just want to LOOK at the feed (it exists already)
   // Call ajax here
   // force it to start!
 
-  window.console.log('init: ' + _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid"));
+  // window.console.log('init: ' + _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid"));
 
 
-    if(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid") == ''){
-        _CHRIS_INTERACTIVE_PLUGIN_.force = true;
-        $("#plugin_submit").click();
-    }
-    else{
-        _CHRIS_INTERACTIVE_PLUGIN_.getDB(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid"));
-    }
+  //   if(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid") == ''){
+  //       _CHRIS_INTERACTIVE_PLUGIN_.force = true;
+  //       $("#plugin_submit").click();
+  //   }
+  //   else{
+  //       _CHRIS_INTERACTIVE_PLUGIN_.getDB(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid"));
+  //   }
 }
 
 
 
-_CHRIS_INTERACTIVE_PLUGIN_.getDB = function(feedID){
+_CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedID, feedType, directory){
     // ajax find matching directory!
     jQuery.ajax({
         type : "POST",
-        url : "plugins/viewer/core/findDB.php",
+        url : "plugins/viewer/core/findJSON.php",
         dataType : "json",
         data : {
-            FEED_ID : feedID
+            FEED_ID : feedID,
+            FEED_TYPE : feedType,
+            DIRECTORY: directory
         },
         success : function(data) {
-            _CHRIS_INTERACTIVE_PLUGIN_.startViewer(feedID, data);
+            window.console.log(data);
+            //_CHRIS_INTERACTIVE_PLUGIN_.startViewer(feedID, data);
         }
     });
 }
@@ -73,12 +122,12 @@ _CHRIS_INTERACTIVE_PLUGIN_.getDB = function(feedID){
 _CHRIS_INTERACTIVE_PLUGIN_.startViewer = function(feedID, json){
 
     // create collab object
-    collab = new Collab(feedID);
+    // collab = new Collab(feedID);
     // close the connection on the chris Kill function
 
     // create viewer object
-    viewer = new Viewer();
-    viewer.init(json);
+    // viewer = new Viewer();
+    // viewer.init(json);
 
     // hook them up!
     // needs an interface!
