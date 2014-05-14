@@ -13,23 +13,34 @@
  * - SliceDrop clone
  */
 
-function Viewer(){
+// Declare (or re-declare) the single global variable
+viewer = viewer || {};
 
-	this.verson = 0.0;
+viewer.Viewer = function( jsonFile ) {
+
+	this.version = 0.0;
 	this.threeD = null;
-	
+  //window.console.log(''jsonFile);
+  this.scene = {
+    patientID : null,
+    fNames : [['plugins/viewer/widget/data/dicom/0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
+    'plugins/viewer/widget/data/dicom/0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
+    'plugins/viewer/widget/data/dicom/0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
+    'plugins/viewer/widget/data/dicom/0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
+    'plugins/viewer/widget/data/dicom/0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm'], 
+    'plugins/viewer/widget/data/recon.nii', 'plugins/viewer/widget/data/tact.trk']
+  };
+    // try to create and initialize a 3D renderer
+  _webGLFriendly = true;
+  try {
+    this.threeD = new X.renderer3D();
+    this.threeD.container = '33d';
+    this.threeD.init();
+  } catch ( Exception ) {
+  // no webgl on this machine
+    _webGLFriendly = false;
+  }
 
-}
-
-Viewer.prototype.init = function(jsonFile){
-
-  //window.console.log(jsonFile);
-
-  // try to create and initialize a 3D render
-  this.threeD = new X.renderer3D();
-  this.threeD.container = '33d';
-  this.threeD.init();
-  //
   // create the 2D renderers
   // .. for the X orientation
   this.sliceX = new X.renderer2D();
@@ -47,24 +58,23 @@ Viewer.prototype.init = function(jsonFile){
   this.sliceZ.orientation = 'Z';
   this.sliceZ.init();
   
-  //
   // THE VOLUME DATA
   //
   // create a X.volume
   this.volume = new X.volume();
-  // .. and attach the single-file dicom in .NRRD format
+  window.console.log('hey ' + this.volume);
+    // .. and attach the single-file dicom in .NRRD format
   // this works with gzip/gz/raw encoded NRRD files but XTK also supports other
   // formats like MGH/MGZ
-  this.volume.file = 'plugins/viewer/widget/data/recon.nii';
+  this.volume.file = this.scene.fNames[0].sort().map(function( str ) { return str;});
   
-  // add the volume in the main renderer
-  // we choose the sliceX here, since this should work also on
-  // non-webGL-friendly devices like Safari on iOS
+  // Use a 2D renderer as the main renderer since this should work also on
+  // non-webGL-friendly devices like Safari on iOS. Add the volume so it 
+  // can be loaded and parsed
   this.sliceX.add(this.volume);
   
   // start the loading/rendering
   this.sliceX.render();
-  
 
   //
   // THE GUI
@@ -72,7 +82,7 @@ Viewer.prototype.init = function(jsonFile){
   // the onShowtime method gets executed after all files were fully loaded and
   // just before the first rendering attempt
   var self = this;
-  this.sliceX.onShowtime = function() {
+  this.sliceX.onShowtime = function(volume) {
 
     // //
     // // add the volume to the other 3 renderers
@@ -82,8 +92,10 @@ Viewer.prototype.init = function(jsonFile){
     self.sliceZ.add(self.volume);
     self.sliceZ.render();
     
-    self.threeD.add(self.volume);
-    self.threeD.render();
+    if ( _webGLFriendly ) {
+      self.threeD.add(self.volume);
+     self.threeD.render();
+    } 
     
     // // now the real GUI
     // var gui = new dat.GUI({ autoPlace: false });
@@ -119,26 +131,32 @@ Viewer.prototype.init = function(jsonFile){
     // volumegui.open();
 
   };
-
+	
 }
 
-Viewer.prototype.addObject = function(){
 
-
-}
-
-Viewer.prototype.removeObject = function(){
+viewer.Viewer.prototype.render = function( fname ) {
 
 
 }
 
-Viewer.prototype.sayHi = function(){
+viewer.Viewer.prototype.addObject = function(){
+
+
+}
+
+viewer.Viewer.prototype.removeObject = function(){
+
+
+}
+
+viewer.Viewer.prototype.sayHi = function(){
 
   window.console.log('HI VIEWER');
 
 }
 
-Viewer.prototype.onThreshold = function(){
+viewer.Viewer.prototype.onThreshold = function(){
 
   window.console.log('Lets threshold!');
   //this.threeDRenderer 

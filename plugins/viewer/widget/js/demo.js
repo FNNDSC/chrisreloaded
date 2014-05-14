@@ -77,9 +77,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.startViewer = function(feedID, json){
     // close the connection on the chris Kill function
 
     // create viewer object
-    viewer = new Viewer();
-    viewer.init(json);
-
+    view = new viewer.Viewer( json );
     // hook them up!
     // needs an interface!
     // api: name, object
