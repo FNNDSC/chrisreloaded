@@ -18,7 +18,7 @@ _FEED_.feed_check_action = function(id){
   jQuery(allElts).each(function(){
     $(this).attr('data-chris-feed_checked', 'true');
     $(this).find('.feed_uncheck').css('display', 'block');
-    $(this).find('.feed_header').css('backgroundColor', 'rgba(255, 255, 0, 0.3)');
+    $(this).find('.feed_header').css('backgroundColor', 'rgb(204, 204, 204)');
     $(this).find('.feed_header').css('color', '#353535');
   });
 }
@@ -46,45 +46,40 @@ _FEED_.feed_check = function() {
         var allElts = jQuery(this).parent().parent().find('.feed');
         if(checked == "true"){
           jQuery(allElts).each(function(){
-              _FEED_.feed_check_action($(this).attr('data-chris-feed_id'));
+            $(this).find('.feed_icon').addClass('flip');
+            _FEED_.feed_check_action($(this).attr('data-chris-feed_id'));
           });
         }
         else{
           jQuery(allElts).each(function(){
-              _FEED_.feed_ucheck_action($(this).attr('data-chris-feed_id'));
+            $(this).find('.feed_icon').removeClass('flip');
+            _FEED_.feed_ucheck_action($(this).attr('data-chris-feed_id'));
           });
         }
       });
 
   jQuery(document).on(
       'click',
-      '.feed_check',
+      '.feed_icon',
       function(event) {
 
-        event.preventDefault();
-        event.stopPropagation();
+          event.preventDefault();
+          event.stopPropagation();
 
-        // get id, apply to all
-        var feedElt = jQuery(this).closest('.feed');
-        var feedID = feedElt.attr('data-chris-feed_id');
-        _FEED_.feed_check_action(feedID);
-
+          // if flip class
+          if( jQuery(this).hasClass('flip')){
+              $(this).removeClass('flip');
+              var feedElt = jQuery(this).closest('.feed');
+              var feedID = feedElt.attr('data-chris-feed_id');
+              _FEED_.feed_ucheck_action(feedID);
+          }
+          else{
+              $(this).addClass('flip');
+              var feedElt = jQuery(this).closest('.feed');
+              var feedID = feedElt.attr('data-chris-feed_id');
+              _FEED_.feed_check_action(feedID);
+          }
       });
-
-  jQuery(document).on(
-      'click',
-      '.feed_uncheck',
-      function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        // get id, apply to all
-        var feedElt = jQuery(this).closest('.feed');
-        var feedID = feedElt.attr('data-chris-feed_id');
-        _FEED_.feed_ucheck_action(feedID);
-
-      });
-
 }
 
 _FEED_.feed_view = function() {

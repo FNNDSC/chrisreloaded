@@ -327,10 +327,6 @@
 	line-height: 13px;
 }
 
-.feed_check {
-  position:absolute
-}
-
 .feed_uncheck {
   position: absolute;
   bottom: 0px;
@@ -386,4 +382,81 @@
 
 .feed_failure, .feed_failure .feed_header_small{
     color: black!important;
+}
+
+/*
+http://css3playground.com/3d-flip-cards/
+*/
+.feed_icon {
+    -webkit-perspective: 600px;
+	-moz-perspective: 600px;
+	perspective: 600px;
+}
+.feed_icon .front {
+	float: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 900;
+	width: 48px;
+	height: 48px;
+
+	-webkit-transform: rotateX(0deg) rotateY(0deg);
+	-moz-transform: rotateX(0deg) rotateY(0deg);
+	transform: rotateX(0deg) rotateY(0deg);
+
+	-webkit-transform-style: preserve-3d;
+	-moz-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	backface-visibility: hidden;
+
+	/* -- transition is the magic sauce for animation -- */
+	-webkit-transition: all .4s ease-in-out;
+	transition: all .4s ease-in-out;
+}
+
+.feed_icon.flip .front {
+	z-index: 900;
+	background: #333;
+
+	-webkit-transform: rotateY(180deg);
+	-moz-transform: rotateY(180deg);
+	transform: rotateY(180deg);
+}
+
+.feed_icon .back {
+	float: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 800;
+	width: 48px;
+	height: 48px;
+
+	-webkit-transform: rotateY(-180deg);
+    -moz-transform: rotateY(-179deg); /* setting to 180 causes an unnatural-looking half-flip */
+	transform: rotateY(-179deg);
+
+	-webkit-transform-style: preserve-3d;
+	-moz-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+
+	-webkit-backface-visibility: hidden;
+	-moz-backface-visibility: hidden;
+	backface-visibility: hidden;
+
+	/* -- transition is the magic sauce for animation -- */
+	-webkit-transition: all .4s ease-in-out;
+	transition: all .4s ease-in-out;
+}
+
+.feed_icon.flip .back {
+	z-index: 1000;
+
+	-webkit-transform: rotateX(0deg) rotateY(0deg);
+    -moz-transform: rotateX(0deg) rotateY(0deg);
+	transform: rotateX(0deg) rotateY(0deg);
 }

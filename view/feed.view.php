@@ -150,10 +150,12 @@ class FeedV implements ObjectViewInterface {
     $t = new Template('feed.html');
     $t -> replace('ID', $object->id);
     $feed_gfx64 = 'plugins/'.$object->plugin.'/feed.png';
+    $feed_gfx64_checked = 'view/gfx/feed_checked.png';
     if(!is_file(joinPaths(CHRIS_WWWROOT, $feed_gfx64))){
       $feed_gfx64 = 'http://placehold.it/48x48';
     }
     $t -> replace('IMAGE_SRC', $feed_gfx64);
+    $t -> replace('IMAGE_CHECKED', $feed_gfx64_checked);
     $t -> replace('USERNAME', $username_displayed);
    // $t -> replace('FEED_STATUS', $feed_status);
     $t -> replace('FEED_NAME', $object->name);
