@@ -81,15 +81,6 @@ class FeedV implements ObjectViewInterface {
       $feed_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
     }
 
-    // create the status text
-    $status_text = '<font color=red>Running <i class="icon-refresh rotating_class"></i></font>';
-    // ('.$object->status.'%)
-    if ($object->status == 100) {
-      $status_text = '<font color=#009DE9>Done</font>';
-    } else if ($object->status == 101) {
-      $status_text = '<font color=darkred>Canceled</font>';
-    }
-
     $feed_status = 'feed_success';
     $feed_folder = joinPaths(CHRIS_USERS, $username,$object->plugin, $object->name.'-'.$object->id);
     if ($handle = opendir($feed_folder)) {
@@ -110,6 +101,18 @@ class FeedV implements ObjectViewInterface {
 
         }
       }
+    }
+
+    // create the status text
+    $status_text = '<span style="background-color: #009DE9;color: #fff;padding: 1px 2px;">Running<i class="icon-refresh rotating_class"></i></span>';
+    // ('.$object->status.'%)
+    if ($feed_status == 'feed_failure') {
+      $status_text = '<span style="background-color: #E90000;color: #fff;padding: 1px 2px;">Errors</span>';
+      $feed_status = 'feed_success';
+    }else if($object->status == 100){
+      $status_text = '<span style="background-color: #41E900;color: #fff;padding: 1px 2px;">Success</span>';
+    }else if ($object->status == 101) {
+      $status_text = '<span style="background-color: #E95D00;color: #fff;padding: 1px 2px;">Canceled</span>';
     }
 
     $share_icon = 'icon-share-alt';
@@ -148,7 +151,7 @@ class FeedV implements ObjectViewInterface {
     }
     $t -> replace('IMAGE_SRC', $feed_gfx64);
     $t -> replace('USERNAME', $username_displayed);
-    $t -> replace('FEED_STATUS', $feed_status);
+   // $t -> replace('FEED_STATUS', $feed_status);
     $t -> replace('FEED_NAME', $object->name);
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
     $t -> replace('TIME_FORMATED', $object->time);
