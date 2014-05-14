@@ -2,13 +2,13 @@
 #
 # PACS push plugin for ChRIS reloaded
 #
-#                                            _     
-#                                           | |    
-# ____  _____  ____  ___    ____  _   _  ___| |__  
-#|  _ \(____ |/ ___)/___)  |  _ \| | | |/___)  _ \ 
+#                                            _
+#                                           | |
+# ____  _____  ____  ___    ____  _   _  ___| |__
+#|  _ \(____ |/ ___)/___)  |  _ \| | | |/___)  _ \
 #| |_| / ___ ( (___|___ |  | |_| | |_| |___ | | | |
 #|  __/\_____|\____|___/   |  __/|____/(___/|_| |_|
-#|_|                       |_|                     
+#|_|                       |_|
 #
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
 #                   Boston Children's Hospital
@@ -23,7 +23,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 from plugin import Plugin
 sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
 from  _common import crun
-from  _common import systemMisc as misc 
+from  _common import systemMisc as misc
 import json
 import datetime as d
 
@@ -37,22 +37,24 @@ class PACSPush(Plugin):
   Plugin.DOCUMENTATION = 'http://wiki'
   Plugin.LICENSE = 'Opensource (MIT)'
   Plugin.VERSION = '0.3'
-  
+
+
   def push(self, root, name, suffix):
     print '======================================='
     print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
 
     options = self.options
     target = os.path.join(root, name)
-    
+
     command = options.DicomDirSendScript + ' -v 10';
 
     #special case for the top level directory anonymization
-    print name 
+    print name
     if name == '':
       name = os.path.basename(options.DIR)
- 
+
     print name
+    print options
 
     if options.ANONYM:
       command += ' -A -k -O ' + os.path.join(options.output, name) + '-' + d.datetime.now().strftime("%Y%m%d%H%M%S%f") + '-anon'
@@ -111,15 +113,15 @@ class PACSPush(Plugin):
     current_dir = os.path.dirname(os.path.abspath(__file__))
 
     #####
-    # 
+    #
     # MUST RUN AS CHRIS
     # CHRIS MUST HAVE ACCESS TO TARGET FILE
     #
     #####
-    
+
     print Plugin.TITLE
     print Plugin.VERSION
-    
+
     # we expect directory as input
     options.DIR = self.validate('directory', options.DIR);
 
@@ -141,19 +143,30 @@ class PACSPush(Plugin):
     print json_data
     data = json.loads(json_data)
 
-    print data['dicomhost']
-    print data['dicomport']
+    print "Configured dicomhost = %s" % data['dicomhost']
+    print "Configured dicomport = %s" % data['dicomport']
 
-    options.HOST = data['dicomhost']
-    options.PORT = data['dicomport']
+    if len(options.HOST) and len(options.PORT):
+      options.PACSDEST   = True
+    else:
+      options.PACSDEST  = False
+
+    if not options.PACSDEST:
+      options.HOST = data['dicomhost']
+      options.PORT = data['dicomport']
+    else:
+      print('PACSDEST override detected...')
+
+    print "Actual dicomhost = %s" % options.HOST
+    print "Actual dicomport = %s" % options.PORT
 
     # create link to input directory
     if not os.path.islink(os.path.join(options.output, os.path.basename(options.DIR))):
       os.symlink(options.DIR, os.path.join(options.output, os.path.basename(options.DIR)))
-  
-    suffix = '' 
 
-    # push subdirectories 
+    suffix = ''
+
+    # push subdirectories
     # Follow links required since most of chris data from feeds is linked to data/MRN/STUDY/SERIES/
     # Pushable directories are those containing files with any of the extensions in options.EXT
     pushableDirs = []
@@ -162,7 +175,7 @@ class PACSPush(Plugin):
       for fileName in files:
         if fileName.endswith(extensions):
           pushableDirs.append(root)
-          break                
+          break
       for i, name in enumerate(dirs):
         # we want the last push to create a new feeds for the pushed user id
         if(i == len(dirs) - 1):
@@ -182,31 +195,26 @@ class PACSPush(Plugin):
       self.push(options.DIR, '', suffix)
       pushableDirs.remove(options.DIR)
 
-    
-        
+
+
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = PACSPush()
-  plugin.add_parameter('Input', Plugin.IMAGE, '--directory', action='store', dest='DIR',
-                       help='Directory to be pushed')
-  plugin.add_parameter('Parameters', Plugin.COMBOBOX, '--remote', values=['MGH', 'BCH'],
-                       action='store', default='MGH', dest='REMOTE', help='Remote DICOM instance')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='dcm',
-                       dest='EXT', help='Extension of files to be pushed')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--aetitle', action='store', default='CHRIS2',
-                       dest='AETITLE', help='Called AETitle')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--caetitle', action='store', default='emaillink',
-                       dest='CAETITLE', help='Calling AETitle')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--panonymize', default=True, action='store_true',
-                       dest='PANONYM', help='Partially anonymize the dataset')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--MRN_force', action='store', default='',
-                       dest='MRN_FORCE', help='Override the MRN for anonymization')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--SUBJ_force', action='store', default='',
-                       dest='SUBJ_FORCE', help='Override subject name for anonymization')
-  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true',
-                       dest='ANONYM', help='Anonymize the dataset')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--dicomdirsendscript', action='store', dest='DicomDirSendScript',
+  plugin.add_parameter('Input', Plugin.IMAGE, '--directory', action='store', dest='DIR', help='Directory to be pushed')
+  plugin.add_parameter('Parameters', Plugin.COMBOBOX, '--remote', values=['MGH', 'BCH'], action='store', default='MGH', dest='REMOTE', help='Remote DICOM instance')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='dcm', dest='EXT', help='Extension of files to be pushed')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--aetitle', action='store', default='CHRIS2', dest='AETITLE', help='Called AETitle')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--caetitle', action='store', default='emaillink', dest='CAETITLE', help='Calling AETitle')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--panonymize', default=False, action='store_true', dest='PANONYM', help='Partially anonymize the dataset')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--MRN_force', action='store', default='', dest='MRN_FORCE', help='Override the MRN for anonymization')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--SUBJ_force', action='store', default='', dest='SUBJ_FORCE', help='Override subject name for anonymization')
+  plugin.add_parameter('Advanced', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Anonymize the dataset')
+
+  plugin.add_parameter('Advanced (Network)', Plugin.STRING, '--host', action='store', default='', dest='HOST', help='Override PACS host')
+  plugin.add_parameter('Advanced (Network)', Plugin.STRING, '--port', action='store', default='', dest='PORT', help='Override PACS port')
+
+  plugin.add_parameter('Advanced (Scripts)', Plugin.STRING, '--dicomdirsendscript', action='store', dest='DicomDirSendScript',
                        default=plugin.envVars['ENV_DICOMDIRSEND_SCRIPT'], help='The images directory')
-  plugin.add_parameter('Advanced', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
+  plugin.add_parameter('Advanced (Scripts)', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
                        default=plugin.envVars['ENV_FREESURFER_SCRIPT'], help='The images directory')
   plugin.launch()
