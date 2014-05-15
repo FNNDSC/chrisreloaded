@@ -1,0 +1,71 @@
+.logincontainer{
+    margin-top: 200px;
+}
+
+.loginwell{
+    background-color:#000;
+    color:#FFF;
+    border:none;
+}
+
+.loginlogo{
+    height: 80px;
+    float:right;
+}
+
+.loginlogotext{
+    color: white;
+    font-size:20px;
+}
+
+.center{
+    text-align: center; 
+}
+
+.feature {
+    width: 300px;
+    margin: auto;
+    float: right;
+    margin-right:20px;
+}
+
+.feature.webgl {
+   	display:none;
+}
+
+.feature.nowebgl {
+   	display:none;
+}
+
+.container2 {
+    height: 300px;
+    width: 300px;
+    position: relative;
+}
+
+.container2 canvas {
+    position: relative;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.circle {
+    height: 200px;
+    width: 200px;
+    border-radius: 200px;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    -webkit-transform-origin: center center;
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -o-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    -webkit-transition: .5s -webkit-transform ease;
+}
+
+.blue {
+   	color: #009DE9;
+}
