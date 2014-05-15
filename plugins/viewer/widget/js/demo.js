@@ -50,28 +50,28 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
 // when the html is loaded, we get the parameters from the plugin parameters
 _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
 
-   window.console.log(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid"));
-   window.console.log(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedtype"));
-   window.console.log(_CHRIS_INTERACTIVE_PLUGIN_.getParam("directory"));
-   window.console.log(_CHRIS_INTERACTIVE_PLUGIN_.getParam("links"));
+    var feedId = _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid");
+    var directory = _CHRIS_INTERACTIVE_PLUGIN_.getParam("directory");
+    var links = _CHRIS_INTERACTIVE_PLUGIN_.getParam("links");
+    var feedId = _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid");
 
   // IF THERE IS AN ID, make sure to cleanup the scene and the collaboration
-  if(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid") != ''){
+  if(feedId != ''){
     window.console.log('new visu + no new feed');
     _CHRIS_INTERACTIVE_PLUGIN_.destroy();
 
     // MIGHT NEED TO INTRODUCE TYPE AS WELL
-    _CHRIS_INTERACTIVE_PLUGIN_.getJSON(_CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid"), _CHRIS_INTERACTIVE_PLUGIN_.getParam("type"), '');
+    _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
     return;
   }
-  else if(_CHRIS_INTERACTIVE_PLUGIN_.getParam("directory") != '' && _CHRIS_INTERACTIVE_PLUGIN_.getParam("links") == false){
+  else if(directory != '' && links == false){
     window.console.log('same visu + new JSON');
     // get more json from the directory and view it!
     // MIGHT NEED TO INTRODUCE TYPE AS WELL
-    _CHRIS_INTERACTIVE_PLUGIN_.getJSON('', '', _CHRIS_INTERACTIVE_PLUGIN_.getParam("directory"));
+    _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
     return;
   }
-  else if(_CHRIS_INTERACTIVE_PLUGIN_.getParam("directory") != '' && _CHRIS_INTERACTIVE_PLUGIN_.getParam("links") == true){
+  else if(directory != '' && links == true){
     window.console.log('new visu + new feed');
     _CHRIS_INTERACTIVE_PLUGIN_.destroy();
 
@@ -100,7 +100,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
 
 
 
-_CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedID, feedType, directory){
+_CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedID, directory){
     // ajax find matching directory!
     jQuery.ajax({
         type : "POST",
@@ -108,12 +108,11 @@ _CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedID, feedType, directory){
         dataType : "json",
         data : {
             FEED_ID : feedID,
-            FEED_TYPE : feedType,
             DIRECTORY: directory
         },
         success : function(data) {
             window.console.log(data);
-            //_CHRIS_INTERACTIVE_PLUGIN_.startViewer(feedID, data);
+            _CHRIS_INTERACTIVE_PLUGIN_.startViewer(feedID, data);
         }
     });
 }
@@ -126,8 +125,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.startViewer = function(feedID, json){
     // close the connection on the chris Kill function
 
     // create viewer object
-    // viewer = new Viewer();
-    // viewer.init(json);
+    viewer = new Viewer();
+    viewer.init(json);
 
     // hook them up!
     // needs an interface!

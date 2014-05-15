@@ -93,7 +93,6 @@ _FEED_.feed_view_action = function(e, el){
           // modify
         e.stopPropagation();
 
-         var feedType = '';
          var feedID = '';
          var feedFolder = '';
 
@@ -102,7 +101,6 @@ _FEED_.feed_view_action = function(e, el){
 
             var feedElt = jQuery(this).closest('.feed');
 
-            feedType = feedElt.attr('data-type');
             feedID = feedElt.attr('data-chris-feed_id');
             feedFolder = feedElt.find('.file_browser').attr('data-folder');
             
@@ -131,9 +129,6 @@ _FEED_.feed_view_action = function(e, el){
             }
             else if(flag == '--feedid'){
               content = feedID;
-            }
-            else if(flag == '--feedtype'){
-              content = feedType;
             }
             else{
               content = '';

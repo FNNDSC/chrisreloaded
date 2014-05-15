@@ -36,51 +36,31 @@ function is_set($variable, $value = '') {
   return isset($variable)?$variable:$value;
 }
 
-// here, we always need a session started to access username
-session_start();
+// TODO FIX RELATIVE PATH ISSUE TO ENSURE WE CAN ACCESS/ DOWNLOAD THE DATA
 
 // exact match on subjectname
 $feed_id = is_set($_POST['FEED_ID']);
-
-// go through users' viewer feeds and find the matching ID!
-$username = $_SESSION['username'];
-$viewerFeeds = CHRIS_USERS.'/'.$username.'/viewer/';
-
-// Find relevant id
-$targetFeed = '';
-if ($handle = opendir($viewerFeeds)) {
-    while (false !== ($file = readdir($handle))) {
-    	// if match, we return!
-        if (preg_match("/-".$feed_id."/", $file)) {
-            $targetFeed = $file;
-            break;
-        }
-    }
-    closedir($handle);
-}
-
-// return relative path as well
-// the following allows us to access the file directly
-// http://chris/nicolas/users/chris.test/viewer/5_8_2014_15_52_24-2033/0_2014-05-08-15-52-25/files/0001-1.3.12.2.1107.5.2.32.35201.2012070314083059706985466.dcm-51
-// or request the data through api. probably better but to be done later
-
-// return the db.json file content
+$directory = is_set($_POST['DIRECTORY']);
 $content = '';
-if( $targetFeed != ''){
-	$dh  = opendir($viewerFeeds.'/'.$targetFeed);
-    while (false !== ($filename = readdir($dh))) {
-	    if($filename != '.' && $filename != '..'){
-            if (file_exists($viewerFeeds.'/'.$targetFeed.'/'.$filename.'/chris.json')){
-                $content = file_get_contents($viewerFeeds.'/'.$targetFeed.'/'.$filename.'/chris.json');
-                break;
-            }
 
-            return;
-		    
-	    }
+if($feed_id != ''){
+    // there should be a json file
+    // go through users' viewer feeds and find the matching ID!
+    $viewerFeeds = CHRIS_USERS."/$directory";
+
+    // echo "$viewerFeeds/.chris.json";
+    if (file_exists("$viewerFeeds/.chris.json")){
+        $content = file_get_contents("$viewerFeeds/.chris.json");
+    }
+    else{
+        return;
     }
 }
+else{
+    // index files in directory and return a json file
+    $content = exec(escapeshellcmd(CHRIS_PLUGINS_FOLDER."/viewer/viewer --directory $directory --output $directory --nottofile"));
+}
 
-echo json_encode($content);
-
+$relative_content = str_replace(CHRIS_USERS, 'users', $content);
+echo json_encode($relative_content);
 ?>

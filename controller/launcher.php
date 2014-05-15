@@ -279,7 +279,7 @@ $ssh->exec('bash -c \' echo "'.$command.'" >> '.$runfile.'\'');
 // generate the db.json file
 // to generate the db.json, we just call the viewer plugin with the correct input and ouput directories, $feed_path
 $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-$ssh->exec("echo '$viewer_plugin --directory $job_path --output $job_path;' >> $runfile;");
+$ssh->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
 if($status != 100){
   $end_token = TokenC::create();

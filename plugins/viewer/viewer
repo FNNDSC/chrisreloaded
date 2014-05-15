@@ -67,14 +67,18 @@ class Viewer(Plugin):
 
             # print indexedData
             if not ds.SOPInstanceUID in indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
+              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = os.path.join(root, fileName)
               # newRelativeName = os.path.join(filesDirectory, fileName + '-' + str(index))
-              relativePath = os.path.relpath(os.path.join(root, fileName), options.output)
-              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = relativePath
+              # relativePath = os.path.relpath(os.path.join(root, fileName), options.output)
+              # use full path, take care of the relative path in PHP -: getJSON.php, during AJAX call, which can get the CHRIS_HOME/USERS & CHRIS_USERS
 
-      path = os.path.join(options.output, 'chris.json')
-      f = open(path,'w')
-      f.write(json.dumps(indexedData))
-      f.close()
+      if not options.NOTTOFILE:
+        path = os.path.join(options.output, '.chris.json')
+        f = open(path,'w')
+        f.write(json.dumps(indexedData))
+        f.close()
+      else:
+        print indexedData
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -85,8 +89,8 @@ if __name__ == "__main__":
 
   plugin.add_parameter('Directory', Plugin.STRING, '--directory', action='store', dest='DIRECTORY', default='/neuro/users/chris/users/chris.test/data/dicom', help='Directory to be visualized')
   plugin.add_parameter('FeedID', Plugin.STRING, '--feedid', action='store', dest='FEEDID', default='', help='Feed ID to be viewed')
-  plugin.add_parameter('FeedType', Plugin.STRING, '--feedtype', default='', dest='FEEDTYPE', help='Help plugin to find the feed')
 
+  plugin.add_parameter('Print object instead of writing it to FS', Plugin.BOOLEAN, '--nottofile', default=False, action='store_true',dest='NOTTOFILE', help='Cset')
   plugin.add_parameter('Create links', Plugin.BOOLEAN, '--links', default=False, action='store_true',dest='LINKS', help='Create links for the dataset')
   # save json scene arg option, to parse json, put all files in new feed, generate new updated DB
   # useful to import data from multiple feeds
