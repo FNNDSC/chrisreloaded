@@ -37,7 +37,10 @@ class Viewer(Plugin):
 
       options = self.options
 
-      extension = ['dcm']
+      fibersExt = tuple(['trk'])
+      modelsExt = tuple(['obj', 'vtk', 'stl'])
+      volumesExt = tuple(['mgh', 'mgz', 'nrrd', 'nii', 'nii.gz'])
+      dicomExt = tuple(['dcm', 'ima', 'DCM', 'IMA'])
 
       # create links only if we create a viewer feed
       if options.LINKS:
@@ -47,30 +50,47 @@ class Viewer(Plugin):
               os.symlink(options.DIRECTORY, os.path.join(options.output, dirname))
 
       indexedData = {}
+      indexedData['fibers'] = []
+      indexedData['models'] = []
+      indexedData['volumes'] = []
+
+      dcmData = {}
 
       for root, dirs, files in os.walk(options.output, topdown=False, followlinks=True):
         for fileName in files:
           print fileName
-          if fileName.endswith(extension[0]):
+          if fileName.endswith(fibersExt):
+              indexedData['fibers'].append({'file':[fileName], 'url':root})
+          elif fileName.endswith(modelsExt):
+              indexedData['models'].append({'file':[fileName], 'url':root})
+          elif fileName.endswith(volumesExt):
+              indexedData['volumes'].append({'file':[fileName], 'url':root})
+          elif fileName.endswith(dicomExt):
             # read file
             ds = dicom.read_file(os.path.join(root, fileName))
             # index file
-            if not ds.PatientID in indexedData:
-              indexedData[ds.PatientID] = {}
+            if not ds.PatientID in dcmData:
+              dcmData[ds.PatientID] = {}
 
-            if not ds.StudyInstanceUID in indexedData[ds.PatientID]:
-              indexedData[ds.PatientID][ds.StudyInstanceUID] = {}
+            if not ds.StudyInstanceUID in dcmData[ds.PatientID]:
+              dcmData[ds.PatientID][ds.StudyInstanceUID] = {}
 
-            if not ds.SeriesInstanceUID in indexedData[ds.PatientID][ds.StudyInstanceUID]:
-              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID] = {}
+            if not ds.SeriesInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID]:
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID] = {}
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'] = []
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['url'] = root
 
+            if not ds.SOPInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'].append(fileName)
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = fileName
 
-            # print indexedData
-            if not ds.SOPInstanceUID in indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
-              indexedData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = os.path.join(root, fileName)
-              # newRelativeName = os.path.join(filesDirectory, fileName + '-' + str(index))
-              # relativePath = os.path.relpath(os.path.join(root, fileName), options.output)
-              # use full path, take care of the relative path in PHP -: getJSON.php, during AJAX call, which can get the CHRIS_HOME/USERS & CHRIS_USERS
+      # add DCM data to indexed data if any!
+      for patient in dcmData:
+        for study in dcmData[patient]:
+          for series in dcmData[patient][study]:
+            indexedData['volumes'].append({'file' : dcmData[patient][study][series]['file'], 'url' : dcmData[patient][study][series]['url']})
+
+      print indexedData
 
       if not options.NOTTOFILE:
         path = os.path.join(options.output, '.chris.json')
@@ -92,7 +112,5 @@ if __name__ == "__main__":
 
   plugin.add_parameter('Print object instead of writing it to FS', Plugin.BOOLEAN, '--nottofile', default=False, action='store_true',dest='NOTTOFILE', help='Cset')
   plugin.add_parameter('Create links', Plugin.BOOLEAN, '--links', default=False, action='store_true',dest='LINKS', help='Create links for the dataset')
-  # save json scene arg option, to parse json, put all files in new feed, generate new updated DB
-  # useful to import data from multiple feeds
 
   plugin.launch()

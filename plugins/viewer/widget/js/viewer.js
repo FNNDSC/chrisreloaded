@@ -14,7 +14,7 @@
  */
 
 // Declare (or re-declare) the single global variable
-viewer = viewer || {};
+var viewer = viewer || {};
 
 viewer.Viewer = function( jsonFile ) {
 
@@ -142,6 +142,12 @@ viewer.Viewer.prototype.render = function( fname ) {
 
 viewer.Viewer.prototype.addObject = function(){
 
+
+}
+
+viewer.Viewer.prototype.addJSON = function(json){
+
+  window.console.log(json);
 
 }
 

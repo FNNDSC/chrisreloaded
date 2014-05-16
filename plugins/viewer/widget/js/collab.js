@@ -9,8 +9,11 @@
  * TECHNOLOGY
  * - TogetherJS
  */
+
+// Declare (or re-declare) the single global variable
+var collab = collab || {};
  
-function Collab(roomID) {
+collab.Collab = function(roomID) {
 
 	this.version = 0.0;
 	this.roomID = roomID;
@@ -19,7 +22,7 @@ function Collab(roomID) {
 
 }
 
-Collab.prototype.init = function(){
+collab.Collab.prototype.init = function(){
 
 	TogetherJSConfig_findRoom =  "chris" + this.feedID;
 	TogetherJSConfig_on = {
@@ -28,19 +31,19 @@ Collab.prototype.init = function(){
     };
 }
 
-Collab.prototype.connect = function(){
+collab.Collab.prototype.connect = function(){
 
 
 }
 
-Collab.prototype.disconnet = function(){
+collab.Collab.prototype.disconnet = function(){
 
 
 }
 
-Collab.prototype.sayHi = function(){
+collab.Collab.prototype.destroy = function(){
 
-  window.console.log('HI COLLAB');
+  window.console.log('DESTROY COLLAB');
 
 }
 
