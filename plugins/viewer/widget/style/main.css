@@ -1,6 +1,6 @@
 .collaborate-btn{
 	float: left;
-	position: relative;
+	position: absolute;
 	z-index: 1;
 }
 
@@ -42,4 +42,8 @@
 	border-top-width: 2px;
 	border-top-style: solid;
 	border-top-color: green;
+}
+
+.interactive_plugin_content {
+	background-color: #353535 !important;
 }

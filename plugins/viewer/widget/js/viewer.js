@@ -23,11 +23,12 @@ viewer.Viewer = function( jsonFile ) {
   //window.console.log(''jsonFile);
   this.scene = {
     patientID : null,
-    fNames : [['plugins/viewer/widget/data/dicom/0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
-    'plugins/viewer/widget/data/dicom/0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
-    'plugins/viewer/widget/data/dicom/0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
-    'plugins/viewer/widget/data/dicom/0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
-    'plugins/viewer/widget/data/dicom/0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm'], 
+    fNames : [
+    // ['plugins/viewer/widget/data/dicom/0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
+    // 'plugins/viewer/widget/data/dicom/0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
+    // 'plugins/viewer/widget/data/dicom/0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
+    // 'plugins/viewer/widget/data/dicom/0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
+    // 'plugins/viewer/widget/data/dicom/0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm'], 
     'plugins/viewer/widget/data/recon.nii', 'plugins/viewer/widget/data/tact.trk']
   };
     // try to create and initialize a 3D renderer
@@ -66,7 +67,8 @@ viewer.Viewer = function( jsonFile ) {
     // .. and attach the single-file dicom in .NRRD format
   // this works with gzip/gz/raw encoded NRRD files but XTK also supports other
   // formats like MGH/MGZ
-  this.volume.file = this.scene.fNames[0].sort().map(function( str ) { return str;});
+  // this.volume.file = this.scene.fNames[0].sort().map(function( str ) { return str;});
+  this.volume.file = this.scene.fNames[0];
   
   // Use a 2D renderer as the main renderer since this should work also on
   // non-webGL-friendly devices like Safari on iOS. Add the volume so it 
@@ -83,6 +85,10 @@ viewer.Viewer = function( jsonFile ) {
   // just before the first rendering attempt
   var self = this;
   this.sliceX.onShowtime = function(volume) {
+
+    self.threeD.interactor.onTouchStart = self.threeD.interactor.onMouseDown = function(){self.onTouchStart();};
+    self.threeD.interactor.onTouchEnd = self.threeD.interactor.onMouseUp = function(){self.onTouchEnd();};
+
 
     // //
     // // add the volume to the other 3 renderers
@@ -167,4 +173,31 @@ viewer.Viewer.prototype.onThreshold = function(){
   window.console.log('Lets threshold!');
   //this.threeDRenderer 
 
+}
+
+
+viewer.Viewer.prototype.viewChanged = function(arr){
+    window.console.log('emit view changed');
+}
+
+// viewer.Viewer.prototype.viewEmitChanged = function(arr){
+//     window.console.log('emit view changed');
+//     self.viewChanged(viewM);
+// }
+
+viewer.Viewer.prototype.onViewChanged = function(arr){
+    window.console.log('update view in view');
+    window.console.log(this);
+    this.threeD.camera.view = new Float32Array(arr);
+}
+
+viewer.Viewer.prototype.onTouchStart = function(){
+    var self = this;
+    _CHRIS_INTERACTIVE_PLUGIN_._updater = setInterval(function(){
+            self.viewChanged(self.threeD.camera.view);
+        }, 150);
+}
+
+viewer.Viewer.prototype.onTouchEnd = function(){
+    clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
 }

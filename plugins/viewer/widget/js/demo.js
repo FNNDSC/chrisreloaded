@@ -70,13 +70,20 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
 /**
  * Create the base objects of the interactive plugin
  * Sets up all the connection
+ *
+ * feedID is important to create the common room for collaboration
  */
 _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID) {
     // create collab object
     collaborator = new collab.Collab(feedID);
 
     // create viewer object
-    //view = new viewer.Viewer('YO');
+    view = new viewer.Viewer('YO');
+
+    // connect events
+    collaborator.onViewChanged = function(test){view.onViewChanged(test);};
+    view.viewChanged = function(view){collaborator.viewChanged(view);};
+
 }
 
 /**
@@ -98,7 +105,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedID, directory){
             DIRECTORY: directory
         },
         success : function(data){
-          window.console.log(data);
+          //window.console.log(data);
           //view.addJSON(data);
         }
     });
