@@ -45,6 +45,29 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
  */
 class FeedV implements ObjectViewInterface {
 
+  public static function findFirstRootID($rootID){
+
+    $feedMetaAdvancedMapper= new Mapper('Feed');
+    $feedMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.name=(?)', 'root_id')->filter('meta.target_id=(?)', $rootID)->filter('meta.type=(?)', 'extra');
+    $feedMetaAdvancedResults = $feedMetaAdvancedMapper->get();
+
+    $root = -1;
+    $target = -2;
+
+    if(count($feedMetaAdvancedResults['Meta']) >= 1){
+      $root = $feedMetaAdvancedResults['Meta'][0]->value;
+      $target = $feedMetaAdvancedResults['Meta'][0]->target_id;
+    }
+
+    if($root == $target){
+      return $root;
+    }
+    else{
+      return FeedV::findFirstRootID($root);
+    }
+
+  }
+
   /**
    * Get HTML representation of the given object.
    * @param Feed $object object to be converted to HMTL.
@@ -82,7 +105,7 @@ class FeedV implements ObjectViewInterface {
     foreach($feedMetaAdvancedResults['Meta'] as $key => $value){
       // $feed_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
       if($value->name == "root_id"){
-        $root_id = $value->value;
+        $root_id = FeedV::findFirstRootID($value->value);
       }
     }
 
