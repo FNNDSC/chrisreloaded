@@ -114,6 +114,8 @@ class FeedV implements ObjectViewInterface {
     }else if ($object->status == 101) {
       $status_text = '<span style="background-color: #E95D00;color: #fff;padding: 1px 2px;">Canceled</span>';
     }
+ 
+    $view_icon = 'icon-eye-open';
 
     $share_icon = 'icon-share-alt';
 
@@ -135,12 +137,14 @@ class FeedV implements ObjectViewInterface {
 
     $edit_icon = '';
     $cancel = '';
+    $view = "display:none";
     if ($object->status >= 100 || $shared_feed) {
       $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'>";
 
       // if the job is not queued or running, don't display the cancel icon
       // also if the feed was shared
       $cancel = "display:none";
+      $view = "";
     }
 
     $t = new Template('feed.html');
@@ -160,12 +164,14 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('PLUGIN', ucwords(str_replace('_',' ',$object->plugin)));
     $t -> replace('STATUS', $object->status);
     $t -> replace('STATUS_TEXT', $status_text);
+    $t -> replace('VIEW_ICON', $view_icon);
     $t -> replace('SHARE_ICON', $share_icon);
     $t -> replace('TAG_ICON', $tag_icon);
     $t -> replace('ARCHIVE_ICON', $archive_icon);
     $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_ICON', $favorite_icon);
     $t -> replace('FAVORITE_TEXT', $favorite_text);
+    $t -> replace('VIEW', $view);
     $t -> replace('CANCEL', $cancel);
     $t -> replace('EDIT_ICON', $edit_icon);
     $t -> replace('FEED_SHINE', $shine);

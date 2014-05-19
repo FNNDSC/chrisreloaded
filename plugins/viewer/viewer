@@ -15,8 +15,12 @@
 
 # import the plugin.py superclass
 import os, sys, time
+
 sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
 from plugin import Plugin
+
+sys.path.append( os.path.join(os.path.dirname(__file__), 'libs/pydicom-0.9.8') )
+import dicom, json
 
 class Viewer(Plugin):
   '''
@@ -30,9 +34,71 @@ class Viewer(Plugin):
   Plugin.VERSION = '0.1'
 
   def run(self):
-      print 'I am sleeping 10s!'
-      time.sleep(10)
-      print 'I am done sleeping!'
+
+      options = self.options
+
+      fibersExt = tuple(['trk'])
+      modelsExt = tuple(['obj', 'vtk', 'stl'])
+      volumesExt = tuple(['mgh', 'mgz', 'nrrd', 'nii', 'nii.gz'])
+      dicomExt = tuple(['dcm', 'ima', 'DCM', 'IMA'])
+
+      # create links only if we create a viewer feed
+      if options.LINKS:
+          dirname = os.path.basename(options.DIRECTORY)
+          print dirname
+          if not os.path.exists(os.path.join(options.output, dirname)):
+              os.symlink(options.DIRECTORY, os.path.join(options.output, dirname))
+
+      indexedData = {}
+      indexedData['fibers'] = []
+      indexedData['models'] = []
+      indexedData['volumes'] = []
+
+      dcmData = {}
+
+      for root, dirs, files in os.walk(options.output, topdown=False, followlinks=True):
+        for fileName in files:
+          print fileName
+          if fileName.endswith(fibersExt):
+              indexedData['fibers'].append({'file':[fileName], 'url':root})
+          elif fileName.endswith(modelsExt):
+              indexedData['models'].append({'file':[fileName], 'url':root})
+          elif fileName.endswith(volumesExt):
+              indexedData['volumes'].append({'file':[fileName], 'url':root})
+          elif fileName.endswith(dicomExt):
+            # read file
+            ds = dicom.read_file(os.path.join(root, fileName))
+            # index file
+            if not ds.PatientID in dcmData:
+              dcmData[ds.PatientID] = {}
+
+            if not ds.StudyInstanceUID in dcmData[ds.PatientID]:
+              dcmData[ds.PatientID][ds.StudyInstanceUID] = {}
+
+            if not ds.SeriesInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID]:
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID] = {}
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'] = []
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['url'] = root
+
+            if not ds.SOPInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'].append(fileName)
+              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = fileName
+
+      # add DCM data to indexed data if any!
+      for patient in dcmData:
+        for study in dcmData[patient]:
+          for series in dcmData[patient][study]:
+            indexedData['volumes'].append({'file' : dcmData[patient][study][series]['file'], 'url' : dcmData[patient][study][series]['url']})
+
+      print indexedData
+
+      if not options.NOTTOFILE:
+        path = os.path.join(options.output, '.chris.json')
+        f = open(path,'w')
+        f.write(json.dumps(indexedData))
+        f.close()
+      else:
+        print indexedData
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -40,5 +106,11 @@ if __name__ == "__main__":
 
   # this in an interactive plugin
   plugin.interactive = True
-    
+
+  plugin.add_parameter('Directory', Plugin.STRING, '--directory', action='store', dest='DIRECTORY', default='/neuro/users/chris/users/chris.test/data/dicom', help='Directory to be visualized')
+  plugin.add_parameter('FeedID', Plugin.STRING, '--feedid', action='store', dest='FEEDID', default='', help='Feed ID to be viewed')
+
+  plugin.add_parameter('Print object instead of writing it to FS', Plugin.BOOLEAN, '--nottofile', default=False, action='store_true',dest='NOTTOFILE', help='Cset')
+  plugin.add_parameter('Create links', Plugin.BOOLEAN, '--links', default=False, action='store_true',dest='LINKS', help='Create links for the dataset')
+
   plugin.launch()

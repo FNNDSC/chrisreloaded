@@ -31,6 +31,7 @@ _PLUGIN_.hideBatchDrop = function() {
  */
 _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
   if (typeof _CHRIS_INTERACTIVE_PLUGIN_ == 'undefined') {
+    window.console.log('undef');
     // setup view layout
     _PLUGIN_.setupInteractiveLayout(_plugin_name, _jobs);
     jQuery('#plugin_submit').removeClass('disabled');
@@ -38,6 +39,7 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     jQuery('#plugin_submit_play').show();
     return null;
   } else if (_CHRIS_INTERACTIVE_PLUGIN_.force == false) {
+    window.console.log('force');
     // load new parameters
     _CHRIS_INTERACTIVE_PLUGIN_.parameters(_jobs);
     // start view
@@ -47,15 +49,18 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     jQuery('#plugin_submit_play').show();
     return null;
   } else {
+    window.console.log('go');
     // get new parameters
     _CHRIS_INTERACTIVE_PLUGIN_.force = false;
     return _CHRIS_INTERACTIVE_PLUGIN_.parameters();
   }
 }
+
 /**
  * Cleanup the layout after an interactive plugin
  */
 _PLUGIN_.cleanInteractiveLayout = function() {
+
   // clean if necessary
   if (typeof _CHRIS_INTERACTIVE_PLUGIN_ != 'undefined') {
     _CHRIS_INTERACTIVE_PLUGIN_.destroy();
@@ -63,6 +68,7 @@ _PLUGIN_.cleanInteractiveLayout = function() {
   // clean namespace
   _CHRIS_INTERACTIVE_PLUGIN_ = {};
   _CHRIS_INTERACTIVE_PLUGIN_ = undefined;
+
   // back to original layout
   // GO!
   // 1- hide center
@@ -76,11 +82,13 @@ _PLUGIN_.cleanInteractiveLayout = function() {
                 .on(
                     "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
                     function() {
-                      jQuery('#opaqueoverlay').css('width',
-                          jQuery('#opaqueoverlay').data('width'));
+                      jQuery('#opaqueoverlay').css('width',jQuery('#opaqueoverlay').data('width'));
                       jQuery('#right')
                           .off(
                               "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
+
+                      jQuery(".interactive_plugin_content").trigger( "cleanInteractive", [ "Custom", "Event" ] );
+
                     });
             jQuery('#right').css('width', jQuery('#right').data('width'));
           });
@@ -89,9 +97,17 @@ _PLUGIN_.cleanInteractiveLayout = function() {
  * Setup the layout before an interactive plugin
  */
 _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
-  // store width value
-  jQuery('#opaqueoverlay').data('width', jQuery('#opaqueoverlay').css('width'));
-  jQuery('#right').data('width', jQuery('#right').css('width'));
+
+  // * store width value
+  // * we only set it the first time we start an interactive plugin
+  // * if we reset it all the time, timing issues when we go from 1 interactive
+  // to another interactive plugin
+  // * the values are updated if the window is resized
+  if(typeof(jQuery('#right').data('width')) == 'undefined'){
+      jQuery('#opaqueoverlay').data('width', jQuery('#opaqueoverlay').css('width'));
+      jQuery('#right').data('width', jQuery('#right').css('width'));
+  }
+
   // connect close button
   jQuery(document).off('click', '#close_interactive_plugin').on('click',
       '#close_interactive_plugin', _PLUGIN_.cleanInteractiveLayout);
@@ -198,11 +214,19 @@ jQuery(document)
 
                     var _categorySelector = '';
                     var _pluginSelector = '';
-                    if (e.val.length > 0) {
+
+                    var val = null;
+
+                    if (jQuery("#cart_categories").select2('data') != null){
+                      val = jQuery("#cart_categories").select2('data').text;
+                      cat = jQuery("#cart_categories").select2('data').element[0].parentElement.label;
+                    }
+
+                    if (val != null) {
                       // set category + active plugin
                       // show one plugin
-                      _categorySelector = '[data-category="' + e.added.element[0].parentElement.label + '"]';
-                      _pluginSelector = '#' + e.val;
+                      _categorySelector = '[data-category="' + cat + '"]';
+                      _pluginSelector = '#' + val;
                     }
                     else {
                       //'show all'; == 'show first'
