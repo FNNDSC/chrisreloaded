@@ -72,13 +72,18 @@ class FeedV implements ObjectViewInterface {
     }
 
     // Format advanced meta feed
+    $root_id = 0;
+
     $feedMetaAdvancedMapper= new Mapper('Feed');
-    $feedMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
+    $feedMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'extra');
     $feedMetaAdvancedResults = $feedMetaAdvancedMapper->get();
     $feed_meta_advanced = $feed_meta_simple;
 
     foreach($feedMetaAdvancedResults['Meta'] as $key => $value){
-      $feed_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
+      // $feed_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
+      if($value->name == "root_id"){
+        $root_id = $value->value;
+      }
     }
 
     $feed_status = 'feed_success';
@@ -149,6 +154,7 @@ class FeedV implements ObjectViewInterface {
 
     $t = new Template('feed.html');
     $t -> replace('ID', $object->id);
+    $t -> replace('ROOT_ID', $root_id);
     $feed_gfx64 = 'plugins/'.$object->plugin.'/feed.png';
     $feed_gfx64_checked = 'view/gfx/feed_checked.png';
     if(!is_file(joinPaths(CHRIS_WWWROOT, $feed_gfx64))){
@@ -157,7 +163,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('IMAGE_SRC', $feed_gfx64);
     $t -> replace('IMAGE_CHECKED', $feed_gfx64_checked);
     $t -> replace('USERNAME', $username_displayed);
-   // $t -> replace('FEED_STATUS', $feed_status);
+    $t -> replace('FEED_STATUS', $feed_status);
     $t -> replace('FEED_NAME', $object->name);
     $t -> replace('FEED_META_CONTENT', $feed_meta_advanced);
     $t -> replace('TIME_FORMATED', $object->time);
