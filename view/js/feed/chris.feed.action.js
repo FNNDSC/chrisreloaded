@@ -101,7 +101,14 @@ _FEED_.feed_view_action = function(e, el){
 
             var feedElt = jQuery(this).closest('.feed');
 
-            feedID = feedElt.attr('data-chris-feed_id');
+            rootID = feedElt.attr('data-chris-root_id');
+            if(rootID != 0){
+                feedID = rootID;
+            }
+            else{
+                feedID = feedElt.attr('data-chris-feed_id');
+            }
+
             feedFolder = feedElt.find('.file_browser').attr('data-folder');
             
         }

@@ -63,9 +63,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
     //     //viewer.destroy();
     //     view = null;
     // }
-
-    // stop timeout if any
-}
+  }
 
 /**
  * Create the base objects of the interactive plugin
@@ -141,6 +139,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
         // * click on 'view' inside a feed's file browser
         // DO:
         // * UPDATE the scene and the collaboration
+        // what if there is NO scene?
 
         // get more json from the directory and view it!
         // MIGHT NEED TO INTRODUCE TYPE AS WELL
