@@ -77,37 +77,22 @@ class FeedV implements ObjectViewInterface {
     // Format username
     $username = FeedV::_getUsername($object->user_id);
     $username_displayed = ucwords($username);
-    $shared_feed = false;
-    // Format time
-    //$time = FeedV::_getTime(date("Y-m-d H:i:s", $object->time));
-    // Format simple meta feed
-    $feedMetaSimpleMapper= new Mapper('Feed');
-    $feedMetaSimpleMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
-    $feedMetaSimpleResults = $feedMetaSimpleMapper->get();
     $feed_meta_simple = '';
 
-    foreach($feedMetaSimpleResults['Meta'] as $key => $value){
-      $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value. '</br>';
-      if($value->name == "sharer_id"){
-        $username_displayed = 'Shared by '.ucwords(FeedV::_getUsername($value->value));
+    // Format simple meta feed
+    $feedMetaSimpleMapper= new Mapper('Feed');
+    $feedMetaSimpleMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.name=(?)', 'sharer_id')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
+    $feedMetaSimpleResults = $feedMetaSimpleMapper->get();
+    $shared_feed = false;
+    if(count($feedMetaSimpleResults['Meta']) >= 1){
+        $username_displayed = 'Shared by '.ucwords(FeedV::_getUsername($feedMetaSimpleResults['Meta'][0]->value));
         $shared_feed = true;
-      }
     }
 
     // Format advanced meta feed
     $root_id = 0;
-
-    $feedMetaAdvancedMapper= new Mapper('Feed');
-    $feedMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'extra');
-    $feedMetaAdvancedResults = $feedMetaAdvancedMapper->get();
+    $root_id = FeedV::findFirstRootID($object->id);
     $feed_meta_advanced = $feed_meta_simple;
-
-    foreach($feedMetaAdvancedResults['Meta'] as $key => $value){
-      // $feed_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
-      if($value->name == "root_id"){
-        $root_id = FeedV::findFirstRootID($value->value);
-      }
-    }
 
     $feed_status = 'feed_success';
     $feed_folder = joinPaths(CHRIS_USERS, $username,$object->plugin, $object->name.'-'.$object->id);

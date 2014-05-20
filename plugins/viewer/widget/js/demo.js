@@ -79,6 +79,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID) {
     view = new viewer.Viewer('YO');
 
     // connect events
+    // collaborator.onViewChanged = function(test){view.onViewChanged(test);};
+    // view.viewChanged = function(view){collaborator.viewChanged(view);};
     collaborator.onViewChanged = function(test){view.onViewChanged(test);};
     view.viewChanged = function(view){collaborator.viewChanged(view);};
 
