@@ -119,10 +119,12 @@ class PluginTest():
         feedID = 0
         for dir in os.listdir(pluginDir):
             splittedFile = dir.split('-')
-            fileID = splittedFile[len(splittedFile) - 1]
-            if int(fileID)  > feedID:
-                feedID = int(fileID)
-                latestFeed = dir
+            length = len(splittedFile) - 1
+            if length > 0 :
+                fileID = splittedFile[length]
+                if int(fileID)  > feedID:
+                    feedID = int(fileID)
+                    latestFeed = dir
         
         return latestFeed
 
