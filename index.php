@@ -123,7 +123,7 @@ if (SecurityC::login_attempt()) {
 
   // check if query required
   $parsed_url = parse_url($_SERVER["REQUEST_URI"]);
-  print_r( $parsed_url );
+  
   // we have args, let's have a look at them
   if(isset($parsed_url['query']) && !empty($parsed_url['query'])){
     // if anything, might want to CURL it :)
