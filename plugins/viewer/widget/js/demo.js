@@ -134,6 +134,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
 
         // MIGHT NEED TO INTRODUCE TYPE AS WELL
         _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
+
         return;
     }
     else if(directory != '' && links == false){
@@ -146,6 +147,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
         // get more json from the directory and view it!
         // MIGHT NEED TO INTRODUCE TYPE AS WELL
         _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
+
         return;
     }
     else if(directory != '' && links == true){
@@ -157,7 +159,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
         // * CREATE feed
         // * CREATE scene and collaboration
 
-        _CHRIS_INTERACTIVE_PLUGIN_.destroy();
+        //_CHRIS_INTERACTIVE_PLUGIN_.destroy();
         // create new feed
         _CHRIS_INTERACTIVE_PLUGIN_.force = true;
         $("#plugin_submit").click();

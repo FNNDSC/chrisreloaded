@@ -17,26 +17,82 @@ collab.Collab = function(roomID) {
 
 	this.version = 0.0;
 	this.roomID = roomID;
-	window.console.log('room ID: ' + this.roomID);
-
 	this.init();
+
+}
+
+collab.Collab.prototype.updateButton = function(){
+    // apply style
+    var jButton = jQuery('.collaborate-btn > button');
+
+    if(jButton.hasClass('collaborating')){
+
+        jButton.removeClass('collaborating');
+
+    }
+    else{
+
+        jButton.addClass('collaborating');
+
+    }
+
+    // set content
+    // false because TogetherJS is still true but we want to change style/content
+    this.setButtonContent(false);
+}
+
+collab.Collab.prototype.setButtonContent = function(force){
+
+    var test = typeof force !== 'undefined' ? force : (typeof(TogetherJS) != 'undefined' && TogetherJS != null && TogetherJS.running);
+
+    var jButton = jQuery('.collaborate-btn > button');
+
+    if(jButton.hasClass('collaborating') ||  test){
+
+      // if togetherjs running
+         if(test){
+            jButton.addClass('collaborating');
+         }
+         
+         jButton.html('Leave The Reading Room');
+
+    }
+    else{
+
+        jButton.html('Enter Feed Reading Room');
+
+    }
 
 }
 
 collab.Collab.prototype.init = function(){
 
+  //style button with appropriate content
+  this.setButtonContent();
+  // connect callbacks
+  var self = this;
+
 	TogetherJSConfig_findRoom =  "chris" + this.roomID;
-	TogetherJSConfig_autoStart =  true;
 	TogetherJSConfig_suppressJoinConfirmation = true;
 	TogetherJSConfig_suppressInvite = true;
 	TogetherJSConfig_dontShowClicks = true;
 
-	var self = this;
 	TogetherJSConfig_on = {
-		// connect everything
         ready: function(){
-        	self.style();
-        	self.connect();
+        	  self.style();
+        	  self.connect();
+            // for is running (reload page with open collab)
+            self.setButtonContent();
+        },
+        close:function(){
+            // clean up callbacks
+            // required if not next time we will have 2 ready & close callbacks
+            TogetherJS._listeners = {};
+            // cleanup room ID
+            // required, if not tries to go to previous room
+            self.updateButton();
+            var store = TogetherJS.require('storage');
+            store.tab.set('status').then(function(saved){saved = null;});
         }
     };
 }
@@ -51,7 +107,7 @@ collab.Collab.prototype.style = function(){
 collab.Collab.prototype.connect = function(msg){
  
     var self = this;
-	TogetherJS.hub.on("viewChanged", function (msg) {
+	  TogetherJS.hub.on("viewChanged", function (msg) {
         if (! msg.sameUrl) {
             return;
         }
@@ -60,7 +116,6 @@ collab.Collab.prototype.connect = function(msg){
         var arr = $.map(obj, function(el) { return el; });
         self.onViewChanged(arr);
     });
-
 }
 
 collab.Collab.prototype.onViewChanged = function(msg){
@@ -90,14 +145,9 @@ collab.Collab.prototype.destroy = function(){
 
 	if(typeof(TogetherJS) != 'undefined' && TogetherJS != null){
 		if(TogetherJS.running){
-	        TogetherJS();
-		    var store = TogetherJS.require('storage');
-		    store.tab.set('status').then(function(saved){saved = null;});
+         TogetherJS();
 		}
 	}
-
-    //this.disconnect();
-
 }
 
 // _CHRIS_INTERACTIVE_PLUGIN_.togetherjsYO = function(feedID, threeD){
