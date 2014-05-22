@@ -459,8 +459,15 @@ jQuery(document)
                 if (jQuery(this).hasClass('disabled')) {
                   return;
                 }
-                // grab the visible plugin panel
+                // if nothing selected in the search box
                 var _visible_panel = jQuery('.plugin_panel:visible');
+
+                // if in expanded view
+                var _data = jQuery("#cart_categories").select2('data');
+                if (_data != null){
+                  _visible_panel = jQuery("#panel_" + _data.text);
+                }
+
                 var _plugin_name = _visible_panel.attr('id').replace(
                     'panel_', '');
                 var _parameter_rows = _visible_panel.find('.parameter_row');
