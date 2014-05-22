@@ -25,7 +25,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.getParam = function(parameter) {
     return "";
 };
 
-
 /**
  * Helper function to get a parameter's index from container
  */
@@ -38,8 +37,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.getInd = function(parameter) {
 
 
 /**
- * Callback function which is called when a plugin has been submitted
- * It doesn't tell us if the plugin is queued/finished
+ * Callback function which is called when a plugin has been submitte
+d * It doesn't tell us if the plugin is queued/finished
  */
 _CHRIS_INTERACTIVE_PLUGIN_.submitted = function(data) {
     var res = data.match(/\d+/g);
@@ -72,15 +71,18 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
  * feedID is important to create the common room for collaboration
  */
 _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID) {
+
     // create collab object
-    collaborator = new collab.Collab(feedID);
+    if(typeof(collaborator) == 'undefined' || collaborator == null){
+        collaborator = new collab.Collab(feedID);
+    }
 
     // create viewer object
-    view = new viewer.Viewer('YO');
+    if(typeof(view) == 'undefined' || view == null){
+        view = new viewer.Viewer('YO');
+    }
 
-    // connect events
-    // collaborator.onViewChanged = function(test){view.onViewChanged(test);};
-    // view.viewChanged = function(view){collaborator.viewChanged(view);};
+    // (re)connect events
     collaborator.onViewChanged = function(test){view.onViewChanged(test);};
     view.viewChanged = function(view){collaborator.viewChanged(view);};
 
@@ -141,10 +143,11 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
         // USE CASE:
         // * click on 'view' inside a feed's file browser
         // DO:
+        // * CREATE new scene if needed
         // * UPDATE the scene and the collaboration
-        // what if there is NO scene?
 
-        // get more json from the directory and view it!
+        // We might have to create a scene/collab - id -1
+        _CHRIS_INTERACTIVE_PLUGIN_.create(-1);
         // MIGHT NEED TO INTRODUCE TYPE AS WELL
         _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
 

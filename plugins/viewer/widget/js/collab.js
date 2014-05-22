@@ -54,12 +54,12 @@ collab.Collab.prototype.setButtonContent = function(force){
             jButton.addClass('collaborating');
          }
          
-         jButton.html('Leave The Reading Room');
+         jButton.html('<i class="fa fa-sign-out"></i> Leave The Reading Room');
 
     }
     else{
 
-        jButton.html('Enter Feed Reading Room');
+        jButton.html('<i class="fa fa-sign-in"></i> Enter The Reading Room');
 
     }
 

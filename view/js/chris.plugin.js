@@ -69,30 +69,38 @@ _PLUGIN_.cleanInteractiveLayout = function() {
   _CHRIS_INTERACTIVE_PLUGIN_ = {};
   _CHRIS_INTERACTIVE_PLUGIN_ = undefined;
 
+  var jCenter = jQuery('#center');
+  var jRight = jQuery('#right');
+
+  // leave expanded mode if necessary
+  var expanded = jCenter.hasClass('expanded');
+  if(expanded){
+    _PLUGIN_.expandInteractiveLayout();
+  }
+
   // back to original layout
   // GO!
   // 1- hide center
   // 2- modify right width
   // 3- modify background width
   jQuery('#center:visible')
-      .hide(
-          'blind',
-          function() {
-            jQuery('#right')
+      .hide(0, 'linear', function() {
+            jRight
                 .on(
                     "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
                     function() {
                       jQuery('#opaqueoverlay').css('width',jQuery('#opaqueoverlay').data('width'));
-                      jQuery('#right')
+                      jRight
                           .off(
                               "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
 
                       jQuery(".interactive_plugin_content").trigger( "cleanInteractive", [ "Custom", "Event" ] );
 
                     });
-            jQuery('#right').css('width', jQuery('#right').data('width'));
+            jRight.css('width', jRight.data('width'));
           });
 }
+
 /**
  * Setup the layout before an interactive plugin
  */
@@ -111,6 +119,11 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
   // connect close button
   jQuery(document).off('click', '#close_interactive_plugin').on('click',
       '#close_interactive_plugin', _PLUGIN_.cleanInteractiveLayout);
+
+  // connect expand button
+  jQuery(document).off('click', '#expand_interactive_plugin').on('click',
+      '#expand_interactive_plugin', _PLUGIN_.expandInteractiveLayout);
+
   // prepare sequence of transitions
   jQuery('#opaqueoverlay').on(
       "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
@@ -128,7 +141,7 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
                   dataType : "text",
                   success : function(data) {
                     jQuery('.interactive_plugin_content').html(data);
-                    jQuery('#center').show('blind');
+                    jQuery('#center').show();
                     // pass parameters
                     _CHRIS_INTERACTIVE_PLUGIN_.parameters(_params);
                     // start view
@@ -154,6 +167,44 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
     jQuery('#opaqueoverlay').css('width', _windows_width)
   });
 }
+
+/**
+ * Expand/reduce the layout of an interactive plugin
+ */
+_PLUGIN_.expandInteractiveLayout = function() {
+
+  window.console.log('expand clicked');
+
+  // add/removed expanded class
+  var jCenter = jQuery('#center');
+  var jLeft = jQuery('#left');
+  var jRight = jQuery('#right');
+
+  var expanded = jCenter.hasClass('expanded');
+
+  if(expanded){
+    jLeft.show();
+    jRight.show();
+    jCenter.removeClass('expanded');
+
+    jCenter.find('#expand_interactive_plugin').html('<i class="fa fa-expand fa-2x"></i>');
+  }
+  else{
+    jLeft.hide();
+    jRight.hide();
+    jCenter.addClass('expanded');
+
+    jCenter.find('#expand_interactive_plugin').html('<i class="fa fa-compress fa-2x"></i>');
+  }
+
+  // trigger resize event instead ( Interactive plugin might need it, i.e. Renderer3D)
+  // not working
+  //$(window).resize();
+  var ev = document.createEvent('Event');
+  ev.initEvent('resize', true, true);
+  window.dispatchEvent(ev);
+}
+
 /**
  * Setup the javascript when document is ready (finshed loading)
  */

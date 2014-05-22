@@ -190,45 +190,44 @@ to {
 }
 
 #opaqueoverlay {
-	-webkit-transition:500ms linear;
-  -moz-transition:500ms linear;
-  -o-transition:500ms linear;
-  -ms-transition:500ms linear;
-  transition:500ms linear;
+	-webkit-transition:200ms linear;
+  -moz-transition:200ms linear;
+  -o-transition:200ms linear;
+  -ms-transition:200ms linear;
+  transition:200ms linear;
 }
 
 #home {
-  -webkit-transition:500ms linear;
-  -moz-transition:500ms linear;
-  -o-transition:500ms linear;
-  -ms-transition:500ms linear;
-  transition:500ms linear;
+  -webkit-transition:200ms linear;
+  -moz-transition:200ms linear;
+  -o-transition:200ms linear;
+  -ms-transition:200ms linear;
+  transition:200ms linear;
 }
 
 #left {
-  -webkit-transition:500ms linear;
-  -moz-transition:500ms linear;
-  -o-transition:500ms linear;
-  -ms-transition:500ms linear;
-  transition:500ms linear;
+  -webkit-transition:200ms linear;
+  -moz-transition:200ms linear;
+  -o-transition:200ms linear;
+  -ms-transition:200ms linear;
+  transition:200ms linear;
 }
 
 #right {
-  -webkit-transition:500ms linear;
-  -moz-transition:500ms linear;
-  -o-transition:500ms linear;
-  -ms-transition:500ms linear;
-  transition:500ms;
+  -webkit-transition:200ms linear;
+  -moz-transition:200ms linear;
+  -o-transition:200ms linear;
+  -ms-transition:200ms linear;
+  transition:200ms;
 }
 
 .well{
 	 background-color: #FFF;
 }
 
-#close_interactive_plugin:hover {
+.interactive_plugin_title i:hover {
 	cursor:pointer;
 	background-color:grey;
-
 }
 
 ::-webkit-scrollbar {
