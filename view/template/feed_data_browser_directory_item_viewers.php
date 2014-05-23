@@ -11,13 +11,10 @@
 
   if (count($dicom_files) > 0) {
 
-    // this folder contains dicoms
-    // -> show the slicedrop logo
-
 ?>
-<img
-	src='view/gfx/slicedrop.png' title='Open with Slice:Drop'
-	class='slicedrop_icon focus' onclick='var e = arguments[0] || window.event; e.stopPropagation(); _FEED_.slicedrop_dicom(e);' style='position: absolute; right: 10px;'>
+<span class="feed_view" style="float:right;" onclick='var e = arguments[0] || window.event; var self = this; _FEED_.feed_view_action(e, self)'>
+  <i class="icon-eye-open focus"></i>
+</span>
 <?php
 
   }
@@ -31,7 +28,7 @@
   if (count($freesurfer_meshes) > 0) {
 
 ?>
-<span style='position: absolute; right: 10px;'></span>
+<span style='float:right'></span>
 <?php
 
   }

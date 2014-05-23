@@ -26,34 +26,41 @@
  *
  */
 
+define('__CHRIS_ENTRY_POINT__', 666);
+
+// include the configuration
+require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
+
 // convenience method to check if variable is set or not
 function is_set($variable, $value = '') {
   return isset($variable)?$variable:$value;
 }
 
+// TODO FIX RELATIVE PATH ISSUE TO ENSURE WE CAN ACCESS/ DOWNLOAD THE DATA
 
-// uniqueID
-$uniqueID = is_set($_POST['UNIQUEID']);
+// exact match on subjectname
+$feed_id = is_set($_POST['FEED_ID']);
+$directory = is_set($_POST['DIRECTORY']);
+$content = '';
 
-// seriesUIDlist
-$dataList = is_set($_POST['DATA']);
+if($feed_id != ''){
+    // there should be a json file
+    // go through users' viewer feeds and find the matching ID!
+    $viewerFeeds = CHRIS_USERS."/$directory";
 
-// clustertmpdir
-$clusterTmpDir = is_set($_POST['CLUSTER']);
-
-
-if($uniqueID != '') {
-    $str_fileName = $clusterTmpDir . '/' . $uniqueID;
-    $FH = fopen($str_fileName, 'w');
-    fclose($FH);
+    // echo "$viewerFeeds/.chris.json";
+    if (file_exists("$viewerFeeds/.chris.json")){
+        $content = file_get_contents("$viewerFeeds/.chris.json");
+    }
+    else{
+        return;
+    }
+}
+else{
+    // index files in directory and return a json file
+    $content = exec(escapeshellcmd(CHRIS_PLUGINS_FOLDER."/viewer/viewer --directory $directory --output $directory --nottofile"));
 }
 
-if($dataList != '') {
-    $str_fileName = $clusterTmpDir . '/' . $uniqueID;
-    file_put_contents($str_fileName, $dataList);
-    
-}
-
-echo $str_fileName;
-
+$relative_content = str_replace(CHRIS_USERS, 'users', $content);
+echo json_encode($relative_content);
 ?>

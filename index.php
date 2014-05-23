@@ -123,6 +123,7 @@ if (SecurityC::login_attempt()) {
 
   // check if query required
   $parsed_url = parse_url($_SERVER["REQUEST_URI"]);
+  
   // we have args, let's have a look at them
   if(isset($parsed_url['query']) && !empty($parsed_url['query'])){
     // if anything, might want to CURL it :)
@@ -156,6 +157,17 @@ if (SecurityC::login_attempt()) {
     }
 
     // then clean URL, back to main entry point
+    header("Location: ?");
+    exit();
+  }
+
+  // quick (and dirty) hack to ensure that there is always a '?' in the URL
+  // we add it to ensure that a user is always logged in at chris/? or chris/experimental/?
+  // if not, in collaboration mode it can happend that
+  // user 1 is at: chris/
+  // user 2 is at: chris/?
+  // then the collaboration is buggy
+  if ( $_SERVER["REQUEST_URI"][ strlen($_SERVER["REQUEST_URI"]) -1] !== '?') {
     header("Location: ?");
     exit();
   }

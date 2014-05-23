@@ -45,6 +45,29 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'template.class.php'));
  */
 class FeedV implements ObjectViewInterface {
 
+  public static function findFirstRootID($rootID){
+
+    $feedMetaAdvancedMapper= new Mapper('Feed');
+    $feedMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.name=(?)', 'root_id')->filter('meta.target_id=(?)', $rootID)->filter('meta.type=(?)', 'extra');
+    $feedMetaAdvancedResults = $feedMetaAdvancedMapper->get();
+
+    $root = -1;
+    $target = -2;
+
+    if(count($feedMetaAdvancedResults['Meta']) >= 1){
+      $root = $feedMetaAdvancedResults['Meta'][0]->value;
+      $target = $feedMetaAdvancedResults['Meta'][0]->target_id;
+    }
+
+    if($root == $target){
+      return $root;
+    }
+    else{
+      return FeedV::findFirstRootID($root);
+    }
+
+  }
+
   /**
    * Get HTML representation of the given object.
    * @param Feed $object object to be converted to HMTL.
@@ -54,41 +77,22 @@ class FeedV implements ObjectViewInterface {
     // Format username
     $username = FeedV::_getUsername($object->user_id);
     $username_displayed = ucwords($username);
-    $shared_feed = false;
-    // Format time
-    //$time = FeedV::_getTime(date("Y-m-d H:i:s", $object->time));
-    // Format simple meta feed
-    $feedMetaSimpleMapper= new Mapper('Feed');
-    $feedMetaSimpleMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
-    $feedMetaSimpleResults = $feedMetaSimpleMapper->get();
     $feed_meta_simple = '';
 
-    foreach($feedMetaSimpleResults['Meta'] as $key => $value){
-      $feed_meta_simple .= ' <b>'.$value->name.':</b> '.$value->value. '</br>';
-      if($value->name == "sharer_id"){
-        $username_displayed = 'Shared by '.ucwords(FeedV::_getUsername($value->value));
+    // Format simple meta feed
+    $feedMetaSimpleMapper= new Mapper('Feed');
+    $feedMetaSimpleMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.name=(?)', 'sharer_id')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'simple');
+    $feedMetaSimpleResults = $feedMetaSimpleMapper->get();
+    $shared_feed = false;
+    if(count($feedMetaSimpleResults['Meta']) >= 1){
+        $username_displayed = 'Shared by '.ucwords(FeedV::_getUsername($feedMetaSimpleResults['Meta'][0]->value));
         $shared_feed = true;
-      }
     }
 
     // Format advanced meta feed
-    $feedMetaAdvancedMapper= new Mapper('Feed');
-    $feedMetaAdvancedMapper->ljoin('Meta', 'meta.target_id = feed.id')->filter('meta.target_type=(?)', 'feed')->filter('meta.target_id=(?)', $object->id)->filter('meta.type=(?)', 'advanced');
-    $feedMetaAdvancedResults = $feedMetaAdvancedMapper->get();
+    $root_id = 0;
+    $root_id = FeedV::findFirstRootID($object->id);
     $feed_meta_advanced = $feed_meta_simple;
-
-    foreach($feedMetaAdvancedResults['Meta'] as $key => $value){
-      $feed_meta_advanced .= ' <b>'.$value->name.' :</b> '.$value->value;
-    }
-
-    // create the status text
-    $status_text = '<font color=red>Running <i class="icon-refresh rotating_class"></i></font>';
-    // ('.$object->status.'%)
-    if ($object->status == 100) {
-      $status_text = '<font color=#009DE9>Done</font>';
-    } else if ($object->status == 101) {
-      $status_text = '<font color=darkred>Canceled</font>';
-    }
 
     $feed_status = 'feed_success';
     $feed_folder = joinPaths(CHRIS_USERS, $username,$object->plugin, $object->name.'-'.$object->id);
@@ -112,6 +116,18 @@ class FeedV implements ObjectViewInterface {
       }
     }
 
+    // create the status text
+    $status_text = '<span style="background-color: #009DE9;color: #fff;padding: 1px 2px;">Running<i class="icon-refresh rotating_class"></i></span>';
+    // ('.$object->status.'%)
+    if ($feed_status == 'feed_failure') {
+      $status_text = '<span style="background-color: #E90000;color: #fff;padding: 1px 2px;">Errors</span>';
+      $feed_status = 'feed_success';
+    }else if($object->status == 100){
+      $status_text = '<span style="background-color: #41E900;color: #fff;padding: 1px 2px;">Success</span>';
+    }else if ($object->status == 101) {
+      $status_text = '<span style="background-color: #E95D00;color: #fff;padding: 1px 2px;">Canceled</span>';
+    }
+ 
     $view_icon = 'icon-eye-open';
 
     $share_icon = 'icon-share-alt';
@@ -134,21 +150,26 @@ class FeedV implements ObjectViewInterface {
 
     $edit_icon = '';
     $cancel = '';
+    $view = "display:none";
     if ($object->status >= 100 || $shared_feed) {
       $edit_icon = "<img class='feed_edit_icon show_me focus' src='view/gfx/jigsoar-icons/dark/16_edit_page2.png'>";
 
       // if the job is not queued or running, don't display the cancel icon
       // also if the feed was shared
       $cancel = "display:none";
+      $view = "";
     }
 
     $t = new Template('feed.html');
     $t -> replace('ID', $object->id);
+    $t -> replace('ROOT_ID', $root_id);
     $feed_gfx64 = 'plugins/'.$object->plugin.'/feed.png';
+    $feed_gfx64_checked = 'view/gfx/feed_checked.png';
     if(!is_file(joinPaths(CHRIS_WWWROOT, $feed_gfx64))){
       $feed_gfx64 = 'http://placehold.it/48x48';
     }
     $t -> replace('IMAGE_SRC', $feed_gfx64);
+    $t -> replace('IMAGE_CHECKED', $feed_gfx64_checked);
     $t -> replace('USERNAME', $username_displayed);
     $t -> replace('FEED_STATUS', $feed_status);
     $t -> replace('FEED_NAME', $object->name);
@@ -164,6 +185,7 @@ class FeedV implements ObjectViewInterface {
     $t -> replace('ARCHIVE_TEXT', $archive_text);
     $t -> replace('FAVORITE_ICON', $favorite_icon);
     $t -> replace('FAVORITE_TEXT', $favorite_text);
+    $t -> replace('VIEW', $view);
     $t -> replace('CANCEL', $cancel);
     $t -> replace('EDIT_ICON', $edit_icon);
     $t -> replace('FEED_SHINE', $shine);

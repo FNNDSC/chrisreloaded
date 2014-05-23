@@ -860,7 +860,7 @@ def attributes_strToDict(astr_attributes, astr_separator=" "):
     adict.setdefault(alistTuple[0], alistTuple[1].strip(chr(0x22) + chr(0x27)))
   return adict
 
-def str_blockIndent(astr_buf, a_tabs=1, a_tabLength=4):
+def str_blockIndent(astr_buf, a_tabs=1, a_tabLength=4, **kwargs):
     """
     For the input string <astr_buf>, replace each '\n'
     with '\n<tab>' where the number of tabs is indicated
@@ -868,6 +868,9 @@ def str_blockIndent(astr_buf, a_tabs=1, a_tabLength=4):
     
     Trailing '\n' are *not* replaced.
     """
+    str_tabBoundary = " "
+    for key, value in kwargs.iteritems():
+      if key == 'tabBoundary':  str_tabBoundary = value
     b_trailN = False
     length = len(astr_buf)
     ch_trailN = astr_buf[length - 1]
@@ -879,6 +882,7 @@ def str_blockIndent(astr_buf, a_tabs=1, a_tabLength=4):
     str_Indent = ''
     for i in range(a_tabLength):
         str_tab = '%s ' % str_tab
+    str_tab = "%s%s" % (str_tab, str_tabBoundary)
     for i in range(a_tabs):
         str_Indent = '%s%s' % (str_Indent, str_tab)
     str_ret = re.sub('\n', '\n%s' % str_Indent, astr_buf)

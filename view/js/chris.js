@@ -103,9 +103,20 @@ _CHRIS_.scalePanels = function() {
   jQuery('.interactive_plugin_content').css('min-height', _interactivepluginsize);
   jQuery('.interactive_plugin_content').css('height', _interactivepluginsize);
   jQuery('.interactive_plugin_content').css('max-height', _interactivepluginsize);
-  jQuery('#center').css('min-width', _interactivepluginwidth);
-  jQuery('#center').css('width', _interactivepluginwidth);
-  jQuery('#center').css('max-width', _interactivepluginwidth);
+  jQuery('#center').attr('chris-center_width', _interactivepluginwidth);
+
+  // if not in full screen mode, resize
+  if(jQuery('#left').is(":visible") && jQuery('#right').is(":visible")){
+    jQuery('#center').css('min-width', _interactivepluginwidth);
+    jQuery('#center').css('width', _interactivepluginwidth);
+    jQuery('#center').css('max-width', _interactivepluginwidth);
+  }
+  else{
+    jQuery('#center').css('min-width', _opaqueoverlaywidth);
+    jQuery('#center').css('width', _opaqueoverlaywidth);
+    jQuery('#center').css('max-width', _opaqueoverlaywidth); 
+  }
+
   if(jQuery('#center').is(":visible")){
     // resize opaque overlay if interactive plugin (#center) is visible
     jQuery('#opaqueoverlay').css('width', _opaqueoverlaywidth);

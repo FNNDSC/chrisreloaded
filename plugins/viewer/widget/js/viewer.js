@@ -14,7 +14,7 @@
  */
 
 // Declare (or re-declare) the single global variable
-viewer = viewer || {};
+var viewer = viewer || {};
 
 
 viewer.Viewer = function(jsonObj) {
@@ -315,3 +315,30 @@ viewer.Scene.prototype.typeListPropertyName = function(type) {
         files : ['lh.pial'] }, 
       { url   : 'plugins/viewer/widget/data/',
         files : ['rh.pial'] } ]; */
+
+
+viewer.Viewer.prototype.viewChanged = function(arr){
+    window.console.log('emit view changed');
+}
+
+// viewer.Viewer.prototype.viewEmitChanged = function(arr){
+//     window.console.log('emit view changed');
+//     self.viewChanged(viewM);
+// }
+
+viewer.Viewer.prototype.onViewChanged = function(arr){
+    window.console.log('update view in view');
+    window.console.log(this);
+    this.threeD.camera.view = new Float32Array(arr);
+}
+
+viewer.Viewer.prototype.onTouchStart = function(){
+    var self = this;
+    _CHRIS_INTERACTIVE_PLUGIN_._updater = setInterval(function(){
+            self.viewChanged(self.threeD.camera.view);
+        }, 150);
+}
+
+viewer.Viewer.prototype.onTouchEnd = function(){
+    clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
+}

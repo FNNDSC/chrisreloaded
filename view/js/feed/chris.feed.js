@@ -212,14 +212,14 @@ _FEED_.ajaxUpdate = function() {
                             if (data['new']['status'][i] == 100) {
                               
                               jQuery(this).find('.feed_status').html(
-                                  'Status: <font color=#009DE9>Done</font>');
+                                  '<span style="background-color: #41E900;color: #fff;padding: 1px 2px;">Success</span>');
                               
                             } else {
                              // hide cancel option
                               jQuery(this).find('.feed_cancel').parent().hide();
                              // change status
                               jQuery(this).find('.feed_status').html(
-                                  'Status: <font color=darkred>Canceled</font>');
+                                  '<span style="background-color: #E95D00;color: #fff;padding: 1px 2px;">Canceled</span>');
                               
                             }
                             
@@ -270,7 +270,7 @@ _FEED_.ajaxUpdate = function() {
                           jQuery(this)
                               .find('.feed_status')
                               .html(
-                                  'Status: <font color=red>Running <i class="icon-refresh rotating_class"></i></font>');
+                                  '<span style="background-color: #009DE9;color: #fff;padding: 1px 2px;">Running<i class="icon-refresh rotating_class"></i></span>');
                           // ('+ data['running']['content'][i] + '%)
                         });
               }

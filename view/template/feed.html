@@ -1,11 +1,14 @@
-<div data-chris-feed_id="${ID}" data-chris-feed_status="${STATUS}"
+<div data-chris-feed_id="${ID}" data-chris-root_id="${ROOT_ID}" data-chris-feed_status="${STATUS}"
 	data-chris-feed_time="${TIME_FORMATED}" class="feed ${FEED_STATUS}"
 	data-type='${PLUGIN}'>
 	<div class='feed_header ${FEED_SHINE}'>
-		<span class='feed_icon' data-type='${PLUGIN}'
-			data-chris-feed_id="${ID}"> 
-			<img class="feed_check" src="${IMAGE_SRC}">
-			<span class="feed_uncheck">✓</span>
+		<span class='feed_icon' data-type='${PLUGIN}' data-chris-feed_id="${ID}">
+	        <div class="front">
+		        <img class="feed_check" src="${IMAGE_SRC}">
+	        </div>
+	        <div class="back">
+		        <img class="feed_check" src="${IMAGE_CHECKED}">
+	        </div>
 		</span>
 		<div class='feed_header_line_one'>
 			<span style='margin-left: 0px; float: none;'>
@@ -16,7 +19,9 @@
 			${TAGS}
 			<span class="pull-right">
 				<span class="feed_time feed_header_small">Some time ago..</span><span class="pull-right show_me">&nbsp;
-				    <a class="feed_view"><i class="${VIEW_ICON} focus"></i></a>
+				    <span style="${VIEW}">
+				        <a class="feed_view"><i class="${VIEW_ICON} focus"></i></a>
+				    </span>
 				    <a class="feed_share"><i class="${SHARE_ICON} focus"></i></a>
 				    <a class="feed_favorite"><i class="${FAVORITE_ICON} focus"></i></a>
 				    <a class="feed_tag"><i class="${TAG_ICON} focus"></i></a>
@@ -32,8 +37,7 @@
 				class='feed_name_edit '
 				style='display: none; font-size: 12px; line-height: 12px'
 				type='text' value='${FEED_NAME}' /> ${EDIT_ICON} <span
-				class='feed_status feed_header_small pull-right'>Status:
-				${STATUS_TEXT} </span>
+				class='feed_status feed_header_small pull-right'>${STATUS_TEXT} </span>
 		</div>
 	</div>
 

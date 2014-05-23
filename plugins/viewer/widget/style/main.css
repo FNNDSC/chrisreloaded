@@ -1,6 +1,6 @@
 .collaborate-btn{
 	float: left;
-	position: relative;
+	position: absolute;
 	z-index: 1;
 }
 
@@ -56,4 +56,26 @@
 p { 
 	color: #FFF;
 	font-size: 20px;
+}
+
+.interactive_plugin_content {
+	background-color: #353535;
+}
+
+.collaborate-btn > button{
+    color: #FFF;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: rgb(70, 206, 135);
+    border: none;
+    padding: 5px;
+}
+
+.collaborate-btn > button.collaborating{
+	background-color: rgb(206, 92, 70);
+}
+
+.collaborate-btn > button:hover{
+    background-color: #353535;
+    border: 1px solid #FFF;
 }

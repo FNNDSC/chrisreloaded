@@ -18,7 +18,7 @@ _FEED_.feed_check_action = function(id){
   jQuery(allElts).each(function(){
     $(this).attr('data-chris-feed_checked', 'true');
     $(this).find('.feed_uncheck').css('display', 'block');
-    $(this).find('.feed_header').css('backgroundColor', 'rgba(255, 255, 0, 0.3)');
+    $(this).find('.feed_header').css('backgroundColor', 'rgb(204, 204, 204)');
     $(this).find('.feed_header').css('color', '#353535');
   });
 }
@@ -46,76 +46,77 @@ _FEED_.feed_check = function() {
         var allElts = jQuery(this).parent().parent().find('.feed');
         if(checked == "true"){
           jQuery(allElts).each(function(){
-              _FEED_.feed_check_action($(this).attr('data-chris-feed_id'));
+            $(this).find('.feed_icon').addClass('flip');
+            _FEED_.feed_check_action($(this).attr('data-chris-feed_id'));
           });
         }
         else{
           jQuery(allElts).each(function(){
-              _FEED_.feed_ucheck_action($(this).attr('data-chris-feed_id'));
+            $(this).find('.feed_icon').removeClass('flip');
+            _FEED_.feed_ucheck_action($(this).attr('data-chris-feed_id'));
           });
         }
       });
 
   jQuery(document).on(
       'click',
-      '.feed_check',
+      '.feed_icon',
       function(event) {
 
-        event.preventDefault();
-        event.stopPropagation();
+          event.preventDefault();
+          event.stopPropagation();
 
-        // get id, apply to all
-        var feedElt = jQuery(this).closest('.feed');
-        var feedID = feedElt.attr('data-chris-feed_id');
-        _FEED_.feed_check_action(feedID);
-
+          // if flip class
+          if( jQuery(this).hasClass('flip')){
+              $(this).removeClass('flip');
+              var feedElt = jQuery(this).closest('.feed');
+              var feedID = feedElt.attr('data-chris-feed_id');
+              _FEED_.feed_ucheck_action(feedID);
+          }
+          else{
+              $(this).addClass('flip');
+              var feedElt = jQuery(this).closest('.feed');
+              var feedID = feedElt.attr('data-chris-feed_id');
+              _FEED_.feed_check_action(feedID);
+          }
       });
-
-  jQuery(document).on(
-      'click',
-      '.feed_uncheck',
-      function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        // get id, apply to all
-        var feedElt = jQuery(this).closest('.feed');
-        var feedID = feedElt.attr('data-chris-feed_id');
-        _FEED_.feed_ucheck_action(feedID);
-
-      });
-
 }
 
 _FEED_.feed_view = function() {
   jQuery(document).on(
       'click',
       '.feed_view',
-      function(e) {
+      _FEED_.feed_view_action);
+}
 
-        // modify
+_FEED_.feed_view_action = function(e, el){
+          // modify
         e.stopPropagation();
 
-        // is single action?
-        var feedElt = jQuery(this).closest('.feed');
+         var feedID = '';
+         var feedFolder = '';
 
-        // is it a view feed?
-        var feedType = feedElt.attr('data-type');
+        // view whole feed or filebrowser directory?
+        if(typeof(el) == 'undefined'){
 
-        var feedID = '';
-        
-        if(feedType == 'Viewer'){
-          feedID = feedElt.attr('data-chris-feed_id');
+            var feedElt = jQuery(this).closest('.feed');
+
+            rootID = feedElt.attr('data-chris-root_id');
+            if(rootID != 0){
+                feedID = rootID;
+            }
+            else{
+                feedID = feedElt.attr('data-chris-feed_id');
+            }
+
+            feedFolder = feedElt.find('.file_browser').attr('data-folder');
+            
         }
+        else{
 
-        window.console.log(feedID);
+            feedFolder = jQuery(el).parent().attr('data-full-path');
 
-        // feed location relative to users
-        var feedFolder = feedElt.find('.file_browser').attr('data-folder');
-
-        window.console.log('feed id: ' + feedID);
-        window.console.log('feed type: ' + feedType);
-        window.console.log('feed folder: ' + feedFolder);
+        }
 
         // start viewer interactive plugin - HOW?
         // 1- show plugin
@@ -123,6 +124,7 @@ _FEED_.feed_view = function() {
         // 3- GO
         // 4- what if is already open?
         // update viewer default values
+
         var inputs = $("#panel_viewer .parameter_input");
 
         jQuery(inputs).each(function(){
@@ -132,13 +134,15 @@ _FEED_.feed_view = function() {
             if(flag == '--directory'){
               content = feedFolder;
             }
-            else{
+            else if(flag == '--feedid'){
               content = feedID;
+            }
+            else{
+              content = '';
             }
 
             $(this).find('textarea').attr('data-default', content);
             $(this).find('textarea').val(content);
-
         });
 
         // If I am already in the viewer plugin, this is not necessary
@@ -157,6 +161,7 @@ _FEED_.feed_view = function() {
             });
 
           $("#cart_categories").val("viewer").change();
+
         }
         // if not interactive, not timing issue, all sequential
         else if(_plugin_name != 'viewer' ){
@@ -167,10 +172,10 @@ _FEED_.feed_view = function() {
         }
         // if viewer
         else{
-          $("#plugin_submit").click();
-        }
 
-      });
+          $("#plugin_submit").click();
+
+        }
 }
 
 _FEED_.feed_share = function() {
