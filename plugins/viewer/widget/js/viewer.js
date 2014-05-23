@@ -73,17 +73,27 @@ viewer.Viewer = function(jsonObj) {
       ]
     }
   ];
+  
+  //rendered volume 
+  this.volume = new X.volume();
+  //rendered fibers
+  this.fibersList = [];
+  //rendered meshes
+  this.meshList = [];
+  //file selection widget
+  this.fileSelectWidget = null;
+  this.volWidget = null;
 
-  //current scene
-  this.scene = new viewer.Scene();
-  this.scene.setVolume('plugins/viewer/widget/data/dicom/', ['0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
+  this.fileSelectTree = this.createFileSelectTree('tree');
+
+  this.setVolume('plugins/viewer/widget/data/dicom/', ['0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
                                  '0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
                                  '0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
                                  '0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
                                  '0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm'] );
   //window.console.log('url: ' + json.fibers[0].url);
-  this.scene.addFibers('plugins/viewer/widget/data/', 'tact.trk');
-  this.scene.addMesh('plugins/viewer/widget/data/', 'lh.pial');
+  this.addFibers('plugins/viewer/widget/data/', 'tact.trk');
+  this.addMesh('plugins/viewer/widget/data/', 'lh.pial');
   // try to create and initialize a 3D renderer
   this._webGLFriendly = true;
   try {
@@ -95,7 +105,10 @@ viewer.Viewer = function(jsonObj) {
   this.create2DRenderer('sliceXX', 'X');
   this.create2DRenderer('sliceYY', 'Y');
   this.create2DRenderer('sliceZZ', 'Z');
-  this.render();
+  //Event handler for render button
+  self = this;
+  document.getElementById("renderbutton").addEventListener('click', function() {
+    self.render();});
 }
 
 
@@ -119,7 +132,7 @@ viewer.Viewer.prototype.render = function() {
   // Use a 2D renderer as the main renderer since this should work also on
   // non-webGL-friendly devices like Safari on iOS. Add the volume so it 
   // can be loaded and parsed
-  this.sliceXX.add(this.scene.volume);
+  this.sliceXX.add(this.volume);
   // start the loading/rendering
   this.sliceXX.render();
   // the onShowtime method gets executed after all files were fully loaded and
@@ -127,18 +140,18 @@ viewer.Viewer.prototype.render = function() {
   var self = this;
   this.sliceXX.onShowtime = function() {
     // add the volume to the other 3 renderers
-    self.sliceYY.add(self.scene.volume);
+    self.sliceYY.add(self.volume);
     //self.sliceYY.remove(self.volume)
     self.sliceYY.render(); 
-    self.sliceZZ.add(self.scene.volume);
+    self.sliceZZ.add(self.volume);
     self.sliceZZ.render();
     if (self._webGLFriendly) {
-      self['33d'].add(self.scene.volume);
-      for (var i = 0; i < self.scene.fibersList.length; i++) {
-        self['33d'].add(self.scene.fibersList[i]);
+      self['33d'].add(self.volume);
+      for (var i = 0; i < self.fibersList.length; i++) {
+        self['33d'].add(self.fibersList[i]);
       }
-      for (i = 0; i < self.scene.meshList.length; i++) {
-        self['33d'].add(self.scene.meshList[i]);
+      for (i = 0; i < self.meshList.length; i++) {
+        self['33d'].add(self.meshList[i]);
       }
       // the volume and geometric models are not in the same space, so
       // we configure some transforms in the onShowtime method which gets executed
@@ -153,16 +166,14 @@ viewer.Viewer.prototype.render = function() {
       self['33d'].render();
     } 
     // now the volume GUI widgets
-
-    
-    self.createFileSelectWidget('tree');
+  
     self.createVolWidget('xcontroller');
   };
 }
 
 
 viewer.Viewer.prototype.createVolWidget = function(container) {
-  if (this.scene.volume) {
+  if (this.volume.file) {
     var gui = new dat.GUI({ autoPlace: false });
     var customContainer = document.getElementById(container);
     customContainer.appendChild(gui.domElement);
@@ -171,41 +182,29 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     var volumegui = gui.addFolder('Volume');
     // now we can configure controllers which..
     // .. switch between slicing and volume rendering
-    volumegui.add(this.scene.volume, 'volumeRendering');
+    volumegui.add(this.volume, 'volumeRendering');
     // .. configure the volume rendering opacity
-    volumegui.add(this.scene.volume, 'opacity', 0, 1);
+    volumegui.add(this.volume, 'opacity', 0, 1);
     // .. and the threshold in the min..max range
-    volumegui.add(this.scene.volume, 'lowerThreshold', this.scene.volume.min, this.scene.volume.max);
-    volumegui.add(this.scene.volume, 'upperThreshold', this.scene.volume.min, this.scene.volume.max);
-    volumegui.add(this.scene.volume, 'windowLow', this.scene.volume.min, this.scene.volume.max);
-    volumegui.add(this.scene.volume, 'windowHigh', this.scene.volume.min, this.scene.volume.max);
+    volumegui.add(this.volume, 'lowerThreshold', this.volume.min, this.volume.max);
+    volumegui.add(this.volume, 'upperThreshold', this.volume.min, this.volume.max);
+    volumegui.add(this.volume, 'windowLow', this.volume.min, this.volume.max);
+    volumegui.add(this.volume, 'windowHigh', this.volume.min, this.volume.max);
     // the indexX,Y,Z are the currently displayed slice indices in the range
     // 0..dimensions-1
-    volumegui.add(this.scene.volume, 'indexX', 0, this.scene.volume.dimensions[0] - 1);
-    volumegui.add(this.scene.volume, 'indexY', 0, this.scene.volume.dimensions[1] - 1);
-    volumegui.add(this.scene.volume, 'indexZ', 0, this.scene.volume.dimensions[2] - 1);
+    volumegui.add(this.volume, 'indexX', 0, this.volume.dimensions[0] - 1);
+    volumegui.add(this.volume, 'indexY', 0, this.volume.dimensions[1] - 1);
+    volumegui.add(this.volume, 'indexZ', 0, this.volume.dimensions[2] - 1);
     volumegui.open();
   }
 }
 
 
-viewer.Viewer.prototype.createFileSelectWidget = function(container) {
-  $('#' + container).fancytree({
+viewer.Viewer.prototype.createFileSelectTree = function(container) {
+  return $('#' + container).fancytree({
     checkbox: true,
     source: this.source
   });
-}
-
-
-viewer.Viewer.prototype.addObject = function() {
-
-
-}
-
-
-viewer.Viewer.prototype.removeObject = function() {
-
-
 }
 
 
@@ -217,18 +216,7 @@ viewer.Viewer.prototype.onThreshold = function() {
 }
 
 
-//Scene class
-viewer.Scene = function() {
-  //rendered volume 
-  this.volume = new X.volume();
-  //rendered fibers
-  this.fibersList = [];
-  //rendered meshes
-  this.meshList = [];
-}
-
-
-viewer.Scene.prototype.setVolume = function(url, fileNames) {
+viewer.Viewer.prototype.setVolume = function(url, fileNames) {
   // for the dicom format, fileNames is a list of strings 
   // for other formats it's a list with just a single string 
   var orderedFiles = fileNames.sort().map(function(str) { 
@@ -242,17 +230,17 @@ viewer.Scene.prototype.setVolume = function(url, fileNames) {
 }
 
 
-viewer.Scene.prototype.addFibers = function(url, fileName) {
+viewer.Viewer.prototype.addFibers = function(url, fileName) {
   this.addGeomModel(url, fileName, 'fibers');
 }
 
 
-viewer.Scene.prototype.addMesh = function(url, fileName) {
+viewer.Viewer.prototype.addMesh = function(url, fileName) {
   this.addGeomModel(url, fileName, 'mesh');
 }
 
 
-viewer.Scene.prototype.addGeomModel = function(url, fileName, type) {
+viewer.Viewer.prototype.addGeomModel = function(url, fileName, type) {
   var tList = this.typeListPropertyName(type);
   var filePath = url + fileName;
 
@@ -264,7 +252,7 @@ viewer.Scene.prototype.addGeomModel = function(url, fileName, type) {
 }
 
 
-viewer.Scene.prototype.remGeomModel = function(url, fileName, type) {
+viewer.Viewer.prototype.remGeomModel = function(url, fileName, type) {
   var tList = this.typeListPropertyName(type);
   var filePath = url + fileName;
   var ix = indexOfGeomModel(filePath, type);
@@ -275,7 +263,7 @@ viewer.Scene.prototype.remGeomModel = function(url, fileName, type) {
 }
 
 
-viewer.Scene.prototype.indexOfGeomModel = function(filePath, type) {
+viewer.Viewer.prototype.indexOfGeomModel = function(filePath, type) {
   var tList = this.typeListPropertyName(type);
   var found = false;
 
@@ -293,9 +281,10 @@ viewer.Scene.prototype.indexOfGeomModel = function(filePath, type) {
 }
 
 
-viewer.Scene.prototype.typeListPropertyName = function(type) {
+viewer.Viewer.prototype.typeListPropertyName = function(type) {
   return type + 'List';
 }
+
 
 
   /*   { title : '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm'

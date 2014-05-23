@@ -48,14 +48,18 @@
 	position: absolute;
 }
 
-#tree{
+.fileselectwidget {
 	z-index: 10;
 	position: absolute;
 }
 
-p { 
+#fileselect { 
 	color: #FFF;
 	font-size: 20px;
+}
+
+ol, ul { 
+	list-style-type: none;
 }
 
 .interactive_plugin_content {
