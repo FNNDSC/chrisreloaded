@@ -19,7 +19,7 @@ var viewer = viewer || {};
 
 viewer.Viewer = function(jsonObj) {
 
-	this.version = 0.0;
+  this.version = 0.0;
   //Parse the jason file  
   this.source = [
     { title: 'plugins', key : '1', folder : true,
@@ -76,24 +76,36 @@ viewer.Viewer = function(jsonObj) {
   
   //rendered volume 
   this.volume = new X.volume();
-  //rendered fibers
-  this.fibersList = [];
-  //rendered meshes
-  this.meshList = [];
+  this.volume.key = -1;
+  //rendered geometric models (eg. fibers and meshes) 
+  this.geomModels = [];
   //file selection widget
   this.fileSelectWidget = null;
+  this.createFileSelectTree('tree');
+  // volume GUI widget
   this.volWidget = null;
 
-  this.fileSelectTree = this.createFileSelectTree('tree');
-
-  this.setVolume('plugins/viewer/widget/data/dicom/', ['0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
-                                 '0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
-                                 '0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
-                                 '0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
-                                 '0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm'] );
+  /*this.setVolume({  title: '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302_fullvol.dcm', 
+                    key: '6',
+                    type : 'volume', 
+                    url  : 'plugins/viewer/widget/data/dicom/',
+                    files : [ '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
+                              '0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
+                              '0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
+                              '0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
+                              '0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm']               
+                  });
   //window.console.log('url: ' + json.fibers[0].url);
-  this.addFibers('plugins/viewer/widget/data/', 'tact.trk');
-  this.addMesh('plugins/viewer/widget/data/', 'lh.pial');
+  this.addGeomModel({ title: 'tact.trk', key: '8',
+                      type : 'fibers', 
+                      url  : 'plugins/viewer/widget/data/',
+                      files : ['tact.trk']
+                   });
+  this.addGeomModel({ title: 'lh.pial', key: '9',
+                      type : 'mesh', 
+                      url  : 'plugins/viewer/widget/data/',
+                      files : ['lh.pial']
+                    });*/
   // try to create and initialize a 3D renderer
   this._webGLFriendly = true;
   try {
@@ -129,10 +141,14 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
 
 
 viewer.Viewer.prototype.render = function() {
-  // Use a 2D renderer as the main renderer since this should work also on
+
+    // Use a 2D renderer as the main renderer since this should work also on
   // non-webGL-friendly devices like Safari on iOS. Add the volume so it 
   // can be loaded and parsed
-  this.sliceXX.add(this.volume);
+  /*if (this.sliceXX.get(this.volume.id) != null) {
+      this.sliceXX.add(this.volume);
+  }*/
+
   // start the loading/rendering
   this.sliceXX.render();
   // the onShowtime method gets executed after all files were fully loaded and
@@ -147,11 +163,8 @@ viewer.Viewer.prototype.render = function() {
     self.sliceZZ.render();
     if (self._webGLFriendly) {
       self['33d'].add(self.volume);
-      for (var i = 0; i < self.fibersList.length; i++) {
-        self['33d'].add(self.fibersList[i]);
-      }
-      for (i = 0; i < self.meshList.length; i++) {
-        self['33d'].add(self.meshList[i]);
+      for (var i = 0; i < self.geomModels.length; i++) {
+        self['33d'].add(self.geomModels[i]);
       }
       // the volume and geometric models are not in the same space, so
       // we configure some transforms in the onShowtime method which gets executed
@@ -165,10 +178,97 @@ viewer.Viewer.prototype.render = function() {
       self['33d'].camera.position = [0, 0, 200];
       self['33d'].render();
     } 
-    // now the volume GUI widgets
+    // now the volume GUI widget
   
     self.createVolWidget('xcontroller');
   };
+}
+
+
+viewer.Viewer.prototype.createFileSelectTree = function(container) {
+  var self = this;
+
+  this.fileSelectTree = $('#' + container).fancytree({
+    checkbox: true,
+    source: this.source,
+    select: function(event, data) {
+      var node = data.node;
+      if (node.data.type == 'volume') {
+        self.setVolume(data.node);
+      } else {
+        self.addGeomModel(data.node);
+      };
+    }
+  });
+}
+
+
+viewer.Viewer.prototype.setVolume = function(nodeObj) {
+  var orderedFiles, files, url;
+
+  if (nodeObj.key != this.volume.key) {
+    url = nodeObj.data.url;
+    // for the dicom format, files is a list of strings 
+    // for other formats it's a list with just a single string 
+    files = nodeObj.data.files;
+    orderedFiles = files.sort().map(function(str) { 
+    return url + str;});
+    // attach the single-file dicom in .NRRD format
+    // this works with gzip/gz/raw encoded NRRD files but XTK also supports other
+    // formats like MGH/MGZ
+    this.volume.file = orderedFiles;
+    this.volume.key = nodeObj.key;
+    if (!this.sliceXX.get(this.volume.id)){
+      this.sliceXX.add(this.volume); 
+    } else {
+      this.volume.modified();
+    }
+  }
+}
+
+
+viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
+  var xtkObj; 
+
+  if (this.indexOfGeomModel(nodeObj.key) == -1) {
+    xtkObj = new X[nodeObj.data.type]();
+    xtkObj.file = nodeObj.data.url + nodeObj.data.files;
+    xtkObj.key = nodeObj.key;
+    this.geomModels.push(xtkObj);
+  }
+}
+
+
+viewer.Viewer.prototype.remGeomModel = function(key) {
+  var ix = indexOfGeomModel(key);
+
+  if (ix != -1) {
+    this.geomModels.splice(ix,1);
+  }
+}
+
+
+viewer.Viewer.prototype.indexOfGeomModel = function(key) {
+  var found = false;
+
+  if (this.geomModels) {
+    for (var i = 0; i < this.geomModels.length; i++) {
+      if (this.geomModels[i].key == key) {
+        return i;
+     }
+    }
+  }
+  if (!found) {
+    return -1;
+  }
+}
+
+
+viewer.Viewer.prototype.onThreshold = function() {
+
+  window.console.log('Lets threshold!');
+  //this.threeDRenderer 
+
 }
 
 
@@ -198,93 +298,6 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     volumegui.open();
   }
 }
-
-
-viewer.Viewer.prototype.createFileSelectTree = function(container) {
-  return $('#' + container).fancytree({
-    checkbox: true,
-    source: this.source
-  });
-}
-
-
-viewer.Viewer.prototype.onThreshold = function() {
-
-  window.console.log('Lets threshold!');
-  //this.threeDRenderer 
-
-}
-
-
-viewer.Viewer.prototype.setVolume = function(url, fileNames) {
-  // for the dicom format, fileNames is a list of strings 
-  // for other formats it's a list with just a single string 
-  var orderedFiles = fileNames.sort().map(function(str) { 
-    return url + str;});
-  if (!this.volume.file || (this.volume.file[0] != orderedFiles[0])) {
-    // attach the single-file dicom in .NRRD format
-    // this works with gzip/gz/raw encoded NRRD files but XTK also supports other
-    // formats like MGH/MGZ
-    this.volume.file = orderedFiles;
-  }
-}
-
-
-viewer.Viewer.prototype.addFibers = function(url, fileName) {
-  this.addGeomModel(url, fileName, 'fibers');
-}
-
-
-viewer.Viewer.prototype.addMesh = function(url, fileName) {
-  this.addGeomModel(url, fileName, 'mesh');
-}
-
-
-viewer.Viewer.prototype.addGeomModel = function(url, fileName, type) {
-  var tList = this.typeListPropertyName(type);
-  var filePath = url + fileName;
-
-  if (this.indexOfGeomModel(filePath, type) == -1) {
-    var obj = new X[type]();
-    obj.file = filePath;
-    this[tList].push(obj);
-  }
-}
-
-
-viewer.Viewer.prototype.remGeomModel = function(url, fileName, type) {
-  var tList = this.typeListPropertyName(type);
-  var filePath = url + fileName;
-  var ix = indexOfGeomModel(filePath, type);
-
-  if ( ix != -1) {
-    this[tList].splice(ix,1);
-  }
-}
-
-
-viewer.Viewer.prototype.indexOfGeomModel = function(filePath, type) {
-  var tList = this.typeListPropertyName(type);
-  var found = false;
-
-  if (this[tList]) {
-    for (var i = 0; i < this[tList].length; i++) {
-      if (this[tList][i].file == filePath) {
-        found = true;
-        return i;
-     }
-    }
-  }
-  if (!found) {
-    return -1;
-  }
-}
-
-
-viewer.Viewer.prototype.typeListPropertyName = function(type) {
-  return type + 'List';
-}
-
 
 
   /*   { title : '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm'
