@@ -76,12 +76,17 @@ viewer.Viewer = function(jsonObj) {
   
   //rendered volume 
   this.volume = new X.volume();
+  //no source file loaded yet, so key is initialized to 
+  //a special value
   this.volume.key = -1;
+
   //rendered geometric models (eg. fibers and meshes) 
   this.geomModels = [];
+
   //file selection widget
   this.fileSelectWidget = null;
   this.createFileSelectTree('tree');
+
   // volume GUI widget
   this.volWidget = null;
 
@@ -117,10 +122,37 @@ viewer.Viewer = function(jsonObj) {
   this.create2DRenderer('sliceXX', 'X');
   this.create2DRenderer('sliceYY', 'Y');
   this.create2DRenderer('sliceZZ', 'Z');
-  //Event handler for render button
-  self = this;
+  // the onShowtime method gets executed after all files were fully loaded and
+  // just before the first rendering attempt
+  var self = this;
+  this.sliceXX.onShowtime = function() {
+    // add the volume to the other 3 renderers
+    self.sliceYY.add(self.volume);
+    self.sliceYY.render(); 
+    self.sliceZZ.add(self.volume);
+    self.sliceZZ.render();
+    if (self._webGLFriendly) {
+      self['33d'].add(self.volume);
+      // the volume and geometric models are not in the same space, so
+      // we configure some transforms in the onShowtime method which gets executed
+      // after all files were fully loaded and just before the first rendering
+      // attempt
+      self['33d'].onShowtime = function() {
+      // we reset the bounding box so track and mesh are in the same space
+        self['33d'].resetBoundingBox();
+      };
+      // .. and start the loading and rendering!
+      self['33d'].camera.position = [0, 0, 200];
+      self['33d'].render();
+    } 
+    // now the volume GUI widget
+  
+    self.setVolWidget('xcontroller');
+  };
+
+  /*//Event handler for render button
   document.getElementById("renderbutton").addEventListener('click', function() {
-    self.render();});
+    self.render();});*/
 }
 
 
@@ -140,51 +172,6 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
 }
 
 
-viewer.Viewer.prototype.render = function() {
-
-    // Use a 2D renderer as the main renderer since this should work also on
-  // non-webGL-friendly devices like Safari on iOS. Add the volume so it 
-  // can be loaded and parsed
-  /*if (this.sliceXX.get(this.volume.id) != null) {
-      this.sliceXX.add(this.volume);
-  }*/
-
-  // start the loading/rendering
-  this.sliceXX.render();
-  // the onShowtime method gets executed after all files were fully loaded and
-  // just before the first rendering attempt
-  var self = this;
-  this.sliceXX.onShowtime = function() {
-    // add the volume to the other 3 renderers
-    self.sliceYY.add(self.volume);
-    //self.sliceYY.remove(self.volume)
-    self.sliceYY.render(); 
-    self.sliceZZ.add(self.volume);
-    self.sliceZZ.render();
-    if (self._webGLFriendly) {
-      self['33d'].add(self.volume);
-      for (var i = 0; i < self.geomModels.length; i++) {
-        self['33d'].add(self.geomModels[i]);
-      }
-      // the volume and geometric models are not in the same space, so
-      // we configure some transforms in the onShowtime method which gets executed
-      // after all files were fully loaded and just before the first rendering
-      // attempt
-      self['33d'].onShowtime = function() {
-      // we reset the bounding box so track and mesh are in the same space
-        self['33d'].resetBoundingBox();
-      };
-      // .. and start the loading and rendering!
-      self['33d'].camera.position = [0, 0, 200];
-      self['33d'].render();
-    } 
-    // now the volume GUI widget
-  
-    self.createVolWidget('xcontroller');
-  };
-}
-
-
 viewer.Viewer.prototype.createFileSelectTree = function(container) {
   var self = this;
 
@@ -194,9 +181,9 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
     select: function(event, data) {
       var node = data.node;
       if (node.data.type == 'volume') {
-        self.setVolume(data.node);
+        self.setVolume(node);
       } else {
-        self.addGeomModel(data.node);
+        self.addGeomModel(node);
       };
     }
   });
@@ -207,6 +194,12 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
   var orderedFiles, files, url;
 
   if (nodeObj.key != this.volume.key) {
+    /*if (this._webGLFriendly) {
+      this['33d'].remove(this.volume);
+    }*/
+    this.sliceXX.remove(this.volume);
+    this.sliceYY.remove(this.volume);
+    this.sliceZZ.remove(this.volume);
     url = nodeObj.data.url;
     // for the dicom format, files is a list of strings 
     // for other formats it's a list with just a single string 
@@ -218,11 +211,10 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
     // formats like MGH/MGZ
     this.volume.file = orderedFiles;
     this.volume.key = nodeObj.key;
-    if (!this.sliceXX.get(this.volume.id)){
-      this.sliceXX.add(this.volume); 
-    } else {
-      this.volume.modified();
-    }
+    //if (!this.sliceXX.get(this.volume.id)){ }
+    this.sliceXX.add(this.volume); 
+    // start the loading/rendering
+    this.sliceXX.render();
   }
 }
 
@@ -230,11 +222,20 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
 viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
   var xtkObj; 
 
-  if (this.indexOfGeomModel(nodeObj.key) == -1) {
-    xtkObj = new X[nodeObj.data.type]();
-    xtkObj.file = nodeObj.data.url + nodeObj.data.files;
-    xtkObj.key = nodeObj.key;
-    this.geomModels.push(xtkObj);
+  if (this._webGLFriendly) {
+    if (this.indexOfGeomModel(nodeObj.key) == -1) {
+      xtkObj = new X[nodeObj.data.type]();
+      xtkObj.file = nodeObj.data.url + nodeObj.data.files;
+      xtkObj.key = nodeObj.key;
+      this.geomModels.push(xtkObj);
+      this['33d'].add(xtkObj);
+      self = this;
+      this['33d'].onShowtime = function() {
+        self['33d'].resetBoundingBox();
+      };
+      this['33d'].camera.position = [0, 0, 200];
+      this['33d'].render();
+    }
   }
 }
 
@@ -272,31 +273,41 @@ viewer.Viewer.prototype.onThreshold = function() {
 }
 
 
-viewer.Viewer.prototype.createVolWidget = function(container) {
-  if (this.volume.file) {
+viewer.Viewer.prototype.setVolWidget = function(container) {
+  if (!this.volWidget) {
     var gui = new dat.GUI({ autoPlace: false });
     var customContainer = document.getElementById(container);
     customContainer.appendChild(gui.domElement);
     // $('.interactive_plugin_content').css("background-color", "#000");
     // the following configures the gui for interacting with the X.volume
-    var volumegui = gui.addFolder('Volume');
+    this.volWidget = gui.addFolder('Volume');
+  } else {
+    this.volWidget.remove(this.volWidget.vrCtrl);
+    this.volWidget.remove(this.volWidget.opacityCtrl);
+    this.volWidget.remove(this.volWidget.lowThCtrl);
+    this.volWidget.remove(this.volWidget.upThCtrl);
+    this.volWidget.remove(this.volWidget.lowWinCtrl);
+    this.volWidget.remove(this.volWidget.upWinCtrl);
+    this.volWidget.remove(this.volWidget.sliceXCtrl);
+    this.volWidget.remove(this.volWidget.sliceYCtrl);
+    this.volWidget.remove(this.volWidget.sliceZCtrl);
+  }
     // now we can configure controllers which..
     // .. switch between slicing and volume rendering
-    volumegui.add(this.volume, 'volumeRendering');
+    this.volWidget.vrCtrl = this.volWidget.add(this.volume, 'volumeRendering');
     // .. configure the volume rendering opacity
-    volumegui.add(this.volume, 'opacity', 0, 1);
+    this.volWidget.opacityCtrl = this.volWidget.add(this.volume, 'opacity', 0, 1);
     // .. and the threshold in the min..max range
-    volumegui.add(this.volume, 'lowerThreshold', this.volume.min, this.volume.max);
-    volumegui.add(this.volume, 'upperThreshold', this.volume.min, this.volume.max);
-    volumegui.add(this.volume, 'windowLow', this.volume.min, this.volume.max);
-    volumegui.add(this.volume, 'windowHigh', this.volume.min, this.volume.max);
+    this.volWidget.lowThCtrl = this.volWidget.add(this.volume, 'lowerThreshold', this.volume.min, this.volume.max);
+    this.volWidget.upThCtrl = this.volWidget.add(this.volume, 'upperThreshold', this.volume.min, this.volume.max);
+    this.volWidget.lowWinCtrl = this.volWidget.add(this.volume, 'windowLow', this.volume.min, this.volume.max);
+    this.volWidget.upWinCtrl = this.volWidget.add(this.volume, 'windowHigh', this.volume.min, this.volume.max);
     // the indexX,Y,Z are the currently displayed slice indices in the range
     // 0..dimensions-1
-    volumegui.add(this.volume, 'indexX', 0, this.volume.dimensions[0] - 1);
-    volumegui.add(this.volume, 'indexY', 0, this.volume.dimensions[1] - 1);
-    volumegui.add(this.volume, 'indexZ', 0, this.volume.dimensions[2] - 1);
-    volumegui.open();
-  }
+    this.volWidget.sliceXCtrl = this.volWidget.add(this.volume, 'indexX', 0, this.volume.dimensions[0] - 1);
+    this.volWidget.sliceYCtrl = this.volWidget.add(this.volume, 'indexY', 0, this.volume.dimensions[1] - 1);
+    this.volWidget.sliceZCtrl = this.volWidget.add(this.volume, 'indexZ', 0, this.volume.dimensions[2] - 1);
+    this.volWidget.open();
 }
 
 
