@@ -90,27 +90,6 @@ viewer.Viewer = function(jsonObj) {
   // volume GUI widget
   this.volWidget = null;
 
-  /*this.setVolume({  title: '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302_fullvol.dcm', 
-                    key: '6',
-                    type : 'volume', 
-                    url  : 'plugins/viewer/widget/data/dicom/',
-                    files : [ '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
-                              '0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
-                              '0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
-                              '0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
-                              '0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm']               
-                  });
-  //window.console.log('url: ' + json.fibers[0].url);
-  this.addGeomModel({ title: 'tact.trk', key: '8',
-                      type : 'fibers', 
-                      url  : 'plugins/viewer/widget/data/',
-                      files : ['tact.trk']
-                   });
-  this.addGeomModel({ title: 'lh.pial', key: '9',
-                      type : 'mesh', 
-                      url  : 'plugins/viewer/widget/data/',
-                      files : ['lh.pial']
-                    });*/
   // try to create and initialize a 3D renderer
   this._webGLFriendly = true;
   try {
@@ -122,6 +101,7 @@ viewer.Viewer = function(jsonObj) {
   this.create2DRenderer('sliceXX', 'X');
   this.create2DRenderer('sliceYY', 'Y');
   this.create2DRenderer('sliceZZ', 'Z');
+
   // the onShowtime method gets executed after all files were fully loaded and
   // just before the first rendering attempt
   var self = this;
@@ -133,20 +113,11 @@ viewer.Viewer = function(jsonObj) {
     self.sliceZZ.render();
     if (self._webGLFriendly) {
       self['33d'].add(self.volume);
-      // the volume and geometric models are not in the same space, so
-      // we configure some transforms in the onShowtime method which gets executed
-      // after all files were fully loaded and just before the first rendering
-      // attempt
-      self['33d'].onShowtime = function() {
-      // we reset the bounding box so track and mesh are in the same space
-        self['33d'].resetBoundingBox();
-      };
       // .. and start the loading and rendering!
       self['33d'].camera.position = [0, 0, 200];
       self['33d'].render();
     } 
     // now the volume GUI widget
-  
     self.setVolWidget('xcontroller');
   };
 
@@ -161,6 +132,14 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   this[container].bgColor = [.1, .1, .1];
   this[container].container = container;
   this[container].init();
+  // the volume and geometric models are not in the same space, so
+  // we configure some transforms in the onShowtime method which gets executed
+  // after all files were fully loaded and just before the first rendering
+  // attempt
+  this[container].onShowtime = function() {
+  // we reset the bounding box so track and mesh are in the same space
+    this.resetBoundingBox();
+  };
 }
 
 
@@ -194,12 +173,9 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
   var orderedFiles, files, url;
 
   if (nodeObj.key != this.volume.key) {
-    /*if (this._webGLFriendly) {
+    if (this._webGLFriendly) {
       this['33d'].remove(this.volume);
-    }*/
-    this.sliceXX.remove(this.volume);
-    this.sliceYY.remove(this.volume);
-    this.sliceZZ.remove(this.volume);
+    }
     url = nodeObj.data.url;
     // for the dicom format, files is a list of strings 
     // for other formats it's a list with just a single string 
@@ -222,20 +198,14 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
 viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
   var xtkObj; 
 
-  if (this._webGLFriendly) {
-    if (this.indexOfGeomModel(nodeObj.key) == -1) {
-      xtkObj = new X[nodeObj.data.type]();
-      xtkObj.file = nodeObj.data.url + nodeObj.data.files;
-      xtkObj.key = nodeObj.key;
-      this.geomModels.push(xtkObj);
-      this['33d'].add(xtkObj);
-      self = this;
-      this['33d'].onShowtime = function() {
-        self['33d'].resetBoundingBox();
-      };
-      this['33d'].camera.position = [0, 0, 200];
-      this['33d'].render();
-    }
+  if (this._webGLFriendly && (this.indexOfGeomModel(nodeObj.key) == -1)) {
+    xtkObj = new X[nodeObj.data.type]();
+    xtkObj.file = nodeObj.data.url + nodeObj.data.files;
+    xtkObj.key = nodeObj.key;
+    this.geomModels.push(xtkObj);
+    this['33d'].add(xtkObj);
+    this['33d'].camera.position = [0, 0, 200];
+    this['33d'].render();
   }
 }
 
@@ -244,6 +214,7 @@ viewer.Viewer.prototype.remGeomModel = function(key) {
   var ix = indexOfGeomModel(key);
 
   if (ix != -1) {
+    this['33d'].remove(this.geomModels[ix]);
     this.geomModels.splice(ix,1);
   }
 }
