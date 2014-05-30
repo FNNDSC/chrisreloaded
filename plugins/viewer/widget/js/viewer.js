@@ -79,6 +79,9 @@ viewer.Viewer = function(jsonObj) {
   //no source file loaded yet, so key is initialized to 
   //a special value
   this.volume.key = -1;
+  this.sceneOrientation = 0;
+  this.mode = 0;
+  this.bbox = true;
 
   //rendered geometric models (eg. fibers and meshes) 
   this.geomModels = [];
@@ -118,7 +121,11 @@ viewer.Viewer = function(jsonObj) {
       self['33d'].render();
     } 
     // now the volume GUI widget
-    self.setVolWidget('xcontroller');
+    if (!self.volWidget) {
+      self.createVolWidget('xcontroller');
+    } else {
+      self.updateVolWidget();
+    }
   };
 
   /*//Event handler for render button
@@ -244,44 +251,69 @@ viewer.Viewer.prototype.onThreshold = function() {
 }
 
 
-viewer.Viewer.prototype.setVolWidget = function(container) {
-  if (!this.volWidget) {
+viewer.Viewer.prototype.createVolWidget = function(container) {
+    this.volWidget = {};
     var gui = new dat.GUI({ autoPlace: false });
     var customContainer = document.getElementById(container);
     customContainer.appendChild(gui.domElement);
+    this.volWidget.view = gui.addFolder('View');
     // $('.interactive_plugin_content').css("background-color", "#000");
     // the following configures the gui for interacting with the X.volume
-    this.volWidget = gui.addFolder('Volume');
-  } else {
-    this.volWidget.remove(this.volWidget.vrCtrl);
-    this.volWidget.remove(this.volWidget.opacityCtrl);
-    this.volWidget.remove(this.volWidget.lowThCtrl);
-    this.volWidget.remove(this.volWidget.upThCtrl);
-    this.volWidget.remove(this.volWidget.lowWinCtrl);
-    this.volWidget.remove(this.volWidget.upWinCtrl);
-    this.volWidget.remove(this.volWidget.sliceXCtrl);
-    this.volWidget.remove(this.volWidget.sliceYCtrl);
-    this.volWidget.remove(this.volWidget.sliceZCtrl);
-  }
-    // now we can configure controllers which..
-    // .. switch between slicing and volume rendering
-    this.volWidget.vrCtrl = this.volWidget.add(this.volume, 'volumeRendering');
-    // .. configure the volume rendering opacity
-    this.volWidget.opacityCtrl = this.volWidget.add(this.volume, 'opacity', 0, 1);
-    // .. and the threshold in the min..max range
-    this.volWidget.lowThCtrl = this.volWidget.add(this.volume, 'lowerThreshold', this.volume.min, this.volume.max);
-    this.volWidget.upThCtrl = this.volWidget.add(this.volume, 'upperThreshold', this.volume.min, this.volume.max);
-    this.volWidget.lowWinCtrl = this.volWidget.add(this.volume, 'windowLow', this.volume.min, this.volume.max);
-    this.volWidget.upWinCtrl = this.volWidget.add(this.volume, 'windowHigh', this.volume.min, this.volume.max);
-    // the indexX,Y,Z are the currently displayed slice indices in the range
-    // 0..dimensions-1
-    this.volWidget.sliceXCtrl = this.volWidget.add(this.volume, 'indexX', 0, this.volume.dimensions[0] - 1);
-    this.volWidget.sliceYCtrl = this.volWidget.add(this.volume, 'indexY', 0, this.volume.dimensions[1] - 1);
-    this.volWidget.sliceZCtrl = this.volWidget.add(this.volume, 'indexZ', 0, this.volume.dimensions[2] - 1);
-    this.volWidget.open();
+    this.volWidget.interact = gui.addFolder('Volume Interaction');
+    this.populateVolWidget();
+  
 }
 
 
+viewer.Viewer.prototype.populateVolWidget = function() {
+  // now we can configure controllers ..
+  //view mode
+  this.volWidget.view.sliceMode = this.volWidget.view.add(this, 'mode', { 'Default':0, 'Rotate Box':1});
+  this.volWidget.view.bboxMode = this.volWidget.view.add(this, 'bbox').name('Show BBox');
+  this.volWidget.view.orientation = this.volWidget.view.add(this, 'sceneOrientation',
+   { Free: 0, Sagittal: 1, Coronal: 2, Axial: 3 }).name('orientation');
+  this.volWidget.view.open();
+  // .. switch between slicing and volume rendering
+  this.volWidget.interact.vrCtrl = this.volWidget.interact.add(this.volume, 'volumeRendering').name('rendering');
+  // .. configure the volume rendering opacity
+  this.volWidget.interact.opacityCtrl = this.volWidget.interact.add(this.volume, 'opacity', 0, 1);
+  // .. and the threshold in the min..max range
+  this.volWidget.interact.lowThCtrl = this.volWidget.interact.add(this.volume, 'lowerThreshold', 
+    this.volume.min, this.volume.max).name('lowerThr');
+  this.volWidget.interact.upThCtrl = this.volWidget.interact.add(this.volume, 'upperThreshold', 
+    this.volume.min, this.volume.max).name('upperThr');
+  this.volWidget.interact.lowWinCtrl = this.volWidget.interact.add(this.volume, 'windowLow', 
+    this.volume.min, this.volume.max).name('winLow');
+  this.volWidget.interact.upWinCtrl = this.volWidget.interact.add(this.volume, 'windowHigh',
+   this.volume.min, this.volume.max).name('winHigh');
+  // the indexX,Y,Z are the currently displayed slice indices in the range
+  // 0..dimensions-1
+  this.volWidget.interact.sliceXCtrl = this.volWidget.interact.add(this.volume, 'indexX', 0,
+   this.volume.dimensions[0] - 1).listen();
+  this.volWidget.interact.sliceYCtrl = this.volWidget.interact.add(this.volume, 'indexY', 0,
+   this.volume.dimensions[1] - 1).listen();
+  this.volWidget.interact.sliceZCtrl = this.volWidget.interact.add(this.volume, 'indexZ', 0,
+   this.volume.dimensions[2] - 1).listen();
+  this.volWidget.interact.open();
+}
+
+
+viewer.Viewer.prototype.updateVolWidget = function() {
+  this.volWidget.view.remove(this.volWidget.view.sliceMode);
+  this.volWidget.view.remove(this.volWidget.view.bboxMode);
+  this.volWidget.view.remove(this.volWidget.view.orientation);
+  this.volWidget.interact.remove(this.volWidget.interact.vrCtrl);
+  this.volWidget.interact.remove(this.volWidget.interact.opacityCtrl);
+  this.volWidget.interact.remove(this.volWidget.interact.lowThCtrl);
+  this.volWidget.interact.remove(this.volWidget.interact.upThCtrl);
+  this.volWidget.interact.remove(this.volWidget.interact.lowWinCtrl);
+  this.volWidget.interact.remove(this.volWidget.interact.upWinCtrl);
+  this.volWidget.interact.remove(this.volWidget.interact.sliceXCtrl);
+  this.volWidget.interact.remove(this.volWidget.interact.sliceYCtrl);
+  this.volWidget.interact.remove(this.volWidget.interact.sliceZCtrl);
+  this.populateVolWidget();
+}
+ 
   /*   { title : '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm'
         url   : 'plugins/viewer/widget/data/dicom/',
         files : ['0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
