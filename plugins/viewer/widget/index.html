@@ -1,17 +1,17 @@
 <link rel="stylesheet" type="text/css" href="plugins/viewer/widget/style/main.css">
 <!-- include fancytree css -->
-<link rel="stylesheet" type="text/css" href="plugins/viewer/widget/lib/fancytree/css/skin-win8/ui.fancytree.min.css">
+<link rel="stylesheet" type="text/css" href="plugins/viewer/widget/lib/fancytree/css/skin-viewer/ui.fancytree.css">
 
+<div class='topLeftContainer'>
 <div class="collaborate-btn">
-    <button onclick="TogetherJS(this); return false;">L</button>
+    <button onclick="TogetherJS(this); return false;">Enter the Reading Room</button>
 </div>
 
 <div class="fileselectwidget">
-	<ul>
-		<li><span id="fileselect">Select files:</span></li>
-		<li><div id="tree"> </div></li>
-<!--		<li><input id="renderbutton" type="button" value="Render"></li> -->
-	</ul>    
+	<span id="fileselect-btn">Select files:</span>
+	<div id="tree"> </div> 
+</div>
+
 </div>
 
 
@@ -42,4 +42,5 @@
 <!-- NEEDS A COLLAB.JS for our viewer object -->
 <!-- Start script -->
 <!-- Integrate with CHRIS, connect view to collab, etc. -->
+<script src="plugins/viewer/widget/js/helper.js"></script>
 <script src="plugins/viewer/widget/js/demo.js"></script>

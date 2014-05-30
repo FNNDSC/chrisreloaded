@@ -50,9 +50,9 @@ class Viewer(Plugin):
               os.symlink(options.DIRECTORY, os.path.join(options.output, dirname))
 
       indexedData = {}
-      indexedData['fibers'] = []
-      indexedData['models'] = []
-      indexedData['volumes'] = []
+      indexedData['fiber'] = []
+      indexedData['model'] = []
+      indexedData['volume'] = []
 
       dcmData = {}
 
@@ -60,11 +60,11 @@ class Viewer(Plugin):
         for fileName in files:
           print fileName
           if fileName.endswith(fibersExt):
-              indexedData['fibers'].append({'file':[fileName], 'url':root})
+              indexedData['fiber'].append({'file':[fileName], 'url':root})
           elif fileName.endswith(modelsExt):
-              indexedData['models'].append({'file':[fileName], 'url':root})
+              indexedData['model'].append({'file':[fileName], 'url':root})
           elif fileName.endswith(volumesExt):
-              indexedData['volumes'].append({'file':[fileName], 'url':root})
+              indexedData['volume'].append({'file':[fileName], 'url':root})
           elif fileName.endswith(dicomExt):
             # read file
             ds = dicom.read_file(os.path.join(root, fileName))
@@ -88,7 +88,7 @@ class Viewer(Plugin):
       for patient in dcmData:
         for study in dcmData[patient]:
           for series in dcmData[patient][study]:
-            indexedData['volumes'].append({'file' : dcmData[patient][study][series]['file'], 'url' : dcmData[patient][study][series]['url']})
+            indexedData['volume'].append({'file' : dcmData[patient][study][series]['file'], 'url' : dcmData[patient][study][series]['url']})
 
       print indexedData
 

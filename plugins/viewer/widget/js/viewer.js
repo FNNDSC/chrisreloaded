@@ -20,65 +20,11 @@ var viewer = viewer || {};
 viewer.Viewer = function(jsonObj) {
 
   this.version = 0.0;
-  //Parse the jason file  
-  this.source = [
-    { title: 'plugins', key : '1', folder : true,
-      children : [
-        { title: 'viewer', key : '2', folder : true,
-          children : [
-            { title: 'widget', key : '3', folder : true,
-              children : [
-              { title: 'data', key : '4', folder : true,
-                children : [
-                  { title: 'dicom', key : '5', folder : true,
-                    children : [
-                      { title: '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302_fullvol.dcm', 
-                        key: '6',
-                        type : 'volume', 
-                        url  : 'plugins/viewer/widget/data/dicom/',
-                        files : ['0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
-                                 '0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
-                                 '0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
-                                 '0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
-                                 '0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm']               
-                      },        
-                    ] 
-                  },
-                  { title: 'recon.nii', key: '7',
-                    type : 'volume', 
-                    url  : 'plugins/viewer/widget/data/',
-                    files : ['recon.nii']
-                  }, 
-                  { title: 'tact.trk', key: '8',
-                    type : 'fibers', 
-                    url  : 'plugins/viewer/widget/data/',
-                    files : ['tact.trk']
-                  }, 
-                  { title: 'lh.pial', key: '9',
-                    type : 'mesh', 
-                    url  : 'plugins/viewer/widget/data/',
-                    files : ['lh.pial']
-                  }, 
-                  { title: 'rh.pial', key: '10',
-                    type : 'mesh', 
-                    url  : 'plugins/viewer/widget/data/',
-                    files : ['rh.pial']
-                  }
-                ]
-              }
-             ]
-           }
-         ]
-       }
-      ]
-    }
-  ];
+  //Parse the json file  
+  this.source = jsonObj;
   
   //rendered volume 
-  this.volume = new X.volume();
-  //no source file loaded yet, so key is initialized to 
-  //a special value
-  this.volume.key = -1;
+  this.volume = null;
 
   //rendered geometric models (eg. fibers and meshes) 
   this.geomModels = [];
@@ -137,8 +83,11 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   // after all files were fully loaded and just before the first rendering
   // attempt
   this[container].onShowtime = function() {
+   // $("#tree").fancytree("option", "disabled", false);
   // we reset the bounding box so track and mesh are in the same space
     this.resetBoundingBox();
+    // (re)activate the tree picking
+    // we have to do that to avoid race conditions/sync issues
   };
 }
 
@@ -158,49 +107,72 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
     checkbox: true,
     source: this.source,
     select: function(event, data) {
+
+      // disable picking
+      //$("#tree").fancytree("option", "disabled", true);
+
       var node = data.node;
       if (node.data.type == 'volume') {
-        self.setVolume(node);
+        self.unsetVolume(node);
+        if(node.selected == true){
+          self.setVolume(node);
+        }
       } else {
-        self.addGeomModel(node);
+        //self.addGeomModel(node);
       };
     }
   });
 }
 
-
 viewer.Viewer.prototype.setVolume = function(nodeObj) {
-  var orderedFiles, files, url;
+    var orderedFiles, files, url;
 
-  if (nodeObj.key != this.volume.key) {
-    if (this._webGLFriendly) {
-      this['33d'].remove(this.volume);
-    }
     url = nodeObj.data.url;
+
     // for the dicom format, files is a list of strings 
     // for other formats it's a list with just a single string 
     files = nodeObj.data.files;
     orderedFiles = files.sort().map(function(str) { 
-    return url + str;});
-    // attach the single-file dicom in .NRRD format
-    // this works with gzip/gz/raw encoded NRRD files but XTK also supports other
-    // formats like MGH/MGZ
+        return url + '/' + str;});
+
+    this.volume = new X.volume();
+    this.volume.key = -1;
     this.volume.file = orderedFiles;
     this.volume.key = nodeObj.key;
-    //if (!this.sliceXX.get(this.volume.id)){ }
+
     this.sliceXX.add(this.volume); 
     // start the loading/rendering
     this.sliceXX.render();
-  }
 }
 
+viewer.Viewer.prototype.unsetVolume = function(nodeObj) {
+
+  if (this.volume != null) {
+
+    // remove from the visualization
+    if (this._webGLFriendly) {
+      this['33d'].remove(this.volume);
+    }
+
+    this['sliceXX'].remove(this.volume);
+    this['sliceYY'].remove(this.volume);
+    this['sliceZZ'].remove(this.volume);
+
+    // uncheck it
+    var prevVolume = $("#tree").fancytree("getTree").getNodeByKey(this.volume.key);
+    prevVolume.selected = false;
+
+    this.volume = null;
+
+  }
+}
 
 viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
   var xtkObj; 
 
   if (this._webGLFriendly && (this.indexOfGeomModel(nodeObj.key) == -1)) {
     xtkObj = new X[nodeObj.data.type]();
-    xtkObj.file = nodeObj.data.url + nodeObj.data.files;
+    xtkObj.file = nodeObj.data.url + '/' + nodeObj.data.files;
     xtkObj.key = nodeObj.key;
     this.geomModels.push(xtkObj);
     this['33d'].add(xtkObj);
@@ -280,26 +252,6 @@ viewer.Viewer.prototype.setVolWidget = function(container) {
     this.volWidget.sliceZCtrl = this.volWidget.add(this.volume, 'indexZ', 0, this.volume.dimensions[2] - 1);
     this.volWidget.open();
 }
-
-
-  /*   { title : '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm'
-        url   : 'plugins/viewer/widget/data/dicom/',
-        files : ['0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
-                 '0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
-                 '0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
-                 '0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
-                 '0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm'] }, 
-      { url   : 'plugins/viewer/widget/data/', 
-        files : ['recon.nii'] } ],
-    fibers  : [
-      { url   : 'plugins/viewer/widget/data/',
-        files : ['tact.trk'] } ],
-    models : [      
-      { url   : 'plugins/viewer/widget/data/',
-        files : ['lh.pial'] }, 
-      { url   : 'plugins/viewer/widget/data/',
-        files : ['rh.pial'] } ]; */
-
 
 viewer.Viewer.prototype.viewChanged = function(arr){
     window.console.log('emit view changed');
