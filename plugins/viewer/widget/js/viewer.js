@@ -20,7 +20,7 @@ var viewer = viewer || {};
 viewer.Viewer = function(jsonObj) {
 
   this.version = 0.0;
-  //Parse the json file  
+  //Parse the json file 
   this.source = jsonObj;
   
   //rendered volume 
@@ -110,9 +110,10 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
 viewer.Viewer.prototype.createFileSelectTree = function(container) {
   var self = this;
 
-  this.fileSelectTree = $('#' + container).fancytree({
+  $('#' + container).fancytree({
     checkbox: true,
     source: this.source,
+
     select: function(event, data) {
 
       // disable picking
@@ -120,59 +121,75 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
 
       var node = data.node;
       if (node.data.type == 'volume') {
-        self.unsetVolume(node);
-        if(node.selected == true){
+        if (node.isSelected()) {
+          if (self.volume != null) {
+            var prevSelectedNode = self.fileSelectTree.getNodeByKey(self.volume.key);
+            //uncheck previously selected volume node and call the select event
+            prevSelectedNode.setSelected(false);
+          }
           self.setVolume(node);
+        } else {
+          self.unsetVolume(node);
         }
       } else {
-        //self.addGeomModel(node);
+        if (node.isSelected()) {
+          self.addGeomModel(node);
+        } else {
+          self.remGeomModel(node);
+        }  
       };
-    }
+    },
+
+    keydown: function(event, data) {
+      var node = data.node;
+      if (event.which === 13) {
+        if (node.isFolder()) {
+          node.toggleExpanded();
+        } else {
+          node.toggleSelected();
+        }
+      }
+    }     
   });
+
+  this.fileSelectTree = $('#' + container).fancytree("getTree");
 }
+
 
 viewer.Viewer.prototype.setVolume = function(nodeObj) {
-    var orderedFiles, files, url;
+  var orderedFiles, files, url;
 
-    url = nodeObj.data.url;
+  url = nodeObj.data.url;
 
-    // for the dicom format, files is a list of strings 
-    // for other formats it's a list with just a single string 
-    files = nodeObj.data.files;
-    orderedFiles = files.sort().map(function(str) { 
-        return url + '/' + str;});
+  // for the dicom format, files is a list of strings 
+  // for other formats it's a list with just a single string 
+  files = nodeObj.data.files;
+  orderedFiles = files.sort().map(function(str) { 
+      return url + '/' + str;});
 
-    this.volume = new X.volume();
-    this.volume.key = -1;
-    this.volume.file = orderedFiles;
-    this.volume.key = nodeObj.key;
+  this.volume = new X.volume();
+  this.volume.file = orderedFiles;
+  this.volume.key = nodeObj.key;
 
-    this.sliceXX.add(this.volume); 
-    // start the loading/rendering
-    this.sliceXX.render();
+  this.sliceXX.add(this.volume); 
+  // start the loading/rendering
+  this.sliceXX.render();
 }
+
 
 viewer.Viewer.prototype.unsetVolume = function(nodeObj) {
-
-  if (this.volume != null) {
-
-    // remove from the visualization
-    if (this._webGLFriendly) {
-      this['33d'].remove(this.volume);
-    }
-
-    this['sliceXX'].remove(this.volume);
-    this['sliceYY'].remove(this.volume);
-    this['sliceZZ'].remove(this.volume);
-
-    // uncheck it
-    var prevVolume = $("#tree").fancytree("getTree").getNodeByKey(this.volume.key);
-    prevVolume.selected = false;
-
-    this.volume = null;
-
+  // remove from the visualization
+  if (this._webGLFriendly) {
+    this['33d'].remove(this.volume);
   }
+
+  this['sliceXX'].remove(this.volume);
+  this['sliceYY'].remove(this.volume);
+  this['sliceZZ'].remove(this.volume);
+
+  this.volume = null;
 }
+
 
 viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
   var xtkObj; 
@@ -189,8 +206,8 @@ viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
 }
 
 
-viewer.Viewer.prototype.remGeomModel = function(key) {
-  var ix = indexOfGeomModel(key);
+viewer.Viewer.prototype.remGeomModel = function(nodeObj) {
+  var ix = this.indexOfGeomModel(nodeObj.key);
 
   if (ix != -1) {
     this['33d'].remove(this.geomModels[ix]);
@@ -224,16 +241,15 @@ viewer.Viewer.prototype.onThreshold = function() {
 
 
 viewer.Viewer.prototype.createVolWidget = function(container) {
-    this.volWidget = {};
-    var gui = new dat.GUI({ autoPlace: false });
-    var customContainer = document.getElementById(container);
-    customContainer.appendChild(gui.domElement);
-    this.volWidget.view = gui.addFolder('View');
-    // $('.interactive_plugin_content').css("background-color", "#000");
-    // the following configures the gui for interacting with the X.volume
-    this.volWidget.interact = gui.addFolder('Volume Interaction');
-    this.populateVolWidget();
-  
+  this.volWidget = {};
+  var gui = new dat.GUI({ autoPlace: false });
+  var customContainer = document.getElementById(container);
+  customContainer.appendChild(gui.domElement);
+  this.volWidget.view = gui.addFolder('View');
+  // $('.interactive_plugin_content').css("background-color", "#000");
+  // the following configures the gui for interacting with the X.volume
+  this.volWidget.interact = gui.addFolder('Volume Interaction');
+  this.populateVolWidget(); 
 }
 
 viewer.Viewer.prototype.populateVolWidget = function() {

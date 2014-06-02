@@ -188,7 +188,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, 
         subtree.push({ 'title': path[depth],
                        'key': key,
                        'folder': true,
-                       'unselectable':true,
+                       'hideCheckbox' : true,    
                        'children': []
                     });
 
