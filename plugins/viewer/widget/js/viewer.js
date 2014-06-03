@@ -91,6 +91,27 @@ viewer.Viewer = function(jsonObj) {
       self.updateVolWidget();
     }
   };
+
+  //Event handler for full screen behaviour main container is double clicked
+  document.getElementById('33d').addEventListener('dblclick', function() {
+    var render2D = document.getElementById('render2D');
+
+
+    if (this.style.height == '100%') {
+      render2D.style.display = 'block';
+      this.style.height = '70%';
+    } else {
+      render2D.style.display = 'none';
+      this.style.height = '100%'
+    }
+    var ev = document.createEvent('Event');
+    ev.initEvent('resize', true, true);
+    window.dispatchEvent(ev);
+  });
+
+  /*//Event handler for render button
+  document.getElementById("renderbutton").addEventListener('click', function() {
+    self.render();});*/
 }
 
 viewer.Viewer.prototype.createBBox = function(){

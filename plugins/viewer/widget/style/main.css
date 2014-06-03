@@ -6,8 +6,6 @@
 
 .slice-X{
 	background-color: #000;
-	margin-left: 2px;
-	margin-right: 2px;
 	height:100%;
 	border-top-width: 2px;
 	border-style: solid;
@@ -20,8 +18,6 @@
 
 .slice-Y{
 	background-color: #000;
-	margin-left: 1px;
-	margin-right: 1px;
 	height:100%;
 	border-top-width: 2px;
 	border-top-style: solid;
@@ -30,8 +26,6 @@
 
 .slice-Z{
 	background-color: #000;
-	margin-left: 1px;
-	margin-right: 1px;
 	height:100%;
 	border-top-width: 2px;
 	border-top-style: solid;
