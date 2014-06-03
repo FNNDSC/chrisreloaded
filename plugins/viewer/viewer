@@ -56,9 +56,8 @@ class Viewer(Plugin):
 
       dcmData = {}
 
-      for root, dirs, files in os.walk(options.output, topdown=False, followlinks=True):
+      for root, dirs, files in os.walk(options.DIRECTORY, topdown=False, followlinks=True):
         for fileName in files:
-          print fileName
           if fileName.endswith(fibersExt):
               indexedData['fiber'].append({'file':[fileName], 'url':root})
           elif fileName.endswith(modelsExt):
@@ -98,7 +97,7 @@ class Viewer(Plugin):
         f.write(json.dumps(indexedData))
         f.close()
       else:
-        print indexedData
+        print json.dumps(indexedData)
 
 # ENTRYPOINT
 if __name__ == "__main__":

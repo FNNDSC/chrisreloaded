@@ -25,9 +25,17 @@ viewer.Viewer = function(jsonObj) {
   
   //rendered volume 
   this.volume = null;
+
+  this.volumeBBox = null;
+  this.bbox = true;
+
   this.sceneOrientation = 0;
   this.mode = 0;
-  this.bbox = true;
+
+  // true == ignore orientation
+  // false == use orientation
+  this.reslice = 'false';
+  this.reslice2 = false;
 
   //rendered geometric models (eg. fibers and meshes) 
   this.geomModels = [];
@@ -60,9 +68,19 @@ viewer.Viewer = function(jsonObj) {
     self.sliceYY.render(); 
     self.sliceZZ.add(self.volume);
     self.sliceZZ.render();
+
+    // make sure to re-paint
+    self['sliceXX'].update(self.volume);
+    self['sliceYY'].update(self.volume);
+    self['sliceZZ'].update(self.volume);
+
     if (self._webGLFriendly) {
+      // no need to worry about the other showtimes
+      self['33d'].interactor.addEventListener(X.event.events.ROTATE, function(){self.updateSceneView();});
+      self['33d'].resetBoundingBox();
+      self.createBBox();
+      self['33d'].add(self.volumeBBox);
       self['33d'].add(self.volume);
-      // .. and start the loading and rendering!
       self['33d'].camera.position = [0, 0, 200];
       self['33d'].render();
     } 
@@ -73,29 +91,54 @@ viewer.Viewer = function(jsonObj) {
       self.updateVolWidget();
     }
   };
-
-  /*//Event handler for render button
-  document.getElementById("renderbutton").addEventListener('click', function() {
-    self.render();});*/
 }
 
+viewer.Viewer.prototype.createBBox = function(){
+
+    var res = [this.volume.bbox[0],this.volume.bbox[2],this.volume.bbox[4]];
+    var res2 = [this.volume.bbox[1],this.volume.bbox[3],this.volume.bbox[5]];
+
+    this.volumeBBox = new X.object();
+    this.volumeBBox.points = new X.triplets(72);
+    this.volumeBBox.normals = new X.triplets(72);
+    this.volumeBBox.type = 'LINES';
+    this.volumeBBox.points.add(res2[0], res[1], res2[2]);
+    this.volumeBBox.points.add(res[0], res[1], res2[2]);
+    this.volumeBBox.points.add(res2[0], res2[1], res2[2]);
+    this.volumeBBox.points.add(res[0], res2[1], res2[2]);
+    this.volumeBBox.points.add(res2[0], res[1], res[2]);
+    this.volumeBBox.points.add(res[0], res[1], res[2]);
+    this.volumeBBox.points.add(res2[0], res2[1], res[2]);
+    this.volumeBBox.points.add(res[0], res2[1], res[2]);
+    this.volumeBBox.points.add(res2[0], res[1], res2[2]);
+    this.volumeBBox.points.add(res2[0], res[1], res[2]);
+    this.volumeBBox.points.add(res[0], res[1], res2[2]);
+    this.volumeBBox.points.add(res[0], res[1], res[2]);
+    this.volumeBBox.points.add(res2[0], res2[1], res2[2]);
+    this.volumeBBox.points.add(res2[0], res2[1], res[2]);
+    this.volumeBBox.points.add(res[0], res2[1], res2[2]);
+    this.volumeBBox.points.add(res[0], res2[1], res[2]);
+    this.volumeBBox.points.add(res2[0], res2[1], res2[2]);
+    this.volumeBBox.points.add(res2[0], res[1], res2[2]);
+    this.volumeBBox.points.add(res[0], res2[1], res2[2]);
+    this.volumeBBox.points.add(res[0], res[1], res2[2]);
+    this.volumeBBox.points.add(res[0], res2[1], res[2]);
+    this.volumeBBox.points.add(res[0], res[1], res[2]);
+    this.volumeBBox.points.add(res2[0], res2[1], res[2]);
+    this.volumeBBox.points.add(res2[0], res[1], res[2]);
+    for ( var i = 0; i < 24; ++i) {
+      this.volumeBBox.normals.add(0, 0, 0);
+    }
+
+    this.volumeBBox.visible = this.bbox;
+
+}
 
 viewer.Viewer.prototype.create3DRenderer = function(container) {
   this[container] = new X.renderer3D();
   this[container].bgColor = [.1, .1, .1];
   this[container].container = container;
   this[container].init();
-  // the volume and geometric models are not in the same space, so
-  // we configure some transforms in the onShowtime method which gets executed
-  // after all files were fully loaded and just before the first rendering
-  // attempt
-  this[container].onShowtime = function() {
-   // $("#tree").fancytree("option", "disabled", false);
-  // we reset the bounding box so track and mesh are in the same space
-    this.resetBoundingBox();
-    // (re)activate the tree picking
-    // we have to do that to avoid race conditions/sync issues
-  };
 }
 
 
@@ -129,7 +172,7 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
           }
           self.setVolume(node);
         } else {
-          self.unsetVolume(node);
+          self.unsetVolume();
         }
       } else {
         if (node.isSelected()) {
@@ -157,6 +200,7 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
 
 
 viewer.Viewer.prototype.setVolume = function(nodeObj) {
+
   var orderedFiles, files, url;
 
   url = nodeObj.data.url;
@@ -168,28 +212,40 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
       return url + '/' + str;});
 
   this.volume = new X.volume();
+  this.volume.reslicing = this.reslice;
+  window.console.log(this.reslice);
   this.volume.file = orderedFiles;
   this.volume.key = nodeObj.key;
+  this.volume.nodeObj = nodeObj;
 
   this.sliceXX.add(this.volume); 
   // start the loading/rendering
   this.sliceXX.render();
 }
 
-
-viewer.Viewer.prototype.unsetVolume = function(nodeObj) {
+viewer.Viewer.prototype.unsetVolume = function() {
   // remove from the visualization
   if (this._webGLFriendly) {
     this['33d'].remove(this.volume);
+    this['33d'].remove(this.volumeBBox);
   }
 
-  this['sliceXX'].remove(this.volume);
-  this['sliceYY'].remove(this.volume);
-  this['sliceZZ'].remove(this.volume);
+    this['sliceXX'].remove(this.volume);
+    this['sliceYY'].remove(this.volume);
+    this['sliceZZ'].remove(this.volume);
 
-  this.volume = null;
+    this.volume = null;
+    this.volumeBBox = null;
+
 }
 
+viewer.Viewer.prototype.updateVolume = function() {
+  if(this.volume != null){
+    var nodeObj = this.volume.nodeObj;
+    this.unsetVolume();
+    this.setVolume(nodeObj);
+  }
+}
 
 viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
   var xtkObj; 
@@ -241,15 +297,16 @@ viewer.Viewer.prototype.onThreshold = function() {
 
 
 viewer.Viewer.prototype.createVolWidget = function(container) {
-  this.volWidget = {};
-  var gui = new dat.GUI({ autoPlace: false });
-  var customContainer = document.getElementById(container);
-  customContainer.appendChild(gui.domElement);
-  this.volWidget.view = gui.addFolder('View');
-  // $('.interactive_plugin_content').css("background-color", "#000");
-  // the following configures the gui for interacting with the X.volume
-  this.volWidget.interact = gui.addFolder('Volume Interaction');
-  this.populateVolWidget(); 
+    this.volWidget = {};
+    var gui = new dat.GUI({ autoPlace: false });
+    var customContainer = document.getElementById(container);
+    customContainer.appendChild(gui.domElement);
+    this.volWidget.view = gui.addFolder('View');
+    // $('.interactive_plugin_content').css("background-color", "#000");
+    // the following configures the gui for interacting with the X.volume
+    // this.volWidget.interact = gui.addFolder('Volume Interaction');
+    this.populateVolWidget();
+  
 }
 
 viewer.Viewer.prototype.populateVolWidget = function() {
@@ -257,47 +314,139 @@ viewer.Viewer.prototype.populateVolWidget = function() {
   //view mode
   this.volWidget.view.sliceMode = this.volWidget.view.add(this, 'mode', { 'Default':0, 'Rotate Box':1});
   this.volWidget.view.bboxMode = this.volWidget.view.add(this, 'bbox').name('Show BBox');
+  this.volWidget.view.orientationMode = this.volWidget.view.add(this, 'reslice2').name('Reslice');
   this.volWidget.view.orientation = this.volWidget.view.add(this, 'sceneOrientation',
-   { Free: 0, Sagittal: 1, Coronal: 2, Axial: 3 }).name('orientation');
+   { Free: 0, Blue: 1, Red: 2, Green: 3 }).name('orientation');
   this.volWidget.view.open();
-  // .. switch between slicing and volume rendering
-  this.volWidget.interact.vrCtrl = this.volWidget.interact.add(this.volume, 'volumeRendering').name('rendering');
-  // .. configure the volume rendering opacity
-  this.volWidget.interact.opacityCtrl = this.volWidget.interact.add(this.volume, 'opacity', 0, 1);
-  // .. and the threshold in the min..max range
-  this.volWidget.interact.lowThCtrl = this.volWidget.interact.add(this.volume, 'lowerThreshold', 
-    this.volume.min, this.volume.max).name('lowerThr');
-  this.volWidget.interact.upThCtrl = this.volWidget.interact.add(this.volume, 'upperThreshold', 
-    this.volume.min, this.volume.max).name('upperThr');
-  this.volWidget.interact.lowWinCtrl = this.volWidget.interact.add(this.volume, 'windowLow', 
-    this.volume.min, this.volume.max).name('winLow');
-  this.volWidget.interact.upWinCtrl = this.volWidget.interact.add(this.volume, 'windowHigh',
-   this.volume.min, this.volume.max).name('winHigh');
-  // the indexX,Y,Z are the currently displayed slice indices in the range
-  // 0..dimensions-1
-  this.volWidget.interact.sliceXCtrl = this.volWidget.interact.add(this.volume, 'indexX', 0,
-   this.volume.dimensions[0] - 1).listen();
-  this.volWidget.interact.sliceYCtrl = this.volWidget.interact.add(this.volume, 'indexY', 0,
-   this.volume.dimensions[1] - 1).listen();
-  this.volWidget.interact.sliceZCtrl = this.volWidget.interact.add(this.volume, 'indexZ', 0,
-   this.volume.dimensions[2] - 1).listen();
-  this.volWidget.interact.open();
+
+  // connect callbacks
+  var self = this;
+  this.volWidget.view.bboxMode.onChange(function(value) {
+    if(self.volumeBBox != null){
+        self.volumeBBox.visible = value;
+    }
+  });
+
+  this.volWidget.view.orientationMode.onChange(function(value) {
+    // Delete current volume
+    if(value){
+        window.console.log(value);
+        self.reslice = 'true';
+    }
+    else{
+      window.console.log(value);
+        self.reslice = 'false';
+    }
+    self.updateVolume();
+  });
+
+  this.volWidget.view.orientation.onChange(function(value){
+    if(value == 2){
+      // move camera
+      self['33d'].camera.position = [-400, 0, 0];
+      self['33d'].camera.up = [0, 0, 1];
+    }
+    else if(value == 3){
+      // move camera
+      self['33d'].camera.position = [0, 400, 0];
+      self['33d'].camera.up = [0, 0, 1];
+    }
+    else if(value == 1){
+      // move camera
+      self['33d'].camera.position = [0, 0, -400];
+      self['33d'].camera.up = [0, 1, 0];
+    }
+  });
+
+  // // .. switch between slicing and volume rendering
+  // this.volWidget.interact.vrCtrl = this.volWidget.interact.add(this.volume, 'volumeRendering').name('rendering');
+  // // .. configure the volume rendering opacity
+  // this.volWidget.interact.opacityCtrl = this.volWidget.interact.add(this.volume, 'opacity', 0, 1);
+  // // .. and the threshold in the min..max range
+  // this.volWidget.interact.lowThCtrl = this.volWidget.interact.add(this.volume, 'lowerThreshold', 
+  //   this.volume.min, this.volume.max).name('lowerThr');
+  // this.volWidget.interact.upThCtrl = this.volWidget.interact.add(this.volume, 'upperThreshold', 
+  //   this.volume.min, this.volume.max).name('upperThr');
+  // this.volWidget.interact.lowWinCtrl = this.volWidget.interact.add(this.volume, 'windowLow', 
+  //   this.volume.min, this.volume.max).name('winLow');
+  // this.volWidget.interact.upWinCtrl = this.volWidget.interact.add(this.volume, 'windowHigh',
+  //  this.volume.min, this.volume.max).name('winHigh');
+  // // the indexX,Y,Z are the currently displayed slice indices in the range
+  // // 0..dimensions-1
+  // this.volWidget.interact.sliceXCtrl = this.volWidget.interact.add(this.volume, 'indexX', 0,
+  //  this.volume.dimensions[0] - 1).listen();
+  // this.volWidget.interact.sliceYCtrl = this.volWidget.interact.add(this.volume, 'indexY', 0,
+  //  this.volume.dimensions[1] - 1).listen();
+  // this.volWidget.interact.sliceZCtrl = this.volWidget.interact.add(this.volume, 'indexZ', 0,
+  //  this.volume.dimensions[2] - 1).listen();
+  // this.volWidget.interact.open();
+}
+
+viewer.Viewer.prototype.updateSceneView = function(){
+
+  // if reslice mode, update the renderers by default
+  // else reset normals to default (or RASIJK vals?)
+  if(this.volWidget.view.sliceMode.getValue() == 1){
+    var _x = this['33d'].camera.view[2];
+    var _y = this['33d'].camera.view[6];
+    var _z = this['33d'].camera.view[10];
+    // normalize 
+    var length = Math.sqrt(_x*_x + _y*_y+_z*_z);
+
+
+    window.console.log(this.volume);
+    
+
+    // Update X
+    this.volume.xNormX = _x/length;
+    this.volume.xNormY = _y/length;
+    this.volume.xNormZ = _z/length;
+
+    this.volume.sliceInfoChanged(0);
+
+    // get new slice normal
+    var sliceX = this.volume.children[0].children[this.volume.indexX];
+    // window.console.log();
+
+    // Update Y
+    this.volume.yNormX = sliceX.up[0];
+    this.volume.yNormY = sliceX.up[1];
+    this.volume.yNormZ = sliceX.up[2];
+
+    this.volume.sliceInfoChanged(1);
+
+    // Update Z
+    this.volume.zNormX = sliceX.right[0];
+    this.volume.zNormY = sliceX.right[1];
+    this.volume.zNormZ = sliceX.right[2];
+
+    this.volume.sliceInfoChanged(2);
+
+    // only triggers 1 3d renderer
+
+    // this.volume.modified();
+    this['sliceXX'].update(this.volume);
+    this['sliceYY'].update(this.volume);
+    this['sliceZZ'].update(this.volume);
+    }
+
 }
 
 
 viewer.Viewer.prototype.updateVolWidget = function() {
   this.volWidget.view.remove(this.volWidget.view.sliceMode);
   this.volWidget.view.remove(this.volWidget.view.bboxMode);
+  this.volWidget.view.remove(this.volWidget.view.orientationMode);
   this.volWidget.view.remove(this.volWidget.view.orientation);
-  this.volWidget.interact.remove(this.volWidget.interact.vrCtrl);
-  this.volWidget.interact.remove(this.volWidget.interact.opacityCtrl);
-  this.volWidget.interact.remove(this.volWidget.interact.lowThCtrl);
-  this.volWidget.interact.remove(this.volWidget.interact.upThCtrl);
-  this.volWidget.interact.remove(this.volWidget.interact.lowWinCtrl);
-  this.volWidget.interact.remove(this.volWidget.interact.upWinCtrl);
-  this.volWidget.interact.remove(this.volWidget.interact.sliceXCtrl);
-  this.volWidget.interact.remove(this.volWidget.interact.sliceYCtrl);
-  this.volWidget.interact.remove(this.volWidget.interact.sliceZCtrl);
+  // this.volWidget.interact.remove(this.volWidget.interact.vrCtrl);
+  // this.volWidget.interact.remove(this.volWidget.interact.opacityCtrl);
+  // this.volWidget.interact.remove(this.volWidget.interact.lowThCtrl);
+  // this.volWidget.interact.remove(this.volWidget.interact.upThCtrl);
+  // this.volWidget.interact.remove(this.volWidget.interact.lowWinCtrl);
+  // this.volWidget.interact.remove(this.volWidget.interact.upWinCtrl);
+  // this.volWidget.interact.remove(this.volWidget.interact.sliceXCtrl);
+  // this.volWidget.interact.remove(this.volWidget.interact.sliceYCtrl);
+  // this.volWidget.interact.remove(this.volWidget.interact.sliceZCtrl);
   this.populateVolWidget();
 }
  
@@ -344,4 +493,9 @@ viewer.Viewer.prototype.onTouchStart = function(){
 
 viewer.Viewer.prototype.onTouchEnd = function(){
     clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
+}
+
+viewer.Viewer.prototype.destroy = function(){
+    // destroy the fancy tree
+    $("#tree").fancytree("destroy");
 }

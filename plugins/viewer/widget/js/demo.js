@@ -59,8 +59,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
     }
 
     if(typeof(view) != 'undefined' && view != null){
-        //viewer.destroy();
-        //view = null;
+        view.destroy();
+        view = null;
     }
   }
 
@@ -117,6 +117,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedId, directory){
 
 _CHRIS_INTERACTIVE_PLUGIN_.formatData = function(dataObj){
 
+    window.console.log(dataObj);
+
     var tree = [];
 
     // Loop though models, fibers and volumes 
@@ -142,8 +144,12 @@ _CHRIS_INTERACTIVE_PLUGIN_.addToTree = function(tree, obj, type){
 _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, files, key){
 
     // get current location
-    var relPath = url.split('..');
-    var path = relPath[1].split('/');
+    window.console.log(url);
+    var path = url.split('/');
+    // we do not want to show the following in the tree
+    // users/plugin_name/feed_name
+    path.shift();
+    path.shift();
     path.shift();
 
     if(depth >= path.length){

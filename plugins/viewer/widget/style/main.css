@@ -11,7 +11,7 @@
 	height:100%;
 	border-top-width: 2px;
 	border-style: solid;
-	border-top-color: yellow;
+	border-top-color: red;
 	border-right-width: 1px;
 	border-left-width: 1px;
 	border-right-color:#FFF;
@@ -25,7 +25,7 @@
 	height:100%;
 	border-top-width: 2px;
 	border-top-style: solid;
-	border-top-color: red;
+	border-top-color: green;
 }
 
 .slice-Z{
@@ -35,7 +35,7 @@
 	height:100%;
 	border-top-width: 2px;
 	border-top-style: solid;
-	border-top-color: green;
+	border-top-color: blue;
 }
 
 /*Widget containers*/
@@ -97,4 +97,21 @@ ol, ul {
     font-weight: bold;
     border: none;
     padding: 5px;
+}
+
+/* select style*/
+.c select{
+    width: initial;
+    border: none;
+    height: initial;
+    line-height: initial;
+    padding: initial;
+    font-size: inherit;
+    font-weight: inherit;
+    -webkit-border-radius: 0px; 
+    -moz-border-radius: 0px;
+    border-radius: 0px; 
+    margin: inherit; 
+    font-size: inherit; 
+    vertical-align: inherit; 
 }
