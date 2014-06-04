@@ -524,4 +524,34 @@ viewer.Viewer.prototype.onTouchEnd = function(){
 viewer.Viewer.prototype.destroy = function(){
     // destroy the fancy tree
     $("#tree").fancytree("destroy");
+
+    // dbl click listeners
+
+    // single click listeners
+
+    // top right object
+
+    // delete all elements contained in the scene
+    if(this.volume != null){
+        this.unsetVolume();
+    }
+
+    if (this.geomModels != []) {
+        // iterate backwards to handle splice in remGeomModel
+        var len = this.geomModels.length;
+        while (len--) {
+            this.remGeomModel(len);
+        }
+    }
+    this.geomModels.length = [];
+
+    // destroy XTK renderers
+    this['33d'].destroy();
+    this['33d'] = null;
+    this['sliceXX'].destroy();
+    this['sliceXX'] = null;
+    this['sliceYY'].destroy();
+    this['sliceYY'] = null;
+    this['sliceZZ'].destroy();
+    this['sliceZZ'] = null;
 }
