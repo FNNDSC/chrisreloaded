@@ -20,10 +20,10 @@ var viewer = viewer || {};
 viewer.Viewer = function(jsonObj) {
 
   this.version = 0.0;
-  //Parse the json file 
+  //Parse the json file
   this.source = jsonObj;
-  
-  //rendered volume 
+
+  //rendered volume
   this.volume = null;
 
   this.volumeBBox = null;
@@ -37,7 +37,7 @@ viewer.Viewer = function(jsonObj) {
   this.reslice = 'false';
   this.reslice2 = false;
 
-  //rendered geometric models (eg. fibers and meshes) 
+  //rendered geometric models (eg. fibers and meshes)
   this.geomModels = [];
 
   //file selection widget
@@ -51,7 +51,7 @@ viewer.Viewer = function(jsonObj) {
   this._webGLFriendly = true;
   try {
     this.create3DRenderer('33d');
-  } catch (Exception) { 
+  } catch (Exception) {
     this._webGLFriendly = false;
   }
   // create the 2D renderers for the X, Y, Z orientations
@@ -65,7 +65,7 @@ viewer.Viewer = function(jsonObj) {
   this.sliceXX.onShowtime = function() {
     // add the volume to the other 3 renderers
     self.sliceYY.add(self.volume);
-    self.sliceYY.render(); 
+    self.sliceYY.render();
     self.sliceZZ.add(self.volume);
     self.sliceZZ.render();
 
@@ -83,7 +83,7 @@ viewer.Viewer = function(jsonObj) {
       self['33d'].add(self.volume);
       self['33d'].camera.position = [0, 0, 200];
       self['33d'].render();
-    } 
+    }
     // now the volume GUI widget
     if (!self.volWidget) {
       self.createVolWidget('xcontroller');
@@ -200,7 +200,7 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
           self.addGeomModel(node);
         } else {
           self.remGeomModel(node);
-        }  
+        }
       };
     },
 
@@ -213,7 +213,7 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
           node.toggleSelected();
         }
       }
-    }     
+    }
   });
 
   this.fileSelectTree = $('#' + container).fancytree("getTree");
@@ -226,10 +226,10 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
 
   url = nodeObj.data.url;
 
-  // for the dicom format, files is a list of strings 
-  // for other formats it's a list with just a single string 
+  // for the dicom format, files is a list of strings
+  // for other formats it's a list with just a single string
   files = nodeObj.data.files;
-  orderedFiles = files.sort().map(function(str) { 
+  orderedFiles = files.sort().map(function(str) {
       return url + '/' + str;});
 
   this.volume = new X.volume();
@@ -239,7 +239,7 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
   this.volume.key = nodeObj.key;
   this.volume.nodeObj = nodeObj;
 
-  this.sliceXX.add(this.volume); 
+  this.sliceXX.add(this.volume);
   // start the loading/rendering
   this.sliceXX.render();
 }
@@ -255,7 +255,10 @@ viewer.Viewer.prototype.unsetVolume = function() {
     this['sliceYY'].remove(this.volume);
     this['sliceZZ'].remove(this.volume);
 
+    this.volume.destroy();
     this.volume = null;
+
+    this.volumeBBox.destroy();
     this.volumeBBox = null;
 
 }
@@ -269,7 +272,7 @@ viewer.Viewer.prototype.updateVolume = function() {
 }
 
 viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
-  var xtkObj; 
+  var xtkObj;
 
   if (this._webGLFriendly && (this.indexOfGeomModel(nodeObj.key) == -1)) {
     xtkObj = new X[nodeObj.data.type]();
@@ -288,6 +291,8 @@ viewer.Viewer.prototype.remGeomModel = function(nodeObj) {
 
   if (ix != -1) {
     this['33d'].remove(this.geomModels[ix]);
+    this.geomModels[ix].destroy();
+    this.geomModels[ix] = null;
     this.geomModels.splice(ix,1);
   }
 }
@@ -312,7 +317,7 @@ viewer.Viewer.prototype.indexOfGeomModel = function(key) {
 viewer.Viewer.prototype.onThreshold = function() {
 
   window.console.log('Lets threshold!');
-  //this.threeDRenderer 
+  //this.threeDRenderer
 
 }
 
@@ -327,7 +332,7 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     // the following configures the gui for interacting with the X.volume
     // this.volWidget.interact = gui.addFolder('Volume Interaction');
     this.populateVolWidget();
-  
+
 }
 
 viewer.Viewer.prototype.populateVolWidget = function() {
@@ -384,11 +389,11 @@ viewer.Viewer.prototype.populateVolWidget = function() {
   // // .. configure the volume rendering opacity
   // this.volWidget.interact.opacityCtrl = this.volWidget.interact.add(this.volume, 'opacity', 0, 1);
   // // .. and the threshold in the min..max range
-  // this.volWidget.interact.lowThCtrl = this.volWidget.interact.add(this.volume, 'lowerThreshold', 
+  // this.volWidget.interact.lowThCtrl = this.volWidget.interact.add(this.volume, 'lowerThreshold',
   //   this.volume.min, this.volume.max).name('lowerThr');
-  // this.volWidget.interact.upThCtrl = this.volWidget.interact.add(this.volume, 'upperThreshold', 
+  // this.volWidget.interact.upThCtrl = this.volWidget.interact.add(this.volume, 'upperThreshold',
   //   this.volume.min, this.volume.max).name('upperThr');
-  // this.volWidget.interact.lowWinCtrl = this.volWidget.interact.add(this.volume, 'windowLow', 
+  // this.volWidget.interact.lowWinCtrl = this.volWidget.interact.add(this.volume, 'windowLow',
   //   this.volume.min, this.volume.max).name('winLow');
   // this.volWidget.interact.upWinCtrl = this.volWidget.interact.add(this.volume, 'windowHigh',
   //  this.volume.min, this.volume.max).name('winHigh');
@@ -411,12 +416,12 @@ viewer.Viewer.prototype.updateSceneView = function(){
     var _x = this['33d'].camera.view[2];
     var _y = this['33d'].camera.view[6];
     var _z = this['33d'].camera.view[10];
-    // normalize 
+    // normalize
     var length = Math.sqrt(_x*_x + _y*_y+_z*_z);
 
 
     window.console.log(this.volume);
-    
+
 
     // Update X
     this.volume.xNormX = _x/length;
@@ -470,22 +475,22 @@ viewer.Viewer.prototype.updateVolWidget = function() {
   // this.volWidget.interact.remove(this.volWidget.interact.sliceZCtrl);
   this.populateVolWidget();
 }
- 
+
   /*   { title : '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm'
         url   : 'plugins/viewer/widget/data/dicom/',
-        files : ['0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm', 
+        files : ['0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm',
                  '0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
                  '0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
                  '0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
-                 '0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm'] }, 
-      { url   : 'plugins/viewer/widget/data/', 
+                 '0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm'] },
+      { url   : 'plugins/viewer/widget/data/',
         files : ['recon.nii'] } ],
     fibers  : [
       { url   : 'plugins/viewer/widget/data/',
         files : ['tact.trk'] } ],
-    models : [      
+    models : [
       { url   : 'plugins/viewer/widget/data/',
-        files : ['lh.pial'] }, 
+        files : ['lh.pial'] },
       { url   : 'plugins/viewer/widget/data/',
         files : ['rh.pial'] } ]; */
 
