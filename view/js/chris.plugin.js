@@ -124,6 +124,10 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
   jQuery(document).off('click', '#expand_interactive_plugin').on('click',
       '#expand_interactive_plugin', _PLUGIN_.expandInteractiveLayout);
 
+  // connect the double click event
+  jQuery(document).off('dblclick', '.interactive_plugin_title').on('dblclick',
+      '.interactive_plugin_title', _PLUGIN_.expandInteractiveLayout);
+
   // prepare sequence of transitions
   jQuery('#opaqueoverlay').on(
       "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
@@ -753,5 +757,5 @@ jQuery(document)
                       parseInt(jQuery(this).css('height'), 10)
                           + parseInt(jQuery(this).css('line-height'), 10));
                 }
-              })
+              });
         });
