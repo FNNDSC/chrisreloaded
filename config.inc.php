@@ -42,7 +42,7 @@ define('CHRIS_MAINTENANCE', false);
 
 define('CHRIS_HOME', '/neuro/users/chris/dev');
 define('CHRIS_TRANSFER_PROTOCOL', 'http');
-define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/nicolas');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/jorge');
 
 // admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
@@ -59,7 +59,7 @@ define('SQL_DATABASE', 'chrisdev');
 
 // chris file system
 
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'nicolas'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
 define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
 define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 define('CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));

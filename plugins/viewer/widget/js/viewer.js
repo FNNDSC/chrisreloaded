@@ -219,6 +219,7 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
   $('#' + container).fancytree({
     checkbox: true,
     source: this.source,
+    selectMode: 1,
 
     select: function(event, data) {
       var node = data.node;
@@ -273,8 +274,7 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
       return url + '/' + str;});
 
   this.volume = new X.volume();
-  this.volume.reslicing = this.reslice;
-  window.console.log(this.reslice);
+  this.volume.reslicing = this.reslice
   this.volume.file = orderedFiles;
   this.volume.key = nodeObj.key;
   this.volume.nodeObj = nodeObj;
@@ -295,7 +295,10 @@ viewer.Viewer.prototype.unsetVolume = function() {
     this['sliceYY'].remove(this.volume);
     this['sliceZZ'].remove(this.volume);
 
+    this.volume.destroy();
     this.volume = null;
+
+    this.volumeBBox.destroy();
     this.volumeBBox = null;
 
 }
@@ -328,6 +331,8 @@ viewer.Viewer.prototype.remGeomModel = function(nodeObj) {
 
   if (ix != -1) {
     this['33d'].remove(this.geomModels[ix]);
+    this.geomModels[ix].destroy();
+    this.geomModels[ix] = null;
     this.geomModels.splice(ix,1);
   }
 }
@@ -454,10 +459,6 @@ viewer.Viewer.prototype.updateSceneView = function(){
     // normalize
     var length = Math.sqrt(_x*_x + _y*_y+_z*_z);
 
-
-    window.console.log(this.volume);
-
-
     // Update X
     this.volume.xNormX = _x/length;
     this.volume.xNormY = _y/length;
@@ -559,4 +560,34 @@ viewer.Viewer.prototype.onTouchEnd = function(){
 viewer.Viewer.prototype.destroy = function(){
     // destroy the fancy tree
     $("#tree").fancytree("destroy");
+
+    // dbl click listeners
+
+    // single click listeners
+
+    // top right object
+
+    // delete all elements contained in the scene
+    if(this.volume != null){
+        this.unsetVolume();
+    }
+
+    if (this.geomModels != []) {
+        // iterate backwards to handle splice in remGeomModel
+        var len = this.geomModels.length;
+        while (len--) {
+            this.remGeomModel(len);
+        }
+    }
+    this.geomModels.length = [];
+
+    // destroy XTK renderers
+    this['33d'].destroy();
+    this['33d'] = null;
+    this['sliceXX'].destroy();
+    this['sliceXX'] = null;
+    this['sliceYY'].destroy();
+    this['sliceYY'] = null;
+    this['sliceZZ'].destroy();
+    this['sliceZZ'] = null;
 }

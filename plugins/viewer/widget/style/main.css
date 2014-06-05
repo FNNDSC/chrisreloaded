@@ -1,7 +1,11 @@
 .x-controller{
-	position:absolute
 	top:10px;
 	right:10px;
+}
+
+.topLeftContainer{
+  padding-top:10px;
+  padding-left:10px;
 }
 
 .slice-X{
@@ -45,39 +49,31 @@ z-index: 1;
 
 .collaborate-btn > button{
     color: #FFF;
-    font-size: 20px;
-    font-weight: bold;
-    background-color: rgb(70, 206, 135);
+    font-size: 11px;
+		background-color:black;
+    /*background-color: rgb(70, 206, 135);*/
     border: none;
-    padding: 5px;
 }
 
 .collaborate-btn > button.collaborating{
 	background-color: rgb(206, 92, 70);
 }
 
-.collaborate-btn > button:hover{
-    background-color: #353535;
-    border: 1px solid #FFF;
-}
-
-
 /*FILESELECT Widget*/
-.fileselectwidget {
-position: relative;
-z-index: 1;
+
+.bordered {
+  max-width: 350px;
+  margin-bottom: -1px;
+  color: grey;
+  border: 1px solid;
+	margin-top:none;
 }
 
 .fileselectwidget > ul{
 	margin: 0;
 }
 
-#fileselect { 
-	color: #FFF;
-	font-size: 20px;
-}
-
-ol, ul { 
+ol, ul {
 	list-style-type: none;
 }
 
@@ -102,10 +98,10 @@ ol, ul {
     padding: initial;
     font-size: inherit;
     font-weight: inherit;
-    -webkit-border-radius: 0px; 
+    -webkit-border-radius: 0px;
     -moz-border-radius: 0px;
-    border-radius: 0px; 
-    margin: inherit; 
-    font-size: inherit; 
-    vertical-align: inherit; 
+    border-radius: 0px;
+    margin: inherit;
+    font-size: inherit;
+    vertical-align: inherit;
 }

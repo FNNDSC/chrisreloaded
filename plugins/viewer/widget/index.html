@@ -3,15 +3,20 @@
 <link rel="stylesheet" type="text/css" href="plugins/viewer/widget/lib/fancytree/css/skin-viewer/ui.fancytree.css">
 
 <div class='topLeftContainer'>
-<div class="collaborate-btn">
-    <button onclick="TogetherJS(this); return false;">Enter the Reading Room</button>
-</div>
+    <div class="collaborate-btn bordered" style='width:100%;'>
+        <button onclick="TogetherJS(this); return false;" style='width:100%; text-align:left;'> Start collaboration</button>
+    </div>
 
-<div class="fileselectwidget">
-	<span id="fileselect-btn">Select files:</span>
-	<div id="tree"> </div>
-</div>
-
+    <details open class='bordered' style='
+    position: relative;
+    z-index: 1;width:100%;    font-size: 11px;'>
+        <summary style='padding: 1px 6px;color:#FFF;background-color:#000;'>Select files</summary>
+        <div class='content' style='border-top: 1px solid;max-height: 300px; overflow-y: auto;'>
+            <div class="fileselectwidget">
+                <div id="tree"> </div>
+            </div>
+        </div>
+    </details>
 </div>
 
 <div id="render3D" style="height: 70%; width: 100%;">

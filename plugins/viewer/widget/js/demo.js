@@ -31,7 +31,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.getParam = function(parameter) {
 _CHRIS_INTERACTIVE_PLUGIN_.getInd = function(parameter) {
     if (typeof _CHRIS_INTERACTIVE_PLUGIN_._param[parameter] != 'undefined')
         return _CHRIS_INTERACTIVE_PLUGIN_._param_ind[parameter];
-  
+
     return -1;
 };
 
@@ -77,7 +77,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID, data) {
         collaborator = new collab.Collab(feedID);
     }
 
-    window.console.log(data);
     // create viewer object
     if(typeof(view) == 'undefined' || view == null){
         view = new viewer.Viewer(data);
@@ -117,11 +116,9 @@ _CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedId, directory){
 
 _CHRIS_INTERACTIVE_PLUGIN_.formatData = function(dataObj){
 
-    window.console.log(dataObj);
-
     var tree = [];
 
-    // Loop though models, fibers and volumes 
+    // Loop though models, fibers and volumes
     for (var type in dataObj) {
        var typeArr = dataObj[type];
 
@@ -144,7 +141,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.addToTree = function(tree, obj, type){
 _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, files, key){
 
     // get current location
-    window.console.log(url);
     var path = url.split('/');
     // we do not want to show the following in the tree
     // users/plugin_name/feed_name
@@ -174,7 +170,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, 
     }
 
 
-    // subtree is not there, create it 
+    // subtree is not there, create it
     var indexSubTree = -1;
 
     // loop through tree and look for 'title' match
@@ -194,7 +190,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, 
         subtree.push({ 'title': path[depth],
                        'key': key,
                        'folder': true,
-                       'hideCheckbox' : true,    
+                       'hideCheckbox' : true,
                        'children': []
                     });
 
@@ -212,7 +208,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.createTreeFile = function(title, type, url, files, ke
 
     return { 'title': title,
              'key': key,
-             'type' : type, 
+             'type' : type,
              'url'  : url,
              'files' : files
             };
@@ -259,7 +255,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
         return;
     }
     else if(directory != '' && links == true){
-        // USE CASE: 
+        // USE CASE:
         // * start viewer from Plugin UI
         // * save current scene (which can contain elements from N feeds)
         // DO:
