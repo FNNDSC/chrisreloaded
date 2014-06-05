@@ -177,6 +177,7 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
   $('#' + container).fancytree({
     checkbox: true,
     source: this.source,
+    selectMode: 1,
 
     select: function(event, data) {
 
