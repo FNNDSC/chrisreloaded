@@ -12,7 +12,7 @@
 
 // Declare (or re-declare) the single global variable
 var collab = collab || {};
- 
+
 collab.Collab = function(roomID) {
 
 	this.version = 0.0;
@@ -53,13 +53,13 @@ collab.Collab.prototype.setButtonContent = function(force){
          if(test){
             jButton.addClass('collaborating');
          }
-         
-         jButton.html('<i class="fa fa-sign-out"></i> Leave The Reading Room');
+
+         jButton.html('<i class="fa fa-sign-out"></i> Stop collaboration');
 
     }
     else{
 
-        jButton.html('<i class="fa fa-sign-in"></i> Enter The Reading Room');
+        jButton.html('<i class="fa fa-sign-in"></i> Start collaboration');
 
     }
 
@@ -98,14 +98,14 @@ collab.Collab.prototype.init = function(){
 }
 
 collab.Collab.prototype.style = function(){
- 
+
     $('#togetherjs-dock').css('background-color', '#353535');
     $('.togetherjs .togetherjs-window > header').css('background-color', '#353535');
 
 }
 
 collab.Collab.prototype.connect = function(msg){
- 
+
     var self = this;
 	  TogetherJS.hub.on("viewChanged", function (msg) {
         if (! msg.sameUrl) {
@@ -175,7 +175,7 @@ collab.Collab.prototype.destroy = function(){
 
 //   window.console.log('TouchEnd');
 //   clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
-  
+
 // }
 
 _CHRIS_INTERACTIVE_PLUGIN_.togetherjsTestYO = function(threeD){
