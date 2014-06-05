@@ -141,7 +141,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.addToTree = function(tree, obj, type){
 _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, files, key){
 
     // get current location
-    window.console.log(url);
     var path = url.split('/');
     // we do not want to show the following in the tree
     // users/plugin_name/feed_name
