@@ -233,8 +233,7 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
       return url + '/' + str;});
 
   this.volume = new X.volume();
-  this.volume.reslicing = this.reslice;
-  window.console.log(this.reslice);
+  this.volume.reslicing = this.reslice
   this.volume.file = orderedFiles;
   this.volume.key = nodeObj.key;
   this.volume.nodeObj = nodeObj;
@@ -418,10 +417,6 @@ viewer.Viewer.prototype.updateSceneView = function(){
     var _z = this['33d'].camera.view[10];
     // normalize
     var length = Math.sqrt(_x*_x + _y*_y+_z*_z);
-
-
-    window.console.log(this.volume);
-
 
     // Update X
     this.volume.xNormX = _x/length;
