@@ -274,10 +274,9 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
       return url + '/' + str;});
 
   this.volume = new X.volume();
-  this.volume.reslicing = this.reslice
+  this.volume.reslicing = this.reslice;
   this.volume.file = orderedFiles;
   this.volume.key = nodeObj.key;
-  this.volume.nodeObj = nodeObj;
 
   this.sliceXX.add(this.volume);
   // start the loading/rendering
@@ -305,7 +304,7 @@ viewer.Viewer.prototype.unsetVolume = function() {
 
 viewer.Viewer.prototype.updateVolume = function() {
   if(this.volume != null){
-    var nodeObj = this.volume.nodeObj;
+    var nodeObj = this.fileSelectTree.getNodeByKey(this.volume.key);
     this.unsetVolume();
     this.setVolume(nodeObj);
   }
