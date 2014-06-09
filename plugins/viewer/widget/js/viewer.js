@@ -103,9 +103,8 @@ viewer.Viewer = function(jsonObj) {
       render2D.style.display = 'none';
       this.style.height = '100%'
     }
-    var ev = document.createEvent('Event');
-    ev.initEvent('resize', true, true);
-    window.dispatchEvent(ev);
+    //repaint
+    viewer.documentRepaint();
   });
 
   //Event handlers for switching renderers
@@ -125,25 +124,15 @@ viewer.Viewer = function(jsonObj) {
 
 
 viewer.Viewer.prototype.TwoDContClickHandler = function(containerObj) {
-  var twoDRenderer = firstChild(containerObj);
+  var twoDRenderer = viewer.firstChild(containerObj);
   var threeD = document.getElementById('render3D');
-  var threeDRenderer = firstChild(threeD);
+  var threeDRenderer = viewer.firstChild(threeD);
 
   containerObj.replaceChild(threeDRenderer, twoDRenderer);
   threeD.insertBefore(twoDRenderer, threeD.firstChild);
   //threed.appendChild(renderer);
-  //Find the first child which is an element node
-  function firstChild(n) {
-    x = n.firstChild;
-    while (x.nodeType != 1) {
-      x = x.nextSibling;
-    }
-    return x;
-  }
   //repaint
-  var ev = document.createEvent('Event');
-  ev.initEvent('resize', true, true);
-  window.dispatchEvent(ev);
+  viewer.documentRepaint();
 }
 
 viewer.Viewer.prototype.createBBox = function(){
@@ -589,4 +578,21 @@ viewer.Viewer.prototype.destroy = function(){
     this['sliceYY'] = null;
     this['sliceZZ'].destroy();
     this['sliceZZ'] = null;
+}
+
+
+//Find the first child which is an element node
+viewer.firstChild = function(DOMObj) {
+  var x = DOMObj.firstChild;
+  while ((x != null) && (x.nodeType != 1)) {
+    x = x.nextSibling;
+  }
+  return x;
+}
+
+//repaint
+viewer.documentRepaint = function() {
+  var ev = document.createEvent('Event');
+  ev.initEvent('resize', true, true);
+  window.dispatchEvent(ev);
 }
