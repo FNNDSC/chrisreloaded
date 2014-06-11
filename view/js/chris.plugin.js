@@ -31,7 +31,6 @@ _PLUGIN_.hideBatchDrop = function() {
  */
 _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
   if (typeof _CHRIS_INTERACTIVE_PLUGIN_ == 'undefined') {
-    window.console.log('undef');
     // setup view layout
     _PLUGIN_.setupInteractiveLayout(_plugin_name, _jobs);
     jQuery('#plugin_submit').removeClass('disabled');
@@ -39,7 +38,6 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     jQuery('#plugin_submit_play').show();
     return null;
   } else if (_CHRIS_INTERACTIVE_PLUGIN_.force == false) {
-    window.console.log('force');
     // load new parameters
     _CHRIS_INTERACTIVE_PLUGIN_.parameters(_jobs);
     // start view
@@ -49,7 +47,6 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     jQuery('#plugin_submit_play').show();
     return null;
   } else {
-    window.console.log('go');
     // get new parameters
     _CHRIS_INTERACTIVE_PLUGIN_.force = false;
     return _CHRIS_INTERACTIVE_PLUGIN_.parameters();
@@ -304,7 +301,7 @@ jQuery(document)
                     jQuery('.carousel-inner').children('.active').removeClass(
                         'active');
                     // and activate the first one
-                    // 
+                    //
                     if(_pluginSelector == ''){
                     jQuery('.carousel-inner').children().first().addClass(
                         'active');
@@ -625,7 +622,7 @@ jQuery(document)
                 jQuery(this).addClass('disabled');
                 var now = new Date();
                 var month = now.getMonth() + 1;
-                var _feed_name =  month + "-" + now.getDate() + "-" + now.getFullYear() + " " 
+                var _feed_name =  month + "-" + now.getDate() + "-" + now.getFullYear() + " "
                + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                 // if interactive plugin calling, give control to the plugin
                 // and return before launching

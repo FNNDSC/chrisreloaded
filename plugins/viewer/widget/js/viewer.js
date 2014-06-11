@@ -93,42 +93,36 @@ viewer.Viewer = function(jsonObj) {
   };
 
   //Event handler for full screen behaviour main container is double clicked
-  document.getElementById('render3D').addEventListener('dblclick', function() {
-    var render2D = document.getElementById('render2D');
-
-    if (this.style.height == '100%') {
-      render2D.style.display = 'block';
-      this.style.height = '70%';
-    } else {
-      render2D.style.display = 'none';
-      this.style.height = '100%'
-    }
-    //repaint
-    viewer.documentRepaint();
-  });
+  document.getElementById('render3D').addEventListener('dblclick', self.ThreeDContDClickHandler);
 
   //Event handlers for switching renderers
-  document.getElementById('sliceX').addEventListener('click', function() {
-    self.TwoDContClickHandler(this);
-  });
-
-  document.getElementById('sliceY').addEventListener('click', function() {
-    self.TwoDContClickHandler(this);
-  });
-
-  document.getElementById('sliceZ').addEventListener('click', function() {
-    self.TwoDContClickHandler(this);
-  });
+  document.getElementById('sliceX').addEventListener('click', self.TwoDContClickHandler);
+  document.getElementById('sliceY').addEventListener('click', self.TwoDContClickHandler);
+  document.getElementById('sliceZ').addEventListener('click', self.TwoDContClickHandler);
 
 }
 
+viewer.Viewer.prototype.ThreeDContDClickHandler = function() {
+    var render2D = document.getElementById('render2D');
 
-viewer.Viewer.prototype.TwoDContClickHandler = function(containerObj) {
-  var twoDRenderer = viewer.firstChild(containerObj);
+    if (this.style.height == '100%') {
+        render2D.style.display = 'block';
+        this.style.height = '70%';
+    } else {
+        render2D.style.display = 'none';
+        this.style.height = '100%'
+    }
+
+    //repaint
+    viewer.documentRepaint();
+}
+
+viewer.Viewer.prototype.TwoDContClickHandler = function() {
+  var twoDRenderer = viewer.firstChild(this);
   var threeD = document.getElementById('render3D');
   var threeDRenderer = viewer.firstChild(threeD);
 
-  containerObj.replaceChild(threeDRenderer, twoDRenderer);
+  this.replaceChild(threeDRenderer, twoDRenderer);
   threeD.insertBefore(twoDRenderer, threeD.firstChild);
   //threed.appendChild(renderer);
   //repaint
@@ -500,37 +494,11 @@ viewer.Viewer.prototype.updateVolWidget = function() {
   this.populateVolWidget();
 }
 
-  /*   { title : '0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm'
-        url   : 'plugins/viewer/widget/data/dicom/',
-        files : ['0001-1.3.12.2.1107.5.2.32.35162.2012021516003275873755302.dcm',
-                 '0002-1.3.12.2.1107.5.2.32.35162.2012021516003288462855318.dcm',
-                 '0003-1.3.12.2.1107.5.2.32.35162.2012021516003360797655352.dcm',
-                 '0004-1.3.12.2.1107.5.2.32.35162.2012021516003411054655384.dcm',
-                 '0005-1.3.12.2.1107.5.2.32.35162.2012021516003465209455412.dcm'] },
-      { url   : 'plugins/viewer/widget/data/',
-        files : ['recon.nii'] } ],
-    fibers  : [
-      { url   : 'plugins/viewer/widget/data/',
-        files : ['tact.trk'] } ],
-    models : [
-      { url   : 'plugins/viewer/widget/data/',
-        files : ['lh.pial'] },
-      { url   : 'plugins/viewer/widget/data/',
-        files : ['rh.pial'] } ]; */
-
-
 viewer.Viewer.prototype.viewChanged = function(arr){
     window.console.log('emit view changed');
 }
 
-// viewer.Viewer.prototype.viewEmitChanged = function(arr){
-//     window.console.log('emit view changed');
-//     self.viewChanged(viewM);
-// }
-
 viewer.Viewer.prototype.onViewChanged = function(arr){
-    window.console.log('update view in view');
-    window.console.log(this);
     this.threeD.camera.view = new Float32Array(arr);
 }
 
@@ -549,11 +517,15 @@ viewer.Viewer.prototype.destroy = function(){
     // destroy the fancy tree
     $("#tree").fancytree("destroy");
 
-    // dbl click listeners
+    // listeners
+    var self = this;
+    document.getElementById('render3D').removeEventListener('dblclick', self.ThreeDContDClickHandler);
+    document.getElementById('sliceX').removeEventListener('click', self.TwoDContClickHandler);
+    document.getElementById('sliceY').removeEventListener('click', self.TwoDContClickHandler);
+    document.getElementById('sliceZ').removeEventListener('click', self.TwoDContClickHandler);
 
-    // single click listeners
-
-    // top right object
+    // top right object must be destroyed or not recreated!
+    window.console.log('top right object must be destroyed or not recreated!');
 
     // delete all elements contained in the scene
     if(this.volume != null){

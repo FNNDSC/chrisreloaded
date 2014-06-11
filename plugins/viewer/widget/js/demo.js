@@ -225,7 +225,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
     var links = _CHRIS_INTERACTIVE_PLUGIN_.getParam("links");
     var feedId = _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid");
 
-    if(feedId != ''){
+    if(feedId != '' || (directory != '' && links == false)){
         // USE CASE:
         // * click on 'view' a feed
         // DO:
@@ -240,20 +240,20 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
 
         return;
     }
-    else if(directory != '' && links == false){
-        // USE CASE:
-        // * click on 'view' inside a feed's file browser
-        // DO:
-        // * CREATE new scene if needed
-        // * UPDATE the scene and the collaboration
-
-        // We might have to create a scene/collab - id -1
-        //_CHRIS_INTERACTIVE_PLUGIN_.create(-1);
-        // MIGHT NEED TO INTRODUCE TYPE AS WELL
-        _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
-
-        return;
-    }
+    // else if(directory != '' && links == false){
+    //     // USE CASE:
+    //     // * click on 'view' inside a feed's file browser
+    //     // DO:
+    //     // * CREATE new scene if needed
+    //     // * UPDATE the scene and the collaboration
+    //
+    //     // We might have to create a scene/collab - id -1
+    //     //_CHRIS_INTERACTIVE_PLUGIN_.create(-1);
+    //     // MIGHT NEED TO INTRODUCE TYPE AS WELL
+    //     _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
+    //
+    //     return;
+    // }
     else if(directory != '' && links == true){
         // USE CASE:
         // * start viewer from Plugin UI
