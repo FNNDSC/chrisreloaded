@@ -1,14 +1,42 @@
-.x-controller{
+#render3D {
+	height: 70%;
+	width: 100%;
+	position:relative;
+}
+
+.threeD-renderer {
+	background-color: #000;
+	width: 100%;
+	height: 100%;
+}
+
+.x-controller {
 	top:10px;
 	right:10px;
 }
 
-.topLeftContainer{
+.topLeftContainer {
   padding-top:10px;
   padding-left:10px;
 }
 
-.slice-X{
+#render2D {
+    height: 30%; 
+    width: 100%;
+}
+
+#render2D > div {
+    width: 33%; 
+    height: 100%; 
+    float: left; 
+    box-sizing: border-box;
+}
+
+#sliceX { 
+    style=width: 34%;
+}
+
+.slice-X {
 	background-color: #000;
 	height:100%;
 	border-top-width: 2px;
@@ -20,7 +48,7 @@
 	border-left-color:#FFF;
 }
 
-.slice-Y{
+.slice-Y {
 	background-color: #000;
 	height:100%;
 	border-top-width: 2px;
@@ -28,7 +56,7 @@
 	border-top-color: green;
 }
 
-.slice-Z{
+.slice-Z {
 	background-color: #000;
 	height:100%;
 	border-top-width: 2px;
@@ -37,25 +65,28 @@
 }
 
 /*Widget containers*/
-.topLeftContainer, .x-controller{
+.topLeftContainer, .x-controller {
 	position: absolute;
 }
 
 /*COLLABORATE Widget*/
 .collaborate-btn{
-position: relative;
-z-index: 1;
+	position: relative;
+	z-index: 1;
+	width:100%;
 }
 
-.collaborate-btn > button{
-    color: #FFF;
-    font-size: 11px;
-		background-color:black;
-    /*background-color: rgb(70, 206, 135);*/
-    border: none;
+.collaborate-btn > button {
+  color: #FFF;
+  font-size: 11px;
+	background-color:black;
+  /*background-color: rgb(70, 206, 135);*/
+  border: none;
+	width: 100%;
+	text-align: left;
 }
 
-.collaborate-btn > button.collaborating{
+.collaborate-btn > button.collaborating {
 	background-color: rgb(206, 92, 70);
 }
 
@@ -67,6 +98,22 @@ z-index: 1;
   color: grey;
   border: 1px solid;
 	margin-top:none;
+	position: relative;
+	z-index: 1;
+	width:100%;
+	font-size: 11px;
+}
+
+.bordered > summary {
+	padding: 1px 6px;
+	color: #FFF;
+	background-color: #000;
+}
+
+.content {
+	border-top: 1px solid;
+	max-height: 300px;
+	overflow-y: auto;
 }
 
 .fileselectwidget > ul{
@@ -82,26 +129,26 @@ ol, ul {
 }
 
 #fileselect-btn {
-    color: #FFF;
-    font-size: 20px;
-    font-weight: bold;
-    border: none;
-    padding: 5px;
+  color: #FFF;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  padding: 5px;
 }
 
 /* select style*/
-.c select{
-    width: initial;
-    border: none;
-    height: initial;
-    line-height: initial;
-    padding: initial;
-    font-size: inherit;
-    font-weight: inherit;
-    -webkit-border-radius: 0px;
-    -moz-border-radius: 0px;
-    border-radius: 0px;
-    margin: inherit;
-    font-size: inherit;
-    vertical-align: inherit;
+.c select {
+  width: initial;
+  border: none;
+  height: initial;
+  line-height: initial;
+  padding: initial;
+  font-size: inherit;
+  font-weight: inherit;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  margin: inherit;
+  font-size: inherit;
+  vertical-align: inherit;
 }

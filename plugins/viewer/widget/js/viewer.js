@@ -50,7 +50,7 @@ viewer.Viewer = function(jsonObj) {
   // try to create and initialize a 3D renderer
   this._webGLFriendly = true;
   try {
-    this.create3DRenderer('33d');
+    this.create3DRenderer('vol3D');
   } catch (Exception) {
     this._webGLFriendly = false;
   }
@@ -76,13 +76,13 @@ viewer.Viewer = function(jsonObj) {
 
     if (self._webGLFriendly) {
       // no need to worry about the other showtimes
-      self['33d'].interactor.addEventListener(X.event.events.ROTATE, function(){self.updateSceneView();});
-      self['33d'].resetBoundingBox();
+      self['vol3D'].interactor.addEventListener(X.event.events.ROTATE, function(){self.updateSceneView();});
+      self['vol3D'].resetBoundingBox();
       self.createBBox();
-      self['33d'].add(self.volumeBBox);
-      self['33d'].add(self.volume);
-      self['33d'].camera.position = [0, 0, 200];
-      self['33d'].render();
+      self['vol3D'].add(self.volumeBBox);
+      self['vol3D'].add(self.volume);
+      self['vol3D'].camera.position = [0, 0, 200];
+      self['vol3D'].render();
     }
     // now the volume GUI widget
     if (!self.volWidget) {
@@ -195,7 +195,7 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
 /*viewer.Viewer.prototype.getContainedRenderer = function(container) {
 
   switch(container) {
-    case this['33d'].container: return this['33d']; break;
+    case this['vol3D'].container: return this['vol3D']; break;
     case this['sliceXX'].container: return this['sliceXX']; break;
     case this['sliceYY'].container: return this['sliceYY']; break;
     case this['sliceZZ'].container: return this['sliceZZ']; break;
@@ -275,8 +275,8 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
 viewer.Viewer.prototype.unsetVolume = function() {
   // remove from the visualization
   if (this._webGLFriendly) {
-    this['33d'].remove(this.volume);
-    this['33d'].remove(this.volumeBBox);
+    this['vol3D'].remove(this.volume);
+    this['vol3D'].remove(this.volumeBBox);
   }
 
     this['sliceXX'].remove(this.volume);
@@ -307,9 +307,9 @@ viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
     xtkObj.file = nodeObj.data.url + '/' + nodeObj.data.files;
     xtkObj.key = nodeObj.key;
     this.geomModels.push(xtkObj);
-    this['33d'].add(xtkObj);
-    this['33d'].camera.position = [0, 0, 200];
-    this['33d'].render();
+    this['vol3D'].add(xtkObj);
+    this['vol3D'].camera.position = [0, 0, 200];
+    this['vol3D'].render();
   }
 }
 
@@ -318,7 +318,7 @@ viewer.Viewer.prototype.remGeomModel = function(nodeObj) {
   var ix = this.indexOfGeomModel(nodeObj.key);
 
   if (ix != -1) {
-    this['33d'].remove(this.geomModels[ix]);
+    this['vol3D'].remove(this.geomModels[ix]);
     this.geomModels[ix].destroy();
     this.geomModels[ix] = null;
     this.geomModels.splice(ix,1);
@@ -397,18 +397,18 @@ viewer.Viewer.prototype.populateVolWidget = function() {
   this.volWidget.view.orientation.onChange(function(value){
     if(value == 2){
       // move camera
-      self['33d'].camera.position = [-400, 0, 0];
-      self['33d'].camera.up = [0, 0, 1];
+      self['vol3D'].camera.position = [-400, 0, 0];
+      self['vol3D'].camera.up = [0, 0, 1];
     }
     else if(value == 3){
       // move camera
-      self['33d'].camera.position = [0, 400, 0];
-      self['33d'].camera.up = [0, 0, 1];
+      self['vol3D'].camera.position = [0, 400, 0];
+      self['vol3D'].camera.up = [0, 0, 1];
     }
     else if(value == 1){
       // move camera
-      self['33d'].camera.position = [0, 0, -400];
-      self['33d'].camera.up = [0, 1, 0];
+      self['vol3D'].camera.position = [0, 0, -400];
+      self['vol3D'].camera.up = [0, 1, 0];
     }
   });
 
@@ -441,9 +441,9 @@ viewer.Viewer.prototype.updateSceneView = function(){
   // if reslice mode, update the renderers by default
   // else reset normals to default (or RASIJK vals?)
   if(this.volWidget.view.sliceMode.getValue() == 1){
-    var _x = this['33d'].camera.view[2];
-    var _y = this['33d'].camera.view[6];
-    var _z = this['33d'].camera.view[10];
+    var _x = this['vol3D'].camera.view[2];
+    var _y = this['vol3D'].camera.view[6];
+    var _z = this['vol3D'].camera.view[10];
     // normalize
     var length = Math.sqrt(_x*_x + _y*_y+_z*_z);
 
@@ -570,8 +570,8 @@ viewer.Viewer.prototype.destroy = function(){
     this.geomModels.length = [];
 
     // destroy XTK renderers
-    this['33d'].destroy();
-    this['33d'] = null;
+    this['vol3D'].destroy();
+    this['vol3D'] = null;
     this['sliceXX'].destroy();
     this['sliceXX'] = null;
     this['sliceYY'].destroy();

@@ -3,37 +3,35 @@
 <link rel="stylesheet" type="text/css" href="plugins/viewer/widget/lib/fancytree/css/skin-viewer/ui.fancytree.css">
 
 <div class='topLeftContainer'>
-    <div class="collaborate-btn bordered" style='width:100%;'>
-        <button onclick="TogetherJS(this); return false;" style='width:100%; text-align:left;'> Start collaboration</button>
-    </div>
+  <div class="collaborate-btn bordered">
+    <button onclick="TogetherJS(this); return false;">Start collaboration</button>
+  </div>
 
-    <details open class='bordered' style='
-    position: relative;
-    z-index: 1;width:100%;    font-size: 11px;'>
-        <summary style='padding: 1px 6px;color:#FFF;background-color:#000;'>Select files</summary>
-        <div class='content' style='border-top: 1px solid;max-height: 300px; overflow-y: auto;'>
-            <div class="fileselectwidget">
-                <div id="tree"> </div>
-            </div>
-        </div>
-    </details>
+  <details open class='bordered'>
+    <summary>Select files</summary>
+    <div class='content'>
+      <div class="fileselectwidget">
+        <div id="tree"> </div>
+      </div>
+    </div>
+  </details>
 </div>
 
-<div id="render3D" style="height: 70%; width: 100%; position:relative;">
-  <div id="33d" class="3d-renderer" style="background-color: #000; width: 100%; height: 100%;">
+<div id="render3D">
+  <div id="vol3D" class="threeD-renderer">
   </div>
   <div id="xcontroller" class="x-controller"></div>
 </div>
 
-<div id="render2D" style="height: 30%; width: 100%;">
-  <div id="sliceZ" style="width: 33%; height: 100%; float: left; box-sizing: border-box;">
+<div id="render2D">
+  <div id="sliceZ">
       <div id="sliceZZ" class="slice-Z"></div>
   </div>
 
-  <div id="sliceX" style="width: 34%; height: 100%; float: left; box-sizing: border-box;">
+  <div id="sliceX">
     <div id="sliceXX" class="slice-X"></div>
   </div>
-  <div id="sliceY" style="width: 33%; height: 100%; float: left; box-sizing: border-box;">
+  <div id="sliceY">
     <div id="sliceYY" class="slice-Y"></div>
   </div>
 </div>
