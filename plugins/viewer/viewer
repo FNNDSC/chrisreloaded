@@ -37,6 +37,11 @@ class Viewer(Plugin):
 
       options = self.options
 
+      # if directory is a file, get containing directory
+      if not os.path.isdir(options.DIRECTORY):
+          options.DIRECTORY = os.path.dirname(options.DIRECTORY)
+
+
       fibersExt = tuple(['trk'])
       modelsExt = tuple(['obj', 'vtk', 'stl'])
       volumesExt = tuple(['mgh', 'mgz', 'nrrd', 'nii', 'nii.gz'])
@@ -106,10 +111,10 @@ if __name__ == "__main__":
   # this in an interactive plugin
   plugin.interactive = True
 
-  plugin.add_parameter('Directory', Plugin.STRING, '--directory', action='store', dest='DIRECTORY', default='/neuro/users/chris/users/chris.test/data/dicom', help='Directory to be visualized')
-  plugin.add_parameter('FeedID', Plugin.STRING, '--feedid', action='store', dest='FEEDID', default='', help='Feed ID to be viewed')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--directory', action='store', dest='DIRECTORY', default='', help='Directory to be visualized')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', dest='FEEDID', default='', help='Feed ID to be viewed')
 
-  plugin.add_parameter('Print object instead of writing it to FS', Plugin.BOOLEAN, '--nottofile', default=False, action='store_true',dest='NOTTOFILE', help='Cset')
-  plugin.add_parameter('Create links', Plugin.BOOLEAN, '--links', default=False, action='store_true',dest='LINKS', help='Create links for the dataset')
+  plugin.add_parameter('HIDDEN', Plugin.BOOLEAN, '--nottofile', default=False, action='store_true',dest='NOTTOFILE', help='Cset')
+  plugin.add_parameter('HIDDEN', Plugin.BOOLEAN, '--links', default=False, action='store_true',dest='LINKS', help='Create links for the dataset')
 
   plugin.launch()
