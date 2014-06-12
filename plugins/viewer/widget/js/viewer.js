@@ -524,8 +524,11 @@ viewer.Viewer.prototype.destroy = function(){
     document.getElementById('sliceY').removeEventListener('click', self.TwoDContClickHandler);
     document.getElementById('sliceZ').removeEventListener('click', self.TwoDContClickHandler);
 
-    // top right object must be destroyed or not recreated!
-    window.console.log('top right object must be destroyed or not recreated!');
+    // top right widget must be destroyed if any!
+    if(this.volWidget != null){
+        this.volWidget.container.removeChild(this.volWidget.container.lastChild);
+        this.volWidget = null;
+    }
 
     // delete all elements contained in the scene
     if(this.volume != null){
@@ -551,9 +554,6 @@ viewer.Viewer.prototype.destroy = function(){
     this['sliceZZ'].destroy();
     this['sliceZZ'] = null;
 
-    // destroy the volume GUI
-    this.volWidget.container.removeChild(this.volWidget.container.lastChild);
-    this.volWidget = null;
 }
 
 
