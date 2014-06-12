@@ -92,6 +92,27 @@
 
 /*FILESELECT Widget*/
 
+.volumeIcon .fancytree-icon{
+
+	background-image: url('http://www.iconsdb.com/icons/preview/white/brain-xxl.png');
+	background-size: contain;
+
+}
+
+.fibersIcon .fancytree-icon{
+
+	background-image: url('https://kwikom.com/images/misc/leopard-fiber-optic-cable_128x128-2.png');
+	background-size: contain;
+
+}
+
+.meshIcon .fancytree-icon{
+
+	background-image: url('http://cdn-img.easyicon.net/png/55/5501.png');
+	background-size: contain;
+
+}
+
 .bordered {
   max-width: 350px;
   margin-bottom: -1px;
