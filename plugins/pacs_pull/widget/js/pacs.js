@@ -194,7 +194,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
 _CHRIS_INTERACTIVE_PLUGIN_.advancedTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
   var i = 0;
-  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>Location</th><th>Files</th><th></th></tr></thead><tbody>';
+  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Mod.</th><th>Study Desc.</th><th>Series Desc.</th><th>Location</th><th>Files</th><th><input id="c_series" class="checkbox pull-right" type="checkbox"></th></tr></thead><tbody>';
   content += '</tbody></table>';
   // update html with table
   $('#SC-RESULTS').html(content);
@@ -440,6 +440,11 @@ _CHRIS_INTERACTIVE_PLUGIN_.setupDownloadStudy = function() {
               _CHRIS_INTERACTIVE_PLUGIN_.studyStatus[stuid] = !_CHRIS_INTERACTIVE_PLUGIN_.studyStatus[stuid];
             }
             for ( var key in _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[stuid]["SeriesInstanceUID"]) {
+              if(key == 'hasObject'){
+                // we are done, lets exit
+                break;
+              }
+
               var full = '#'
                   + stuid.replace(/\./g, "_")
                   + "-"
@@ -457,10 +462,50 @@ _CHRIS_INTERACTIVE_PLUGIN_.setupDownloadStudy = function() {
             }
           });
 }
+
+/**
+ * Setup the check all callback.
+ */
+_CHRIS_INTERACTIVE_PLUGIN_.checkAllVisible = function(){
+
+  var type = 'series';
+  if($(this).prop('id') == 'c_studies'){
+    type = 'study';
+  }
+
+  var self = this;
+  $('.d_'+ type +' input').each(function(){
+    if($(self).prop('checked') != $(this).prop('checked')){
+      $(this).click();
+    }
+  });
+
+}
+
+/**
+ * Setup the check all action for series and studies.
+ */
+_CHRIS_INTERACTIVE_PLUGIN_.setupCheckAll = function(type){
+
+  $(document)
+    .off('click', '#c_series')
+    .on(
+        'click',
+        '#c_series',_CHRIS_INTERACTIVE_PLUGIN_.checkAllVisible);
+
+  $(document)
+    .off('click', '#c_studies')
+    .on(
+        'click',
+        '#c_studies',_CHRIS_INTERACTIVE_PLUGIN_.checkAllVisible);
+
+}
+
 /**
  * Setup the download series button.
  */
 _CHRIS_INTERACTIVE_PLUGIN_.setupDownloadSeries = function() {
+
   $(document)
       .off('click', '.d_series')
       .on(
@@ -537,7 +582,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxSimpleResults = function(data, force) {
  */
 _CHRIS_INTERACTIVE_PLUGIN_.simpleTable = function() {
   var content = '<table cellpadding="0" cellspacing="0" border="0" class="table table-striped table-bordered" id="S-RESULTS">';
-  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Study Desc.</th><th>Mod.</th><th>Location</th><th></th></tr></thead><tbody>';
+  content += '<thead><tr><th>Name</th><th>MRN</th><th>DOB</th><th>Study Date</th><th>Study Desc.</th><th>Mod.</th><th>Location</th><th><input id="c_studies" class="checkbox pull-right" type="checkbox"></th></tr></thead><tbody>';
   content += '</tbody></table>';
   $('#SC-RESULTS').html(content);
   // make table sortable, filterable, ...
@@ -584,11 +629,11 @@ _CHRIS_INTERACTIVE_PLUGIN_.simpleFormat = function(data, i) {
   }
   else{
     sub.push('<div id="' + stuid.replace(/\./g, "_")
-        + '" class="control"><i class="icon-chevron-down"></i>XXXXXX</div>'); 
+        + '" class="control"><i class="icon-chevron-down"></i>XXXXXX</div>');
     sub.push('XXXXXX');
     sub.push('XXXXXX');
     sub.push('XXXXXX');
-  } 
+  }
 
   sub.push(data.StudyDescription[i].replace(/\>/g, "&gt").replace(/\</g, "&lt")
       .replace(/\_/g, " "));
@@ -743,7 +788,7 @@ $.ajax({
             }
             // trigger submit with "True"
             _CHRIS_INTERACTIVE_PLUGIN_.force = true;
-            $("#plugin_submit").click();            
+            $("#plugin_submit").click();
           }
         });
 }
@@ -784,5 +829,6 @@ $(document).ready(function() {
   _CHRIS_INTERACTIVE_PLUGIN_.setupDetailStudy();
   _CHRIS_INTERACTIVE_PLUGIN_.setupDownloadStudy();
   _CHRIS_INTERACTIVE_PLUGIN_.setupDownloadSeries();
+  _CHRIS_INTERACTIVE_PLUGIN_.setupCheckAll();
   _CHRIS_INTERACTIVE_PLUGIN_.connectPull();
 });
