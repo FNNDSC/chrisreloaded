@@ -348,6 +348,7 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     var gui = new dat.GUI({ autoPlace: false });
     var customContainer = document.getElementById(container);
     customContainer.appendChild(gui.domElement);
+    this.volWidget.container = customContainer;
     this.volWidget.view = gui.addFolder('View');
     // $('.interactive_plugin_content').css("background-color", "#000");
     // the following configures the gui for interacting with the X.volume
@@ -549,6 +550,10 @@ viewer.Viewer.prototype.destroy = function(){
     this['sliceYY'] = null;
     this['sliceZZ'].destroy();
     this['sliceZZ'] = null;
+
+    // destroy the volume GUI
+    this.volWidget.container.removeChild(this.volWidget.container.lastChild);
+    this.volWidget = null;
 }
 
 
