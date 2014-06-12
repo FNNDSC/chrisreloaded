@@ -202,11 +202,10 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
   $('#' + container).fancytree({
     checkbox: true,
     source: this.source,
-    selectMode: 1,
 
     select: function(event, data) {
       var node = data.node;
-
+      window.console.log(node.data.type);
       if (node.data.type == 'volume') {
         if (node.isSelected()) {
           if (self.volume != null) {
