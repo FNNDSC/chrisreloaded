@@ -210,7 +210,8 @@ _CHRIS_INTERACTIVE_PLUGIN_.createTreeFile = function(title, type, url, files, ke
              'key': key,
              'type' : type,
              'url'  : url,
-             'files' : files
+             'files' : files,
+             'extraClasses' : type + 'Icon'
             };
 }
 
