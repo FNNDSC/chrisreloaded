@@ -42,14 +42,14 @@ define('CHRIS_MAINTENANCE', false);
 
 define('CHRIS_HOME', '/neuro/users/chris/dev');
 define('CHRIS_TRANSFER_PROTOCOL', 'http');
-define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/jorge');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/rudolph');
 
 // admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
 define('CHRIS_ADMIN_EMAIL', 'chris@babymri.org');
 define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.org');
 define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.org');
-define('CHRIS_DICOM_EMAIL_TO', 'nicolas.rannou@childrens.harvard.edu');
+define('CHRIS_DICOM_EMAIL_TO', 'rudolph.pienaar@childrens.harvard.edu');
 
 // MYSQL configuration
 define('SQL_HOST', 'chris');
@@ -108,9 +108,9 @@ define('DICOM_DCMTK_ECHOSCU', '/usr/bin/echoscu');
 // remote chris
 define('CHRIS_REMOTES', serialize(array(
 "MGH" => serialize(array(
-    "sshhost" => "fnndsc",
+    "sshhost" => "johannesburg",
     "sshport" => "1148",
-    "dicomhost" => "fnndsc",
+    "dicomhost" => "johannesburg",
     "dicomport" => "10301",
     "src"  => "/home/chris/src/chrisreloaded")),
 "BCH" => serialize(array(
@@ -118,7 +118,7 @@ define('CHRIS_REMOTES', serialize(array(
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
-    "src"  => "/neuro/users/chris/dev/jorge"))
+    "src"  => "/neuro/users/chris/dev/rudolph"))
 )));
 
 //
