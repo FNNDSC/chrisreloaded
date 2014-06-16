@@ -113,6 +113,12 @@
 
 }
 
+span.fancytree-node span.fancytree-icon:hover{
+
+	background-position: initial;
+
+}
+
 .bordered {
   max-width: 350px;
   margin-bottom: -1px;
