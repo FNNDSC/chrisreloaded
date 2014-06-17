@@ -106,6 +106,8 @@ collab.Collab.prototype.style = function(){
 
 collab.Collab.prototype.connect = function(msg){
 
+  window.console.log(msg);
+
     var self = this;
 	  TogetherJS.hub.on("viewChanged", function (msg) {
         if (! msg.sameUrl) {

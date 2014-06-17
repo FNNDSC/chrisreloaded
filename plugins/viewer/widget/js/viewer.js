@@ -77,6 +77,9 @@ viewer.Viewer = function(jsonObj) {
     if (self._webGLFriendly) {
       // no need to worry about the other showtimes
       self['vol3D'].interactor.addEventListener(X.event.events.ROTATE, function(){self.updateSceneView();});
+      self['vol3D'].interactor.onTouchStart = self['vol3D'].interactor.onMouseDown = function(){self.onTouchStart();};
+      self['vol3D'].interactor.onTouchEnd = self['vol3D'].interactor.onMouseUp = function(){self.onTouchEnd();};
+
       self['vol3D'].resetBoundingBox();
       self.createBBox();
       self['vol3D'].add(self.volumeBBox);
@@ -205,7 +208,6 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
 
     select: function(event, data) {
       var node = data.node;
-      window.console.log(node.data.type);
       if (node.data.type == 'volume') {
         if (node.isSelected()) {
           if (self.volume != null) {
@@ -378,11 +380,9 @@ viewer.Viewer.prototype.populateVolWidget = function() {
   this.volWidget.view.orientationMode.onChange(function(value) {
     // Delete current volume
     if(value){
-        window.console.log(value);
         self.reslice = 'true';
     }
     else{
-      window.console.log(value);
         self.reslice = 'false';
     }
     self.updateVolume();
@@ -499,13 +499,13 @@ viewer.Viewer.prototype.viewChanged = function(arr){
 }
 
 viewer.Viewer.prototype.onViewChanged = function(arr){
-    this.threeD.camera.view = new Float32Array(arr);
+    this['vol3D'].camera.view = new Float32Array(arr);
 }
 
 viewer.Viewer.prototype.onTouchStart = function(){
     var self = this;
     _CHRIS_INTERACTIVE_PLUGIN_._updater = setInterval(function(){
-            self.viewChanged(self.threeD.camera.view);
+            self.viewChanged(self['vol3D'].camera.view);
         }, 150);
 }
 
