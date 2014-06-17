@@ -252,7 +252,7 @@ if ($handle = opendir($study_directory)) {
                 // create the 0.info file, which contains more information about the data
                 // build command
                 $command = '/bin/bash -c  "';
-                $command .= 'source '.ENV_FREESURFER_SCRIPT.' stable  2>&1 ; mri_info '.$study_directory.'/'.$entry.'/'.$sub_entry.' ;';
+                $command .= CHRIS_LIB_FOLDER.'/mri_info '.$study_directory.'/'.$entry.'/'.$sub_entry.' ;';
                 $command .= '"';
                 $command_output = shell_exec($command);
                 fwrite($fh, $command_output);
