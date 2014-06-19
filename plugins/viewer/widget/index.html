@@ -1,28 +1,47 @@
 <link rel="stylesheet" type="text/css" href="plugins/viewer/widget/style/main.css">
+<!-- include fancytree css -->
+<link rel="stylesheet" type="text/css" href="plugins/viewer/widget/lib/fancytree/css/skin-viewer/ui.fancytree.css">
 
-<div class="collaborate-btn">
-    <button onclick="TogetherJS(this); return false;">Collaborate</button>
+<div class='topLeftContainer'>
+  <div class="collaborate-btn bordered">
+    <button onclick="TogetherJS(this); return false;">Start collaboration</button>
+  </div>
+
+  <details open class='bordered'>
+    <summary>Select files</summary>
+    <div class='content'>
+      <div class="fileselectwidget">
+        <div id="tree"> </div>
+      </div>
+    </div>
+  </details>
 </div>
 
-<div id="33d" class="3d-renderer" style="background-color: #000; width: 100%; height: 70%; position:relative;">
-	<div id="xcontroller" class="x-controller"></div>
+<div id="render3D" class='render-3D'>
+  <div id="vol3D" class="threeD-renderer">
+  </div>
+  <div id="xcontroller" class="x-controller"></div>
 </div>
 
-<div style=" margin-left: 2%;width: 32%; height: 30%; float: left;">
-    <div id="sliceZZ" class="slice-Z"></div>
-</div>
+<div id="render2D" class='render-2D'>
+  <div id="sliceZ">
+      <div id="sliceZZ" class="slice-Z"></div>
+  </div>
 
-<div style="width: 32%; height: 30%; float: left;">
+  <div id="sliceX">
     <div id="sliceXX" class="slice-X"></div>
-</div>
-<div style="margin-right: 2%;width: 32%; height: 30%; float: left;">
+  </div>
+  <div id="sliceY">
     <div id="sliceYY" class="slice-Y"></div>
+  </div>
 </div>
 
 <!-- Include the Collaboration -->
 <script src="https://togetherjs.com/togetherjs-min.js"></script>
 <script src="plugins/viewer/widget/js/collab.js"></script>
 <!-- NEEDS A COLLAB.JS for our collab object -->
+<!-- include fancytree lib-->
+<script src="plugins/viewer/widget/lib/fancytree/jquery.fancytree.min.js"></script>
 <!-- Include the Viewer -->
 <script type="text/javascript" src="plugins/viewer/widget/js/xtk_xdat.gui.js"></script>
 <script src="plugins/viewer/widget/js/viewer.js"></script>

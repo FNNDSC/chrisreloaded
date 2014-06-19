@@ -25,21 +25,20 @@ _CHRIS_INTERACTIVE_PLUGIN_.getParam = function(parameter) {
     return "";
 };
 
-
 /**
  * Helper function to get a parameter's index from container
  */
 _CHRIS_INTERACTIVE_PLUGIN_.getInd = function(parameter) {
     if (typeof _CHRIS_INTERACTIVE_PLUGIN_._param[parameter] != 'undefined')
         return _CHRIS_INTERACTIVE_PLUGIN_._param_ind[parameter];
-  
+
     return -1;
 };
 
 
 /**
- * Callback function which is called when a plugin has been submitted
- * It doesn't tell us if the plugin is queued/finished
+ * Callback function which is called when a plugin has been submitte
+d * It doesn't tell us if the plugin is queued/finished
  */
 _CHRIS_INTERACTIVE_PLUGIN_.submitted = function(data) {
     var res = data.match(/\d+/g);
@@ -59,10 +58,10 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
         collaborator = null;
     }
 
-    // if(typeof(view) != 'undefined' && view != null){
-    //     //viewer.destroy();
-    //     view = null;
-    // }
+    if(typeof(view) != 'undefined' && view != null){
+        view.destroy();
+        view = null;
+    }
   }
 
 /**
@@ -71,16 +70,19 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
  *
  * feedID is important to create the common room for collaboration
  */
-_CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID) {
+_CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID, data) {
+
     // create collab object
-    collaborator = new collab.Collab(feedID);
+    if(typeof(collaborator) == 'undefined' || collaborator == null){
+        collaborator = new collab.Collab(feedID);
+    }
 
     // create viewer object
-    view = new viewer.Viewer('YO');
+    if(typeof(view) == 'undefined' || view == null){
+        view = new viewer.Viewer(data);
+    }
 
-    // connect events
-    // collaborator.onViewChanged = function(test){view.onViewChanged(test);};
-    // view.viewChanged = function(view){collaborator.viewChanged(view);};
+    // (re)connect events
     collaborator.onViewChanged = function(test){view.onViewChanged(test);};
     view.viewChanged = function(view){collaborator.viewChanged(view);};
 
@@ -93,7 +95,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID) {
  *
  * On success, append JSON to current View Object
  */
-_CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedID, directory){
+_CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedId, directory){
     // ajax find matching directory!
     jQuery.ajax({
         async: "false",
@@ -101,14 +103,116 @@ _CHRIS_INTERACTIVE_PLUGIN_.getJSON = function(feedID, directory){
         url : "plugins/viewer/core/findJSON.php",
         dataType : "json",
         data : {
-            FEED_ID : feedID,
+            FEED_ID : feedId,
             DIRECTORY: directory
         },
         success : function(data){
-          //window.console.log(data);
-          //view.addJSON(data);
+          var jsonObj = JSON.parse( data );
+          var tree = _CHRIS_INTERACTIVE_PLUGIN_.formatData(jsonObj);
+          _CHRIS_INTERACTIVE_PLUGIN_.create(feedId, tree);
         }
     });
+}
+
+_CHRIS_INTERACTIVE_PLUGIN_.formatData = function(dataObj){
+
+    var tree = [];
+
+    // Loop though models, fibers and volumes
+    for (var type in dataObj) {
+       var typeArr = dataObj[type];
+
+       // loop though all obj of a same type
+       for (var i=0; i < typeArr.length; i++){
+        _CHRIS_INTERACTIVE_PLUGIN_.addToTree(tree, typeArr[i], type);
+       }
+    }
+
+    return tree;
+
+}
+
+_CHRIS_INTERACTIVE_PLUGIN_.addToTree = function(tree, obj, type){
+
+    return _CHRIS_INTERACTIVE_PLUGIN_.parseTree(tree, obj, 0, type, obj.url, [], '');
+
+}
+
+_CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, files, key){
+
+    // get current location
+    var path = url.split('/');
+    // we do not want to show the following in the tree
+    // users/plugin_name/feed_name
+    path.shift();
+    path.shift();
+    path.shift();
+
+    if(depth >= path.length){
+        // loop through tree and look for 'title' match
+        var indexSubTree = -1;
+
+        for (var i=0; i < subtree.length; i++){
+            if(subtree[i].title == obj.title){
+                indexSubTree = i;
+                break;
+            }
+        }
+
+        if(indexSubTree == -1){
+
+            indexSubTree = subtree.length;
+            subtree.push(_CHRIS_INTERACTIVE_PLUGIN_.createTreeFile(obj.file[0], type, obj.url, obj.file, key + indexSubTree.toString()));
+
+        }
+
+        return;
+    }
+
+
+    // subtree is not there, create it
+    var indexSubTree = -1;
+
+    // loop through tree and look for 'title' match
+    for (var i=0; i < subtree.length; i++){
+        if(subtree[i].title == path[depth]){
+            indexSubTree = i;
+            break;
+        }
+    }
+
+    // we push object to children
+    if(indexSubTree == -1){
+
+        indexSubTree = subtree.length;
+        key = key.toString() + subtree.length.toString();
+
+        subtree.push({ 'title': path[depth],
+                       'key': key,
+                       'folder': true,
+                       'hideCheckbox' : true,
+                       'children': []
+                    });
+
+    }
+    else{
+
+        key = subtree[indexSubTree].key;
+
+    }
+
+    _CHRIS_INTERACTIVE_PLUGIN_.parseTree(subtree[indexSubTree].children, obj, depth + 1, type, url, files, key);
+}
+
+_CHRIS_INTERACTIVE_PLUGIN_.createTreeFile = function(title, type, url, files, key){
+
+    return { 'title': title,
+             'key': key,
+             'type' : type,
+             'url'  : url,
+             'files' : files,
+             'extraClasses' : type + 'Icon'
+            };
 }
 
 /**
@@ -122,7 +226,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
     var links = _CHRIS_INTERACTIVE_PLUGIN_.getParam("links");
     var feedId = _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid");
 
-    if(feedId != ''){
+    if(feedId != '' || (directory != '' && links == false)){
         // USE CASE:
         // * click on 'view' a feed
         // DO:
@@ -130,26 +234,29 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
         // * CREATE scene and collaboration
 
         _CHRIS_INTERACTIVE_PLUGIN_.destroy();
-        _CHRIS_INTERACTIVE_PLUGIN_.create(feedId);
+        //_CHRIS_INTERACTIVE_PLUGIN_.create(feedId);
 
         // MIGHT NEED TO INTRODUCE TYPE AS WELL
         _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
-        return;
-    }
-    else if(directory != '' && links == false){
-        // USE CASE:
-        // * click on 'view' inside a feed's file browser
-        // DO:
-        // * UPDATE the scene and the collaboration
-        // what if there is NO scene?
 
-        // get more json from the directory and view it!
-        // MIGHT NEED TO INTRODUCE TYPE AS WELL
-        _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
         return;
     }
+    // else if(directory != '' && links == false){
+    //     // USE CASE:
+    //     // * click on 'view' inside a feed's file browser
+    //     // DO:
+    //     // * CREATE new scene if needed
+    //     // * UPDATE the scene and the collaboration
+    //
+    //     // We might have to create a scene/collab - id -1
+    //     //_CHRIS_INTERACTIVE_PLUGIN_.create(-1);
+    //     // MIGHT NEED TO INTRODUCE TYPE AS WELL
+    //     _CHRIS_INTERACTIVE_PLUGIN_.getJSON(feedId, directory);
+    //
+    //     return;
+    // }
     else if(directory != '' && links == true){
-        // USE CASE: 
+        // USE CASE:
         // * start viewer from Plugin UI
         // * save current scene (which can contain elements from N feeds)
         // DO:
@@ -157,7 +264,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
         // * CREATE feed
         // * CREATE scene and collaboration
 
-        _CHRIS_INTERACTIVE_PLUGIN_.destroy();
+        //_CHRIS_INTERACTIVE_PLUGIN_.destroy();
         // create new feed
         _CHRIS_INTERACTIVE_PLUGIN_.force = true;
         $("#plugin_submit").click();

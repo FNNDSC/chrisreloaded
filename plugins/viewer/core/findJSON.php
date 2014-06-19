@@ -53,7 +53,7 @@ if($feed_id != ''){
         $content = file_get_contents("$viewerFeeds/.chris.json");
     }
     else{
-        return;
+        $content = exec(escapeshellcmd(CHRIS_PLUGINS_FOLDER."/viewer/viewer --directory $viewerFeeds --output $viewerFeeds --nottofile"));
     }
 }
 else{

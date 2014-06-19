@@ -144,7 +144,7 @@ body,html { /* 	background: url( */
 }
 
 @-moz-keyframes rotate {from { -moz-transform:rotate(0deg);
-	
+
 }
 
 to {
@@ -153,7 +153,7 @@ to {
 
 }
 @-webkit-keyframes rotate {from { -webkit-transform:rotate(0deg);
-	
+
 }
 
 to {
@@ -162,7 +162,7 @@ to {
 
 }
 @-ms-keyframes rotate {from { -ms-transform:rotate(0deg);
-	
+
 }
 
 to {
@@ -190,45 +190,44 @@ to {
 }
 
 #opaqueoverlay {
-	-webkit-transition:500ms linear;
-  -moz-transition:500ms linear;
-  -o-transition:500ms linear;
-  -ms-transition:500ms linear;
-  transition:500ms linear;
+	-webkit-transition:200ms linear;
+  -moz-transition:200ms linear;
+  -o-transition:200ms linear;
+  -ms-transition:200ms linear;
+  transition:200ms linear;
 }
 
 #home {
-  -webkit-transition:500ms linear;
-  -moz-transition:500ms linear;
-  -o-transition:500ms linear;
-  -ms-transition:500ms linear;
-  transition:500ms linear;
+  -webkit-transition:200ms linear;
+  -moz-transition:200ms linear;
+  -o-transition:200ms linear;
+  -ms-transition:200ms linear;
+  transition:200ms linear;
 }
 
 #left {
-  -webkit-transition:500ms linear;
-  -moz-transition:500ms linear;
-  -o-transition:500ms linear;
-  -ms-transition:500ms linear;
-  transition:500ms linear;
+  -webkit-transition:200ms linear;
+  -moz-transition:200ms linear;
+  -o-transition:200ms linear;
+  -ms-transition:200ms linear;
+  transition:200ms linear;
 }
 
 #right {
-  -webkit-transition:500ms linear;
-  -moz-transition:500ms linear;
-  -o-transition:500ms linear;
-  -ms-transition:500ms linear;
-  transition:500ms;
+  -webkit-transition:200ms linear;
+  -moz-transition:200ms linear;
+  -o-transition:200ms linear;
+  -ms-transition:200ms linear;
+  transition:200ms;
 }
 
 .well{
 	 background-color: #FFF;
 }
 
-#close_interactive_plugin:hover {
+.interactive_plugin_title i:hover {
 	cursor:pointer;
-	background-color:grey;
-
+	color:#009DE9;
 }
 
 ::-webkit-scrollbar {

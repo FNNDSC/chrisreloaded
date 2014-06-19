@@ -91,7 +91,7 @@ class PACSPull(Plugin):
         else:
           print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
           print '(see process.log for more information)'
-          shutil.move(options.LIST_SERIES, options.output)
+      shutil.move(options.LIST_SERIES, options.output)
 
         
 # ENTRYPOINT

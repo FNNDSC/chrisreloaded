@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# _           _ _                            _     _ 
+# _           _ _                            _     _
 #| |         | | |                          | |   | |
 #| | _   ____| | | ___     _ _ _  ___   ____| | _ | |
 #| || \ / _  ) | |/ _ \   | | | |/ _ \ / ___) |/ || |
 #| | | ( (/ /| | | |_| |  | | | | |_| | |   | ( (_| |
 #|_| |_|\____)_|_|\___/    \____|\___/|_|   |_|\____|
-#                                                    
+#
 # (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
 #                   Boston Children's Hospital
 #
@@ -37,6 +37,11 @@ class Viewer(Plugin):
 
       options = self.options
 
+      # if directory is a file, get containing directory
+      if not os.path.isdir(options.DIRECTORY):
+          options.DIRECTORY = os.path.dirname(options.DIRECTORY)
+
+
       fibersExt = tuple(['trk'])
       modelsExt = tuple(['obj', 'vtk', 'stl'])
       volumesExt = tuple(['mgh', 'mgz', 'nrrd', 'nii', 'nii.gz'])
@@ -51,20 +56,19 @@ class Viewer(Plugin):
 
       indexedData = {}
       indexedData['fibers'] = []
-      indexedData['models'] = []
-      indexedData['volumes'] = []
+      indexedData['mesh'] = []
+      indexedData['volume'] = []
 
       dcmData = {}
 
-      for root, dirs, files in os.walk(options.output, topdown=False, followlinks=True):
+      for root, dirs, files in os.walk(options.DIRECTORY, topdown=False, followlinks=True):
         for fileName in files:
-          print fileName
           if fileName.endswith(fibersExt):
               indexedData['fibers'].append({'file':[fileName], 'url':root})
           elif fileName.endswith(modelsExt):
-              indexedData['models'].append({'file':[fileName], 'url':root})
+              indexedData['mesh'].append({'file':[fileName], 'url':root})
           elif fileName.endswith(volumesExt):
-              indexedData['volumes'].append({'file':[fileName], 'url':root})
+              indexedData['volume'].append({'file':[fileName], 'url':root})
           elif fileName.endswith(dicomExt):
             # read file
             ds = dicom.read_file(os.path.join(root, fileName))
@@ -88,7 +92,7 @@ class Viewer(Plugin):
       for patient in dcmData:
         for study in dcmData[patient]:
           for series in dcmData[patient][study]:
-            indexedData['volumes'].append({'file' : dcmData[patient][study][series]['file'], 'url' : dcmData[patient][study][series]['url']})
+            indexedData['volume'].append({'file' : dcmData[patient][study][series]['file'], 'url' : dcmData[patient][study][series]['url']})
 
       print indexedData
 
@@ -98,7 +102,7 @@ class Viewer(Plugin):
         f.write(json.dumps(indexedData))
         f.close()
       else:
-        print indexedData
+        print json.dumps(indexedData)
 
 # ENTRYPOINT
 if __name__ == "__main__":
@@ -107,10 +111,10 @@ if __name__ == "__main__":
   # this in an interactive plugin
   plugin.interactive = True
 
-  plugin.add_parameter('Directory', Plugin.STRING, '--directory', action='store', dest='DIRECTORY', default='/neuro/users/chris/users/chris.test/data/dicom', help='Directory to be visualized')
-  plugin.add_parameter('FeedID', Plugin.STRING, '--feedid', action='store', dest='FEEDID', default='', help='Feed ID to be viewed')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--directory', action='store', dest='DIRECTORY', default='', help='Directory to be visualized')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', dest='FEEDID', default='', help='Feed ID to be viewed')
 
-  plugin.add_parameter('Print object instead of writing it to FS', Plugin.BOOLEAN, '--nottofile', default=False, action='store_true',dest='NOTTOFILE', help='Cset')
-  plugin.add_parameter('Create links', Plugin.BOOLEAN, '--links', default=False, action='store_true',dest='LINKS', help='Create links for the dataset')
+  plugin.add_parameter('HIDDEN', Plugin.BOOLEAN, '--nottofile', default=False, action='store_true',dest='NOTTOFILE', help='Cset')
+  plugin.add_parameter('HIDDEN', Plugin.BOOLEAN, '--links', default=False, action='store_true',dest='LINKS', help='Create links for the dataset')
 
   plugin.launch()

@@ -31,7 +31,6 @@ _PLUGIN_.hideBatchDrop = function() {
  */
 _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
   if (typeof _CHRIS_INTERACTIVE_PLUGIN_ == 'undefined') {
-    window.console.log('undef');
     // setup view layout
     _PLUGIN_.setupInteractiveLayout(_plugin_name, _jobs);
     jQuery('#plugin_submit').removeClass('disabled');
@@ -39,7 +38,6 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     jQuery('#plugin_submit_play').show();
     return null;
   } else if (_CHRIS_INTERACTIVE_PLUGIN_.force == false) {
-    window.console.log('force');
     // load new parameters
     _CHRIS_INTERACTIVE_PLUGIN_.parameters(_jobs);
     // start view
@@ -49,7 +47,6 @@ _PLUGIN_.submitInteractive = function(_plugin_name, _jobs) {
     jQuery('#plugin_submit_play').show();
     return null;
   } else {
-    window.console.log('go');
     // get new parameters
     _CHRIS_INTERACTIVE_PLUGIN_.force = false;
     return _CHRIS_INTERACTIVE_PLUGIN_.parameters();
@@ -69,30 +66,38 @@ _PLUGIN_.cleanInteractiveLayout = function() {
   _CHRIS_INTERACTIVE_PLUGIN_ = {};
   _CHRIS_INTERACTIVE_PLUGIN_ = undefined;
 
+  var jCenter = jQuery('#center');
+  var jRight = jQuery('#right');
+
+  // leave expanded mode if necessary
+  var expanded = jCenter.hasClass('expanded');
+  if(expanded){
+    _PLUGIN_.expandInteractiveLayout();
+  }
+
   // back to original layout
   // GO!
   // 1- hide center
   // 2- modify right width
   // 3- modify background width
   jQuery('#center:visible')
-      .hide(
-          'blind',
-          function() {
-            jQuery('#right')
+      .hide(0, 'linear', function() {
+            jRight
                 .on(
                     "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
                     function() {
                       jQuery('#opaqueoverlay').css('width',jQuery('#opaqueoverlay').data('width'));
-                      jQuery('#right')
+                      jRight
                           .off(
                               "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd");
 
                       jQuery(".interactive_plugin_content").trigger( "cleanInteractive", [ "Custom", "Event" ] );
 
                     });
-            jQuery('#right').css('width', jQuery('#right').data('width'));
+            jRight.css('width', jRight.data('width'));
           });
 }
+
 /**
  * Setup the layout before an interactive plugin
  */
@@ -111,6 +116,15 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
   // connect close button
   jQuery(document).off('click', '#close_interactive_plugin').on('click',
       '#close_interactive_plugin', _PLUGIN_.cleanInteractiveLayout);
+
+  // connect expand button
+  jQuery(document).off('click', '#expand_interactive_plugin').on('click',
+      '#expand_interactive_plugin', _PLUGIN_.expandInteractiveLayout);
+
+  // connect the double click event
+  jQuery(document).off('dblclick', '.interactive_plugin_title').on('dblclick',
+      '.interactive_plugin_title', _PLUGIN_.expandInteractiveLayout);
+
   // prepare sequence of transitions
   jQuery('#opaqueoverlay').on(
       "transitionend webkitTransitionEnd oTransitionEnd MSTransitionEnd",
@@ -128,7 +142,7 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
                   dataType : "text",
                   success : function(data) {
                     jQuery('.interactive_plugin_content').html(data);
-                    jQuery('#center').show('blind');
+                    jQuery('#center').show();
                     // pass parameters
                     _CHRIS_INTERACTIVE_PLUGIN_.parameters(_params);
                     // start view
@@ -154,6 +168,44 @@ _PLUGIN_.setupInteractiveLayout = function(_pluginName, _params) {
     jQuery('#opaqueoverlay').css('width', _windows_width)
   });
 }
+
+/**
+ * Expand/reduce the layout of an interactive plugin
+ */
+_PLUGIN_.expandInteractiveLayout = function() {
+
+  window.console.log('expand clicked');
+
+  // add/removed expanded class
+  var jCenter = jQuery('#center');
+  var jLeft = jQuery('#left');
+  var jRight = jQuery('#right');
+
+  var expanded = jCenter.hasClass('expanded');
+
+  if(expanded){
+    jLeft.show();
+    jRight.show();
+    jCenter.removeClass('expanded');
+
+    jCenter.find('#expand_interactive_plugin').html('<i class="fa fa-expand fa-2x"></i>');
+  }
+  else{
+    jLeft.hide();
+    jRight.hide();
+    jCenter.addClass('expanded');
+
+    jCenter.find('#expand_interactive_plugin').html('<i class="fa fa-compress fa-2x"></i>');
+  }
+
+  // trigger resize event instead ( Interactive plugin might need it, i.e. Renderer3D)
+  // not working
+  //$(window).resize();
+  var ev = document.createEvent('Event');
+  ev.initEvent('resize', true, true);
+  window.dispatchEvent(ev);
+}
+
 /**
  * Setup the javascript when document is ready (finshed loading)
  */
@@ -249,7 +301,7 @@ jQuery(document)
                     jQuery('.carousel-inner').children('.active').removeClass(
                         'active');
                     // and activate the first one
-                    // 
+                    //
                     if(_pluginSelector == ''){
                     jQuery('.carousel-inner').children().first().addClass(
                         'active');
@@ -408,8 +460,15 @@ jQuery(document)
                 if (jQuery(this).hasClass('disabled')) {
                   return;
                 }
-                // grab the visible plugin panel
+                // if nothing selected in the search box
                 var _visible_panel = jQuery('.plugin_panel:visible');
+
+                // if in expanded view
+                var _data = jQuery("#cart_categories").select2('data');
+                if (_data != null){
+                  _visible_panel = jQuery("#panel_" + _data.text);
+                }
+
                 var _plugin_name = _visible_panel.attr('id').replace(
                     'panel_', '');
                 var _parameter_rows = _visible_panel.find('.parameter_row');
@@ -563,7 +622,7 @@ jQuery(document)
                 jQuery(this).addClass('disabled');
                 var now = new Date();
                 var month = now.getMonth() + 1;
-                var _feed_name =  month + "-" + now.getDate() + "-" + now.getFullYear() + " " 
+                var _feed_name =  month + "-" + now.getDate() + "-" + now.getFullYear() + " "
                + now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
                 // if interactive plugin calling, give control to the plugin
                 // and return before launching
@@ -695,5 +754,5 @@ jQuery(document)
                       parseInt(jQuery(this).css('height'), 10)
                           + parseInt(jQuery(this).css('line-height'), 10));
                 }
-              })
+              });
         });
