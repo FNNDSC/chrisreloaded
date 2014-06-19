@@ -33,7 +33,7 @@ if(!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 require_once(dirname(__FILE__).'/controller/_util.inc.php');
 
 // version
-define('CHRIS_VERSION', '2.8');
+define('CHRIS_VERSION', '2.9-experimental');
 define('CHRIS_TIMEZONE', 'America/New_York');
 date_default_timezone_set(CHRIS_TIMEZONE);
 

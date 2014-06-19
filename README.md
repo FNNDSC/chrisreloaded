@@ -16,8 +16,10 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 
 ## Change log ##
 
+### current **r2.9** ###
+
 ### 2014 06 19 **r2.8** ###
-* View plugin
+* Viewer plugin
 * First work on collaboration
 * Improved PACS Pull
 
