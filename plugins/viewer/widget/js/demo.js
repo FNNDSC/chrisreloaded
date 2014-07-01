@@ -221,7 +221,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.createTreeFile = function(title, type, url, files, ke
  */
 _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
 
-    var feedId = _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid");
     var directory = _CHRIS_INTERACTIVE_PLUGIN_.getParam("directory");
     var links = _CHRIS_INTERACTIVE_PLUGIN_.getParam("links");
     var feedId = _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid");
