@@ -134,12 +134,13 @@ _CHRIS_INTERACTIVE_PLUGIN_.formatData = function(dataObj){
 
 _CHRIS_INTERACTIVE_PLUGIN_.addToTree = function(tree, obj, type){
 
-    return _CHRIS_INTERACTIVE_PLUGIN_.parseTree(tree, obj, 0, type, obj.url, [], '');
+    return _CHRIS_INTERACTIVE_PLUGIN_.parseTree(tree, obj, 0, type, [], '');
 
 }
 
-_CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, files, key){
+_CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, files, key){
 
+    var url = obj.url;
     // get current location
     var path = url.split('/');
     // we do not want to show the following in the tree
@@ -183,25 +184,26 @@ _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, 
 
     // we push object to children
     if(indexSubTree == -1){
-
         indexSubTree = subtree.length;
         key = key.toString() + subtree.length.toString();
-
-        subtree.push({ 'title': path[depth],
-                       'key': key,
-                       'folder': true,
-                       'hideCheckbox' : true,
-                       'children': []
-                    });
-
+        subtree.push(_CHRIS_INTERACTIVE_PLUGIN_.createTreeFolder(path[depth], key));
     }
     else{
-
         key = subtree[indexSubTree].key;
-
     }
 
     _CHRIS_INTERACTIVE_PLUGIN_.parseTree(subtree[indexSubTree].children, obj, depth + 1, type, url, files, key);
+}
+
+
+_CHRIS_INTERACTIVE_PLUGIN_.createTreeFolder = function(title, key){
+
+    return { 'title': title,
+             'key': key,
+             'folder' : true,
+             'hideCheckbox' : true,
+             'children': []
+            };
 }
 
 _CHRIS_INTERACTIVE_PLUGIN_.createTreeFile = function(title, type, url, files, key){
