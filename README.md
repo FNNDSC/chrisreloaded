@@ -16,7 +16,12 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 
 ## Change log ##
 
-### Current **r2.8** ###
+### current **r2.9** ###
+
+### 2014 06 19 **r2.8** ###
+* Viewer plugin
+* First work on collaboration
+* Improved PACS Pull
 
 ### 2014 03 13 **r2.7.2** ###
 * Fix bug on _chrisRun_ permissions
