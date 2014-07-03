@@ -103,7 +103,7 @@ collab.Collab.prototype.style = function(){
 
 }
 
-
+// register action name with a handler callback
 collab.Collab.prototype.register = function(actionName, callback){
   TogetherJS.hub.on(actionName, function (msg) {
 	  if (! msg.sameUrl) {
@@ -113,14 +113,14 @@ collab.Collab.prototype.register = function(actionName, callback){
   });
 }
 
-// data is an object
-collab.Collab.prototype.send = function(action, data){
+// send action name and associated data object
+collab.Collab.prototype.send = function(actionName, dataObj){
 	if(typeof(TogetherJS) != 'undefined' && TogetherJS != null){
 		if(TogetherJS.running){
 
-            var myJsonString = JSON.stringify(data);
-						window.console.log(action);
-            TogetherJS.send({type: action, data: myJsonString});
+            var myJsonString = JSON.stringify(dataObj);
+						window.console.log(actionName);
+            TogetherJS.send({type: actionName, data: myJsonString});
 
         }
     }
@@ -169,7 +169,7 @@ collab.Collab.prototype.destroy = function(){
 
 // }
 
-_CHRIS_INTERACTIVE_PLUGIN_.togetherjsTestYO = function(threeD){
+/*_CHRIS_INTERACTIVE_PLUGIN_.togetherjsTestYO = function(threeD){
   window.console.log('I am READY!');
 
   // to be stopped when view closed
@@ -198,7 +198,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.togetherjsTestYO = function(threeD){
 //   var element = elementFinder.findElement(msg.element);
 //   MyApp.changeVisibility(element, msg.isVisible);
 // });
-}
+}*/
 
 // _CHRIS_INTERACTIVE_PLUGIN_.RTpushCamera = function(renderer) {
 

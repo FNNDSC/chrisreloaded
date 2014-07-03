@@ -24,6 +24,9 @@ viewer.Viewer = function(jsonObj) {
   //Parse the json file
   this.source = jsonObj;
 
+  // collaborator object
+  this.collaborator = null;
+
   //rendered volume
   this.volume = null;
 
@@ -55,7 +58,7 @@ viewer.Viewer = function(jsonObj) {
   } catch (Exception) {
     this._webGLFriendly = false;
   }
-  // create the 2D renderers for the X, Y, Z orientations
+  // create 2D renderers for the X, Y, Z orientations
   this.create2DRenderer('sliceXX', 'X');
   this.create2DRenderer('sliceYY', 'Y');
   this.create2DRenderer('sliceZZ', 'Z');
@@ -77,7 +80,9 @@ viewer.Viewer = function(jsonObj) {
 
     if (self._webGLFriendly) {
       // no need to worry about the other showtimes
-      self['vol3D'].interactor.addEventListener(X.event.events.ROTATE, function(){self.updateSceneView();});
+
+      self['vol3D'].interactor.onTouchStart = self['vol3D'].interactor.onMouseDown = function(){self.onTouchStart();};
+      self['vol3D'].interactor.onTouchEnd = self['vol3D'].interactor.onMouseUp = function(){self.onTouchEnd();};
       self['vol3D'].resetBoundingBox();
       self.createBBox();
       self['vol3D'].add(self.volumeBBox);
@@ -103,6 +108,7 @@ viewer.Viewer = function(jsonObj) {
 
 }
 
+
 viewer.Viewer.prototype.ThreeDContDClickHandler = function() {
     var render2D = document.getElementById('render2D');
 
@@ -118,6 +124,7 @@ viewer.Viewer.prototype.ThreeDContDClickHandler = function() {
     viewer.documentRepaint();
 }
 
+
 viewer.Viewer.prototype.TwoDContClickHandler = function() {
   var twoDRenderer = viewer.firstChild(this);
   var threeD = document.getElementById('render3D');
@@ -129,6 +136,74 @@ viewer.Viewer.prototype.TwoDContClickHandler = function() {
   //repaint
   viewer.documentRepaint();
 }
+
+
+viewer.Viewer.prototype.create3DRenderer = function(container) {
+  this[container] = new X.renderer3D();
+  this[container].bgColor = [.1, .1, .1];
+  this[container].container = container;
+  this[container].init();
+  self = this;
+  //3D renderer's ROTATE event handler (update the camera view)
+  this[container].interactor.addEventListener(X.event.events.ROTATE,
+    function(){self.updateSceneView();});
+}
+
+
+viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
+  this[container] = new X.renderer2D();
+  this[container].container = container;
+  this[container].orientation = orientation;
+  this[container].init();
+}
+
+
+viewer.Viewer.prototype.createFileSelectTree = function(container) {
+  var self = this;
+
+  $('#' + container).fancytree({
+    checkbox: true,
+    source: this.source,
+
+    select: function(event, data) {
+      var node = data.node;
+
+      if (node.data.type == 'volume') {
+        if (node.isSelected()) {
+          if (self.volume != null) {
+            var prevSelectedNode = self.fileSelectTree.getNodeByKey(self.volume.key);
+            //uncheck previously selected volume node and call the select event
+            prevSelectedNode.setSelected(false);
+          }
+          self.setVolume(node);
+        } else {
+          self.unsetVolume();
+        }
+      } else {
+        if (node.isSelected()) {
+          self.addGeomModel(node);
+        } else {
+          self.remGeomModel(node);
+        }
+      };
+    },
+
+    keydown: function(event, data) {
+      var node = data.node;
+
+      if (event.which === 13) {
+        if (node.isFolder()) {
+          node.toggleExpanded();
+        } else {
+          node.toggleSelected();
+        }
+      }
+    }
+  });
+
+  this.fileSelectTree = $('#' + container).fancytree("getTree");
+}
+
 
 viewer.Viewer.prototype.createBBox = function(){
 
@@ -171,78 +246,6 @@ viewer.Viewer.prototype.createBBox = function(){
 
 }
 
-viewer.Viewer.prototype.create3DRenderer = function(container) {
-  this[container] = new X.renderer3D();
-  this[container].bgColor = [.1, .1, .1];
-  this[container].container = container;
-  this[container].init();
-}
-
-
-viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
-  this[container] = new X.renderer2D();
-  this[container].container = container;
-  this[container].orientation = orientation;
-  this[container].init();
-}
-
-//given a div container return the contained renderer
-/*viewer.Viewer.prototype.getContainedRenderer = function(container) {
-
-  switch(container) {
-    case this['vol3D'].container: return this['vol3D']; break;
-    case this['sliceXX'].container: return this['sliceXX']; break;
-    case this['sliceYY'].container: return this['sliceYY']; break;
-    case this['sliceZZ'].container: return this['sliceZZ']; break;
-  }
-}*/
-
-viewer.Viewer.prototype.createFileSelectTree = function(container) {
-  var self = this;
-
-  $('#' + container).fancytree({
-    checkbox: true,
-    source: this.source,
-
-    select: function(event, data) {
-      var node = data.node;
-      window.console.log(node.data.type);
-      if (node.data.type == 'volume') {
-        if (node.isSelected()) {
-          if (self.volume != null) {
-            var prevSelectedNode = self.fileSelectTree.getNodeByKey(self.volume.key);
-            //uncheck previously selected volume node and call the select event
-            prevSelectedNode.setSelected(false);
-          }
-          self.setVolume(node);
-        } else {
-          self.unsetVolume();
-        }
-      } else {
-        if (node.isSelected()) {
-          self.addGeomModel(node);
-        } else {
-          self.remGeomModel(node);
-        }
-      };
-    },
-
-    keydown: function(event, data) {
-      var node = data.node;
-
-      if (event.which === 13) {
-        if (node.isFolder()) {
-          node.toggleExpanded();
-        } else {
-          node.toggleSelected();
-        }
-      }
-    }
-  });
-
-  this.fileSelectTree = $('#' + container).fancytree("getTree");
-}
-
 
 viewer.Viewer.prototype.setVolume = function(nodeObj) {
 
@@ -266,6 +269,7 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
   this.sliceXX.render();
 }
 
+
 viewer.Viewer.prototype.unsetVolume = function() {
   // remove from the visualization
   if (this._webGLFriendly) {
@@ -285,6 +289,7 @@ viewer.Viewer.prototype.unsetVolume = function() {
 
 }
 
+
 viewer.Viewer.prototype.updateVolume = function() {
   if(this.volume != null){
     var nodeObj = this.fileSelectTree.getNodeByKey(this.volume.key);
@@ -292,6 +297,7 @@ viewer.Viewer.prototype.updateVolume = function() {
     this.setVolume(nodeObj);
   }
 }
+
 
 viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
   var xtkObj;
@@ -321,8 +327,6 @@ viewer.Viewer.prototype.remGeomModel = function(nodeObj) {
 
 
 viewer.Viewer.prototype.indexOfGeomModel = function(key) {
-  var found = false;
-
   if (this.geomModels) {
     for (var i = 0; i < this.geomModels.length; i++) {
       if (this.geomModels[i].key == key) {
@@ -330,9 +334,7 @@ viewer.Viewer.prototype.indexOfGeomModel = function(key) {
      }
     }
   }
-  if (!found) {
-    return -1;
-  }
+  return -1;
 }
 
 
@@ -358,6 +360,7 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
 
 }
 
+
 viewer.Viewer.prototype.populateVolWidget = function() {
   // now we can configure controllers ..
   //view mode
@@ -379,11 +382,9 @@ viewer.Viewer.prototype.populateVolWidget = function() {
   this.volWidget.view.orientationMode.onChange(function(value) {
     // Delete current volume
     if(value){
-        window.console.log(value);
         self.reslice = 'true';
     }
     else{
-      window.console.log(value);
         self.reslice = 'false';
     }
     self.updateVolume();
@@ -406,30 +407,8 @@ viewer.Viewer.prototype.populateVolWidget = function() {
       self['vol3D'].camera.up = [0, 1, 0];
     }
   });
-
-  // // .. switch between slicing and volume rendering
-  // this.volWidget.interact.vrCtrl = this.volWidget.interact.add(this.volume, 'volumeRendering').name('rendering');
-  // // .. configure the volume rendering opacity
-  // this.volWidget.interact.opacityCtrl = this.volWidget.interact.add(this.volume, 'opacity', 0, 1);
-  // // .. and the threshold in the min..max range
-  // this.volWidget.interact.lowThCtrl = this.volWidget.interact.add(this.volume, 'lowerThreshold',
-  //   this.volume.min, this.volume.max).name('lowerThr');
-  // this.volWidget.interact.upThCtrl = this.volWidget.interact.add(this.volume, 'upperThreshold',
-  //   this.volume.min, this.volume.max).name('upperThr');
-  // this.volWidget.interact.lowWinCtrl = this.volWidget.interact.add(this.volume, 'windowLow',
-  //   this.volume.min, this.volume.max).name('winLow');
-  // this.volWidget.interact.upWinCtrl = this.volWidget.interact.add(this.volume, 'windowHigh',
-  //  this.volume.min, this.volume.max).name('winHigh');
-  // // the indexX,Y,Z are the currently displayed slice indices in the range
-  // // 0..dimensions-1
-  // this.volWidget.interact.sliceXCtrl = this.volWidget.interact.add(this.volume, 'indexX', 0,
-  //  this.volume.dimensions[0] - 1).listen();
-  // this.volWidget.interact.sliceYCtrl = this.volWidget.interact.add(this.volume, 'indexY', 0,
-  //  this.volume.dimensions[1] - 1).listen();
-  // this.volWidget.interact.sliceZCtrl = this.volWidget.interact.add(this.volume, 'indexZ', 0,
-  //  this.volume.dimensions[2] - 1).listen();
-  // this.volWidget.interact.open();
 }
+
 
 viewer.Viewer.prototype.updateSceneView = function(){
 
@@ -483,36 +462,48 @@ viewer.Viewer.prototype.updateVolWidget = function() {
   this.volWidget.view.remove(this.volWidget.view.bboxMode);
   this.volWidget.view.remove(this.volWidget.view.orientationMode);
   this.volWidget.view.remove(this.volWidget.view.orientation);
-  // this.volWidget.interact.remove(this.volWidget.interact.vrCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.opacityCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.lowThCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.upThCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.lowWinCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.upWinCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.sliceXCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.sliceYCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.sliceZCtrl);
   this.populateVolWidget();
 }
 
-viewer.Viewer.prototype.viewChanged = function(arr){
-    window.console.log('emit view changed');
-}
-
-viewer.Viewer.prototype.onViewChanged = function(arr){
-    this.threeD.camera.view = new Float32Array(arr);
-}
-
+// grab the camera view state every 20 mms after touch start and until touch end
 viewer.Viewer.prototype.onTouchStart = function(){
     var self = this;
     _CHRIS_INTERACTIVE_PLUGIN_._updater = setInterval(function(){
-            self.viewChanged(self.threeD.camera.view);
-        }, 150);
+            self.onCameraViewChange(self['vol3D'].camera.view);
+        }, 20);
 }
+
 
 viewer.Viewer.prototype.onTouchEnd = function(){
     clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
 }
+
+// local camera view change handler
+viewer.Viewer.prototype.onCameraViewChange = function(dataObj){
+
+  window.console.log('send: ' + dataObj);
+
+  this.collaborator.send('cameraViewChanged', dataObj);
+
+}
+
+// remote camera view change handler
+viewer.Viewer.prototype.onRemoteCameraViewChange = function(msgObj){
+
+  window.console.log('received: ' + msgObj);
+  window.console.log(this);
+
+  var obj = JSON.parse(msgObj.data);
+  var arr = $.map(obj, function(el) { return el; });
+  this['vol3D'].camera.view = new Float32Array(arr);
+}
+
+
+viewer.Viewer.prototype.connect = function(){
+  var self = this;
+  this.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
+}
+
 
 viewer.Viewer.prototype.destroy = function(){
     // destroy the fancy tree
@@ -556,7 +547,6 @@ viewer.Viewer.prototype.destroy = function(){
     this['sliceZZ'] = null;
 
 }
-
 
 //Find the first child which is an element node
 viewer.firstChild = function(DOMObj) {

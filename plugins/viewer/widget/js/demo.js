@@ -82,9 +82,13 @@ _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID, data) {
         view = new viewer.Viewer(data);
     }
 
+    // attach the collaborator
+    view.collaborator = collaborator;
+    view.connect();
+
     // (re)connect events
-    collaborator.onViewChanged = function(test){view.onViewChanged(test);};
-    view.viewChanged = function(view){collaborator.viewChanged(view);};
+    // collaborator.onViewChanged = function(param){view.onViewChanged(param);};
+    // view.viewChanged = function(param){collaborator.viewChanged(param);};
 
 }
 
