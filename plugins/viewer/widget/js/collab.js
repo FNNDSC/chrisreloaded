@@ -80,7 +80,6 @@ collab.Collab.prototype.init = function(){
 	TogetherJSConfig_on = {
         ready: function(){
         	  self.style();
-        	  self.connect();
             // for is running (reload page with open collab)
             self.setButtonContent();
         },
@@ -104,37 +103,27 @@ collab.Collab.prototype.style = function(){
 
 }
 
-collab.Collab.prototype.connect = function(msg){
 
-  window.console.log(msg);
-
-    var self = this;
-	  TogetherJS.hub.on("viewChanged", function (msg) {
-        if (! msg.sameUrl) {
-            return;
-        }
-
-        var obj = JSON.parse(msg.view);
-        var arr = $.map(obj, function(el) { return el; });
-        self.onViewChanged(arr);
-    });
+collab.Collab.prototype.register = function(actionName, callback){
+  TogetherJS.hub.on(actionName, function (msg) {
+	  if (! msg.sameUrl) {
+		 	return;
+	  }
+	  callback(msg);
+  });
 }
 
-collab.Collab.prototype.onViewChanged = function(msg){
-    window.console.log('do NOTHING - overload me!');
-}
-
-collab.Collab.prototype.viewChanged = function(arr){
-
+// data is an object
+collab.Collab.prototype.send = function(action, data){
 	if(typeof(TogetherJS) != 'undefined' && TogetherJS != null){
 		if(TogetherJS.running){
 
-            var myJsonString = JSON.stringify(arr);
-            TogetherJS.send({type: "viewChanged", view:myJsonString});
+            var myJsonString = JSON.stringify(data);
+						window.console.log(action);
+            TogetherJS.send({type: action, data: myJsonString});
 
         }
     }
-
 }
 
 collab.Collab.prototype.disconnet = function(){
