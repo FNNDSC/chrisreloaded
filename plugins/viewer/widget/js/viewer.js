@@ -2,7 +2,7 @@
  * This object takes care of all the visualization:
  *
  * FEATURES
- * - Give it a JSON file which represents the 'scene'
+ * - Give it a JSON object which represents the 'scene'
  * - Allows users to selects elements of the scene to be rendered
  * - Allows basic image processing (thresholding, Volume Rendering (VR), Fibers Length Thresholding, etc.)
  * - Expose some functions
@@ -80,9 +80,6 @@ viewer.Viewer = function(jsonObj) {
 
     if (self._webGLFriendly) {
       // no need to worry about the other showtimes
-
-      self['vol3D'].interactor.onTouchStart = self['vol3D'].interactor.onMouseDown = function(){self.onTouchStart();};
-      self['vol3D'].interactor.onTouchEnd = self['vol3D'].interactor.onMouseUp = function(){self.onTouchEnd();};
       self['vol3D'].resetBoundingBox();
       self.createBBox();
       self['vol3D'].add(self.volumeBBox);
@@ -98,43 +95,14 @@ viewer.Viewer = function(jsonObj) {
     }
   };
 
-  //Event handler for full screen behaviour main container is double clicked
-  document.getElementById('render3D').addEventListener('dblclick', self.ThreeDContDClickHandler);
+  //Event handler for full screen behaviour when main container is double clicked
+  document.getElementById('render3D').addEventListener('dblclick', self.onThreeDContDblClick.bind(self));
 
   //Event handlers for switching renderers
-  document.getElementById('sliceX').addEventListener('click', self.TwoDContClickHandler);
-  document.getElementById('sliceY').addEventListener('click', self.TwoDContClickHandler);
-  document.getElementById('sliceZ').addEventListener('click', self.TwoDContClickHandler);
+  document.getElementById('sliceX').addEventListener('click', self.onTwoDContClick);
+  document.getElementById('sliceY').addEventListener('click', self.onTwoDContClick);
+  document.getElementById('sliceZ').addEventListener('click', self.onTwoDContClick);
 
-}
-
-
-viewer.Viewer.prototype.ThreeDContDClickHandler = function() {
-    var render2D = document.getElementById('render2D');
-
-    if (this.style.height == '100%') {
-        render2D.style.display = 'block';
-        this.style.height = '70%';
-    } else {
-        render2D.style.display = 'none';
-        this.style.height = '100%'
-    }
-
-    //repaint
-    viewer.documentRepaint();
-}
-
-
-viewer.Viewer.prototype.TwoDContClickHandler = function() {
-  var twoDRenderer = viewer.firstChild(this);
-  var threeD = document.getElementById('render3D');
-  var threeDRenderer = viewer.firstChild(threeD);
-
-  this.replaceChild(threeDRenderer, twoDRenderer);
-  threeD.insertBefore(twoDRenderer, threeD.firstChild);
-  //threed.appendChild(renderer);
-  //repaint
-  viewer.documentRepaint();
 }
 
 
@@ -147,6 +115,8 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   //3D renderer's ROTATE event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.ROTATE,
     function(){self.updateSceneView();});
+  this[container].interactor.onTouchStart = this[container].interactor.onMouseDown = function(){ self.onTouchStart(); };
+  this[container].interactor.onTouchEnd = this[container].interactor.onMouseUp = function(){ self.onTouchEnd(); };
 }
 
 
@@ -331,7 +301,7 @@ viewer.Viewer.prototype.indexOfGeomModel = function(key) {
     for (var i = 0; i < this.geomModels.length; i++) {
       if (this.geomModels[i].key == key) {
         return i;
-     }
+      }
     }
   }
   return -1;
@@ -465,6 +435,63 @@ viewer.Viewer.prototype.updateVolWidget = function() {
   this.populateVolWidget();
 }
 
+
+//COLLABORATION: Local and Remote event handlers
+//Register remote actions with their local handlers
+viewer.Viewer.prototype.connect = function(){
+  var self = this;
+  this.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
+  this.collaborator.register('ThreeDContDblClicked', function(msgObj) {self.onRemoteThreeDContDblClick(msgObj);});
+}
+
+
+viewer.Viewer.prototype.onThreeDContDblClick = function() {
+  var contHeight = this._ThreeDContDblClickHandler();
+
+  this.collaborator.send('ThreeDContDblClicked', contHeight);
+}
+
+
+viewer.Viewer.prototype.onRemoteThreeDContDblClick = function(msgObj) {
+  var contHeight = JSON.parse(msgObj.data);
+  var render3D = document.getElementById('render3D');
+
+  if (render3D.style.height != contHeight) {
+    this._ThreeDContDblClickHandler();
+  }
+}
+
+
+viewer.Viewer.prototype._ThreeDContDblClickHandler = function() {
+  var render3D = document.getElementById('render3D');
+  var render2D = document.getElementById('render2D');
+
+  if (render3D.style.height == '100%') {
+      render2D.style.display = 'block';
+      render3D.style.height = '70%';
+  } else {
+      render2D.style.display = 'none';
+      render3D.style.height = '100%'
+  }
+  //repaint
+  viewer.documentRepaint();
+  return render3D.style.height;
+}
+
+
+viewer.Viewer.prototype.onTwoDContClick = function() {
+  var twoDRenderer = viewer.firstChild(this);
+  var threeD = document.getElementById('render3D');
+  var threeDRenderer = viewer.firstChild(threeD);
+
+  this.replaceChild(threeDRenderer, twoDRenderer);
+  threeD.insertBefore(twoDRenderer, threeD.firstChild);
+  //threed.appendChild(renderer);
+  //repaint
+  viewer.documentRepaint();
+}
+
+
 // grab the camera view state every 20 mms after touch start and until touch end
 viewer.Viewer.prototype.onTouchStart = function(){
     var self = this;
@@ -475,8 +502,9 @@ viewer.Viewer.prototype.onTouchStart = function(){
 
 
 viewer.Viewer.prototype.onTouchEnd = function(){
-    clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
+  clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
 }
+
 
 // local camera view change handler
 viewer.Viewer.prototype.onCameraViewChange = function(dataObj){
@@ -487,6 +515,7 @@ viewer.Viewer.prototype.onCameraViewChange = function(dataObj){
 
 }
 
+
 // remote camera view change handler
 viewer.Viewer.prototype.onRemoteCameraViewChange = function(msgObj){
 
@@ -496,12 +525,6 @@ viewer.Viewer.prototype.onRemoteCameraViewChange = function(msgObj){
   var obj = JSON.parse(msgObj.data);
   var arr = $.map(obj, function(el) { return el; });
   this['vol3D'].camera.view = new Float32Array(arr);
-}
-
-
-viewer.Viewer.prototype.connect = function(){
-  var self = this;
-  this.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
 }
 
 
