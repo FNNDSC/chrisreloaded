@@ -99,9 +99,9 @@ viewer.Viewer = function(jsonObj) {
   document.getElementById('render3D').addEventListener('dblclick', self.onThreeDContDblClick.bind(self));
 
   //Event handlers for switching renderers
-  document.getElementById('sliceX').addEventListener('click', self.onTwoDContClick);
-  document.getElementById('sliceY').addEventListener('click', self.onTwoDContClick);
-  document.getElementById('sliceZ').addEventListener('click', self.onTwoDContClick);
+  document.getElementById('sliceX').addEventListener('click', self.onTwoDContClick.bind(self, 'sliceX'));
+  document.getElementById('sliceY').addEventListener('click', self.onTwoDContClick.bind(self, 'sliceY'));
+  document.getElementById('sliceZ').addEventListener('click', self.onTwoDContClick.bind(self, 'sliceZ'));
 
 }
 
@@ -442,6 +442,7 @@ viewer.Viewer.prototype.connect = function(){
   var self = this;
   this.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
   this.collaborator.register('ThreeDContDblClicked', function(msgObj) {self.onRemoteThreeDContDblClick(msgObj);});
+  this.collaborator.register('TwoDContClicked', function(msgObj) {self.onRemoteTwoDContClick(msgObj);});
 }
 
 
@@ -479,12 +480,27 @@ viewer.Viewer.prototype._ThreeDContDblClickHandler = function() {
 }
 
 
-viewer.Viewer.prototype.onTwoDContClick = function() {
-  var twoDRenderer = viewer.firstChild(this);
+viewer.Viewer.prototype.onTwoDContClick = function(cont) {
+  window.console.log('sent: ', cont);
+  this.collaborator.send('TwoDContClicked', cont);
+  this._TwoDContClickHandler(cont);
+}
+
+
+viewer.Viewer.prototype.onRemoteTwoDContClick = function(msgObj) {
+  var cont = JSON.parse(msgObj.data);
+  window.console.log('received: ', cont);
+  this._TwoDContClickHandler(cont);
+}
+
+
+viewer.Viewer.prototype._TwoDContClickHandler = function(cont) {
+  var contObj = document.getElementById(cont);
+  var twoDRenderer = viewer.firstChild(contObj);
   var threeD = document.getElementById('render3D');
   var threeDRenderer = viewer.firstChild(threeD);
 
-  this.replaceChild(threeDRenderer, twoDRenderer);
+  contObj.replaceChild(threeDRenderer, twoDRenderer);
   threeD.insertBefore(twoDRenderer, threeD.firstChild);
   //threed.appendChild(renderer);
   //repaint
