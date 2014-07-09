@@ -96,12 +96,12 @@ viewer.Viewer = function(jsonObj) {
   };
 
   //Event handler for full screen behaviour when main container is double clicked
-  document.getElementById('render3D').addEventListener('dblclick', self.onThreeDContDblClick.bind(self));
+  document.getElementById('render3D').addEventListener('dblclick', self.on3DContDblClick.bind(self));
 
   //Event handlers for switching renderers
-  document.getElementById('sliceX').addEventListener('click', self.onTwoDContClick.bind(self, 'sliceX'));
-  document.getElementById('sliceY').addEventListener('click', self.onTwoDContClick.bind(self, 'sliceY'));
-  document.getElementById('sliceZ').addEventListener('click', self.onTwoDContClick.bind(self, 'sliceZ'));
+  document.getElementById('sliceX').addEventListener('click', self.on2DContClick.bind(self, 'sliceX'));
+  document.getElementById('sliceY').addEventListener('click', self.on2DContClick.bind(self, 'sliceY'));
+  document.getElementById('sliceZ').addEventListener('click', self.on2DContClick.bind(self, 'sliceZ'));
 
 }
 
@@ -115,8 +115,11 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   //3D renderer's ROTATE event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.ROTATE,
     function(){self.updateSceneView();});
-  this[container].interactor.onTouchStart = this[container].interactor.onMouseDown = function(){ self.onTouchStart(); };
-  this[container].interactor.onTouchEnd = this[container].interactor.onMouseUp = function(){ self.onTouchEnd(); };
+  this[container].interactor.addEventListener(X.event.events.SCROLL,
+      function(){self.updateSceneView();});
+  this[container].interactor.onTouchStart = this[container].interactor.onMouseDown = function(){ self.on3DVolTouchStart(); };
+  this[container].interactor.onTouchEnd = this[container].interactor.onMouseUp = function(){ self.on3DVolTouchEnd(); };
+  this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on3DVolMouseWheel(); };
 }
 
 
@@ -441,29 +444,29 @@ viewer.Viewer.prototype.updateVolWidget = function() {
 viewer.Viewer.prototype.connect = function(){
   var self = this;
   this.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
-  this.collaborator.register('ThreeDContDblClicked', function(msgObj) {self.onRemoteThreeDContDblClick(msgObj);});
-  this.collaborator.register('TwoDContClicked', function(msgObj) {self.onRemoteTwoDContClick(msgObj);});
+  this.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
+  this.collaborator.register('2DContClicked', function(msgObj) {self.onRemote2DContClick(msgObj);});
 }
 
 
-viewer.Viewer.prototype.onThreeDContDblClick = function() {
-  var contHeight = this._ThreeDContDblClickHandler();
+viewer.Viewer.prototype.on3DContDblClick = function() {
+  var contHeight = this._3DContDblClickHandler();
 
-  this.collaborator.send('ThreeDContDblClicked', contHeight);
+  this.collaborator.send('3DContDblClicked', contHeight);
 }
 
 
-viewer.Viewer.prototype.onRemoteThreeDContDblClick = function(msgObj) {
+viewer.Viewer.prototype.onRemote3DContDblClick = function(msgObj) {
   var contHeight = JSON.parse(msgObj.data);
   var render3D = document.getElementById('render3D');
 
   if (render3D.style.height != contHeight) {
-    this._ThreeDContDblClickHandler();
+    this._3DContDblClickHandler();
   }
 }
 
 
-viewer.Viewer.prototype._ThreeDContDblClickHandler = function() {
+viewer.Viewer.prototype._3DContDblClickHandler = function() {
   var render3D = document.getElementById('render3D');
   var render2D = document.getElementById('render2D');
 
@@ -480,21 +483,21 @@ viewer.Viewer.prototype._ThreeDContDblClickHandler = function() {
 }
 
 
-viewer.Viewer.prototype.onTwoDContClick = function(cont) {
+viewer.Viewer.prototype.on2DContClick = function(cont) {
   window.console.log('sent: ', cont);
-  this.collaborator.send('TwoDContClicked', cont);
-  this._TwoDContClickHandler(cont);
+  this.collaborator.send('2DContClicked', cont);
+  this._2DContClickHandler(cont);
 }
 
 
-viewer.Viewer.prototype.onRemoteTwoDContClick = function(msgObj) {
+viewer.Viewer.prototype.onRemote2DContClick = function(msgObj) {
   var cont = JSON.parse(msgObj.data);
   window.console.log('received: ', cont);
-  this._TwoDContClickHandler(cont);
+  this._2DContClickHandler(cont);
 }
 
 
-viewer.Viewer.prototype._TwoDContClickHandler = function(cont) {
+viewer.Viewer.prototype._2DContClickHandler = function(cont) {
   var contObj = document.getElementById(cont);
   var twoDRenderer = viewer.firstChild(contObj);
   var threeD = document.getElementById('render3D');
@@ -508,8 +511,13 @@ viewer.Viewer.prototype._TwoDContClickHandler = function(cont) {
 }
 
 
+viewer.Viewer.prototype.on3DVolMouseWheel = function(){
+  this.onCameraViewChange(self['vol3D'].camera.view);
+}
+
+
 // grab the camera view state every 20 mms after touch start and until touch end
-viewer.Viewer.prototype.onTouchStart = function(){
+viewer.Viewer.prototype.on3DVolTouchStart = function(){
     var self = this;
     _CHRIS_INTERACTIVE_PLUGIN_._updater = setInterval(function(){
             self.onCameraViewChange(self['vol3D'].camera.view);
@@ -517,7 +525,7 @@ viewer.Viewer.prototype.onTouchStart = function(){
 }
 
 
-viewer.Viewer.prototype.onTouchEnd = function(){
+viewer.Viewer.prototype.on3DVolTouchEnd = function(){
   clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
 }
 
@@ -550,10 +558,10 @@ viewer.Viewer.prototype.destroy = function(){
 
     // listeners
     var self = this;
-    document.getElementById('render3D').removeEventListener('dblclick', self.ThreeDContDClickHandler);
-    document.getElementById('sliceX').removeEventListener('click', self.TwoDContClickHandler);
-    document.getElementById('sliceY').removeEventListener('click', self.TwoDContClickHandler);
-    document.getElementById('sliceZ').removeEventListener('click', self.TwoDContClickHandler);
+    document.getElementById('render3D').removeEventListener('dblclick', self.on3DContDblClick);
+    document.getElementById('sliceX').removeEventListener('click', self.on2DContClick);
+    document.getElementById('sliceY').removeEventListener('click', self.on2DContClick);
+    document.getElementById('sliceZ').removeEventListener('click', self.on2DContClick);
 
     // top right widget must be destroyed if any!
     if(this.volWidget != null){
