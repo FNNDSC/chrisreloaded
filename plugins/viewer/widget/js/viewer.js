@@ -412,6 +412,14 @@ viewer.Viewer.prototype.updateVolWidget = function() {
   this.volWidget.view.remove(this.volWidget.view.bboxMode);
   this.volWidget.view.remove(this.volWidget.view.orientationMode);
   this.volWidget.view.remove(this.volWidget.view.orientation);
+  this.volWidget.interaction.remove(this.volWidget.interaction.opacity);
+  this.volWidget.interaction.remove(this.volWidget.interaction.lowerThresh);
+  this.volWidget.interaction.remove(this.volWidget.interaction.upperThresh);
+  this.volWidget.interaction.remove(this.volWidget.interaction.lowerWindow);
+  this.volWidget.interaction.remove(this.volWidget.interaction.upperWindow);
+  this.volWidget.interaction.remove(this.volWidget.interaction.sliceX);
+  this.volWidget.interaction.remove(this.volWidget.interaction.sliceY);
+  this.volWidget.interaction.remove(this.volWidget.interaction.sliceZ);
   this.populateVolWidget();
 }
 
