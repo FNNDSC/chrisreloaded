@@ -129,9 +129,10 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
   this[container].container = container;
   this[container].orientation = orientation;
   this[container].init();
+  /*self = this;
   this[container].interactor.addEventListener(X.event.events.SCROLL,
       function(){self.updateSceneView();});
-  this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on2DRendererMouseWheel(); };
+  this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on2DRendererMouseWheel(); };*/
 }
 
 
@@ -330,9 +331,8 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     customContainer.appendChild(gui.domElement);
     this.volWidget.container = customContainer;
     this.volWidget.view = gui.addFolder('View');
-    // $('.interactive_plugin_content').css("background-color", "#000");
-    // the following configures the gui for interacting with the X.volume
-    // this.volWidget.interact = gui.addFolder('Volume Interaction');
+    $('.interactive_plugin_content').css("background-color", "#000");
+    this.volWidget.interaction = gui.addFolder('Interaction');
     this.populateVolWidget();
 
 }
@@ -347,6 +347,26 @@ viewer.Viewer.prototype.populateVolWidget = function() {
   this.volWidget.view.orientation = this.volWidget.view.add(this, 'sceneOrientation',
    { Free: 0, Blue: 1, Red: 2, Green: 3 }).name('orientation');
   this.volWidget.view.open();
+  //the following configures the gui for interacting with the X.volume
+  // .. configure the volume rendering opacity
+  this.volWidget.interaction.opacity = this.volWidget.interaction.add(this.volume, 'opacity', 0, 1).listen();
+  // .. and the threshold in the min..max range
+  this.volWidget.interaction.lowerThresh = this.volWidget.interaction.add(this.volume, 'lowerThreshold',
+    this.volume.min, this.volume.max).name('lowerThr').listen();
+  this.volWidget.interaction.upperThresh = this.volWidget.interaction.add(this.volume, 'upperThreshold',
+    this.volume.min, this.volume.max).name('upperThr').listen();
+  this.volWidget.interaction.lowerWindow = this.volWidget.interaction.add(this.volume, 'windowLow',
+    this.volume.min, this.volume.max).name('winLow').listen();
+  this.volWidget.interaction.upperWindow = this.volWidget.interaction.add(this.volume, 'windowHigh',
+    this.volume.min, this.volume.max).name('winHigh').listen();
+  // the indexX,Y,Z are the currently displayed slice indices in the range 0..dimensions-1
+  this.volWidget.interaction.sliceX = this.volWidget.interaction.add(this.volume, 'indexX', 0,
+    this.volume.range[0] - 1).listen();
+  this.volWidget.interaction.sliceY = this.volWidget.interaction.add(this.volume, 'indexY', 0,
+    this.volume.range[1] - 1).listen();
+  this.volWidget.interaction.sliceZ = this.volWidget.interaction.add(this.volume, 'indexZ', 0,
+    this.volume.range[2] - 1).listen();
+  this.volWidget.interaction.open();
 
   // connect callbacks
   var self = this;
@@ -384,6 +404,15 @@ viewer.Viewer.prototype.populateVolWidget = function() {
       self['vol3D'].camera.up = [0, 1, 0];
     }
   });
+}
+
+
+viewer.Viewer.prototype.updateVolWidget = function() {
+  this.volWidget.view.remove(this.volWidget.view.sliceMode);
+  this.volWidget.view.remove(this.volWidget.view.bboxMode);
+  this.volWidget.view.remove(this.volWidget.view.orientationMode);
+  this.volWidget.view.remove(this.volWidget.view.orientation);
+  this.populateVolWidget();
 }
 
 
@@ -431,15 +460,6 @@ viewer.Viewer.prototype.updateSceneView = function(){
     this['sliceZZ'].update(this.volume);
     }
 
-}
-
-
-viewer.Viewer.prototype.updateVolWidget = function() {
-  this.volWidget.view.remove(this.volWidget.view.sliceMode);
-  this.volWidget.view.remove(this.volWidget.view.bboxMode);
-  this.volWidget.view.remove(this.volWidget.view.orientationMode);
-  this.volWidget.view.remove(this.volWidget.view.orientation);
-  this.populateVolWidget();
 }
 
 
