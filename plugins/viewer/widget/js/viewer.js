@@ -115,11 +115,12 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   //3D renderer's ROTATE event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.ROTATE,
     function(){self.updateSceneView();});
+  //3D renderer's SCROLL event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.SCROLL,
       function(){self.updateSceneView();});
-  this[container].interactor.onTouchStart = this[container].interactor.onMouseDown = function(){ self.on3DVolTouchStart(); };
-  this[container].interactor.onTouchEnd = this[container].interactor.onMouseUp = function(){ self.on3DVolTouchEnd(); };
-  this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on3DVolMouseWheel(); };
+  this[container].interactor.onTouchStart = this[container].interactor.onMouseDown = function(){ self.on3DRendererTouchStart(); };
+  this[container].interactor.onTouchEnd = this[container].interactor.onMouseUp = function(){ self.on3DRendererTouchEnd(); };
+  this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on3DRendererMouseWheel(); };
 }
 
 
@@ -128,6 +129,9 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
   this[container].container = container;
   this[container].orientation = orientation;
   this[container].init();
+  this[container].interactor.addEventListener(X.event.events.SCROLL,
+      function(){self.updateSceneView();});
+  this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on2DRendererMouseWheel(); };
 }
 
 
@@ -511,13 +515,13 @@ viewer.Viewer.prototype._2DContClickHandler = function(cont) {
 }
 
 
-viewer.Viewer.prototype.on3DVolMouseWheel = function(){
-  this.onCameraViewChange(self['vol3D'].camera.view);
+viewer.Viewer.prototype.on3DRendererMouseWheel = function(){
+  this.onCameraViewChange(this['vol3D'].camera.view);
 }
 
 
 // grab the camera view state every 20 mms after touch start and until touch end
-viewer.Viewer.prototype.on3DVolTouchStart = function(){
+viewer.Viewer.prototype.on3DRendererTouchStart = function(){
     var self = this;
     _CHRIS_INTERACTIVE_PLUGIN_._updater = setInterval(function(){
             self.onCameraViewChange(self['vol3D'].camera.view);
@@ -525,7 +529,7 @@ viewer.Viewer.prototype.on3DVolTouchStart = function(){
 }
 
 
-viewer.Viewer.prototype.on3DVolTouchEnd = function(){
+viewer.Viewer.prototype.on3DRendererTouchEnd = function(){
   clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
 }
 
