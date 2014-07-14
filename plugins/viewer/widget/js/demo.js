@@ -72,19 +72,11 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
  */
 _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID, data) {
 
-    // create collab object
-    if(typeof(collaborator) == 'undefined' || collaborator == null){
-        collaborator = new collab.Collab(feedID);
-    }
-
     // create viewer object
     if(typeof(view) == 'undefined' || view == null){
         view = new viewer.Viewer(data);
     }
-
-    // attach the collaborator
-    view.collaborator = collaborator;
-    view.connect();
+    view.connect(feedID);
 
     // (re)connect events
     // collaborator.onViewChanged = function(param){view.onViewChanged(param);};

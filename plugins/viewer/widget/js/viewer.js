@@ -33,6 +33,7 @@ viewer.Viewer = function(jsonObj) {
   this.volumeBBox = null;
   this.bbox = true;
 
+  this.scene = {vol: 1, name: 'lolo'};
   this.sceneOrientation = 0;
   this.mode = 0;
 
@@ -473,11 +474,39 @@ viewer.Viewer.prototype.updateSceneView = function(){
 
 //COLLABORATION: Local and Remote event handlers
 //Register remote actions with their local handlers
-viewer.Viewer.prototype.connect = function(){
+viewer.Viewer.prototype.connect = function(feedID){
+  //Create collaborator object
+  this.collaborator = new collab.Collab(feedID);
+  var myId = this.collaborator.id;
+  //var sceneOwnerId = this.collaborator.connect();
   var self = this;
+
+  window.console.log('My Id: ', myId);
+  //this.collaborator.register('remoteViewerConnected', function(msgObj) {self.onRemoteViewerConnect(msgObj);});
+  //this.collaborator.register('sceneSent', function(msgObj) {self.onRemoteSceneReceived(msgObj);});
   this.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
   this.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
   this.collaborator.register('2DContClicked', function(msgObj) {self.onRemote2DContClick(msgObj);});
+  //this.collaborator.send('remoteViewerConnected', {receiverId: myId, senderId: sceneOwnerId});
+}
+
+
+viewer.Viewer.prototype.onRemoteViewerConnect = function(msgObj) {
+  var ids = JSON.parse(msgObj.data);
+  var self = this;
+
+  if (this.collaborator.id == ids.senderId) {
+    this.collaborator.send('sceneSent', {receiverId: ids.receiverId, scene: self.scene});
+  }
+}
+
+
+viewer.Viewer.prototype.onRemoteSceneReceived = function(msgObj) {
+  var obj = JSON.parse(msgObj.data);
+
+  if (this.collaborator.id == obj.receiverId) {
+    this.scene = obj.scene;
+  }
 }
 
 
@@ -485,6 +514,7 @@ viewer.Viewer.prototype.on3DContDblClick = function() {
   var contHeight = this._3DContDblClickHandler();
 
   this.collaborator.send('3DContDblClicked', contHeight);
+  window.console.log('sent: ', contHeight);
 }
 
 
@@ -492,6 +522,7 @@ viewer.Viewer.prototype.onRemote3DContDblClick = function(msgObj) {
   var contHeight = JSON.parse(msgObj.data);
   var render3D = document.getElementById('render3D');
 
+  window.console.log('received: ', contHeight);
   if (render3D.style.height != contHeight) {
     this._3DContDblClickHandler();
   }

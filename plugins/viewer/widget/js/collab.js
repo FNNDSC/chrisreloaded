@@ -17,6 +17,7 @@ collab.Collab = function(roomID) {
 
 	this.version = 0.0;
 	this.roomID = roomID;
+	this.id = '';
 	this.init();
 
 }
@@ -79,6 +80,7 @@ collab.Collab.prototype.init = function(){
 
 	TogetherJSConfig_on = {
         ready: function(){
+						self.id = TogetherJS.require('peers').Self.id;
         	  self.style();
             // for is running (reload page with open collab)
             self.setButtonContent();
@@ -125,6 +127,12 @@ collab.Collab.prototype.send = function(actionName, dataObj){
         }
     }
 }
+
+
+collab.Collab.prototype.connect = function(){
+	return TogetherJS.require('peers').getAllPeers()[0].id;
+}
+
 
 collab.Collab.prototype.disconnet = function(){
 
