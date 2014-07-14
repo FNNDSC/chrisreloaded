@@ -82,6 +82,11 @@ collab.Collab.prototype.init = function(){
         	  self.style();
             // for is running (reload page with open collab)
             self.setButtonContent();
+						window.console.log('collabReady sent');
+						// emit ready event
+						var ev = document.createEvent('Event');
+						ev.initEvent('TogetherJSReady', true, true);
+						window.dispatchEvent(ev);
         },
         close:function(){
             // clean up callbacks
@@ -117,13 +122,10 @@ collab.Collab.prototype.register = function(actionName, callback){
 collab.Collab.prototype.send = function(actionName, dataObj){
 	if(typeof(TogetherJS) != 'undefined' && TogetherJS != null){
 		if(TogetherJS.running){
-
-            var myJsonString = JSON.stringify(dataObj);
-						window.console.log(actionName);
-            TogetherJS.send({type: actionName, data: myJsonString});
-
-        }
+      var myJsonString = JSON.stringify(dataObj);
+			TogetherJS.send({type: actionName, data: myJsonString});
     }
+  }
 }
 
 collab.Collab.prototype.disconnet = function(){

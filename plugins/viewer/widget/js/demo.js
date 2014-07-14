@@ -54,6 +54,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.submitted = function(data) {
 _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
 
     if(typeof(collaborator) != 'undefined' && collaborator != null){
+        window.console.log('destroying');
         collaborator.destroy();
         collaborator = null;
     }
@@ -72,23 +73,24 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
  */
 _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID, data) {
 
-    // create collab object
-    if(typeof(collaborator) == 'undefined' || collaborator == null){
-        collaborator = new collab.Collab(feedID);
+  // create viewer object
+  if(typeof(view) == 'undefined' || view == null){
+      view = new viewer.Viewer(data);
+  }
+
+  // when collab & viewer are ready connect them!
+  window.addEventListener('TogetherJSReady',
+    function(){
+      view.collaborator = collaborator;
+      view.connect();
     }
+  );
 
-    // create viewer object
-    if(typeof(view) == 'undefined' || view == null){
-        view = new viewer.Viewer(data);
-    }
-
-    // attach the collaborator
-    view.collaborator = collaborator;
-    view.connect();
-
-    // (re)connect events
-    // collaborator.onViewChanged = function(param){view.onViewChanged(param);};
-    // view.viewChanged = function(param){collaborator.viewChanged(param);};
+  // create collab object
+  if(typeof(collaborator) == 'undefined' || collaborator == null){
+    window.console.log('creating');
+    collaborator = new collab.Collab(feedID);
+  }
 
 }
 
