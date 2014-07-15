@@ -47,7 +47,8 @@ viewer.Viewer = function(jsonObj) {
 
   //file selection widget
   this.fileSelectWidget = null;
-  this.createFileSelectTree('tree');
+  this.treeContainerId = 'tree';
+  this.createFileSelectTree(this.treeContainerId);
 
   // volume GUI widget
   this.volWidget = null;
@@ -140,7 +141,7 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
 viewer.Viewer.prototype.createFileSelectTree = function(container) {
   var self = this;
 
-  $('#' + container).fancytree({
+  $('#' + self.treeContainerId).fancytree({
     checkbox: true,
     source: this.source,
 
@@ -180,7 +181,7 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
     }
   });
 
-  this.fileSelectTree = $('#' + container).fancytree("getTree");
+  this.fileSelectTree = $('#' + self.treeContainerId).fancytree("getTree");
 }
 
 
@@ -475,19 +476,27 @@ viewer.Viewer.prototype.updateSceneView = function(){
 //COLLABORATION: Local and Remote event handlers
 //Register remote actions with their local handlers
 viewer.Viewer.prototype.connect = function(feedID){
-  //Create collaborator object
-  this.collaborator = new collab.Collab(feedID);
-  var myId = this.collaborator.id;
-  //var sceneOwnerId = this.collaborator.connect();
   var self = this;
 
-  window.console.log('My Id: ', myId);
-  //this.collaborator.register('remoteViewerConnected', function(msgObj) {self.onRemoteViewerConnect(msgObj);});
-  //this.collaborator.register('sceneSent', function(msgObj) {self.onRemoteSceneReceived(msgObj);});
-  this.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
-  this.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
-  this.collaborator.register('2DContClicked', function(msgObj) {self.onRemote2DContClick(msgObj);});
-  //this.collaborator.send('remoteViewerConnected', {receiverId: myId, senderId: sceneOwnerId});
+// when TogetherJS is ready connect!
+window.addEventListener('TogetherJSReady',
+  function(){
+    var myId = self.collaborator.id;
+    var sceneOwnerId = self.collaborator.getRoomOwnerId();
+
+    window.console.log('myId: ', myId);
+    window.console.log('sceneOwnerId: ', sceneOwnerId);
+    self.collaborator.register('remoteViewerConnected', function(msgObj) {self.onRemoteViewerConnect(msgObj);});
+    self.collaborator.register('sceneSent', function(msgObj) {self.onRemoteSceneReceived(msgObj);});
+    self.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
+    self.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
+    self.collaborator.register('2DContClicked', function(msgObj) {self.onRemote2DContClick(msgObj);});
+    if (myId != sceneOwnerId) {
+      self.collaborator.send('remoteViewerConnected', {receiverId: myId, senderId: sceneOwnerId});
+    }
+  });
+  //Create collaborator object
+  this.collaborator = new collab.Collab(feedID);
 }
 
 
@@ -496,16 +505,19 @@ viewer.Viewer.prototype.onRemoteViewerConnect = function(msgObj) {
   var self = this;
 
   if (this.collaborator.id == ids.senderId) {
-    this.collaborator.send('sceneSent', {receiverId: ids.receiverId, scene: self.scene});
+    this.collaborator.send('sceneSent', {receiverId: ids.receiverId, scene: self.exportScene()});
   }
 }
 
 
-viewer.Viewer.prototype.onRemoteSceneReceived = function(msgObj) {
-  var obj = JSON.parse(msgObj.data);
+viewer.Viewer.prototype.onRemoteSceneReceived = function(msgObj){
+  var dataObj = JSON.parse(msgObj.data);
 
-  if (this.collaborator.id == obj.receiverId) {
-    this.scene = obj.scene;
+  if (this.collaborator.id == dataObj.receiverId) {
+    // set objects selection
+    this.setSelectedKeys(dataObj.scene.selectedKeys);
+    // set layout
+    this.setLayout(dataObj.scene.layout);
   }
 }
 
@@ -656,6 +668,149 @@ viewer.Viewer.prototype.destroy = function(){
     this['sliceZZ'].destroy();
     this['sliceZZ'] = null;
 
+}
+
+viewer.Viewer.prototype.exportScene = function(){
+  var sceneObj = {};
+
+  // export objects which are selected
+  sceneObj.selectedKeys = {};
+  sceneObj.selectedKeys = this.getSelectedKeys();
+
+  // export viewer layout
+  sceneObj.layout = {};
+  sceneObj.layout = this.getLayout();
+
+  // get general viewer information
+
+  // get volume information
+
+  // get mesh information
+  // for loop
+
+  // get fiber information
+  // for loop
+
+  window.console.log(sceneObj);
+
+  return sceneObj;
+}
+
+
+viewer.Viewer.prototype.setLayout = function(remoteLayout){
+  var layout = this.getLayout();
+
+  // is main container ok?
+  if(layout.main != remoteLayout.main){
+    var main = document.getElementById(layout.main);
+    var mainContainer = main.parentNode;
+    var remoteMain = document.getElementById(remoteLayout.main);
+    var remoteMainContainer = remoteMain.parentNode;
+
+    remoteMainContainer.replaceChild(main, remoteMain);
+    mainContainer.insertBefore(remoteMain, mainContainer.firstChild);
+
+    layout = this.getLayout();
+  }
+
+  // is left container ok?
+  if(layout.left != remoteLayout.left){
+    var left = document.getElementById(layout.left);
+    var leftContainer = left.parentNode;
+    var remoteLeft = document.getElementById(remoteLayout.left);
+    var remoteLeftContainer = remoteLeft.parentNode;
+
+    remoteLeftContainer.replaceChild(left, remoteLeft);
+    leftContainer.insertBefore(remoteLeft, leftContainer.firstChild);
+
+    layout = this.getLayout();
+  }
+
+  // is center container ok?
+  // right will be automatically up to date then
+  if(layout.center != remoteLayout.center){
+    var center = document.getElementById(layout.center);
+    var centerContainer = center.parentNode;
+    var remoteCenter = document.getElementById(remoteLayout.center);
+    var remoteCenterContainer = remoteCenter.parentNode;
+
+    remoteCenterContainer.replaceChild(center, remoteLeft);
+    centerContainer.insertBefore(remoteCenter, centerContainer.firstChild);
+
+    layout = this.getLayout();
+  }
+
+  // is mode ok?
+
+  // re-paint!
+  viewer.documentRepaint();
+}
+
+viewer.Viewer.prototype.getLayout = function(){
+  var layout = {};
+
+  var contObj = document.getElementById('render3D');
+  // full screen?
+  // 0 : default
+  // 1 : full screen
+  layout.mode = (contObj.style.height == '100%') ? 1 : 0;
+  // where are sliceX,Y,Z,3D?
+  layout.main = viewer.firstChild(contObj).id;
+
+  contObj = document.getElementById('sliceZ');
+  layout.left = viewer.firstChild(contObj).id;
+
+  contObj = document.getElementById('sliceX');
+  layout.center = viewer.firstChild(contObj).id;
+
+  contObj = document.getElementById('sliceY');
+  layout.right = viewer.firstChild(contObj).id;
+
+  return layout;
+}
+
+viewer.Viewer.prototype.setSelectedKeys = function(remoteSelectedKeys){
+
+  //
+  // synchronize fancytree
+  //
+  var tree = $('#' + this.treeContainerId).fancytree('getTree');
+  var selectedKeys = this.getSelectedKeys();
+
+  // get keys which have to be unselected
+  var unselectKeys = selectedKeys.filter(function(val) {
+    return remoteSelectedKeys.indexOf(val) == -1;
+  });
+  // and un-check it!
+  for (var i=0; i < unselectKeys.length; i++) {
+    var node = tree.getNodeByKey(unselectKeys[i]);
+    node.setSelected(false);
+  }
+
+  // get keys which have to be selected
+  var selectKeys = remoteSelectedKeys.filter(function(val) {
+    return selectedKeys.indexOf(val) == -1;
+  });
+  // and check it!
+  for (var i=0; i < selectKeys.length; i++) {
+    var node = tree.getNodeByKey(selectKeys[i]);
+    node.setSelected(true);
+  }
+
+}
+
+// get the selected keys from the fancy tree
+viewer.Viewer.prototype.getSelectedKeys = function(){
+  // fancytree API
+  var selectedNodes = $('#' + this.treeContainerId).fancytree('getTree').getSelectedNodes();
+  var selectedKeys = [];
+
+  // loopTrhough array and get keys ().key
+  for (var i=0; i < selectedNodes.length; i++) {
+    selectedKeys.push(selectedNodes[i].key);
+  }
+
+  return selectedKeys;
 }
 
 //Find the first child which is an element node
