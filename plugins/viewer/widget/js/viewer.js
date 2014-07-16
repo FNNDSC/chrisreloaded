@@ -52,65 +52,6 @@ viewer.Viewer = function(jsonObj) {
 
   // volume GUI widget
   this.volWidget = null;
-  this.viewFolder = [
-    {
-      label: 'sliceMode',
-      target: 'mode',
-      parameters: { 'Default':0, 'Rotate Box':1},
-      name: 'Mode',
-      callback: function(){}
-    },
-    {
-      label: 'bboxMode',
-      target: 'bbox',
-      parameters: null,
-      name: 'Show BBox',
-      callback: function(value) {
-        if(this.volumeBBox != null){
-            this.volumeBBox.visible = value;
-        }
-      }
-    },
-    {
-      label: 'orientationMode',
-      target: 'reslice2',
-      parameters: null,
-      name: 'Reslice',
-      callback: function(value) {
-        // Delete current volume
-        if(value){
-          this.reslice = 'true';
-        }
-        else{
-         this.reslice = 'false';
-        }
-        this.updateVolume();
-      }
-    },
-    {
-      label: 'orientation',
-      target: 'sceneOrientation',
-      parameters: { 'Free': 0, 'Blue': 1, 'Red': 2, 'Green': 3 },
-      name: 'Orientation',
-      callback: function(value){
-        if(value == 2){
-          // move camera
-          this['vol3D'].camera.position = [-400, 0, 0];
-          this['vol3D'].camera.up = [0, 0, 1];
-        }
-        else if(value == 3){
-          // move camera
-          this['vol3D'].camera.position = [0, 400, 0];
-          this['vol3D'].camera.up = [0, 0, 1];
-        }
-        else if(value == 1){
-          // move camera
-          this['vol3D'].camera.position = [0, 0, -400];
-          this['vol3D'].camera.up = [0, 1, 0];
-        }
-      }
-    }
-  ];
 
   // try to create and initialize a 3D renderer
   this._webGLFriendly = true;
@@ -422,45 +363,180 @@ viewer.Viewer.prototype.destroyViewFolder = function(){
 
 }
 
+viewer.Viewer.prototype.createInteractionFolder = function(){
+  var root = this.volWidget.interaction;
+
+  for (var i=0; i < this.interactionFolder.length; i++) {
+    // create element
+    root[this.interactionFolder[i].label] = root.add(this.volume, this.interactionFolder[i].target, this.interactionFolder[i].parameters.min, this.interactionFolder[i].parameters.max).name(this.interactionFolder[i].name).listen();
+    // set value
+    root[this.interactionFolder[i].label].setValue(this.volume[this.interactionFolder[i].target]);
+    // connect callback
+    root[this.interactionFolder[i].label].onChange(this.interactionFolder[i].callback.bind(this));
+  }
+
+}
+
+viewer.Viewer.prototype.destroyInteractionFolder = function(){
+  var root = this.volWidget.interaction;
+
+  for (var i=0; i < this.interactionFolder.length; i++) {
+    root.remove(root[this.interactionFolder[i].label]);
+  }
+
+}
+
 viewer.Viewer.prototype.populateVolWidget = function() {
   // now we can configure controllers ..
+  this.viewFolder = [
+    {
+      label: 'sliceMode',
+      target: 'mode',
+      parameters: { 'Default':0, 'Rotate Box':1},
+      name: 'Mode',
+      callback: function(){}
+    },
+    {
+      label: 'bboxMode',
+      target: 'bbox',
+      parameters: null,
+      name: 'Show BBox',
+      callback: function(value) {
+        if(this.volumeBBox != null){
+            this.volumeBBox.visible = value;
+        }
+      }
+    },
+    {
+      label: 'orientationMode',
+      target: 'reslice2',
+      parameters: null,
+      name: 'Reslice',
+      callback: function(value) {
+        // Delete current volume
+        if(value){
+          this.reslice = 'true';
+        }
+        else{
+         this.reslice = 'false';
+        }
+        this.updateVolume();
+      }
+    },
+    {
+      label: 'orientation',
+      target: 'sceneOrientation',
+      parameters: { 'Free': 0, 'Blue': 1, 'Red': 2, 'Green': 3 },
+      name: 'Orientation',
+      callback: function(value){
+        if(value == 2){
+          // move camera
+          this['vol3D'].camera.position = [-400, 0, 0];
+          this['vol3D'].camera.up = [0, 0, 1];
+        }
+        else if(value == 3){
+          // move camera
+          this['vol3D'].camera.position = [0, 400, 0];
+          this['vol3D'].camera.up = [0, 0, 1];
+        }
+        else if(value == 1){
+          // move camera
+          this['vol3D'].camera.position = [0, 0, -400];
+          this['vol3D'].camera.up = [0, 1, 0];
+        }
+      }
+    }
+  ];
+
+  this.interactionFolder = [
+    {
+      label: 'opacity',
+      target: 'opacity',
+      parameters: { 'min':0, 'max':1},
+      name: 'Opacity',
+      callback: function(){
+        // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+      }
+    },
+    {
+      label: 'lowerThresh',
+      target: 'lowerThreshold',
+      parameters: { 'min':this.volume.min, 'max':this.volume.max},
+      name: 'lowThresh',
+      callback: function(){
+        // emit message
+      }
+    },
+    {
+      label: 'upperThresh',
+      target: 'upperThreshold',
+      parameters: { 'min':this.volume.min, 'max':this.volume.max},
+      name: 'upThresh',
+      callback: function(){
+        // emit message
+      }
+    },
+    {
+      label: 'windowLow',
+      target: 'windowLow',
+      parameters: { 'min':this.volume.min, 'max':this.volume.max},
+      name: 'winLow',
+      callback: function(){
+        // emit message
+      }
+    },
+    {
+      label: 'windowHigh',
+      target: 'windowHigh',
+      parameters: { 'min':this.volume.min, 'max':this.volume.max},
+      name: 'winHigh',
+      callback: function(){
+        // emit message
+      }
+    },
+    {
+      label: 'sliceZ',
+      target: 'indexZ',
+      parameters: { 'min':0, 'max':this.volume.range[2] - 1},
+      name: 'Blue slice',
+      callback: function(){
+        // emit message
+      }
+    },
+    {
+      label: 'sliceX',
+      target: 'indexX',
+      parameters: { 'min':0, 'max':this.volume.range[0] - 1},
+      name: 'Red slice',
+      callback: function(){
+        // emit message
+      }
+    },
+    {
+      label: 'sliceY',
+      target: 'indexY',
+      parameters: { 'min':0, 'max':this.volume.range[1] - 1},
+      name: 'Green slice',
+      callback: function(){
+        // emit message
+      }
+    }
+  ];
+
+
   //view mode
   this.createViewFolder();
   this.volWidget.view.open();
-  //the following configures the gui for interacting with the X.volume
-  // .. configure the volume rendering opacity
-  this.volWidget.interaction.opacity = this.volWidget.interaction.add(this.volume, 'opacity', 0, 1).listen();
-  // .. and the threshold in the min..max range
-  this.volWidget.interaction.lowerThresh = this.volWidget.interaction.add(this.volume, 'lowerThreshold',
-    this.volume.min, this.volume.max).name('lowerThr').listen();
-  this.volWidget.interaction.upperThresh = this.volWidget.interaction.add(this.volume, 'upperThreshold',
-    this.volume.min, this.volume.max).name('upperThr').listen();
-  this.volWidget.interaction.lowerWindow = this.volWidget.interaction.add(this.volume, 'windowLow',
-    this.volume.min, this.volume.max).name('winLow').listen();
-  this.volWidget.interaction.upperWindow = this.volWidget.interaction.add(this.volume, 'windowHigh',
-    this.volume.min, this.volume.max).name('winHigh').listen();
-  // the indexX,Y,Z are the currently displayed slice indices in the range 0..dimensions-1
-  this.volWidget.interaction.sliceX = this.volWidget.interaction.add(this.volume, 'indexX', 0,
-    this.volume.range[0] - 1).listen();
-  this.volWidget.interaction.sliceY = this.volWidget.interaction.add(this.volume, 'indexY', 0,
-    this.volume.range[1] - 1).listen();
-  this.volWidget.interaction.sliceZ = this.volWidget.interaction.add(this.volume, 'indexZ', 0,
-    this.volume.range[2] - 1).listen();
+  // interaction mode
+  this.createInteractionFolder();
   this.volWidget.interaction.open();
 }
 
 
 viewer.Viewer.prototype.updateVolWidget = function() {
   this.destroyViewFolder();
-
-  this.volWidget.interaction.remove(this.volWidget.interaction.opacity);
-  this.volWidget.interaction.remove(this.volWidget.interaction.lowerThresh);
-  this.volWidget.interaction.remove(this.volWidget.interaction.upperThresh);
-  this.volWidget.interaction.remove(this.volWidget.interaction.lowerWindow);
-  this.volWidget.interaction.remove(this.volWidget.interaction.upperWindow);
-  this.volWidget.interaction.remove(this.volWidget.interaction.sliceX);
-  this.volWidget.interaction.remove(this.volWidget.interaction.sliceY);
-  this.volWidget.interaction.remove(this.volWidget.interaction.sliceZ);
+  this.destroyInteractionFolder();
   this.populateVolWidget();
 }
 
@@ -527,6 +603,7 @@ window.addEventListener('CollaboratorReady',
     window.console.log('sceneOwnerId: ', sceneOwnerId);
     self.collaborator.register('remoteViewerConnected', function(msgObj) {self.onRemoteViewerConnect(msgObj);});
     self.collaborator.register('sceneRequested', function(msgObj) {self.onRemoteSceneReceived(msgObj);});
+    self.collaborator.register('volumeInformationSent', function(msgObj) {self.onRemoteVolumeInformationReceived(msgObj);});
     self.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
     self.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
     self.collaborator.register('2DContClicked', function(msgObj) {self.onRemote2DContClick(msgObj);});
@@ -544,7 +621,7 @@ viewer.Viewer.prototype.onRemoteViewerConnect = function(msgObj) {
   var self = this;
 
   if (this.collaborator.id == ids.senderId) {
-    this.collaborator.send('sceneRequested', {receiverId: ids.receiverId, scene: self.exportScene()});
+    this.collaborator.send('sceneRequested', {receiverId: ids.receiverId, scene: self.getScene()});
   }
 }
 
@@ -553,8 +630,13 @@ viewer.Viewer.prototype.onRemoteSceneReceived = function(msgObj){
   var dataObj = JSON.parse(msgObj.data);
 
   if (this.collaborator.id == dataObj.receiverId) {
-    this.importScene(dataObj.scene);
+    this.setScene(dataObj.scene);
   }
+}
+
+viewer.Viewer.prototype.onRemoteVolumeInformationReceived = function(msgObj){
+  var dataObj = JSON.parse(msgObj.data);
+  this.setVolumeInformation(dataObj);
 }
 
 
@@ -706,7 +788,7 @@ viewer.Viewer.prototype.destroy = function(){
 
 }
 
-viewer.Viewer.prototype.exportScene = function(){
+viewer.Viewer.prototype.getScene = function(){
   var sceneObj = {};
 
   // export objects which are selected
@@ -724,7 +806,7 @@ viewer.Viewer.prototype.exportScene = function(){
   return sceneObj;
 }
 
-viewer.Viewer.prototype.importScene = function(sceneObj){
+viewer.Viewer.prototype.setScene = function(sceneObj){
   // set objects selection
   this.setSelectedKeys(sceneObj.selectedKeys);
 
@@ -734,6 +816,35 @@ viewer.Viewer.prototype.importScene = function(sceneObj){
   // set view
   this.setView(sceneObj.view);
 }
+
+viewer.Viewer.prototype.setVolumeInformation = function(remoteVolumeInformation){
+
+  // when the widget is created, it will set the values from there
+  for (var i=0; i < remoteVolumeInformation.length; i++) {
+    // if not loaded yet
+    this.volume[remoteVolumeInformation[i].target] = remoteVolumeInformation[i].value;
+  }
+
+}
+
+viewer.Viewer.prototype.getVolumeInformation = function(){
+  var volumeInfObj = [];
+
+  if(typeof(this.volWidget) != 'undefined' && this.volWidget != null){
+    var root = this.volWidget.interaction;
+
+    for (var i=0; i < this.interactionFolder.length; i++) {
+      volumeInfObj.push({
+        'label': this.interactionFolder[i].label,
+        'value': this.volume[this.interactionFolder[i].target],
+        'target': this.interactionFolder[i].target
+      });
+    }
+  }
+
+  return volumeInfObj;
+}
+
 
 viewer.Viewer.prototype.setView = function(remoteView){
   var view = this.getView();
@@ -866,6 +977,7 @@ viewer.Viewer.prototype.setSelectedKeys = function(remoteSelectedKeys){
   for (var i=0; i < unselectKeys.length; i++) {
     var node = tree.getNodeByKey(unselectKeys[i]);
     node.setSelected(false);
+    node.setActive(false);
   }
 
   // get keys which have to be selected
@@ -876,6 +988,7 @@ viewer.Viewer.prototype.setSelectedKeys = function(remoteSelectedKeys){
   for (var i=0; i < selectKeys.length; i++) {
     var node = tree.getNodeByKey(selectKeys[i]);
     node.setSelected(true);
+    node.setActive(true);
   }
 
 }
