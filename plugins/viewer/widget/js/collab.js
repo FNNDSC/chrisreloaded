@@ -87,9 +87,9 @@ collab.Collab.prototype.init = function(){
         	  self.style();
             // for is running (reload page with open collab)
             self.setButtonContent();
-						window.console.log('collabReady sent');
-						// emit ready event
 						TogetherJS.checkForUsersOnChannel('https://hub.togetherjs.com/hub/chris' + self.roomID, function(n){
+							window.console.log('collabReady sent');
+							// emit ready event
 							var ev = document.createEvent('Event');
 							ev.initEvent('CollaboratorReady', true, true);
 							window.dispatchEvent(ev);
@@ -138,15 +138,16 @@ collab.Collab.prototype.send = function(actionName, dataObj){
 
 
 collab.Collab.prototype.getRoomOwnerId = function(){
-	var peers = TogetherJS.require('peers').getAllPeers('live');
+	var peers = TogetherJS.require('peers').getAllPeers();
 
-	if (peers.length) {
+	for (var i = 0; i < peers.length; i++) {
+		if (peers[i].status != "bye") {
 			window.console.log('Other is the owner!!!');
-			return peers[0].id;
-	} else {
-			window.console.log('I am the owner!!!');
-			return this.id;
+			return peers[i].id;
+		}
 	}
+	window.console.log('I am the owner!!!');
+	return this.id;
 }
 
 
