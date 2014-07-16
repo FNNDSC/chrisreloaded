@@ -33,7 +33,6 @@ viewer.Viewer = function(jsonObj) {
   this.volumeBBox = null;
   this.bbox = true;
 
-  this.scene = {vol: 1, name: 'lolo'};
   this.sceneOrientation = 0;
   this.mode = 0;
 
@@ -517,7 +516,7 @@ viewer.Viewer.prototype.updateSceneView = function(){
 viewer.Viewer.prototype.connect = function(feedID){
   var self = this;
 
-// when TogetherJS is ready connect!
+// when the collaborator is ready connect!
 window.addEventListener('CollaboratorReady',
   function(){
     var myId = self.collaborator.id;
@@ -596,7 +595,7 @@ viewer.Viewer.prototype._3DContDblClickHandler = function() {
 
 viewer.Viewer.prototype.on2DContClick = function(cont) {
   window.console.log('sent: ', cont);
-  // this.collaborator.send('2DContClicked', cont);
+  this.collaborator.send('2DContClicked', cont);
   this._2DContClickHandler(cont);
 }
 
