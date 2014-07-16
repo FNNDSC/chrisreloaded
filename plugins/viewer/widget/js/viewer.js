@@ -596,7 +596,7 @@ viewer.Viewer.prototype._3DContDblClickHandler = function() {
 
 viewer.Viewer.prototype.on2DContClick = function(cont) {
   window.console.log('sent: ', cont);
-  // this.collaborator.send('2DContClicked', cont);
+  this.collaborator.send('2DContClicked', cont);
   this._2DContClickHandler(cont);
 }
 
