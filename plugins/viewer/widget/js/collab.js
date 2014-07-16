@@ -88,7 +88,7 @@ collab.Collab.prototype.init = function(){
 							window.console.log('collabReady sent');
 							// emit ready event
 							var ev = document.createEvent('Event');
-							ev.initEvent('TogetherJSReady', true, true);
+							ev.initEvent('CollaboratorReady', true, true);
 							window.dispatchEvent(ev);
 							window.console.log('Users on chanel!!!: ', n)
 						});
