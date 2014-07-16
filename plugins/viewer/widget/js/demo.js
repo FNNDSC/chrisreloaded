@@ -72,26 +72,11 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
  * feedID is important to create the common room for collaboration
  */
 _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID, data) {
-
-  // create viewer object
-  if(typeof(view) == 'undefined' || view == null){
-      view = new viewer.Viewer(data);
-  }
-
-  // when collab & viewer are ready connect them!
-  window.addEventListener('TogetherJSReady',
-    function(){
-      view.collaborator = collaborator;
-      view.connect();
+    // create viewer object
+    if(typeof(view) == 'undefined' || view == null){
+        view = new viewer.Viewer(data);
     }
-  );
-
-  // create collab object
-  if(typeof(collaborator) == 'undefined' || collaborator == null){
-    window.console.log('creating');
-    collaborator = new collab.Collab(feedID);
-  }
-
+    view.connect(feedID);
 }
 
 /**

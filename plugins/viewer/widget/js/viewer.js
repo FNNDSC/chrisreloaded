@@ -33,6 +33,7 @@ viewer.Viewer = function(jsonObj) {
   this.volumeBBox = null;
   this.bbox = true;
 
+  this.scene = {vol: 1, name: 'lolo'};
   this.sceneOrientation = 0;
   this.mode = 0;
 
@@ -51,7 +52,6 @@ viewer.Viewer = function(jsonObj) {
 
   // volume GUI widget
   this.volWidget = null;
-  // NEEDS CALLBACKS TOO!
   this.viewFolder = [
     {
       label: 'sliceMode',
@@ -514,12 +514,47 @@ viewer.Viewer.prototype.updateSceneView = function(){
 
 //COLLABORATION: Local and Remote event handlers
 //Register remote actions with their local handlers
-viewer.Viewer.prototype.connect = function(){
+viewer.Viewer.prototype.connect = function(feedID){
   var self = this;
-  this.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
-  this.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
-  this.collaborator.register('2DContClicked', function(msgObj) {self.onRemote2DContClick(msgObj);});
-  this.collaborator.register('syncScene', function(msgObj) {self.importScene(msgObj);});
+
+// when TogetherJS is ready connect!
+window.addEventListener('CollaboratorReady',
+  function(){
+    var myId = self.collaborator.id;
+    var sceneOwnerId = self.collaborator.getRoomOwnerId();
+
+    window.console.log('myId: ', myId);
+    window.console.log('sceneOwnerId: ', sceneOwnerId);
+    self.collaborator.register('remoteViewerConnected', function(msgObj) {self.onRemoteViewerConnect(msgObj);});
+    self.collaborator.register('sceneRequested', function(msgObj) {self.onRemoteSceneReceived(msgObj);});
+    self.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
+    self.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
+    self.collaborator.register('2DContClicked', function(msgObj) {self.onRemote2DContClick(msgObj);});
+    if (myId != sceneOwnerId) {
+      self.collaborator.send('remoteViewerConnected', {receiverId: myId, senderId: sceneOwnerId});
+    }
+  });
+  //Create collaborator object
+  this.collaborator = new collab.Collab(feedID);
+}
+
+
+viewer.Viewer.prototype.onRemoteViewerConnect = function(msgObj) {
+  var ids = JSON.parse(msgObj.data);
+  var self = this;
+
+  if (this.collaborator.id == ids.senderId) {
+    this.collaborator.send('sceneRequested', {receiverId: ids.receiverId, scene: self.exportScene()});
+  }
+}
+
+
+viewer.Viewer.prototype.onRemoteSceneReceived = function(msgObj){
+  var dataObj = JSON.parse(msgObj.data);
+
+  if (this.collaborator.id == dataObj.receiverId) {
+    this.importScene(dataObj.scene);
+  }
 }
 
 
@@ -527,6 +562,7 @@ viewer.Viewer.prototype.on3DContDblClick = function() {
   var contHeight = this._3DContDblClickHandler();
 
   this.collaborator.send('3DContDblClicked', contHeight);
+  window.console.log('sent: ', contHeight);
 }
 
 
@@ -534,6 +570,7 @@ viewer.Viewer.prototype.onRemote3DContDblClick = function(msgObj) {
   var contHeight = JSON.parse(msgObj.data);
   var render3D = document.getElementById('render3D');
 
+  window.console.log('received: ', contHeight);
   if (render3D.style.height != contHeight) {
     this._3DContDblClickHandler();
   }
@@ -561,10 +598,6 @@ viewer.Viewer.prototype.on2DContClick = function(cont) {
   window.console.log('sent: ', cont);
   // this.collaborator.send('2DContClicked', cont);
   this._2DContClickHandler(cont);
-
-  // test scene synchronization
-  var scene = this.exportScene();
-  this.collaborator.send('syncScene', scene);
 }
 
 
@@ -692,9 +725,6 @@ viewer.Viewer.prototype.exportScene = function(){
 }
 
 viewer.Viewer.prototype.importScene = function(sceneObj){
-
-  var sceneObj = JSON.parse(sceneObj.data);
-
   // set objects selection
   this.setSelectedKeys(sceneObj.selectedKeys);
 
@@ -735,9 +765,9 @@ viewer.Viewer.prototype.getView = function(){
 
     for (var i=0; i < this.viewFolder.length; i++) {
       view.push({
-        label: this.viewFolder[i].label,
-        value: this.viewFolder[i].value,
-        target: this.viewFolder[i].target
+        'label': this.viewFolder[i].label,
+        'value': this[this.viewFolder[i].target],
+        'target': this.viewFolder[i].target
       });
     }
   }

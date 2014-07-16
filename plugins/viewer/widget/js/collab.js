@@ -17,6 +17,7 @@ collab.Collab = function(roomID) {
 
 	this.version = 0.0;
 	this.roomID = roomID;
+	this.id = '';
 	this.init();
 
 }
@@ -79,14 +80,18 @@ collab.Collab.prototype.init = function(){
 
 	TogetherJSConfig_on = {
         ready: function(){
+						self.id = TogetherJS.require('peers').Self.id;
         	  self.style();
             // for is running (reload page with open collab)
             self.setButtonContent();
 						window.console.log('collabReady sent');
 						// emit ready event
-						var ev = document.createEvent('Event');
-						ev.initEvent('TogetherJSReady', true, true);
-						window.dispatchEvent(ev);
+						TogetherJS.checkForUsersOnChannel('https://hub.togetherjs.com/hub/chris' + self.roomID, function(n){
+							var ev = document.createEvent('Event');
+							ev.initEvent('TogetherJSReady', true, true);
+							window.dispatchEvent(ev);
+							window.console.log('Users on chanel!!!: ', n)
+						});
         },
         close:function(){
             // clean up callbacks
@@ -127,6 +132,20 @@ collab.Collab.prototype.send = function(actionName, dataObj){
     }
   }
 }
+
+
+collab.Collab.prototype.getRoomOwnerId = function(){
+	var peers = TogetherJS.require('peers').getAllPeers('live');
+
+	if (peers.length) {
+			window.console.log('Other is the owner!!!');
+			return peers[0].id;
+	} else {
+			window.console.log('I am the owner!!!');
+			return this.id;
+	}
+}
+
 
 collab.Collab.prototype.disconnet = function(){
 
