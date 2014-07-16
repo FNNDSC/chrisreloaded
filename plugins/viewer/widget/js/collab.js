@@ -88,7 +88,7 @@ collab.Collab.prototype.init = function(){
 						// emit ready event
 						TogetherJS.checkForUsersOnChannel('https://hub.togetherjs.com/hub/chris' + self.roomID, function(n){
 							var ev = document.createEvent('Event');
-							ev.initEvent('TogetherJSReady', true, true);
+							ev.initEvent('CollaboratorReady', true, true);
 							window.dispatchEvent(ev);
 							window.console.log('Users on chanel!!!: ', n)
 						});
