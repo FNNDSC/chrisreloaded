@@ -84,9 +84,9 @@ collab.Collab.prototype.init = function(){
         	  self.style();
             // for is running (reload page with open collab)
             self.setButtonContent();
-						window.console.log('collabReady sent');
-						// emit ready event
 						TogetherJS.checkForUsersOnChannel('https://hub.togetherjs.com/hub/chris' + self.roomID, function(n){
+							window.console.log('collabReady sent');
+							// emit ready event
 							var ev = document.createEvent('Event');
 							ev.initEvent('TogetherJSReady', true, true);
 							window.dispatchEvent(ev);
