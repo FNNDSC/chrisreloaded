@@ -703,6 +703,12 @@ viewer.Viewer.prototype.destroy = function(){
     this['sliceZZ'].destroy();
     this['sliceZZ'] = null;
 
+    if(this.collaborator){
+        window.console.log('destroying collaborator');
+        this.collaborator.destroy();
+        this.collaborator = null;
+    }
+
 }
 
 viewer.Viewer.prototype.exportScene = function(){

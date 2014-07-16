@@ -53,12 +53,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.submitted = function(data) {
  */
 _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
 
-    if(typeof(collaborator) != 'undefined' && collaborator != null){
-        window.console.log('destroying');
-        collaborator.destroy();
-        collaborator = null;
-    }
-
     if(typeof(view) != 'undefined' && view != null){
         view.destroy();
         view = null;

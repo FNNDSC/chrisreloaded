@@ -67,7 +67,10 @@ collab.Collab.prototype.setButtonContent = function(force){
 }
 
 collab.Collab.prototype.init = function(){
-
+  /*if (TogetherJS.running) {
+    var session = TogetherJS.require("session");
+    session.close();
+  }*/
   //style button with appropriate content
   this.setButtonContent();
   // connect callbacks
