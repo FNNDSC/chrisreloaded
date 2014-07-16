@@ -10,6 +10,12 @@
  * - TogetherJS
  */
 
+// TOGETHERJS CONFIGURATION
+TogetherJSConfig_suppressJoinConfirmation = true;
+TogetherJSConfig_suppressInvite = true;
+TogetherJSConfig_dontShowClicks = true;
+TogetherJSConfig_noAutoStart = true;
+
 // Declare (or re-declare) the single global variable
 var collab = collab || {};
 
@@ -73,12 +79,9 @@ collab.Collab.prototype.init = function(){
   // connect callbacks
   var self = this;
 
+  // additional togetherjs configuration
 	TogetherJSConfig_findRoom =  "chris" + this.roomID;
-	TogetherJSConfig_suppressJoinConfirmation = true;
-	TogetherJSConfig_suppressInvite = true;
-	TogetherJSConfig_dontShowClicks = true;
-
-	TogetherJSConfig_on = {
+  TogetherJSConfig_on = {
         ready: function(){
 						self.id = TogetherJS.require('peers').Self.id;
         	  self.style();
