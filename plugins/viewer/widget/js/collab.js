@@ -29,56 +29,33 @@ collab.Collab = function(roomID) {
 }
 
 collab.Collab.prototype.updateButton = function(){
-    // apply style
-    var jButton = jQuery('.collaborate-btn > button');
+  // apply style
+  var jButton = jQuery('.collaborate-btn > button');
 
-    if(jButton.hasClass('collaborating')){
+  if(jButton.hasClass('collaborating')){
+    jButton.removeClass('collaborating');
+  }
+  else{
+    jButton.addClass('collaborating');
+  }
 
-        jButton.removeClass('collaborating');
-
-    }
-    else{
-
-        jButton.addClass('collaborating');
-
-    }
-
-    // set content
-    // false because TogetherJS is still true but we want to change style/content
-    this.setButtonContent(false);
+  // set content
+  this.setButtonContent();
 }
 
-collab.Collab.prototype.setButtonContent = function(force){
+collab.Collab.prototype.setButtonContent = function(){
+  var jButton = jQuery('.collaborate-btn > button');
 
-    var test = typeof force !== 'undefined' ? force : (typeof(TogetherJS) != 'undefined' && TogetherJS != null && TogetherJS.running);
-
-    var jButton = jQuery('.collaborate-btn > button');
-
-    if(jButton.hasClass('collaborating') ||  test){
-
-      // if togetherjs running
-         if(test){
-            jButton.addClass('collaborating');
-         }
-
-         jButton.html('<i class="fa fa-sign-out"></i> Stop collaboration');
-
-    }
-    else{
-
-        jButton.html('<i class="fa fa-sign-in"></i> Start collaboration');
-
-    }
-
+  if(jButton.hasClass('collaborating')){
+    jButton.addClass('collaborating');
+    jButton.html('<i class="fa fa-sign-out"></i> Stop collaboration');
+  }
+  else{
+    jButton.html('<i class="fa fa-sign-in"></i> Start collaboration');
+  }
 }
 
 collab.Collab.prototype.init = function(){
-  /*if (TogetherJS.running) {
-    var session = TogetherJS.require("session");
-    session.close();
-  }*/
-  //style button with appropriate content
-  this.setButtonContent();
   // connect callbacks
   var self = this;
 
@@ -87,9 +64,10 @@ collab.Collab.prototype.init = function(){
   TogetherJSConfig_on = {
         ready: function(){
 						self.id = TogetherJS.require('peers').Self.id;
+						// togetherJS div style
         	  self.style();
-            // for is running (reload page with open collab)
-            self.setButtonContent();
+            // togetherJS button style
+            self.updateButton();
 						TogetherJS.checkForUsersOnChannel('https://hub.togetherjs.com/hub/chris' + self.roomID, function(n){
 							window.console.log('collabReady sent');
 							// emit ready event
@@ -113,10 +91,8 @@ collab.Collab.prototype.init = function(){
 }
 
 collab.Collab.prototype.style = function(){
-
     $('#togetherjs-dock').css('background-color', '#353535');
     $('.togetherjs .togetherjs-window > header').css('background-color', '#353535');
-
 }
 
 // register action name with a handler callback
@@ -168,79 +144,3 @@ collab.Collab.prototype.destroy = function(){
 		}
 	}
 }
-
-// _CHRIS_INTERACTIVE_PLUGIN_.togetherjsYO = function(feedID, threeD){
-
-//   TogetherJSConfig_findRoom =  "chris" + feedID;
-
-// window.console.log(TogetherJSConfig_findRoom);
-
-//   TogetherJSConfig_on = {
-//     ready: function(){_CHRIS_INTERACTIVE_PLUGIN_.togetherjsTestYO(threeD);}
-//   };
-// }
-
-// _CHRIS_INTERACTIVE_PLUGIN_.onTouchStart = function(){
-//   window.console.log('Touch Start');
-
-//   _CHRIS_INTERACTIVE_PLUGIN_._updater = setInterval(function(){
-//                 var myJsonString = JSON.stringify(threeD.camera.view);
-//                 TogetherJS.send({type: "viewChanged", view:myJsonString});
-//               }
-//               , 150);
-// }
-
-// _CHRIS_INTERACTIVE_PLUGIN_.onTouchEnd = function(){
-
-//   window.console.log('TouchEnd');
-//   clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
-
-// }
-
-/*_CHRIS_INTERACTIVE_PLUGIN_.togetherjsTestYO = function(threeD){
-  window.console.log('I am READY!');
-
-  // to be stopped when view closed
-  threeD.interactor.onTouchStart = threeD.interactor.onMouseDown = _CHRIS_INTERACTIVE_PLUGIN_.onTouchStart;
-  threeD.interactor.onTouchEnd = threeD.interactor.onMouseUp = _CHRIS_INTERACTIVE_PLUGIN_.onTouchEnd;
- // ren3d.interactor.onMouseWheel = function(e) {
-//       setInterval(function(threeD){
-//         var myJsonString = JSON.stringify(threeD.camera.view);
-// TogetherJS.send({type: "viewChanged", view:myJsonString});
-// },1000,threeD);
-
-      TogetherJS.hub.on("viewChanged", function (msg) {
-        if (! msg.sameUrl) {
-          return;
-        }
-
-        var obj = JSON.parse(msg.view);
-        var arr = $.map(obj, function(el) { return el; });
-        threeD.camera.view = new Float32Array(arr);
-      });
-
-  //TogetherJS.send({type: "visibilityChange", isVisible: isVisible, element: element});
-//TogetherJS.hub.on("visibilityChange", function (msg) {
-//   var elementFinder = TogetherJS.require("elementFinder");
-//   // If the element can't be found this will throw an exception:
-//   var element = elementFinder.findElement(msg.element);
-//   MyApp.changeVisibility(element, msg.isVisible);
-// });
-}*/
-
-// _CHRIS_INTERACTIVE_PLUGIN_.RTpushCamera = function(renderer) {
-
-//   var _current_view = Array.apply([], eval(renderer).camera.view);
-
-//   if ( !arraysEqual(_current_view, RT._old_view) ) {
-
-//     RT._link.trigger('client-camera-sync', {
-//       'target' : renderer,
-//       'value' : _current_view
-//     });
-
-//     RT._old_view = _current_view;
-
-//   }
-
-// };
