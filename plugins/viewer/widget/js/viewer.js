@@ -882,7 +882,10 @@ viewer.Viewer.prototype.setView = function(remoteView){
   if(view.length == remoteView.length){
     for (var i=0; i < view.length; i++) {
       // if loaded
-      if(typeof(this.volWidget) != 'undefined' && this.volWidget != null && view[i].label == remoteView[i].label){
+      if(typeof(this.volWidget) != 'undefined' &&
+        this.volWidget != null &&
+        view[i].label == remoteView[i].label &&
+        view[i].value != remoteView[i].value){
         this.volWidget.view[remoteView[i].label].setValue(remoteView[i].value);
       }
     }
