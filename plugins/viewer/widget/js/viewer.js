@@ -100,9 +100,9 @@ viewer.Viewer = function(jsonObj) {
   document.getElementById('render3D').addEventListener('dblclick', self.on3DContDblClick.bind(self));
 
   //Event handlers for switching renderers
-  document.getElementById('sliceX').addEventListener('click', self.on2DContClick.bind(self, 'sliceX'));
-  document.getElementById('sliceY').addEventListener('click', self.on2DContClick.bind(self, 'sliceY'));
-  document.getElementById('sliceZ').addEventListener('click', self.on2DContClick.bind(self, 'sliceZ'));
+  document.getElementById('sliceX').addEventListener('dblclick', self.on2DContDblClick.bind(self, 'sliceX'));
+  document.getElementById('sliceY').addEventListener('dblclick', self.on2DContDblClick.bind(self, 'sliceY'));
+  document.getElementById('sliceZ').addEventListener('dblclick', self.on2DContDblClick.bind(self, 'sliceZ'));
 
 }
 
@@ -699,7 +699,7 @@ viewer.Viewer.prototype._3DContDblClickHandler = function() {
 }
 
 
-viewer.Viewer.prototype.on2DContClick = function(cont) {
+viewer.Viewer.prototype.on2DContDblClick = function(cont) {
   window.console.log('sent: ', cont);
   this.collaborator.send('2DContClicked', cont);
   this._2DContClickHandler(cont);
@@ -775,9 +775,9 @@ viewer.Viewer.prototype.destroy = function(){
     // listeners
     var self = this;
     document.getElementById('render3D').removeEventListener('dblclick', self.on3DContDblClick);
-    document.getElementById('sliceX').removeEventListener('click', self.on2DContClick);
-    document.getElementById('sliceY').removeEventListener('click', self.on2DContClick);
-    document.getElementById('sliceZ').removeEventListener('click', self.on2DContClick);
+    document.getElementById('sliceX').removeEventListener('dblclick', self.on2DContDblClick);
+    document.getElementById('sliceY').removeEventListener('dblclick', self.on2DContDblClick);
+    document.getElementById('sliceZ').removeEventListener('dblclick', self.on2DContDblClick);
 
     // top right widget must be destroyed if any!
     if(this.volWidget != null){
@@ -882,7 +882,10 @@ viewer.Viewer.prototype.setView = function(remoteView){
   if(view.length == remoteView.length){
     for (var i=0; i < view.length; i++) {
       // if loaded
-      if(typeof(this.volWidget) != 'undefined' && this.volWidget != null && view[i].label == remoteView[i].label){
+      if(typeof(this.volWidget) != 'undefined' &&
+        this.volWidget != null &&
+        view[i].label == remoteView[i].label &&
+        view[i].value != remoteView[i].value){
         this.volWidget.view[remoteView[i].label].setValue(remoteView[i].value);
       }
     }
