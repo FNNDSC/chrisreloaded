@@ -629,7 +629,7 @@ window.addEventListener('CollaboratorReady',
     self.collaborator.register('volumeInformationSent', function(msgObj) {self.onRemoteVolumeInformationReceived(msgObj);});
     self.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
     self.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
-    self.collaborator.register('2DContClicked', function(msgObj) {self.onRemote2DContClick(msgObj);});
+    self.collaborator.register('2DContDblClicked', function(msgObj) {self.onRemote2DContDblClick(msgObj);});
     if (myId != sceneOwnerId) {
       self.collaborator.send('remoteViewerConnected', {receiverId: myId, senderId: sceneOwnerId});
     }
@@ -701,19 +701,19 @@ viewer.Viewer.prototype._3DContDblClickHandler = function() {
 
 viewer.Viewer.prototype.on2DContDblClick = function(cont) {
   window.console.log('sent: ', cont);
-  this.collaborator.send('2DContClicked', cont);
-  this._2DContClickHandler(cont);
+  this.collaborator.send('2DContDblClicked', cont);
+  this._2DContDblClickHandler(cont);
 }
 
 
-viewer.Viewer.prototype.onRemote2DContClick = function(msgObj) {
+viewer.Viewer.prototype.onRemote2DContDblClick = function(msgObj) {
   var cont = JSON.parse(msgObj.data);
   window.console.log('received: ', cont);
-  this._2DContClickHandler(cont);
+  this._2DContDblClickHandler(cont);
 }
 
 
-viewer.Viewer.prototype._2DContClickHandler = function(cont) {
+viewer.Viewer.prototype._2DContDblClickHandler = function(cont) {
   var contObj = document.getElementById(cont);
   var twoDRenderer = viewer.firstChild(contObj);
   var threeD = document.getElementById('render3D');
