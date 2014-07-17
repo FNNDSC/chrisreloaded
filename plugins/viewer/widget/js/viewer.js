@@ -620,7 +620,7 @@ viewer.Viewer.prototype.connect = function(feedID){
 window.addEventListener('CollaboratorReady',
   function(){
     var myId = self.collaborator.id;
-    var sceneOwnerId = self.collaborator.getRoomOwnerId();
+    var sceneOwnerId = self.collaborator.roomOwnerId;
 
     window.console.log('myId: ', myId);
     window.console.log('sceneOwnerId: ', sceneOwnerId);
