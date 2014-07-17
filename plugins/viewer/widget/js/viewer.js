@@ -115,13 +115,20 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   self = this;
   //3D renderer's ROTATE event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.ROTATE,
-    function(){self.updateSceneView();});
+    function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
+
+  // FIXME: event is not propagated to remotes for some reason
   //3D renderer's SCROLL event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.SCROLL,
-      function(){self.updateSceneView();});
-  this[container].interactor.onTouchStart = this[container].interactor.onMouseDown = function(){ self.on3DRendererTouchStart(); };
-  this[container].interactor.onTouchEnd = this[container].interactor.onMouseUp = function(){ self.on3DRendererTouchEnd(); };
-  this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on3DRendererMouseWheel(); };
+      function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
+
+  // FIXME: not working properly if we start dragging then exit the 3D renderer.
+  // scene is still sent.
+  // other users can not interact with the 3D anymore because they receive all those events from the 'broken' remote
+
+  // this[container].interactor.onTouchStart = this[container].interactor.onMouseDown = function(){ self.on3DRendererTouchStart(); };
+  // this[container].interactor.onTouchEnd = this[container].interactor.onMouseUp = function(){ self.on3DRendererTouchEnd(); };
+  // this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on3DRendererMouseWheel(); };
 }
 
 
@@ -130,10 +137,14 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
   this[container].container = container;
   this[container].orientation = orientation;
   this[container].init();
-  /*self = this;
+
+  // we need to explicitly send volume info to peers if we changed slices/windowlevel/etc. through mouse action (not through the GUI)
+
+  // FIXME: it must be extended to all events
+  var self = this;
   this[container].interactor.addEventListener(X.event.events.SCROLL,
-      function(){self.updateSceneView();});
-  this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on2DRendererMouseWheel(); };*/
+      function(){self.updateSceneView();self.collaborator.send('volumeInformationSent', self.getVolumeInformation());});
+  //this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on2DRendererMouseWheel();this.collaborator.send('volumeInformationSent', this.getVolumeInformation()); };
 }
 
 
@@ -448,16 +459,16 @@ viewer.Viewer.prototype.populateVolWidget = function() {
   ];
 
   this.interactionFolder = [
-    {
-      label: 'opacity',
-      target: 'opacity',
-      parameters: { 'min':0, 'max':1},
-      name: 'Opacity',
-      callback: function(){
-        // emit message
-        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
-      }
-    },
+    // {
+    //   label: 'opacity',
+    //   target: 'opacity',
+    //   parameters: { 'min':0, 'max':1},
+    //   name: 'Opacity',
+    //   callback: function(){
+    //     // emit message
+    //     this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+    //   }
+    // },
     {
       label: 'lowerThresh',
       target: 'lowerThreshold',
@@ -465,6 +476,7 @@ viewer.Viewer.prototype.populateVolWidget = function() {
       name: 'lowThresh',
       callback: function(){
         // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
       }
     },
     {
@@ -474,6 +486,7 @@ viewer.Viewer.prototype.populateVolWidget = function() {
       name: 'upThresh',
       callback: function(){
         // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
       }
     },
     {
@@ -483,6 +496,7 @@ viewer.Viewer.prototype.populateVolWidget = function() {
       name: 'winLow',
       callback: function(){
         // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
       }
     },
     {
@@ -492,6 +506,7 @@ viewer.Viewer.prototype.populateVolWidget = function() {
       name: 'winHigh',
       callback: function(){
         // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
       }
     },
     {
@@ -501,6 +516,7 @@ viewer.Viewer.prototype.populateVolWidget = function() {
       name: 'Blue slice',
       callback: function(){
         // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
       }
     },
     {
@@ -510,6 +526,7 @@ viewer.Viewer.prototype.populateVolWidget = function() {
       name: 'Red slice',
       callback: function(){
         // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
       }
     },
     {
@@ -519,6 +536,7 @@ viewer.Viewer.prototype.populateVolWidget = function() {
       name: 'Green slice',
       callback: function(){
         // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
       }
     }
   ];
@@ -592,7 +610,13 @@ viewer.Viewer.prototype.updateSceneView = function(){
 viewer.Viewer.prototype.connect = function(feedID){
   var self = this;
 
-// when the collaborator is ready connect!
+// when TogetherJS is ready connect!
+
+// FIXME: we should only do that the first time we connect to the room, if not event sent multiple times...!
+// un-connect then re-connect: events are processed/sent 2 times
+
+// FIXME: something messed up with the owner ID, it doesn't work sometimes
+
 window.addEventListener('CollaboratorReady',
   function(){
     var myId = self.collaborator.id;
@@ -785,12 +809,11 @@ viewer.Viewer.prototype.destroy = function(){
     this['sliceZZ'].destroy();
     this['sliceZZ'] = null;
 
-    if(this.collaborator){
+  if(this.collaborator){
         window.console.log('destroying collaborator');
         this.collaborator.destroy();
         this.collaborator = null;
     }
-
 }
 
 viewer.Viewer.prototype.getScene = function(){
@@ -824,6 +847,7 @@ viewer.Viewer.prototype.setScene = function(sceneObj){
 
 viewer.Viewer.prototype.setVolumeInformation = function(remoteVolumeInformation){
 
+  // if remote view, update the targets
   // when the widget is created, it will set the values from there
   for (var i=0; i < remoteVolumeInformation.length; i++) {
     // if not loaded yet
@@ -967,6 +991,8 @@ viewer.Viewer.prototype.getLayout = function(){
 }
 
 viewer.Viewer.prototype.setSelectedKeys = function(remoteSelectedKeys){
+
+  // FIXME: it looks like volume is reloaded when remote logout then logs in again
 
   //
   // synchronize fancytree
