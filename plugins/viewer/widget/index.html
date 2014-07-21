@@ -2,39 +2,41 @@
 <!-- include fancytree css -->
 <link rel="stylesheet" type="text/css" href="plugins/viewer/widget/lib/fancytree/css/skin-viewer/ui.fancytree.css">
 
-<div class='topLeftContainer'>
-  <div class="collaborate-btn bordered">
-    <button onclick="TogetherJS(this); return false;">Start collaboration</button>
-  </div>
 
-  <details open class='bordered'>
-    <summary>Select files</summary>
-    <div class='content'>
-      <div class="fileselectwidget">
-        <div id="tree"> </div>
+<!-- We need this extra container to set the background color properly -->
+<div style="height:100%; background-color: #353535">
+
+  <div class='topLeftContainer'>
+    <div class="collaborate-btn bordered">
+      <button onclick="TogetherJS(this); return false;">Start collaboration</button>
+    </div>
+
+    <details open class='bordered'>
+      <summary>Select files</summary>
+      <div class='content'>
+        <div class="fileselectwidget">
+          <div id="tree"> </div>
+        </div>
       </div>
-    </div>
-  </details>
-</div>
+    </details>
+  </div>
 
-<div style="background-color:rgb(108,131,131);" class="row-fluid largeRenderer renderer main">
-  <div id="vol3D" class="border-top yellow">
+  <div class="row-fluid largeRenderer renderer main">
+    <div id="vol3D" class="border-top yellow"></div>
+    <div id="xcontroller" class="x-controller"></div>
   </div>
-  <div id="xcontroller" class="x-controller"></div>
-</div>
-<div class="row-fluid smallRenderers">
-  <div class="xSmallRenderer renderer left">
-    <div id="sliceZ" class="border-top green">
+  <div class="row-fluid smallRenderers">
+    <div class="xSmallRenderer renderer left">
+      <div id="sliceZ" class="border-top green"></div>
+    </div>
+    <div class="smallRenderer renderer center">
+      <div id="sliceX" class="border-top red"></div>
+    </div>
+    <div class="xSmallRenderer renderer right">
+      <div id="sliceY" class="border-top blue"></div>
     </div>
   </div>
-  <div class="smallRenderer renderer center">
-    <div id="sliceX" class="border-top red">
-    </div>
-  </div>
-  <div class="xSmallRenderer renderer right">
-    <div id="sliceY" class="border-top blue">
-    </div>
-  </div>
+
 </div>
 
 <!-- Include the Collaboration -->
