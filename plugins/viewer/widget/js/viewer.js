@@ -60,33 +60,33 @@ viewer.Viewer = function(jsonObj) {
     this._webGLFriendly = false;
   }
   // create 2D renderers for the X, Y, Z orientations
-  this.create2DRenderer('sliceXX', 'X');
-  this.create2DRenderer('sliceYY', 'Y');
-  this.create2DRenderer('sliceZZ', 'Z');
+  this.create2DRenderer('sliceX', 'X');
+  this.create2DRenderer('sliceY', 'Y');
+  this.create2DRenderer('sliceZ', 'Z');
 
   // the onShowtime method gets executed after all files were fully loaded and
   // just before the first rendering attempt
   var self = this;
-  this.sliceXX.onShowtime = function() {
+  this.sliceX.onShowtime = function() {
     // add the volume to the other 3 renderers
-    self.sliceYY.add(self.volume);
-    self.sliceYY.render();
-    self.sliceZZ.add(self.volume);
-    self.sliceZZ.render();
+    self.sliceY.add(self.volume);
+    self.sliceY.render();
+    self.sliceZ.add(self.volume);
+    self.sliceZ.render();
 
     // make sure to re-paint
-    self['sliceXX'].update(self.volume);
-    self['sliceYY'].update(self.volume);
-    self['sliceZZ'].update(self.volume);
+    self.sliceX.update(self.volume);
+    self.sliceY.update(self.volume);
+    self.sliceZ.update(self.volume);
 
     if (self._webGLFriendly) {
       // no need to worry about the other showtimes
-      self['vol3D'].resetBoundingBox();
+      self.vol3D.resetBoundingBox();
       self.createBBox();
-      self['vol3D'].add(self.volumeBBox);
-      self['vol3D'].add(self.volume);
-      self['vol3D'].camera.position = [0, 0, 200];
-      self['vol3D'].render();
+      self.vol3D.add(self.volumeBBox);
+      self.vol3D.add(self.volume);
+      self.vol3D.camera.position = [0, 0, 200];
+      self.vol3D.render();
     }
     // now the volume GUI widget
     if (!self.volWidget) {
@@ -97,12 +97,12 @@ viewer.Viewer = function(jsonObj) {
   };
 
   //Event handler for full screen behaviour when main container is double clicked
-  document.getElementById('render3D').addEventListener('dblclick', self.on3DContDblClick.bind(self));
+  document.getElementsByClassName('renderer main')[0].addEventListener('dblclick', self.on3DContDblClick.bind(self));
 
   //Event handlers for switching renderers
-  document.getElementById('sliceX').addEventListener('dblclick', self.on2DContDblClick.bind(self, 'sliceX'));
-  document.getElementById('sliceY').addEventListener('dblclick', self.on2DContDblClick.bind(self, 'sliceY'));
-  document.getElementById('sliceZ').addEventListener('dblclick', self.on2DContDblClick.bind(self, 'sliceZ'));
+  document.getElementsByClassName('renderer left')[0].addEventListener('dblclick', self.on2DContDblClick.bind(self, 'left'));
+  document.getElementsByClassName('renderer center')[0].addEventListener('dblclick', self.on2DContDblClick.bind(self, 'center'));
+  document.getElementsByClassName('renderer right')[0].addEventListener('dblclick', self.on2DContDblClick.bind(self, 'right'));
 
 }
 
@@ -256,9 +256,9 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
   this.volume.file = orderedFiles;
   this.volume.key = nodeObj.key;
 
-  this.sliceXX.add(this.volume);
+  this.sliceX.add(this.volume);
   // start the loading/rendering
-  this.sliceXX.render();
+  this.sliceX.render();
 }
 
 
@@ -269,9 +269,9 @@ viewer.Viewer.prototype.unsetVolume = function() {
     this['vol3D'].remove(this.volumeBBox);
   }
 
-    this['sliceXX'].remove(this.volume);
-    this['sliceYY'].remove(this.volume);
-    this['sliceZZ'].remove(this.volume);
+    this['sliceX'].remove(this.volume);
+    this['sliceY'].remove(this.volume);
+    this['sliceZ'].remove(this.volume);
 
     this.volume.destroy();
     this.volume = null;
@@ -597,9 +597,9 @@ viewer.Viewer.prototype.updateSceneView = function(){
     // only triggers 1 3d renderer
 
     // this.volume.modified();
-    this['sliceXX'].update(this.volume);
-    this['sliceYY'].update(this.volume);
-    this['sliceZZ'].update(this.volume);
+    this['sliceX'].update(this.volume);
+    this['sliceY'].update(this.volume);
+    this['sliceZ'].update(this.volume);
     }
 
 }
@@ -673,7 +673,7 @@ viewer.Viewer.prototype.on3DContDblClick = function() {
 
 viewer.Viewer.prototype.onRemote3DContDblClick = function(msgObj) {
   var contHeight = JSON.parse(msgObj.data);
-  var render3D = document.getElementById('render3D');
+  var render3D = document.getElementsByClassName('renderer main')[0];
 
   window.console.log('received: ', contHeight);
   if (render3D.style.height != contHeight) {
@@ -683,8 +683,8 @@ viewer.Viewer.prototype.onRemote3DContDblClick = function(msgObj) {
 
 
 viewer.Viewer.prototype._3DContDblClickHandler = function() {
-  var render3D = document.getElementById('render3D');
-  var render2D = document.getElementById('render2D');
+  var render3D = document.getElementsByClassName('main renderer')[0];
+  var render2D = document.getElementsByClassName('smallRenderers')[0];
 
   if (render3D.style.height == '100%') {
       render2D.style.display = 'block';
@@ -714,9 +714,9 @@ viewer.Viewer.prototype.onRemote2DContClick = function(msgObj) {
 
 
 viewer.Viewer.prototype._2DContClickHandler = function(cont) {
-  var contObj = document.getElementById(cont);
+  var contObj = document.getElementsByClassName('renderer ' + cont)[0];
   var twoDRenderer = viewer.firstChild(contObj);
-  var threeD = document.getElementById('render3D');
+  var threeD = document.getElementsByClassName('main renderer')[0];
   var threeDRenderer = viewer.firstChild(threeD);
 
   contObj.replaceChild(threeDRenderer, twoDRenderer);
@@ -774,10 +774,10 @@ viewer.Viewer.prototype.destroy = function(){
 
     // listeners
     var self = this;
-    document.getElementById('render3D').removeEventListener('dblclick', self.on3DContDblClick);
-    document.getElementById('sliceX').removeEventListener('dblclick', self.on2DContDblClick);
-    document.getElementById('sliceY').removeEventListener('dblclick', self.on2DContDblClick);
-    document.getElementById('sliceZ').removeEventListener('dblclick', self.on2DContDblClick);
+    document.getElementsByClassName('renderer main')[0].removeEventListener('dblclick', self.on3DContDblClick);
+    document.getElementsByClassName('renderer left')[0].removeEventListener('dblclick', self.on2DContDblClick);
+    document.getElementsByClassName('renderer center')[0].removeEventListener('dblclick', self.on2DContDblClick);
+    document.getElementsByClassName('renderer right')[0].removeEventListener('dblclick', self.on2DContDblClick);
 
     // top right widget must be destroyed if any!
     if(this.volWidget != null){
@@ -802,12 +802,12 @@ viewer.Viewer.prototype.destroy = function(){
     // destroy XTK renderers
     this['vol3D'].destroy();
     this['vol3D'] = null;
-    this['sliceXX'].destroy();
-    this['sliceXX'] = null;
-    this['sliceYY'].destroy();
-    this['sliceYY'] = null;
-    this['sliceZZ'].destroy();
-    this['sliceZZ'] = null;
+    this['sliceX'].destroy();
+    this['sliceX'] = null;
+    this['sliceY'].destroy();
+    this['sliceY'] = null;
+    this['sliceZ'].destroy();
+    this['sliceZ'] = null;
 
   if(this.collaborator){
         window.console.log('destroying collaborator');
@@ -973,7 +973,7 @@ viewer.Viewer.prototype.setLayout = function(remoteLayout){
 viewer.Viewer.prototype.getLayout = function(){
   var layout = {};
 
-  var contObj = document.getElementById('render3D');
+  var contObj = document.getElementsByClassName('renderer main')[0];
   // full screen?
   // 0 : default
   // 1 : full screen
@@ -981,13 +981,13 @@ viewer.Viewer.prototype.getLayout = function(){
   // where are sliceX,Y,Z,3D?
   layout.main = viewer.firstChild(contObj).id;
 
-  contObj = document.getElementById('sliceZ');
+  contObj = document.getElementsByClassName('renderer left')[0];
   layout.left = viewer.firstChild(contObj).id;
 
-  contObj = document.getElementById('sliceX');
+  contObj = document.getElementsByClassName('renderer center')[0];
   layout.center = viewer.firstChild(contObj).id;
 
-  contObj = document.getElementById('sliceY');
+  contObj = document.getElementsByClassName('renderer right');
   layout.right = viewer.firstChild(contObj).id;
 
   return layout;
