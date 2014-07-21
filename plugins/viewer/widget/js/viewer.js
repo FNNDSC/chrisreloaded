@@ -109,7 +109,7 @@ viewer.Viewer = function(jsonObj) {
 
 viewer.Viewer.prototype.create3DRenderer = function(container) {
   this[container] = new X.renderer3D();
-  this[container].bgColor = [.1, .1, .1];
+  this[container].bgColor = [.4, .5, .5];
   this[container].container = container;
   this[container].init();
   self = this;
@@ -135,6 +135,7 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
 viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
   this[container] = new X.renderer2D();
   this[container].container = container;
+  this[container].bgColor = [.2, .2, .2];
   this[container].orientation = orientation;
   this[container].init();
 
@@ -620,7 +621,7 @@ viewer.Viewer.prototype.connect = function(feedID){
 window.addEventListener('CollaboratorReady',
   function(){
     var myId = self.collaborator.id;
-    var sceneOwnerId = self.collaborator.getRoomOwnerId();
+    var sceneOwnerId = self.collaborator.roomOwnerId;
 
     window.console.log('myId: ', myId);
     window.console.log('sceneOwnerId: ', sceneOwnerId);
@@ -629,7 +630,7 @@ window.addEventListener('CollaboratorReady',
     self.collaborator.register('volumeInformationSent', function(msgObj) {self.onRemoteVolumeInformationReceived(msgObj);});
     self.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
     self.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
-    self.collaborator.register('2DContClicked', function(msgObj) {self.onRemote2DContClick(msgObj);});
+    self.collaborator.register('2DContDblClicked', function(msgObj) {self.onRemote2DContDblClick(msgObj);});
     if (myId != sceneOwnerId) {
       self.collaborator.send('remoteViewerConnected', {receiverId: myId, senderId: sceneOwnerId});
     }
@@ -701,19 +702,18 @@ viewer.Viewer.prototype._3DContDblClickHandler = function() {
 
 viewer.Viewer.prototype.on2DContDblClick = function(cont) {
   window.console.log('sent: ', cont);
-  this.collaborator.send('2DContClicked', cont);
-  this._2DContClickHandler(cont);
+  this.collaborator.send('2DContDblClicked', cont);
+  this._2DContDblClickHandler(cont);
 }
 
 
-viewer.Viewer.prototype.onRemote2DContClick = function(msgObj) {
+viewer.Viewer.prototype.onRemote2DContDblClick = function(msgObj) {
   var cont = JSON.parse(msgObj.data);
   window.console.log('received: ', cont);
-  this._2DContClickHandler(cont);
+  this._2DContDblClickHandler(cont);
 }
 
-
-viewer.Viewer.prototype._2DContClickHandler = function(cont) {
+viewer.Viewer.prototype._2DContDblClickHandler = function(cont) {
   var contObj = document.getElementsByClassName('renderer ' + cont)[0];
   var twoDRenderer = viewer.firstChild(contObj);
   var threeD = document.getElementsByClassName('main renderer')[0];
@@ -987,7 +987,7 @@ viewer.Viewer.prototype.getLayout = function(){
   contObj = document.getElementsByClassName('renderer center')[0];
   layout.center = viewer.firstChild(contObj).id;
 
-  contObj = document.getElementsByClassName('renderer right');
+  contObj = document.getElementsByClassName('renderer right')[0];
   layout.right = viewer.firstChild(contObj).id;
 
   return layout;

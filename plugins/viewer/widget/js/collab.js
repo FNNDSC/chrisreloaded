@@ -24,6 +24,7 @@ collab.Collab = function(roomID) {
 	this.version = 0.0;
 	this.roomID = roomID;
 	this.id = '';
+	this.roomOwnerId = '';
 	this.init();
 
 }
@@ -61,6 +62,8 @@ collab.Collab.prototype.init = function(){
 
   // additional togetherjs configuration
 	TogetherJSConfig_findRoom =  "chris" + this.roomID;
+	this.register('remoteCollabConnected', function(msgObj) {self.onRemoteCollabConnect(msgObj);});
+	this.register('idSent', function(msgObj) {self.onRemoteIdReceived(msgObj);});
   TogetherJSConfig_on = {
         ready: function(){
 						self.id = TogetherJS.require('peers').Self.id;
@@ -69,11 +72,14 @@ collab.Collab.prototype.init = function(){
             // togetherJS button style
             self.updateButton();
 						TogetherJS.checkForUsersOnChannel('https://hub.togetherjs.com/hub/chris' + self.roomID, function(n){
-							window.console.log('collabReady sent');
-							// emit ready event
-							var ev = document.createEvent('Event');
-							ev.initEvent('CollaboratorReady', true, true);
-							window.dispatchEvent(ev);
+							if (n > 1) {
+								self.send('remoteCollabConnected', self.id);
+								window.console.log('Other is the room owner!!!');
+							} else {
+								self.roomOwnerId = self.id;
+								window.console.log('I am the room owner!!!');
+								self._emitReadyEvent();
+							}
 							window.console.log('Users on chanel!!!: ', n)
 						});
         },
@@ -84,6 +90,7 @@ collab.Collab.prototype.init = function(){
             // cleanup room ID
             // required, if not tries to go to previous room
             self.updateButton();
+						self.roomOwnerId = '';
             var store = TogetherJS.require('storage');
             store.tab.set('status').then(function(saved){saved = null;});
         }
@@ -116,7 +123,35 @@ collab.Collab.prototype.send = function(actionName, dataObj){
 }
 
 
-collab.Collab.prototype.getRoomOwnerId = function(){
+collab.Collab.prototype.onRemoteCollabConnect = function(msgObj) {
+	var remoteId = JSON.parse(msgObj.data);
+	var myId = this.id;
+
+	this.send('idSent', {receiverId: remoteId, senderId: myId});
+}
+
+
+collab.Collab.prototype.onRemoteIdReceived = function(msgObj) {
+	if (!this.roomOwnerId) {
+		var ids = JSON.parse(msgObj.data);
+		if (this.id == ids.receiverId )  {
+			this.roomOwnerId = ids.senderId;
+			this._emitReadyEvent();
+		}
+	}
+}
+
+
+collab.Collab.prototype._emitReadyEvent = function() {
+	window.console.log('collabReady sent');
+	// emit ready event
+	var ev = document.createEvent('Event');
+	ev.initEvent('CollaboratorReady', true, true);
+	window.dispatchEvent(ev);
+}
+
+
+/*collab.Collab.prototype.getRoomOwnerId = function(){
 	var peers = TogetherJS.require('peers').getAllPeers();
 
 	for (var i = 0; i < peers.length; i++) {
@@ -127,7 +162,7 @@ collab.Collab.prototype.getRoomOwnerId = function(){
 	}
 	window.console.log('I am the owner!!!');
 	return this.id;
-}
+}*/
 
 
 collab.Collab.prototype.disconnet = function(){
