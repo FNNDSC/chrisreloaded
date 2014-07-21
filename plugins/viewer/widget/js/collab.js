@@ -62,13 +62,14 @@ collab.Collab.prototype.init = function(){
 
   // additional togetherjs configuration
 	TogetherJSConfig_findRoom =  "chris" + this.roomID;
-	this.register('remoteCollabConnected', function(msgObj) {self.onRemoteCollabConnect(msgObj);});
-	this.register('idSent', function(msgObj) {self.onRemoteIdReceived(msgObj);});
   TogetherJSConfig_on = {
         ready: function(){
 						self.id = TogetherJS.require('peers').Self.id;
 						// togetherJS div style
         	  self.style();
+						// Register msg once TogetherJS is ready
+						self.register('remoteCollabConnected', function(msgObj) {self.onRemoteCollabConnect(msgObj);});
+						self.register('idSent', function(msgObj) {self.onRemoteIdReceived(msgObj);});
             // togetherJS button style
             self.updateButton();
 						TogetherJS.checkForUsersOnChannel('https://hub.togetherjs.com/hub/chris' + self.roomID, function(n){
