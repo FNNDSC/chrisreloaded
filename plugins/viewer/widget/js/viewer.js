@@ -115,17 +115,17 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   self = this;
   //3D renderer's ROTATE event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.ROTATE,
-    function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
+    function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
 
   // FIXME: event is not propagated to remotes for some reason
   //3D renderer's SCROLL event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.SCROLL,
-      function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
   //3D renderer's SCROLL event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.ZOOM,
-      function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
   this[container].interactor.addEventListener(X.event.events.PAN,
-      function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
 
   // FIXME: not working properly if we start dragging then exit the 3D renderer.
   // scene is still sent.
@@ -150,6 +150,12 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
   var self = this;
   this[container].interactor.addEventListener(X.event.events.SCROLL,
       function(){self.updateSceneView();self.collaborator.send('volumeInformationSent', self.getVolumeInformation());});
+  this[container].interactor.addEventListener(X.event.events.ROTATE,
+      function(){self.updateSceneView();self.collaborator.send('volumeInformationSent', self.getVolumeInformation());});
+  this[container].interactor.addEventListener(X.event.events.ZOOM,
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view, container);});
+  this[container].interactor.addEventListener(X.event.events.PAN,
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view, container);});
   //this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on2DRendererMouseWheel();this.collaborator.send('volumeInformationSent', this.getVolumeInformation()); };
 }
 
@@ -805,8 +811,11 @@ viewer.Viewer.prototype.on3DRendererTouchEnd = function(){
 
 
 // local camera view change handler
-viewer.Viewer.prototype.onCameraViewChange = function(dataObj){
-  this.collaborator.send('cameraViewChanged', dataObj);
+viewer.Viewer.prototype.onCameraViewChange = function(dataObj, container){
+  if (!container) {
+    container = 'vol3D';
+  }
+  this.collaborator.send('cameraViewChanged', {data:dataObj, cont: container});
 }
 
 
@@ -817,8 +826,8 @@ viewer.Viewer.prototype.onRemoteCameraViewChange = function(msgObj){
   window.console.log(this);
 
   var obj = JSON.parse(msgObj.data);
-  var arr = $.map(obj, function(el) { return el; });
-  this['vol3D'].camera.view = new Float32Array(arr);
+  var arr = $.map(obj.data, function(el) { return el; });
+  this[obj.cont].camera.view = new Float32Array(arr);
 }
 
 
