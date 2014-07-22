@@ -15,6 +15,8 @@ TogetherJSConfig_suppressJoinConfirmation = true;
 TogetherJSConfig_suppressInvite = true;
 TogetherJSConfig_dontShowClicks = true;
 TogetherJSConfig_noAutoStart = true;
+TogetherJSConfig_disableWebRTC = true;
+
 
 // Declare (or re-declare) the single global variable
 var collab = collab || {};
@@ -30,6 +32,10 @@ collab.Collab = function(roomID) {
 }
 
 collab.Collab.prototype.updateButton = function(){
+
+	// hide the sharing link
+	jQuery('#togetherjs-share-button').hide();
+	
   // apply style
   var jButton = jQuery('.collaborate-btn > button');
 
