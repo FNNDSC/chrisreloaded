@@ -168,6 +168,12 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
       self.onFileTreeNodeExpand(node);
     },
 
+    collapse: function(event, data) {
+      var node = data.node;
+
+      self.onFileTreeNodeExpand(node);
+    },
+
     keydown: function(event, data) {
       var node = data.node;
 
