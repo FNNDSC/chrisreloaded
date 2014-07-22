@@ -102,7 +102,7 @@
         if (Modernizr.webgl) {
           window.deg2rad = function(deg) { return deg * (Math.PI / 180); };
         	$('.feature.webgl').show();
-            initHTML5();
+          initHTML5();
         } else {
             $('.feature.nowebgl').show();
         }
