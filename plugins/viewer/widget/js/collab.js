@@ -119,6 +119,7 @@ collab.Collab.prototype.send = function(actionName, dataObj){
 		if(TogetherJS.running){
       var myJsonString = JSON.stringify(dataObj);
 			TogetherJS.send({type: actionName, data: myJsonString});
+			window.console.log('sent: ', dataObj);
     }
   }
 }

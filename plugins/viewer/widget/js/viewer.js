@@ -664,7 +664,6 @@ viewer.Viewer.prototype.onFileTreeNodeExpand = function(node) {
   var data = {key: node.key, expanded: node.isExpanded()};
 
   this.collaborator.send('fileTreeNodeExpanded', data);
-  window.console.log('sent: ', data);
 }
 
 
@@ -683,7 +682,6 @@ viewer.Viewer.prototype.onFileTreeNodeSelect = function(node) {
   var data = {key: node.key, selected: node.isSelected()};
 
   this.collaborator.send('fileTreeNodeSelected', data);
-  window.console.log('sent: ', data);
   this._fileTreeNodeSelectHandler(node);
 }
 
@@ -703,9 +701,7 @@ viewer.Viewer.prototype._fileTreeNodeSelectHandler = function(node) {
   if (node.data.type == 'volume') {
     if (node.isSelected()) {
       if (this.volume != null) {
-        window.console.log(this.volume.key);
         var prevSelectedNode = this.fileSelectTree.getNodeByKey(this.volume.key);
-        window.console.log(prevSelectedNode);
         //uncheck previously selected volume node and call the select event
         prevSelectedNode.setSelected(false);
       }
@@ -727,7 +723,6 @@ viewer.Viewer.prototype.on3DContDblClick = function() {
   var contHeight = this._3DContDblClickHandler();
 
   this.collaborator.send('3DContDblClicked', contHeight);
-  window.console.log('sent: ', contHeight);
 }
 
 
@@ -760,7 +755,6 @@ viewer.Viewer.prototype._3DContDblClickHandler = function() {
 
 
 viewer.Viewer.prototype.on2DContDblClick = function(cont) {
-  window.console.log('sent: ', cont);
   this.collaborator.send('2DContDblClicked', cont);
   this._2DContDblClickHandler(cont);
 }
@@ -807,11 +801,7 @@ viewer.Viewer.prototype.on3DRendererTouchEnd = function(){
 
 // local camera view change handler
 viewer.Viewer.prototype.onCameraViewChange = function(dataObj){
-
-  window.console.log('send: ' + dataObj);
-
   this.collaborator.send('cameraViewChanged', dataObj);
-
 }
 
 
