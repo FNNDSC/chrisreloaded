@@ -121,6 +121,11 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   //3D renderer's SCROLL event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.SCROLL,
       function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
+  //3D renderer's SCROLL event handler (update the camera view)
+  this[container].interactor.addEventListener(X.event.events.ZOOM,
+      function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
+  this[container].interactor.addEventListener(X.event.events.PAN,
+      function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
 
   // FIXME: not working properly if we start dragging then exit the 3D renderer.
   // scene is still sent.
@@ -159,26 +164,19 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
     select: function(event, data) {
       var node = data.node;
 
-      if (node.data.type == 'volume') {
-        if (node.isSelected()) {
-          if (self.volume != null) {
-            window.console.log(self.volume.key);
-            var prevSelectedNode = self.fileSelectTree.getNodeByKey(self.volume.key);
-            window.console.log(prevSelectedNode);
-            //uncheck previously selected volume node and call the select event
-            prevSelectedNode.setSelected(false);
-          }
-          self.setVolume(node);
-        } else {
-          self.unsetVolume();
-        }
-      } else {
-        if (node.isSelected()) {
-          self.addGeomModel(node);
-        } else {
-          self.remGeomModel(node);
-        }
-      };
+      self.onFileTreeNodeSelect(node);
+    },
+
+    expand: function(event, data) {
+      var node = data.node;
+
+      self.onFileTreeNodeExpand(node);
+    },
+
+    collapse: function(event, data) {
+      var node = data.node;
+
+      self.onFileTreeNodeExpand(node);
     },
 
     keydown: function(event, data) {
@@ -192,6 +190,7 @@ viewer.Viewer.prototype.createFileSelectTree = function(container) {
         }
       }
     }
+
   });
 
   this.fileSelectTree = $('#' + self.treeContainerId).fancytree("getTree");
@@ -611,14 +610,14 @@ viewer.Viewer.prototype.updateSceneView = function(){
 viewer.Viewer.prototype.connect = function(feedID){
   var self = this;
 
-// when TogetherJS is ready connect!
+  // when TogetherJS is ready connect!
 
-// FIXME: we should only do that the first time we connect to the room, if not event sent multiple times...!
-// un-connect then re-connect: events are processed/sent 2 times
+  // FIXME: we should only do that the first time we connect to the room, if not event sent multiple times...!
+  // un-connect then re-connect: events are processed/sent 2 times
 
-// FIXME: something messed up with the owner ID, it doesn't work sometimes
+  // FIXME: something messed up with the owner ID, it doesn't work sometimes
 
-window.addEventListener('CollaboratorReady',
+  window.addEventListener('CollaboratorReady',
   function(){
     var myId = self.collaborator.id;
     var sceneOwnerId = self.collaborator.roomOwnerId;
@@ -631,6 +630,8 @@ window.addEventListener('CollaboratorReady',
     self.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
     self.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
     self.collaborator.register('2DContDblClicked', function(msgObj) {self.onRemote2DContDblClick(msgObj);});
+    self.collaborator.register('fileTreeNodeSelected', function(msgObj) {self.onRemoteFileTreeNodeSelect(msgObj);});
+    self.collaborator.register('fileTreeNodeExpanded', function(msgObj) {self.onRemoteFileTreeNodeExpand(msgObj);});
     if (myId != sceneOwnerId) {
       self.collaborator.send('remoteViewerConnected', {receiverId: myId, senderId: sceneOwnerId});
     }
@@ -664,11 +665,69 @@ viewer.Viewer.prototype.onRemoteVolumeInformationReceived = function(msgObj){
 }
 
 
+viewer.Viewer.prototype.onFileTreeNodeExpand = function(node) {
+  var data = {key: node.key, expanded: node.isExpanded()};
+
+  this.collaborator.send('fileTreeNodeExpanded', data);
+}
+
+
+viewer.Viewer.prototype.onRemoteFileTreeNodeExpand = function(msgObj) {
+  var data = JSON.parse(msgObj.data);
+
+  window.console.log('received: ', data);
+  node = this.fileSelectTree.getNodeByKey(data.key);
+  if (node.isExpanded() != data.expanded) {
+    node.setExpanded(data.expanded);
+  }
+}
+
+
+viewer.Viewer.prototype.onFileTreeNodeSelect = function(node) {
+  var data = {key: node.key, selected: node.isSelected()};
+
+  this.collaborator.send('fileTreeNodeSelected', data);
+  this._fileTreeNodeSelectHandler(node);
+}
+
+
+viewer.Viewer.prototype.onRemoteFileTreeNodeSelect = function(msgObj) {
+  var data = JSON.parse(msgObj.data);
+
+  window.console.log('received: ', data);
+  node = this.fileSelectTree.getNodeByKey(data.key);
+  if (node.isSelected() != data.selected) {
+    node.setSelected(data.selected)
+  }
+}
+
+
+viewer.Viewer.prototype._fileTreeNodeSelectHandler = function(node) {
+  if (node.data.type == 'volume') {
+    if (node.isSelected()) {
+      if (this.volume != null) {
+        var prevSelectedNode = this.fileSelectTree.getNodeByKey(this.volume.key);
+        //uncheck previously selected volume node and call the select event
+        prevSelectedNode.setSelected(false);
+      }
+      this.setVolume(node);
+    } else {
+      this.unsetVolume();
+    }
+  } else {
+    if (node.isSelected()) {
+      this.addGeomModel(node);
+    } else {
+      this.remGeomModel(node);
+    }
+  };
+}
+
+
 viewer.Viewer.prototype.on3DContDblClick = function() {
   var contHeight = this._3DContDblClickHandler();
 
   this.collaborator.send('3DContDblClicked', contHeight);
-  window.console.log('sent: ', contHeight);
 }
 
 
@@ -701,7 +760,6 @@ viewer.Viewer.prototype._3DContDblClickHandler = function() {
 
 
 viewer.Viewer.prototype.on2DContDblClick = function(cont) {
-  window.console.log('sent: ', cont);
   this.collaborator.send('2DContDblClicked', cont);
   this._2DContDblClickHandler(cont);
 }
@@ -748,11 +806,7 @@ viewer.Viewer.prototype.on3DRendererTouchEnd = function(){
 
 // local camera view change handler
 viewer.Viewer.prototype.onCameraViewChange = function(dataObj){
-
-  window.console.log('send: ' + dataObj);
-
   this.collaborator.send('cameraViewChanged', dataObj);
-
 }
 
 
