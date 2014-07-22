@@ -117,7 +117,6 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   this[container].interactor.addEventListener(X.event.events.ROTATE,
     function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
 
-  // FIXME: event is not propagated to remotes for some reason
   //3D renderer's SCROLL event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.SCROLL,
       function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
@@ -126,14 +125,6 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
       function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
   this[container].interactor.addEventListener(X.event.events.PAN,
       function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
-
-  // FIXME: not working properly if we start dragging then exit the 3D renderer.
-  // scene is still sent.
-  // other users can not interact with the 3D anymore because they receive all those events from the 'broken' remote
-
-  // this[container].interactor.onTouchStart = this[container].interactor.onMouseDown = function(){ self.on3DRendererTouchStart(); };
-  // this[container].interactor.onTouchEnd = this[container].interactor.onMouseUp = function(){ self.on3DRendererTouchEnd(); };
-  // this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on3DRendererMouseWheel(); };
 }
 
 
@@ -145,8 +136,6 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
   this[container].init();
 
   // we need to explicitly send volume info to peers if we changed slices/windowlevel/etc. through mouse action (not through the GUI)
-
-  // FIXME: it must be extended to all events
   var self = this;
   this[container].interactor.addEventListener(X.event.events.SCROLL,
       function(){self.updateSceneView();self.collaborator.send('volumeInformationSent', self.getVolumeInformation());});
@@ -156,7 +145,6 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
       function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view, container);});
   this[container].interactor.addEventListener(X.event.events.PAN,
       function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view, container);});
-  //this[container].interactor.onTouchMove = this[container].interactor.onMouseWheel = function(){ self.on2DRendererMouseWheel();this.collaborator.send('volumeInformationSent', this.getVolumeInformation()); };
 }
 
 
@@ -617,12 +605,6 @@ viewer.Viewer.prototype.connect = function(feedID){
   var self = this;
 
   // when TogetherJS is ready connect!
-
-  // FIXME: we should only do that the first time we connect to the room, if not event sent multiple times...!
-  // un-connect then re-connect: events are processed/sent 2 times
-
-  // FIXME: something messed up with the owner ID, it doesn't work sometimes
-
   window.addEventListener('CollaboratorReady',
   function(){
     var myId = self.collaborator.id;
