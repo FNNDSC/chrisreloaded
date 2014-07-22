@@ -994,9 +994,6 @@ viewer.Viewer.prototype.getLayout = function(){
 }
 
 viewer.Viewer.prototype.setSelectedKeys = function(remoteSelectedKeys){
-
-  // FIXME: it looks like volume is reloaded when remote logout then logs in again
-
   //
   // synchronize fancytree
   //
