@@ -124,6 +124,8 @@ viewer.Viewer.prototype.create3DRenderer = function(container) {
   //3D renderer's SCROLL event handler (update the camera view)
   this[container].interactor.addEventListener(X.event.events.ZOOM,
       function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
+  this[container].interactor.addEventListener(X.event.events.PAN,
+      function(){self.updateSceneView();self.onCameraViewChange(self['vol3D'].camera.view);});
 
   // FIXME: not working properly if we start dragging then exit the 3D renderer.
   // scene is still sent.
