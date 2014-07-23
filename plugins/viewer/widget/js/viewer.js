@@ -250,6 +250,10 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
   this.volume.file = orderedFiles;
   this.volume.key = nodeObj.key;
 
+  document.getElementById('sliceX').firstChild.style.visibility = 'visible';
+  document.getElementById('sliceY').firstChild.style.visibility = 'visible';
+  document.getElementById('sliceZ').firstChild.style.visibility = 'visible';
+
   this.sliceX.add(this.volume);
   // start the loading/rendering
   this.sliceX.render();
@@ -266,6 +270,10 @@ viewer.Viewer.prototype.unsetVolume = function() {
     this['sliceX'].remove(this.volume);
     this['sliceY'].remove(this.volume);
     this['sliceZ'].remove(this.volume);
+    document.getElementById('sliceX').firstChild.style.visibility = 'hidden';
+    document.getElementById('sliceY').firstChild.style.visibility = 'hidden';
+    document.getElementById('sliceZ').firstChild.style.visibility = 'hidden';
+
 
     this.volume.destroy();
     this.volume = null;
