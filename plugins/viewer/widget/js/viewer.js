@@ -2,7 +2,7 @@
  * This object takes care of all the visualization:
  *
  * FEATURES
- * - Give it a JSON file which represents the 'scene'
+ * - Give it a JSON object which represents the 'scene'
  * - Allows users to selects elements of the scene to be rendered
  * - Allows basic image processing (thresholding, Volume Rendering (VR), Fibers Length Thresholding, etc.)
  * - Expose some functions
@@ -11,6 +11,7 @@
  * - XTK
  * - xdatgui.js
  * - SliceDrop clone
+ * - fancytree
  */
 
 // Declare (or re-declare) the single global variable
@@ -22,6 +23,9 @@ viewer.Viewer = function(jsonObj) {
   this.version = 0.0;
   //Parse the json file
   this.source = jsonObj;
+
+  // collaborator object
+  this.collaborator = null;
 
   //rendered volume
   this.volume = null;
@@ -42,7 +46,8 @@ viewer.Viewer = function(jsonObj) {
 
   //file selection widget
   this.fileSelectWidget = null;
-  this.createFileSelectTree('tree');
+  this.treeContainerId = 'tree';
+  this.createFileSelectTree(this.treeContainerId);
 
   // volume GUI widget
   this.volWidget = null;
@@ -54,38 +59,34 @@ viewer.Viewer = function(jsonObj) {
   } catch (Exception) {
     this._webGLFriendly = false;
   }
-  // create the 2D renderers for the X, Y, Z orientations
-  this.create2DRenderer('sliceXX', 'X');
-  this.create2DRenderer('sliceYY', 'Y');
-  this.create2DRenderer('sliceZZ', 'Z');
+  // create 2D renderers for the X, Y, Z orientations
+  this.create2DRenderer('sliceX', 'X');
+  this.create2DRenderer('sliceY', 'Y');
+  this.create2DRenderer('sliceZ', 'Z');
 
   // the onShowtime method gets executed after all files were fully loaded and
   // just before the first rendering attempt
   var self = this;
-  this.sliceXX.onShowtime = function() {
+  this.sliceX.onShowtime = function() {
     // add the volume to the other 3 renderers
-    self.sliceYY.add(self.volume);
-    self.sliceYY.render();
-    self.sliceZZ.add(self.volume);
-    self.sliceZZ.render();
+    self.sliceY.add(self.volume);
+    self.sliceY.render();
+    self.sliceZ.add(self.volume);
+    self.sliceZ.render();
 
     // make sure to re-paint
-    self['sliceXX'].update(self.volume);
-    self['sliceYY'].update(self.volume);
-    self['sliceZZ'].update(self.volume);
+    self.sliceX.update(self.volume);
+    self.sliceY.update(self.volume);
+    self.sliceZ.update(self.volume);
 
     if (self._webGLFriendly) {
       // no need to worry about the other showtimes
-      self['vol3D'].interactor.addEventListener(X.event.events.ROTATE, function(){self.updateSceneView();});
-      self['vol3D'].interactor.onTouchStart = self['vol3D'].interactor.onMouseDown = function(){self.onTouchStart();};
-      self['vol3D'].interactor.onTouchEnd = self['vol3D'].interactor.onMouseUp = function(){self.onTouchEnd();};
-
-      self['vol3D'].resetBoundingBox();
+      self.vol3D.resetBoundingBox();
       self.createBBox();
-      self['vol3D'].add(self.volumeBBox);
-      self['vol3D'].add(self.volume);
-      self['vol3D'].camera.position = [0, 0, 200];
-      self['vol3D'].render();
+      self.vol3D.add(self.volumeBBox);
+      self.vol3D.add(self.volume);
+      self.vol3D.camera.position = [0, 0, 200];
+      self.vol3D.render();
     }
     // now the volume GUI widget
     if (!self.volWidget) {
@@ -95,42 +96,100 @@ viewer.Viewer = function(jsonObj) {
     }
   };
 
-  //Event handler for full screen behaviour main container is double clicked
-  document.getElementById('render3D').addEventListener('dblclick', self.ThreeDContDClickHandler);
+  //Event handler for full screen behaviour when main container is double clicked
+  document.getElementsByClassName('renderer main')[0].addEventListener('dblclick', self.on3DContDblClick.bind(self));
 
   //Event handlers for switching renderers
-  document.getElementById('sliceX').addEventListener('click', self.TwoDContClickHandler);
-  document.getElementById('sliceY').addEventListener('click', self.TwoDContClickHandler);
-  document.getElementById('sliceZ').addEventListener('click', self.TwoDContClickHandler);
+  document.getElementsByClassName('renderer left')[0].addEventListener('dblclick', self.on2DContDblClick.bind(self, 'left'));
+  document.getElementsByClassName('renderer center')[0].addEventListener('dblclick', self.on2DContDblClick.bind(self, 'center'));
+  document.getElementsByClassName('renderer right')[0].addEventListener('dblclick', self.on2DContDblClick.bind(self, 'right'));
 
 }
 
-viewer.Viewer.prototype.ThreeDContDClickHandler = function() {
-    var render2D = document.getElementById('render2D');
 
-    if (this.style.height == '100%') {
-        render2D.style.display = 'block';
-        this.style.height = '70%';
-    } else {
-        render2D.style.display = 'none';
-        this.style.height = '100%'
+viewer.Viewer.prototype.create3DRenderer = function(container) {
+  this[container] = new X.renderer3D();
+  this[container].bgColor = [.4, .5, .5];
+  this[container].container = container;
+  this[container].init();
+  self = this;
+  //3D renderer's ROTATE event handler (update the camera view)
+  this[container].interactor.addEventListener(X.event.events.ROTATE,
+    function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
+
+  //3D renderer's SCROLL event handler (update the camera view)
+  this[container].interactor.addEventListener(X.event.events.SCROLL,
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
+  //3D renderer's SCROLL event handler (update the camera view)
+  this[container].interactor.addEventListener(X.event.events.ZOOM,
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
+  this[container].interactor.addEventListener(X.event.events.PAN,
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view);});
+}
+
+
+viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
+  this[container] = new X.renderer2D();
+  this[container].container = container;
+  this[container].bgColor = [.2, .2, .2];
+  this[container].orientation = orientation;
+  this[container].init();
+
+  // we need to explicitly send volume info to peers if we changed slices/windowlevel/etc. through mouse action (not through the GUI)
+  var self = this;
+  this[container].interactor.addEventListener(X.event.events.SCROLL,
+      function(){self.updateSceneView();self.collaborator.send('volumeInformationSent', self.getVolumeInformation());});
+  this[container].interactor.addEventListener(X.event.events.ROTATE,
+      function(){self.updateSceneView();self.collaborator.send('volumeInformationSent', self.getVolumeInformation());});
+  this[container].interactor.addEventListener(X.event.events.ZOOM,
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view, container);});
+  this[container].interactor.addEventListener(X.event.events.PAN,
+      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view, container);});
+}
+
+
+viewer.Viewer.prototype.createFileSelectTree = function(container) {
+  var self = this;
+
+  $('#' + self.treeContainerId).fancytree({
+    checkbox: true,
+    source: this.source,
+
+    select: function(event, data) {
+      var node = data.node;
+
+      self.onFileTreeNodeSelect(node);
+    },
+
+    expand: function(event, data) {
+      var node = data.node;
+
+      self.onFileTreeNodeExpand(node);
+    },
+
+    collapse: function(event, data) {
+      var node = data.node;
+
+      self.onFileTreeNodeExpand(node);
+    },
+
+    keydown: function(event, data) {
+      var node = data.node;
+
+      if (event.which === 13) {
+        if (node.isFolder()) {
+          node.toggleExpanded();
+        } else {
+          node.toggleSelected();
+        }
+      }
     }
 
-    //repaint
-    viewer.documentRepaint();
+  });
+
+  this.fileSelectTree = $('#' + self.treeContainerId).fancytree("getTree");
 }
 
-viewer.Viewer.prototype.TwoDContClickHandler = function() {
-  var twoDRenderer = viewer.firstChild(this);
-  var threeD = document.getElementById('render3D');
-  var threeDRenderer = viewer.firstChild(threeD);
-
-  this.replaceChild(threeDRenderer, twoDRenderer);
-  threeD.insertBefore(twoDRenderer, threeD.firstChild);
-  //threed.appendChild(renderer);
-  //repaint
-  viewer.documentRepaint();
-}
 
 viewer.Viewer.prototype.createBBox = function(){
 
@@ -173,77 +232,6 @@ viewer.Viewer.prototype.createBBox = function(){
 
 }
 
-viewer.Viewer.prototype.create3DRenderer = function(container) {
-  this[container] = new X.renderer3D();
-  this[container].bgColor = [.1, .1, .1];
-  this[container].container = container;
-  this[container].init();
-}
-
-
-viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
-  this[container] = new X.renderer2D();
-  this[container].container = container;
-  this[container].orientation = orientation;
-  this[container].init();
-}
-
-//given a div container return the contained renderer
-/*viewer.Viewer.prototype.getContainedRenderer = function(container) {
-
-  switch(container) {
-    case this['vol3D'].container: return this['vol3D']; break;
-    case this['sliceXX'].container: return this['sliceXX']; break;
-    case this['sliceYY'].container: return this['sliceYY']; break;
-    case this['sliceZZ'].container: return this['sliceZZ']; break;
-  }
-}*/
-
-viewer.Viewer.prototype.createFileSelectTree = function(container) {
-  var self = this;
-
-  $('#' + container).fancytree({
-    checkbox: true,
-    source: this.source,
-
-    select: function(event, data) {
-      var node = data.node;
-      if (node.data.type == 'volume') {
-        if (node.isSelected()) {
-          if (self.volume != null) {
-            var prevSelectedNode = self.fileSelectTree.getNodeByKey(self.volume.key);
-            //uncheck previously selected volume node and call the select event
-            prevSelectedNode.setSelected(false);
-          }
-          self.setVolume(node);
-        } else {
-          self.unsetVolume();
-        }
-      } else {
-        if (node.isSelected()) {
-          self.addGeomModel(node);
-        } else {
-          self.remGeomModel(node);
-        }
-      };
-    },
-
-    keydown: function(event, data) {
-      var node = data.node;
-
-      if (event.which === 13) {
-        if (node.isFolder()) {
-          node.toggleExpanded();
-        } else {
-          node.toggleSelected();
-        }
-      }
-    }
-  });
-
-  this.fileSelectTree = $('#' + container).fancytree("getTree");
-}
-
 
 viewer.Viewer.prototype.setVolume = function(nodeObj) {
 
@@ -262,10 +250,11 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
   this.volume.file = orderedFiles;
   this.volume.key = nodeObj.key;
 
-  this.sliceXX.add(this.volume);
+  this.sliceX.add(this.volume);
   // start the loading/rendering
-  this.sliceXX.render();
+  this.sliceX.render();
 }
+
 
 viewer.Viewer.prototype.unsetVolume = function() {
   // remove from the visualization
@@ -274,9 +263,9 @@ viewer.Viewer.prototype.unsetVolume = function() {
     this['vol3D'].remove(this.volumeBBox);
   }
 
-    this['sliceXX'].remove(this.volume);
-    this['sliceYY'].remove(this.volume);
-    this['sliceZZ'].remove(this.volume);
+    this['sliceX'].remove(this.volume);
+    this['sliceY'].remove(this.volume);
+    this['sliceZ'].remove(this.volume);
 
     this.volume.destroy();
     this.volume = null;
@@ -286,6 +275,7 @@ viewer.Viewer.prototype.unsetVolume = function() {
 
 }
 
+
 viewer.Viewer.prototype.updateVolume = function() {
   if(this.volume != null){
     var nodeObj = this.fileSelectTree.getNodeByKey(this.volume.key);
@@ -293,6 +283,7 @@ viewer.Viewer.prototype.updateVolume = function() {
     this.setVolume(nodeObj);
   }
 }
+
 
 viewer.Viewer.prototype.addGeomModel = function(nodeObj) {
   var xtkObj;
@@ -322,18 +313,14 @@ viewer.Viewer.prototype.remGeomModel = function(nodeObj) {
 
 
 viewer.Viewer.prototype.indexOfGeomModel = function(key) {
-  var found = false;
-
   if (this.geomModels) {
     for (var i = 0; i < this.geomModels.length; i++) {
       if (this.geomModels[i].key == key) {
         return i;
-     }
+      }
     }
   }
-  if (!found) {
-    return -1;
-  }
+  return -1;
 }
 
 
@@ -352,83 +339,218 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     customContainer.appendChild(gui.domElement);
     this.volWidget.container = customContainer;
     this.volWidget.view = gui.addFolder('View');
-    // $('.interactive_plugin_content').css("background-color", "#000");
-    // the following configures the gui for interacting with the X.volume
-    // this.volWidget.interact = gui.addFolder('Volume Interaction');
+    $('.interactive_plugin_content').css("background-color", "#000");
+    this.volWidget.interaction = gui.addFolder('Interaction');
     this.populateVolWidget();
+}
+
+viewer.Viewer.prototype.createViewFolder = function(){
+  var root = this.volWidget.view;
+
+  for (var i=0; i < this.viewFolder.length; i++) {
+    // create element
+    root[this.viewFolder[i].label] = root.add(this, this.viewFolder[i].target, this.viewFolder[i].parameters).name(this.viewFolder[i].name);
+    // set value
+    root[this.viewFolder[i].label].setValue(this[this.viewFolder[i].target]);
+    // connect callback
+    root[this.viewFolder[i].label].onChange(this.viewFolder[i].callback.bind(this));
+  }
+
+}
+
+viewer.Viewer.prototype.destroyViewFolder = function(){
+  var root = this.volWidget.view;
+
+  for (var i=0; i < this.viewFolder.length; i++) {
+    root.remove(root[this.viewFolder[i].label]);
+  }
+
+}
+
+viewer.Viewer.prototype.createInteractionFolder = function(){
+  var root = this.volWidget.interaction;
+
+  for (var i=0; i < this.interactionFolder.length; i++) {
+    // create element
+    root[this.interactionFolder[i].label] = root.add(this.volume, this.interactionFolder[i].target, this.interactionFolder[i].parameters.min, this.interactionFolder[i].parameters.max).name(this.interactionFolder[i].name).listen();
+    // set value
+    root[this.interactionFolder[i].label].setValue(this.volume[this.interactionFolder[i].target]);
+    // connect callback
+    root[this.interactionFolder[i].label].onChange(this.interactionFolder[i].callback.bind(this));
+  }
+
+}
+
+viewer.Viewer.prototype.destroyInteractionFolder = function(){
+  var root = this.volWidget.interaction;
+
+  for (var i=0; i < this.interactionFolder.length; i++) {
+    root.remove(root[this.interactionFolder[i].label]);
+  }
 
 }
 
 viewer.Viewer.prototype.populateVolWidget = function() {
   // now we can configure controllers ..
+  this.viewFolder = [
+    {
+      label: 'sliceMode',
+      target: 'mode',
+      parameters: { 'Default':0, 'Rotate Box':1},
+      name: 'Mode',
+      callback: function(){}
+    },
+    {
+      label: 'bboxMode',
+      target: 'bbox',
+      parameters: null,
+      name: 'Show BBox',
+      callback: function(value) {
+        if(this.volumeBBox != null){
+            this.volumeBBox.visible = value;
+        }
+      }
+    },
+    {
+      label: 'orientationMode',
+      target: 'reslice2',
+      parameters: null,
+      name: 'Reslice',
+      callback: function(value) {
+        // Delete current volume
+        if(value){
+          this.reslice = 'true';
+        }
+        else{
+         this.reslice = 'false';
+        }
+        this.updateVolume();
+      }
+    },
+    {
+      label: 'orientation',
+      target: 'sceneOrientation',
+      parameters: { 'Free': 0, 'Blue': 1, 'Red': 2, 'Green': 3 },
+      name: 'Orientation',
+      callback: function(value){
+        if(value == 2){
+          // move camera
+          this['vol3D'].camera.position = [-400, 0, 0];
+          this['vol3D'].camera.up = [0, 0, 1];
+        }
+        else if(value == 3){
+          // move camera
+          this['vol3D'].camera.position = [0, 400, 0];
+          this['vol3D'].camera.up = [0, 0, 1];
+        }
+        else if(value == 1){
+          // move camera
+          this['vol3D'].camera.position = [0, 0, -400];
+          this['vol3D'].camera.up = [0, 1, 0];
+        }
+      }
+    }
+  ];
+
+  this.interactionFolder = [
+    // {
+    //   label: 'opacity',
+    //   target: 'opacity',
+    //   parameters: { 'min':0, 'max':1},
+    //   name: 'Opacity',
+    //   callback: function(){
+    //     // emit message
+    //     this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+    //   }
+    // },
+    {
+      label: 'lowerThresh',
+      target: 'lowerThreshold',
+      parameters: { 'min':this.volume.min, 'max':this.volume.max},
+      name: 'lowThresh',
+      callback: function(){
+        // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+      }
+    },
+    {
+      label: 'upperThresh',
+      target: 'upperThreshold',
+      parameters: { 'min':this.volume.min, 'max':this.volume.max},
+      name: 'upThresh',
+      callback: function(){
+        // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+      }
+    },
+    {
+      label: 'windowLow',
+      target: 'windowLow',
+      parameters: { 'min':this.volume.min, 'max':this.volume.max},
+      name: 'winLow',
+      callback: function(){
+        // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+      }
+    },
+    {
+      label: 'windowHigh',
+      target: 'windowHigh',
+      parameters: { 'min':this.volume.min, 'max':this.volume.max},
+      name: 'winHigh',
+      callback: function(){
+        // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+      }
+    },
+    {
+      label: 'sliceZ',
+      target: 'indexZ',
+      parameters: { 'min':0, 'max':this.volume.range[2] - 1},
+      name: 'Blue slice',
+      callback: function(){
+        // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+      }
+    },
+    {
+      label: 'sliceX',
+      target: 'indexX',
+      parameters: { 'min':0, 'max':this.volume.range[0] - 1},
+      name: 'Red slice',
+      callback: function(){
+        // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+      }
+    },
+    {
+      label: 'sliceY',
+      target: 'indexY',
+      parameters: { 'min':0, 'max':this.volume.range[1] - 1},
+      name: 'Green slice',
+      callback: function(){
+        // emit message
+        this.collaborator.send('volumeInformationSent', this.getVolumeInformation());
+      }
+    }
+  ];
+
+
   //view mode
-  this.volWidget.view.sliceMode = this.volWidget.view.add(this, 'mode', { 'Default':0, 'Rotate Box':1});
-  this.volWidget.view.bboxMode = this.volWidget.view.add(this, 'bbox').name('Show BBox');
-  this.volWidget.view.orientationMode = this.volWidget.view.add(this, 'reslice2').name('Reslice');
-  this.volWidget.view.orientation = this.volWidget.view.add(this, 'sceneOrientation',
-   { Free: 0, Blue: 1, Red: 2, Green: 3 }).name('orientation');
+  this.createViewFolder();
   this.volWidget.view.open();
-
-  // connect callbacks
-  var self = this;
-  this.volWidget.view.bboxMode.onChange(function(value) {
-    if(self.volumeBBox != null){
-        self.volumeBBox.visible = value;
-    }
-  });
-
-  this.volWidget.view.orientationMode.onChange(function(value) {
-    // Delete current volume
-    if(value){
-        self.reslice = 'true';
-    }
-    else{
-        self.reslice = 'false';
-    }
-    self.updateVolume();
-  });
-
-  this.volWidget.view.orientation.onChange(function(value){
-    if(value == 2){
-      // move camera
-      self['vol3D'].camera.position = [-400, 0, 0];
-      self['vol3D'].camera.up = [0, 0, 1];
-    }
-    else if(value == 3){
-      // move camera
-      self['vol3D'].camera.position = [0, 400, 0];
-      self['vol3D'].camera.up = [0, 0, 1];
-    }
-    else if(value == 1){
-      // move camera
-      self['vol3D'].camera.position = [0, 0, -400];
-      self['vol3D'].camera.up = [0, 1, 0];
-    }
-  });
-
-  // // .. switch between slicing and volume rendering
-  // this.volWidget.interact.vrCtrl = this.volWidget.interact.add(this.volume, 'volumeRendering').name('rendering');
-  // // .. configure the volume rendering opacity
-  // this.volWidget.interact.opacityCtrl = this.volWidget.interact.add(this.volume, 'opacity', 0, 1);
-  // // .. and the threshold in the min..max range
-  // this.volWidget.interact.lowThCtrl = this.volWidget.interact.add(this.volume, 'lowerThreshold',
-  //   this.volume.min, this.volume.max).name('lowerThr');
-  // this.volWidget.interact.upThCtrl = this.volWidget.interact.add(this.volume, 'upperThreshold',
-  //   this.volume.min, this.volume.max).name('upperThr');
-  // this.volWidget.interact.lowWinCtrl = this.volWidget.interact.add(this.volume, 'windowLow',
-  //   this.volume.min, this.volume.max).name('winLow');
-  // this.volWidget.interact.upWinCtrl = this.volWidget.interact.add(this.volume, 'windowHigh',
-  //  this.volume.min, this.volume.max).name('winHigh');
-  // // the indexX,Y,Z are the currently displayed slice indices in the range
-  // // 0..dimensions-1
-  // this.volWidget.interact.sliceXCtrl = this.volWidget.interact.add(this.volume, 'indexX', 0,
-  //  this.volume.dimensions[0] - 1).listen();
-  // this.volWidget.interact.sliceYCtrl = this.volWidget.interact.add(this.volume, 'indexY', 0,
-  //  this.volume.dimensions[1] - 1).listen();
-  // this.volWidget.interact.sliceZCtrl = this.volWidget.interact.add(this.volume, 'indexZ', 0,
-  //  this.volume.dimensions[2] - 1).listen();
-  // this.volWidget.interact.open();
+  // interaction mode
+  this.createInteractionFolder();
+  this.volWidget.interaction.open();
 }
+
+
+viewer.Viewer.prototype.updateVolWidget = function() {
+  this.destroyViewFolder();
+  this.destroyInteractionFolder();
+  this.populateVolWidget();
+}
+
 
 viewer.Viewer.prototype.updateSceneView = function(){
 
@@ -469,60 +591,238 @@ viewer.Viewer.prototype.updateSceneView = function(){
     // only triggers 1 3d renderer
 
     // this.volume.modified();
-    this['sliceXX'].update(this.volume);
-    this['sliceYY'].update(this.volume);
-    this['sliceZZ'].update(this.volume);
+    this['sliceX'].update(this.volume);
+    this['sliceY'].update(this.volume);
+    this['sliceZ'].update(this.volume);
     }
 
 }
 
 
-viewer.Viewer.prototype.updateVolWidget = function() {
-  this.volWidget.view.remove(this.volWidget.view.sliceMode);
-  this.volWidget.view.remove(this.volWidget.view.bboxMode);
-  this.volWidget.view.remove(this.volWidget.view.orientationMode);
-  this.volWidget.view.remove(this.volWidget.view.orientation);
-  // this.volWidget.interact.remove(this.volWidget.interact.vrCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.opacityCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.lowThCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.upThCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.lowWinCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.upWinCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.sliceXCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.sliceYCtrl);
-  // this.volWidget.interact.remove(this.volWidget.interact.sliceZCtrl);
-  this.populateVolWidget();
+//COLLABORATION: Local and Remote event handlers
+//Register remote actions with their local handlers
+viewer.Viewer.prototype.connect = function(feedID){
+  var self = this;
+
+  // when TogetherJS is ready connect!
+  window.addEventListener('CollaboratorReady',
+  function(){
+    var myId = self.collaborator.id;
+    var sceneOwnerId = self.collaborator.roomOwnerId;
+
+    window.console.log('myId: ', myId);
+    window.console.log('sceneOwnerId: ', sceneOwnerId);
+    self.collaborator.register('remoteViewerConnected', function(msgObj) {self.onRemoteViewerConnect(msgObj);});
+    self.collaborator.register('sceneRequested', function(msgObj) {self.onRemoteSceneReceived(msgObj);});
+    self.collaborator.register('volumeInformationSent', function(msgObj) {self.onRemoteVolumeInformationReceived(msgObj);});
+    self.collaborator.register('cameraViewChanged', function(msgObj) {self.onRemoteCameraViewChange(msgObj);});
+    self.collaborator.register('3DContDblClicked', function(msgObj) {self.onRemote3DContDblClick(msgObj);});
+    self.collaborator.register('2DContDblClicked', function(msgObj) {self.onRemote2DContDblClick(msgObj);});
+    self.collaborator.register('fileTreeNodeSelected', function(msgObj) {self.onRemoteFileTreeNodeSelect(msgObj);});
+    self.collaborator.register('fileTreeNodeExpanded', function(msgObj) {self.onRemoteFileTreeNodeExpand(msgObj);});
+    if (myId != sceneOwnerId) {
+      self.collaborator.send('remoteViewerConnected', {receiverId: myId, senderId: sceneOwnerId});
+    }
+  });
+  //Create collaborator object
+  this.collaborator = new collab.Collab(feedID);
 }
 
-viewer.Viewer.prototype.viewChanged = function(arr){
-    window.console.log('emit view changed');
+
+viewer.Viewer.prototype.onRemoteViewerConnect = function(msgObj) {
+  var ids = JSON.parse(msgObj.data);
+  var self = this;
+
+  if (this.collaborator.id == ids.senderId) {
+    this.collaborator.send('sceneRequested', {receiverId: ids.receiverId, scene: self.getScene()});
+  }
 }
 
-viewer.Viewer.prototype.onViewChanged = function(arr){
-    this['vol3D'].camera.view = new Float32Array(arr);
+
+viewer.Viewer.prototype.onRemoteSceneReceived = function(msgObj){
+  var dataObj = JSON.parse(msgObj.data);
+
+  if (this.collaborator.id == dataObj.receiverId) {
+    this.setScene(dataObj.scene);
+  }
 }
 
-viewer.Viewer.prototype.onTouchStart = function(){
+viewer.Viewer.prototype.onRemoteVolumeInformationReceived = function(msgObj){
+  var dataObj = JSON.parse(msgObj.data);
+  this.setVolumeInformation(dataObj);
+}
+
+
+viewer.Viewer.prototype.onFileTreeNodeExpand = function(node) {
+  var data = {key: node.key, expanded: node.isExpanded()};
+
+  this.collaborator.send('fileTreeNodeExpanded', data);
+}
+
+
+viewer.Viewer.prototype.onRemoteFileTreeNodeExpand = function(msgObj) {
+  var data = JSON.parse(msgObj.data);
+
+  window.console.log('received: ', data);
+  node = this.fileSelectTree.getNodeByKey(data.key);
+  if (node.isExpanded() != data.expanded) {
+    node.setExpanded(data.expanded);
+  }
+}
+
+
+viewer.Viewer.prototype.onFileTreeNodeSelect = function(node) {
+  var data = {key: node.key, selected: node.isSelected()};
+
+  this.collaborator.send('fileTreeNodeSelected', data);
+  this._fileTreeNodeSelectHandler(node);
+}
+
+
+viewer.Viewer.prototype.onRemoteFileTreeNodeSelect = function(msgObj) {
+  var data = JSON.parse(msgObj.data);
+
+  window.console.log('received: ', data);
+  node = this.fileSelectTree.getNodeByKey(data.key);
+  if (node.isSelected() != data.selected) {
+    node.setSelected(data.selected)
+  }
+}
+
+
+viewer.Viewer.prototype._fileTreeNodeSelectHandler = function(node) {
+  if (node.data.type == 'volume') {
+    if (node.isSelected()) {
+      if (this.volume != null) {
+        var prevSelectedNode = this.fileSelectTree.getNodeByKey(this.volume.key);
+        //uncheck previously selected volume node and call the select event
+        prevSelectedNode.setSelected(false);
+      }
+      this.setVolume(node);
+    } else {
+      this.unsetVolume();
+    }
+  } else {
+    if (node.isSelected()) {
+      this.addGeomModel(node);
+    } else {
+      this.remGeomModel(node);
+    }
+  };
+}
+
+
+viewer.Viewer.prototype.on3DContDblClick = function() {
+  var contHeight = this._3DContDblClickHandler();
+
+  this.collaborator.send('3DContDblClicked', contHeight);
+}
+
+
+viewer.Viewer.prototype.onRemote3DContDblClick = function(msgObj) {
+  var contHeight = JSON.parse(msgObj.data);
+  var render3D = document.getElementsByClassName('renderer main')[0];
+
+  window.console.log('received: ', contHeight);
+  if (render3D.style.height != contHeight) {
+    this._3DContDblClickHandler();
+  }
+}
+
+
+viewer.Viewer.prototype._3DContDblClickHandler = function() {
+  var render3D = document.getElementsByClassName('main renderer')[0];
+  var render2D = document.getElementsByClassName('smallRenderers')[0];
+
+  if (render3D.style.height == '100%') {
+      render2D.style.display = 'block';
+      render3D.style.height = '70%';
+  } else {
+      render2D.style.display = 'none';
+      render3D.style.height = '100%'
+  }
+  //repaint
+  viewer.documentRepaint();
+  return render3D.style.height;
+}
+
+
+viewer.Viewer.prototype.on2DContDblClick = function(cont) {
+  this.collaborator.send('2DContDblClicked', cont);
+  this._2DContDblClickHandler(cont);
+}
+
+
+viewer.Viewer.prototype.onRemote2DContDblClick = function(msgObj) {
+  var cont = JSON.parse(msgObj.data);
+  window.console.log('received: ', cont);
+  this._2DContDblClickHandler(cont);
+}
+
+viewer.Viewer.prototype._2DContDblClickHandler = function(cont) {
+  var contObj = document.getElementsByClassName('renderer ' + cont)[0];
+  var twoDRenderer = viewer.firstChild(contObj);
+  var threeD = document.getElementsByClassName('main renderer')[0];
+  var threeDRenderer = viewer.firstChild(threeD);
+
+  contObj.replaceChild(threeDRenderer, twoDRenderer);
+  threeD.insertBefore(twoDRenderer, threeD.firstChild);
+  //threed.appendChild(renderer);
+  //repaint
+  viewer.documentRepaint();
+}
+
+
+viewer.Viewer.prototype.on3DRendererMouseWheel = function(){
+  this.onCameraViewChange(this['vol3D'].camera.view);
+}
+
+
+// grab the camera view state every 20 mms after touch start and until touch end
+viewer.Viewer.prototype.on3DRendererTouchStart = function(){
     var self = this;
     _CHRIS_INTERACTIVE_PLUGIN_._updater = setInterval(function(){
-            self.viewChanged(self['vol3D'].camera.view);
-        }, 150);
+            self.onCameraViewChange(self['vol3D'].camera.view);
+        }, 20);
 }
 
-viewer.Viewer.prototype.onTouchEnd = function(){
-    clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
+
+viewer.Viewer.prototype.on3DRendererTouchEnd = function(){
+  clearInterval(_CHRIS_INTERACTIVE_PLUGIN_._updater);
 }
+
+
+// local camera view change handler
+viewer.Viewer.prototype.onCameraViewChange = function(dataObj, container){
+  if (!container) {
+    container = 'vol3D';
+  }
+  this.collaborator.send('cameraViewChanged', {data:dataObj, cont: container});
+}
+
+
+// remote camera view change handler
+viewer.Viewer.prototype.onRemoteCameraViewChange = function(msgObj){
+
+  window.console.log('received: ' + msgObj);
+  window.console.log(this);
+
+  var obj = JSON.parse(msgObj.data);
+  var arr = $.map(obj.data, function(el) { return el; });
+  this[obj.cont].camera.view = new Float32Array(arr);
+}
+
 
 viewer.Viewer.prototype.destroy = function(){
     // destroy the fancy tree
-    $("#tree").fancytree("destroy");
+    $("#" + this.treeContainerId).fancytree("destroy");
 
     // listeners
     var self = this;
-    document.getElementById('render3D').removeEventListener('dblclick', self.ThreeDContDClickHandler);
-    document.getElementById('sliceX').removeEventListener('click', self.TwoDContClickHandler);
-    document.getElementById('sliceY').removeEventListener('click', self.TwoDContClickHandler);
-    document.getElementById('sliceZ').removeEventListener('click', self.TwoDContClickHandler);
+    document.getElementsByClassName('renderer main')[0].removeEventListener('dblclick', self.on3DContDblClick);
+    document.getElementsByClassName('renderer left')[0].removeEventListener('dblclick', self.on2DContDblClick);
+    document.getElementsByClassName('renderer center')[0].removeEventListener('dblclick', self.on2DContDblClick);
+    document.getElementsByClassName('renderer right')[0].removeEventListener('dblclick', self.on2DContDblClick);
 
     // top right widget must be destroyed if any!
     if(this.volWidget != null){
@@ -547,15 +847,241 @@ viewer.Viewer.prototype.destroy = function(){
     // destroy XTK renderers
     this['vol3D'].destroy();
     this['vol3D'] = null;
-    this['sliceXX'].destroy();
-    this['sliceXX'] = null;
-    this['sliceYY'].destroy();
-    this['sliceYY'] = null;
-    this['sliceZZ'].destroy();
-    this['sliceZZ'] = null;
+    this['sliceX'].destroy();
+    this['sliceX'] = null;
+    this['sliceY'].destroy();
+    this['sliceY'] = null;
+    this['sliceZ'].destroy();
+    this['sliceZ'] = null;
+
+  if(this.collaborator){
+        window.console.log('destroying collaborator');
+        this.collaborator.destroy();
+        this.collaborator = null;
+    }
+}
+
+viewer.Viewer.prototype.getScene = function(){
+  var sceneObj = {};
+
+  // export objects which are selected
+  sceneObj.selectedKeys = {};
+  sceneObj.selectedKeys = this.getSelectedKeys();
+
+  // export viewer layout
+  sceneObj.layout = {};
+  sceneObj.layout = this.getLayout();
+
+  // get general viewer information
+  sceneObj.view = {};
+  sceneObj.view = this.getView();
+
+  return sceneObj;
+}
+
+viewer.Viewer.prototype.setScene = function(sceneObj){
+  // set objects selection
+  this.setSelectedKeys(sceneObj.selectedKeys);
+
+  // set layout
+  this.setLayout(sceneObj.layout);
+
+  // set view
+  this.setView(sceneObj.view);
+}
+
+viewer.Viewer.prototype.setVolumeInformation = function(remoteVolumeInformation){
+
+  // if remote view, update the targets
+  // when the widget is created, it will set the values from there
+  for (var i=0; i < remoteVolumeInformation.length; i++) {
+    // if not loaded yet
+    this.volume[remoteVolumeInformation[i].target] = remoteVolumeInformation[i].value;
+  }
 
 }
 
+viewer.Viewer.prototype.getVolumeInformation = function(){
+  var volumeInfObj = [];
+
+  if(typeof(this.volWidget) != 'undefined' && this.volWidget != null){
+    var root = this.volWidget.interaction;
+
+    for (var i=0; i < this.interactionFolder.length; i++) {
+      volumeInfObj.push({
+        'label': this.interactionFolder[i].label,
+        'value': this.volume[this.interactionFolder[i].target],
+        'target': this.interactionFolder[i].target
+      });
+    }
+  }
+
+  return volumeInfObj;
+}
+
+
+viewer.Viewer.prototype.setView = function(remoteView){
+  var view = this.getView();
+
+  // if local view, update the widget from remote
+  if(view.length == remoteView.length){
+    for (var i=0; i < view.length; i++) {
+      // if loaded
+      if(typeof(this.volWidget) != 'undefined' &&
+        this.volWidget != null &&
+        view[i].label == remoteView[i].label &&
+        view[i].value != remoteView[i].value){
+        this.volWidget.view[remoteView[i].label].setValue(remoteView[i].value);
+      }
+    }
+  }
+
+  // if remote view, update the targets
+  // when the widget is created, it will set the values from there
+  for (var i=0; i < remoteView.length; i++) {
+    // if not loaded yet
+    this[remoteView[i].target] = remoteView[i].value;
+  }
+
+}
+
+viewer.Viewer.prototype.getView = function(){
+  var view = [];
+
+  if(typeof(this.volWidget) != 'undefined' && this.volWidget != null){
+    var root = this.volWidget.view;
+
+    for (var i=0; i < this.viewFolder.length; i++) {
+      view.push({
+        'label': this.viewFolder[i].label,
+        'value': this[this.viewFolder[i].target],
+        'target': this.viewFolder[i].target
+      });
+    }
+  }
+
+  return view;
+}
+
+viewer.Viewer.prototype.setLayout = function(remoteLayout){
+  var layout = this.getLayout();
+
+  // is main container ok?
+  if(layout.main != remoteLayout.main){
+    var main = document.getElementById(layout.main);
+    var mainContainer = main.parentNode;
+    var remoteMain = document.getElementById(remoteLayout.main);
+    var remoteMainContainer = remoteMain.parentNode;
+
+    remoteMainContainer.replaceChild(main, remoteMain);
+    mainContainer.insertBefore(remoteMain, mainContainer.firstChild);
+
+    layout = this.getLayout();
+  }
+
+  // is left container ok?
+  if(layout.left != remoteLayout.left){
+    var left = document.getElementById(layout.left);
+    var leftContainer = left.parentNode;
+    var remoteLeft = document.getElementById(remoteLayout.left);
+    var remoteLeftContainer = remoteLeft.parentNode;
+
+    remoteLeftContainer.replaceChild(left, remoteLeft);
+    leftContainer.insertBefore(remoteLeft, leftContainer.firstChild);
+
+    layout = this.getLayout();
+  }
+
+  // is center container ok?
+  // right will be automatically up to date then
+  if(layout.center != remoteLayout.center){
+    var center = document.getElementById(layout.center);
+    var centerContainer = center.parentNode;
+    var remoteCenter = document.getElementById(remoteLayout.center);
+    var remoteCenterContainer = remoteCenter.parentNode;
+
+    remoteCenterContainer.replaceChild(center, remoteLeft);
+    centerContainer.insertBefore(remoteCenter, centerContainer.firstChild);
+
+    layout = this.getLayout();
+  }
+
+  // is mode ok?
+  if(layout.mode != remoteLayout.mode){
+    this._3DContDblClickHandler();
+  }
+
+  // re-paint!
+  viewer.documentRepaint();
+}
+
+viewer.Viewer.prototype.getLayout = function(){
+  var layout = {};
+
+  var contObj = document.getElementsByClassName('renderer main')[0];
+  // full screen?
+  // 0 : default
+  // 1 : full screen
+  layout.mode = (contObj.style.height == '100%') ? 1 : 0;
+  // where are sliceX,Y,Z,3D?
+  layout.main = viewer.firstChild(contObj).id;
+
+  contObj = document.getElementsByClassName('renderer left')[0];
+  layout.left = viewer.firstChild(contObj).id;
+
+  contObj = document.getElementsByClassName('renderer center')[0];
+  layout.center = viewer.firstChild(contObj).id;
+
+  contObj = document.getElementsByClassName('renderer right')[0];
+  layout.right = viewer.firstChild(contObj).id;
+
+  return layout;
+}
+
+viewer.Viewer.prototype.setSelectedKeys = function(remoteSelectedKeys){
+  //
+  // synchronize fancytree
+  //
+  var tree = $('#' + this.treeContainerId).fancytree('getTree');
+  var selectedKeys = this.getSelectedKeys();
+
+  // get keys which have to be unselected
+  var unselectKeys = selectedKeys.filter(function(val) {
+    return remoteSelectedKeys.indexOf(val) == -1;
+  });
+  // and un-check it!
+  for (var i=0; i < unselectKeys.length; i++) {
+    var node = tree.getNodeByKey(unselectKeys[i]);
+    node.setSelected(false);
+    node.setActive(false);
+  }
+
+  // get keys which have to be selected
+  var selectKeys = remoteSelectedKeys.filter(function(val) {
+    return selectedKeys.indexOf(val) == -1;
+  });
+  // and check it!
+  for (var i=0; i < selectKeys.length; i++) {
+    var node = tree.getNodeByKey(selectKeys[i]);
+    node.setSelected(true);
+    node.setActive(true);
+  }
+
+}
+
+// get the selected keys from the fancy tree
+viewer.Viewer.prototype.getSelectedKeys = function(){
+  // fancytree API
+  var selectedNodes = $('#' + this.treeContainerId).fancytree('getTree').getSelectedNodes();
+  var selectedKeys = [];
+
+  // loopTrhough array and get keys ().key
+  for (var i=0; i < selectedNodes.length; i++) {
+    selectedKeys.push(selectedNodes[i].key);
+  }
+
+  return selectedKeys;
+}
 
 //Find the first child which is an element node
 viewer.firstChild = function(DOMObj) {
