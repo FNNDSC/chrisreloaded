@@ -53,11 +53,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.submitted = function(data) {
  */
 _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
 
-    if(typeof(collaborator) != 'undefined' && collaborator != null){
-        collaborator.destroy();
-        collaborator = null;
-    }
-
     if(typeof(view) != 'undefined' && view != null){
         view.destroy();
         view = null;
@@ -71,21 +66,11 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
  * feedID is important to create the common room for collaboration
  */
 _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID, data) {
-
-    // create collab object
-    if(typeof(collaborator) == 'undefined' || collaborator == null){
-        collaborator = new collab.Collab(feedID);
-    }
-
     // create viewer object
     if(typeof(view) == 'undefined' || view == null){
         view = new viewer.Viewer(data);
     }
-
-    // (re)connect events
-    collaborator.onViewChanged = function(test){view.onViewChanged(test);};
-    view.viewChanged = function(view){collaborator.viewChanged(view);};
-
+    view.connect(feedID);
 }
 
 /**
@@ -134,14 +119,13 @@ _CHRIS_INTERACTIVE_PLUGIN_.formatData = function(dataObj){
 
 _CHRIS_INTERACTIVE_PLUGIN_.addToTree = function(tree, obj, type){
 
-    return _CHRIS_INTERACTIVE_PLUGIN_.parseTree(tree, obj, 0, type, obj.url, [], '');
+    return _CHRIS_INTERACTIVE_PLUGIN_.parseTree(tree, obj, 0, type, [], '');
 
 }
 
-_CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, files, key){
-
+_CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, files, key){
     // get current location
-    var path = url.split('/');
+    var path = obj.url.split('/');
     // we do not want to show the following in the tree
     // users/plugin_name/feed_name
     path.shift();
@@ -169,7 +153,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, 
         return;
     }
 
-
     // subtree is not there, create it
     var indexSubTree = -1;
 
@@ -183,25 +166,26 @@ _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, url, 
 
     // we push object to children
     if(indexSubTree == -1){
-
         indexSubTree = subtree.length;
         key = key.toString() + subtree.length.toString();
-
-        subtree.push({ 'title': path[depth],
-                       'key': key,
-                       'folder': true,
-                       'hideCheckbox' : true,
-                       'children': []
-                    });
-
+        subtree.push(_CHRIS_INTERACTIVE_PLUGIN_.createTreeFolder(path[depth], key));
     }
     else{
-
         key = subtree[indexSubTree].key;
-
     }
 
-    _CHRIS_INTERACTIVE_PLUGIN_.parseTree(subtree[indexSubTree].children, obj, depth + 1, type, url, files, key);
+    _CHRIS_INTERACTIVE_PLUGIN_.parseTree(subtree[indexSubTree].children, obj, depth + 1, type, files, key);
+}
+
+
+_CHRIS_INTERACTIVE_PLUGIN_.createTreeFolder = function(title, key){
+
+    return { 'title': title,
+             'key': key,
+             'folder' : true,
+             'hideCheckbox' : true,
+             'children': []
+            };
 }
 
 _CHRIS_INTERACTIVE_PLUGIN_.createTreeFile = function(title, type, url, files, key){
@@ -221,7 +205,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.createTreeFile = function(title, type, url, files, ke
  */
 _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
 
-    var feedId = _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid");
     var directory = _CHRIS_INTERACTIVE_PLUGIN_.getParam("directory");
     var links = _CHRIS_INTERACTIVE_PLUGIN_.getParam("links");
     var feedId = _CHRIS_INTERACTIVE_PLUGIN_.getParam("feedid");
