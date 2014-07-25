@@ -96,13 +96,18 @@ viewer.Viewer = function(jsonObj) {
     }
   };
 
+  //The Listener variables below are necessary when bind() is used
   //Event handler for full screen behaviour when main container is double clicked
-  document.getElementsByClassName('renderer main')[0].addEventListener('dblclick', self.on3DContDblClick.bind(self));
+  this.on3DContDblClickListener = this.on3DContDblClick.bind(this);
+  document.getElementsByClassName('renderer main')[0].addEventListener('dblclick', self.on3DContDblClickListener);
 
   //Event handlers for switching renderers
-  document.getElementsByClassName('renderer left')[0].addEventListener('dblclick', self.on2DContDblClick.bind(self, 'left'));
-  document.getElementsByClassName('renderer center')[0].addEventListener('dblclick', self.on2DContDblClick.bind(self, 'center'));
-  document.getElementsByClassName('renderer right')[0].addEventListener('dblclick', self.on2DContDblClick.bind(self, 'right'));
+  this.onLeft2DContDblClickListener = this.on2DContDblClick.bind(this, 'left');
+  document.getElementsByClassName('renderer left')[0].addEventListener('dblclick', self.onLeft2DContDblClickListener);
+  this.onCenter2DContDblClickListener = this.on2DContDblClick.bind(this, 'center');
+  document.getElementsByClassName('renderer center')[0].addEventListener('dblclick', self.onCenter2DContDblClickListener);
+  this.onRight2DContDblClickListener = this.on2DContDblClick.bind(this, 'right');
+  document.getElementsByClassName('renderer right')[0].addEventListener('dblclick', self.onRight2DContDblClickListener);
 
 }
 
@@ -827,10 +832,10 @@ viewer.Viewer.prototype.destroy = function(){
 
     // listeners
     var self = this;
-    document.getElementsByClassName('renderer main')[0].removeEventListener('dblclick', self.on3DContDblClick);
-    document.getElementsByClassName('renderer left')[0].removeEventListener('dblclick', self.on2DContDblClick);
-    document.getElementsByClassName('renderer center')[0].removeEventListener('dblclick', self.on2DContDblClick);
-    document.getElementsByClassName('renderer right')[0].removeEventListener('dblclick', self.on2DContDblClick);
+    document.getElementsByClassName('renderer main')[0].removeEventListener('dblclick', self.on3DContDblClickListener);
+    document.getElementsByClassName('renderer left')[0].removeEventListener('dblclick', self.onLeft2DContDblClickListener);
+    document.getElementsByClassName('renderer center')[0].removeEventListener('dblclick', self.onCenter2DContDblClickListener);
+    document.getElementsByClassName('renderer right')[0].removeEventListener('dblclick', self.onRight2DContDblClickListener);
 
     // top right widget must be destroyed if any!
     if(this.volWidget != null){
