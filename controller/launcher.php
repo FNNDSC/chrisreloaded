@@ -179,24 +179,37 @@ if ($commandline_mode) {
 // *****************
 
 
+//
 // get the name of the executable as plugin name
+//
+
 $plugin_command_array = explode ( ' ' , $command );
 $plugin_name_array = explode ( '/' , $plugin_command_array[0]);
 $plugin_name = end($plugin_name_array);
 array_shift($plugin_command_array);
 $parameters = implode(' ', $plugin_command_array);
 
+
+//
 // get user if from username
+//
+
 $user_id = UserC::getID($username);
 
 
+//
 // create the feed if first batch job
+//
 
 if($feed_id == -1){
   $feed_id = FeedC::create($user_id, $plugin_name, $feedname, $status);
 }
 
+
+//
 // create the feed directory
+//
+
 $user_path = joinPaths(CHRIS_USERS, $username);
 $plugin_path = joinPaths($user_path, $plugin_name);
 $feed_path = joinPaths($plugin_path, $feedname.'-'.$feed_id);
@@ -218,12 +231,15 @@ $ssh = new Net_SSH2($host);
 if (!$ssh->login($username, $password)) {
   die('Login Failed');
 }
-// create job directory and chris_run directory
-// createDir is a utility function provided by controller/_util.inc.php
+
 $job_path_output = createDir($ssh, $job_path, '');
 $job_path_output = createDir($ssh, $job_path);
 
+
+//
 // replace ${OUTPUT} pattern in the command and in the parameters
+//
+
 $command = str_replace("{OUTPUT}", $job_path, $command);
 $command = str_replace("{FEED_ID}", $feed_id, $command);
 $command = str_replace("{USER_ID}", $user_id, $command);
@@ -239,24 +255,13 @@ FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 // append the log files to the command
 $command .= ' >> '.$job_path_output.'/chris.std 2> '.$job_path_output.'/chris.err';
 
-// create the chris.env and chris.run file
+
+//
+// create the file containing some chris env variables
+// and fill it
+//
+
 $envfile = joinPaths($job_path_output, 'chris.env');
-$runfile = joinPaths($job_path_output, 'chris.run');
-
-// dprint($of, "command = $command\n");
-// dprint($of, "runfile = $runfile\n");
-
-
-$setStatus = '';
-// retry 5 times with a 5 seconds delay
-// connection timeout: 5s
-// max query time: 30
-if ($status != 100) {
-//  $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
-  $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl -k --data ';
-}
-
-// also the actual chris.run dir
 $ssh->exec('bash -c \' echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$envfile.'\'');
 $ssh->exec('bash -c \' echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile.'\'');
 $ssh->exec('bash -c \' echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile.'\'');
@@ -266,28 +271,73 @@ $ssh->exec('bash -c \' echo "export ENV_REMOTEUSERIDENTITY='.$user_key_file.'" >
 
 $ssh->exec('bash -c \' echo "umask 0002" >> '.$envfile.'\'');
 
+
+//
+// create the file containing some chris run commannds
+// and fill it
+// 1- source en
+// 2- set status to 1
+// 3- log date/hostname
+// 4- run plugin
+// 5- generate json scene for the viewer
+// 6- set status to 100
+// 7- update permissions of the files
+//
+
+$runfile = joinPaths($job_path_output, 'chris.run');
+
+// the set status command, to update a job status through curl
+$setStatus = '';
+// retry 5 times with a 5 seconds delay
+// connection timeout: 5s
+// max query time: 30
+if ($status != 100) {
+//  $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
+  $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl -k --data ';
+}
+
+// 1- source the environment
 $ssh->exec('bash -c \' echo "source '.$envfile.';" >> '.$runfile.'\'');
 
+// 2- set status to 1 if necessary
+// status == 1 means the job has started
+// status == 100 means this a 'non-blocking' plugin that is just gonna run without scheduling
+// this is defined in the plugin's configuration
+// for instance, the file_browser is a non-blocking plugin
 if($status != 100){
   $start_token = TokenC::create();
   $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" >> '.$runfile);
 }
 
+// 3- log to the chris.std the time and machine on which the plugin is running (useful for debugging)
 $ssh->exec('bash -c \'echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$job_path_output.'/chris.std" >> '.$runfile.'\'');
+
+// 4- run the actual plugin
 $ssh->exec('bash -c \' echo "'.$command.'" >> '.$runfile.'\'');
 
-// generate the db.json file
+// 5- generate the db.json file
+// it generates a scene for the job after is finishes. It is useful for the viewer plugin.
+// it is useful performance-wise because if this file already exists, we do not have to re-generate it in javascript when we open the viewer plugin.
 // to generate the db.json, we just call the viewer plugin with the correct input and ouput directories, $feed_path
 $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
 $ssh->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
+// 6- set status to 100 if necessary
+// status == 100 means the job has finished
 if($status != 100){
   $end_token = TokenC::create();
   $ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
 }
 
-// make sure to update file permissions
+// 7- make sure to update file permissions
 $ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
+
+
+//
+// the chris.run is ready now
+// execute the chris.run how it is supposed to (local, remote, as chris, etc.)
+// update the chris.run file permissions to be executable
+//
 
 $ssh->exec("chmod o+rx,g+rx $runfile");
 
