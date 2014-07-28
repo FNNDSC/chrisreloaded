@@ -181,6 +181,7 @@ if ($commandline_mode) {
 
 //
 // get the name of the executable as plugin name
+// get the list of parameters
 //
 
 $plugin_command_array = explode ( ' ' , $command );
@@ -191,6 +192,20 @@ $parameters = implode(' ', $plugin_command_array);
 
 
 //
+// initiate ssh connection
+//
+
+$force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
+$host = CLUSTER_HOST;
+if ($status == 100 || $force_chris_local) {
+  $host = 'localhost';
+}
+$ssh = new Net_SSH2($host);
+if (!$ssh->login($username, $password)) {
+  die('Login Failed');
+}
+
+//
 // get user if from username
 //
 
@@ -199,6 +214,7 @@ $user_id = UserC::getID($username);
 
 //
 // create the feed if first batch job
+// if $feed_id has already been defined (bash job), we do not generate a new id
 //
 
 if($feed_id == -1){
@@ -218,18 +234,6 @@ $feed_path = joinPaths($plugin_path, $feedname.'-'.$feed_id);
 $job_path = $feed_path;
 if($jobid != ''){
   $job_path .= '/'.$jobid;
-}
-
-// Setup directories (including ssh/host vars)
-// do we force this plugin to run locally as chris?
-$force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
-$host = CLUSTER_HOST;
-if ($status == 100 || $force_chris_local) {
-  $host = 'localhost';
-}
-$ssh = new Net_SSH2($host);
-if (!$ssh->login($username, $password)) {
-  die('Login Failed');
 }
 
 $job_path_output = createDir($ssh, $job_path, '');
