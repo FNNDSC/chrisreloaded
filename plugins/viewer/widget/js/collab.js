@@ -35,7 +35,7 @@ collab.Collab.prototype.updateButton = function(){
 
 	// hide the sharing link
 	jQuery('#togetherjs-share-button').hide();
-	
+
   // apply style
   var jButton = jQuery('.collaborate-btn > button');
 
@@ -94,6 +94,7 @@ collab.Collab.prototype.init = function(){
             // clean up callbacks
             // required if not next time we will have 2 ready & close callbacks
             TogetherJS._listeners = {};
+						TogetherJS.hub._listeners = {};
             // cleanup room ID
             // required, if not tries to go to previous room
             self.updateButton();
