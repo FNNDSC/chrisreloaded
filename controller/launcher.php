@@ -213,7 +213,7 @@ $user_id = UserC::getID($username);
 
 
 //
-// create the feed if first batch job
+// create the feed in the database if first batch job
 // if $feed_id has already been defined (bash job), we do not generate a new id
 //
 
@@ -251,17 +251,20 @@ $parameters = str_replace("{OUTPUT}", $job_path, $parameters);
 $parameters = str_replace("{FEED_ID}", $feed_id, $parameters);
 $parameters = str_replace("{USER_ID}", $user_id, $parameters);
 
-// add meta information to the feed
-FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
-// add owner
-FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
-
 // append the log files to the command
 $command .= ' >> '.$job_path_output.'/chris.std 2> '.$job_path_output.'/chris.err';
 
 
+// 
+// add meta information to the feed in the database
 //
-// create the file containing some chris env variables
+
+FeedC::addMetaS($feed_id, 'parameters', $parameters, 'simple');
+FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
+
+
+//
+// create the file containing the chris env variables which are required by the plugin
 // and fill it
 //
 
@@ -277,7 +280,7 @@ $ssh->exec('bash -c \' echo "umask 0002" >> '.$envfile.'\'');
 
 
 //
-// create the file containing some chris run commannds
+// create the file containing the chris run commannds
 // and fill it
 // 1- source en
 // 2- set status to 1
