@@ -218,10 +218,10 @@ $ssh = new Net_SSH2($host);
 if (!$ssh->login($username, $password)) {
   die('Login Failed');
 }
-$ssh->exec('umask 0002 ; mkdir -p '.$job_path);
-// dprint($of, "job_path = $job_path\n");
-$job_path_output = tempdir($ssh, $job_path);
-// dprint($of, "job_path_output = $job_path_output\n");
+// create job directory and chris_run directory
+// createDir is a utility function provided by controller/_util.inc.php
+$job_path_output = createDir($ssh, $job_path, '');
+$job_path_output = createDir($ssh, $job_path);
 
 // replace ${OUTPUT} pattern in the command and in the parameters
 $command = str_replace("{OUTPUT}", $job_path, $command);

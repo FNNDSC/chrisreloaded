@@ -194,11 +194,9 @@ function getConfiguration(){
     return $config;
   }
 
-# Create and return a unique temp dir in $dir with $prefix
-function tempdir(&$ssh, $dir = false, $prefix = '_chrisRun_') {
-    // $dirname  = uniqid($prefix, false);
-    $dirname  = $prefix;
-    $tempdir  = joinPaths($dir, $dirname);
+# Create and return dir in $prefix with $prefix
+function createDir(&$ssh, $prefix = '', $suffix = '_chrisRun_') {
+    $tempdir  = joinPaths($prefix, $suffix);
     $message = $ssh->exec('bash -c \'umask 0002 ; mkdir -p '.$tempdir.'\'');
     # empty return message on mkdir means success
     if ($message == '') { return $tempdir; }
