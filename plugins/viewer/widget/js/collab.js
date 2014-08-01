@@ -38,16 +38,25 @@ collab.Collab.prototype.updateButton = function(){
 
   // apply style
   var jButton = jQuery('.collaborate-btn > button');
+  var jRenderersContainer = jQuery('.renderersContainer');
+
 
   if(jButton.hasClass('collaborating')){
     jButton.removeClass('collaborating');
+    jRenderersContainer.removeClass('collaborating');
   }
   else{
     jButton.addClass('collaborating');
+    jRenderersContainer.addClass('collaborating');
   }
 
   // set content
   this.setButtonContent();
+
+  // trigger resize event instead ( Interactive plugin might need it, i.e. Renderer3D)
+  var ev = document.createEvent('Event');
+  ev.initEvent('resize', true, true);
+  window.dispatchEvent(ev);
 }
 
 collab.Collab.prototype.setButtonContent = function(){

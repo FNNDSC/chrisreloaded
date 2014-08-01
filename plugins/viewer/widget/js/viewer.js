@@ -147,9 +147,37 @@ viewer.Viewer.prototype.create2DRenderer = function(container, orientation) {
   this[container].interactor.addEventListener(X.event.events.ROTATE,
       function(){self.updateSceneView();self.collaborator.send('volumeInformationSent', self.getVolumeInformation());});
   this[container].interactor.addEventListener(X.event.events.ZOOM,
-      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view, container);});
+      function(){
+        var newView = new Float32Array(self[container].camera.view);
+        var cont = document.getElementById(container).firstChild;
+
+        newView[12] = newView[12]/cont.offsetWidth;
+        newView[13]=  newView[13]/cont.offsetHeight;
+
+
+
+        self.onCameraViewChange(newView, container);
+        window.console.log('local');
+        window.console.log(self[container].camera.view);
+        window.console.log('remote');
+        window.console.log(newView);
+      });
   this[container].interactor.addEventListener(X.event.events.PAN,
-      function(){self.updateSceneView();self.onCameraViewChange(self[container].camera.view, container);});
+      function(){
+        var newView = new Float32Array(self[container].camera.view);
+        var cont = document.getElementById(container).firstChild;
+
+        newView[12] = newView[12]/cont.offsetWidth;
+        newView[13]=  newView[13]/cont.offsetHeight;
+
+
+
+        self.onCameraViewChange(newView, container);
+        window.console.log('local');
+        window.console.log(self[container].camera.view);
+        window.console.log('remote');
+        window.console.log(newView);
+      });
 }
 
 
@@ -352,7 +380,6 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     customContainer.appendChild(gui.domElement);
     this.volWidget.container = customContainer;
     this.volWidget.view = gui.addFolder('View');
-    $('.interactive_plugin_content').css("background-color", "#000");
     this.volWidget.interaction = gui.addFolder('Interaction');
     this.populateVolWidget();
 }
@@ -813,7 +840,6 @@ viewer.Viewer.prototype.onCameraViewChange = function(dataObj, container){
   this.collaborator.send('cameraViewChanged', {data:dataObj, cont: container});
 }
 
-
 // remote camera view change handler
 viewer.Viewer.prototype.onRemoteCameraViewChange = function(msgObj){
 
@@ -822,9 +848,18 @@ viewer.Viewer.prototype.onRemoteCameraViewChange = function(msgObj){
 
   var obj = JSON.parse(msgObj.data);
   var arr = $.map(obj.data, function(el) { return el; });
+
+// adjust padding
+  if(obj.cont != 'vol3D'){
+        var cont = document.getElementById(obj.cont).firstChild;
+
+        arr[12] = arr[12]*cont.offsetWidth;
+        arr[13]=  arr[13]*cont.offsetHeight;
+  
+  }
+
   this[obj.cont].camera.view = new Float32Array(arr);
 }
-
 
 viewer.Viewer.prototype.destroy = function(){
     // destroy the fancy tree

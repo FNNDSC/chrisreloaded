@@ -8,7 +8,7 @@
 	box-sizing: border-box;
 	overflow:hidden;
 }
-
+/* regular */
 .largeRenderer{
 	width:100%;
 	height:70%;
@@ -17,6 +17,24 @@
 
 .smallRenderers{
 	height:30%;
+	width:100%;
+}
+
+/*collaborating - must enforce ratio for pointer accuracy*/
+#center.expanded .renderersContainer.collaborating {
+	display:table;
+	margin: auto;
+}
+
+#center.expanded .collaborating .largeRenderer{
+	height:calc(70vmin - 100px);
+	width:calc(150vmin - 20px - 20px);
+	position:relative;
+}
+
+#center.expanded .collaborating .smallRenderers{
+	height:calc(30vmin - 30px);
+	width:calc(150vmin - 20px - 20px);
 }
 
 .xSmallRenderer{
