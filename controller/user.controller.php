@@ -38,6 +38,8 @@ require_once ('Net/SSH2.php');
 // interface
 interface UserControllerInterface
 {
+  // Get the Group ID for Chris user (assumed to be the same for all Chris users)
+  static public function getGroupId();
   // Get the User ID for a username
   static public function getID($username);
   // Get all users
@@ -56,7 +58,22 @@ interface UserControllerInterface
  * Feed controller class
  */
 class UserC implements UserControllerInterface {
+  /**
+   * Chris group id.
+   */
+  static private $groupId = null;
 
+  /**
+   * Get Chris group id.
+   * @return int
+   */
+  static public function getGroupId() {
+    if (self::$groupId == null) {
+      self::$groupId = shell_exec('id -g');
+    }
+    return self::$groupId;
+  }
+  
   /**
    * Get user id from username. Returns -1 if no match.
    * @return int
