@@ -193,7 +193,7 @@ class UserC implements UserControllerInterface {
     // generate ssh key for passwordless ssh  (if does't exist)
     $user_key_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_SSHKEY);
     if(!file_exists($user_key_file)){
-        
+
       $ssh->exec('ssh-keygen -t rsa -N "" -f '.$user_key_file.';');
 
     }
@@ -203,7 +203,7 @@ class UserC implements UserControllerInterface {
 
     // make sure the permissions are correct to allow ssh with id_rsa
     $ssh->exec('chmod go-w ~/.ssh;chmod 600 ~/.ssh/authorized_keys;chown `whoami` ~/.ssh/authorized_keys;');
- 
+
  }
 
   /**
@@ -249,4 +249,22 @@ class UserC implements UserControllerInterface {
   }
 
 }
+
+function remoteDirExists(&$ssh, $dirName) {
+  $cmd = 'if [ -d "'.$dirName.'" ]; then echo "found!"; fi';
+  if ($ssh->exec($cmd)) {
+    return true;
+  }
+  return false;
+}
+
+function remoteFileExists(&$ssh, $fileName) {
+  $cmd = 'if [ -f "'.$fileName.'" ]; then echo "found!"; fi';
+  if ($ssh->exec($cmd)) {
+    return true;
+  }
+  return false;
+}
+
+
 ?>
