@@ -1,0 +1,8 @@
+Update submodule phpseclib with upstream repository
+ 1-Change the current working directory to your local project.
+ 2-git clone https://github.com/FNNDSC/phpseclib.git
+ 3-git remote add upstream https://github.com/phpseclib/phpseclib.git
+ 4-git fetch upstream (Fetch the branches and their respective commits from the upstream repository. Commits to master will be stored in a local branch, upstream/master).
+ 5-git checkout master (Check out your fork's local master branch)
+ 6-git merge upstream/master
+ 7-git push origin master
