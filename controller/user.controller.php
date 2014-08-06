@@ -165,6 +165,10 @@ class UserC implements UserControllerInterface {
         $sshLocal->exec('cd / ; tar -zxf '.$userHomeDir.'/ssh.tar.gz;');
         $sshLocal->exec('rm '.$userHomeDir.'/ssh.tar.gz;');
       }
+      //this errases the compressed file from the cluster (Chris interface doesn't work properly).
+      /*if (remoteFileExists($ssh, $userHomeDir.'/ssh.tar.gz')) {
+        $ssh->exec('rm '.$userHomeDir.'/ssh.tar.gz;');
+      }*/
 
       return $user;
     }
@@ -241,9 +245,6 @@ class UserC implements UserControllerInterface {
     $ssh->exec('tar -zcf ssh.tar.gz ~/.ssh;');
     $scp = new Net_SCP($ssh);
     $scp->get('~/ssh.tar.gz', $userHomeDir.'/ssh.tar.gz');
-    //The next errases the compressed file from the cluster after some time. We need to wait some
-    //time so we have time to decompress it in the VM when both the cluster and the VM share the same file system
-    $ssh->exec('(sleep 60 ; rm ~/ssh.tar.gz;) &');
 
     return $userHomeDir;
  }
