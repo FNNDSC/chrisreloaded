@@ -226,7 +226,6 @@ class UserC implements UserControllerInterface {
     // generate ssh key for passwordless ssh  (if does't exist)
     $keyDir = joinPaths($userHomeDir,'.ssh');
     $user_key_file = joinPaths($keyDir, CHRIS_USERS_CONFIG_SSHKEY);
-    file_put_contents ('/neuro/users/chris/userhome.txt', $user_key_file);
     if(!file_exists($user_key_file)){
       if (!remoteDirExists($ssh, $keyDir)) {
         $ssh->exec('mkdir -p '.$keyDir.';');
