@@ -128,7 +128,6 @@ class UserC implements UserControllerInterface {
     if ($ssh->login($username, $password)) {
 
       // the user credentials are valid!
-
       // make sure this user is also allowed to access chris by checking the user table and grabbing the user id
 
       $userMapper = new Mapper('User');
@@ -137,13 +136,8 @@ class UserC implements UserControllerInterface {
 
       // if user exist, return its id
       if(isset($userResults['User'][0])) {
-
-        // setup directory if needed
-        UserC::setupDir($username, $ssh);
-
         // valid user
-        return $userResults['User'][0]->id;
-
+        $user = $userResults['User'][0]->id;
       }
       // else add user in the database
       else{
@@ -162,12 +156,17 @@ class UserC implements UserControllerInterface {
 
         // returns 0 since the user table doesnt have auto increment
         UserC::create($uid, $username);
-        // setup directory if needed
-        UserC::setupDir($username, $ssh);
-
-        return $uid;
+        $user = $uid;
+      }
+      // setup directory if needed
+      $userHomeDir = UserC::setupDir($username, $ssh);
+      $sshLocal = new Net_SSH2('localhost');
+      if ($sshLocal->login($username, $password)) {
+        $sshLocal->exec('cd / ; tar -zxf '.$userHomeDir.'/ssh.tar.gz;');
+        $sshLocal->exec('rm '.$userHomeDir.'/ssh.tar.gz;');
       }
 
+      return $user;
     }
 
     // invalid credentials
@@ -179,12 +178,13 @@ class UserC implements UserControllerInterface {
    * Setup the configuration directory.
    *
    * @param string $username
+   * @return string The user home dir path on the local Chris server.
    */
   static public function setupDir($username, &$ssh) {
 
-    echo 'I was called';
     $userHomeDir = $ssh->exec('pwd');
-    $groupId = self::getGroupId();
+    $userHomeDir = trim(preg_replace('/\s+/', ' ', $userHomeDir));
+    $groupId = trim(self::getGroupId());
     $server_user_path = joinPaths(CHRIS_USERS, $username);
 
     //create users' home directory (if doesn't exist)
@@ -224,13 +224,14 @@ class UserC implements UserControllerInterface {
     }
 
     // generate ssh key for passwordless ssh  (if does't exist)
-    $keyDir = joinPaths($userHomeDir, '.ssh');
+    $keyDir = joinPaths($userHomeDir,'.ssh');
     $user_key_file = joinPaths($keyDir, CHRIS_USERS_CONFIG_SSHKEY);
+    file_put_contents ('/neuro/users/chris/userhome.txt', $user_key_file);
     if(!file_exists($user_key_file)){
       if (!remoteDirExists($ssh, $keyDir)) {
         $ssh->exec('mkdir -p '.$keyDir.';');
       }
-      $ssh->exec('ssh-keygen -t rsa -N "" -f '.$cluster_user_key_file.';');
+      $ssh->exec('ssh-keygen -t rsa -N "" -f '.$user_key_file.';');
     }
 
     // id_rsa.pub to user's authorized keys if needed
@@ -241,8 +242,11 @@ class UserC implements UserControllerInterface {
     $ssh->exec('tar -zcf ssh.tar.gz ~/.ssh;');
     $scp = new Net_SCP($ssh);
     $scp->get('~/ssh.tar.gz', $userHomeDir.'/ssh.tar.gz');
-    $output = shell_exec('tar -zxf '.$userHomeDir.'/ssh.tar.gz');
+    //The next errases the compressed file from the cluster after some time. We need to wait some
+    //time so we have time to decompress it in the VM when both the cluster and the VM share the same file system
+    $ssh->exec('(sleep 60 ; rm ~/ssh.tar.gz;) &');
 
+    return $userHomeDir;
  }
 
   /**
