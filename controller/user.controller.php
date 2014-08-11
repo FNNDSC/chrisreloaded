@@ -165,10 +165,14 @@ class UserC implements UserControllerInterface {
         $sshLocal->exec('cd / ; tar -zxf '.$userHomeDir.'/ssh.tar.gz;');
         $sshLocal->exec('rm '.$userHomeDir.'/ssh.tar.gz;');
       }
-      //this errases the compressed file from the cluster (Chris interface doesn't work properly).
-      /*if (remoteFileExists($ssh, $userHomeDir.'/ssh.tar.gz')) {
-        $ssh->exec('rm '.$userHomeDir.'/ssh.tar.gz;');
-      }*/
+      // the next erases the compressed file from the cluster; we need to create a new connection
+      // object because using the already created $ssh doesn't work, maybe its connection times out at this point
+      $ssh1 = new Net_SSH2(CLUSTER_HOST);
+      if ($ssh1->login($username, $password)) {
+        if (remoteFileExists($ssh1, $userHomeDir.'/ssh.tar.gz')) {
+          $ssh1->exec('rm '.$userHomeDir.'/ssh.tar.gz;');
+        }
+      }
 
       return $user;
     }
@@ -179,7 +183,7 @@ class UserC implements UserControllerInterface {
   }
 
   /**
-   * Setup the configuration directory.
+   * Setup the configuration and home directories.
    *
    * @param string $username
    * @return string The user home dir path on the local Chris server.
@@ -187,6 +191,7 @@ class UserC implements UserControllerInterface {
   static public function setupDir($username, &$ssh) {
 
     $userHomeDir = $ssh->exec('pwd');
+    //remove EOL and white spaces
     $userHomeDir = trim(preg_replace('/\s+/', ' ', $userHomeDir));
     $groupId = trim(self::getGroupId());
     $server_user_path = joinPaths(CHRIS_USERS, $username);
@@ -200,7 +205,6 @@ class UserC implements UserControllerInterface {
 
     // create user directory within Chris (if does't exist)
     if(!file_exists($server_user_path)){
-
       mkdir($server_user_path, 0775);
       chown($server_user_path, $username);
       chgrp($server_user_path, $groupId);
@@ -210,7 +214,6 @@ class UserC implements UserControllerInterface {
     // create users' config directory  (if does't exist)
     $user_config_path = joinPaths($server_user_path, CHRIS_USERS_CONFIG_DIR);
     if(!file_exists($user_config_path)){
-
       mkdir($user_config_path, 0775);
       chown($user_config_path, $username);
       chgrp($user_config_path, $groupId);
@@ -241,8 +244,9 @@ class UserC implements UserControllerInterface {
     $ssh->exec('/bin/bash -c "(cat ~/.ssh/authorized_keys | grep \"$(cat '.$user_key_file.'.pub)\") || (cat '.$user_key_file.'.pub >> ~/.ssh/authorized_keys;ssh-add;)"');
     // make sure the permissions are correct to allow ssh with id_rsa
     $ssh->exec('chmod go-w ~/.ssh;chmod 600 ~/.ssh/authorized_keys;chown `whoami` ~/.ssh/authorized_keys;');
-    //Compress .ssh dir
+    //compress .ssh dir
     $ssh->exec('tar -zcf ssh.tar.gz ~/.ssh;');
+    //copy over the compressed file to the local server
     $scp = new Net_SCP($ssh);
     $scp->get('~/ssh.tar.gz', $userHomeDir.'/ssh.tar.gz');
 
