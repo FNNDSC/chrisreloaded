@@ -70,7 +70,7 @@ class UserC implements UserControllerInterface {
    */
   static public function getGroupId() {
     if (self::$groupId == null) {
-      self::$groupId = shell_exec('id -g');
+      self::$groupId = trim(shell_exec('id -g'));
     }
     return self::$groupId;
   }
@@ -193,7 +193,7 @@ class UserC implements UserControllerInterface {
     $userHomeDir = $ssh->exec('pwd');
     //remove EOL and white spaces
     $userHomeDir = trim(preg_replace('/\s+/', ' ', $userHomeDir));
-    $groupId = trim(self::getGroupId());
+    $groupId = self::getGroupId();
     $server_user_path = joinPaths(CHRIS_USERS, $username);
 
     //create users' home directory (if doesn't exist)
