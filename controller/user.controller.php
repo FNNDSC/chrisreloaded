@@ -297,21 +297,5 @@ class UserC implements UserControllerInterface {
 
 }
 
-function remoteDirExists(&$ssh, $dirName) {
-  $cmd = 'if [ -d "'.$dirName.'" ]; then echo "found!"; fi';
-  if ($ssh->exec($cmd)) {
-    return true;
-  }
-  return false;
-}
-
-function remoteFileExists(&$ssh, $fileName) {
-  $cmd = 'if [ -f "'.$fileName.'" ]; then echo "found!"; fi';
-  if ($ssh->exec($cmd)) {
-    return true;
-  }
-  return false;
-}
-
 
 ?>
