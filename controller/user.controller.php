@@ -174,7 +174,7 @@ class UserC implements UserControllerInterface {
         $sshCluster = new Net_SSH2(CLUSTER_HOST);
         $sshCluster->login($username, $password);
         if (remoteFileExists($sshCluster, $userHomeDir.'/ssh.tar.gz')) {
-          $sshCluster->exec('rm '.$userHomeDir.'/ssh.tar.gz;');
+          $sshCluster->exec('rm '.$userHomeDir.'/ssh.tar.gz &');
         }
 
       } else {
