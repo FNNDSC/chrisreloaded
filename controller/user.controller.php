@@ -133,7 +133,7 @@ class UserC implements UserControllerInterface {
         }
         // else add user in the database
         else{
-          $uid = $sshLocal->exec('id -u '.$username);
+          $uid = $sshLocal->exec(bash('id -u '.$username));
 
           $report = "=========================================". PHP_EOL;
           $report .= date('Y-m-d h:i:s'). ' ---> New user logging in...'. PHP_EOL;
@@ -160,21 +160,21 @@ class UserC implements UserControllerInterface {
         $sshCluster->login($username, $password);
 
         // compress .ssh dir
-        $sshCluster->exec('tar -zcf ssh.tar.gz ~/.ssh;');
+        $sshCluster->exec(bash('tar -zcf ssh.tar.gz ~/.ssh;'));
 
         // copy over the compressed file to the local server,
         $scp = new Net_SCP($sshCluster);
         $scp->get('~/ssh.tar.gz', $userHomeDir.'/ssh.tar.gz');
 
         // uncompress and remove ssh.tar.gz on the local server
-        $sshLocal->exec('cd / ; tar -zxf '.$userHomeDir.'/ssh.tar.gz;');
-        $sshLocal->exec('rm '.$userHomeDir.'/ssh.tar.gz;');
+        $sshLocal->exec(bash('cd / ; tar -zxf '.$userHomeDir.'/ssh.tar.gz;'));
+        $sshLocal->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz;'));
 
         // remove ssh.tar.gz from the cluster
         $sshCluster = new Net_SSH2(CLUSTER_HOST);
         $sshCluster->login($username, $password);
         if (remoteFileExists($sshCluster, $userHomeDir.'/ssh.tar.gz')) {
-          $sshCluster->exec('rm '.$userHomeDir.'/ssh.tar.gz &');
+          $sshCluster->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz &'));
         }
 
       } else {
@@ -198,7 +198,7 @@ class UserC implements UserControllerInterface {
   */
   static public function setupClusterDir(&$ssh) {
 
-    $userHomeDir = $ssh->exec('pwd');
+    $userHomeDir = $ssh->exec(bash('pwd'));
     //remove EOL and white spaces
     $userHomeDir = trim(preg_replace('/\s+/', ' ', $userHomeDir));
 
@@ -207,9 +207,9 @@ class UserC implements UserControllerInterface {
     $user_key_file = joinPaths($keyDir, CHRIS_USERS_CONFIG_SSHKEY);
     if(!file_exists($user_key_file)){
       if (!remoteDirExists($ssh, $keyDir)) {
-        $ssh->exec('mkdir -p '.$keyDir.';');
+        $ssh->exec(bash('mkdir -p '.$keyDir.';'));
       }
-      $ssh->exec('ssh-keygen -t rsa -N "" -f '.$user_key_file.';');
+      $ssh->exec(bash('ssh-keygen -t rsa -N "" -f '.$user_key_file.';'));
     }
 
     // id_rsa.pub to user's authorized keys if needed

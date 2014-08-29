@@ -212,13 +212,18 @@ function remoteDirExists(&$ssh, $dirName) {
   return false;
 }
 
-# assesses whether or not a file exists 
+# assesses whether or not a file exists
 function remoteFileExists(&$ssh, $fileName) {
   $cmd = 'if [ -f "'.$fileName.'" ]; then echo "found!"; fi';
   if ($ssh->exec($cmd)) {
     return true;
   }
   return false;
+}
+
+# embeds input command string within a bash wrapper string
+function bash($cmd) {
+  return 'bash -c \''.$cmd.'\'';
 }
 
 # Simple debug console that writes $content to $outstem.

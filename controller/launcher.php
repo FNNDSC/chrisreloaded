@@ -271,14 +271,14 @@ FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 //
 
 $envfile = joinPaths($job_path_output, 'chris.env');
-$sshLocal->exec('bash -c \' echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$envfile.'\'');
-$sshLocal->exec('bash -c \' echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile.'\'');
-$sshLocal->exec('bash -c \' echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile.'\'');
-$sshLocal->exec('bash -c \' echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile.'\'');
+$sshLocal->exec(bash('echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile));
 $user_key_file = joinPaths(CHRIS_USERS, $username, CHRIS_USERS_CONFIG_DIR, CHRIS_USERS_CONFIG_SSHKEY);
-$sshLocal->exec('bash -c \' echo "export ENV_REMOTEUSERIDENTITY='.$user_key_file.'" >>  '.$envfile.'\'');
+$sshLocal->exec(bash('echo "export ENV_REMOTEUSERIDENTITY='.$user_key_file.'" >>  '.$envfile));
 
-$sshLocal->exec('bash -c \' echo "umask 0002" >> '.$envfile.'\'');
+$sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 
 
 //
@@ -306,7 +306,7 @@ if ($status != 100) {
 }
 
 // 1- source the environment
-$sshLocal->exec('bash -c \' echo "source '.$envfile.';" >> '.$runfile.'\'');
+$sshLocal->exec(bash('echo "source '.$envfile.';" >> '.$runfile));
 
 // 2- set status to 1 if necessary
 // status == 1 means the job has started
@@ -315,14 +315,14 @@ $sshLocal->exec('bash -c \' echo "source '.$envfile.';" >> '.$runfile.'\'');
 // for instance, the file_browser is a non-blocking plugin
 if($status != 100){
   $start_token = TokenC::create();
-  $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" >> '.$runfile);
+  $sshLocal->exec(bash('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" >> '.$runfile));
 }
 
 // 3- log to the chris.std the time and machine on which the plugin is running (useful for debugging)
-$sshLocal->exec('bash -c \'echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$job_path_output.'/chris.std" >> '.$runfile.'\'');
+$sshLocal->exec(bash('echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$job_path_output.'/chris.std" >> '.$runfile));
 
 // 4- run the actual plugin
-$sshLocal->exec('bash -c \' echo "'.$command.'" >> '.$runfile.'\'');
+$sshLocal->exec(bash('echo "'.$command.'" >> '.$runfile));
 
 // 5- generate the db.json file
 // it generates a scene for the job after is finishes. It is useful for the viewer plugin.
@@ -403,36 +403,37 @@ else
   $envfile_str = file_get_contents($envfile);
   $envfile_str = str_replace($job_path_output, $cluster_job_path_output, $envfile_str);
   $envfile = joinPaths($cluster_job_path_output, 'chris.env');
-  $sshCluster->exec('echo "'.$envfile_str.'"'.' > '.$envfile);
+  $sshCluster->exec(bash('echo "'.$envfile_str.'"'.' > '.$envfile));
   // replace output paths in chris.run
   $runfile_str = file_get_contents($runfile);
   $runfile_str = str_replace($job_path, $cluster_job_path, $runfile_str);
   $runfile_str = str_replace($job_path_output, $cluster_job_path_output, $runfile_str);
   $runfile = joinPaths($cluster_job_path_output, 'chris.run');
-  $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
+  $sshCluster->exec(bash('echo "'.$runfile_str.'"'.' > '.$runfile));
 
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
   $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
   $cluster_command = str_replace("{COMMAND}", "/bin/bash ".$runfile, $cluster_command);
-  $pid = $sshCluster->exec('bash -c \''.$cluster_command.'\'');
+  //dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command.'\'');
+  $pid = $sshCluster->exec(bash($cluster_command));
 
   // compress $cluster_job_path dir
   $output = basename($cluster_job_path);
-  $sshCluster->exec('cd '.$cluster_feed_path.'; tar -zcf '.$output.'.tar.gz '.$output);
+  $sshCluster->exec(bash('cd '.$cluster_feed_path.'; tar -zcf '.$output.'.tar.gz '.$output));
 
   // copy over the compressed file to the local server,
   $scp = new Net_SCP($sshCluster);
   $scp->get($cluster_feed_path.'/'.$output.'.tar.gz', $feed_path.'/'.$output.'.tar.gz');
 
   // uncompress and remove the compressed file on the local server
-  $sshLocal->exec('cd '.$feed_path.'; tar -zxf '.$output.'.tar.gz;');
-  $sshLocal->exec('cd '.$feed_path.'; rm '.$output.'.tar.gz;');
+  $sshLocal->exec(bash('cd '.$feed_path.'; tar -zxf '.$output.'.tar.gz;'));
+  $sshLocal->exec(bash('cd '.$feed_path.'; rm '.$output.'.tar.gz;'));
 
   // remove compressed file from the cluster
   $sshCluster = new Net_SSH2(CLUSTER_HOST);
   $sshCluster->login($username, $password);
   if (remoteFileExists($sshCluster, $output.'.tar.gz')) {
-    $sshCluster->exec('cd '.$cluster_feed_path.'; rm '.$output.'.tar.gz &');
+    $sshCluster->exec(bash('cd '.$cluster_feed_path.'; rm '.$output.'.tar.gz &'));
   }
 }
 
