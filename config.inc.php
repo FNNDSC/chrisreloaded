@@ -201,7 +201,7 @@ define('SQL_USERNAME', 'chris');
 /**
  * The SQL User password.
  */
-define('SQL_PASSWORD', 'YOURPASSWORD');
+define('SQL_PASSWORD', 'chris1234');
 /**
  * The SQL Database.
  * The name of the database which contains all the ChRIS information.
