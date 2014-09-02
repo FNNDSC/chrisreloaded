@@ -315,7 +315,7 @@ $sshLocal->exec(bash('echo "source '.$envfile.';" >> '.$runfile));
 // for instance, the file_browser is a non-blocking plugin
 if($status != 100){
   $start_token = TokenC::create();
-  $sshLocal->exec(bash('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" >> '.$runfile));
+  $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" >> '.$runfile);
 }
 
 // 3- log to the chris.std the time and machine on which the plugin is running (useful for debugging)
