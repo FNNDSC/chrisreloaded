@@ -403,38 +403,42 @@ else
   $envfile_str = file_get_contents($envfile);
   $envfile_str = str_replace($job_path_output, $cluster_job_path_output, $envfile_str);
   $envfile = joinPaths($cluster_job_path_output, 'chris.env');
-  $sshCluster->exec(bash('echo "'.$envfile_str.'"'.' > '.$envfile));
+  $sshCluster->exec('echo "'.$envfile_str.'"'.' > '.$envfile);
+
   // replace output paths in chris.run
   $runfile_str = file_get_contents($runfile);
   $runfile_str = str_replace($job_path, $cluster_job_path, $runfile_str);
   $runfile_str = str_replace($job_path_output, $cluster_job_path_output, $runfile_str);
+
+  // command to compress $cluster_job_path dir
+  $output = basename($cluster_job_path);
+  $cmd = 'cd '.$cluster_feed_path.'; tar -zcf '.$output.'.tar.gz '.$output.';';
+  $runfile_str = $runfile_str.$cmd;
+
+  // command to copy over the compressed file to the local server
+  $cmd = 'scp ' . $cluster_feed_path.'/'.$output.'.tar.gz ' . $username.'@'.CHRIS_HOST.':'.$feed_path.';';
+  $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+  // command to uncompress and remove the compressed file on the local server
+  $cmd = 'cd '.$feed_path.'; tar -zxf '.$output.'.tar.gz; rm '.$output.'.tar.gz;';
+  $cmd = 'ssh ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
+  $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+  // command to remove compressed file from the cluster
+  $cmd = 'cd '.$cluster_feed_path.'; rm '.$output.'.tar.gz &';
+  $cmd = 'ssh ' . $username.'@localhost '.$cmd;
+  $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+  //dprint('/neuro/users/chris/console.log', $runfile_str);
+
   $runfile = joinPaths($cluster_job_path_output, 'chris.run');
-  $sshCluster->exec(bash('echo "'.$runfile_str.'"'.' > '.$runfile));
+  $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
 
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
   $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
   $cluster_command = str_replace("{COMMAND}", "/bin/bash ".$runfile, $cluster_command);
-  //dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command.'\'');
+  //dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command . " &".'\'');
   $pid = $sshCluster->exec(bash($cluster_command));
-
-  // compress $cluster_job_path dir
-  $output = basename($cluster_job_path);
-  $sshCluster->exec(bash('cd '.$cluster_feed_path.'; tar -zcf '.$output.'.tar.gz '.$output));
-
-  // copy over the compressed file to the local server,
-  $scp = new Net_SCP($sshCluster);
-  $scp->get($cluster_feed_path.'/'.$output.'.tar.gz', $feed_path.'/'.$output.'.tar.gz');
-
-  // uncompress and remove the compressed file on the local server
-  $sshLocal->exec(bash('cd '.$feed_path.'; tar -zxf '.$output.'.tar.gz;'));
-  $sshLocal->exec(bash('cd '.$feed_path.'; rm '.$output.'.tar.gz;'));
-
-  // remove compressed file from the cluster
-  $sshCluster = new Net_SSH2(CLUSTER_HOST);
-  $sshCluster->login($username, $password);
-  if (remoteFileExists($sshCluster, $output.'.tar.gz')) {
-    $sshCluster->exec(bash('cd '.$cluster_feed_path.'; rm '.$output.'.tar.gz &'));
-  }
 }
 
 // attach pid to feed
