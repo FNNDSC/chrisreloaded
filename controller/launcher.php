@@ -420,13 +420,12 @@ else
   $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
   // command to uncompress and remove the compressed file on the local server
-  $cmd = 'cd '.$feed_path.'; tar -zxf '.$output.'.tar.gz; rm '.$output.'.tar.gz;';
-  $cmd = 'ssh ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
+  $cmd = '\"cd '.$feed_path.'; tar -zxf '.$output.'.tar.gz; rm '.$output.'.tar.gz;\"';
+  $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
   $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
   // command to remove compressed file from the cluster
   $cmd = 'cd '.$cluster_feed_path.'; rm '.$output.'.tar.gz &';
-  $cmd = 'ssh ' . $username.'@localhost '.$cmd;
   $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
   //dprint('/neuro/users/chris/console.log', $runfile_str);
@@ -437,7 +436,7 @@ else
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
   $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
   $cluster_command = str_replace("{COMMAND}", "/bin/bash ".$runfile, $cluster_command);
-  //dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command . " &".'\'');
+  dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command.'\'');
   $pid = $sshCluster->exec(bash($cluster_command));
 }
 
