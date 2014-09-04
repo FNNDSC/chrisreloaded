@@ -436,7 +436,7 @@ else
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
   $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
   $cluster_command = str_replace("{COMMAND}", "/bin/bash ".$runfile, $cluster_command);
-  dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command.'\'');
+  //dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command.'\'');
   $pid = $sshCluster->exec(bash($cluster_command));
 }
 

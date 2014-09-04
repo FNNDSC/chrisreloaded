@@ -20,6 +20,7 @@ import os
 import sys
 import getpass
 import socket
+import argparse 
 
 # FNNDSC imports
 import systemMisc as misc
@@ -321,14 +322,13 @@ class crun(object):
                    self._str_shellCmd,
                    str_sshDetach)
 
-           print self._str_shellCmd
-               
         if self._b_disassociate:
             self._str_shellCmd  = "( %s ) &" % self._str_shellCmd
         ret                     = 0
 
         if self._b_echoCmd: sys.stdout.write('%s\n' % self._str_shellCmd)
         if self._b_runCmd:
+            kwargs['waitForChild'] = self._b_waitForChild
             self._str_stdout, self._str_stderr, self._exitCode    = \
                     misc.shell(self._str_shellCmd, **kwargs)
         if self._b_echoStdOut: 
@@ -979,26 +979,39 @@ class crun_mosixbash(crun):
 
 if __name__ == '__main__':
 
-    # Create the crun instance
-    #shell       = crun()
-    #shell       = crun_hpc_mosix(remoteUser="rudolphpienaar", remoteHost="rc-twice")
-    shell       = crun(remoteUser="rudolphpienaar", remoteHost="rc-drno")
+    parser = argparse.ArgumentParser(description="crun is functor family of scripts for running \
+                                     command line apps on a cluster.")
+    parser.add_argument("user", help="remote user")
+    parser.add_argument("--host", help="connection host")
+    parser.add_argument("-c", "--command", help="command to be executed")
+    args = parser.parse_args()
+    user = args.user
+    if args.host:
+        host = args.host
+    else:
+        host = 'localhost'
+    if args.command:
+        str_cmd = args.command
+        # Create the crun instance
+        #shell       = crun()
+        #shell       = crun_hpc_mosix(remoteUser="rudolphpienaar", remoteHost="rc-twice")
+        shell = crun(remoteUser=user, remoteHost=host)
+        
+        # Set some parameters for this shell
+        shell.echo(False)               # echo actual shell command to stdout
+        shell.echoStdOut(False)         # capture and echo child stdout
+        shell.detach(False)             # child &
+        shell.sshDetach(True)           # ssh .... &
+        shell.waitForChild(False)       # block on child
 
-    # Grab the command line args defining the app and args that need to be 
-    # scheduled
-    str_cmd     = ""
-    for arg in sys.argv[1:len(sys.argv)]:
-        str_cmd = str_cmd + " " + arg
+        # And now run it!
+        misc.tic()
+        shell(str_cmd)
+        print "Elapsed time = %f seconds" % misc.toc()
+    else:
+        print "No command has been supplied with -c or --command options"
     
-    # Set some parameters for this shell
-    shell.echo()
-    shell.echoStdOut()
-    shell.detach()
-    # shell.dontRun()
 
-    # And now run it!
-    misc.tic()
-    shell(str_cmd)
-    print "Elapsed time = %f seconds" % misc.toc()
+
     
     
