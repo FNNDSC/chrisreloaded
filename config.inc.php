@@ -79,7 +79,7 @@ define('CHRIS_TRANSFER_PROTOCOL', 'http');
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
- define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/jorge');
+ define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/nicolas');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
@@ -100,7 +100,7 @@ define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.org');
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'nicolas'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -276,7 +276,7 @@ define('CHRIS_REMOTES', serialize(array(
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
-    "src"  => "/neuro/users/chris/dev/jorge"))
+    "src"  => "/neuro/users/chris/dev/nicolas"))
 )));
 
 
@@ -358,7 +358,7 @@ define('CLUSTER_CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
  * {FEED_ID} will be replaced in the launcher with the correct FEEDID.
  * FEED_ID is important to be able to kill a job.
  */
-define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND} < /dev/null & echo $!;');
+define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND} < /dev/null &>/dev/null & echo $!;');
 /**
  * The cluster kill command.
  * We specify the command to terminate a job on the cluster.
