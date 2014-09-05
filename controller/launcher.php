@@ -389,49 +389,65 @@ else
 { //
   // run on cluster and return pid
   //
-  $cluster_user_path = joinPaths(CLUSTER_CHRIS_USERS, $username);
-  $cluster_plugin_path = joinPaths($cluster_user_path, $plugin_name);
-  $cluster_feed_path = joinPaths($cluster_plugin_path, $feedname.'-'.$feed_id);
-  // create job directory
-  $cluster_job_path = $cluster_feed_path;
-  if($jobid != ''){
-    $cluster_job_path .= '/'.$jobid;
+  if (!CLUSTER_SHARED_FS) {
+    $cluster_user_path = joinPaths(CLUSTER_CHRIS_USERS, $username);
+    $cluster_plugin_path = joinPaths($cluster_user_path, $plugin_name);
+    $cluster_feed_path = joinPaths($cluster_plugin_path, $feedname.'-'.$feed_id);
+    // create job directory
+    $cluster_job_path = $cluster_feed_path;
+    if($jobid != ''){
+      $cluster_job_path .= '/'.$jobid;
+    }
+    $cluster_job_path_output = createDir($sshCluster, $cluster_job_path);
+
+    // replace chris server's paths in chris.env by cluster's paths
+    $envfile_str = file_get_contents($envfile);
+    $envfile_str = str_replace($job_path_output, $cluster_job_path_output, $envfile_str);
+    $envfile = joinPaths($cluster_job_path_output, 'chris.env');
+    $sshCluster->exec('echo "'.$envfile_str.'"'.' > '.$envfile);
+
+    // replace chris server's paths in chris.run by cluster's paths
+    $runfile_str = file_get_contents($runfile);
+    $runfile_str = str_replace($job_path, $cluster_job_path, $runfile_str);
+    $runfile_str = str_replace($job_path_output, $cluster_job_path_output, $runfile_str);
+
+    // command to compress $job_path dir on the chris server
+    $data = basename($job_path);
+    $cmd = '\"cd '.$feed_path.'; tar -zcf '.$data.'.tar.gz '.$data.';\"';
+    $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
+
+    // command to copy over the compressed $job_path dir to the cluster
+    $cmd = $cmd.PHP_EOL.'scp ' . $username.'@'.CHRIS_HOST.':'.$feed_path.'/'.$data.'.tar.gz ' .$cluster_feed_path.';';
+
+    // command to remove the compressed file on the chris server
+    $cmd = $cmd.PHP_EOL.'ssh ' . $username.'@'.CHRIS_HOST . ' rm '.$data.'.tar.gz;';
+
+    // command to uncompress the compressed file on the cluster
+    $cmd = $cmd.PHP_EOL.'cd '.$cluster_feed_path.'; tar -zxf '.$data.'.tar.gz;';
+    $runfile_str = $cmd.PHP_EOL.$runfile_str;
+
+    // command to compress $cluster_job_path dir on the cluster
+    $cmd = 'cd '.$cluster_feed_path.'; tar -zcf '.$data.'.tar.gz '.$data.';';
+    $runfile_str = $runfile_str.$cmd;
+
+    // command to copy over the compressed $cluster_job_path dir to the chris server
+    $cmd = 'scp ' . $cluster_feed_path.'/'.$data.'.tar.gz ' . $username.'@'.CHRIS_HOST.':'.$feed_path.';';
+    $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+    // command to uncompress and remove the compressed file on the chris server
+    $cmd = '\"cd '.$feed_path.'; tar -zxf '.$data.'.tar.gz; rm '.$data.'.tar.gz;\"';
+    $cmd = 'ssh ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
+    $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+    // command to remove the compressed file from the cluster
+    $cmd = 'cd '.$cluster_feed_path.'; rm '.$data.'.tar.gz &';
+    $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+    //dprint('/neuro/users/chris/console.log', $runfile_str);
+
+    $runfile = joinPaths($cluster_job_path_output, 'chris.run');
+    $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
   }
-  $cluster_job_path_output = createDir($sshCluster, $cluster_job_path);
-
-  // replace output paths in chris.env
-  $envfile_str = file_get_contents($envfile);
-  $envfile_str = str_replace($job_path_output, $cluster_job_path_output, $envfile_str);
-  $envfile = joinPaths($cluster_job_path_output, 'chris.env');
-  $sshCluster->exec('echo "'.$envfile_str.'"'.' > '.$envfile);
-
-  // replace output paths in chris.run
-  $runfile_str = file_get_contents($runfile);
-  $runfile_str = str_replace($job_path, $cluster_job_path, $runfile_str);
-  $runfile_str = str_replace($job_path_output, $cluster_job_path_output, $runfile_str);
-
-  // command to compress $cluster_job_path dir
-  $output = basename($cluster_job_path);
-  $cmd = 'cd '.$cluster_feed_path.'; tar -zcf '.$output.'.tar.gz '.$output.';';
-  $runfile_str = $runfile_str.$cmd;
-
-  // command to copy over the compressed file to the local server
-  $cmd = 'scp ' . $cluster_feed_path.'/'.$output.'.tar.gz ' . $username.'@'.CHRIS_HOST.':'.$feed_path.';';
-  $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-  // command to uncompress and remove the compressed file on the local server
-  $cmd = '\"cd '.$feed_path.'; tar -zxf '.$output.'.tar.gz; rm '.$output.'.tar.gz;\"';
-  $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
-  $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-  // command to remove compressed file from the cluster
-  $cmd = 'cd '.$cluster_feed_path.'; rm '.$output.'.tar.gz &';
-  $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-  //dprint('/neuro/users/chris/console.log', $runfile_str);
-
-  $runfile = joinPaths($cluster_job_path_output, 'chris.run');
-  $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
 
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
   $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
