@@ -59,6 +59,7 @@ class Plugin(ArgumentParser):
       raise ValueError("Plugin.DESCRIPTION must be set in your plugin code")
     super( Plugin, self ).__init__(description=Plugin.DESCRIPTION)
     self.add_argument( '--xml', action='store_true', dest='xml', default=False, help='show xml description of parameters (default: FALSE)' )
+    self.add_argument( '--inputs', action='store_true', dest='inputs', default=False, help='show input parameters which should be copied (default: FALSE)' )
     self.add_argument( '--configuration', action='store', dest='configuration', default="", help='custom userconfiguration in JSON format (default: "")' )
     self.add_argument( '--icon', action='store_true', dest='icon', default=False, help='show the description of this plugin (default: FALSE)' )
     self.add_argument( '--description', action='store_true', dest='description', default=False, help='show the icon path of this plugin (default: FALSE)' )
@@ -106,6 +107,9 @@ class Plugin(ArgumentParser):
 
     # is it an inteactive plugin
     self.interactive = False
+
+    # list of inputs to move
+    self.inputs = ""    
 
   def error(self, message):
     '''
@@ -269,7 +273,7 @@ class Plugin(ArgumentParser):
     '''
     This method triggers the parsing of arguments.   
     The run() method gets called if not
-     --xml
+     --xml or --inputs
     are specified.
     '''
     options = self.parse_args()
@@ -280,7 +284,13 @@ class Plugin(ArgumentParser):
         print(self.xml(options.configuration))
       else:
         print(self.xml())
-    else:
+      return 
+
+    if (options.inputs):
+      # print the inputssounds OK to you
+      print self.inputs
+      return
+
       # run the plugin
       self.run()
 

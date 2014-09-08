@@ -51,6 +51,10 @@ class MRIConvert(Plugin1In1Out):
 # ENTRYPOINT
 if __name__ == "__main__":
     plugin = MRIConvert()
+
+    # list the inputs
+    plugin.inputs = "--input"
+
     plugin.add_parameter('Input', Plugin.IMAGE, '--input', action='store', dest='input',
                           help='the image to convert')
     plugin.add_parameter('Output', Plugin.STRING, '--format', action='store', dest='format',
