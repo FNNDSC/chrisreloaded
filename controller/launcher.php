@@ -411,6 +411,31 @@ else
     $runfile_str = str_replace($job_path, $cluster_job_path, $runfile_str);
     $runfile_str = str_replace($job_path_output, $cluster_job_path_output, $runfile_str);
 
+    // run the plugin with the --inputs switch on the chris server
+    $plugin_command_array = explode(' ', $command);
+    // $inputs_options is a string containing a list of input options separated by comma
+    $input_options = $sshLocal->exec($plugin_command_array[0].' --inputs');
+    $input_options_array = explode(',', $input_options);
+    // get an array of input paths in $inputs
+    for ($i = 0; $i < count($input_options_array); $i++) {
+      $ind = array_search($input_options_array[i], $plugin_command_array);
+      $inputs[i] = $plugin_command_array[$ind + 1];
+    }
+
+    // create _chrisInput_ dir
+    $sshLocal->exec('cd ' . $job_path.'; mkdir _chrisInput_; chmod 755 _chrisInput_');
+
+    // copy all inputs to _chrisInput_
+    foreach ($inputs as $in) {
+      $sshLocal->exec('cp -r ' . $in . ' ' . joinPaths($job_path,'_chrisInput_/'));
+    }
+
+
+    //Nicola we  need to implement the incorporation of _chrisInput_ dir to the input paths in the cluster
+    // as in the code below $job_path is used insted
+
+
+
     // command to compress $job_path dir on the chris server
     $data = basename($job_path);
     $cmd = '\"cd '.$feed_path.'; tar -zcf '.$data.'.tar.gz '.$data.';\"';
