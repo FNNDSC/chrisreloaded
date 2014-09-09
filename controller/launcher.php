@@ -476,9 +476,9 @@ else
     // MOVE DATA ($job_path directory) FROM CLUSTER TO SERVER
     //
 
-    // command to compress $cluster_job_path dir on the cluster
+    // command to compress $cluster_job_path dir on the cluster (excluding _chrisInput_ dir)
     $data = basename($job_path);
-    $cmd = 'cd '.$cluster_feed_path.'; tar -zcf '.$data.'.tar.gz '.$data.';';
+    $cmd = 'cd '.$cluster_feed_path.'; tar -zcf '.$data.'.tar.gz '.$data.' --exclude ' . joinPaths($data, '_chrisInput_'). ';';
     $runfile_str = $runfile_str.$cmd;
 
     // command to copy over the compressed $cluster_job_path dir to the chris server
