@@ -418,8 +418,8 @@ else
     $input_options_array = explode(',', $input_options);
     // get an array of input paths in $inputs
     for ($i = 0; $i < count($input_options_array); $i++) {
-      $ind = array_search($input_options_array[i], $plugin_command_array);
-      $inputs[i] = $plugin_command_array[$ind + 1];
+      $ind = array_search($input_options_array[$i], $plugin_command_array);
+      $inputs[$i] = $plugin_command_array[$ind + 1];
     }
 
     // create _chrisInput_ dir
@@ -427,7 +427,13 @@ else
 
     // copy all inputs to _chrisInput_
     foreach ($inputs as $in) {
-      $sshLocal->exec('cp -r ' . $in . ' ' . joinPaths($job_path,'_chrisInput_/'));
+      // get location of input in the command array
+      $input_key = array_search($in, $plugin_command_array);
+      // get value of the input in the command array
+      // the value of the input should be the next element in the $command_array
+      $value_key = $input_key + 1; 
+      // need to add something to make it unique
+      $sshLocal->exec('cp -r ' . $plugin_command_array[$value_key] . ' ' . joinPaths($job_path,'_chrisInput_/'));
     }
 
 
