@@ -277,6 +277,7 @@ class Plugin(ArgumentParser):
     are specified.
     '''
     options = self.parse_args()
+
     self.options = options
     if (options.xml):
       # print the xml
@@ -291,8 +292,8 @@ class Plugin(ArgumentParser):
       print self.inputs
       return
 
-      # run the plugin
-      self.run()
+    # run the plugin
+    self.run()
 
   def validate(self, expected, provided, extension='dcm'):
       '''
