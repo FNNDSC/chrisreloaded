@@ -410,12 +410,9 @@ else
     $plugin_command_array = explode(' ', $command);
     // $inputs_options is a string containing a list of input options separated by comma
     $input_options = $sshLocal->exec($plugin_command_array[0].' --inputs');
+    //remove EOL and white spaces
+    $input_options = trim(preg_replace('/\s+/', ' ', $input_options));
     $input_options_array = explode(',', $input_options);
-    // get an array of input paths in $inputs
-    for ($i = 0; $i < count($input_options_array); $i++) {
-      $ind = array_search($input_options_array[$i], $plugin_command_array);
-      $inputs[$i] = $plugin_command_array[$ind + 1];
-    }
 
     // create _chrisInput_ dir
     $sshLocal->exec('cd ' . $job_path.'; mkdir _chrisInput_; chmod 755 _chrisInput_');
@@ -425,13 +422,13 @@ else
     // input_values[0] contains an array where the first index is the old command and the second index the new command
     // it can be used in str_replace to update the commands
     $input_values = Array();
-    foreach ($inputs as $in) {
+    foreach ($input_options_array as $in) {
       // get location of input in the command array
       $input_key = array_search($in, $plugin_command_array);
       // get value of the input in the command array
       // the value of the input should be the next element in the $command_array
       $value_key = $input_key + 1;
-      $value = $plugin_command_array[$value_key]; 
+      $value = $plugin_command_array[$value_key];
       // need to add something to make it unique
       $value_dirname = dirname($value);
       $value_chris_path = joinPaths($job_path,'_chrisInput_', $value_dirname);
@@ -450,7 +447,7 @@ else
 
     // UPDATE THE PLUGIN COMMAND
     foreach($input_values as $old_new) {
-      $runfile_str = str_replace($old_new[0], $old_new[1], $runfile_str);    
+      $runfile_str = str_replace($old_new[0], $old_new[1], $runfile_str);
     }
 
     //
@@ -471,7 +468,7 @@ else
     // command to uncompress the compressed file on the cluster
     $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; tar -zxf '.$data.'.tar.gz;';
 
-    // command to remove the compressed file fromthe server
+    // command to remove the compressed file from the cluster
     $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; rm '.$data.'.tar.gz;';
     $runfile_str = $cmd.PHP_EOL.$runfile_str;
 
