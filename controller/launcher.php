@@ -431,13 +431,17 @@ else
       $input_key = array_search($in, $plugin_command_array);
       // get value of the input in the command array
       // the value of the input should be the next element in the $command_array
-      $value_key = $input_key + 1; 
+      $value_key = $input_key + 1;
+      $value = $plugin_command_array[$value_key]; 
       // need to add something to make it unique
-      $sshLocal->exec('cp -r ' . $plugin_command_array[$value_key] . ' ' . joinPaths($job_path,'_chrisInput_/'));
+      $value_dirname = dirname($value);
+      $value_chris_path = joinPaths($job_path,'_chrisInput_', $value_dirname);
+      $sshLocal->exec('mkdir -p ' . $value_chris_path);
+      $sshLocal->exec('cp -r ' . $value . ' ' . $value_chris_path);
     }
 
 
-    //Nicola we  need to implement the incorporation of _chrisInput_ dir to the input paths in the cluster
+    //Nicolas we  need to implement the incorporation of _chrisInput_ dir to the input paths in the cluster
     // as in the code below $job_path is used insted
 
 
