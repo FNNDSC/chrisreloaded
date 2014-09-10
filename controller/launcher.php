@@ -456,7 +456,7 @@ else
     //
 
     // command to compress _chrisInput_ dir on the chris server
-    $cmd = '\"cd '.$job_path.'; tar -zcf '.$data.'.tar.gz '.$chrisInputDirectory.';\"';
+    $cmd = '\"cd '.$job_path.'; tar -zcf '.$chrisInputDirectory.'.tar.gz '.$chrisInputDirectory.';\"';
     $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
 
     // command to copy over the compressed _chrisIput_ dir to the cluster
