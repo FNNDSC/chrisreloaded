@@ -415,7 +415,8 @@ else
     $input_options_array = explode(',', $input_options);
 
     // create _chrisInput_ dir
-    $sshLocal->exec('cd ' . $job_path.'; mkdir _chrisInput_; chmod 755 _chrisInput_');
+    $chrisInputDirectory = '_chrisInput_';
+    $sshLocal->exec('cd ' . $job_path.'; mkdir '.$chrisInputDirectory.'; chmod 755 '.$chrisInputDirectory);
 
     // copy all inputs to _chrisInput_
     // and keep track of the old and new input values for easy update of the command later on
@@ -431,13 +432,13 @@ else
       $value = $plugin_command_array[$value_key];
       // need to add something to make it unique
       $value_dirname = dirname($value);
-      $value_chris_path = joinPaths($job_path,'_chrisInput_', $value_dirname);
+      $value_chris_path = joinPaths($job_path,$chrisInputDirectory, $value_dirname);
       $sshLocal->exec('mkdir -p ' . $value_chris_path);
       // -n to not overwrite file if already there
       $sshLocal->exec('cp -rn ' . $value . ' ' . $value_chris_path);
 
       array_push($input_values, Array(0 => $plugin_command_array[$input_key].' '.$plugin_command_array[$value_key],
-                                      1 => $plugin_command_array[$input_key].' '.$cluster_job_path.'/_chrisInput_/'.$plugin_command_array[$value_key]));
+                                      1 => $plugin_command_array[$input_key].' '.$cluster_job_path.'/'.$chrisInputDirectory.'/'.$plugin_command_array[$value_key]));
     }
 
     // replace chris server's paths in chris.run by cluster's paths
@@ -451,25 +452,24 @@ else
     }
 
     //
-    // MOVE DATA (_chrisInput_ directory) FROM SERVER TO CLUSTER
+    // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
     //
 
     // command to compress _chrisInput_ dir on the chris server
-    $data = '_chrisInput_';
-    $cmd = '\"cd '.$job_path.'; tar -zcf '.$data.'.tar.gz '.$data.';\"';
+    $cmd = '\"cd '.$job_path.'; tar -zcf '.$data.'.tar.gz '.$chrisInputDirectory.';\"';
     $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
 
     // command to copy over the compressed _chrisIput_ dir to the cluster
-    $cmd = $cmd.PHP_EOL.'scp ' . $username.'@'.CHRIS_HOST.':'.$job_path.'/'.$data.'.tar.gz ' .$cluster_job_path.';';
+    $cmd = $cmd.PHP_EOL.'scp ' . $username.'@'.CHRIS_HOST.':'.$job_path.'/'.$chrisInputDirectory.'.tar.gz ' .$cluster_job_path.';';
 
     // command to remove the compressed file on the chris server
-    $cmd = $cmd.PHP_EOL.'ssh ' . $username.'@'.CHRIS_HOST . ' rm '.$job_path.'/'.$data.'.tar.gz;';
+    $cmd = $cmd.PHP_EOL.'ssh ' . $username.'@'.CHRIS_HOST . ' rm '.$job_path.'/'.$chrisInputDirectory.'.tar.gz;';
 
     // command to uncompress the compressed file on the cluster
-    $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; tar -zxf '.$data.'.tar.gz;';
+    $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; tar -zxf '.$chrisInputDirectory.'.tar.gz;';
 
     // command to remove the compressed file from the cluster
-    $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; rm '.$data.'.tar.gz;';
+    $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; rm '.$chrisInputDirectory.'.tar.gz;';
     $runfile_str = $cmd.PHP_EOL.$runfile_str;
 
     //
@@ -478,7 +478,7 @@ else
 
     // command to compress $cluster_job_path dir on the cluster (excluding _chrisInput_ dir)
     $data = basename($job_path);
-    $cmd = 'cd '.$cluster_feed_path.'; tar -zcf '.$data.'.tar.gz '.$data.' --exclude ' . joinPaths($data, '_chrisInput_'). ';';
+    $cmd = 'cd '.$cluster_feed_path.'; tar -zcf '.$data.'.tar.gz '.$data.' --exclude ' . joinPaths($data, $chrisInputDirectory). ';';
     $runfile_str = $runfile_str.$cmd;
 
     // command to copy over the compressed $cluster_job_path dir to the chris server
