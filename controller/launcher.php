@@ -212,7 +212,7 @@ if ($status == 100 || $force_chris_local) {
 
 
 //
-// get username's id and Chris group
+// get username's id
 //
 $user_id = UserC::getID($username);
 
