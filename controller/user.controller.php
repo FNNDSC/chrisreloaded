@@ -209,7 +209,7 @@ class UserC implements UserControllerInterface {
       if (!remoteDirExists($ssh, $keyDir)) {
         $ssh->exec(bash('mkdir -p '.$keyDir.';'));
       }
-      $ssh->exec(bash('ssh-keygen -t rsa -N "" -f '.$user_key_file.';'));
+      $ssh->exec(bash('echo -e \'y\\n\' | ssh-keygen -q -t rsa -N "" -f '.$user_key_file.';'));
     }
 
     // id_rsa.pub to user's authorized keys if needed
