@@ -266,6 +266,9 @@ $ssh->exec('bash -c \' echo "export ENV_REMOTEUSERIDENTITY='.$user_key_file.'" >
 
 $ssh->exec('bash -c \' echo "umask 0002" >> '.$envfile.'\'');
 
+// make sure to update the permissions of the file
+$ssh->exec("chmod 644 $envfile");
+
 $ssh->exec('bash -c \' echo "source '.$envfile.';" >> '.$runfile.'\'');
 
 if($status != 100){
@@ -289,7 +292,7 @@ if($status != 100){
 // make sure to update file permissions
 $ssh->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
 
-$ssh->exec("chmod o+rx,g+rx $runfile");
+$ssh->exec("chmod 755 $runfile");
 
 $arguments = ' -l '.$job_path;
 $arguments .= ' -m '.$memory;
