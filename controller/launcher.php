@@ -44,10 +44,10 @@ require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'token.controller.php'));
 require_once ('Net/SSH2.php');
 require_once('Crypt/RSA.php');
 
-// tempnam actually creates a file in addition to 
+// tempnam actually creates a file in addition to
 // generating a name.
-// $of = tempnam(sys_get_temp_dir(), 'PHPconsole-');
-// if (file_exists($tempfile)) { unlink($tempfile); }
+$of = tempnam(sys_get_temp_dir(), 'PHPconsole-');
+if (file_exists($tempfile)) { unlink($tempfile); }
 
 
 // check if we are invoked by commandline
@@ -263,7 +263,7 @@ $ssh->exec('bash -c \' echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$env
 $ssh->exec('bash -c \' echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile.'\'');
 $user_key_file = joinPaths(CHRIS_USERS, $username, CHRIS_USERS_CONFIG_DIR, CHRIS_USERS_CONFIG_SSHKEY);
 $ssh->exec('bash -c \' echo "export ENV_REMOTEUSERIDENTITY='.$user_key_file.'" >>  '.$envfile.'\'');
-
+$ssh->exec('bash -c \' echo "export PYTHONPATH=$PYTHONPATH:'.CHRIS_ENV_PYTHONPATH.'" >>  '.$envfile.'\'');
 $ssh->exec('bash -c \' echo "umask 0002" >> '.$envfile.'\'');
 
 // make sure to update the permissions of the file
@@ -281,7 +281,7 @@ $ssh->exec('bash -c \' echo "'.$command.'" >> '.$runfile.'\'');
 
 // generate the db.json file
 // to generate the db.json, we just call the viewer plugin with the correct input and ouput directories, $feed_path
-$viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
+$viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
 $ssh->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
 if($status != 100){
