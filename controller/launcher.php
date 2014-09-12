@@ -46,8 +46,8 @@ require_once('Crypt/RSA.php');
 
 // tempnam actually creates a file in addition to
 // generating a name.
-// $of = tempnam(sys_get_temp_dir(), 'PHPconsole-');
-// if (file_exists($tempfile)) { unlink($tempfile); }
+$of = tempnam(sys_get_temp_dir(), 'PHPconsole-');
+if (file_exists($tempfile)) { unlink($tempfile); }
 
 
 // check if we are invoked by commandline
@@ -328,7 +328,7 @@ $sshLocal->exec(bash('echo "'.$command.'" >> '.$runfile));
 // it generates a scene for the job after is finishes. It is useful for the viewer plugin.
 // it is useful performance-wise because if this file already exists, we do not have to re-generate it in javascript when we open the viewer plugin.
 // to generate the db.json, we just call the viewer plugin with the correct input and ouput directories, $feed_path
-$viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
+$viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
 $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
 // 6- set status to 100 if necessary
@@ -348,7 +348,7 @@ $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; 
 // update the chris.run file permissions to be executable
 //
 
-$sshLocal->exec("chmod o+rx,g+rx $runfile");
+$sshLocal->exec("chmod 755 $runfile");
 
 $arguments = ' -l '.$job_path;
 $arguments .= ' -m '.$memory;
