@@ -63,39 +63,39 @@ define('CHRIS_MAINTENANCE', false);
  * We also use it in this configuration file as a base directory for all the
  * directories ChRIS relies on, such as 'src', 'users', 'log', etc.
  */
-define('CHRIS_HOME', '/neuro/users/chris/dev');
+define('CHRIS_HOME', '/space/chris/1');
 /**
  * The transfer protocol.
  * We use it to generate the CHRIS_URL.
  * deprecated: Alos used to push a dicom scene to SliceDrop through the api.php.
  */
-define('CHRIS_TRANSFER_PROTOCOL', 'http');
+define('CHRIS_TRANSFER_PROTOCOL', 'https');
 /**
  * The ChRIS url.
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
-define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris/rudolph');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.nmr.mgh.harvard.edu');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
  * The email address follows the format: username + CHRIS_MAIL_SUFFIX.
  * We use this address to contact user when a plugin has finished, etc.
  */
-define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
+define('CHRIS_MAIL_SUFFIX', '@nmr.mgh.harvard.edu');
 /**
  * The plugin email from field.
  * When a plugin finishes, it emails the user that started it.
  * When the user receives the email, this is what appears in the 'from' email
  * field.
  */
-define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.org');
+define('CHRIS_PLUGIN_EMAIL_FROM', 'rudolph@nmr.mgh.harvard.edu');
 /**
  * The ChRIS source location.
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'rudolph'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'src/chrisreloaded'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -188,7 +188,7 @@ define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
  * The SQL Host name.
  * This is the name of the machine hosting the ChRIS database.
  */
-define('SQL_HOST', 'chris');
+define('SQL_HOST', 'localhost');
 /**
  * The SQL Username.
  * This is the name of user we use to interact with the ChRIS database.
@@ -198,12 +198,12 @@ define('SQL_USERNAME', 'chris');
 /**
  * The SQL User password.
  */
-define('SQL_PASSWORD', 'YOURPASSWORD');
+define('SQL_PASSWORD', 'n1c0l45');
 /**
  * The SQL Database.
  * The name of the database which contains all the ChRIS information.
  */
-define('SQL_DATABASE', 'chrisdev');
+define('SQL_DATABASE', 'chris');
 
 
 // --------------------------------------------------------------------------
@@ -218,17 +218,17 @@ define('SQL_DATABASE', 'chrisdev');
  * through the dicom listener.
  * It supports multiple users, i.e. 'rudolp@bch,nicolas@hcb,jorge@chb'
  */
-define('CHRIS_DICOM_EMAIL_TO', 'rudolph.pienaar@childrens.harvard.edu');
+define('CHRIS_DICOM_EMAIL_TO', 'rudolph@nmr.mgh.harvard.edu');
 /**
  * The Dicom email from.
  * The name of the database which contains all the ChRIS information.
  */
-define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.org');
+define('CHRIS_DICOM_EMAIL_FROM', 'rudolph@nmr.mgh.harvard.edu');
 /**
  * The destination AETITLE.
  * The remote machine where the data will be pushed after a pacs_pull retrieval.
  */
-define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
+define('DICOM_DESTINATION_AETITLE', 'ELLENGRANT');
 /**
  * DCMTK binaries.
  * TODO: It should probably be sitting in the CHRIS/LIBS directory, with the
@@ -330,7 +330,7 @@ define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
  * We connect to this machine to scedule jobs on the cluster.
  * This is our *ONLY* way to communicate to the cluster.
  */
-define('CLUSTER_HOST', 'rc-golden');
+define('CLUSTER_HOST', 'launchpad');
 /**
  * The cluster type.
  * We specify the cluster type in order for crun to know how to handle the
@@ -338,7 +338,7 @@ define('CLUSTER_HOST', 'rc-golden');
  * Valid cluster types:
  * crun_hpc_mosix or crun_hpc_lsf or crun_hpc_launchpad or local
  */
-define('CLUSTER_TYPE', 'crun_hpc_mosix');
+define('CLUSTER_TYPE', 'crun_hpc_launchpad');
 /**
  * The cluster run command.
  * We specify the command to schedule a job on the cluster.
@@ -348,15 +348,31 @@ define('CLUSTER_TYPE', 'crun_hpc_mosix');
  * {FEED_ID} will be replaced in the launcher with the correct FEEDID.
  * FEED_ID is important to be able to kill a job.
  */
-define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND} < /dev/null & echo $!;');
+define('CLUSTER_RUN', 'RET=$(pbsubmit -q max200 -c "{COMMAND}" 2>&1) && echo "$RET" | tail -1');
 /**
  * The cluster kill command.
  * We specify the command to terminate a job on the cluster.
  * {FEED_ID} will be replaced in the launcher with the plugin required id, in
  * the feed.controller.php
  */
-define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
+define('CLUSTER_KILL', 'qdel {PID}');
 
+// --------------------------------------------------------------------------
+//
+// CHRIS ENVIRNOMENT EXTRA SETUP
+//
+// --------------------------------------------------------------------------
+
+/**
+ * Path to be added to the default python path by chris.env.
+ * It should be use to add python libraries that might be missing on the cluster.
+ * It should only be related to the plugin.py or similar.
+ * It shouldn't add any plugin specific library.
+ *
+ * THIS APPROACH DOESN'T WORK IN A NOT SHARED FILE SYSTEM SETUP.
+ *
+ */
+define('CHRIS_ENV_PYTHONPATH', joinPaths(CHRIS_HOME, 'lib', 'pymodules'));
 
 // --------------------------------------------------------------------------
 //
