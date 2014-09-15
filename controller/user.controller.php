@@ -233,20 +233,20 @@ class UserC implements UserControllerInterface {
 
     // create user directory within Chris (if does't exist)
     if(!file_exists($user_path)){
-      $ssh->exec("mkdir $user_path;chmod 775 $user_path;");
+      $ssh->exec('mkdir  '.$user_path.'; chmod 775 '.$user_path.';');
     }
 
     // create users' config directory  (if does't exist)
     $user_config_path = joinPaths($user_path, CHRIS_USERS_CONFIG_DIR);
     if(!file_exists($user_config_path)){
-      $ssh->exec("mkdir $user_config_path;chmod 775 $user_config_path;");
+      $ssh->exec('mkdir  '.$user_config_path. '; chmod 775  '.$user_config_path.';');
     }
 
     // add default configuration file  (if does't exist)
     $user_config_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_FILE);
     $chris_config_file = joinPaths(CHRIS_SRC, CHRIS_USERS_CONFIG_FILE);
     if(!file_exists($user_config_file)){
-      $ssh->exec("cp  $chris_config_file $user_config_file;chmod 660 $user_config_file;");
+      $ssh->exec('cp  '.$chris_config_file.' '.$user_config_file. ';chmod 660  '.$user_config_file.';');
     }
   }
 
