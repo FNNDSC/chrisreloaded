@@ -280,6 +280,9 @@ $sshLocal->exec(bash('echo "export ENV_REMOTEUSERIDENTITY='.$user_key_file.'" >>
 
 $sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 
+// make sure to update the permissions of the file
+$sshLocal->exec("chmod 644 $envfile");
+
 
 //
 // create the file containing the chris run commannds
