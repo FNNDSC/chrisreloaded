@@ -372,6 +372,20 @@ define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND
  */
 define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
 
+// --------------------------------------------------------------------------
+//
+// CHRIS ENVIRNOMENT EXTRA SETUP
+//
+// --------------------------------------------------------------------------
+
+/**
+ * Path to be added to the default python path by chris.env.
+ * It should be use to add python libraries that might be missing on the cluster.
+ * It should only be related to the plugin.py or similar.
+ * It shouldn't add any plugin specific library.
+ */
+ define('CHRIS_ENV_PYTHONPATH', joinPaths(CHRIS_HOME, 'lib', 'pymodules'));
+
 
 // --------------------------------------------------------------------------
 //
