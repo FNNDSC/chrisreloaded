@@ -46,8 +46,8 @@ require_once('Crypt/RSA.php');
 
 // tempnam actually creates a file in addition to
 // generating a name.
-$of = tempnam(sys_get_temp_dir(), 'PHPconsole-');
-if (file_exists($tempfile)) { unlink($tempfile); }
+//$of = tempnam(sys_get_temp_dir(), 'PHPconsole-');
+//if (file_exists($tempfile)) { unlink($tempfile); }
 
 
 // check if we are invoked by commandline
@@ -277,7 +277,7 @@ $sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envf
 $sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile));
 $user_key_file = joinPaths(CHRIS_USERS, $username, CHRIS_USERS_CONFIG_DIR, CHRIS_USERS_CONFIG_SSHKEY);
 $sshLocal->exec(bash('echo "export ENV_REMOTEUSERIDENTITY='.$user_key_file.'" >>  '.$envfile));
-
+$sshLocal->exec('bash -c \' echo "export PYTHONPATH=$PYTHONPATH:'.CHRIS_ENV_PYTHONPATH.'" >>  '.$envfile.'\'');
 $sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 
 // make sure to update the permissions of the file
