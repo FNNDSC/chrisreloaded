@@ -164,7 +164,9 @@ class UserC implements UserControllerInterface {
 
         // copy over the compressed file to the local server,
         $scp = new Net_SCP($sshCluster);
-        $scp->get('~/ssh.tar.gz', $userHomeDir.'/ssh.tar.gz');
+        $data = $scp->get($userHomeDir.'/ssh.tar.gz');
+        $scp = new Net_SCP($sshLocal);
+        $scp->put($userHomeDir.'/ssh.tar.gz', $data);
 
         // uncompress and remove ssh.tar.gz on the local server
         $sshLocal->exec(bash('cd / ; tar -zxf '.$userHomeDir.'/ssh.tar.gz;'));
