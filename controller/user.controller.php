@@ -160,7 +160,7 @@ class UserC implements UserControllerInterface {
         $sshCluster->login($username, $password);
 
         // compress .ssh dir
-        $sshCluster->exec(bash('tar -zcf ssh.tar.gz ~/.ssh;'));
+        $sshCluster->exec(bash('cd '.$userHomeDir.'; tar -zcf ssh.tar.gz .ssh;'));
 
         // copy over the compressed file to the local server,
         $scp = new Net_SCP($sshCluster);
@@ -169,7 +169,7 @@ class UserC implements UserControllerInterface {
         $scp->put($userHomeDir.'/ssh.tar.gz', $data);
 
         // uncompress and remove ssh.tar.gz on the local server
-        $sshLocal->exec(bash('cd / ; tar -zxf '.$userHomeDir.'/ssh.tar.gz;'));
+        $sshLocal->exec(bash('cd '.$userHomeDir.'; tar -zxf ssh.tar.gz;'));
         $sshLocal->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz;'));
 
         // remove ssh.tar.gz from the cluster
