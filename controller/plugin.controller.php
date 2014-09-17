@@ -180,7 +180,7 @@ class PluginC implements PluginControllerInterface {
    */
   static public function getExecutable($plugin) {
 
-    $p_folder = CHRIS_PLUGINS_FOLDER_NET . DIRECTORY_SEPARATOR . $plugin;
+    $p_folder = CHRIS_PLUGINS_FOLDER . DIRECTORY_SEPARATOR . $plugin;
     $p_executable = $p_folder . DIRECTORY_SEPARATOR . $plugin;
 
     return $p_executable;
