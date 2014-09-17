@@ -317,7 +317,7 @@ class crun(object):
                str_idhandle = ""
                if len(self._str_remoteUserIdentity):
                    str_idhandle = "-i %s" % self._str_remoteUserIdentity
-                self._str_shellCmd   = 'ssh -p %s %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s  "%s" %s' % (
+               self._str_shellCmd   = 'ssh -p %s %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s  "%s" %s' % (
                    self._str_remotePort,
                    self._str_idhandle,
                    self._str_remoteUser,
