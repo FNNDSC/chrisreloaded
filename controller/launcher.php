@@ -275,8 +275,6 @@ $sshLocal->exec(bash('echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.
 $sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile));
-$user_key_file = joinPaths(CHRIS_USERS, $username, CHRIS_USERS_CONFIG_DIR, CHRIS_USERS_CONFIG_SSHKEY);
-$sshLocal->exec(bash('echo "export ENV_REMOTEUSERIDENTITY='.$user_key_file.'" >>  '.$envfile));
 $sshLocal->exec('bash -c \' echo "export PYTHONPATH=$PYTHONPATH:'.CHRIS_ENV_PYTHONPATH.'" >>  '.$envfile.'\'');
 $sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 
