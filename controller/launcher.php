@@ -446,6 +446,7 @@ else
     $runfile_str = file_get_contents($runfile);
     $runfile_str = str_replace($job_path, $cluster_job_path, $runfile_str);
     $runfile_str = str_replace($job_path_output, $cluster_job_path_output, $runfile_str);
+    $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
     // UPDATE THE PLUGIN COMMAND
     foreach($input_values as $old_new) {
