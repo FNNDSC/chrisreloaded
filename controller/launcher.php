@@ -431,22 +431,25 @@ else
       // the value of the input should be the next element in the $command_array
       $value_key = $input_key + 1;
       $value = $plugin_command_array[$value_key];
-      // need to add something to make it unique
-      $value_dirname = dirname($value);
-      $value_chris_path = joinPaths($job_path,$chrisInputDirectory, $value_dirname);
+      if (is_dir($value)) {
+        $value_dirname = $value;
+      } else {
+        $value_dirname = dirname($value);
+      }
+      // need to add the full absolute path to make it unique
+      $value_chris_path = joinPaths($job_path,$chrisInputDirectory, dirname($value_dirname));
       $sshLocal->exec('mkdir -p ' . $value_chris_path);
       // -n to not overwrite file if already there
       $sshLocal->exec('cp -rn ' . $value . ' ' . $value_chris_path);
 
       array_push($input_values, Array(0 => $plugin_command_array[$input_key].' '.$plugin_command_array[$value_key],
-                                      1 => $plugin_command_array[$input_key].' '.$cluster_job_path.'/'.$chrisInputDirectory.'/'.$plugin_command_array[$value_key]));
+                                      1 => $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path,$chrisInputDirectory, $value_dirname)));
     }
 
     // replace chris server's paths in chris.run by cluster's paths
     $runfile_str = file_get_contents($runfile);
     $runfile_str = str_replace($job_path, $cluster_job_path, $runfile_str);
     $runfile_str = str_replace($job_path_output, $cluster_job_path_output, $runfile_str);
-    $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
     // UPDATE THE PLUGIN COMMAND
     foreach($input_values as $old_new) {
@@ -459,7 +462,7 @@ else
 
     // command to compress _chrisInput_ dir on the chris server
     $cmd = '\"cd '.$job_path.'; tar -zcf '.$chrisInputDirectory.'.tar.gz '.$chrisInputDirectory.';\"';
-    $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
+    $cmd = 'ssh -o StrictHostKeyChecking=no ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
 
     // command to copy over the compressed _chrisIput_ dir to the cluster
     $cmd = $cmd.PHP_EOL.'scp ' . $username.'@'.CHRIS_HOST.':'.$job_path.'/'.$chrisInputDirectory.'.tar.gz ' .$cluster_job_path.';';
