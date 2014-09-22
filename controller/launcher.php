@@ -435,7 +435,7 @@ else
         $value_dirname = dirname($value);
       }
       // need to add the full absolute path to make it unique
-      $value_chris_path = joinPaths($job_path,$chrisInputDirectory, dirname($value_dirname));
+      $value_chris_path = joinPaths($job_path,$chrisInputDirectory, $value_dirname);
       $sshLocal->exec('mkdir -p ' . $value_chris_path);
       // -n to not overwrite file if already there
       $sshLocal->exec('cp -rn ' . $value . ' ' . $value_chris_path);
