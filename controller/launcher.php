@@ -407,6 +407,10 @@ else
     $envfile = joinPaths($cluster_job_path_output, 'chris.env');
     $sshCluster->exec('echo "'.$envfile_str.'"'.' > '.$envfile);
 
+    // create _chrisInput_ dir
+    $chrisInputDirectory = '_chrisInput_';
+    $sshLocal->exec('cd ' . $job_path.'; mkdir '.$chrisInputDirectory.'; chmod 755 '.$chrisInputDirectory);
+
     // run the plugin with the --inputs switch on the chris server
     $plugin_command_array = explode(' ', $command);
     // $inputs_options is a string containing a list of input options separated by comma
@@ -415,15 +419,9 @@ else
     $input_options = trim(preg_replace('/\s+/', ' ', $input_options));
     $input_options_array = explode(',', $input_options);
 
-    // create _chrisInput_ dir
-    $chrisInputDirectory = '_chrisInput_';
-    $sshLocal->exec('cd ' . $job_path.'; mkdir '.$chrisInputDirectory.'; chmod 755 '.$chrisInputDirectory);
-
-    // copy all inputs to _chrisInput_
-    // and keep track of the old and new input values for easy update of the command later on
-    // input_values[0] contains an array where the first index is the old command and the second index the new command
-    // it can be used in str_replace to update the commands
-    $input_values = Array();
+    // replace chris server's paths in chris.run by cluster's paths
+    $runfile_str = file_get_contents($runfile);
+    $runfile_str = str_replace($user_path, $cluster_user_path, $runfile_str);
     foreach ($input_options_array as $in) {
       // get location of input in the command array
       $input_key = array_search($in, $plugin_command_array);
@@ -441,20 +439,11 @@ else
       $sshLocal->exec('mkdir -p ' . $value_chris_path);
       // -n to not overwrite file if already there
       $sshLocal->exec('cp -rn ' . $value . ' ' . $value_chris_path);
-
-      array_push($input_values, Array(0 => $plugin_command_array[$input_key].' '.$plugin_command_array[$value_key],
-                                      1 => $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path,$chrisInputDirectory, $value_dirname)));
+      $value = str_replace($user_path, $cluster_user_path, $value);
+      $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path,$chrisInputDirectory, $value_dirname), $runfile_str);
     }
-
-    // replace chris server's paths in chris.run by cluster's paths
-    $runfile_str = file_get_contents($runfile);
-    $runfile_str = str_replace($user_path, $cluster_user_path, $runfile_str);
     $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
-    // UPDATE THE PLUGIN COMMAND
-    foreach($input_values as $old_new) {
-      $runfile_str = str_replace($old_new[0], $old_new[1], $runfile_str);
-    }
 
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
