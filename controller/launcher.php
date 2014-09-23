@@ -438,7 +438,7 @@ else
       $value_chris_path = joinPaths($job_path,$chrisInputDirectory, $value_dirname);
       $sshLocal->exec('mkdir -p ' . $value_chris_path);
       // -n to not overwrite file if already there
-      $sshLocal->exec('cp -rn ' . $value . ' ' . $value_chris_path);
+      $sshLocal->exec('cp -rn ' . $value_dirname . ' ' . $value_chris_path);
       $value = str_replace($user_path, $cluster_user_path, $value);
       $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path,$chrisInputDirectory, $value_dirname), $runfile_str);
     }
