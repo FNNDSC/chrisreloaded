@@ -425,22 +425,24 @@ else
     foreach ($input_options_array as $in) {
       // get location of input in the command array
       $input_key = array_search($in, $plugin_command_array);
-      // get value of the input in the command array
-      // the value of the input should be the next element in the $command_array
-      $value_key = $input_key + 1;
-      $value = $plugin_command_array[$value_key];
-      if (is_dir($value)) {
-        $value_dirname = $value;
-      } else {
-        $value_dirname = dirname($value);
+      if($input_key !== false){
+        // get value of the input in the command array
+        // the value of the input should be the next element in the $command_array
+        $value_key = $input_key + 1;
+        $value = $plugin_command_array[$value_key];
+        if (is_dir($value)) {
+          $value_dirname = $value;
+        } else {
+          $value_dirname = dirname($value);
+        }
+        // need to add the full absolute path to make it unique
+        $value_chris_path = joinPaths($job_path,$chrisInputDirectory, $value_dirname);
+        $sshLocal->exec('mkdir -p ' . $value_chris_path);
+        // -n to not overwrite file if already there
+        $sshLocal->exec('cp -rn ' . $value_dirname . ' ' . $value_chris_path);
+        $value = str_replace($user_path, $cluster_user_path, $value);
+        $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path,$chrisInputDirectory, $value_dirname), $runfile_str);
       }
-      // need to add the full absolute path to make it unique
-      $value_chris_path = joinPaths($job_path,$chrisInputDirectory, $value_dirname);
-      $sshLocal->exec('mkdir -p ' . $value_chris_path);
-      // -n to not overwrite file if already there
-      $sshLocal->exec('cp -rn ' . $value_dirname . ' ' . $value_chris_path);
-      $value = str_replace($user_path, $cluster_user_path, $value);
-      $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path,$chrisInputDirectory, $value_dirname), $runfile_str);
     }
     $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
