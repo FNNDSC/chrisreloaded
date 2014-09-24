@@ -275,7 +275,9 @@ $sshLocal->exec(bash('echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.
 $sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile));
-$sshLocal->exec('bash -c \' echo "export PYTHONPATH=$PYTHONPATH:'.CHRIS_ENV_PYTHONPATH.'" >>  '.$envfile.'\'');
+// should be renamed CLUSTER_CHRIS_PYTHONPATH
+$sshLocal->exec(bash('echo "export PYTHONPATH=$PYTHONPATH:'.CHRIS_ENV_PYTHONPATH.'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export PATH=$PATH:'.CLUSTER_CHRIS_BIN.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 
 // make sure to update the permissions of the file
