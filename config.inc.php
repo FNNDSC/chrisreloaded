@@ -355,10 +355,11 @@ define('CLUSTER_SHARED_FS', false);
  */
 define('CLUSTER_CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
 /**
- * The ChRIS bin location on the cluster.
- * This is the full name of the cluster's directory containing the ChRIS binaries that are needed by the plugins.
+ * The ChRIS bin/lib location on the cluster.
+ * This is the full name of the cluster's directory containing the ChRIS binaries/libraries that are needed by the plugins.
  */
 define('CLUSTER_CHRIS_BIN', joinPaths(CHRIS_HOME, 'bin'));
+define('CLUSTER_CHRIS_LIB', joinPaths(CHRIS_HOME, 'lib'));
 /**
  * The cluster run command.
  * We specify the command to schedule a job on the cluster.

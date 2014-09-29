@@ -278,6 +278,7 @@ $sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfi
 // should be renamed CLUSTER_CHRIS_PYTHONPATH
 $sshLocal->exec(bash('echo "export PYTHONPATH=$PYTHONPATH:'.CHRIS_ENV_PYTHONPATH.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export PATH=$PATH:'.CLUSTER_CHRIS_BIN.'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:'.CLUSTER_CHRIS_LIB.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 
 // make sure to update the permissions of the file
