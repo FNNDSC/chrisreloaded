@@ -192,11 +192,7 @@ class UserC implements UserControllerInterface {
 
     // generate ssh key for passwordless ssh  (if does't exist)
     $user_key_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_SSHKEY);
-    if(!file_exists($user_key_file)){
-        
-      $ssh->exec('ssh-keygen -t rsa -N "" -f '.$user_key_file.';');
-
-    }
+    $ssh->exec('echo \'n\' | ssh-keygen -t rsa -N "" -f '.$user_key_file.';');
 
     // id_rsa.pub to user's authorized keys if needed
     $ssh->exec('/bin/bash -c "mkdir -p ~/.ssh; (cat ~/.ssh/authorized_keys | grep \"$(cat '.$user_key_file.'.pub)\") || (cat '.$user_key_file.'.pub >> ~/.ssh/authorized_keys;ssh-add;)"');
