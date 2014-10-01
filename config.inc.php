@@ -79,7 +79,7 @@ define('CHRIS_TRANSFER_PROTOCOL', 'http');
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
- define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/jorge');
+ define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/nicolas');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
@@ -100,7 +100,7 @@ define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.org');
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'nicolas'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -354,6 +354,12 @@ define('CLUSTER_SHARED_FS', false);
  * The data is organized by: username/pluginname/feedid
  */
 define('CLUSTER_CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
+/**
+ * The ChRIS bin/lib location on the cluster.
+ * This is the full name of the cluster's directory containing the ChRIS binaries/libraries that are needed by the plugins.
+ */
+define('CLUSTER_CHRIS_BIN', joinPaths(CHRIS_HOME, 'bin'));
+define('CLUSTER_CHRIS_LIB', joinPaths(CHRIS_HOME, 'lib'));
 /**
  * The cluster run command.
  * We specify the command to schedule a job on the cluster.
