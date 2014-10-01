@@ -738,6 +738,58 @@ _CHRIS_INTERACTIVE_PLUGIN_.seriesFormat = function(data) {
   content += '</body></table></div>';
   return content;
 }
+_CHRIS_INTERACTIVE_PLUGIN_.connectDownload = function() {
+  $(document).off('click', '#DOWNLOAD').on('click', '#DOWNLOAD', function(event) {
+    _CHRIS_INTERACTIVE_PLUGIN_.download();
+  });
+}
+_CHRIS_INTERACTIVE_PLUGIN_.download = function() {
+
+  var list = "";
+
+  for ( var study_key in _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries) {
+    for ( var j = 0; j < _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"].length; j++) {
+      if (_CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"][j] == true) {
+        // write csv column headers if list is empty
+        if(list === ''){
+           list += '"PatientID","PatientName","PatientBirthDate","PatientSex","StudyInstanceUID","StudyDescription","StudyDate","PerformedStationAETitle","ModalitiesInStudy","SeriesInstanceUID","SeriesDescription","NumberOFSeriesRelatedInstances"\r\n'
+        }
+  
+        // write table content
+        var index = _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0].StudyInstanceUID.indexOf(_CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["StudyInstanceUID"][j]);
+        list +='"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["PatientID"][index] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["PatientName"][index] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["PatientBirthDate"][index] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["PatientSex"][index] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["StudyInstanceUID"][j] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["StudyDescription"][index] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["StudyDate"][index] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["PerformedStationAETitle"][index] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["ModalitiesInStudy"][index] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["SeriesInstanceUID"][j] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["SeriesDescription"][j] + '",'
+             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["NumberOfSeriesRelatedInstances"][j] + '",'
+             +  '\r\n';
+
+      }
+    }
+  }
+
+  var downloadLink = document.createElement("a");
+  var blob = new Blob([list],{type : 'text/csv'});
+  var url = URL.createObjectURL(blob);
+  downloadLink.href = url;
+  var now = new Date();
+  downloadLink.download = "pacs_pull-" +( "0" + now.getFullYear()).slice(-2) + ("0" + now.getMonth()).slice(-2) + ("0" + now.getDate()).slice(-2) + "-" + ("0" + now.getHours()).slice(-2) + ("0" + now.getMinutes()).slice(-2) + ("0" + now.getSeconds()).slice(-2) +  ".csv";
+
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+
+  //window.open("data:text/csv;charset=utf-8," + encodeURIComponent(list));
+
+}
+
 _CHRIS_INTERACTIVE_PLUGIN_.connectPull = function() {
   $(document).off('click', '#PULL').on('click', '#PULL', function(event) {
     // modify button icon
@@ -831,4 +883,5 @@ $(document).ready(function() {
   _CHRIS_INTERACTIVE_PLUGIN_.setupDownloadSeries();
   _CHRIS_INTERACTIVE_PLUGIN_.setupCheckAll();
   _CHRIS_INTERACTIVE_PLUGIN_.connectPull();
+  _CHRIS_INTERACTIVE_PLUGIN_.connectDownload();
 });
