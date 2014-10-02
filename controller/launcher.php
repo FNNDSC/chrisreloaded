@@ -335,14 +335,7 @@ $sshLocal->exec(bash('echo "'.$command.'" >> '.$runfile));
 $viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
 $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
-// 6- set status to 100 if necessary
-// status == 100 means the job has finished
-if($status != 100){
-  $end_token = TokenC::create();
-  $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
-}
-
-// 7- make sure to update file permissions
+// 6- make sure to update file permissions
 $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
 
 
@@ -365,10 +358,18 @@ if ($force_chris_local) {
   // get user group id
   $groupID =  $sshLocal->exec("id -g");
   $groupID = trim($groupID);
+
+  // give all files back to users after the job finished.
+  //$sshLocal->exec("echo 'sudo bash; chown -R $user_id:$groupID $feed_path;' >> $runfile;");
+  
+  // update status to 100%
+  $end_token = TokenC::create();
+  $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
+
   // open permissions so user can see its plugin running
   $local_command = "/bin/chgrp -R $groupID $feed_path; /bin/chmod g+rxw -R $feed_path";
   $sshLocal->exec($local_command);
-
+  
   unset($sshLocal);
 
   # run command as locally ChRIS!
@@ -403,6 +404,7 @@ else
       $cluster_job_path .= '/'.$jobid;
     }
     $cluster_job_path_output = createDir($sshCluster, $cluster_job_path);
+    $cluster_job_path_output.PHP_EOL;
 
     // replace chris server's paths in chris.env by cluster's paths
     $envfile_str = file_get_contents($envfile);
@@ -449,7 +451,6 @@ else
     }
     $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
-
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
     //
@@ -493,10 +494,27 @@ else
     $cmd = 'cd '.$cluster_feed_path.'; rm '.$data.'.tar.gz &';
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
+
+    //
+    // UPDATE FEED STATUS
+    //
+
+    // update status to 100% after moving the files back on the server
+    $end_token = TokenC::create();
+    $cmd = $setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$cluster_job_path_output.'/curlB.std 2> '.$cluster_job_path_output.'/curlB.err';
+    $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
     //dprint('/neuro/users/chris/console.log', $runfile_str);
 
     $runfile = joinPaths($cluster_job_path_output, 'chris.run');
     $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
+  }
+  else{
+
+    // update status to 100%
+   $end_token = TokenC::create();
+   $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
+
   }
 
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
