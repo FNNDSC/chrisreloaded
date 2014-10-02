@@ -265,6 +265,9 @@ class crun(object):
                     self._str_remotePort = l_remoteHost[1]
             if key == "remoteUser":     self._str_remoteUser    = value
             if key == "remoteUserIdentity":   self._str_remoteUserIdentity = value
+            if key == "emailUser":   self._str_emailUser = value
+            if key == "remoteStdOut":  self._str_schedulerStdOut  = value
+            if key == "remoteStdErr":  self._str_schedulerStdErr  = value
         
     
     def __call__(self, str_cmd, **kwargs):
@@ -694,7 +697,7 @@ class crun_hpc_slurm(crun_hpc):
         self._str_queue                 = "sched_any_quicktest"
 
         self._priority                  = 50
-        self._str_scheduler             = 'srun'
+        self._str_scheduler             = 'module load slurm ; srun'
         self._str_scheduleCmd           = ''
         self._str_scheduleArgs          = ''
 
@@ -720,7 +723,7 @@ class crun_hpc_slurm(crun_hpc):
                                 self._str_schedulerStdOut,
                                 self._str_schedulerStdErr)
             if self._b_emailWhenDone and len(self._str_emailUser):
-                self._str_scheduleArgs += "-m %s " % self._str_emailUser
+                self._str_scheduleArgs += "--mail-user=%s " % self._str_emailUser
             self._str_scheduleArgs     += "-p %s " % self._str_queue
         return self._str_scheduleArgs
 
@@ -1156,23 +1159,40 @@ if __name__ == '__main__':
                                      command line apps on a cluster.")
     parser.add_argument("user", help="remote user")
     parser.add_argument("--host", help="connection host")
+    parser.add_argument("-t", "--type", help="cluster type: \
+        crun_hpc_launchpad, crun_hpc_slurm, crun_hpc_chpc, crun_hpc_lsf, crun_hpc_lsf_crit \
+        crun_hpc_mosix, crun_hpc_mosix_HPtest, crun_mosixbash")
     parser.add_argument("-c", "--command", help="command to be executed")
+    parser.add_argument("-o", "--out", help="remote standard output directory")
+    parser.add_argument("-e", "--err", help="remote standard error directory")
     args = parser.parse_args()
     user = args.user
     if args.host:
         host = args.host
     else:
         host = 'localhost'
+    if args.out:
+        out = args.out
+    else:
+        out = None
+    if args.err:
+        err = args.err
+    else:
+        err = None
     if args.command:
         str_cmd = args.command
-        # Create the crun instance
-        #shell       = crun()
-        #shell       = crun_hpc_mosix(remoteUser="rudolphpienaar", remoteHost="rc-twice")
-        shell = crun(remoteUser=user, remoteHost=host)
+        if args.type:
+            try:
+                shell = eval(args.type + '(remoteUser=user, remoteHost=host, emailUser=user, remoteStdOut=out, remoteStdErr=err)')
+            except NameError:
+                raise ValueError("Wrong cluster type input. Please run with the -h \
+                                 option to see posible values")
+        else:
+            shell = crun(remoteUser=user, remoteHost=host, emailUser=user, remoteStdOut=out, remoteStdErr=err)
         
         # Set some parameters for this shell
-        shell.echo(False)               # echo actual shell command to stdout
-        shell.echoStdOut(False)         # capture and echo child stdout
+        shell.echo(True)               # echo actual shell command to stdout
+        shell.echoStdOut(True)         # capture and echo child stdout
         shell.detach(False)             # child &
         shell.sshDetach(True)           # ssh .... &
         shell.waitForChild(False)       # block on child
