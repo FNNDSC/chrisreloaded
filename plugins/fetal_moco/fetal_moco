@@ -92,6 +92,9 @@ class FetalMoco(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = FetalMoco()
+  
+  plugin.inputs = "--imagedir";
+
   plugin.add_parameter('Input', Plugin.IMAGE, '--imagedir', action='store', dest='ImageDir', help='The images directory')
   plugin.add_parameter('Advanced', Plugin.STRING, '--fetamocodir', action='store', dest='FetalMocoDir',
                         default=plugin.envVars['ENV_FETALMOCO_DIR'], help='Moco app directory')

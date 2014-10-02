@@ -55,7 +55,7 @@ function joinPaths($args) {
  * @todo use regular expressions to replace everything in one command
  */
 function sanitize($dirty){
-  
+
   // remove trailing spaces
   $dirty = trim($dirty);
 
@@ -169,8 +169,8 @@ function hex2rgb($hex) {
 // http://alienryderflex.com/hsp.html
 function brightness($rgb){
    return sqrt(
-      $rgb[0] * $rgb[0] * .241 + 
-      $rgb[1] * $rgb[1] * .691 + 
+      $rgb[0] * $rgb[0] * .241 +
+      $rgb[1] * $rgb[1] * .691 +
       $rgb[2] * $rgb[2] * .068);
 }
 
@@ -194,15 +194,36 @@ function getConfiguration(){
     return $config;
   }
 
-# Create and return a unique temp dir in $dir with $prefix
-function tempdir(&$ssh, $dir = false, $prefix = '_chrisRun_') {
-    // $dirname  = uniqid($prefix, false);
-    $dirname  = $prefix;
-    $tempdir  = joinPaths($dir, $dirname);
+# Create and return dir in $prefix with $prefix
+function createDir(&$ssh, $prefix = '', $suffix = '_chrisRun_') {
+    $tempdir  = joinPaths($prefix, $suffix);
     $message = $ssh->exec('bash -c \'umask 0002 ; mkdir -p '.$tempdir.'\'');
     # empty return message on mkdir means success
     if ($message == '') { return $tempdir; }
     echo '_chrisRun_ could not be created in dir $dir -- possible permission issue: '.$message.PHP_EOL;
+}
+
+# assesses whether or not a directory exists
+function remoteDirExists(&$ssh, $dirName) {
+  $cmd = 'if [ -d "'.$dirName.'" ]; then echo "found!"; fi';
+  if ($ssh->exec($cmd)) {
+    return true;
+  }
+  return false;
+}
+
+# assesses whether or not a file exists
+function remoteFileExists(&$ssh, $fileName) {
+  $cmd = 'if [ -f "'.$fileName.'" ]; then echo "found!"; fi';
+  if ($ssh->exec($cmd)) {
+    return true;
+  }
+  return false;
+}
+
+# embeds input command string within a bash wrapper string
+function bash($cmd) {
+  return 'bash -c \''.$cmd.'\'';
 }
 
 # Simple debug console that writes $content to $outstem.

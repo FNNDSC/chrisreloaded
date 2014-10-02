@@ -81,6 +81,9 @@ class ReconAll(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = ReconAll()
+
+  plugin.inputs = "--mri";
+
   plugin.add_parameter('Input', Plugin.IMAGE, '--mri', action='store', dest='MRI', help='the mri scan to reconstruct')
   plugin.add_parameter('Advanced', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
                           default=plugin.envVars['ENV_FREESURFER_SCRIPT'], help='The images directory')
