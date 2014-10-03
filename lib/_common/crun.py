@@ -265,9 +265,6 @@ class crun(object):
                     self._str_remotePort = l_remoteHost[1]
             if key == "remoteUser":     self._str_remoteUser    = value
             if key == "remoteUserIdentity":   self._str_remoteUserIdentity = value
-            if key == "emailUser":   self._str_emailUser = value
-            if key == "remoteStdOut":  self._str_schedulerStdOut  = value
-            if key == "remoteStdErr":  self._str_schedulerStdErr  = value
         
     
     def __call__(self, str_cmd, **kwargs):
@@ -571,6 +568,11 @@ class crun_hpc(crun):
         self._b_emailWhenDone           = False
         self._str_emailUser             = ''
 
+        for key, value in kwargs.iteritems():
+            if key == "remoteStdOut":  self._str_schedulerStdOut  = value
+            if key == "remoteStdErr":  self._str_schedulerStdErr  = value
+            if key == "emailUser":   self._str_emailUser = value
+
 
     def __call__(self, str_cmd, **kwargs):
         '''
@@ -687,13 +689,13 @@ class crun_hpc_slurm(crun_hpc):
 
         self._b_emailWhenDone           = False
 
-        self._str_emailUser             = "rudolph"
         self._str_jobID                 = ""
         if len(self._str_remoteUser):
             self._str_jobInfoDir        = "/nobackup1/%s" % self._str_remoteUser
         else:
             self._str_jobInfoDir        = "/nobackup1/%s"  % self._str_emailUser
-        self._b_singleQuoteCmd          = True
+        self._str_jobInfoDir            = self._str_jobInfoDir + '/jobInfoDir'
+        self._b_singleQuoteCmd          = False
         self._str_queue                 = "sched_any_quicktest"
 
         self._priority                  = 50
@@ -1155,6 +1157,8 @@ class crun_mosixbash(crun):
 
 if __name__ == '__main__':
 
+    from random import randint
+
     parser = argparse.ArgumentParser(description="crun is functor family of scripts for running \
                                      command line apps on a cluster.")
     parser.add_argument("user", help="remote user")
@@ -1163,8 +1167,9 @@ if __name__ == '__main__':
         crun_hpc_launchpad, crun_hpc_slurm, crun_hpc_chpc, crun_hpc_lsf, crun_hpc_lsf_crit \
         crun_hpc_mosix, crun_hpc_mosix_HPtest, crun_mosixbash")
     parser.add_argument("-c", "--command", help="command to be executed")
-    parser.add_argument("-o", "--out", help="remote standard output directory")
-    parser.add_argument("-e", "--err", help="remote standard error directory")
+    parser.add_argument("-o", "--out", help="remote standard output file")
+    parser.add_argument("-e", "--err", help="remote standard error file")
+    parser.add_argument("-m", "--mail", help="user mail")
     args = parser.parse_args()
     user = args.user
     if args.host:
@@ -1174,21 +1179,25 @@ if __name__ == '__main__':
     if args.out:
         out = args.out
     else:
-        out = None
+        out = ''
     if args.err:
         err = args.err
     else:
-        err = None
+        err = ''
+    if args.mail:
+        mail = args.mail
+    else:
+        mail = ''
     if args.command:
         str_cmd = args.command
         if args.type:
             try:
-                shell = eval(args.type + '(remoteUser=user, remoteHost=host, emailUser=user, remoteStdOut=out, remoteStdErr=err)')
+                shell = eval(args.type + '(remoteUser=user, remoteHost=host, emailUser=mail, remoteStdOut=out, remoteStdErr=err)')
             except NameError:
                 raise ValueError("Wrong cluster type input. Please run with the -h \
                                  option to see posible values")
         else:
-            shell = crun(remoteUser=user, remoteHost=host, emailUser=user, remoteStdOut=out, remoteStdErr=err)
+            shell = crun(remoteUser=user, remoteHost=host, emailUser=mail, remoteStdOut=out, remoteStdErr=err)
         
         # Set some parameters for this shell
         shell.echo(True)               # echo actual shell command to stdout
@@ -1196,6 +1205,8 @@ if __name__ == '__main__':
         shell.detach(False)             # child &
         shell.sshDetach(True)           # ssh .... &
         shell.waitForChild(False)       # block on child
+        shell.jobID('j' + str(randint(1,1000)))
+        if mail: shell.emailWhenDone(True)
 
         # And now run it!
         misc.tic()
