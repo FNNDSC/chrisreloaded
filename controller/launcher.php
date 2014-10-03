@@ -347,24 +347,32 @@ $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; 
 
 $sshLocal->exec("chmod 755 $runfile");
 
-$arguments = ' -l '.$job_path;
-$arguments .= ' -m '.$memory;
-$arguments .= ' -c "'.$runfile.'"';
-$arguments .= ' -u "'.$username.'"';
-$arguments .= ' -p "'.$password.'"';
-$arguments .= ' -o "'.$feed_path.'"';
-
 if ($force_chris_local) {
   // get user group id
   $groupID =  $sshLocal->exec("id -g");
   $groupID = trim($groupID);
 
-  // give all files back to users after the job finished.
-  //$sshLocal->exec("echo 'sudo bash; chown -R $user_id:$groupID $feed_path;' >> $runfile;");
+  // make sure the permissions are correct
+  // and give all files ownership to users after the job finished.
+  $sshLocal->exec("echo 'sudo chmod -R 755 $feed_path;' >> $runfile;");
+  $sshLocal->exec("echo 'sudo chown -R $user_id:$groupID $feed_path;' >> $runfile;");
+
+  // update path to tmp path
+  $escaped_path  = str_replace("/", "\/", $feed_path);
+  $sshLocal->exec("sed -i 's/$escaped_path/\/tmp\/$feedname-$feed_id/g' $runfile");
   
+  // copy files back to network space, whith the right permissions
+  $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp /tmp/$feedname-$feed_id $plugin_path\";' >> $runfile;");
+  // rm chris.json
+  $sshLocal->exec("echo 'sudo su $username -c \"rm $feed_path/.chris.json\";' >> $runfile;");
+ 
   // update status to 100%
   $end_token = TokenC::create();
-  $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
+  $sshLocal->exec('echo "sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err\"" >> '.$runfile);
+
+  // copy things back
+  // cleanup
+  // remove the viewer data (path messed up?)
 
   // open permissions so user can see its plugin running
   $local_command = "/bin/chgrp -R $groupID $feed_path; /bin/chmod g+rxw -R $feed_path";
@@ -381,7 +389,13 @@ if ($force_chris_local) {
     exit('Login as ChRIS local user failed...!');
   }
 
+  // create local directory
+  mkdir('/tmp/'.$feedname.'-'.$feed_id);
+  
+  $sshLocal2->exec("cp -R $feed_path /tmp");
+
   $local_command = "/bin/bash umask 0002;/bin/bash $runfile;";
+  $local_command .= "sudo rm -rf /tmp/$feedname-$feed_id";
   $nohup_wrap = 'bash -c \'nohup bash -c "'.$local_command.'" > /dev/null 2>&1 &\'';
   $sshLocal2->exec($nohup_wrap);
   $pid = -1;
