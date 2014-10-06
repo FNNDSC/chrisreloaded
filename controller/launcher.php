@@ -382,24 +382,20 @@ if ($force_chris_local) {
   
   unset($sshLocal);
 
-  # run command as locally ChRIS!
-  $sshLocal2 = new Net_SSH2('localhost');
-  $key = new Crypt_RSA();
-  $sshLocalkey = joinPaths(CHRIS_HOME, '.ssh/id_rsa');
-  $key->loadKey(file_get_contents($sshLocalkey));
-  if (!$sshLocal2->login('chris', $key)) {
-    exit('Login as ChRIS local user failed...!');
-  }
+  // run command as locally ChRIS!
+  // *** IMPORTANT ***
+  // do not need to ssh as chris because we assume
+  // plugins which run locally are started from the front end
+  // therefore calling launcher.php as chris
 
   // create local directory
   mkdir('/tmp/'.$feedname.'-'.$feed_id);
-  
-  $sshLocal2->exec("cp -R $feed_path ".CHRIS_TMP);
+  shell_exec("cp -R $feed_path ".CHRIS_TMP);
 
   $local_command = "/bin/bash umask 0002;/bin/bash $runfile;";
   $local_command .= "sudo rm -rf $tmp_path;";
   $nohup_wrap = 'bash -c \'nohup bash -c "'.$local_command.'" > /dev/null 2>&1 &\'';
-  $sshLocal2->exec($nohup_wrap);
+  shell_exec($nohup_wrap);
   $pid = -1;
 } else if ($status == 100 ) {
   // run locally
