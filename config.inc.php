@@ -114,8 +114,15 @@ define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
  * This directory contains the files received by the dicom listener, before
  * before being processed.
  * It also can contain the data sent from a remote ChRIS instance.
+ *
+ *
+ * !!!! IMPORTANT !!!!
+ *
+ * It must be a LOCAL directory (NOT nfs mounted), to allow chris user to
+ * change ownership and mode as root
+ *
  */
-define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
+define('CHRIS_TMP', '/tmp');
 /**
  * The ChRIS users location.
  * This is the full name of the directory containing the ChRIS users data.

@@ -358,11 +358,13 @@ if ($force_chris_local) {
   $sshLocal->exec("echo 'sudo chown -R $user_id:$groupID $feed_path;' >> $runfile;");
 
   // update path to tmp path
+  $tmp_path = CHRIS_TMP.'/'.$feedname.'-'.$feed_id;
+  $escaped_tmp_path = str_replace("/", "\/", $tmp_path);
   $escaped_path  = str_replace("/", "\/", $feed_path);
-  $sshLocal->exec("sed -i 's/$escaped_path/\/tmp\/$feedname-$feed_id/g' $runfile");
+  $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $runfile");
   
   // copy files back to network space, whith the right permissions
-  $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp /tmp/$feedname-$feed_id $plugin_path\";' >> $runfile;");
+  $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $plugin_path\";' >> $runfile;");
   // rm chris.json
   $sshLocal->exec("echo 'sudo su $username -c \"rm $feed_path/.chris.json\";' >> $runfile;");
  
@@ -392,10 +394,10 @@ if ($force_chris_local) {
   // create local directory
   mkdir('/tmp/'.$feedname.'-'.$feed_id);
   
-  $sshLocal2->exec("cp -R $feed_path /tmp");
+  $sshLocal2->exec("cp -R $feed_path ".CHRIS_TMP);
 
   $local_command = "/bin/bash umask 0002;/bin/bash $runfile;";
-  $local_command .= "sudo rm -rf /tmp/$feedname-$feed_id";
+  $local_command .= "sudo rm -rf $tmp_path;";
   $nohup_wrap = 'bash -c \'nohup bash -c "'.$local_command.'" > /dev/null 2>&1 &\'';
   $sshLocal2->exec($nohup_wrap);
   $pid = -1;
@@ -502,6 +504,11 @@ else
     // command to uncompress and remove the compressed file on the chris server
     $cmd = '\"cd '.$feed_path.'; tar -zxf '.$data.'.tar.gz; rm '.$data.'.tar.gz;\"';
     $cmd = 'ssh ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
+    $runfile_str = $runfile_str.PHP_EOL.$cmd;
+  
+    // command to remove the scene for the chris viewer plugin
+   // it was generated on the cluster with the wrong paths
+    $cmd = 'rm '.$feed_path.'.chris.json;';
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     // command to remove the compressed file from the cluster
