@@ -79,13 +79,14 @@ define('CHRIS_TRANSFER_PROTOCOL', 'http');
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
- define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/jorge');
+ define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/nicolas');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
  * The email address follows the format: username + CHRIS_MAIL_SUFFIX.
  * We use this address to contact user when a plugin has finished, etc.
  */
+// admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
 /**
  * The plugin email from field.
@@ -93,13 +94,13 @@ define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
  * When the user receives the email, this is what appears in the 'from' email
  * field.
  */
-define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.tch.harvard.edu');
+define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.org');
 /**
  * The ChRIS source location.
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'nicolas'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -114,15 +115,8 @@ define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
  * This directory contains the files received by the dicom listener, before
  * before being processed.
  * It also can contain the data sent from a remote ChRIS instance.
- *
- *
- * !!!! IMPORTANT !!!!
- *
- * It must be a LOCAL directory (NOT nfs mounted), to allow chris user to
- * change ownership and mode as root
- *
  */
-define('CHRIS_TMP', '/tmp');
+define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 /**
  * The ChRIS users location.
  * This is the full name of the directory containing the ChRIS users data.
@@ -232,7 +226,7 @@ define('CHRIS_DICOM_EMAIL_TO', 'rudolph.pienaar@childrens.harvard.edu');
  * The Dicom email from.
  * The name of the database which contains all the ChRIS information.
  */
-define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.tch.harvard.edu');
+define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.org');
 /**
  * The destination AETITLE.
  * The remote machine where the data will be pushed after a pacs_pull retrieval.

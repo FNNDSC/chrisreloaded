@@ -59,7 +59,7 @@ define('CHRIS_MAINTENANCE', false);
 /**
  * The chris' host machine.
  */
-define('CHRIS_HOST', 'chris.tch.harvard.edu');
+define('CHRIS_HOST', 'chris-crit.tch.harvard.edu');
 /**
  * The chris user home directory.
  * We use it to find the chris user .ssh/id_rsa to allow passwordless ssh
@@ -67,25 +67,26 @@ define('CHRIS_HOST', 'chris.tch.harvard.edu');
  * We also use it in this configuration file as a base directory for all the
  * directories ChRIS relies on, such as 'src', 'users', 'log', etc.
  */
-define('CHRIS_HOME', '/neuro/users/chris/dev');
+define('CHRIS_HOME', '/home/chris/');
 /**
  * The transfer protocol.
  * We use it to generate the CHRIS_URL.
  * deprecated: Alos used to push a dicom scene to SliceDrop through the api.php.
  */
-define('CHRIS_TRANSFER_PROTOCOL', 'http');
+define('CHRIS_TRANSFER_PROTOCOL', 'https');
 /**
  * The ChRIS url.
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
- define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/jorge');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris-crit.tch.harvard.edu');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
  * The email address follows the format: username + CHRIS_MAIL_SUFFIX.
  * We use this address to contact user when a plugin has finished, etc.
  */
+// admin email
 define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
 /**
  * The plugin email from field.
@@ -93,13 +94,13 @@ define('CHRIS_MAIL_SUFFIX', '@childrens.harvard.edu');
  * When the user receives the email, this is what appears in the 'from' email
  * field.
  */
-define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.tch.harvard.edu');
+define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris-crit.tch.harvard.edu');
 /**
  * The ChRIS source location.
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'src/chrisreloaded'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -114,15 +115,8 @@ define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
  * This directory contains the files received by the dicom listener, before
  * before being processed.
  * It also can contain the data sent from a remote ChRIS instance.
- *
- *
- * !!!! IMPORTANT !!!!
- *
- * It must be a LOCAL directory (NOT nfs mounted), to allow chris user to
- * change ownership and mode as root
- *
  */
-define('CHRIS_TMP', '/tmp');
+define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
 /**
  * The ChRIS users location.
  * This is the full name of the directory containing the ChRIS users data.
@@ -181,7 +175,7 @@ define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
  * The plugins folder.
  * The location of the plugins folder, relative to the file system root directory.
  */
-define('CHRIS_PLUGINS_FOLDER_NET', joinPaths(CHRIS_SRC,'plugins'));
+define('CHRIS_PLUGINS_FOLDER_NET', joinPaths('/neuro/hpc/crit-hpc/chris/src/chrisreloaded', 'plugins'));
 /**
  * The plugins folder.
  */
@@ -197,7 +191,7 @@ define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
  * The SQL Host name.
  * This is the name of the machine hosting the ChRIS database.
  */
-define('SQL_HOST', 'chris');
+define('SQL_HOST', 'chris-crit');
 /**
  * The SQL Username.
  * This is the name of user we use to interact with the ChRIS database.
@@ -212,7 +206,7 @@ define('SQL_PASSWORD', 'chris1234');
  * The SQL Database.
  * The name of the database which contains all the ChRIS information.
  */
-define('SQL_DATABASE', 'chrisdev');
+define('SQL_DATABASE', 'chris');
 
 
 // --------------------------------------------------------------------------
@@ -232,7 +226,7 @@ define('CHRIS_DICOM_EMAIL_TO', 'rudolph.pienaar@childrens.harvard.edu');
  * The Dicom email from.
  * The name of the database which contains all the ChRIS information.
  */
-define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.tch.harvard.edu');
+define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris-crit.tch.harvard.edu');
 /**
  * The destination AETITLE.
  * The remote machine where the data will be pushed after a pacs_pull retrieval.
@@ -272,9 +266,9 @@ define('CHRIS_SCANNERS', serialize(array(
  */
 define('CHRIS_REMOTES', serialize(array(
 "MGH" => serialize(array(
-    "sshhost" => "johannesburg",
+    "sshhost" => "tautona",
     "sshport" => "1148",
-    "dicomhost" => "johannesburg",
+    "dicomhost" => "tautona",
     "dicomport" => "10301",
     "src"  => "/home/chris/src/chrisreloaded")),
 "BCH" => serialize(array(
@@ -282,7 +276,7 @@ define('CHRIS_REMOTES', serialize(array(
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
-    "src"  => "/neuro/users/chris/dev/jorge"))
+    "src"  => "/home/chris/src/chrisreloaded"))
 )));
 
 
@@ -290,7 +284,6 @@ define('CHRIS_REMOTES', serialize(array(
 //
 // USERS CONFIGURATION
 //
-// --------------------------------------------------------------------------
 
 /**
  * The user configuration directory.
@@ -339,7 +332,7 @@ define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
  * We connect to this machine to schedule jobs on the cluster.
  * This is our *ONLY* way to communicate to the cluster.
  */
-define('CLUSTER_HOST', 'rc-golden');
+define('CLUSTER_HOST', 'crit-hpc-head');
 /**
  * The cluster type.
  * We specify the cluster type in order for crun to know how to handle the
@@ -347,7 +340,7 @@ define('CLUSTER_HOST', 'rc-golden');
  * Valid cluster types:
  * crun_hpc_mosix or crun_hpc_lsf or crun_hpc_launchpad or local
  */
-define('CLUSTER_TYPE', 'crun_hpc_mosix');
+define('CLUSTER_TYPE', 'crun_hpc_lsf_crit');
 /**
  * Set this to true if the cluster shares the file system with the chris server.
  * It will improve performance by exploting the common file system.
@@ -359,13 +352,13 @@ define('CLUSTER_SHARED_FS', false);
  * This directory contains all the data generated by the users running plugins.
  * The data is organized by: username/pluginname/feedid
  */
-define('CLUSTER_CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
+define('CLUSTER_CHRIS_USERS', joinPaths('/neuro/hpc/crit-hpc/chris', 'users'));
 /**
  * The ChRIS bin/lib location on the cluster.
  * This is the full name of the cluster's directory containing the ChRIS binaries/libraries that are needed by the plugins.
  */
-define('CLUSTER_CHRIS_BIN', joinPaths(CHRIS_HOME, 'bin'));
-define('CLUSTER_CHRIS_LIB', joinPaths(CHRIS_HOME, 'lib'));
+define('CLUSTER_CHRIS_BIN', joinPaths('/neuro/hpc/crit-hpc/chris', 'bin'));
+define('CLUSTER_CHRIS_LIB', joinPaths('/neuro/hpc/crit-hpc/chris', 'lib'));
 /**
  * The cluster run command.
  * We specify the command to schedule a job on the cluster.
@@ -375,14 +368,14 @@ define('CLUSTER_CHRIS_LIB', joinPaths(CHRIS_HOME, 'lib'));
  * {FEED_ID} will be replaced in the launcher with the correct FEEDID.
  * FEED_ID is important to be able to kill a job.
  */
-define('CLUSTER_RUN', 'nohup /bin/mosbatch -q -b -J{FEED_ID} -m{MEMORY} {COMMAND} < /dev/null &>/dev/null & echo $!;');
+define('CLUSTER_RUN', 'nohup /opt/lsf/8.3/linux2.6-glibc2.3-x86_64/bin/bsub -S 20000 -J {FEED_ID} -o /neuro/hpc/crit-hpc/chris/tmp  -q high_priority "{COMMAND}" < /dev/null &>/dev/null & echo $!;');
 /**
  * The cluster kill command.
  * We specify the command to terminate a job on the cluster.
  * {FEED_ID} will be replaced in the launcher with the plugin required id, in
  * the feed.controller.php
  */
-define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
+define('CLUSTER_KILL', 'bkill -J {FEED_ID}');
 
 // --------------------------------------------------------------------------
 //
@@ -396,7 +389,7 @@ define('CLUSTER_KILL', 'moskillall -9 -J{FEED_ID}');
  * It should only be related to the plugin.py or similar.
  * It shouldn't add any plugin specific library.
  */
- define('CHRIS_ENV_PYTHONPATH', joinPaths(CHRIS_HOME, 'lib', 'pymodules'));
+ define('CHRIS_ENV_PYTHONPATH', joinPaths('/neuro/hpc/crit-hpc/chris/lib', 'py'));
 
 
 // --------------------------------------------------------------------------
