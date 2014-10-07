@@ -362,12 +362,12 @@ if ($force_chris_local) {
   $escaped_tmp_path = str_replace("/", "\/", $tmp_path);
   $escaped_path  = str_replace("/", "\/", $feed_path);
   $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $runfile");
-  
+
   // copy files back to network space, whith the right permissions
   $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $plugin_path\";' >> $runfile;");
   // rm chris.json
   $sshLocal->exec("echo 'sudo su $username -c \"rm $feed_path/.chris.json\";' >> $runfile;");
- 
+
   // update status to 100%
   if($status != 100){
     $end_token = TokenC::create();
@@ -376,7 +376,7 @@ if ($force_chris_local) {
   // open permissions so user can see its plugin running
   $local_command = "/bin/chgrp -R $groupID $feed_path; /bin/chmod g+rxw -R $feed_path";
   $sshLocal->exec($local_command);
-  
+
   unset($sshLocal);
 
   // run command as locally ChRIS!
@@ -463,16 +463,21 @@ else
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
     //
-
+    //$tunnel_host is the tunnel machine through which we get to the chris server
+    if (CLUSTER_PORT==22) {
+      $tunnel_host = CHRIS_HOST;
+    } else {
+      $tunnel_host = CLUSTER_HOST;
+    }
     // command to compress _chrisInput_ dir on the chris server
     $cmd = '\"cd '.$job_path.'; tar -zcf '.$chrisInputDirectory.'.tar.gz '.$chrisInputDirectory.';\"';
-    $cmd = 'ssh -o StrictHostKeyChecking=no ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
+    $cmd = 'ssh -p ' .CLUSTER_PORT. ' -o StrictHostKeyChecking=no ' . $username.'@'.$tunnel_host. ' '.$cmd;
 
     // command to copy over the compressed _chrisIput_ dir to the cluster
-    $cmd = $cmd.PHP_EOL.'scp ' . $username.'@'.CHRIS_HOST.':'.$job_path.'/'.$chrisInputDirectory.'.tar.gz ' .$cluster_job_path.';';
+    $cmd = $cmd.PHP_EOL.'scp -P ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host.':'.$job_path.'/'.$chrisInputDirectory.'.tar.gz ' .$cluster_job_path.';';
 
     // command to remove the compressed file on the chris server
-    $cmd = $cmd.PHP_EOL.'ssh ' . $username.'@'.CHRIS_HOST . ' rm '.$job_path.'/'.$chrisInputDirectory.'.tar.gz;';
+    $cmd = $cmd.PHP_EOL.'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' rm '.$job_path.'/'.$chrisInputDirectory.'.tar.gz;';
 
     // command to uncompress the compressed file on the cluster
     $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; tar -zxf '.$chrisInputDirectory.'.tar.gz;';
@@ -491,14 +496,14 @@ else
     $runfile_str = $runfile_str.$cmd;
 
     // command to copy over the compressed $cluster_job_path dir to the chris server
-    $cmd = 'scp ' . $cluster_feed_path.'/'.$data.'.tar.gz ' . $username.'@'.CHRIS_HOST.':'.$feed_path.';';
+    $cmd = 'scp -P ' .CLUSTER_PORT. ' ' . $cluster_feed_path.'/'.$data.'.tar.gz ' . $username.'@'.$tunnel_host.':'.$feed_path.';';
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     // command to uncompress and remove the compressed file on the chris server
     $cmd = '\"cd '.$feed_path.'; tar -zxf '.$data.'.tar.gz; rm '.$data.'.tar.gz;\"';
-    $cmd = 'ssh ' . $username.'@'.CHRIS_HOST . ' '.$cmd;
+    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
-  
+
     // command to remove the scene for the chris viewer plugin
    // it was generated on the cluster with the wrong paths
     $cmd = 'rm '.$feed_path.'.chris.json;';
