@@ -79,7 +79,7 @@ define('CHRIS_TRANSFER_PROTOCOL', 'http');
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
- define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/nicolas');
+ define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/jorge');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
@@ -99,7 +99,7 @@ define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.tch.harvard.edu');
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'nicolas'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -282,7 +282,7 @@ define('CHRIS_REMOTES', serialize(array(
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
-    "src"  => "/neuro/users/chris/dev/nicolas"))
+    "src"  => "/neuro/users/chris/dev/jorge"))
 )));
 
 
@@ -340,6 +340,12 @@ define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
  * This is our *ONLY* way to communicate to the cluster.
  */
 define('CLUSTER_HOST', 'rc-golden');
+/**
+ * The tunnel port through which we connect to the chris server from the cluster.
+ * This is by default 22 but if a tunnel is needed and it is set up then change it
+ * to the actual tunnel port.
+ */
+define('CLUSTER_PORT', 22);
 /**
  * The cluster type.
  * We specify the cluster type in order for crun to know how to handle the

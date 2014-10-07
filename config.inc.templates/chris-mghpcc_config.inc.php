@@ -334,6 +334,12 @@ define('CHRIS_RUN_AS_CHRIS_LOCAL', 'file_browser,pacs_pull,search,pacs_push,chri
  */
 define('CLUSTER_HOST', 'eofe4.mit.edu');
 /**
+* The tunnel port through which we connect to the chris server from the cluster.
+* This is by default 22 but if a tunnel is needed and it is set up then change it
+* to the actual tunnel port.
+ */
+define('CLUSTER_PORT', 2439);
+/**
  * The cluster type.
  * We specify the cluster type in order for crun to know how to handle the
  * communication.
