@@ -526,6 +526,8 @@ else
 
     $runfile = joinPaths($cluster_job_path_output, 'chris.run');
     $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
+    $sshCluster->exec('chmod 775 '.$runfile);
+
   }
   else{
     // create the json db for the viewer plugin once the data is in its final location
