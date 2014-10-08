@@ -328,9 +328,6 @@ $sshLocal->exec(bash('echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$job_pat
 // 4- run the actual plugin
 $sshLocal->exec(bash('echo "'.$command.'" >> '.$runfile));
 
-// 5- the viewwer plugin
-$viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
-
 // 6- make sure to update file permissions
 $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
 
@@ -362,6 +359,7 @@ if ($force_chris_local) {
   // copy files back to network space, whith the right permissions
   $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $plugin_path\";' >> $runfile;");
   // create the json db for the viewer plugin once the data is in its final location
+  $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
   $sshLocal->exec("echo 'sudo su $username  -c \"$viewer_plugin --directory $job_path --output $job_path/..\";' >> $runfile;");
 
   // update status to 100%
@@ -393,6 +391,7 @@ if ($force_chris_local) {
   $pid = -1;
 } else if ($status == 100 ) {
   // create the json db for the viewer plugin once the data is in its final location
+  $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
   $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
   // run locally
@@ -521,6 +520,7 @@ else
     //
     // CREATE VIEWER SCENE
     //
+    $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $cmd = $viewer_plugin.' --directory '.$job_path.' --output '.$job_path.'/..;';
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
@@ -529,6 +529,7 @@ else
   }
   else{
     // create the json db for the viewer plugin once the data is in its final location
+    $viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
     $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
     // update status to 100%
