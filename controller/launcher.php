@@ -328,12 +328,8 @@ $sshLocal->exec(bash('echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$job_pat
 // 4- run the actual plugin
 $sshLocal->exec(bash('echo "'.$command.'" >> '.$runfile));
 
-// 5- generate the db.json file
-// it generates a scene for the job after is finishes. It is useful for the viewer plugin.
-// it is useful performance-wise because if this file already exists, we do not have to re-generate it in javascript when we open the viewer plugin.
-// to generate the db.json, we just call the viewer plugin with the correct input and ouput directories, $feed_path
+// 5- the viewwer plugin
 $viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
-$sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
 // 6- make sure to update file permissions
 $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
@@ -365,14 +361,15 @@ if ($force_chris_local) {
 
   // copy files back to network space, whith the right permissions
   $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $plugin_path\";' >> $runfile;");
-  // rm chris.json
-  $sshLocal->exec("echo 'sudo su $username -c \"rm $feed_path/.chris.json\";' >> $runfile;");
+  // create the json db for the viewer plugin once the data is in its final location
+  $sshLocal->exec("echo 'sudo su $username  -c \"$viewer_plugin --directory $job_path --output $job_path/..\";' >> $runfile;");
 
   // update status to 100%
   if($status != 100){
     $end_token = TokenC::create();
     $sshLocal->exec('echo "sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err\"" >> '.$runfile);
   }
+
   // open permissions so user can see its plugin running
   $local_command = "/bin/chgrp -R $groupID $feed_path; /bin/chmod g+rxw -R $feed_path";
   $sshLocal->exec($local_command);
@@ -395,6 +392,9 @@ if ($force_chris_local) {
   shell_exec($nohup_wrap);
   $pid = -1;
 } else if ($status == 100 ) {
+  // create the json db for the viewer plugin once the data is in its final location
+  $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
+
   // run locally
   $sshLocal->exec('bash -c \' /bin/bash '.$runfile.'\'');
   $pid = -1;
@@ -487,6 +487,16 @@ else
     $runfile_str = $cmd.PHP_EOL.$runfile_str;
 
     //
+    // UPDATE FEED STATUS
+    //
+
+    // update status to 100% after moving the files back on the server
+    $end_token = TokenC::create();
+    $cmd = $setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$cluster_job_path_output.'/curlB.std 2> '.$cluster_job_path_output.'/curlB.err;';
+  //dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command.'\'');
+    $runfile_str = $runfile_str.$cmd.PHP_EOL;
+
+    //
     // MOVE DATA ($job_path directory) FROM CLUSTER TO SERVER
     //
 
@@ -504,42 +514,32 @@ else
     $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
-    // command to remove the scene for the chris viewer plugin
-   // it was generated on the cluster with the wrong paths
-    $cmd = 'rm '.$feed_path.'.chris.json;';
-    $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
     // command to remove the compressed file from the cluster
     $cmd = 'cd '.$cluster_feed_path.'; rm '.$data.'.tar.gz &';
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
-
     //
-    // UPDATE FEED STATUS
+    // CREATE VIEWER SCENE
     //
-
-    // update status to 100% after moving the files back on the server
-    $end_token = TokenC::create();
-    $cmd = $setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$cluster_job_path_output.'/curlB.std 2> '.$cluster_job_path_output.'/curlB.err';
+    $cmd = $viewer_plugin.' --directory '.$job_path.' --output '.$job_path.'/..;';
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-    //dprint('/neuro/users/chris/console.log', $runfile_str);
 
     $runfile = joinPaths($cluster_job_path_output, 'chris.run');
     $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
   }
   else{
+    // create the json db for the viewer plugin once the data is in its final location
+    $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
     // update status to 100%
-   $end_token = TokenC::create();
-   $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
+    $end_token = TokenC::create();
+    $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
 
   }
 
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
   $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
   $cluster_command = str_replace("{COMMAND}", "/bin/bash ".$runfile, $cluster_command);
-  //dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command.'\'');
   $pid = $sshCluster->exec(bash($cluster_command));
 }
 
