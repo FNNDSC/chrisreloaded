@@ -704,9 +704,9 @@ class crun_hpc_slurm(crun_hpc):
         self._str_scheduleArgs          = ''
 
         #configuration
-        self._b_detach = False
-        self._b_disassociate = False
-        self._b_waitForChild = True
+        self.detach(False)             # child &
+        self.sshDetach(True)           # ssh .... &
+        self.waitForChild(False)       # block on child
 
     def __call__(self, str_cmd, **kwargs):
         self.scheduleArgs()
