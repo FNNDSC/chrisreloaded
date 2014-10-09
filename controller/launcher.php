@@ -492,7 +492,6 @@ else
     // update status to 100% after moving the files back on the server
     $end_token = TokenC::create();
     $cmd = $setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$cluster_job_path_output.'/curlB.std 2> '.$cluster_job_path_output.'/curlB.err;';
-  //dprint('/neuro/users/chris/console.log', 'bash -c \''.$cluster_command.'\'');
     $runfile_str = $runfile_str.$cmd.PHP_EOL;
 
     //
@@ -521,7 +520,8 @@ else
     // CREATE VIEWER SCENE
     //
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-    $cmd = $viewer_plugin.' --directory '.$job_path.' --output '.$job_path.'/..;';
+    $cmd = '\"'.$viewer_plugin.' --directory '.$job_path.' --output '.$job_path.'/..;\"';
+    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     $runfile = joinPaths($cluster_job_path_output, 'chris.run');
