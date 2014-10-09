@@ -542,17 +542,30 @@ else
     /////
   }
   else{
+
     // create the json db for the viewer plugin once the data is in its final location
     $viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
     $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
+    //
+    // UPDATE FEED STATUS
+    //
+
+    if (CLUSTER_PORT==22) {
+      $tunnel_host = CHRIS_HOST;
+    } else {
+      $tunnel_host = CLUSTER_HOST;
+    }
+
     $start_token = TokenC::create();
-    $sshLocal->exec('sed -i "1i '.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" '.$runfile);
+    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err;\"';
+    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+    $sshLocal->exec('sed -i "1i '.$cmd.'" '.$runfile);
 
-    // update status to 100%
     $end_token = TokenC::create();
-    $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err" >> '.$runfile);
-
+    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err;\"';
+    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+    $sshLocal->exec('echo "'.$cmd.'" >> '.$runfile);
   }
 
   $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
