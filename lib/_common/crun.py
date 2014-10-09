@@ -307,7 +307,7 @@ class crun(object):
                                                 str_embeddedDetach)
         if self._b_sshDo and len(self._str_remoteHost):
            if not self._str_remoteUserIdentity:
-               self._str_shellCmd   = 'ssh -p %s %s@%s  "%s" %s' % (
+               self._str_shellCmd   = 'ssh -p %s -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no %s@%s  "%s" %s' % (
                    self._str_remotePort,
                    self._str_remoteUser,
                    self._str_remoteHost,
