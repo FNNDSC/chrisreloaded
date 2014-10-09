@@ -284,7 +284,6 @@ $sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 // make sure to update the permissions of the file
 $sshLocal->exec("chmod 644 $envfile");
 
-
 //
 // create the file containing the chris run commannds
 // and fill it
@@ -317,10 +316,6 @@ $sshLocal->exec(bash('echo "source '.$envfile.';" >> '.$runfile));
 // status == 100 means this a 'non-blocking' plugin that is just gonna run without scheduling
 // this is defined in the plugin's configuration
 // for instance, the file_browser is a non-blocking plugin
-if($status != 100){
-  $start_token = TokenC::create();
-  $sshLocal->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" >> '.$runfile);
-}
 
 // 3- log to the chris.std the time and machine on which the plugin is running (useful for debugging)
 $sshLocal->exec(bash('echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$job_path_output.'/chris.std" >> '.$runfile));
@@ -364,6 +359,12 @@ if ($force_chris_local) {
 
   // update status to 100%
   if($status != 100){
+    // prepend
+    $start_token = TokenC::create();
+    $sshLocal->exec('sed -i "1i '.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" '.$runfile);
+
+    // append
+    // we need sudo su to run it at the right location after the data has been copied back
     $end_token = TokenC::create();
     $sshLocal->exec('echo "sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err\"" >> '.$runfile);
   }
@@ -452,7 +453,8 @@ else
         $value_chris_path = joinPaths($job_path,$chrisInputDirectory, $value_dirname);
         $sshLocal->exec('mkdir -p ' . $value_chris_path);
         // -n to not overwrite file if already there
-        $sshLocal->exec('cp -rn ' . $value_dirname . ' ' . dirname($value_chris_path));
+        // -L to dereference links (copy actual file rather than link)
+        $sshLocal->exec('cp -Lrn ' . $value_dirname . ' ' . dirname($value_chris_path));
         $value = str_replace($user_path, $cluster_user_path, $value);
         $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path,$chrisInputDirectory, $value_dirname), $runfile_str);
       }
@@ -462,12 +464,13 @@ else
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
     //
-    //$tunnel_host is the tunnel machine through which we get to the chris server
+  
     if (CLUSTER_PORT==22) {
       $tunnel_host = CHRIS_HOST;
     } else {
       $tunnel_host = CLUSTER_HOST;
     }
+
     // command to compress _chrisInput_ dir on the chris server
     $cmd = '\"cd '.$job_path.'; tar -zcf '.$chrisInputDirectory.'.tar.gz '.$chrisInputDirectory.';\"';
     $cmd = 'ssh -p ' .CLUSTER_PORT. ' -o StrictHostKeyChecking=no ' . $username.'@'.$tunnel_host. ' '.$cmd;
@@ -484,15 +487,6 @@ else
     // command to remove the compressed file from the cluster
     $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; rm '.$chrisInputDirectory.'.tar.gz;';
     $runfile_str = $cmd.PHP_EOL.$runfile_str;
-
-    //
-    // UPDATE FEED STATUS
-    //
-
-    // update status to 100% after moving the files back on the server
-    $end_token = TokenC::create();
-    $cmd = $setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$cluster_job_path_output.'/curlB.std 2> '.$cluster_job_path_output.'/curlB.err;';
-    $runfile_str = $runfile_str.$cmd.PHP_EOL;
 
     //
     // MOVE DATA ($job_path directory) FROM CLUSTER TO SERVER
@@ -519,20 +513,41 @@ else
     //
     // CREATE VIEWER SCENE
     //
+
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $cmd = '\"'.$viewer_plugin.' --directory '.$job_path.' --output '.$job_path.'/..;\"';
     $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
+    //
+    // UPDATE FEED STATUS
+    //
+    $start_token = TokenC::create();
+    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err;\"';
+    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+    $runfile_str = $cmd.PHP_EOL.$runfile_str;
+
+    $end_token = TokenC::create();
+    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err;\"';
+    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+    $runfile_str = $runfile_str.$cmd.PHP_EOL;
+
+
     $runfile = joinPaths($cluster_job_path_output, 'chris.run');
     $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
     $sshCluster->exec('chmod 775 '.$runfile);
 
+    ////
+    // WHEN DO WE DELETE THE REMOTE DATA????
+    /////
   }
   else{
     // create the json db for the viewer plugin once the data is in its final location
     $viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
     $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
+
+    $start_token = TokenC::create();
+    $sshLocal->exec('sed -i "1i '.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" '.$runfile);
 
     // update status to 100%
     $end_token = TokenC::create();
