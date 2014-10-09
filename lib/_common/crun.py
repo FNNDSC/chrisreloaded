@@ -1161,15 +1161,34 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description="crun is functor family of scripts for running \
                                      command line apps on a cluster.")
-    parser.add_argument("user", help="remote user")
+    parser.add_argument("-u", "--user", help="remote user")
     parser.add_argument("--host", help="connection host")
-    parser.add_argument("-t", "--type", help="cluster type: \
-        crun_hpc_launchpad, crun_hpc_slurm, crun_hpc_chpc, crun_hpc_lsf, crun_hpc_lsf_crit \
-        crun_hpc_mosix, crun_hpc_mosix_HPtest, crun_mosixbash")
-    parser.add_argument("-c", "--command", help="command to be executed")
+    parser.add_argument("-s", "--scheduler", help="cluster scheduler type: \
+        launchpad, slurm, chpc, lsf, lsf_crit \
+        mosix, mosix_HPtest, mosixbash")
+    parser.add_argument("command", help="command to be executed")
     parser.add_argument("-o", "--out", help="remote standard output file")
     parser.add_argument("-e", "--err", help="remote standard error file")
     parser.add_argument("-m", "--mail", help="user mail")
+
+    parser.add_argument("--waitForChild", help="wait for child process", dest='waitForChild', action='store_true', default=False)
+    parser.add_argument("--no-waitForChild", help="don't wait for child process", dest='waitForChild', action='store_false')
+    parser.add_argument("--echo", help="echo cmd", dest='echo', action='store_true', default=False)
+    parser.add_argument("--no-echo", help="don't echo cmd", dest='echo', action='store_false')
+    parser.add_argument("--echoStdOut", help="echo child stdout", dest='echoStdOut', action='store_true', default=False)
+    parser.add_argument("--no-echoStdOut", help="don't echo child stdout", dest='echoStdOut', action='store_false')
+    parser.add_argument("--detach", help="detach child", dest='detach', action='store_true', default=False)
+    parser.add_argument("--no-detach", help="don't detach child", dest='detach', action='store_false')
+    parser.add_argument("--sshDetach", help="detach ssh", dest='sshDetach', action='store_true', default=False)
+    parser.add_argument("--no-sshDetach", help="don't detach ssh", dest='sshDdetach', action='store_false')
+
+    parser.add_argument("--printElapsedTime", help="print elapsed time", dest='printElapsedTime', action='store_true', default=False)
+    parser.add_argument("--no-printElapsedTime", help="don't print elapsed time", dest='printElapsedTime', action='store_false')
+    
+    parser.add_argument("--setDefaultFlags", help="set default control flags", dest='setDefaultControlFlags', action='store_true', default=True)
+    parser.add_argument("--no-setDefaultFlags", help="don't set default control flags", dest='setDefaultControlFlags', action='store_false')
+    
+    
     args = parser.parse_args()
     user = args.user
     if args.host:
@@ -1188,32 +1207,39 @@ if __name__ == '__main__':
         mail = args.mail
     else:
         mail = ''
-    if args.command:
-        str_cmd = args.command
-        if args.type:
-            try:
-                shell = eval(args.type + '(remoteUser=user, remoteHost=host, emailUser=mail, remoteStdOut=out, remoteStdErr=err)')
-            except NameError:
-                raise ValueError("Wrong cluster type input. Please run with the -h \
-                                 option to see posible values")
-        else:
-            shell = crun(remoteUser=user, remoteHost=host, emailUser=mail, remoteStdOut=out, remoteStdErr=err)
-        
-        # Set some parameters for this shell
-        shell.echo(True)               # echo actual shell command to stdout
-        shell.echoStdOut(True)         # capture and echo child stdout
-        shell.detach(False)             # child &
-        shell.sshDetach(True)           # ssh .... &
-        shell.waitForChild(False)       # block on child
-        shell.jobID('j' + str(randint(1,1000)))
-        if mail: shell.emailWhenDone(True)
-
-        # And now run it!
-        misc.tic()
-        shell(str_cmd)
-        print "Elapsed time = %f seconds" % misc.toc()
+    str_cmd = args.command
+    if args.scheduler:
+        try:
+            shell = eval('crun_hpc_' + args.scheduler + '(remoteUser=user, remoteHost=host, emailUser=mail, remoteStdOut=out, remoteStdErr=err)')
+        except NameError:
+            raise ValueError("Wrong cluster scheduler type input. Please run with the -h \
+                             option to see posible values")
+    elif args.user:
+        shell = crun(remoteUser=user, remoteHost=host, emailUser=mail, remoteStdOut=out, remoteStdErr=err)
+        shell.echo(False)
+        shell.echoStdOut(True)
+        shell.waitForChild(True)
     else:
-        print "No command has been supplied with -c or --command options"
+        shell = crun(emailUser=mail)
+        shell.echo(False)
+        shell.echoStdOut(True)
+        shell.waitForChild(True)
+        
+    # Set some parameters for this shell
+    if not args.setDefaultControlFlags:
+        shell.echo(args.echo)                       # echo actual shell command to stdout
+        shell.echoStdOut(args.echoStdOut)           # capture and echo child stdout
+        shell.detach(args.detach)                   # child &
+        shell.sshDetach(args.sshDetach)             # ssh .... &
+        shell.waitForChild(args.waitForChild)       # block on child
+    if args.scheduler: shell.jobID('j' + str(randint(1,1000)))
+    if mail: shell.emailWhenDone(True)
+
+    # And now run it!
+    misc.tic()
+    shell(str_cmd)
+    #print shell.stdout()
+    if args.printElapsedTime: print("Elapsed time = %f seconds" % misc.toc())
     
 
 
