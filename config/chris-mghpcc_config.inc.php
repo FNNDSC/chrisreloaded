@@ -115,8 +115,15 @@ define('CHRIS_DATA', joinPaths(CHRIS_HOME, 'data'));
  * This directory contains the files received by the dicom listener, before
  * before being processed.
  * It also can contain the data sent from a remote ChRIS instance.
+ *
+ *
+ * !!!! IMPORTANT !!!!
+ *
+ * It must be a LOCAL directory (NOT nfs mounted), to allow chris user to
+ * change ownership and mode as root
+ *
  */
-define('CHRIS_TMP', joinPaths(CHRIS_HOME, 'tmp'));
+define('CHRIS_TMP', '/tmp');
 /**
  * The ChRIS users location.
  * This is the full name of the directory containing the ChRIS users data.
@@ -360,10 +367,11 @@ define('CLUSTER_SHARED_FS', false);
  */
 define('CLUSTER_CHRIS_USERS', joinPaths('/nobackup1/rudolph/chris', 'users'));
 /**
- * The ChRIS bin location on the cluster.
- * This is the full name of the cluster's directory containing the ChRIS binaries that are needed by the plugins.
+ * The ChRIS bin/lib location on the cluster.
+ * This is the full name of the cluster's directory containing the ChRIS binaries/libraries that are needed by the plugins.
  */
 define('CLUSTER_CHRIS_BIN', joinPaths('/nobackup1/rudolph/chris', 'bin'));
+define('CLUSTER_CHRIS_LIB', joinPaths('/nobackup1/rudolph/chris', 'lib'));
 /**
  * The cluster run command.
  * We specify the command to schedule a job on the cluster.
@@ -373,14 +381,15 @@ define('CLUSTER_CHRIS_BIN', joinPaths('/nobackup1/rudolph/chris', 'bin'));
  * {FEED_ID} will be replaced in the launcher with the correct FEEDID.
  * FEED_ID is important to be able to kill a job.
  */
-define('CLUSTER_RUN', 'module load slurm; nohup srun --jobid={FEED_ID} -o /nobackup1/rudolph/chris/tmp -q sched_any_quicktest "{COMMAND}" < /dev/null &>/dev/null & echo $!;');
+define('CLUSTER_RUN', 'module load slurm; nohup srun --job-name=cr_{FEED_ID} -o /nobackup1/rudolph/chris/tmp/std -e /nobackup1/rudolph/chris/tmp/err -p sched_any_quicktest {COMMAND} < /dev/null &>/dev/null & echo $!;');
 /**
  * The cluster kill command.
  * We specify the command to terminate a job on the cluster.
  * {FEED_ID} will be replaced in the launcher with the plugin required id, in
  * the feed.controller.php
  */
-define('CLUSTER_KILL', 'scancel {FEED_ID}');
+//define('CLUSTER_KILL', 'module load slurm; squeue | grep cr_{FEED_ID} | awk \'{print $1}\' | xargs -I{} scancel {};');
+define('CLUSTER_KILL', 'module load slurm; scancel --name=cr_{FEED_ID};');
 
 // --------------------------------------------------------------------------
 //
