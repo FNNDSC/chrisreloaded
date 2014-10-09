@@ -530,7 +530,7 @@ else
     $end_token = TokenC::create();
     $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err;\"';
     $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-    $runfile_str = $runfile_str.$cmd.PHP_EOL;
+    $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
 
     $runfile = joinPaths($cluster_job_path_output, 'chris.run');
