@@ -436,6 +436,11 @@ else
     // replace chris server's paths in chris.run by cluster's paths
     $runfile_str = file_get_contents($runfile);
     $runfile_str = str_replace($user_path, $cluster_user_path, $runfile_str);
+    //A tmp dir within _chrisInput_ is necessary to put the data previous to anonymization
+    $tmp = $chrisInputDirectory;
+    if (ANONYMIZE_DICOM) {
+      $tmp = joinPaths($tmp, 'tmp');
+    }
     foreach ($input_options_array as $in) {
       // get location of input in the command array
       $input_key = array_search($in, $plugin_command_array);
@@ -450,21 +455,43 @@ else
           $value_dirname = dirname($value);
         }
         // need to add the full absolute path to make it unique
-        $value_chris_path = joinPaths($job_path,$chrisInputDirectory, $value_dirname);
-        $sshLocal->exec('mkdir -p ' . $value_chris_path);
+        $value_chris_path = joinPaths($job_path, $tmp, $value_dirname);
         // -n to not overwrite file if already there
         // -L to dereference links (copy actual file rather than link)
         $sshLocal->exec('cp -Lrn ' . $value_dirname . ' ' . dirname($value_chris_path));
         $value = str_replace($user_path, $cluster_user_path, $value);
-        $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path,$chrisInputDirectory, $value_dirname), $runfile_str);
+        $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path, $chrisInputDirectory, $value_dirname), $runfile_str);
       }
+    }
+    //anonymization
+    if (ANONYMIZE_DICOM) {
+      //$dir_array contains the list of all subdirectories in the tree with root joinPaths($job_path, $tmp)
+      $dir_iter = new RecursiveDirectoryIterator(joinPaths($job_path, $tmp), RecursiveDirectoryIterator::SKIP_DOTS);
+      $iter = new RecursiveIteratorIterator($dir_iter, RecursiveIteratorIterator::SELF_FIRST);
+      $tmp_path = joinPaths($job_path, $tmp);
+      $dir_array = array($tmp_path);
+      foreach ($iter as $dir => $dirObj) {
+        if ($dirObj->isDir()) {
+          $dir_array[] = $dir;
+        }
+      }
+      //for each subdirectory in the tree find out if it contains dicom files and if so then run anonymization
+      //the output goes to the same directory structure but without the intermediate tmp (directly below _chrisInput_)
+      foreach ($dir_array as $dir) {
+        $dicomFiles = glob($dir.'/*.dcm');
+        if count($dicomFiles) {
+          $sshLocal->exec(CHRIS_SRC.'/../scripts/dcmanon_meta.bash -P -O ' . $dir . ' -D ' str_replace($tmp_path, joinPaths($job_path, $chrisInputDirectory), $dir));
+        }
+      }
+      //remove the tmp directory
+      $sshLocal->exec('rm -r '. $tmp_path);
     }
     $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
     //
-  
+
     if (CLUSTER_PORT==22) {
       $tunnel_host = CHRIS_HOST;
     } else {
