@@ -440,6 +440,7 @@ else
     $tmp = $chrisInputDirectory;
     if (ANONYMIZE_DICOM) {
       $tmp = joinPaths($tmp, 'tmp');
+      $sshLocal->exec('cd ' . joinPaths($job_path, $chrisInputDirectory) . '; mkdir tmp;');
     }
     foreach ($input_options_array as $in) {
       // get location of input in the command array
@@ -480,8 +481,8 @@ else
       //if no dicom files is found the directory is just copied as it is
       foreach ($dir_array as $dir) {
         $dicomFiles = glob($dir.'/*.dcm');
-        if count($dicomFiles) {
-          $sshLocal->exec(CHRIS_SRC.'/../scripts/dcmanon_meta.bash -P -O ' . $dir . ' -D ' str_replace($tmp_path, joinPaths($job_path, $chrisInputDirectory), $dir));
+        if (count($dicomFiles)) {
+          $sshLocal->exec(CHRIS_SRC.'/../scripts/dcmanon_meta.bash -P -O ' . $dir . ' -D ' . str_replace($tmp_path, joinPaths($job_path, $chrisInputDirectory), $dir));
         } else {
           $outDir = str_replace($tmp_path, joinPaths($job_path, $chrisInputDirectory), $dir);
           $sshLocal->exec('mkdir -p ' . $outDir . '; cp -r ' . $dir . ' ' . dirname($outDir));
