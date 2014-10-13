@@ -477,10 +477,14 @@ else
       }
       //for each subdirectory in the tree find out if it contains dicom files and if so then run anonymization
       //the output goes to the same directory structure but without the intermediate tmp (directly below _chrisInput_)
+      //if no dicom files is found the directory is just copied as it is
       foreach ($dir_array as $dir) {
         $dicomFiles = glob($dir.'/*.dcm');
         if count($dicomFiles) {
           $sshLocal->exec(CHRIS_SRC.'/../scripts/dcmanon_meta.bash -P -O ' . $dir . ' -D ' str_replace($tmp_path, joinPaths($job_path, $chrisInputDirectory), $dir));
+        } else {
+          $outDir = str_replace($tmp_path, joinPaths($job_path, $chrisInputDirectory), $dir);
+          $sshLocal->exec('mkdir -p ' . $outDir . '; cp -r ' . $dir . ' ' . dirname($outDir));
         }
       }
       //remove the tmp directory
