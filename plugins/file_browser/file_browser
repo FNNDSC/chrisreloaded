@@ -36,6 +36,11 @@ class FileBrowser(Plugin):
 
   def run(self):
     options = self.options
+    if options.DIR === "":
+      print 'No input directory provided.'
+      print 'Exiting.'
+      return
+    # WE SHOULD ALSO CHECK THAT THE PROVIDED INPUT EXISTS...
     #os.system('ln -s %s %s' % (options.DIR, options.output))
     cmd = 'ln -s %s %s' % (options.DIR, options.output)
     shell = crun.crun()
