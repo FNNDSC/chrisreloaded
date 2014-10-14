@@ -346,13 +346,19 @@ if ($force_chris_local) {
   $sshLocal->exec("echo 'sudo chown -R $user_id:$groupID $feed_path;' >> $runfile;");
 
   // update path to tmp path
+  // tmp_path is the job path
+  // it can happen that there is no job path (jobid == '')  
   $tmp_path = CHRIS_TMP.'/'.$feedname.'-'.$feed_id;
+  if($jobid != ''){
+    $tmp_path .= '/'.$jobid;
+  }
+
   $escaped_tmp_path = str_replace("/", "\/", $tmp_path);
-  $escaped_path  = str_replace("/", "\/", $feed_path);
+  $escaped_path  = str_replace("/", "\/", $job_path);
   $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $runfile");
 
   // copy files back to network space, whith the right permissions
-  $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $plugin_path\";' >> $runfile;");
+  $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $feed_path\";' >> $runfile;");
   // create the json db for the viewer plugin once the data is in its final location
   $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
   $sshLocal->exec("echo 'sudo su $username  -c \"$viewer_plugin --directory $job_path --output $job_path/..\";' >> $runfile;");
@@ -368,6 +374,10 @@ if ($force_chris_local) {
     $end_token = TokenC::create();
     $sshLocal->exec('echo "sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err\"" >> '.$runfile);
   }
+  
+  // rm job_path directory
+  // feed path diretory remains and should be deleteed by the feed:controller when set status to 100
+  $sshLocal->exec("echo 'sudo rm -rf $tmp_path;' >> $runfile;");
 
   // open permissions so user can see its plugin running
   $local_command = "/bin/chgrp -R $groupID $feed_path; /bin/chmod g+rxw -R $feed_path";
@@ -386,7 +396,6 @@ if ($force_chris_local) {
   shell_exec("cp -R $feed_path ".CHRIS_TMP);
 
   $local_command = "/bin/bash umask 0002;/bin/bash $runfile;";
-  $local_command .= "sudo rm -rf $tmp_path;";
   $nohup_wrap = 'bash -c \'nohup bash -c "'.$local_command.'" > /dev/null 2>&1 &\'';
   shell_exec($nohup_wrap);
   $pid = -1;
