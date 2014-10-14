@@ -36,7 +36,7 @@ class FileBrowser(Plugin):
 
   def run(self):
     options = self.options
-    if options.DIR === "":
+    if options.DIR == "":
       print 'No input directory provided.'
       print 'Exiting.'
       return
