@@ -584,6 +584,9 @@ else
     $sshCluster->exec('chmod 775 '.$runfile);
   }
   else{
+    $escaped_chris_plugin = str_replace("/", "\/", CHRIS_PLUGINS_FOLDER);
+    $escaped_chris_net_plugin  = str_replace("/", "\/", CHRIS_PLUGINS_FOLDER_NET);
+    $sshLocal->exec("sed -i 's/$escaped_chris_plugin/$escaped_chris_net_plugin/g' $runfile");
 
     // create the json db for the viewer plugin once the data is in its final location
     $viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
