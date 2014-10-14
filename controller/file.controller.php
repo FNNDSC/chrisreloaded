@@ -45,7 +45,7 @@ require_once ('Net/SSH2.php');
 interface FileControllerInterface
 {
   // Add file in given feed
-  static public function add($feedID, $files, $ssh_connection);
+  static public function add($feedID, $files);
   // Remove file from given feed
   static public function remove($feedID, $files, $ssh_connection);
 }
@@ -59,9 +59,7 @@ class FileC implements FileControllerInterface {
    * Add file in given feed
    * @return bool
    */
-  static public function add($feedID, $files, $ssh_connection) {
-
-    // set permissions with the ssh connection
+  static public function add($feedID, $files) {
 
     // get feed path
     $mapper = new Mapper('Feed');
@@ -72,24 +70,29 @@ class FileC implements FileControllerInterface {
     $mapper->get($resultsFeed['Feed'][0]->user_id);
     $resultsUser = $mapper->get();
 
-    // target directory
-    $dir = CHRIS_USERS.'/'.$resultsUser['User'][0]->username.'/file_browser/'.$resultsFeed['Feed'][0]->name.'-'.$resultsFeed['Feed'][0]->id.'/';
+    // Misc information
+    $userID = $resultsFeed['Feed'][0]->user_id;
+    $userName = $resultsUser['User'][0]->username;
+    $groupID = shell_exec("sudo su $userName -c 'id -g';");
 
-    $ssh_connection->exec('chmod 777 '.$dir);
+    $dir = CHRIS_USERS.'/'.$userName.'/file_browser/'.$resultsFeed['Feed'][0]->name.'-'.$resultsFeed['Feed'][0]->id.'/';
 
     foreach ($files as $key => $value) {
+      $target_tmp_path = '/tmp/'.basename( $value['name']); 
       $target_path = $dir.basename( $value['name']); 
 
-      if(move_uploaded_file($value['tmp_name'], $target_path)) {
-      // all good, set permissions correctly
-        // not through ssh connection, do it as chris
-        exec('chmod 775 '.$target_path);
+      if(move_uploaded_file($value['tmp_name'], $target_tmp_path)) {
+        // all good, set ownership/permissions correctly
+	shell_exec("sudo chown -R $userID:$groupID $target_tmp_path;");
+	shell_exec("sudo su $userName -c 'cp -rvp $target_tmp_path $target_path';");
+	shell_exec("sudo su $userName -c 'chmod -R 755 $target_path';");
+	shell_exec("sudo su $userName -c 'rm -rv $dir/.chris.json';");
+	shell_exec("sudo rm -rf $target_tmp_path;");
       } else{
         // oops.... something went wrong
         return $value['error'];
       }
 
-    $ssh_connection->exec('chmod 755 '.$dir);
     }
 
     // all files uploaded successfully

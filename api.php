@@ -167,11 +167,7 @@ if (!$loggedIn) {
     switch($action) {
       case "add":
         if ($what == 'file') {
-          $ssh_connection = new Net_SSH2(CLUSTER_HOST);
-          if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
-            die('Login Failed');
-          }
-          $result['result'] = FileC::add($_POST['targetFeed'], $_FILES, $ssh_connection);
+          $result['result'] = FileC::add($_POST['targetFeed'], $_FILES);
         } else if($what == 'tag'){
           // user_id, tagname, tagcolor
           $result['result'] = TagC::add($_SESSION['userid'], $_POST['tagname'], $_POST['tagcolor']);
