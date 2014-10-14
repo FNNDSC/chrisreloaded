@@ -573,14 +573,15 @@ else
     $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
+    ////
+    // DELETE REMOTE JOB PATH AFTER ALL THE DATA AS BEEN COPIED BACK
+    /////
+    $cmd = 'rm -rf '.$cluster_job_path.' &;';
+    $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     $runfile = joinPaths($cluster_job_path_output, 'chris.run');
     $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
     $sshCluster->exec('chmod 775 '.$runfile);
-
-    ////
-    // WHEN DO WE DELETE THE REMOTE DATA????
-    /////
   }
   else{
 
