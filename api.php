@@ -204,12 +204,7 @@ if (!$loggedIn) {
           $result['result'] = FeedC::favorite($id);
         }
         else if($what == 'feed_share'){
-          // login since we will modify things on the file system
-          $ssh_connection = new Net_SSH2(CLUSTER_HOST);
-          if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
-            die('Login Failed');
-          }
-          $result['result'] = FeedC::share($id, $result['userid'], $result['username'], $parameters, $ssh_connection);
+          $result['result'] = FeedC::share($id, $result['userid'], $result['username'], $parameters);
         }
         else if($what == 'feed_archive'){
           $result['result'] = FeedC::archive($id);

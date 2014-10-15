@@ -63,7 +63,7 @@ interface FeedControllerInterface
   // cancel the job
   static public function cancel($id, &$ssh_connection);
   // share a feed
-  static public function share($feed_ids, $ownerid, $ownername, $targetname, &$ssh_connection);
+  static public function share($feed_ids, $ownerid, $ownername, $targetname);
   // tag/untag a feed
   static public function tag($feedid, $tagid, $remove);
   // search on tag and plugin
@@ -388,7 +388,7 @@ class FeedC implements FeedControllerInterface {
 }
 
   // share a feed
-  static public function share($feed_ids, $ownerid, $ownername, $targetname, &$ssh_connection){
+  static public function share($feed_ids, $ownerid, $ownername, $targetname){
     foreach( $feed_ids as $feed_id){
       // get target user id
       $userMapper = new Mapper('User');
@@ -448,29 +448,19 @@ class FeedC implements FeedControllerInterface {
           $targetDirectory = CHRIS_USERS.'/'.$ownername.'/'.$feedResult['Feed'][0]->plugin.'/'.$feedResult['Feed'][0]->name.'-'.$feed_id;
 
           $destinationDirectory = CHRIS_USERS.'/'.$targetname.'/'.$feedResult['Feed'][0]->plugin;
-          if(!is_dir($destinationDirectory)){
-            // 777? 775
-            $old = umask();
-            umask(0000);
-            mkdir($destinationDirectory, 0775, true);
-            umask($old);
+	  if(!is_dir($destinationDirectory)){
+	    shell_exec("sudo su $targetname -c 'umask 002; mkdir -p $destinationDirectory;'");
           }
-
           $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
 
-          // just a link?
-          symlink($targetDirectory, $destinationDirectory);
+	  shell_exec("sudo su $targetname -c 'ln -s $targetDirectory $destinationDirectory;'");	
  
           // we need to change the permission of the target directory to 777 (as the owner)
           // so that the other user can write to this folder
           // but only if the targetDirectory is a directory and not a link (a link means it was re-shared)
           if (is_dir($targetDirectory)) {
-            $ssh_connection->exec('chmod -R 777 '.$targetDirectory);
+	    shell_exec("sudo su $ownername -c 'chmod -R 777 $targetDirectory;'");	
           }
-
-          //if(!is_dir($destinationDirectory)){
-          //  recurse_copy($targetDirectory, $destinationDirectory);
-          //}
         }
         else{
           return "Invalid feed id: ". $feed_id;
