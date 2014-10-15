@@ -356,6 +356,7 @@ if ($force_chris_local) {
   $escaped_tmp_path = str_replace("/", "\/", $tmp_path);
   $escaped_path  = str_replace("/", "\/", $job_path);
   $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $runfile");
+  $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $envfile");
 
   // copy files back to network space, whith the right permissions
   $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $feed_path\";' >> $runfile;");
