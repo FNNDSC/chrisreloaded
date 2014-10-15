@@ -347,7 +347,7 @@ if ($force_chris_local) {
 
   // update path to tmp path
   // tmp_path is the job path
-  // it can happen that there is no job path (jobid == '')  
+  // it can happen that there is no job path (jobid == '')
   $tmp_path = CHRIS_TMP.'/'.$feedname.'-'.$feed_id;
   if($jobid != ''){
     $tmp_path .= '/'.$jobid;
@@ -375,7 +375,7 @@ if ($force_chris_local) {
     $end_token = TokenC::create();
     $sshLocal->exec('echo "sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err\"" >> '.$runfile);
   }
-  
+
   // rm job_path directory
   // feed path diretory remains and should be deleteed by the feed:controller when set status to 100
   $sshLocal->exec("echo 'sudo rm -rf $tmp_path;' >> $runfile;");
@@ -452,6 +452,7 @@ else
       $tmp = joinPaths($tmp, 'tmp');
       $sshLocal->exec('cd ' . joinPaths($job_path, $chrisInputDirectory) . '; mkdir tmp;');
     }
+    $tmp_path = joinPaths($job_path, $tmp);
     foreach ($input_options_array as $in) {
       // get location of input in the command array
       $input_key = array_search($in, $plugin_command_array);
@@ -466,7 +467,7 @@ else
           $value_dirname = dirname($value);
         }
         // need to add the full absolute path to make it unique
-        $value_chris_path = joinPaths($job_path, $tmp, $value_dirname);
+        $value_chris_path = joinPaths($tmp_path, $value_dirname);
         // -n to not overwrite file if already there
         // -L to dereference links (copy actual file rather than link)
         $sshLocal->exec('cp -Lrn ' . $value_dirname . ' ' . dirname($value_chris_path));
@@ -479,7 +480,6 @@ else
       //$dir_array contains the list of all subdirectories in the tree with root joinPaths($job_path, $tmp)
       $dir_iter = new RecursiveDirectoryIterator(joinPaths($job_path, $tmp), RecursiveDirectoryIterator::SKIP_DOTS);
       $iter = new RecursiveIteratorIterator($dir_iter, RecursiveIteratorIterator::SELF_FIRST);
-      $tmp_path = joinPaths($job_path, $tmp);
       $dir_array = array($tmp_path);
       foreach ($iter as $dir => $dirObj) {
         if ($dirObj->isDir()) {
