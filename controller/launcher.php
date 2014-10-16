@@ -469,7 +469,9 @@ else
         $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path, $chrisInputDirectory, $value_dirname), $runfile_str);
       }
     }
-    //anonymization
+    $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
+
+    //ANONYMIZATION
     if (ANONYMIZE_DICOM) {
       //$dir_array contains the list of all subdirectories in the tree with root $chrisInput_path
       $dir_iter = new RecursiveDirectoryIterator($chrisInput_path, RecursiveDirectoryIterator::SKIP_DOTS);
@@ -489,7 +491,6 @@ else
         }
       }
     }
-    $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
