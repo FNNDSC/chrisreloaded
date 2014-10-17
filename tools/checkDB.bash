@@ -28,7 +28,7 @@ do
           		read -p "Do you wish to remove it from the DB [1] or add it to the file system [2] or ignore [3]?" yn </dev/tty
 			case $yn in
 				[1]* ) echo 'Deleting from the DB'; mysql -D $dbName -u $dbUser -e "$sqlDeleteFeedCommand$d;$sqlDeleteFeedDataCommand$d;$sqlDeleteFeedTagCommand$d;$sqlDeleteFeedMetaCommand$d;" -p; break;;
-			        [2]* ) echo 'Adding to the FS'; sudo su $a -c "umask 022; mkdir $feedDirectory";break;;
+			        [2]* ) echo 'Adding to the FS'; sudo su $a -c "umask 022; mkdir -p $feedDirectory";break;;
 			        [3]* ) echo 'Ignoring...'; break;;
 			        * ) echo "Please answer 1, 2 or 3.";;
 	                esac
