@@ -340,11 +340,6 @@ if ($force_chris_local) {
   $groupID =  $sshLocal->exec("id -g");
   $groupID = trim($groupID);
 
-  // make sure the permissions are correct
-  // and give all files ownership to users after the job finished.
-  $sshLocal->exec("echo 'sudo chmod -R 755 $feed_path;' >> $runfile;");
-  $sshLocal->exec("echo 'sudo chown -R $user_id:$groupID $feed_path;' >> $runfile;");
-
   // update path to tmp path
   // tmp_path is the job path
   // it can happen that there is no job path (jobid == '')
@@ -357,6 +352,11 @@ if ($force_chris_local) {
   $escaped_path  = str_replace("/", "\/", $job_path);
   $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $runfile");
   $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $envfile");
+
+  // make sure the permissions are correct
+  // and give all files ownership to users after the job finished.
+  $sshLocal->exec("echo 'sudo chmod -R 755 $tmp_path;' >> $runfile;");
+  $sshLocal->exec("echo 'sudo chown -R $user_id:$groupID $tmp_path;' >> $runfile;");
 
   // copy files back to network space, whith the right permissions
   $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $feed_path\";' >> $runfile;");
