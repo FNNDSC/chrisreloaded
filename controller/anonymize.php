@@ -2,12 +2,12 @@
 
 <?php
 
-$chrisInput_path = ${CHRISINPUT_PATH};
-$chris_bin = ${CHRIS_BIN};
-$chris_scrips = ${CHRIS_SCRIPTS};
+$chrisInput_path = "${CHRISINPUT_PATH}";
+$chris_bin = "${CHRIS_BIN}";
+$chris_scripts = "${CHRIS_SCRIPTS}";
 
 $dir_iter = new RecursiveDirectoryIterator($chrisInput_path, RecursiveDirectoryIterator::SKIP_DOTS);
-$iter = new RecursiveIteratorIterator(\$dir_iter, RecursiveIteratorIterator::SELF_FIRST);
+$iter = new RecursiveIteratorIterator($dir_iter, RecursiveIteratorIterator::SELF_FIRST);
 $dir_array = array($chrisInput_path);
 foreach ($iter as $dir => $dirObj) {
     if ($dirObj->isDir()) {

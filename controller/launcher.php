@@ -471,24 +471,6 @@ else
     }
     $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
-    //ANONYMIZATION
-    if (ANONYMIZE_DICOM) {
-      $anonfile = joinPaths($job_path_output, 'chris.anon');
-      // copy template over
-      $sshLocal->exec("cp ".joinPaths(CHRIS_SRC, "controller/anonymize.php")." $anonfile");
-      // update template content
-      $sshLocal->exec("sed -i 's/\${CHRISINPUT_PATH}/$chrisInput_path/g' $anonfile");
-      $chris_bin = joinPaths(CHRIS_HOME, "bin");
-      $chris_bin_escaped  = str_replace("/", "\/", $chris_bin);
-      $sshLocal->exec("sed -i 's/\${CHRIS_BIN}/$chris_bin_escaped/g' $anonfile");
-      $chris_scripts = joinPaths(CHRIS_SRC, "../scripts");
-      $chris_scripts_escaped  = str_replace("/", "\/", $chris_scripts);
-      $sshLocal->exec("sed -i 's/\${CHRIS_SCRIPTS}/$chris_scripts_escaped/g' $anonfile");
-      // replace vars
-      $sshLocal->exec('echo '.$anonCmd.' >>  '.$anonfile);   
-      $sshLocal->exec('chmod 755 '.$anonfile);   
-    }
-
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
     //
@@ -546,6 +528,30 @@ else
     $cmd = '\"'.$viewer_plugin.' --directory '.$job_path.' --output '.$job_path.'/..;\"';
     $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+    //ANONYMIZATION
+    if (ANONYMIZE_DICOM) {
+      $anonfile = joinPaths($job_path_output, 'chris.anon');
+      // copy template over
+      $sshLocal->exec("cp ".joinPaths(CHRIS_SRC, "controller/anonymize.php")." $anonfile");
+      // update template content
+      $chrisInput_path_escaped  = str_replace("/", "\/", $chrisInput_path);
+      $sshLocal->exec("sed -i 's/\${CHRISINPUT_PATH}/$chrisInput_path_escaped/g' $anonfile");
+
+      $chris_bin = joinPaths(CHRIS_HOME, "bin");
+      $chris_bin_escaped  = str_replace("/", "\/", $chris_bin);
+      $sshLocal->exec("sed -i 's/\${CHRIS_BIN}/$chris_bin_escaped/g' $anonfile");
+
+      $chris_scripts = joinPaths(CHRIS_SRC, "../scripts");
+      $chris_scripts_escaped  = str_replace("/", "\/", $chris_scripts);
+      $sshLocal->exec("sed -i 's/\${CHRIS_SCRIPTS}/$chris_scripts_escaped/g' $anonfile");
+
+      $sshLocal->exec('chmod 755 '.$anonfile);
+
+      $cmd = '\"php '.$anonfile.';\"';
+      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+      $runfile_str = $cmd.PHP_EOL.$runfile_str;
+    }
 
     //
     // UPDATE FEED STATUS
