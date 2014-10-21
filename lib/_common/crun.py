@@ -803,12 +803,12 @@ class crun_hpc_chpc(crun_hpc):
         else:
             self._str_scheduleArgs      = ''
             if len(self._str_jobID):
-                self._str_scheduleArgs += "-O %s -E %s " % (
+                self._str_scheduleArgs += "-o %s -e %s " % (
                                 self._str_schedulerStdOut,
                                 self._str_schedulerStdErr)
             if self._b_emailWhenDone and len(self._str_emailUser):
-                self._str_scheduleArgs += "-m %s " % self._str_emailUser
-            self._str_scheduleArgs     += "-q %s -c " % self._str_queue
+                self._str_scheduleArgs += "-M %s " % self._str_emailUser
+            self._str_scheduleArgs     += "-q %s -- " % self._str_queue
         return self._str_scheduleArgs
 
     def queueInfo(self, **kwargs):
