@@ -93,7 +93,7 @@ define('CHRIS_MAIL_SUFFIX', '@nmr.mgh.harvard.edu');
  * When the user receives the email, this is what appears in the 'from' email
  * field.
  */
-define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@nmr.mgh.tch.harvard.edu');
+define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@nmr.mgh.harvard.edu');
 /**
  * The ChRIS source location.
  * This is the full name of the directory containing the ChRIS source code.
@@ -232,7 +232,7 @@ define('CHRIS_DICOM_EMAIL_TO', 'rudolph@nmr.mgh.harvard.edu');
  * The Dicom email from.
  * The name of the database which contains all the ChRIS information.
  */
-define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.tch.harvard.edu');
+define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.nmr.mgh.harvard.edu');
 /**
  * The destination AETITLE.
  * The remote machine where the data will be pushed after a pacs_pull retrieval.
@@ -325,7 +325,7 @@ define('CHRIS_USERS_CONFIG_SSHKEY', 'id_rsa');
  * The main use case is if a plugins requires something that the cluster doesn't
  * provide, i.e. php5.
  */
-define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
+define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push,findsession');
 
 
 // --------------------------------------------------------------------------
