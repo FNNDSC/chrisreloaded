@@ -95,4 +95,5 @@ if __name__ == "__main__":
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--host', action='store', default='kaos.nmr.mgh.harvard.edu',  dest='HOST', help='Target host')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--port', action='store', default='10402', dest='PORT', help='Target port')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--aetitle', action='store', default="default", dest='AETITLE', help='User AETITLE')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--findsessionscript', action='store', dest='FindSessionScript', default=plugin.envVars['ENV_FINDSESSION_SCRIPT'], help='The find session script')
   plugin.launch()

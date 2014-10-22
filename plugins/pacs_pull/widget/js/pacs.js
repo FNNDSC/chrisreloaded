@@ -752,7 +752,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.download = function() {
       if (_CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["Status"][j] == true) {
         // write csv column headers if list is empty
         if(list === ''){
-           list += '"PatientID","PatientName","PatientBirthDate","PatientSex","StudyInstanceUID","StudyDescription","StudyDate","PerformedStationAETitle","ModalitiesInStudy","SeriesInstanceUID","SeriesDescription","NumberOFSeriesRelatedInstances"\r\n'
+           list += '"PatientID","PatientName","PatientBirthDate","PatientSex","StudyInstanceUID","StudyDescription","StudyDate","PerformedStationAETitle","ModalitiesInStudy","SeriesInstanceUID","SeriesDescription","NumberOfSeriesRelatedInstances"\r\n'
         }
   
         // write table content
@@ -764,11 +764,11 @@ _CHRIS_INTERACTIVE_PLUGIN_.download = function() {
              + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["StudyInstanceUID"][j] + '",'
              + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["StudyDescription"][index] + '",'
              + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["StudyDate"][index] + '",'
-             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["PerformedStationAETitle"][index] + '",'
-             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["ModalitiesInStudy"][index] + '",'
+             + '"' + (typeof _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["PerformedStationAETitle"] !== 'undefined' ? _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["PerformedStationAETitle"][index] : 'nvp' ) + '",'
+             + '"' + (typeof _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["ModalitiesInStudy"] !== 'undefined' ? _CHRIS_INTERACTIVE_PLUGIN_.cachedRaw[0]["ModalitiesInStudy"][index] : 'nvp' ) + '",'
              + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["SeriesInstanceUID"][j] + '",'
              + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["SeriesDescription"][j] + '",'
-             + '"' + _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["NumberOfSeriesRelatedInstances"][j] + '",'
+             + '"' + (typeof _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["NumberOfSeriesRelatedInstances"] !== 'undefined' ? _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries[study_key]["NumberOfSeriesRelatedInstances"][j] : 'nvp' )  + '",'
              +  '\r\n';
 
       }

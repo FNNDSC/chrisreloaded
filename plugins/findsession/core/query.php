@@ -46,8 +46,9 @@ if ($commandline_mode) {
   // parse the options if we are in commandline mode
 
   // define the options
-  $shortopts = "e:i:I:p:o:s:x:rtvh";
+  $shortopts = "c:e:i:I:p:o:s:x:rtvh";
   $longopts  = array(
+      "script:",
       "name:",
       "sessionid:",
       "subjectid:",
@@ -71,6 +72,17 @@ var_dump($options);
     echo "\n";
     return;
   }
+  
+  $script = '';
+  if( array_key_exists('c', $options))
+  {
+    $script = $options['c'];
+  }
+  elseif (array_key_exists('script', $options))
+  {
+    $script = $options['script'];
+  }
+  
   
   $name = '';
   if( array_key_exists('e', $options))
@@ -175,7 +187,7 @@ var_dump($options);
 }
 
 // build command
-$command = ENV_FINDSESSION_SCRIPT;
+$command = $script;
 
 $command .= ($name != '')?' -e '.$name:'';
 $command .= ($session_id != '')?' -i '.$session_id:'';

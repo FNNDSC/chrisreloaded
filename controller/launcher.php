@@ -353,6 +353,18 @@ if ($force_chris_local) {
   $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $runfile");
   $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $envfile");
 
+  // replace feed patd
+  $escaped_feed_path  = str_replace("/", "\/", $feed_path);
+  $sshLocal->exec("sed -i 's/$escaped_feed_path/$escaped_tmp_path/g' $runfile");
+
+  // replace plugin dir
+  $escaped_plugin_path  = str_replace("/", "\/", $plugin_path);
+  $sshLocal->exec("sed -i 's/$escaped_plugin_path/$escaped_tmp_path/g' $runfile");
+
+  // replace user dir
+  $escaped_user_path  = str_replace("/", "\/", $user_path);
+  $sshLocal->exec("sed -i 's/$escaped_user_path/$escaped_tmp_path/g' $runfile");
+
   // make sure the permissions are correct
   // and give all files ownership to users after the job finished.
   $sshLocal->exec("echo 'sudo chmod -R 755 $tmp_path;' >> $runfile;");
@@ -368,7 +380,7 @@ if ($force_chris_local) {
   if($status != 100){
     // prepend
     $start_token = TokenC::create();
-    $sshLocal->exec('sed -i "1i '.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err" '.$runfile);
+    $sshLocal->exec('sed -i "1i sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err"\"'.$runfile);
 
     // append
     // we need sudo su to run it at the right location after the data has been copied back
