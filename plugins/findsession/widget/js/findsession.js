@@ -44,6 +44,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
                      {"name": "FINDS_s", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("datesince")},
                      {"name": "FINDS_t", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("datetoday")},
                      {"name": "FINDS_x", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("experimenter")}
+                     {"name": "FINDS_SCRIPT", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("findsessionscript")}
 //                     {"name": "FINDS_v", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("verbose")}
 );
         },

@@ -56,6 +56,8 @@ $date_today = is_set($_POST['FINDS_t']);
 $experimenter = is_set($_POST['FINDS_x']);
 // verbose
 $verbose = 1;//is_set($_POST['FINDS_v']);
+// session script
+$script = is_set($_POST['FINDS_SCRIPT']);
 
 // we silent the Output Buffer
 // if not, query.php returns the json output + "#!/usr/bin/php"
