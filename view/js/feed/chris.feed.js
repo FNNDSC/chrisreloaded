@@ -46,6 +46,7 @@ _FEED_.preview = function(file) {
   case 'STATUS':
   case 'PARAM':
   case 'RUN':
+  case 'ANON':
     _PREVIEW_.start('text', null, file);
     break;
   }

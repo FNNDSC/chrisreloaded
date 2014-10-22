@@ -340,11 +340,6 @@ if ($force_chris_local) {
   $groupID =  $sshLocal->exec("id -g");
   $groupID = trim($groupID);
 
-  // make sure the permissions are correct
-  // and give all files ownership to users after the job finished.
-  $sshLocal->exec("echo 'sudo chmod -R 755 $feed_path;' >> $runfile;");
-  $sshLocal->exec("echo 'sudo chown -R $user_id:$groupID $feed_path;' >> $runfile;");
-
   // update path to tmp path
   // tmp_path is the job path
   // it can happen that there is no job path (jobid == '')
@@ -357,6 +352,11 @@ if ($force_chris_local) {
   $escaped_path  = str_replace("/", "\/", $job_path);
   $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $runfile");
   $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $envfile");
+
+  // make sure the permissions are correct
+  // and give all files ownership to users after the job finished.
+  $sshLocal->exec("echo 'sudo chmod -R 755 $tmp_path;' >> $runfile;");
+  $sshLocal->exec("echo 'sudo chown -R $user_id:$groupID $tmp_path;' >> $runfile;");
 
   // copy files back to network space, whith the right permissions
   $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $feed_path\";' >> $runfile;");
@@ -471,27 +471,6 @@ else
     }
     $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
-    //ANONYMIZATION
-    if (ANONYMIZE_DICOM) {
-      //$dir_array contains the list of all subdirectories in the tree with root $chrisInput_path
-      $dir_iter = new RecursiveDirectoryIterator($chrisInput_path, RecursiveDirectoryIterator::SKIP_DOTS);
-      $iter = new RecursiveIteratorIterator($dir_iter, RecursiveIteratorIterator::SELF_FIRST);
-      $dir_array = array($chrisInput_path);
-      foreach ($iter as $dir => $dirObj) {
-        if ($dirObj->isDir()) {
-          $dir_array[] = $dir;
-        }
-      }
-      //for each subdirectory in the tree find out if it contains dicom files and if so then run anonymization
-      //the output goes to the same directory overwriting the previous dicom file
-      foreach ($dir_array as $dir) {
-        $dicomFiles = glob($dir.'/*.dcm');
-        if (count($dicomFiles)) {
-          $sshLocal->exec('PATH='.joinPaths(CHRIS_HOME, 'bin').':'.joinPaths(CHRIS_SRC, '../scripts').':$PATH; dcmanon_meta.bash -P -O ' . $dir . ' -D ' . $dir);
-        }
-      }
-    }
-
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
     //
@@ -549,6 +528,30 @@ else
     $cmd = '\"'.$viewer_plugin.' --directory '.$job_path.' --output '.$job_path.'/..;\"';
     $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+    //ANONYMIZATION
+    if (ANONYMIZE_DICOM) {
+      $anonfile = joinPaths($job_path_output, 'chris.anon');
+      // copy template over
+      $sshLocal->exec("cp ".joinPaths(CHRIS_SRC, "controller/anonymize.php")." $anonfile");
+      // update template content
+      $chrisInput_path_escaped  = str_replace("/", "\/", $chrisInput_path);
+      $sshLocal->exec("sed -i 's/\${CHRISINPUT_PATH}/$chrisInput_path_escaped/g' $anonfile");
+
+      $chris_bin = joinPaths(CHRIS_HOME, "bin");
+      $chris_bin_escaped  = str_replace("/", "\/", $chris_bin);
+      $sshLocal->exec("sed -i 's/\${CHRIS_BIN}/$chris_bin_escaped/g' $anonfile");
+
+      $chris_scripts = joinPaths(CHRIS_SRC, "../scripts");
+      $chris_scripts_escaped  = str_replace("/", "\/", $chris_scripts);
+      $sshLocal->exec("sed -i 's/\${CHRIS_SCRIPTS}/$chris_scripts_escaped/g' $anonfile");
+
+      $sshLocal->exec('chmod 755 '.$anonfile);
+
+      $cmd = '\"php '.$anonfile.';\"';
+      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+      $runfile_str = $cmd.PHP_EOL.$runfile_str;
+    }
 
     //
     // UPDATE FEED STATUS
