@@ -381,7 +381,7 @@ define('CLUSTER_CHRIS_LIB', joinPaths('/SCRATCH4/cubic/chris', 'lib'));
  * {FEED_ID} will be replaced in the launcher with the correct FEEDID.
  * FEED_ID is important to be able to kill a job.
  */
-define('CLUSTER_RUN', 'nohup qsub -e ~/scratch/err -o ~/scratch/std -q workq -- {COMMAND} 2>&1 | awk -F \. \'{print $1}\';');
+define('CLUSTER_RUN', '/opt/pbs/default/bin/qsub -e ~/scratch/err -o ~/scratch/std -q workq -- {COMMAND} 2>&1 | awk -F \. \'{print $1}\';');
 /**
  * The cluster kill command.
  * We specify the command to terminate a job on the cluster.
