@@ -777,7 +777,7 @@ class crun_hpc_chpc(crun_hpc):
         self._str_emailUser             = "rudolph"
         self._str_jobID                 = ""
         self._str_jobInfoDir            = "~/scratch"
-        self._b_singleQuoteCmd          = True
+        self._b_singleQuoteCmd          = False
         self._str_queue                 = "workq"
 
         self._priority                  = 50

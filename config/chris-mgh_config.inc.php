@@ -388,7 +388,6 @@ define('CLUSTER_CHRIS_LIB', joinPaths(CHRIS_HOME, 'lib'));
  * FEED_ID is important to be able to kill a job.
  */
 define('CLUSTER_RUN', 'pbsubmit -q max200 -c "{COMMAND}" 2>&1 | tail -n 1 | awk -F \. \'\\\'\'{print $1}\'\\\'\'');
-// RET=$(pbsubmit -q max200 -c "sleep 60" 2>&1 | tail -n 1 | awk -F \. '{print $1}') && echo "$RET"
 /**
  * The cluster kill command.
  * We specify the command to terminate a job on the cluster.
