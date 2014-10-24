@@ -46,8 +46,9 @@ if ($commandline_mode) {
   // parse the options if we are in commandline mode
 
   // define the options
-  $shortopts = "c:e:i:I:p:o:s:x:rtvh";
+  $shortopts = "u:c:e:i:I:p:o:s:x:rtvh";
   $longopts  = array(
+      "username:",
       "script:",
       "name:",
       "sessionid:",
@@ -71,6 +72,16 @@ var_dump($options);
     echo "this is the help!";
     echo "\n";
     return;
+  }
+  
+  $username = '';
+  if( array_key_exists('u', $options))
+  {
+    $script = $options['u'];
+  }
+  elseif (array_key_exists('username', $options))
+  {
+    $script = $options['username'];
   }
   
   $script = '';
@@ -217,8 +228,19 @@ foreach( $output as $key => $value){
 
     // split string on first semi-colon
     $split = explode(':', $value, 2);
-
     $formated_output['aaData'][$index - 1][] = trim($split[1]);
+
+    if(trim($split[0]) == "PATH"){
+      $path = trim($split[1]);
+      
+      if(shell_exec("sudo su $username -c 'cd $path && echo 1';") != 1){
+        unset($formated_output['aaData'][$index - 1]);
+        $index--;
+      }
+      else{
+      echo 'OK: '.$path.PHP_EOL;
+     }
+    }
 
   }
   else{

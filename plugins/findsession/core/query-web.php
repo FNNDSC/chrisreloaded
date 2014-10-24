@@ -58,6 +58,8 @@ $experimenter = is_set($_POST['FINDS_x']);
 $verbose = 1;//is_set($_POST['FINDS_v']);
 // session script
 $script = is_set($_POST['FINDS_SCRIPT']);
+// session script
+$username = is_set($_POST['FINDS_USERNAME']);
 
 // we silent the Output Buffer
 // if not, query.php returns the json output + "#!/usr/bin/php"

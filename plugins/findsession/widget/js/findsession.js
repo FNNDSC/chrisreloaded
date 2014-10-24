@@ -40,12 +40,12 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
                      {"name": "FINDS_I", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("subjectid")},
                      {"name": "FINDS_p", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("project")},
                      {"name": "FINDS_o", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("dateon")},
-                     {"name": "FINDS_r", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("datepast4months")},
+                     {"name": "FINDS_r", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("datepastfourmonths")},
                      {"name": "FINDS_s", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("datesince")},
                      {"name": "FINDS_t", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("datetoday")},
-                     {"name": "FINDS_x", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("experimenter")}
-                     {"name": "FINDS_SCRIPT", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("findsessionscript")}
-//                     {"name": "FINDS_v", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("verbose")}
+                     {"name": "FINDS_x", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("experimenter")},
+                     {"name": "FINDS_SCRIPT", "value":  _CHRIS_INTERACTIVE_PLUGIN_.getParam("findsessionscript")},
+                     {"name": "FINDS_USERNAME", "value": _CHRIS_INTERACTIVE_PLUGIN_.getParam("username") }
 );
         },
         "aoColumns": [
@@ -101,13 +101,12 @@ _CHRIS_INTERACTIVE_PLUGIN_.init = function() {
   $('#findsession_table_filter').css('padding-top', '5px');
 
   $("#findsession_table_wrapper > div:first").width($("#findsession_table_wrapper").width());
-  $("#findsession_table_wrapper > div:first").css('position', 'fixed');
-  $("#findsession_table_wrapper > div:first").css('margin-top', '-42px');
+  $("#findsession_table_wrapper > div:first").css('width', '100%');
   $("#findsession_table_wrapper > div:first").css('display', 'flex');
   $("#findsession_table_wrapper > div:first").css('background-color', '#353535');
   $("#findsession_table_wrapper > div:first").css('color', '#ffffff');
   
-  $("#findsession_table").css('margin-top', '42px');
+  $("#findsession_table").css('width', '100%');
 }
 
 _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
