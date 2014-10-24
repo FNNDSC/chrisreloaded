@@ -380,7 +380,7 @@ if ($force_chris_local) {
   if($status != 100){
     // prepend
     $start_token = TokenC::create();
-    $sshLocal->exec('sed -i "1i sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err"\"'.$runfile);
+    $sshLocal->exec('sed -i "1i sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err"\" '.$runfile);
 
     // append
     // we need sudo su to run it at the right location after the data has been copied back
@@ -409,6 +409,7 @@ if ($force_chris_local) {
   shell_exec("cp -R $feed_path ".CHRIS_TMP);
 
   $local_command = "/bin/bash umask 0002;/bin/bash $runfile;";
+
   $nohup_wrap = 'bash -c \'nohup bash -c "'.$local_command.'" > /dev/null 2>&1 &\'';
   shell_exec($nohup_wrap);
   $pid = -1;
@@ -632,3 +633,4 @@ FeedC::addMeta($feed_id, Array(0 => $metaObject));
 
 echo $feed_id;
 ?>
+
