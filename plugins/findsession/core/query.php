@@ -73,7 +73,7 @@ var_dump($options);
     echo "\n";
     return;
   }
-  
+
   $username = '';
   if( array_key_exists('u', $options))
   {
@@ -83,7 +83,7 @@ var_dump($options);
   {
     $script = $options['username'];
   }
-  
+
   $script = '';
   if( array_key_exists('c', $options))
   {
@@ -93,8 +93,8 @@ var_dump($options);
   {
     $script = $options['script'];
   }
-  
-  
+
+
   $name = '';
   if( array_key_exists('e', $options))
   {
@@ -104,7 +104,7 @@ var_dump($options);
   {
     $name = $options['name'];
   }
-  
+
   $session_id = '';
   if( array_key_exists('i', $options))
   {
@@ -114,7 +114,7 @@ var_dump($options);
   {
     $session_id = $options['sessionid'];
   }
-  
+
   $subject_id = '';
   if( array_key_exists('I', $options))
   {
@@ -134,7 +134,7 @@ var_dump($options);
   {
     $project = $options['project'];
   }
-  
+
   $date_on = '';
   if( array_key_exists('o', $options))
   {
@@ -184,7 +184,7 @@ var_dump($options);
   {
     $experimenter = sanitize($options['experimenter']);
   }
-  
+
   $verbose = '';
   if( array_key_exists('v', $options))
   {
@@ -194,7 +194,7 @@ var_dump($options);
   {
     $verbose = true;
   }
-  
+
 }
 
 // build command
@@ -232,8 +232,8 @@ foreach( $output as $key => $value){
 
     if(trim($split[0]) == "PATH"){
       $path = trim($split[1]);
-      
-      if(shell_exec("sudo su $username -c 'cd $path && echo 1';") != 1){
+
+      if (checkDirAccessible($username, $path)) {
         unset($formated_output['aaData'][$index - 1]);
         $index--;
       }
@@ -244,7 +244,7 @@ foreach( $output as $key => $value){
 
   }
   else{
-    
+
   $formated_output['aaData'][$index] = '';
   $index++;
 

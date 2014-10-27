@@ -50,6 +50,29 @@ function joinPaths($args) {
 }
 
 /**
+ * Checks if a user has reading access to a directory (dosen't chech if the user
+ * is the owner).
+ *
+ * @param string $username User name.
+ * @param string $path Absolute directory path.
+ *
+ */
+function checkDirAccessible($username, $path) {
+  $perms = fileperms($path);
+  if ($perms & 0x0004) {
+    return true;
+  } elseif ($perms & 0x0020) {
+    $dir_group = filegroup($path);
+    $user_groups = shell_exec('id -G ' . $username);
+    $user_group_arr = explode( ' ', $user_groups);
+    if (in_array($dir_group, $user_group_arr)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Remove invalid characters from a string and replace it by '_'
  * @param string $dirty
  * @todo use regular expressions to replace everything in one command
