@@ -319,7 +319,7 @@ define('CHRIS_USERS_CONFIG_SSHKEY', 'id_rsa');
  * The main use case is if a plugins requires something that the cluster doesn't
  * provide, i.e. php5.
  */
-define('CHRIS_RUN_AS_CHRIS_LOCAL', 'file_browser,pacs_pull,search,pacs_push,chris_push');
+define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
 
 
 // --------------------------------------------------------------------------
@@ -339,7 +339,7 @@ define('CLUSTER_HOST', 'sun.chpc.ac.za');
 * This is by default 22 but if a tunnel is needed and it is set up then change it
 * to the actual tunnel port.
  */
-define('CLUSTER_PORT', 22);
+define('CLUSTER_PORT', 2468);
 /**
  * The cluster type.
  * We specify the cluster type in order for crun to know how to handle the
