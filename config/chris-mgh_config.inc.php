@@ -93,7 +93,7 @@ define('CHRIS_MAIL_SUFFIX', '@nmr.mgh.harvard.edu');
  * When the user receives the email, this is what appears in the 'from' email
  * field.
  */
-define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@nmr.mgh.tch.harvard.edu');
+define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@nmr.mgh.harvard.edu');
 /**
  * The ChRIS source location.
  * This is the full name of the directory containing the ChRIS source code.
@@ -232,7 +232,7 @@ define('CHRIS_DICOM_EMAIL_TO', 'rudolph@nmr.mgh.harvard.edu');
  * The Dicom email from.
  * The name of the database which contains all the ChRIS information.
  */
-define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.tch.harvard.edu');
+define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.nmr.mgh.harvard.edu');
 /**
  * The destination AETITLE.
  * The remote machine where the data will be pushed after a pacs_pull retrieval.
@@ -325,7 +325,7 @@ define('CHRIS_USERS_CONFIG_SSHKEY', 'id_rsa');
  * The main use case is if a plugins requires something that the cluster doesn't
  * provide, i.e. php5.
  */
-define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
+define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push,findsession');
 
 
 // --------------------------------------------------------------------------
@@ -387,14 +387,14 @@ define('CLUSTER_CHRIS_LIB', joinPaths(CHRIS_HOME, 'lib'));
  * {FEED_ID} will be replaced in the launcher with the correct FEEDID.
  * FEED_ID is important to be able to kill a job.
  */
-define('CLUSTER_RUN', 'RET=$(pbsubmit -q max200 -c "{COMMAND}" 2>&1) && echo "$RET" | tail -1');
+define('CLUSTER_RUN', 'pbsubmit -q max200 -c "{COMMAND}" 2>&1 | tail -n 1 | awk -F \. \'\\\'\'{print $1}\'\\\'\'');
 /**
  * The cluster kill command.
  * We specify the command to terminate a job on the cluster.
  * {FEED_ID} will be replaced in the launcher with the plugin required id, in
  * the feed.controller.php
  */
-define('CLUSTER_KILL', 'qdel {FEED_ID}');
+define('CLUSTER_KILL', 'qdel {PID}');
 
 // --------------------------------------------------------------------------
 //

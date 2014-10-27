@@ -46,8 +46,9 @@ if ($commandline_mode) {
   // parse the options if we are in commandline mode
 
   // define the options
-  $shortopts = "c:e:i:I:p:o:s:x:rtvh";
+  $shortopts = "u:c:e:i:I:p:o:s:x:rtvh";
   $longopts  = array(
+      "username:",
       "script:",
       "name:",
       "sessionid:",
@@ -72,7 +73,17 @@ var_dump($options);
     echo "\n";
     return;
   }
-  
+
+  $username = '';
+  if( array_key_exists('u', $options))
+  {
+    $script = $options['u'];
+  }
+  elseif (array_key_exists('username', $options))
+  {
+    $script = $options['username'];
+  }
+
   $script = '';
   if( array_key_exists('c', $options))
   {
@@ -82,8 +93,8 @@ var_dump($options);
   {
     $script = $options['script'];
   }
-  
-  
+
+
   $name = '';
   if( array_key_exists('e', $options))
   {
@@ -93,7 +104,7 @@ var_dump($options);
   {
     $name = $options['name'];
   }
-  
+
   $session_id = '';
   if( array_key_exists('i', $options))
   {
@@ -103,7 +114,7 @@ var_dump($options);
   {
     $session_id = $options['sessionid'];
   }
-  
+
   $subject_id = '';
   if( array_key_exists('I', $options))
   {
@@ -123,7 +134,7 @@ var_dump($options);
   {
     $project = $options['project'];
   }
-  
+
   $date_on = '';
   if( array_key_exists('o', $options))
   {
@@ -173,7 +184,7 @@ var_dump($options);
   {
     $experimenter = sanitize($options['experimenter']);
   }
-  
+
   $verbose = '';
   if( array_key_exists('v', $options))
   {
@@ -183,7 +194,7 @@ var_dump($options);
   {
     $verbose = true;
   }
-  
+
 }
 
 // build command
@@ -211,18 +222,31 @@ $formated_output = array(
 
 $index = 0;
 
+$user_groups = shell_exec('id -G ' . $username);
+$user_group_arr = explode( ' ', $user_groups);
 foreach( $output as $key => $value){
   // skip decorator
   if($value != "======="){
 
     // split string on first semi-colon
     $split = explode(':', $value, 2);
-
     $formated_output['aaData'][$index - 1][] = trim($split[1]);
+
+    if(trim($split[0]) == "PATH"){
+      $path = trim($split[1]);
+
+      if (checkDirGroupAccessible($user_group_arr, $path)) {
+        unset($formated_output['aaData'][$index - 1]);
+        $index--;
+      }
+      else{
+      echo 'OK: '.$path.PHP_EOL;
+     }
+    }
 
   }
   else{
-    
+
   $formated_output['aaData'][$index] = '';
   $index++;
 

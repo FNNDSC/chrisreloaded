@@ -47,8 +47,16 @@ class FindSession(Plugin):
     if list_directories:
       for directory in list_directories:
         print '======================================='
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Copy directory over...'
+        command = 'mkdir -p ' + options.output + '/rawdata; chmod 777 ' + options.output + '/rawdata; sudo su ' + options.USERNAME + ' -c "cp -rLv ' + directory + ' ' + options.output  + '/rawdata; chmod 755 ' + options.output + "/rawdata/" + os.path.basename(os.path.normpath(directory)) +  ';  chmod 644 ' +options.output+ '/rawdata/' + os.path.basename(os.path.normpath(directory)) +  '/*;"'
+        print command
+        output = os.system(command)
+        print 'output:'
+        print output
+
+        print '======================================='
         print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
-        command = current_dir + "/../pacs_push/pacs_push --directory " + directory + " --host " + options.HOST + " --port " + options.PORT + " --extension '*' --aetitle " + options.AETITLE + " --output " + options.output 
+        command = current_dir + "/../pacs_push/pacs_push --directory " + options.output + "/rawdata/" + os.path.basename(os.path.normpath(directory)) + " --host " + options.HOST + " --port " + options.PORT + " --extension '*' --aetitle " + options.AETITLE + " --output " + options.output 
         print 'command:'
         print command
         output = os.system(command)
@@ -72,6 +80,9 @@ class FindSession(Plugin):
           for name in files:
             os.unlink(os.path.join(root, name))
 
+        #delete link created by pacs_push plugin
+        # this link is broken anyway, since the plugin was running in /tmp directory and is then deleted
+        os.unlink( os.path.join( options.output,os.path.basename(os.path.normpath(directory)) ) )
 
         
 # ENTRYPOINT
@@ -92,6 +103,7 @@ if __name__ == "__main__":
   plugin.add_parameter('Date', Plugin.BOOLEAN, '--datetoday', action='store_true', dest='TODAY', help='Session was today')
   plugin.add_parameter('More (ADVANCED)', Plugin.STRING, '--experimenter', action='store', dest='XPERIMNTR', help='Experimenter')
   plugin.add_parameter('HIDDEN', Plugin.STRING, '--listdirectories', action='store', dest='LIST_DIRECTORIES', help='Directories to be pushed to ChRIS')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--username', action='store', dest='USERNAME', default='chris', help='Username of the person running the feed')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--host', action='store', default='kaos.nmr.mgh.harvard.edu',  dest='HOST', help='Target host')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--port', action='store', default='10402', dest='PORT', help='Target port')
   plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--aetitle', action='store', default="default", dest='AETITLE', help='User AETITLE')

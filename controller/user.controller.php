@@ -247,6 +247,8 @@ class UserC implements UserControllerInterface {
     if(!file_exists($user_config_file)){
       $ssh->exec('cp  '.$chris_config_file.' '.$user_config_file. ';chmod 664  '.$user_config_file.';');
     }
+
+    $ssh->exec("sed -i 's/\${USERNAME}/$username/g' $user_config_file");
   }
 
   /**

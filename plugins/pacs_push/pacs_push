@@ -173,6 +173,9 @@ class PACSPush(Plugin):
     extensions = tuple(options.EXT)
     for root, dirs, files in os.walk(options.DIR, topdown=False, followlinks=True):
       for fileName in files:
+        if extensions == ('*',):
+          pushableDirs.append(root)
+          break
         if fileName.endswith(extensions):
           pushableDirs.append(root)
           break

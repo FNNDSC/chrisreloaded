@@ -50,6 +50,26 @@ function joinPaths($args) {
 }
 
 /**
+ * Checks if any group in a group array have reading access to a directory.
+ *
+ * @param array $group_arr Array of groups.
+ * @param string $path Absolute directory path.
+ *
+ */
+function checkDirGroupAccessible($group_arr, $path) {
+  $perms = fileperms($path);
+  if ($perms & 0x0004) {
+    return true;
+  } elseif ($perms & 0x0020) {
+    $dir_group = filegroup($path);
+    if (in_array($dir_group, $group_arr)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
  * Remove invalid characters from a string and replace it by '_'
  * @param string $dirty
  * @todo use regular expressions to replace everything in one command
