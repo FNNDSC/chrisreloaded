@@ -57,15 +57,19 @@ function joinPaths($args) {
  *
  */
 function checkDirGroupAccessible($group_arr, $path) {
+  $f = "/tmp/cda/txt";
   $perms = fileperms($path);
   if ($perms & 0x0004) {
     return true;
   } elseif ($perms & 0x0020) {
     $dir_group = filegroup($path);
+    dprint("f", "dir group = ". $dir_group ." " );
     if (in_array($dir_group, $group_arr)) {
+      dprint("f", "in_array = TRUE\n");
       return true;
     }
   }
+  dprint("f", "returning FALSE\n");
   return false;
 }
 
