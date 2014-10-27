@@ -235,13 +235,14 @@ foreach( $output as $key => $value){
     if(trim($split[0]) == "PATH"){
       $path = trim($split[1]);
 
-      if (checkDirGroupAccessible($user_group_arr, $path)) {
+      if (!checkDirGroupAccessible($user_group_arr, $path)) {
         unset($formated_output['aaData'][$index - 1]);
         $index--;
       }
       else{
       echo 'OK: '.$path.PHP_EOL;
      }
+      echo PHP_EOL;
     }
 
   }
