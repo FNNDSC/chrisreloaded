@@ -79,7 +79,7 @@ define('CHRIS_TRANSFER_PROTOCOL', 'http');
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
- define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/jorge');
+ define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/rudolph');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
@@ -99,7 +99,7 @@ define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.tch.harvard.edu');
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
+define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'rudolph'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
