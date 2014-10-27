@@ -50,22 +50,19 @@ function joinPaths($args) {
 }
 
 /**
- * Checks if a user has reading access to a directory (dosen't chech if the user
- * is the owner).
+ * Checks if any group in a group array have reading access to a directory.
  *
- * @param string $username User name.
+ * @param array $group_arr Array of groups.
  * @param string $path Absolute directory path.
  *
  */
-function checkDirAccessible($username, $path) {
+function checkDirGroupAccessible($group_arr, $path) {
   $perms = fileperms($path);
   if ($perms & 0x0004) {
     return true;
   } elseif ($perms & 0x0020) {
     $dir_group = filegroup($path);
-    $user_groups = shell_exec('id -G ' . $username);
-    $user_group_arr = explode( ' ', $user_groups);
-    if (in_array($dir_group, $user_group_arr)) {
+    if (in_array($dir_group, $group_arr)) {
       return true;
     }
   }

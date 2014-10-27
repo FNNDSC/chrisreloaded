@@ -222,6 +222,8 @@ $formated_output = array(
 
 $index = 0;
 
+$user_groups = shell_exec('id -G ' . $username);
+$user_group_arr = explode( ' ', $user_groups);
 foreach( $output as $key => $value){
   // skip decorator
   if($value != "======="){
@@ -233,7 +235,7 @@ foreach( $output as $key => $value){
     if(trim($split[0]) == "PATH"){
       $path = trim($split[1]);
 
-      if (checkDirAccessible($username, $path)) {
+      if (checkDirGroupAccessible($user_group_arr, $path)) {
         unset($formated_output['aaData'][$index - 1]);
         $index--;
       }
