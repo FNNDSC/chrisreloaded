@@ -212,6 +212,8 @@ $command .= ($experimenter != '')?' -x '.$experimenter:'';
 $command .= ($verbose != '')?' -v':'';
 
 exec($command, $output);
+$f = "/space/chris/1/tmp/findsession-cmd.txt";
+dprint($f, "$command");
 
 $formated_output = array(
 //		"sEcho" => intval($_GET['sEcho']),
