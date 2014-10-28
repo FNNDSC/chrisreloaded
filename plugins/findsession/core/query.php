@@ -198,9 +198,10 @@ var_dump($options);
 }
 
 // build command
+// build command
 $command = $script;
 
-$command .= ($name != '')?' -e '.$name:'';
+$command .= ($verbose != '')?' -v':'';
 $command .= ($session_id != '')?' -i '.$session_id:'';
 $command .= ($subject_id != '')?' -I '.$subject_id:'';
 $command .= ($project != '')?' -p '.$project:'';
@@ -209,11 +210,12 @@ $command .= ($date_past_4_months != '')?' -r':'';
 $command .= ($date_since != '')?' -s '.$date_since:'';
 $command .= ($date_today != '')?' -t':'';
 $command .= ($experimenter != '')?' -x '.$experimenter:'';
-$command .= ($verbose != '')?' -v':'';
+$command .= ($name != '')?' '.$name:'';
+
+$f = "/space/chris/1/tmp/findsession-cmd.txt";
+dprint($f, "$command" . "\n");
 
 exec($command, $output);
-$f = "/space/chris/1/tmp/findsession-cmd.txt";
-dprint($f, "$command");
 
 $formated_output = array(
 //		"sEcho" => intval($_GET['sEcho']),
