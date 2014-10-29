@@ -277,7 +277,7 @@ $sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envf
 $sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile));
 // should be renamed CLUSTER_CHRIS_PYTHONPATH
 $sshLocal->exec(bash('echo "export PYTHONPATH=$PYTHONPATH:'.CHRIS_ENV_PYTHONPATH.'" >>  '.$envfile));
-$sshLocal->exec(bash('echo "export PATH=$PATH:'.CLUSTER_CHRIS_BIN.'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export PATH='.CLUSTER_CHRIS_BIN.':$PATH" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:'.CLUSTER_CHRIS_LIB.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 
