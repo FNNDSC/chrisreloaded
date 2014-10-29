@@ -198,9 +198,10 @@ var_dump($options);
 }
 
 // build command
+// build command
 $command = $script;
 
-$command .= ($name != '')?' -e '.$name:'';
+$command .= ($verbose != '')?' -v':'';
 $command .= ($session_id != '')?' -i '.$session_id:'';
 $command .= ($subject_id != '')?' -I '.$subject_id:'';
 $command .= ($project != '')?' -p '.$project:'';
@@ -209,7 +210,10 @@ $command .= ($date_past_4_months != '')?' -r':'';
 $command .= ($date_since != '')?' -s '.$date_since:'';
 $command .= ($date_today != '')?' -t':'';
 $command .= ($experimenter != '')?' -x '.$experimenter:'';
-$command .= ($verbose != '')?' -v':'';
+$command .= ($name != '')?' '.$name:'';
+
+$f = "/space/chris/1/tmp/findsession-cmd.txt";
+dprint($f, "$command" . "\n");
 
 exec($command, $output);
 
@@ -235,13 +239,14 @@ foreach( $output as $key => $value){
     if(trim($split[0]) == "PATH"){
       $path = trim($split[1]);
 
-      if (checkDirGroupAccessible($user_group_arr, $path)) {
+      if (!checkDirGroupAccessible($user_group_arr, $path)) {
         unset($formated_output['aaData'][$index - 1]);
         $index--;
       }
       else{
       echo 'OK: '.$path.PHP_EOL;
      }
+      echo PHP_EOL;
     }
 
   }
