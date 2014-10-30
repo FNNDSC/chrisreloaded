@@ -275,10 +275,12 @@ $sshLocal->exec(bash('echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.
 $sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile));
-// should be renamed CLUSTER_CHRIS_PYTHONPATH
-$sshLocal->exec(bash('echo "export PYTHONPATH=$PYTHONPATH:'.CHRIS_ENV_PYTHONPATH.'" >>  '.$envfile));
-$sshLocal->exec(bash('echo "export PATH='.CLUSTER_CHRIS_BIN.':$PATH" >>  '.$envfile));
-$sshLocal->exec(bash('echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:'.CLUSTER_CHRIS_LIB.'" >>  '.$envfile));
+// add python libraries that might be missing on the cluster
+// no plugin-specific library should be there
+$sshLocal->exec(bash('echo "export PYTHONPATH=$PYTHONPATH:'.joinPaths(CLUSTER_CHRIS, 'lib', 'py').'" >>  '.$envfile));
+// add ChRIS binaries/libraries that are needed by the plugins
+$sshLocal->exec(bash('echo "export PATH='.joinPaths(CLUSTER_CHRIS, 'bin').':$PATH" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:'.joinPaths(CLUSTER_CHRIS, 'lib').'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 
 // make sure to update the permissions of the file
@@ -427,7 +429,7 @@ else
   // run on cluster and return pid
   //
   if (!CLUSTER_SHARED_FS) {
-    $cluster_user_path = joinPaths(CLUSTER_CHRIS_USERS, $username);
+    $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
     $cluster_plugin_path = joinPaths($cluster_user_path, $plugin_name);
     $cluster_feed_path = joinPaths($cluster_plugin_path, $feedname.'-'.$feed_id);
     // create job directory
@@ -436,7 +438,6 @@ else
       $cluster_job_path .= '/'.$jobid;
     }
     $cluster_job_path_output = createDir($sshCluster, $cluster_job_path);
-    $cluster_job_path_output.PHP_EOL;
 
     // replace chris server's paths in chris.env by cluster's paths
     $envfile_str = file_get_contents($envfile);
@@ -483,6 +484,13 @@ else
       }
     }
     $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
+
+    // wraps plugin command with crun scheduler
+    $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
+    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE;
+    $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' "' .$plugin_command_array[0], $runfile_str);
+    $end = count($plugin_command_array) - 1;
+    $runfile_str = str_replace($plugin_command_array[end], $plugin_command_array[end].'"', $runfile_str);
 
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
@@ -618,10 +626,7 @@ else
     $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
     $sshLocal->exec('echo "'.$cmd.'" >> '.$runfile);
   }
-
-  $cluster_command = str_replace("{MEMORY}", $memory, CLUSTER_RUN);
-  $cluster_command = str_replace("{FEED_ID}", $feed_id, $cluster_command);
-  $cluster_command = str_replace("{COMMAND}", "/bin/bash ".$runfile, $cluster_command);
+  $cluster_command = 'nohup /bin/bash '.$runfile. ' &';
   $pid = $sshCluster->exec(bash($cluster_command));
 }
 
