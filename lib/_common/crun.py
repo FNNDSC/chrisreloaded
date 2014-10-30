@@ -1164,8 +1164,8 @@ if __name__ == '__main__':
     parser.add_argument("-u", "--user", help="remote user")
     parser.add_argument("--host", help="connection host")
     parser.add_argument("-s", "--scheduler", help="cluster scheduler type: \
-        launchpad, slurm, chpc, lsf, lsf_crit \
-        mosix, mosix_HPtest, mosixbash")
+        crun_hpc_launchpad, crun_hpc_slurm, crun_hpc_chpc, crun_hpc_lsf, crun_hpc_lsf_crit \
+        crun_hpc_mosix, crun_hpc_mosix_HPtest, crun_hpc_mosixbash")
     parser.add_argument("command", help="command to be executed")
     parser.add_argument("-o", "--out", help="remote standard output file")
     parser.add_argument("-e", "--err", help="remote standard error file")
@@ -1210,7 +1210,7 @@ if __name__ == '__main__':
     str_cmd = args.command
     if args.scheduler:
         try:
-            shell = eval('crun_hpc_' + args.scheduler + '(remoteUser=user, remoteHost=host, emailUser=mail, remoteStdOut=out, remoteStdErr=err)')
+            shell = eval(args.scheduler + '(remoteUser=user, remoteHost=host, emailUser=mail, remoteStdOut=out, remoteStdErr=err)')
         except NameError:
             raise ValueError("Wrong cluster scheduler type input. Please run with the -h \
                              option to see posible values")
