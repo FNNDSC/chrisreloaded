@@ -483,14 +483,15 @@ else
         $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path, $chrisInputDirectory, $value_dirname), $runfile_str);
       }
     }
-    $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
     // wraps plugin command with crun scheduler
     $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
     $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE;
     $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' "' .$plugin_command_array[0], $runfile_str);
     $end = count($plugin_command_array) - 1;
-    $runfile_str = str_replace($plugin_command_array[end], $plugin_command_array[end].'"', $runfile_str);
+    $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'"', $runfile_str);
+
+    $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
     //
     // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
