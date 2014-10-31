@@ -457,8 +457,17 @@ else
     $input_options = trim(preg_replace('/\s+/', ' ', $input_options));
     $input_options_array = explode(',', $input_options);
 
-    // replace chris server's paths in chris.run by cluster's paths
+    // get the contents of chris.run
     $runfile_str = file_get_contents($runfile);
+
+    // wraps plugin command with crun scheduler
+    $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
+    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --no-setDefaultFlags --echo --echoStdOut';
+    $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' "' .$plugin_command_array[0], $runfile_str);
+    $end = count($plugin_command_array) - 1;
+    $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'"', $runfile_str);
+
+    // replace chris server's paths in chris.run by cluster's paths
     $runfile_str = str_replace($user_path, $cluster_user_path, $runfile_str);
     $chrisInput_path = joinPaths($job_path, $chrisInputDirectory);
     foreach ($input_options_array as $in) {
@@ -484,13 +493,7 @@ else
       }
     }
 
-    // wraps plugin command with crun scheduler
-    $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
-    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE;
-    $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' "' .$plugin_command_array[0], $runfile_str);
-    $end = count($plugin_command_array) - 1;
-    $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'"', $runfile_str);
-
+    // replace chris server plugin paths with cluster's paths
     $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
 
     //
