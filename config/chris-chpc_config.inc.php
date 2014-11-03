@@ -345,7 +345,7 @@ define('CLUSTER_PORT', 2468);
  * We specify the cluster type in order for crun to know how to handle the
  * communication.
  * Valid cluster types:
- * crun_hpc_mosix or crun_hpc_lsf or crun_hpc_launchpad or local
+ * crun or any of its subclasses
  */
 define('CLUSTER_TYPE', 'crun_hpc_chpc');
 /**
@@ -369,13 +369,6 @@ define('CLUSTER_CHRIS', '/SCRATCH4/cubic/chris');
  * This is the full name of the directory containing the ChRIS source code.
  */
 define('CLUSTER_CHRIS_SRC', joinPaths(CLUSTER_CHRIS, 'src/chrisreloaded'));
-/**
- * The cluster kill command.
- * We specify the command to terminate a job on the cluster.
- * {FEED_ID} will be replaced in the launcher with the plugin required id, in
- * the feed.controller.php
- */
-define('CLUSTER_KILL', 'qdel {PID}');
 
 
 // --------------------------------------------------------------------------
