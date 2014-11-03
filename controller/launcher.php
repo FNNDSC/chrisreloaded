@@ -463,9 +463,9 @@ else
     // wraps plugin command with crun scheduler
     $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
     $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --no-setDefaultFlags --echo --echoStdOut';
-    $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' "' .$plugin_command_array[0], $runfile_str);
+    $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' \" bash -c \'source '.$envfile.' && ' .$plugin_command_array[0], $runfile_str);
     $end = count($plugin_command_array) - 1;
-    $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'"', $runfile_str);
+    $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'\'\"', $runfile_str);
 
     // replace chris server's paths in chris.run by cluster's paths
     $runfile_str = str_replace($user_path, $cluster_user_path, $runfile_str);
@@ -630,7 +630,7 @@ else
     $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
     $sshLocal->exec('echo "'.$cmd.'" >> '.$runfile);
   }
-  $cluster_command = 'nohup /bin/bash '.$runfile. ' &';
+  $cluster_command = 'nohup /bin/bash '.$runfile. ' </dev/null &>/dev/null &';
   $pid = $sshCluster->exec(bash($cluster_command));
 }
 
