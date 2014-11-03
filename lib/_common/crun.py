@@ -696,7 +696,7 @@ class crun_hpc_slurm(crun_hpc):
             self._str_jobInfoDir        = "/nobackup1/%s"  % self._str_emailUser
         self._str_jobInfoDir            = self._str_jobInfoDir + '/jobInfoDir'
         self._b_singleQuoteCmd          = False
-        self._str_queue                 = "sched_any_quicktest"
+        self._str_queue                 = "sched_mit_hill"
 
         self._priority                  = 50
         self._str_scheduler             = 'module load slurm ; srun'
