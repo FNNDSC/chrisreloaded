@@ -272,9 +272,12 @@ FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 
 $envfile = joinPaths($job_path_output, 'chris.env');
 $sshLocal->exec(bash('echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$envfile));
-$sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
-$sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile));
+// ENV_REMOTEUSER and ENV_REMOTEHOST are only exported when nodes cannot schedule themselves
+if (!CLUSTER_NODES_SCHEDULE) {
+  $sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
+  $sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile));
+}
 // add python libraries that might be missing on the cluster
 // no plugin-specific library should be there
 $sshLocal->exec(bash('echo "export PYTHONPATH=$PYTHONPATH:'.joinPaths(CLUSTER_CHRIS, 'lib', 'py').'" >>  '.$envfile));
