@@ -360,6 +360,11 @@ define('CLUSTER_TYPE', 'crun_hpc_slurm');
  */
 define('CLUSTER_SHARED_FS', false);
 /**
+ * Set this to false if computing nodes can only schedule jobs through out the head
+ * node (i.e nodes cannot schedule jobs themselves).
+ */
+define('CLUSTER_NODES_SCHEDULE', true);
+/**
  * Should dicom files be anonymized before sending them to the cluster?
  * If the answer is no then set this to false which will improve performance by
  * skipping the anonymization step.
