@@ -280,10 +280,10 @@ if (!CLUSTER_NODES_SCHEDULE) {
 }
 // add python libraries that might be missing on the cluster
 // no plugin-specific library should be there
-$sshLocal->exec(bash('echo "export PYTHONPATH=\$PYTHONPATH:'.joinPaths(CLUSTER_CHRIS, 'lib', 'py').'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export PYTHONPATH='.joinPaths(CLUSTER_CHRIS, 'lib', 'py').':\$PYTHONPATH" >>  '.$envfile));
 // add ChRIS binaries/libraries that are needed by the plugins
 $sshLocal->exec(bash('echo "export PATH='.joinPaths(CLUSTER_CHRIS, 'bin').':\$PATH" >>  '.$envfile));
-$sshLocal->exec(bash('echo "export LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:'.joinPaths(CLUSTER_CHRIS, 'lib').'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export LD_LIBRARY_PATH='.joinPaths(CLUSTER_CHRIS, 'lib').':\$LD_LIBRARY_PATH" >>  '.$envfile));
 $sshLocal->exec(bash('echo "umask 0002" >> '.$envfile));
 
 // make sure to update the permissions of the file
