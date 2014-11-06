@@ -462,7 +462,7 @@ else
 
     // wraps plugin command with crun scheduler
     $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
-    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_INTERNAL_HOST . ' -s '. CLUSTER_TYPE . ' --no-setDefaultFlags --echo --echoStdOut';
+    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_INTERNAL_HOST . ' -s '. CLUSTER_TYPE . ' --blockOnChild';
     $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' \" bash -c \'source '.$envfile.' && ' .$plugin_command_array[0], $runfile_str);
     $end = count($plugin_command_array) - 1;
     $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'\'\"', $runfile_str);
