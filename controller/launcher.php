@@ -273,11 +273,8 @@ FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 $envfile = joinPaths($job_path_output, 'chris.env');
 $sshLocal->exec(bash('echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
-// ENV_REMOTEUSER and ENV_REMOTEHOST are only exported when nodes cannot schedule themselves
-if (!CLUSTER_NODES_SCHEDULE) {
-  $sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
-  $sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_HOST.'" >>  '.$envfile));
-}
+$sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_INTERNAL_HOST.'" >>  '.$envfile));
 // add python libraries that might be missing on the cluster
 // no plugin-specific library should be there
 $sshLocal->exec(bash('echo "export PYTHONPATH='.joinPaths(CLUSTER_CHRIS, 'lib', 'py').':\$PYTHONPATH" >>  '.$envfile));
@@ -465,7 +462,7 @@ else
 
     // wraps plugin command with crun scheduler
     $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
-    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --no-setDefaultFlags --echo --echoStdOut';
+    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_INTERNAL_HOST . ' -s '. CLUSTER_TYPE . ' --no-setDefaultFlags --echo --echoStdOut';
     $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' \" bash -c \'source '.$envfile.' && ' .$plugin_command_array[0], $runfile_str);
     $end = count($plugin_command_array) - 1;
     $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'\'\"', $runfile_str);
