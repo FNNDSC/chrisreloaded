@@ -540,6 +540,10 @@ class crun_hpc(crun):
         else:
             return self._str_schedulerStdErr
 
+    def blockOnChild(self):
+        raise NotImplementedError("abstract method crun_hpc.blockOnChild()")
+
+
     def __init__(self, **kwargs):
         '''
         Calls the base constructor and then sets some HPC-specific data.
@@ -703,7 +707,7 @@ class crun_hpc_slurm(crun_hpc):
         self._str_scheduleCmd           = ''
         self._str_scheduleArgs          = ''
 
-        #configuration
+        #Default configuration: do not block on child
         self.detach(False)             # child &
         self.sshDetach(True)           # ssh .... &
         self.waitForChild(False)       # block on child
@@ -727,7 +731,7 @@ class crun_hpc_slurm(crun_hpc):
             if self._b_emailWhenDone and len(self._str_emailUser):
                 self._str_scheduleArgs += "--mail-user=%s " % self._str_emailUser
             self._str_scheduleArgs     += "-p %s " % self._str_queue
-        return self._str_scheduleArgs
+        return self._str_scheduleArgs       
 
     def queueInfo(self, **kwargs):
         """
@@ -762,6 +766,9 @@ class crun_hpc_slurm(crun_hpc):
                 str_processInSchedulerCount,
                 str_processCompletedCount)
 
+    def blockOnChild(self):
+        self.waitForChild(True)
+
 
 class crun_hpc_chpc(crun_hpc):
 
@@ -785,10 +792,11 @@ class crun_hpc_chpc(crun_hpc):
         self._str_scheduleCmd           = ''
         self._str_scheduleArgs          = ''
 
-        #configuration
-        self._b_detach = False
-        self._b_disassociate = False
-        self._b_waitForChild = True
+        #Default configuration: do not block on child
+        self.detach(False)             # child &
+        self.disassociate(False)           
+        self.waitForChild(True)        # block on child
+        
 
     def __call__(self, str_cmd, **kwargs):
         self.scheduleArgs()
@@ -843,6 +851,9 @@ class crun_hpc_chpc(crun_hpc):
                 str_processRunningCount, 
                 str_processInSchedulerCount,
                 str_processCompletedCount)
+
+    def blockOnChild(self):
+        self.detach(True)
 
 
 class crun_hpc_lsf(crun_hpc):
@@ -1187,6 +1198,7 @@ if __name__ == '__main__':
     
     parser.add_argument("--setDefaultFlags", help="set default control flags", dest='setDefaultControlFlags', action='store_true', default=True)
     parser.add_argument("--no-setDefaultFlags", help="don't set default control flags", dest='setDefaultControlFlags', action='store_false')
+    parser.add_argument("--blockOnChild", help="block until all subjobs finish", dest='blockOnChild', action='store_true', default=False)
     
     
     args = parser.parse_args()
