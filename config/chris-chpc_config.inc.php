@@ -354,6 +354,11 @@ define('CLUSTER_INTERNAL_HOST', 'login02');
  */
 define('CLUSTER_TYPE', 'crun_hpc_chpc');
 /**
+ * Set this to true if the cluster shares the file system with the chris server.
+ * It will improve performance by exploting the common file system.
+ */
+define('CLUSTER_SHARED_FS', false);
+/**
  * Should dicom files be anonymized before sending them to the cluster?
  * If the answer is no then set this to false which will improve performance by
  * skipping the anonymization step.
