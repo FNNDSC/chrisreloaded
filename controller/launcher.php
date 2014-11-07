@@ -201,6 +201,7 @@ if (!$sshLocal->login($username, $password)) {
 }
 // get the internal name of the CLUSTER_HEAD_NODE
 $cluster_internal_host = $sshLocal->exec('ssh ' . CLUSTER_HOST . '  hostname -s 2>/dev/null | tail -n 1');
+$cluster_internal_host = trim($cluster_internal_host);
 
 $force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
 if ($status == 100 || $force_chris_local) {
