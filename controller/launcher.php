@@ -199,6 +199,9 @@ $sshLocal = new Net_SSH2('localhost');
 if (!$sshLocal->login($username, $password)) {
   die('Server login Failed');
 }
+// get the internal name of the CLUSTER_HEAD_NODE
+$cluster_internal_host = $sshLocal->exec('ssh ' . CLUSTER_HOST . '  hostname -s 2>/dev/null | tail -n 1');
+
 $force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
 if ($status == 100 || $force_chris_local) {
   $host = 'localhost';
@@ -274,7 +277,7 @@ $envfile = joinPaths($job_path_output, 'chris.env');
 $sshLocal->exec(bash('echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
 $sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
-$sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.CLUSTER_INTERNAL_HOST.'" >>  '.$envfile));
+$sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.$cluster_internal_host.'" >>  '.$envfile));
 // add python libraries that might be missing on the cluster
 // no plugin-specific library should be there
 $sshLocal->exec(bash('echo "export PYTHONPATH='.joinPaths(CLUSTER_CHRIS, 'lib', 'py').':\$PYTHONPATH" >>  '.$envfile));
@@ -462,7 +465,7 @@ else
 
     // wraps plugin command with crun scheduler
     $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
-    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . CLUSTER_INTERNAL_HOST . ' -s '. CLUSTER_TYPE . ' --blockOnChild';
+    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . $cluster_internal_host . ' -s '. CLUSTER_TYPE . ' --blockOnChild';
     $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' \" bash -c \'source '.$envfile.' && ' .$plugin_command_array[0], $runfile_str);
     $end = count($plugin_command_array) - 1;
     $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'\'\"', $runfile_str);
