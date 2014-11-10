@@ -1246,6 +1246,7 @@ if __name__ == '__main__':
         shell.waitForChild(args.waitForChild)       # block on child
     if args.scheduler: shell.jobID('j' + str(randint(1,1000)))
     if mail: shell.emailWhenDone(True)
+    if args.blockOnChild: shell.blockOnChild()
 
     # And now run it!
     misc.tic()
