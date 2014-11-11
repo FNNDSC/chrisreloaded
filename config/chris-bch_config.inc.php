@@ -272,9 +272,9 @@ define('CHRIS_SCANNERS', serialize(array(
  */
 define('CHRIS_REMOTES', serialize(array(
 "MGH" => serialize(array(
-    "sshhost" => "johannesburg",
+    "sshhost" => "tautona",
     "sshport" => "1148",
-    "dicomhost" => "johannesburg",
+    "dicomhost" => "tautona",
     "dicomport" => "10301",
     "src"  => "/home/chris/src/chrisreloaded")),
 "BCH" => serialize(array(
