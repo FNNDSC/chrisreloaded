@@ -102,8 +102,8 @@ class CHRIS_Push(Plugin):
     command = data['src'] + "/plugins/chris_push/scripts/getInfo.php -f " + data['src'] + '/config.inc.php -t -p';
 
     remoteShell = crun.crun()
-    remoteShell._str_remoteHost = options.SSHHOST;
-    remoteShell._str_remotePort = options.SSHPORt;
+    remoteShell._str_remoteHost = options.HOST;
+    remoteShell._str_remotePort = options.PORt;
     remoteShell._str_remoteUser = 'chris';
     remoteShell._b_sshDo = True;
     remoteShell.echo(False)
