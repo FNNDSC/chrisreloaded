@@ -79,15 +79,21 @@ _FEED_.onclick = function(details, more) {
   var hidden = details.is(':hidden');
   if (hidden) {
     if (more) {
-      details.closest('.feed').css('margin-top', '10px');
-      details.closest('.feed').css('margin-bottom', '11px');
+      var feed = details.closest('.feed');
+      feed.css('margin-top', '10px');
+      feed.css('margin-bottom', '11px');
+      feed.find('.feed_icon').css('width', '44px');
+      feed.find('.feed_icon').css('height', '44px');
     }
     // details.show('blind','slow');
     details.slideDown('fast');
   } else {
     if (more) {
-      details.closest('.feed').css('margin-top', '-1px');
-      details.closest('.feed').css('margin-bottom', '0px');
+      var feed = details.closest('.feed');
+      feed.css('margin-top', '-1px');
+      feed.css('margin-bottom', '0px');
+      feed.find('.feed_icon').css('width', '40px');
+      feed.find('.feed_icon').css('height', '40px');
     }
     // details.hide('blind', 'slow');
     details.slideUp('fast');
