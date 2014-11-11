@@ -87,10 +87,16 @@
 
 .feed_icon {
 	float: left;
-	width: 48px;
-	height: 48px;
+	width: 40px;
+	height: 40px;
 	margin-right: 5px;
+	margin-top: 2px;
+	margin-left: 2px;
 	position: relative;
+}
+
+.feed_icon_transition{
+        transition: height .2s ease-out, width .2s ease-out;
 }
 
 .feed_header_small {
@@ -398,9 +404,10 @@ http://css3playground.com/3d-flip-cards/
 	top: 0;
 	left: 0;
 	z-index: 900;
-	width: 48px;
+	width:100%;
+	/*width: 48px;
 	height: 48px;
-
+*/
 	-webkit-transform: rotateX(0deg) rotateY(0deg);
 	-moz-transform: rotateX(0deg) rotateY(0deg);
 	transform: rotateX(0deg) rotateY(0deg);
@@ -420,8 +427,8 @@ http://css3playground.com/3d-flip-cards/
 
 .feed_icon.flip .front {
 	z-index: 900;
-	background: #333;
-
+	/*background: #333;
+*/
 	-webkit-transform: rotateY(180deg);
 	-moz-transform: rotateY(180deg);
 	transform: rotateY(180deg);
@@ -433,9 +440,10 @@ http://css3playground.com/3d-flip-cards/
 	top: 0;
 	left: 0;
 	z-index: 800;
-	width: 48px;
+	width:100%;
+/*	width: 48px;
 	height: 48px;
-
+*/
 	-webkit-transform: rotateY(-180deg);
     -moz-transform: rotateY(-179deg); /* setting to 180 causes an unnatural-looking half-flip */
 	transform: rotateY(-179deg);
@@ -459,4 +467,10 @@ http://css3playground.com/3d-flip-cards/
 	-webkit-transform: rotateX(0deg) rotateY(0deg);
     -moz-transform: rotateX(0deg) rotateY(0deg);
 	transform: rotateX(0deg) rotateY(0deg);
+}
+
+.feed .feed_icon img{
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
 }
