@@ -87,7 +87,7 @@ class CHRIS_Push(Plugin):
       options.SSHDEST  = False
 
     if not options.SSHDEST:
-      options.HOST = data['sshost']
+      options.HOST = data['sshhost']
       options.PORT = data['sshport']
     else:
       print('SSHDEST override detected...')
