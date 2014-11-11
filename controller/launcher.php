@@ -1,31 +1,31 @@
 #!/usr/bin/php
 <?php
 /**
- *
- *            sSSs   .S    S.    .S_sSSs     .S    sSSs
- *           d%%SP  .SS    SS.  .SS~YS%%b   .SS   d%%SP
- *          d%S'    S%S    S%S  S%S   `S%b  S%S  d%S'
- *          S%S     S%S    S%S  S%S    S%S  S%S  S%|
- *          S&S     S%S SSSS%S  S%S    d* S  S&S  S&S
- *          S&S     S&S  SSS&S  S&S   .S* S  S&S  Y&Ss
- *          S&S     S&S    S&S  S&S_sdSSS   S&S  `S&&S
- *          S&S     S&S    S&S  S&S~YSY%b   S&S    `S*S
- *          S*b     S*S    S*S  S*S   `S%b  S*S     l*S
- *          S*S.    S*S    S*S  S*S    S%S  S*S    .S*P
- *           SSSbs  S*S    S*S  S*S    S&S  S*S  sSS*S
- *            YSSP  SSS    S*S  S*S    SSS  S*S  YSS'
- *                         SP   SP          SP
- *                         Y    Y           Y
- *
- *                     R  E  L  O  A  D  E  D
- *
- * (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
- *                   Boston Children's Hospital
- *
- *              http://childrenshospital.org/FNNDSC/
- *                        dev@babyMRI.org
- *
- */
+*
+*            sSSs   .S    S.    .S_sSSs     .S    sSSs
+*           d%%SP  .SS    SS.  .SS~YS%%b   .SS   d%%SP
+*          d%S'    S%S    S%S  S%S   `S%b  S%S  d%S'
+*          S%S     S%S    S%S  S%S    S%S  S%S  S%|
+*          S&S     S%S SSSS%S  S%S    d* S  S&S  S&S
+*          S&S     S&S  SSS&S  S&S   .S* S  S&S  Y&Ss
+*          S&S     S&S    S&S  S&S_sdSSS   S&S  `S&&S
+*          S&S     S&S    S&S  S&S~YSY%b   S&S    `S*S
+*          S*b     S*S    S*S  S*S   `S%b  S*S     l*S
+*          S*S.    S*S    S*S  S*S    S%S  S*S    .S*P
+*           SSSbs  S*S    S*S  S*S    S&S  S*S  sSS*S
+*            YSSP  SSS    S*S  S*S    SSS  S*S  YSS'
+*                         SP   SP          SP
+*                         Y    Y           Y
+*
+*                     R  E  L  O  A  D  E  D
+*
+* (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+*                   Boston Children's Hospital
+*
+*              http://childrenshospital.org/FNNDSC/
+*                        dev@babyMRI.org
+*
+*/
 if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
 
 // include the configuration
@@ -60,16 +60,16 @@ if ($commandline_mode) {
   // define the options
   $shortopts = "c:u::f::i::j::h";
   $longopts  = array(
-      "command:",     // Required value
-      "username::",    // Optional value
-      "password::",
-      "feedname::",    // Optional value
-      "feedid::",    // Optional value
-      "jobid::",    // Optional value
-      "status::", // Optional value
-      "statusstep::",
-      "memory::", // Optional value
-      "help"    // Optional value
+    "command:",     // Required value
+    "username::",    // Optional value
+    "password::",
+    "feedname::",    // Optional value
+    "feedid::",    // Optional value
+    "jobid::",    // Optional value
+    "status::", // Optional value
+    "statusstep::",
+    "memory::", // Optional value
+    "help"    // Optional value
   );
 
   $options = getopt($shortopts, $longopts);
@@ -192,28 +192,20 @@ $parameters = implode(' ', $plugin_command_array);
 
 
 //
-// initiate ssh connection
+// initiate and test necessary ssh connections
 //
 
 $sshLocal = new Net_SSH2('localhost');
 if (!$sshLocal->login($username, $password)) {
   die('Server login Failed');
 }
-
 $force_chris_local = in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL));
-if ($status == 100 || $force_chris_local) {
-  $host = 'localhost';
-} else {
-  $host = CLUSTER_HOST;
-  $sshCluster  = new Net_SSH2($host);
+if ($status != 100 && !$force_chris_local) {
+  $sshCluster  = new Net_SSH2(CLUSTER_HOST);
   if (!$sshCluster->login($username, $password)) {
     die('Cluster login Failed');
   }
-  // get the internal name of the CLUSTER_HEAD_NODE
-  $cluster_internal_host = $sshCluster->exec('hostname -s 2>/dev/null | tail -n 1');
-  $cluster_internal_host = trim($cluster_internal_host);
 }
-
 
 //
 // get username's id
@@ -276,10 +268,14 @@ FeedC::addMetaS($feed_id, 'root_id', (string)$feed_id, 'extra');
 
 $envfile = joinPaths($job_path_output, 'chris.env');
 $sshLocal->exec(bash('echo "export ENV_CHRISRUN_DIR='.$job_path_output.'" >>  '.$envfile));
+//CLUSTER_TYPE could be 'local'
 $sshLocal->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
-$sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
 if ($status != 100 && !$force_chris_local) {
+  // get the internal name of the CLUSTER_HEAD_NODE
+  $cluster_internal_host = $sshCluster->exec('hostname -s 2>/dev/null | tail -n 1');
+  $cluster_internal_host = trim($cluster_internal_host);
   $sshLocal->exec(bash('echo "export ENV_REMOTEHOST='.$cluster_internal_host.'" >>  '.$envfile));
+  $sshLocal->exec(bash('echo "export ENV_REMOTEUSER='.$username.'" >>  '.$envfile));
 }
 // add python libraries that might be missing on the cluster
 // no plugin-specific library should be there
@@ -312,7 +308,7 @@ $setStatus = '';
 // connection timeout: 5s
 // max query time: 30
 if ($status != 100) {
-//  $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
+  //  $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
   $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl -k --data ';
 }
 
@@ -335,316 +331,315 @@ $sshLocal->exec(bash('echo "'.$command.'" >> '.$runfile));
 $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; cd $feed_path ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
 
 
-//
-// the chris.run is ready now
-// execute the chris.run how it is supposed to (local, remote, as chris, etc.)
-// update the chris.run file permissions to be executable
-//
-
-$sshLocal->exec("chmod 755 $runfile");
-
-if ($force_chris_local) {
-  // get user group id
-  $groupID =  $sshLocal->exec("id -g");
-  $groupID = trim($groupID);
-
-  // update path to tmp path
-  // tmp_path is the job path
-  // it can happen that there is no job path (jobid == '')
-  $tmp_path = CHRIS_TMP.'/'.$feedname.'-'.$feed_id;
-  if($jobid != ''){
-    $tmp_path .= '/'.$jobid;
-  }
-
-  $escaped_tmp_path = str_replace("/", "\/", $tmp_path);
-  $escaped_path  = str_replace("/", "\/", $job_path);
-  $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $runfile");
-  $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $envfile");
-
-  // replace feed patd
-  $escaped_feed_path  = str_replace("/", "\/", $feed_path);
-  $sshLocal->exec("sed -i 's/$escaped_feed_path/$escaped_tmp_path/g' $runfile");
-
-  // replace plugin dir
-  $escaped_plugin_path  = str_replace("/", "\/", $plugin_path);
-  $sshLocal->exec("sed -i 's/$escaped_plugin_path/$escaped_tmp_path/g' $runfile");
-
-  // replace user dir
-  $escaped_user_path  = str_replace("/", "\/", $user_path);
-  $sshLocal->exec("sed -i 's/$escaped_user_path/$escaped_tmp_path/g' $runfile");
-
-  // make sure the permissions are correct
-  // and give all files ownership to users after the job finished.
-  $sshLocal->exec("echo 'sudo chmod -R 755 $tmp_path;' >> $runfile;");
-  $sshLocal->exec("echo 'sudo chown -R $user_id:$groupID $tmp_path;' >> $runfile;");
-
-  // copy files back to network space, whith the right permissions
-  $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $feed_path\";' >> $runfile;");
-  // create the json db for the viewer plugin once the data is in its final location
-  $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-  $sshLocal->exec("echo 'sudo su $username  -c \"$viewer_plugin --directory $job_path --output $job_path/..\";' >> $runfile;");
-
-  // update status to 100%
-  if($status != 100){
-    // prepend
-    $start_token = TokenC::create();
-    $sshLocal->exec('sed -i "1i sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err"\" '.$runfile);
-
-    // append
-    // we need sudo su to run it at the right location after the data has been copied back
-    $end_token = TokenC::create();
-    $sshLocal->exec('echo "sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err\"" >> '.$runfile);
-  }
-
-  // rm job_path directory
-  // feed path diretory remains and should be deleteed by the feed:controller when set status to 100
-  $sshLocal->exec("echo 'sudo rm -rf $tmp_path;' >> $runfile;");
-
-  // open permissions so user can see its plugin running
-  $local_command = "/bin/chgrp -R $groupID $feed_path; /bin/chmod g+rxw -R $feed_path";
-  $sshLocal->exec($local_command);
-
-  unset($sshLocal);
-
-  // run command as locally ChRIS!
-  // *** IMPORTANT ***
-  // do not need to ssh as chris because we assume
-  // plugins which run locally are started from the front end
-  // therefore calling launcher.php as chris
-
-  // create local directory
-  mkdir('/tmp/'.$feedname.'-'.$feed_id);
-  shell_exec("cp -R $feed_path ".CHRIS_TMP);
-
-  $local_command = "/bin/bash umask 0002;/bin/bash $runfile;";
-
-  $nohup_wrap = 'bash -c \'nohup bash -c "'.$local_command.'" > /dev/null 2>&1 &\'';
-  shell_exec($nohup_wrap);
-  $pid = -1;
-} else if ($status == 100 ) {
-  // create the json db for the viewer plugin once the data is in its final location
-  $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-  $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
-
-  // run locally
-  $sshLocal->exec('bash -c \' /bin/bash '.$runfile.'\'');
-  $pid = -1;
-}
-else
-{ //
-  // run on cluster and return pid
   //
-  if (!CLUSTER_SHARED_FS) {
-    $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
-    $cluster_plugin_path = joinPaths($cluster_user_path, $plugin_name);
-    $cluster_feed_path = joinPaths($cluster_plugin_path, $feedname.'-'.$feed_id);
-    // create job directory
-    $cluster_job_path = $cluster_feed_path;
+  // the chris.run is ready now
+  // execute the chris.run how it is supposed to (local, remote, as chris, etc.)
+  // update the chris.run file permissions to be executable
+  //
+
+  $sshLocal->exec("chmod 755 $runfile");
+
+  if ($force_chris_local) {
+    // get user group id
+    $groupID =  $sshLocal->exec("id -g");
+    $groupID = trim($groupID);
+
+    // update path to tmp path
+    // tmp_path is the job path
+    // it can happen that there is no job path (jobid == '')
+    $tmp_path = CHRIS_TMP.'/'.$feedname.'-'.$feed_id;
     if($jobid != ''){
-      $cluster_job_path .= '/'.$jobid;
-    }
-    $cluster_job_path_output = createDir($sshCluster, $cluster_job_path);
-
-    // replace chris server's paths in chris.env by cluster's paths
-    $envfile_str = file_get_contents($envfile);
-    $envfile_str = str_replace($job_path_output, $cluster_job_path_output, $envfile_str);
-    $envfile = joinPaths($cluster_job_path_output, 'chris.env');
-    $sshCluster->exec('echo "'.$envfile_str.'"'.' > '.$envfile);
-
-    // create _chrisInput_ dir
-    $chrisInputDirectory = '_chrisInput_';
-    $sshLocal->exec('cd ' . $job_path.'; mkdir '.$chrisInputDirectory.'; chmod 755 '.$chrisInputDirectory);
-
-    // run the plugin with the --inputs switch on the chris server
-    $plugin_command_array = explode(' ', $command);
-    // $inputs_options is a string containing a list of input options separated by comma
-    $input_options = $sshLocal->exec($plugin_command_array[0].' --inputs');
-    //remove EOL and white spaces
-    $input_options = trim(preg_replace('/\s+/', ' ', $input_options));
-    $input_options_array = explode(',', $input_options);
-
-    // get the contents of chris.run
-    $runfile_str = file_get_contents($runfile);
-
-    // wraps plugin command with crun scheduler
-    $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
-    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . $cluster_internal_host . ' -s '. CLUSTER_TYPE . ' --blockOnChild';
-    $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' \" bash -c \'source '.$envfile.' && ' .$plugin_command_array[0], $runfile_str);
-    $end = count($plugin_command_array) - 1;
-    $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'\'\"', $runfile_str);
-
-    // replace chris server's paths in chris.run by cluster's paths
-    $runfile_str = str_replace($user_path, $cluster_user_path, $runfile_str);
-    $chrisInput_path = joinPaths($job_path, $chrisInputDirectory);
-    foreach ($input_options_array as $in) {
-      // get location of input in the command array
-      $input_key = array_search($in, $plugin_command_array);
-      if($input_key !== false){
-        // get value of the input in the command array
-        // the value of the input should be the next element in the $command_array
-        $value_key = $input_key + 1;
-        $value = $plugin_command_array[$value_key];
-        if (is_dir($value)) {
-          $value_dirname = $value;
-        } else {
-          $value_dirname = dirname($value);
-        }
-        // need to add the full absolute path to make it unique
-        $value_chris_path = joinPaths($chrisInput_path, $value_dirname);
-        // -n to not overwrite file if already there
-        // -L to dereference links (copy actual file rather than link)
-        $sshLocal->exec('mkdir -p ' . $value_chris_path . '; cp -Lrn ' . $value_dirname . ' ' . dirname($value_chris_path));
-        $value = str_replace($user_path, $cluster_user_path, $value);
-        $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path, $chrisInputDirectory, $value_dirname), $runfile_str);
-      }
+      $tmp_path .= '/'.$jobid;
     }
 
-    // replace chris server plugin paths with cluster's paths
-    $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
+    $escaped_tmp_path = str_replace("/", "\/", $tmp_path);
+    $escaped_path  = str_replace("/", "\/", $job_path);
+    $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $runfile");
+    $sshLocal->exec("sed -i 's/$escaped_path/$escaped_tmp_path/g' $envfile");
 
-    //
-    // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
-    //
+    // replace feed patd
+    $escaped_feed_path  = str_replace("/", "\/", $feed_path);
+    $sshLocal->exec("sed -i 's/$escaped_feed_path/$escaped_tmp_path/g' $runfile");
 
-    if (CLUSTER_PORT==22) {
-      $tunnel_host = CHRIS_HOST;
-    } else {
-      $tunnel_host = CLUSTER_HOST;
-    }
+    // replace plugin dir
+    $escaped_plugin_path  = str_replace("/", "\/", $plugin_path);
+    $sshLocal->exec("sed -i 's/$escaped_plugin_path/$escaped_tmp_path/g' $runfile");
 
-    // command to compress _chrisInput_ dir on the chris server
-    $cmd = '\"cd '.$job_path.'; tar -zcf '.$chrisInputDirectory.'.tar.gz '.$chrisInputDirectory.';\"';
-    $cmd = 'ssh -p ' .CLUSTER_PORT. ' -o StrictHostKeyChecking=no ' . $username.'@'.$tunnel_host. ' '.$cmd;
+    // replace user dir
+    $escaped_user_path  = str_replace("/", "\/", $user_path);
+    $sshLocal->exec("sed -i 's/$escaped_user_path/$escaped_tmp_path/g' $runfile");
 
-    // command to copy over the compressed _chrisIput_ dir to the cluster
-    $cmd = $cmd.PHP_EOL.'scp -P ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host.':'.$job_path.'/'.$chrisInputDirectory.'.tar.gz ' .$cluster_job_path.';';
+    // make sure the permissions are correct
+    // and give all files ownership to users after the job finished.
+    $sshLocal->exec("echo 'sudo chmod -R 755 $tmp_path;' >> $runfile;");
+    $sshLocal->exec("echo 'sudo chown -R $user_id:$groupID $tmp_path;' >> $runfile;");
 
-    // command to remove the compressed file on the chris server
-    $cmd = $cmd.PHP_EOL.'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' rm '.$job_path.'/'.$chrisInputDirectory.'.tar.gz;';
-
-    // command to uncompress the compressed file on the cluster
-    $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; tar -zxf '.$chrisInputDirectory.'.tar.gz;';
-
-    // command to remove the compressed file from the cluster
-    $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; rm '.$chrisInputDirectory.'.tar.gz;';
-    $runfile_str = $cmd.PHP_EOL.$runfile_str;
-
-    //
-    // MOVE DATA ($job_path directory) FROM CLUSTER TO SERVER
-    //
-
-    // command to compress $cluster_job_path dir on the cluster (excluding _chrisInput_ dir)
-    $data = basename($job_path);
-    $cmd = 'cd '.$cluster_feed_path.'; tar -zcf '.$data.'.tar.gz '.$data.' --exclude ' . joinPaths($data, $chrisInputDirectory). ';';
-    $runfile_str = $runfile_str.$cmd;
-
-    // command to copy over the compressed $cluster_job_path dir to the chris server
-    $cmd = 'scp -P ' .CLUSTER_PORT. ' ' . $cluster_feed_path.'/'.$data.'.tar.gz ' . $username.'@'.$tunnel_host.':'.$feed_path.';';
-    $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-    // command to uncompress and remove the compressed file on the chris server
-    $cmd = '\"cd '.$feed_path.'; tar -zxf '.$data.'.tar.gz; rm '.$data.'.tar.gz;\"';
-    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-    $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-    // command to remove the compressed file from the cluster
-    $cmd = 'cd '.$cluster_feed_path.'; rm '.$data.'.tar.gz &';
-    $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-    //
-    // CREATE VIEWER SCENE
-    //
-
-    $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-    $cmd = '\"'.$viewer_plugin.' --directory '.$job_path.' --output '.$job_path.'/..;\"';
-    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-    $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-    //ANONYMIZATION
-    if (ANONYMIZE_DICOM) {
-      $anonfile = joinPaths($job_path_output, 'chris.anon');
-      // copy template over
-      $sshLocal->exec("cp ".joinPaths(CHRIS_SRC, "controller/anonymize.php")." $anonfile");
-      // update template content
-      $chrisInput_path_escaped  = str_replace("/", "\/", $chrisInput_path);
-      $sshLocal->exec("sed -i 's/\${CHRISINPUT_PATH}/$chrisInput_path_escaped/g' $anonfile");
-
-      $chris_bin = joinPaths(CHRIS_HOME, "bin");
-      $chris_bin_escaped  = str_replace("/", "\/", $chris_bin);
-      $sshLocal->exec("sed -i 's/\${CHRIS_BIN}/$chris_bin_escaped/g' $anonfile");
-
-      $chris_scripts = joinPaths(CHRIS_SRC, "../scripts");
-      $chris_scripts_escaped  = str_replace("/", "\/", $chris_scripts);
-      $sshLocal->exec("sed -i 's/\${CHRIS_SCRIPTS}/$chris_scripts_escaped/g' $anonfile");
-
-      $sshLocal->exec('chmod 755 '.$anonfile);
-
-      $cmd = '\"php '.$anonfile.';\"';
-      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-      $runfile_str = $cmd.PHP_EOL.$runfile_str;
-    }
-
-    //
-    // UPDATE FEED STATUS
-    //
-    $start_token = TokenC::create();
-    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err;\"';
-    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-    $runfile_str = $cmd.PHP_EOL.$runfile_str;
-
-    $end_token = TokenC::create();
-    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err;\"';
-    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-    $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-    ////
-    // DELETE REMOTE JOB PATH AFTER ALL THE DATA AS BEEN COPIED BACK
-    /////
-    $cmd = 'rm -rf '.$cluster_job_path.' &;';
-    $runfile_str = $runfile_str.PHP_EOL.$cmd;
-
-    $runfile = joinPaths($cluster_job_path_output, 'chris.run');
-    $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
-    $sshCluster->exec('chmod 775 '.$runfile);
-  }
-  else{
-    $escaped_chris_plugin = str_replace("/", "\/", CHRIS_PLUGINS_FOLDER);
-    $escaped_chris_net_plugin  = str_replace("/", "\/", CHRIS_PLUGINS_FOLDER_NET);
-    $sshLocal->exec("sed -i 's/$escaped_chris_plugin/$escaped_chris_net_plugin/g' $runfile");
-
+    // copy files back to network space, whith the right permissions
+    $sshLocal->exec("echo 'sudo su $username -c \"cp -rfp $tmp_path $feed_path\";' >> $runfile;");
     // create the json db for the viewer plugin once the data is in its final location
-    $viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
+    $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
+    $sshLocal->exec("echo 'sudo su $username  -c \"$viewer_plugin --directory $job_path --output $job_path/..\";' >> $runfile;");
+
+    // update status to 100%
+    if($status != 100){
+      // prepend
+      $start_token = TokenC::create();
+      $sshLocal->exec('sed -i "1i sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err"\" '.$runfile);
+
+      // append
+      // we need sudo su to run it at the right location after the data has been copied back
+      $end_token = TokenC::create();
+      $sshLocal->exec('echo "sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err\"" >> '.$runfile);
+    }
+
+    // rm job_path directory
+    // feed path diretory remains and should be deleteed by the feed:controller when set status to 100
+    $sshLocal->exec("echo 'sudo rm -rf $tmp_path;' >> $runfile;");
+
+    // open permissions so user can see its plugin running
+    $local_command = "/bin/chgrp -R $groupID $feed_path; /bin/chmod g+rxw -R $feed_path";
+    $sshLocal->exec($local_command);
+
+    unset($sshLocal);
+
+    // run command as locally ChRIS!
+    // *** IMPORTANT ***
+    // do not need to ssh as chris because we assume
+    // plugins which run locally are started from the front end
+    // therefore calling launcher.php as chris
+
+    // create local directory
+    mkdir('/tmp/'.$feedname.'-'.$feed_id);
+    shell_exec("cp -R $feed_path ".CHRIS_TMP);
+
+    $local_command = "/bin/bash umask 0002;/bin/bash $runfile;";
+
+    $nohup_wrap = 'bash -c \'nohup bash -c "'.$local_command.'" > /dev/null 2>&1 &\'';
+    shell_exec($nohup_wrap);
+    $pid = -1;
+
+  } else if ($status == 100 ) {
+    // create the json db for the viewer plugin once the data is in its final location
+    $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
 
-    //
-    // UPDATE FEED STATUS
-    //
+    // run locally
+    $sshLocal->exec('bash -c \' /bin/bash '.$runfile.'\'');
+    $pid = -1;
 
-    if (CLUSTER_PORT==22) {
-      $tunnel_host = CHRIS_HOST;
+  } else { //
+    // run on cluster and return pid
+    //
+    if (!CLUSTER_SHARED_FS) {
+      $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
+      $cluster_plugin_path = joinPaths($cluster_user_path, $plugin_name);
+      $cluster_feed_path = joinPaths($cluster_plugin_path, $feedname.'-'.$feed_id);
+      // create job directory
+      $cluster_job_path = $cluster_feed_path;
+      if($jobid != ''){
+        $cluster_job_path .= '/'.$jobid;
+      }
+      $cluster_job_path_output = createDir($sshCluster, $cluster_job_path);
+
+      // replace chris server's paths in chris.env by cluster's paths
+      $envfile_str = file_get_contents($envfile);
+      $envfile_str = str_replace($job_path_output, $cluster_job_path_output, $envfile_str);
+      $envfile = joinPaths($cluster_job_path_output, 'chris.env');
+      $sshCluster->exec('echo "'.$envfile_str.'"'.' > '.$envfile);
+
+      // create _chrisInput_ dir
+      $chrisInputDirectory = '_chrisInput_';
+      $sshLocal->exec('cd ' . $job_path.'; mkdir '.$chrisInputDirectory.'; chmod 755 '.$chrisInputDirectory);
+
+      // run the plugin with the --inputs switch on the chris server
+      $plugin_command_array = explode(' ', $command);
+      // $inputs_options is a string containing a list of input options separated by comma
+      $input_options = $sshLocal->exec($plugin_command_array[0].' --inputs');
+      //remove EOL and white spaces
+      $input_options = trim(preg_replace('/\s+/', ' ', $input_options));
+      $input_options_array = explode(',', $input_options);
+
+      // get the contents of chris.run
+      $runfile_str = file_get_contents($runfile);
+
+      // wraps plugin command with crun scheduler
+      $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
+      $crun_str = $crun_str . ' -u ' . $username . ' --host ' . $cluster_internal_host . ' -s '. CLUSTER_TYPE . ' --blockOnChild';
+      $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' \" bash -c \'source '.$envfile.' && ' .$plugin_command_array[0], $runfile_str);
+      $end = count($plugin_command_array) - 1;
+      $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'\'\"', $runfile_str);
+
+      // replace chris server's paths in chris.run by cluster's paths
+      $runfile_str = str_replace($user_path, $cluster_user_path, $runfile_str);
+      $chrisInput_path = joinPaths($job_path, $chrisInputDirectory);
+      foreach ($input_options_array as $in) {
+        // get location of input in the command array
+        $input_key = array_search($in, $plugin_command_array);
+        if($input_key !== false){
+          // get value of the input in the command array
+          // the value of the input should be the next element in the $command_array
+          $value_key = $input_key + 1;
+          $value = $plugin_command_array[$value_key];
+          if (is_dir($value)) {
+            $value_dirname = $value;
+          } else {
+            $value_dirname = dirname($value);
+          }
+          // need to add the full absolute path to make it unique
+          $value_chris_path = joinPaths($chrisInput_path, $value_dirname);
+          // -n to not overwrite file if already there
+          // -L to dereference links (copy actual file rather than link)
+          $sshLocal->exec('mkdir -p ' . $value_chris_path . '; cp -Lrn ' . $value_dirname . ' ' . dirname($value_chris_path));
+          $value = str_replace($user_path, $cluster_user_path, $value);
+          $runfile_str = str_replace($plugin_command_array[$input_key].' '.$value, $plugin_command_array[$input_key].' '.joinPaths($cluster_job_path, $chrisInputDirectory, $value_dirname), $runfile_str);
+        }
+      }
+
+      // replace chris server plugin paths with cluster's paths
+      $runfile_str = str_replace(CHRIS_PLUGINS_FOLDER, CHRIS_PLUGINS_FOLDER_NET, $runfile_str);
+
+      //
+      // MOVE DATA ($chrisInputDirectory) FROM SERVER TO CLUSTER
+      //
+
+      if (CLUSTER_PORT==22) {
+        $tunnel_host = CHRIS_HOST;
+      } else {
+        $tunnel_host = CLUSTER_HOST;
+      }
+
+      // command to compress _chrisInput_ dir on the chris server
+      $cmd = '\"cd '.$job_path.'; tar -zcf '.$chrisInputDirectory.'.tar.gz '.$chrisInputDirectory.';\"';
+      $cmd = 'ssh -p ' .CLUSTER_PORT. ' -o StrictHostKeyChecking=no ' . $username.'@'.$tunnel_host. ' '.$cmd;
+
+      // command to copy over the compressed _chrisIput_ dir to the cluster
+      $cmd = $cmd.PHP_EOL.'scp -P ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host.':'.$job_path.'/'.$chrisInputDirectory.'.tar.gz ' .$cluster_job_path.';';
+
+      // command to remove the compressed file on the chris server
+      $cmd = $cmd.PHP_EOL.'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' rm '.$job_path.'/'.$chrisInputDirectory.'.tar.gz;';
+
+      // command to uncompress the compressed file on the cluster
+      $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; tar -zxf '.$chrisInputDirectory.'.tar.gz;';
+
+      // command to remove the compressed file from the cluster
+      $cmd = $cmd.PHP_EOL.'cd '.$cluster_job_path.'; rm '.$chrisInputDirectory.'.tar.gz;';
+      $runfile_str = $cmd.PHP_EOL.$runfile_str;
+
+      //
+      // MOVE DATA ($job_path directory) FROM CLUSTER TO SERVER
+      //
+
+      // command to compress $cluster_job_path dir on the cluster (excluding _chrisInput_ dir)
+      $data = basename($job_path);
+      $cmd = 'cd '.$cluster_feed_path.'; tar -zcf '.$data.'.tar.gz '.$data.' --exclude ' . joinPaths($data, $chrisInputDirectory). ';';
+      $runfile_str = $runfile_str.$cmd;
+
+      // command to copy over the compressed $cluster_job_path dir to the chris server
+      $cmd = 'scp -P ' .CLUSTER_PORT. ' ' . $cluster_feed_path.'/'.$data.'.tar.gz ' . $username.'@'.$tunnel_host.':'.$feed_path.';';
+      $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+      // command to uncompress and remove the compressed file on the chris server
+      $cmd = '\"cd '.$feed_path.'; tar -zxf '.$data.'.tar.gz; rm '.$data.'.tar.gz;\"';
+      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+      $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+      // command to remove the compressed file from the cluster
+      $cmd = 'cd '.$cluster_feed_path.'; rm '.$data.'.tar.gz &';
+      $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+      //
+      // CREATE VIEWER SCENE
+      //
+
+      $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
+      $cmd = '\"'.$viewer_plugin.' --directory '.$job_path.' --output '.$job_path.'/..;\"';
+      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+      $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+      //ANONYMIZATION
+      if (ANONYMIZE_DICOM) {
+        $anonfile = joinPaths($job_path_output, 'chris.anon');
+        // copy template over
+        $sshLocal->exec("cp ".joinPaths(CHRIS_SRC, "controller/anonymize.php")." $anonfile");
+        // update template content
+        $chrisInput_path_escaped  = str_replace("/", "\/", $chrisInput_path);
+        $sshLocal->exec("sed -i 's/\${CHRISINPUT_PATH}/$chrisInput_path_escaped/g' $anonfile");
+
+        $chris_bin = joinPaths(CHRIS_HOME, "bin");
+        $chris_bin_escaped  = str_replace("/", "\/", $chris_bin);
+        $sshLocal->exec("sed -i 's/\${CHRIS_BIN}/$chris_bin_escaped/g' $anonfile");
+
+        $chris_scripts = joinPaths(CHRIS_SRC, "../scripts");
+        $chris_scripts_escaped  = str_replace("/", "\/", $chris_scripts);
+        $sshLocal->exec("sed -i 's/\${CHRIS_SCRIPTS}/$chris_scripts_escaped/g' $anonfile");
+
+        $sshLocal->exec('chmod 755 '.$anonfile);
+
+        $cmd = '\"php '.$anonfile.';\"';
+        $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+        $runfile_str = $cmd.PHP_EOL.$runfile_str;
+      }
+
+      //
+      // UPDATE FEED STATUS
+      //
+      $start_token = TokenC::create();
+      $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err;\"';
+      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+      $runfile_str = $cmd.PHP_EOL.$runfile_str;
+
+      $end_token = TokenC::create();
+      $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err;\"';
+      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+      $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+      ////
+      // DELETE REMOTE JOB PATH AFTER ALL THE DATA AS BEEN COPIED BACK
+      /////
+      $cmd = 'rm -rf '.$cluster_job_path.' &;';
+      $runfile_str = $runfile_str.PHP_EOL.$cmd;
+
+      $runfile = joinPaths($cluster_job_path_output, 'chris.run');
+      $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
+      $sshCluster->exec('chmod 775 '.$runfile);
     } else {
-      $tunnel_host = CLUSTER_HOST;
+      $escaped_chris_plugin = str_replace("/", "\/", CHRIS_PLUGINS_FOLDER);
+      $escaped_chris_net_plugin  = str_replace("/", "\/", CHRIS_PLUGINS_FOLDER_NET);
+      $sshLocal->exec("sed -i 's/$escaped_chris_plugin/$escaped_chris_net_plugin/g' $runfile");
+
+      // create the json db for the viewer plugin once the data is in its final location
+      $viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
+      $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
+
+      //
+      // UPDATE FEED STATUS
+      //
+
+      if (CLUSTER_PORT==22) {
+        $tunnel_host = CHRIS_HOST;
+      } else {
+        $tunnel_host = CLUSTER_HOST;
+      }
+
+      $start_token = TokenC::create();
+      $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err;\"';
+      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+      $sshLocal->exec('sed -i "1i '.$cmd.'" '.$runfile);
+
+      $end_token = TokenC::create();
+      $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err;\"';
+      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
+      $sshLocal->exec('echo "'.$cmd.'" >> '.$runfile);
     }
-
-    $start_token = TokenC::create();
-    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err;\"';
-    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-    $sshLocal->exec('sed -i "1i '.$cmd.'" '.$runfile);
-
-    $end_token = TokenC::create();
-    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err;\"';
-    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-    $sshLocal->exec('echo "'.$cmd.'" >> '.$runfile);
+    $cluster_command = 'nohup /bin/bash '.$runfile. ' </dev/null &>/dev/null &';
+    $pid = $sshCluster->exec(bash($cluster_command));
   }
-  $cluster_command = 'nohup /bin/bash '.$runfile. ' </dev/null &>/dev/null &';
-  $pid = $sshCluster->exec(bash($cluster_command));
-}
 
-// attach pid to feed
-$metaObject = new Meta();
-$metaObject->name = "pid";
-$metaObject->value = $pid;
-FeedC::addMeta($feed_id, Array(0 => $metaObject));
+  // attach pid to feed
+  $metaObject = new Meta();
+  $metaObject->name = "pid";
+  $metaObject->value = $pid;
+  FeedC::addMeta($feed_id, Array(0 => $metaObject));
 
-echo $feed_id;
-?>
+  echo $feed_id;
+  ?>

@@ -175,7 +175,7 @@ define('CHRIS_PLUGINS_FOLDER', joinPaths(CHRIS_WWWROOT,'plugins'));
  * The plugins folder.
  * The location of the plugins folder, relative to the file system root directory.
  */
-define('CHRIS_PLUGINS_FOLDER_NET', joinPaths('/SCRATCH4/cubic/chris/src/chrisreloaded','plugins'));
+define('CHRIS_PLUGINS_FOLDER_NET', joinPaths('/SCRATCH5/cubic/chris/src/chrisreloaded','plugins'));
 /**
  * The plugins folder.
  */
@@ -341,11 +341,6 @@ define('CLUSTER_HOST', 'sun.chpc.ac.za');
  */
 define('CLUSTER_PORT', 2468);
 /**
- * The cluster head machine that is seen by the computing nodes internally.
- * Computing nodes connect to this machine to schedule jobs on the cluster.
- */
-define('CLUSTER_INTERNAL_HOST', 'login02');
-/**
  * The cluster type.
  * We specify the cluster type in order for crun to know how to handle the
  * communication.
@@ -368,7 +363,7 @@ define('ANONYMIZE_DICOM', true);
  * The ChRIS location on the cluster.
  * This is the full name of the cluster's directory containing the ChRIS deployment.
  */
-define('CLUSTER_CHRIS', '/SCRATCH4/cubic/chris');
+define('CLUSTER_CHRIS', '/SCRATCH5/cubic/chris');
 /**
  * The ChRIS source location in the cluster.
  * This is the full name of the directory containing the ChRIS source code.

@@ -347,11 +347,6 @@ define('CLUSTER_HOST', 'eofe4.mit.edu');
  */
 define('CLUSTER_PORT', 2439);
 /**
- * The cluster head machine that is seen by the computing nodes internally.
- * Computing nodes connect to this machine to schedule jobs on the cluster.
- */
-define('CLUSTER_INTERNAL_HOST', 'eofe4.mit.edu');
-/**
  * The cluster type.
  * We specify the cluster type in order for crun to know how to handle the
  * communication.
