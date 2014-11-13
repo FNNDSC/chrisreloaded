@@ -20,7 +20,8 @@ import os
 import sys
 import getpass
 import socket
-import argparse 
+import argparse
+from random import randint
 
 # FNNDSC imports
 import systemMisc as misc
@@ -483,13 +484,18 @@ class crun_hpc(crun):
         if len(args):
             self._str_queue = args[0]
         else:
-            return self._str_queue
+            return self._str_queue 
 
-    def jobID(self, *args):
-        if len(args):
-            self._str_jobID = args[0]
-        else:
-            return self._str_jobID
+    def jobID(self):
+        return self._str_jobID
+
+    def _getJobName(self):
+        return self._str_jobName
+
+    def _setJobName(self, jobName):
+        self._str_jobName = jobName
+    
+    jobName = property(fget=_getJobName, fset=_setJobName) 
 
     def jobInfoDir(self, *args):
         if len(args):
@@ -556,9 +562,11 @@ class crun_hpc(crun):
 
         # The "name" of the queue to use
         self._str_queue                 = ''
-
-        # Job ID and related stdout/stderr 
-        self._str_jobID                 = ''
+        # crun job name. crun's users use it to refer to a job scheduled by crun.
+        self._str_jobName               = ''
+        # Job ID. This could be either the scheduler job name or job id
+        # It is used to control (eg. schedule/kill) a job in the cluster
+        self._str_jobID                 = ''  
         # These define the stdout/stderr that schedulers will often use
         # to capture the outputs of executed applications.
         self._str_schedulerStdOut       = ''
@@ -579,19 +587,10 @@ class crun_hpc(crun):
 
 
     def __call__(self, str_cmd, **kwargs):
-        '''
-        If called, simply drops through to the base functor
-        '''
-        crun_hpc.c_runCount += 1
-        return crun.__call__(self, str_cmd, **kwargs)
+        raise NotImplementedError("abstract method crun_hpc.__call__()")
 
     def queueInfo(self, **kwargs):
-        """
-        Should never be called directly, but specialized 
-        in a derived class.
-        """
-        print("crun_hpc::queueInfo()\nThis method should never be called!\n")
-        sys.exit(10)
+        raise NotImplementedError("abstract method crun_hpc.queueInfo()")
     
 
 class crun_hpc_launchpad(crun_hpc):
@@ -609,7 +608,6 @@ class crun_hpc_launchpad(crun_hpc):
         self._b_emailWhenDone           = False
 
         self._str_emailUser             = "rudolph"
-        self._str_jobID                 = ""
         if len(self._str_remoteUser):
             self._str_jobInfoDir    = "/pbs/%s" % self._str_remoteUser
         else:
@@ -631,18 +629,23 @@ class crun_hpc_launchpad(crun_hpc):
         self.scheduleArgs()
         if len(self._str_workingDir):
             str_cmd = "cd %s ; %s" % (self._str_workingDir, str_cmd)
+        #get job id
+        str_cmd = str_cmd + ' 2>&1 | tail -n 1 | awk -F \. \'\\\'\'{print $1}\'\\\'\''
         self._str_scheduleCmd       = self._str_scheduler
-        return crun.__call__(self, str_cmd, **kwargs)
+        out = crun.__call__(self, str_cmd, **kwargs)
+        self._str_jobID = out[0].strip().split().pop()
+        return out
+
+    def jobID(self):
+        return self._str_jobID
     
     def scheduleArgs(self, *args):
         if len(args):
             self._str_scheduleArgs      = args[0]
         else:
             self._str_scheduleArgs      = ''
-            if len(self._str_jobID):
-                self._str_scheduleArgs += "-O %s -E %s " % (
-                                self._str_schedulerStdOut,
-                                self._str_schedulerStdErr)
+            self._str_scheduleArgs += "-O %s -E %s " % (
+                self._str_schedulerStdOut, self._str_schedulerStdErr)
             if self._b_emailWhenDone and len(self._str_emailUser):
                 self._str_scheduleArgs += "-m %s " % self._str_emailUser
             self._str_scheduleArgs     += "-q %s -c " % self._str_queue
@@ -693,7 +696,6 @@ class crun_hpc_slurm(crun_hpc):
 
         self._b_emailWhenDone           = False
 
-        self._str_jobID                 = ""
         if len(self._str_remoteUser):
             self._str_jobInfoDir        = "/nobackup1/%s" % self._str_remoteUser
         else:
@@ -713,21 +715,24 @@ class crun_hpc_slurm(crun_hpc):
         self.waitForChild(False)       # block on child
 
     def __call__(self, str_cmd, **kwargs):
+        #get job id
+        self._str_jobID = str(randint(1,10000000))
         self.scheduleArgs()
         if len(self._str_workingDir):
             str_cmd = "cd %s ; %s" % (self._str_workingDir, str_cmd)
         self._str_scheduleCmd       = self._str_scheduler
         return crun.__call__(self, str_cmd, **kwargs)
+
+    def jobID(self):
+        return self._str_jobID
     
     def scheduleArgs(self, *args):
         if len(args):
             self._str_scheduleArgs      = args[0]
         else:
             self._str_scheduleArgs      = ''
-            if len(self._str_jobID):
-                self._str_scheduleArgs += "-o %s -e %s " % (
-                                self._str_schedulerStdOut,
-                                self._str_schedulerStdErr)
+            self._str_scheduleArgs += "--job-name %s -o %s -e %s " % (
+                self._str_jobID, self._str_schedulerStdOut, self._str_schedulerStdErr)
             if self._b_emailWhenDone and len(self._str_emailUser):
                 self._str_scheduleArgs += "--mail-user=%s " % self._str_emailUser
             self._str_scheduleArgs     += "-p %s " % self._str_queue
@@ -782,7 +787,6 @@ class crun_hpc_chpc(crun_hpc):
         self._b_emailWhenDone           = False
 
         self._str_emailUser             = "rudolph"
-        self._str_jobID                 = ""
         self._str_jobInfoDir            = "~/scratch"
         self._b_singleQuoteCmd          = False
         self._str_queue                 = "workq"
@@ -810,10 +814,8 @@ class crun_hpc_chpc(crun_hpc):
             self._str_scheduleArgs      = args[0]
         else:
             self._str_scheduleArgs      = ''
-            if len(self._str_jobID):
-                self._str_scheduleArgs += "-o %s -e %s " % (
-                                self._str_schedulerStdOut,
-                                self._str_schedulerStdErr)
+            self._str_scheduleArgs += "-o %s -e %s " % (
+                self._str_schedulerStdOut, self._str_schedulerStdErr)
             if self._b_emailWhenDone and len(self._str_emailUser):
                 self._str_scheduleArgs += "-M %s " % self._str_emailUser
             self._str_scheduleArgs     += "-q %s -- " % self._str_queue
@@ -870,7 +872,6 @@ class crun_hpc_lsf(crun_hpc):
 
         self._b_emailWhenDone           = False
 
-        self._str_jobID                 = ""
         self._str_jobInfoDir            = "~/lsf/output"
         self._b_singleQuoteCmd          = True
         self._str_emailUser             = "rudolph.pienaar@childrens.harvard.edu"
@@ -908,11 +909,9 @@ class crun_hpc_lsf(crun_hpc):
                 )
             if self._b_emailWhenDone and len(self._str_emailUser):
                 self._str_scheduleArgs += "-u %s -N " % self._str_emailUser
-            if len(self._str_jobID):
-                self._str_scheduleArgs += "-S 20000 -J %s " % self._str_jobID
-                self._str_scheduleArgs += "-o %s -e %s " % (
-                                self._str_schedulerStdOut,
-                                self._str_schedulerStdErr)
+            self._str_scheduleArgs += "-S 20000 -J %s " % self._str_jobID
+            self._str_scheduleArgs += "-o %s -e %s " % (
+                self._str_schedulerStdOut, self._str_schedulerStdErr)
             self._str_scheduleArgs     += "-q %s " % self._str_queue
         return self._str_scheduleArgs
 
@@ -968,7 +967,6 @@ class crun_hpc_lsf_crit(crun_hpc_lsf):
 
         self._b_emailWhenDone           = False
 
-        self._str_jobID                 = ""
         self._str_jobInfoDir            = "~/lsf/output"
         self._b_singleQuoteCmd          = True
         self._str_emailUser             = "rudolph.pienaar@childrens.harvard.edu"
@@ -994,7 +992,6 @@ class crun_hpc_mosix(crun_hpc):
 
         self._b_emailWhenDone           = False
 
-        self._str_jobID                 = ""
         self._str_jobInfoDir            = "~/tmp"
         self._b_singleQuoteCmd          = False
         self._str_emailUser             = "rudolph.pienaar@childrens.harvard.edu"
@@ -1026,7 +1023,7 @@ class crun_hpc_mosix(crun_hpc):
         else:
             # Need to check if jobID is integer... other clusters allow
             # ids to be alphanumeric...
-            #if len(self._str_jobID):
+            #if self._str_jobID:
                 #self._str_scheduleArgs += "-J%s " % self._str_jobID
             self._str_scheduleArgs      = ''
             self._str_scheduleArgs     += "-q%d " % self._priority
@@ -1142,7 +1139,6 @@ class crun_hpc_mosix_HPtest(crun_hpc_mosix):
 
         self._b_emailWhenDone           = False
 
-        self._str_jobID                 = ""
         self._str_jobInfoDir            = "~/tmp"
         self._b_singleQuoteCmd          = False
         self._str_emailUser             = "rudolph.pienaar@childrens.harvard.edu"
@@ -1167,8 +1163,6 @@ class crun_mosixbash(crun):
 
 
 if __name__ == '__main__':
-
-    from random import randint
 
     parser = argparse.ArgumentParser(description="crun is functor family of scripts for running \
                                      command line apps on a cluster.")
@@ -1244,7 +1238,6 @@ if __name__ == '__main__':
         shell.detach(args.detach)                   # child &
         shell.sshDetach(args.sshDetach)             # ssh .... &
         shell.waitForChild(args.waitForChild)       # block on child
-    if args.scheduler: shell.jobID('j' + str(randint(1,1000)))
     if mail: shell.emailWhenDone(True)
     if args.blockOnChild: shell.blockOnChild()
 
