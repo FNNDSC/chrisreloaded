@@ -687,6 +687,10 @@ class crun_hpc_launchpad(crun_hpc):
                 str_processInSchedulerCount,
                 str_processCompletedCount)
 
+    def killJob(self, jobID):
+        str_cmd = 'qdel ' + jobID
+        self.__call__(str_cmd)
+
 
 class crun_hpc_slurm(crun_hpc):
 
@@ -776,6 +780,10 @@ class crun_hpc_slurm(crun_hpc):
 
     def blockOnChild(self):
         self.waitForChild(True)
+
+    def killJob(self, jobID):
+        str_cmd = 'module load slurm; scancel --name=' + jobID
+        self.__call__(str_cmd) 
 
 
 class crun_hpc_chpc(crun_hpc):
@@ -867,6 +875,10 @@ class crun_hpc_chpc(crun_hpc):
 
     def blockOnChild(self):
         self.detach(True)
+
+    def killJob(self, jobID):
+        str_cmd = 'qdel ' + jobID
+        self.__call__(str_cmd)  
 
 
 class crun_hpc_lsf(crun_hpc):
@@ -968,6 +980,10 @@ class crun_hpc_lsf(crun_hpc):
                 str_processInSchedulerCount,
                 str_processCompletedCount)
 
+    def killJob(self, jobID):
+        str_cmd = 'bkill -J ' + jobID
+        self.__call__(str_cmd)  
+
 
 class crun_hpc_lsf_crit(crun_hpc_lsf):
 
@@ -1055,6 +1071,9 @@ class crun_hpc_mosix(crun_hpc):
                 self._str_cmdSuffix += " 2>%s " % self._str_schedulerStdErr
         return self._str_scheduleArgs
 
+    def killJob(self, jobID):
+        str_cmd = 'moskillall -9 -J' + jobID
+        self.__call__(str_cmd)
 
     def email_send(self):
         '''
