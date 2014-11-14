@@ -807,8 +807,16 @@ class crun_hpc_chpc(crun_hpc):
         self.scheduleArgs()
         if len(self._str_workingDir):
             str_cmd = "cd %s ; %s" % (self._str_workingDir, str_cmd)
+        #get job id
+        str_cmd = str_cmd + ' 2>&1 | awk -F \. \'{print $1}\';'
         self._str_scheduleCmd       = self._str_scheduler
-        return crun.__call__(self, str_cmd, **kwargs)
+        out = crun.__call__(self, str_cmd, **kwargs)
+        #take stdout from out and process it to get the job id number
+        self._str_jobID = out[0].strip().split().pop().split('.').pop(0)
+        return out
+
+    def jobID(self):
+        return self._str_jobID
     
     def scheduleArgs(self, *args):
         if len(args):
@@ -1018,7 +1026,9 @@ class crun_hpc_mosix(crun_hpc):
             self._str_scheduleCmd       = self._str_scheduler
         return crun.__call__(self, str_cmd, **kwargs)
 
-
+    def jobID(self):
+        return self._str_jobID
+    
     def scheduleArgs(self, *args):
         if len(args):
             self._str_scheduleArgs      = args[0]
