@@ -1008,6 +1008,7 @@ class crun_hpc_mosix(crun_hpc):
         self._b_waitForChild = False
         
     def __call__(self, str_cmd, **kwargs):
+        self._str_jobID = str(randint(1,10000000))
         self.scheduleArgs()
         if len(self._str_workingDir):
             self._str_scheduleCmd       = "cd %s ; %s" %\
@@ -1021,12 +1022,9 @@ class crun_hpc_mosix(crun_hpc):
         if len(args):
             self._str_scheduleArgs      = args[0]
         else:
-            # Need to check if jobID is integer... other clusters allow
-            # ids to be alphanumeric...
-            #if self._str_jobID:
-                #self._str_scheduleArgs += "-J%s " % self._str_jobID
             self._str_scheduleArgs      = ''
-            self._str_scheduleArgs     += "-q%d " % self._priority
+            self._str_scheduleArgs     += "-J%s -q%d " % (
+                self._str_jobID, self._priority)
             if self._b_scheduleOnHostOnly:
                 self._str_scheduleArgs += "-r%s " % self._str_scheduleHostOnly
             else:
