@@ -549,6 +549,8 @@ class crun_hpc(crun):
     def blockOnChild(self):
         raise NotImplementedError("abstract method crun_hpc.blockOnChild()")
 
+    def killJob(self, jobID):
+        raise NotImplementedError("abstract method crun_hpc.killJob()")
 
     def __init__(self, **kwargs):
         '''
