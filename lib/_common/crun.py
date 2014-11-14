@@ -633,7 +633,8 @@ class crun_hpc_launchpad(crun_hpc):
         str_cmd = str_cmd + ' 2>&1 | tail -n 1 | awk -F \. \'\\\'\'{print $1}\'\\\'\''
         self._str_scheduleCmd       = self._str_scheduler
         out = crun.__call__(self, str_cmd, **kwargs)
-        self._str_jobID = out[0].strip().split().pop()
+        #take stdout from out and process it to get the job id number
+        self._str_jobID = out[0].strip().split().pop().split('.').pop(0)
         return out
 
     def jobID(self):
