@@ -900,8 +900,13 @@ class crun_hpc_lsf(crun_hpc):
         if len(self._str_workingDir):
             str_cmd = "cd %s ; %s" % (self._str_workingDir, str_cmd)
         self._str_scheduleCmd           = self._str_scheduler
+        #get job id
+        self._str_jobID = str(randint(1,10000000))
         self.scheduleArgs()
         return crun.__call__(self, str_cmd, **kwargs)
+
+    def jobID(self):
+        return self._str_jobID
     
     def scheduleArgs(self, *args):
         '''
