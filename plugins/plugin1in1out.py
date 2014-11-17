@@ -122,6 +122,8 @@ class Plugin1In1Out(Plugin):
             for cmdId in cmdIds:
               shell("/bin/bash " + chrisRunDir + '/' + cmdId + '.run', stdoutflush=True, stderrflush=True)
               time.sleep(0.5)
+            #save scheduled job IDs into a text file  
+            shell.saveScheduledJobIDs(chrisRunDir) 
             #execute while loop until all cmds have written a file with a name cmdId.log in the chris run dir
             allHaveWritten = False
             while not allHaveWritten:

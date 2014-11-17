@@ -19,7 +19,6 @@
 import os
 import sys
 import getpass
-import socket
 import argparse
 from random import randint
 
@@ -600,7 +599,7 @@ class crun_hpc(crun):
     def saveScheduledJobIDs(self, fpath):
         #expand string list into a single string
         ids_str = '\n'.join(self._jobID_list)
-        misc.file_writeOnce(ids_str)
+        misc.file_writeOnce(os.path.join(fpath, str(os.getpid()) + '.crun.joblist'), ids_str)
     
 
 class crun_hpc_launchpad(crun_hpc):
@@ -1305,7 +1304,7 @@ if __name__ == '__main__':
         str_cmd = args.command
         shell(str_cmd)
         if args.saveJobID:
-            shell.saveScheduledJobIDs(args.saveJobID)
+            shell.saveScheduledJobIDs(args.saveJobID) 
     #print shell.stdout()
     if args.printElapsedTime: print("Elapsed time = %f seconds" % misc.toc())
     
