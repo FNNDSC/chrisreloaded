@@ -1240,9 +1240,12 @@ if __name__ == '__main__':
     parser.add_argument("--setDefaultFlags", help="set default control flags", dest='setDefaultControlFlags', action='store_true', default=True)
     parser.add_argument("--no-setDefaultFlags", help="don't set default control flags", dest='setDefaultControlFlags', action='store_false')
     parser.add_argument("--blockOnChild", help="block until all subjobs finish", dest='blockOnChild', action='store_true', default=False)
-    parser.add_argument("--kill", help="cancel job (ignores any passed command)")
-    parser.add_argument("-c", "--command", help="command to be executed")
-    
+
+    exclusive_options = parser.add_mutually_exclusive_group()
+    exclusive_options.add_argument("--kill", help="cancel job (ignores any passed command)", metavar='jobID')
+    exclusive_options.add_argument("-c", "--command", help="command to be executed")
+
+    parser.add_argument("--saveJobID", help="save job ID into a text file", metavar='PATH')
     
     args = parser.parse_args()
     if args.user:
@@ -1297,10 +1300,12 @@ if __name__ == '__main__':
     if args.kill:
         shell.killJob(args.kill)
     elif not args.command:
-       sys.exit("error: either a --kill jobID or -c cmd option must be passed") 
+       sys.exit("error: either a --kill jobID or a -c COMMAND option must be passed") 
     else:
         str_cmd = args.command
         shell(str_cmd)
+        if args.saveJobID:
+            shell.saveScheduledJobIDs(args.saveJobID)
     #print shell.stdout()
     if args.printElapsedTime: print("Elapsed time = %f seconds" % misc.toc())
     
