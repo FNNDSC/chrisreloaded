@@ -596,6 +596,11 @@ class crun_hpc(crun):
 
     def queueInfo(self, **kwargs):
         raise NotImplementedError("abstract method crun_hpc.queueInfo()")
+
+    def saveScheduledJobIDs(self, fpath):
+        #expand string list into a single string
+        ids_str = '\n'.join(self._jobID_list)
+        misc.file_writeOnce(ids_str)
     
 
 class crun_hpc_launchpad(crun_hpc):
