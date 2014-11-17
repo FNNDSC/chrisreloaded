@@ -465,7 +465,7 @@ $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; 
       // wraps plugin command with crun scheduler
       $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
       $crun_str = $crun_str . ' -u ' . $username . ' --host ' . $cluster_internal_host . ' -s '. CLUSTER_TYPE . ' --blockOnChild';
-      $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' \" bash -c \'source '.$envfile.' && ' .$plugin_command_array[0], $runfile_str);
+      $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' -c \" bash -c \'source '.$envfile.' && ' .$plugin_command_array[0], $runfile_str);
       $end = count($plugin_command_array) - 1;
       $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'\'\"', $runfile_str);
 
