@@ -566,9 +566,12 @@ class crun_hpc(crun):
         self._str_queue                 = ''
         # crun job name. crun's users use it to refer to a job scheduled by crun.
         self._str_jobName               = ''
-        # Job ID. This could be either the scheduler job name or job id
+        # Last scheduled Job ID. Job ID could be either the scheduler job name or job id
+        # depending on whether the job ID was obtained from the cluster or created in Python 
         # It is used to control (eg. schedule/kill) a job in the cluster
-        self._str_jobID                 = ''  
+        self._str_jobID                 = ''
+        # List of all job IDs that have been schedule with this object
+        self._jobID_list                = []
         # These define the stdout/stderr that schedulers will often use
         # to capture the outputs of executed applications.
         self._str_schedulerStdOut       = ''
@@ -637,6 +640,7 @@ class crun_hpc_launchpad(crun_hpc):
         out = crun.__call__(self, str_cmd, **kwargs)
         #take stdout from out and process it to get the job id number
         self._str_jobID = out[0].strip().split().pop().split('.').pop(0)
+        self._jobID_list.append(self._str_jobID)
         return out
 
     def jobID(self):
@@ -724,6 +728,7 @@ class crun_hpc_slurm(crun_hpc):
     def __call__(self, str_cmd, **kwargs):
         #get job id
         self._str_jobID = str(randint(1,10000000))
+        self._jobID_list.append(self._str_jobID)
         self.scheduleArgs()
         if len(self._str_workingDir):
             str_cmd = "cd %s ; %s" % (self._str_workingDir, str_cmd)
@@ -823,6 +828,7 @@ class crun_hpc_chpc(crun_hpc):
         out = crun.__call__(self, str_cmd, **kwargs)
         #take stdout from out and process it to get the job id number
         self._str_jobID = out[0].strip().split().pop().split('.').pop(0)
+        self._jobID_list.append(self._str_jobID)
         return out
 
     def jobID(self):
@@ -916,6 +922,7 @@ class crun_hpc_lsf(crun_hpc):
         self._str_scheduleCmd           = self._str_scheduler
         #get job id
         self._str_jobID = str(randint(1,10000000))
+        self._jobID_list.append(self._str_jobID)
         self.scheduleArgs()
         return crun.__call__(self, str_cmd, **kwargs)
 
@@ -1041,6 +1048,7 @@ class crun_hpc_mosix(crun_hpc):
         
     def __call__(self, str_cmd, **kwargs):
         self._str_jobID = str(randint(1,10000000))
+        self._jobID_list.append(self._str_jobID)
         self.scheduleArgs()
         if len(self._str_workingDir):
             self._str_scheduleCmd       = "cd %s ; %s" %\
