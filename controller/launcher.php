@@ -462,13 +462,6 @@ $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; 
       // get the contents of chris.run
       $runfile_str = file_get_contents($runfile);
 
-      // wraps plugin command with crun scheduler
-      $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
-      $crun_str = $crun_str . ' -u ' . $username . ' --host ' . $cluster_internal_host . ' -s '. CLUSTER_TYPE . ' --blockOnChild';
-      $runfile_str = str_replace($plugin_command_array[0], $crun_str . ' -c \" bash -c \'source '.$envfile.' && ' .$plugin_command_array[0], $runfile_str);
-      $end = count($plugin_command_array) - 1;
-      $runfile_str = str_replace($plugin_command_array[$end], $plugin_command_array[$end].'\'\"', $runfile_str);
-
       // replace chris server's paths in chris.run by cluster's paths
       $runfile_str = str_replace($user_path, $cluster_user_path, $runfile_str);
       $chrisInput_path = joinPaths($job_path, $chrisInputDirectory);
@@ -505,7 +498,7 @@ $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; 
       if (CLUSTER_PORT==22) {
         $tunnel_host = CHRIS_HOST;
       } else {
-        $tunnel_host = CLUSTER_HOST;
+        $tunnel_host = $cluster_internal_host;
       }
 
       // command to compress _chrisInput_ dir on the chris server
@@ -618,7 +611,7 @@ $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; 
       if (CLUSTER_PORT==22) {
         $tunnel_host = CHRIS_HOST;
       } else {
-        $tunnel_host = CLUSTER_HOST;
+        $tunnel_host = $cluster_internal_host;
       }
 
       $start_token = TokenC::create();
@@ -631,7 +624,10 @@ $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; 
       $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
       $sshLocal->exec('echo "'.$cmd.'" >> '.$runfile);
     }
-    $cluster_command = 'nohup /bin/bash '.$runfile. ' </dev/null &>/dev/null &';
+
+    $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
+    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . $cluster_internal_host . ' -s '. CLUSTER_TYPE;
+    $cluster_command = 'nohup /bin/bash -c " source ' . $envfile . ' && ' . $crun_str . ' -c \'\\\'\' /bin/bash ' . $runfile . ' \'\\\'\' "  </dev/null &>/dev/null &';
     $pid = $sshCluster->exec(bash($cluster_command));
   }
 
