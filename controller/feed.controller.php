@@ -323,7 +323,7 @@ class FeedC implements FeedControllerInterface {
   static public function searchTagPlugin($user_id, $searchString){
     // output container
     $feed_update = Array();
-    $feed_update['id'] = Array(); 
+    $feed_update['id'] = Array();
     $feed_update['content'] = Array();
     $feed_list = Array();
     $count = 0;
@@ -351,14 +351,14 @@ class FeedC implements FeedControllerInterface {
           $feed_update['content'] = Array();
           break;
         }
-        
+
         $count++;
       }
     }
 
     // search on plugins next if necessary
     if(isset($searchString[1]) && !$skip){
-    
+
       foreach ($searchString[1] as $keyT => $valueT) {
         // init
         $feed_update['id'] = Array();
@@ -453,13 +453,13 @@ class FeedC implements FeedControllerInterface {
           }
           $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
 
-	  shell_exec("sudo su $targetname -c 'ln -s $targetDirectory $destinationDirectory;'");	
- 
+	  shell_exec("sudo su $targetname -c 'ln -s $targetDirectory $destinationDirectory;'");
+
           // we need to change the permission of the target directory to 777 (as the owner)
           // so that the other user can write to this folder
           // but only if the targetDirectory is a directory and not a link (a link means it was re-shared)
           if (is_dir($targetDirectory)) {
-	    shell_exec("sudo su $ownername -c 'chmod -R 777 $targetDirectory;'");	
+	    shell_exec("sudo su $ownername -c 'chmod -R 777 $targetDirectory;'");
           }
         }
         else{
@@ -733,21 +733,22 @@ class FeedC implements FeedControllerInterface {
 
     if($feedResult['Feed'][0]->status != 100) {
 
-      // grab the PID of this feed
-      $metaMapper = new Mapper('Meta');
-      $metaMapper->filter('name = (?)', 'pid');
-      $metaMapper->filter('target_id != (?)', $feedResult['Feed'][0]->id);
-      $metaResult = $metaMapper->get();
-
       // job is running or queued
-      $cluster_kill_command = str_replace("{FEED_ID}", $feedResult['Feed'][0]->id, CLUSTER_KILL);
-
-      if (count($metaResult['Meta']) >= 1) {
-        // also replace the PID (in case we have a locally executed job
-        $cluster_kill_command = str_replace("{PID}", $metaResult['Meta'][0]->value, $cluster_kill_command);
+      $userMapper = new Mapper('User');
+      $userMapper->filter('user.id = (?)', $feedResult['Feed'][0]->user_id);
+      $userResult = $userMapper->get();
+      $username = $userResult['User'][0]->username
+      $cluster_kill_command = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
+      $cluster_kill_command = $cluster_kill_command . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
+      $dirRoot = joinPaths(CHRIS_USERS, $username, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
+      $dataDir = array_diff(scandir($dirRoot), array('..', '.'));
+      foreach ($dataDir as $dir) {
+        $chrisRunPath = joinPaths($dirRoot, $dir, '_chrisRun_');
+        $jobIdFiles = glob($chrisRunPath."/*.crun.joblist");
+        foreach ($jobIdFiles as $f) {
+          $ssh_connection->exec($cluster_kill_command . $f);
+        }
       }
-
-      $ssh_connection->exec($cluster_kill_command);
 
       // set status to canceled
       $status = 101;
@@ -862,7 +863,7 @@ class FeedC implements FeedControllerInterface {
       $feedtagMapper = new Mapper('Feed_Tag');
       $feedtagMapper->filter('feed_id=(?)', $feedid);
       $feedtagMapper->filter('tag_id=(?)', $tagid);
-    
+
       $feedtadResults = $feedtagMapper->get();
 
       if(count($feedtadResults['Feed_Tag']) >= 1){
@@ -881,7 +882,7 @@ class FeedC implements FeedControllerInterface {
       $feedtagMapper = new Mapper('Feed_Tag');
       $feedtagMapper->filter('feed_id=(?)', $feedid);
       $feedtagMapper->filter('tag_id=(?)', $tagid);
-    
+
       $feedtadResults = $feedtagMapper->get();
 
       if(count($feedtadResults['Feed_Tag']) >= 1){
@@ -922,7 +923,7 @@ class FeedC implements FeedControllerInterface {
       # increase status
       $status = $old_status + $status;
 
-    } 
+    }
     if ($op == 'set') {
 
       // set mode
@@ -959,17 +960,17 @@ class FeedC implements FeedControllerInterface {
 
    # update related shared feeds
    $relatedMapper = new Mapper('Feed');
-   $relatedMapper->join('Meta', 'Meta.target_id = Feed.id')->filter('Meta.name = (?)', 'root_id')->filter('Meta.value = (?)',$feedResult['Feed'][0]->id)->filter('Feed.id != (?)',$feedResult['Feed'][0]->id); 
+   $relatedMapper->join('Meta', 'Meta.target_id = Feed.id')->filter('Meta.name = (?)', 'root_id')->filter('Meta.value = (?)',$feedResult['Feed'][0]->id)->filter('Feed.id != (?)',$feedResult['Feed'][0]->id);
     $relatedResult = $relatedMapper->get();
 
     foreach($relatedResult['Feed'] as $key => $value){
       $relatedResult['Feed'][$key]->time = $feedResult['Feed'][0]->time;
       $relatedResult['Feed'][$key]->duration = $feedResult['Feed'][0]->duration;
       $relatedResult['Feed'][$key]->status = $feedResult['Feed'][0]->status;
-  
+
      Mapper::update($relatedResult['Feed'][$key], $relatedResult['Feed'][$key]->id);
     }
-  
+
     # send email if status == 100
     if ($status == 100) {
       // user's email
@@ -979,7 +980,7 @@ class FeedC implements FeedControllerInterface {
 
       // if nothing in DB yet, return -1
       if(count($userResult['User']) > 0)  {
-   
+
         $subject = "ChRIS2 - " . $feedResult['Feed'][0]->plugin ." plugin finished";
 
         $message = "Hello " . $userResult['User'][0]->username . "," . PHP_EOL. PHP_EOL;
