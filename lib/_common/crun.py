@@ -597,9 +597,32 @@ class crun_hpc(crun):
         raise NotImplementedError("abstract method crun_hpc.queueInfo()")
 
     def saveScheduledJobIDs(self, fpath):
-        #expand string list into a single string
+        # expand string list into a single string
         ids_str = '\n'.join(self._jobID_list)
         misc.file_writeOnce(os.path.join(fpath, str(os.getpid()) + '.crun.joblist'), ids_str)
+
+    def _buildKillCmd(self, killCmd, jobID=None):
+        # Here we build a list of kill commands
+        str_cmd = []
+        if jobID is None:
+            # cmd for killing all jobs that have been scheduled by this obj
+            for jID in self._jobID_list:
+                str_cmd.append(killCmd + ' ' + jID)
+                self._jobID_list.remove(jID)
+        elif os.path.isfile(jobID):
+            # cmd for killing all jobs with ID included in the passed file
+            f = open(jobID, 'r')
+            for jID in f:
+                str_cmd.append(killCmd + ' ' + jID)
+            f.close()
+        else:
+            # cmd for killing the job with the passed ID
+            str_cmd.append(killCmd + ' ' + jobID)
+        return str_cmd
+
+    def killJob(self, jobID=None):
+       # jobID may be a job name/id or a file name containing all job names/ids
+       raise NotImplementedError("abstract method crun_hpc.killJob()")
     
 
 class crun_hpc_launchpad(crun_hpc):
@@ -695,10 +718,13 @@ class crun_hpc_launchpad(crun_hpc):
                 str_processInSchedulerCount,
                 str_processCompletedCount)
 
-    def killJob(self, jobID):
-        str_cmd = 'qdel ' + jobID
-        self.__call__(str_cmd)
+    def killJob(self, jobID=None):
+        cmd_list = super(crun_hpc_launchpad, self)._buildKillCmd('qdel', jobID)
+        for cmd in cmd_list:
+            self.__call__(cmd)
 
+            
+            
 
 class crun_hpc_slurm(crun_hpc):
 
@@ -790,9 +816,10 @@ class crun_hpc_slurm(crun_hpc):
     def blockOnChild(self):
         self.waitForChild(True)
 
-    def killJob(self, jobID):
-        str_cmd = 'module load slurm; scancel --name=' + jobID
-        self.__call__(str_cmd) 
+    def killJob(self, jobID=None):
+        cmd_list = super(crun_hpc_slurm, self)._buildKillCmd('module load slurm; scancel --name=', jobID)
+        for cmd in cmd_list:
+            self.__call__(cmd)
 
 
 class crun_hpc_chpc(crun_hpc):
@@ -886,9 +913,10 @@ class crun_hpc_chpc(crun_hpc):
     def blockOnChild(self):
         self.detach(True)
 
-    def killJob(self, jobID):
-        str_cmd = 'qdel ' + jobID
-        self.__call__(str_cmd)  
+    def killJob(self, jobID=None):
+        cmd_list = super(crun_hpc_chpc, self)._buildKillCmd('qdel', jobID)
+        for cmd in cmd_list:
+            self.__call__(cmd)
 
 
 class crun_hpc_lsf(crun_hpc):
@@ -991,9 +1019,10 @@ class crun_hpc_lsf(crun_hpc):
                 str_processInSchedulerCount,
                 str_processCompletedCount)
 
-    def killJob(self, jobID):
-        str_cmd = 'bkill -J ' + jobID
-        self.__call__(str_cmd)  
+    def killJob(self, jobID=None):
+        cmd_list = super(crun_hpc_lsf, self)._buildKillCmd('bkill -J', jobID)
+        for cmd in cmd_list:
+            self.__call__(cmd)
 
 
 class crun_hpc_lsf_crit(crun_hpc_lsf):
@@ -1083,10 +1112,11 @@ class crun_hpc_mosix(crun_hpc):
                 self._str_cmdSuffix += " 2>%s " % self._str_schedulerStdErr
         return self._str_scheduleArgs
 
-    def killJob(self, jobID):
-        str_cmd = 'moskillall -9 -J' + jobID
-        self.__call__(str_cmd)
-
+    def killJob(self, jobID=None):
+        cmd_list = super(crun_hpc_mosix, self)._buildKillCmd('moskillall -9 -J', jobID)
+        for cmd in cmd_list:
+            self.__call__(cmd)
+            
     def email_send(self):
         '''
         The MOSIX scheduler doesn't have the capacity to email users when jobs
@@ -1241,7 +1271,8 @@ if __name__ == '__main__':
     parser.add_argument("--blockOnChild", help="block until all subjobs finish", dest='blockOnChild', action='store_true', default=False)
 
     exclusive_options = parser.add_mutually_exclusive_group()
-    exclusive_options.add_argument("--kill", help="cancel job (ignores any passed command)", metavar='jobID')
+    exclusive_options.add_argument("--kill", help="if a job ID then cancel that job or if a file name then cancel all jobs in the file",
+                                   metavar='jobID/FILE')
     exclusive_options.add_argument("-c", "--command", help="command to be executed")
 
     parser.add_argument("--saveJobID", help="save job ID into a text file", metavar='PATH')
