@@ -77,6 +77,10 @@ class Zip(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
     plugin = Zip()
+    
+    # list the inputs
+    plugin.inputs = "--input"
+    
     plugin.add_parameter( 'Input', Plugin.IMAGE, '--input', action='store', dest='input', help='the directory to zip' )
     plugin.add_parameter('Zip or Unzip', Plugin.BOOLEAN, '--unzip', default=False, action='store_true', dest='unzip', help='unzip archive')
 
