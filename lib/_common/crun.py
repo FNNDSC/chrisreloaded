@@ -20,7 +20,6 @@ import os
 import sys
 import getpass
 import argparse
-import time
 from random import randint
 
 # FNNDSC imports
@@ -590,6 +589,7 @@ class crun_hpc(crun):
             if key == "remoteStdErr":  self._str_schedulerStdErr  = value
             if key == "emailUser":   self._str_emailUser = value
 
+
     def __call__(self, str_cmd, **kwargs):
         raise NotImplementedError("abstract method crun_hpc.__call__()")
 
@@ -607,22 +607,23 @@ class crun_hpc(crun):
         if jobID is None:
             # cmd for killing all jobs that have been scheduled by this obj
             for jID in self._jobID_list:
-                str_cmd.append(killCmd + ' ' + jID)
+                str_cmd.append(killCmd + jID)
                 self._jobID_list.remove(jID)
         elif os.path.isfile(jobID):
             # cmd for killing all jobs with ID included in the passed file
             f = open(jobID, 'r')
             for jID in f:
-                str_cmd.append(killCmd + ' ' + jID)
+                str_cmd.append(killCmd + jID)
             f.close()
         else:
             # cmd for killing the job with the passed ID
-            str_cmd.append(killCmd + ' ' + jobID)
+            str_cmd.append(killCmd + jobID)
         return str_cmd
 
     def killJob(self, jobID=None):
        # jobID may be a job name/id or a file name containing all job names/ids
        raise NotImplementedError("abstract method crun_hpc.killJob()")
+    
 
 class crun_hpc_launchpad(crun_hpc):
 
@@ -718,11 +719,13 @@ class crun_hpc_launchpad(crun_hpc):
                 str_processCompletedCount)
 
     def killJob(self, jobID=None):
-        cmd_list = super(crun_hpc_launchpad, self)._buildKillCmd('qdel', jobID)
+        cmd_list = super(crun_hpc_launchpad, self)._buildKillCmd('qdel ', jobID)
         for cmd in cmd_list:
             self.__call__(cmd)
+
             
-        
+            
+
 class crun_hpc_slurm(crun_hpc):
 
     def __init__(self, **kwargs):
@@ -818,6 +821,7 @@ class crun_hpc_slurm(crun_hpc):
         for cmd in cmd_list:
             self.__call__(cmd)
 
+
 class crun_hpc_chpc(crun_hpc):
 
     def __init__(self, **kwargs):
@@ -843,7 +847,6 @@ class crun_hpc_chpc(crun_hpc):
         self.detach(False)             # child &
         self.disassociate(False)           
         self.waitForChild(True)        # block on child
-	self._blockPollInterval		= 1 
         
 
     def __call__(self, str_cmd, **kwargs):
@@ -851,7 +854,7 @@ class crun_hpc_chpc(crun_hpc):
         if len(self._str_workingDir):
             str_cmd = "cd %s ; %s" % (self._str_workingDir, str_cmd)
         #get job id
-        str_cmd = str_cmd + ' 2>&1 | awk -F \. \'{print $1}\''
+        str_cmd = str_cmd + ' 2>&1 | awk -F \. \'{print $1}\';'
         self._str_scheduleCmd       = self._str_scheduler
         out = crun.__call__(self, str_cmd, **kwargs)
         #take stdout from out and process it to get the job id number
@@ -908,34 +911,10 @@ class crun_hpc_chpc(crun_hpc):
                 str_processCompletedCount)
 
     def blockOnChild(self):
-        if self._b_sshDo and len(self._str_remoteHost):
-            shellQueue  = crun( remoteHost=self._str_remoteHost,
-                                remotePort=self._str_remotePort,
-                                remoteUser=self._str_remoteUser,
-                                remoteUserIdentity = self._str_remoteUserIdentity)
-            str_user    = self._str_remoteUser
-        else:
-            shellQueue  = crun()
-	    shellQueue('whoami')
-	    str_user	= shellQueue.stdout().strip()
-	shellQueue.waitForChild(True)
-	shellQueue.echo(False)
-	shellQueue.echoStdOut(False)
-	b_allJobsDone	= False
-	while not b_allJobsDone:
-	    b_allJobsDone = True
-	    for scheduledJob in self._jobID_list:
-		outList  = shellQueue('qstat | grep %s | grep %s ' % (str_user, scheduledJob))
-	    	outCount = shellQueue('qstat | grep %s | grep %s | wc -l' % (str_user, scheduledJob))
-	    	b_allJobsDone = not (int(shellQueue.stdout().strip()) and b_allJobsDone)
-	    time.sleep(self._blockPollInterval)
-
-    def killJob(self, jobID):
-        str_cmd = 'qdel ' + jobID
-        self.__call__(str_cmd)  
+        self.detach(True)
 
     def killJob(self, jobID=None):
-        cmd_list = super(crun_hpc_chpc, self)._buildKillCmd('qdel', jobID)
+        cmd_list = super(crun_hpc_chpc, self)._buildKillCmd('qdel ', jobID)
         for cmd in cmd_list:
             self.__call__(cmd)
 
@@ -1041,9 +1020,10 @@ class crun_hpc_lsf(crun_hpc):
                 str_processCompletedCount)
 
     def killJob(self, jobID=None):
-        cmd_list = super(crun_hpc_lsf, self)._buildKillCmd('bkill -J', jobID)
+        cmd_list = super(crun_hpc_lsf, self)._buildKillCmd('bkill -J ', jobID)
         for cmd in cmd_list:
             self.__call__(cmd)
+
 
 class crun_hpc_lsf_crit(crun_hpc_lsf):
 
@@ -1343,7 +1323,7 @@ if __name__ == '__main__':
         shell.sshDetach(args.sshDetach)             # ssh .... &
         shell.waitForChild(args.waitForChild)       # block on child
     if mail: shell.emailWhenDone(True)
-    if args.blockOnChild and args.scheduler != 'crun_hpc_chpc' : shell.blockOnChild()
+    if args.blockOnChild: shell.blockOnChild()
 
     # And now run it!
     misc.tic()
@@ -1356,7 +1336,6 @@ if __name__ == '__main__':
         shell(str_cmd)
         if args.saveJobID:
             shell.saveScheduledJobIDs(args.saveJobID) 
-    	if args.blockOnChild and args.scheduler == 'crun_hpc_chpc' : shell.blockOnChild()
     #print shell.stdout()
     if args.printElapsedTime: print("Elapsed time = %f seconds" % misc.toc())
     
