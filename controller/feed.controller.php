@@ -738,16 +738,17 @@ class FeedC implements FeedControllerInterface {
       $userMapper->filter('user.id = (?)', $feedResult['Feed'][0]->user_id);
       $userResult = $userMapper->get();
       $username = $userResult['User'][0]->username;
-      $cluster_kill_command = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
+      $cluster_kill_command = 'export PYTHONPATH='.joinPaths(CLUSTER_CHRIS, 'lib', 'py'). ';';
+      $cluster_kill_command = $cluster_kill_command . joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
       $cluster_kill_command = $cluster_kill_command . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
       $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
       $dirRoot = joinPaths($cluster_user_path, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
       $dataDir = explode("\n",trim($ssh_connection->exec('ls ' . $dirRoot)));
       foreach ($dataDir as $dir) {
         $chrisRunPath = joinPaths($dirRoot, $dir, '_chrisRun_');
-        $jobIdFiles = glob($chrisRunPath."/*.crun.joblist");
+        $jobIdFiles = explode("\n",trim($ssh_connection->exec('ls ' . $chrisRunPath . ' | grep .crun.joblist')));
         foreach ($jobIdFiles as $f) {
-          $ssh_connection->exec($cluster_kill_command . $f);
+          $ssh_connection->exec($cluster_kill_command . joinPaths($chrisRunPath, $f));
         }
       }
 
