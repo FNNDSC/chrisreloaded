@@ -623,8 +623,6 @@ class crun_hpc(crun):
     def killJob(self, jobID=None):
        # jobID may be a job name/id or a file name containing all job names/ids
        raise NotImplementedError("abstract method crun_hpc.killJob()")
->>>>>>> 591d0540d13814c35cb1e8284065c1d3d984d04e
-    
 
 class crun_hpc_launchpad(crun_hpc):
 
