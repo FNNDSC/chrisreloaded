@@ -737,7 +737,7 @@ class FeedC implements FeedControllerInterface {
       $userMapper = new Mapper('User');
       $userMapper->filter('user.id = (?)', $feedResult['Feed'][0]->user_id);
       $userResult = $userMapper->get();
-      $username = $userResult['User'][0]->username
+      $username = $userResult['User'][0]->username;
       $cluster_kill_command = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
       $cluster_kill_command = $cluster_kill_command . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
       $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
