@@ -409,7 +409,7 @@ $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; 
     // therefore calling launcher.php as chris
 
     // create local directory
-    mkdir('/tmp/'.$feedname.'-'.$feed_id);
+    mkdir('/' . CHRIS_TMP . '/'.$feedname.'-'.$feed_id);
     shell_exec("cp -R $feed_path ".CHRIS_TMP);
 
     $local_command = "/bin/bash umask 0002;/bin/bash $runfile;";
