@@ -626,7 +626,7 @@ $sshLocal->exec("echo 'chmod 775 $user_path $plugin_path; chmod 755 $feed_path; 
     }
 
     $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
-    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . $cluster_internal_host . ' -s '. CLUSTER_TYPE;
+    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . $cluster_internal_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $cluster_job_path_output;
     $cluster_command = 'nohup /bin/bash -c " source ' . $envfile . ' && ' . $crun_str . ' -c \'\\\'\' /bin/bash ' . $runfile . ' \'\\\'\' "  </dev/null &>/dev/null &';
     $pid = $sshCluster->exec(bash($cluster_command));
   }
