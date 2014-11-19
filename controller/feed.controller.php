@@ -742,7 +742,7 @@ class FeedC implements FeedControllerInterface {
       $cluster_kill_command = $cluster_kill_command . ' -u ' . $username . ' --host ' . CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
       $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
       $dirRoot = joinPaths($cluster_user_path, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
-      $dataDir = array_diff(scandir($dirRoot), array('..', '.'));
+      $dataDir = explode("\n",trim($ssh_connection->exec('ls ' . $dirRoot)));
       foreach ($dataDir as $dir) {
         $chrisRunPath = joinPaths($dirRoot, $dir, '_chrisRun_');
         $jobIdFiles = glob($chrisRunPath."/*.crun.joblist");
