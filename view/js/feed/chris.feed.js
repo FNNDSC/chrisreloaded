@@ -92,8 +92,8 @@ _FEED_.onclick = function(details, more) {
       var feed = details.closest('.feed');
       feed.css('margin-top', '-1px');
       feed.css('margin-bottom', '0px');
-      feed.find('.feed_icon').css('width', '40px');
-      feed.find('.feed_icon').css('height', '40px');
+      feed.find('.feed_icon').css('width', '34px');
+      feed.find('.feed_icon').css('height', '34px');
     }
     // details.hide('blind', 'slow');
     details.slideUp('fast');

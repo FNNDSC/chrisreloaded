@@ -38,10 +38,11 @@
 .feed {
 	margin-top: -1px;
 	padding-right: 2px;
-    border-top: 1px solid;
-    border-bottom: 1px solid;
+        border-top: 1px solid;
+        border-bottom: 1px solid;
 	border-color: #8D8D8D;
 	background-color: #FFF;
+        margin-left: 20px;
 }
 
 .feed_content {
@@ -87,11 +88,11 @@
 
 .feed_icon {
 	float: left;
-	width: 40px;
-	height: 40px;
+	width: 34px;
+	height: 34px;
 	margin-right: 5px;
 	margin-top: 2px;
-	margin-left: 2px;
+        margin-left: -20px;
 	position: relative;
 }
 
