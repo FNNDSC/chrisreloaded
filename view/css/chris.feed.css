@@ -474,4 +474,9 @@ http://css3playground.com/3d-flip-cards/
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
     border-radius: 50%;
+    -webkit-box-shadow: rgba(131, 131, 131, 0.85) .1em .1em .6em 0;
+    -ms-box-shadow: rgba(131, 131, 131, 0.85) .1em .1em .6em 0;
+    -moz-box-shadow: rgba(131, 131, 131, 0.85) .1em .1em .6em 0;
+    -o-box-shadow: rgba(131, 131, 131, 0.85) .1em .1em .6em 0;
+    box-shadow: rgba(131, 131, 131, 0.85) .1em .1em .6em 0;
 }
