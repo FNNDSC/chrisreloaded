@@ -109,12 +109,34 @@ viewer.Viewer = function(jsonObj) {
   this.onRight2DContDblClickListener = this.on2DContDblClick.bind(this, 'right');
   document.getElementsByClassName('renderer right')[0].addEventListener('dblclick', self.onRight2DContDblClickListener);
 
+
+  // directly show object if there is only 1 element in tree
+  if(jsonObj.length === 0){
+    return;
+  }
+
+  var root = jsonObj['0'];
+  var key = '-1';
+
+  while( typeof(root.children) !== 'undefined' && root.children.length == 1){
+    if(typeof(root.children[0].type) !== 'undefined'){
+      key = root.children[0].key;
+      break;
+    }
+    root =  root.children[0];
+  }
+
+  window.console.log(key);
+  if(key !== '-1'){
+    node = this.fileSelectTree.getNodeByKey(key);
+    node.setSelected(true);
+  }
 }
 
 
 viewer.Viewer.prototype.create3DRenderer = function(container) {
   this[container] = new X.renderer3D();
-  this[container].bgColor = [.4, .5, .5];
+  this[container].bgColor = [.3, .3, .3];
   this[container].container = container;
   this[container].init();
   self = this;
@@ -569,7 +591,7 @@ viewer.Viewer.prototype.updateSceneView = function(){
 
   // if reslice mode, update the renderers by default
   // else reset normals to default (or RASIJK vals?)
-  if(this.volWidget.view.sliceMode.getValue() == 1){
+  if(this.volWidget != null && this.volWidget.view.sliceMode.getValue() == 1){
     var _x = this['vol3D'].camera.view[2];
     var _y = this['vol3D'].camera.view[6];
     var _z = this['vol3D'].camera.view[10];
@@ -686,8 +708,9 @@ viewer.Viewer.prototype.onRemoteFileTreeNodeExpand = function(msgObj) {
 
 viewer.Viewer.prototype.onFileTreeNodeSelect = function(node) {
   var data = {key: node.key, selected: node.isSelected()};
-
+  if(this.collaborator !== null){
   this.collaborator.send('fileTreeNodeSelected', data);
+}
   this._fileTreeNodeSelectHandler(node);
 }
 
