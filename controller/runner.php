@@ -50,7 +50,7 @@ class Runner{
     $this->ssh->exec(bash('echo "source '.$this->runtimePath . '/_chrisRun_/chris.env;" >> '.$runfile));
 
     // 3- RUN command, need some work!
-    $command = $this->getCommand();
+    $command = $this->buildCommand();
     $ssh->exec(bash('echo "'.$command.'" >> '.$runfile));
 
     // 4- update permission after plugin ran
@@ -58,12 +58,12 @@ class Runner{
     // needs a bash wrapper for consistency
     $ssh->exec("echo 'chmod 755 $runtimePath; cd $runtimePath ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");  
 
-    $this->customRun();
+    $this->customizeRun();
 
     $ssh->exec("chmod 755 $runfile");
   }
 
-  public function getCommand(){
+  public function buildCommand(){
     return implode(' ' , $this->pluginCommandArray);
   }
 
@@ -71,7 +71,7 @@ class Runner{
     // does nothing, to beoverloaded in childrens...
   }	  
 
-  public function customRun(){
+  public function customizeRun(){
     // does nothing, to beoverloaded in childrens...
   }
 
@@ -82,6 +82,7 @@ class Runner{
 
 class LocalRunner extends Runner{
   public function prepare(){
+      
     mkdir($this->runtimePath);
     shell_exec("cp -R " . rtim($this->path, "/") . " " . CHRIS_TMP);
   }	
@@ -96,7 +97,7 @@ class LocalRunner extends Runner{
     $this->pid = -1;
   }
       
-  public function getCommand(){
+  public function buildCommand(){
        
     $executable = $this->pluginCommandArray[0];
     $pluginParametersArray = $this->pluginCommandArray;
@@ -112,7 +113,7 @@ class LocalRunner extends Runner{
     return $executable . ' ' . $parameters;
   }
 
-  function customRun(){
+  function customizeRun(){
       
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
   
@@ -124,7 +125,7 @@ class LocalRunner extends Runner{
     // rm job_path directory
     $this->ssh->exec("echo 'sudo rm -rf $this->runtimePath;' >> $runfile;");
 
-    $setStatus = '/usr/bin/curl -k --data ';
+    $setStatus = '/usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
 
     // update status to 100%
     if($this->status != 100){
@@ -162,7 +163,7 @@ class SeparatedRunner extends RemoteRunner{
 
 class SharedRunner extends RemoteRunner{
       
-  public function getCommand(){
+  public function buildCommand(){
       
     $executable = $this->pluginCommandArray[0];
     $pluginParametersArray = $this->pluginCommandArray;
