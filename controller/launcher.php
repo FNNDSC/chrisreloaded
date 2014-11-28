@@ -34,6 +34,7 @@ require_once (dirname(dirname(__FILE__)).'/config.inc.php');
 
 // include the controller
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'user.controller.php'));
+require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'runner.php'));
 require_once (joinPaths(CHRIS_MODEL_FOLDER, 'user.model.php'));
 
 require_once (joinPaths(CHRIS_CONTROLLER_FOLDER, 'feed.controller.php'));
@@ -237,206 +238,16 @@ $command = str_replace("{OUTPUT}", $job_path, $command);
 $command = str_replace("{FEED_ID}", $feed_id, $command);
 $command = str_replace("{USER_ID}", $user_id, $command);
 
-// append the log files to the command
-$command .= ' >> '.$job_path_output.'/chris.std 2> '.$job_path_output.'/chris.err';
-
-
-
+//
+////
 //
 //
 //
-// create the file containing the chris env variables which are required by the plugin
-// and fill it
-//
-// localChris:
-// - $path == /tmp/....
-// - $remoteHost == null
-// - $remoteUser == null
-//
-// immediate:
-// - $path == /neuro/....
-// - $remoteHost == null
-// - $remoteUser == null
-//
-// separated:
-// - $path == /cluster/....
-// - $remoteHost == login02
-// - $remoteUser == rpienaar
-//
-// shared:
-// - $path == /neuro/....
-// - $remoteHost == login02
-// - $remoteUser == rpienaar
+//  WARNING, {OUTPUT} .... NOT REPLACEDin pluginCommandArray, only in the $command string....
 //
 //
 //
 
-function createChrisEnv(&$ssh, $path, $runtimePath = '',  $remoteHost = null, $remoteUser = null) {
-  $envfile = joinPaths($path, '_chrisRun', 'chris.env');
-  if($runtimePath == ''){
-    $runtimePath = $path;
-  }
-
-  $ssh->exec(bash('echo "export ENV_CHRISRUN_DIR='.$runtimePath.'/_chrisRun_" >>  '.$envfile));
-  $ssh->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
-  if($remoteHost != null){
-    $ssh->exec(bash('echo "export ENV_REMOTEHOST='.$remoteHost.'" >>  '.$envfile));
-  }
-  if($remoteHost != null){
-    $ssh->exec(bash('echo "export ENV_REMOTEUSER='.$remoteUser.'" >>  '.$envfile));
-  }
-  // add python libraries that might be missing on the cluster
-  // no plugin-specific library should be there
-  $ssh->exec(bash('echo "export PYTHONPATH='.joinPaths(CLUSTER_CHRIS, 'lib', 'py').':\$PYTHONPATH" >>  '.$envfile));
-  // add ChRIS binaries/libraries that are needed by the plugins
-  $ssh->exec(bash('echo "export PATH='.joinPaths(CLUSTER_CHRIS, 'bin').':\$PATH" >>  '.$envfile));
-  $ssh->exec(bash('echo "export LD_LIBRARY_PATH='.joinPaths(CLUSTER_CHRIS, 'lib').':\$LD_LIBRARY_PATH" >>  '.$envfile));
-  $ssh->exec(bash('echo "umask 0002" >> '.$envfile));
-  // make sure to update the permissions of the file
-  $ssh->exec("chmod 644 $envfile");
-}
-
-// set remoteHost and $remoteUser if we want it to be created
-//  if ($status != 100 && !$force_chris_local) {dd
-//    $cluster_internal_host = $sshCluster->exec('hostname -s 2>/dev/null | tail -n 1');
-//    $cluster_internal_host = trim($cluster_internal_host);
-//createChrisEnv($sshLocal, $job_path_output);
-// or
-// createChrisEnv($sshLocal, $job_path_output, $remoteHost, $remoteUser);
-//
-
-
-function createCommand($jobType, $pluginCommandArray, $path, $runtimePath){
-
-  $executable = $pluginCommandArray[0];
-  array_shift($pluginCommandArray);
-  $pluginParametersArray = $pluginCommandArray;
-
-  // update output for localChris and separated
-  if($jobType == 'localChris' || $jobType == 'separated'){
-    $outputKey = array_search('output', $pluginParametersArray);
-    if($outputKey !== false){
-      $pluginParametersArray[$outputKey + 1] = $runtimePath;
-    }
-  }
-
-  // all that should probably be in the chris.run
-  //
-  // update inputs for separated (use _chrisInput_)
-  // also update location of plugin binary
-  if($jobType == 'separated'){
-    $inputOptions = $ssh->exec($executable.' --inputs');
-    $inputOptions = trim(preg_replace('/\s+/', ' ', $inputOptions));
-    $inputOptionsArray = explode(',', $inputOptions);
-    foreach ($inputOptionsArray as $in) {
-      $inputKey = array_search($in, $pluginParametersArray);
-      if($inputKey !== false){
-        $valueKey = $inputKey + 1;
-        $value = $pluginCommandArray[$valueKey];
-        $value = rtim($value, "/");
-	$localValue = joinPaths($path, '_chrisInput_', $value);
-        $ssh->exec('mkdir -p ' . $localValue  . '; cp -Lrn ' . $value . ' ' . $localValue);
-	$pluginCommandArray[$valueKey] = joinPaths($runtimePath, '_chrisInput_', $value);
-      }
-    }
-
-    // update executable location
-    $executableArray = explode( '/' , $executable);
-    $executableName = end($executableArray);
-    $executable = joinPaths(CLUSTER_CHRIS, '/src/chrisrelaoded/plugin/', executableName, '/', executableName);
-  }
-
-  $parameters = implode(' ', $pluginParametersArray);
-
-  // return new command
-  return $executable . ' ' . $parameters;
-}
-//
-// create the file containing the chris run commannds
-// and fill it
-// 1- source en
-// 2- set status to 1
-// 3- log date/hostname
-// 4- run plugin
-// 5- generate json scene for the viewer
-// 6- set status to 100
-// 7- update permissions of the files
-//
-// $path is directory containing _chrisRun_ and _chrisInput_
-
-// DO EVERYTHING WITH LOCAL PATH to be able to write file and add ${REMOTEPATH}
-function createChrisRun(&$ssh, $path, $runtimePath = '', $feedId, $status, $statusStep, $jobType, $username, $userId, $groupId, $pluginCommandArray){
-  $runfile = joinPaths($path, '_chrisRun_', 'chris.run');
-  if($runtimePath == ''){
-    $runtimePath = $path;
-  }
-
-  // 1- log HOSTNAME and time
-  $ssh->exec(bash('echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$runtimePath.'/_chrisRun_/chris.std" >> '.$runfile));
-
-  // 2- source the environment
-  $ssh->exec(bash('echo "source '.$runtimePath . '/_chrisRun_/chris.env;" >> '.$runfile));
-
-  // 3- RUN command, need some work!
-  $command = createCommand($jobType, $pluginCommandArray, $path, $runtimePath);
-  $ssh->exec(bash('echo "'.$command.'" >> '.$runfile));
-
-  // 4- update permission after plugin ran
-  // to be tested to make sure this is enough
-  // needs a bash wrapper for consistency
-  $ssh->exec("echo 'chmod 755 $runtimePath; cd $runtimePath ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");  
-  $ssh->exec("chmod 755 $runfile");
-
-
-  //
-  // customize chris.run based on job type
-  //
-  //  $setStatus .= '/bin/sleep $(( RANDOM%=10 )) ; /usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
-  $setStatus = '/usr/bin/curl -k --data ';
-
-  //
-  switch($jobType){
-    case 'localChris':
-      echo 'local custom';
-      $ssh->exec("echo 'sudo chmod -R 755 $runtimePath;' >> $runfile;");
-      $ssh->exec("echo 'sudo chown -R $userId:$groupId $runtimePath;' >> $runfile;");
-      $ssh->exec("echo 'sudo su $username -c \"cp -rfp $runtimePath $path\";' >> $runfile;");
-      $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-      $ssh->exec("echo 'sudo su $username  -c \"$viewer_plugin --directory $path --output $path/..\";' >> $runfile;");
-      // rm job_path directory
-      $ssh->exec("echo 'sudo rm -rf $runtimePath;' >> $runfile;");
-
-      // update status to 100%
-      if($status != 100){
-        // prepend
-        $startToken = TokenC::create();
-        $ssh->exec('sed -i "1i sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feedId.'&op=set&status=1&token='.$startToken.'\' '.CHRIS_URL.'/api.php > '.$path.'/_chrisRun_/curlA.std 2> '.$path.'/_chrisRun_/curlA.err"\" '.$runfile);
-
-        // append
-        // we need sudo su to run it at the right location after the data has been copied back
-        $endToken = TokenC::create();
-        $ssh->exec('echo "sudo su '.$username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feedId.'&op=inc&status=+'.$statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$path.'/_chrisRun_/curlB.std 2> '.$path.'/_chrisRun_/curlB.err\"" >> '.$runfile);
-      }
-      
-      break;
-    case 'immediate':
-      echo 'immediate';
-      // nothing
-      break;
-    case 'shared':
-      echo 'shared';
-      // curl stuff
-      // anonym
-    case 'separated':
-      echo 'separated';
-      // scp
-      // curl
-      // anonym
-    default:
-      echo 'unknown $jobtype';
-  }
-
-}
 function getJobType($name, $status){
   if(in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL))){
     return 'localChris';
@@ -457,31 +268,19 @@ $jobType = getJobType();
 switch($jobType){
   case 'localChris':
     echo 'localChris!';
-
     $groupID =  $sshLocal->exec("id -g");
     $groupID = trim($groupID);
 
     $runtimePath = str_replace($plugin_path, CHRIS_TMP, $job_path);
+    $localRun  = new LocalRunner();
+    // set all variables here!
 
-    // create chris.env in the /neuro/../_chrisRun-/
-    createChrisEnv($sshLocal, $plugin_path, $runtimePath);
+    $localRun->createEnv();
+    $localRun->createRun();
+    $localRun->prepare();
+    $localRun->run();
 
-    // create chris.run in the /neuro/.../_chrisRun_/
-    //function createChrisRun(&$ssh, $path, $runtimePath = '', $feedId, $status, $statusStep, $jobType, $username, $userId, $groupId, $pluginCommandArray){
-    createChrisRun($sshLocal, $plugin_path, $runtimePath, $feed_id, $status, $status_step, $jobType, $username, $user_id, $groupID, $plugin_command_array);
-
-    // copy things to runtimePath..
-    //
-    mkdir($runtimePath);
-    // was feed_path...?
-    // we trim last / just in case, to ensure we copy the right directory....
-    shell_exec("cp -R " . rtim($job_path, "/") . " " . CHRIS_TMP);
-
-    //run!
-    $command = "/bin/bash umask 0002;/bin/bash $runfile;";
-    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
-    shell_exec($nohup_wrap);
-    $pid = -1;
+    $pid = $localRun->pid;
     break;
   case 'immediate':
     // create the json db for the viewer plugin once the data is in its final location
