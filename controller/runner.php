@@ -141,7 +141,24 @@ class LocalRunner extends Runner{
 }
 
 class ImmediateRunner extends Runner{
+  function customizeRun(){
+      
+    $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
+  
+    $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
+    $this->ssh->exec("echo 'sudo su $this->username  -c \"$viewer_plugin --directory $this->path --output $this->path/..\";' >> $runfile;");
+  }
 
+  public function run(){
+      
+    $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
+      
+    $command = "/bin/bash umask 0002;/bin/bash $runfile;";
+    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
+    shell_exec($nohup_wrap);
+    $this->pid = -1;
+  }
+      
 }
 
 class RemoteRunner extends Runner{

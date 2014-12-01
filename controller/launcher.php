@@ -302,14 +302,25 @@ switch($jobType){
     $pid = $localRun->pid;
     break;
   case 'immediate':
-    // create the json db for the viewer plugin once the data is in its final location
-    $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-    $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
-
-    // run locally
-    $sshLocal->exec('bash -c \' /bin/bash '.$runfile.'\'');
-    $pid = -1;
     echo 'immediate!';
+    
+    // instantiate a local run
+    $localRun  = new LocalRunner();
+
+    // set all variables here!
+    $localRun->ssh = $sshLocal;
+    $localRun->path = $job_path;
+    $localRun->runtimePath = $job_path;
+    $localRun->pluginCommandArray = $plugin_command_array;
+
+    // run all steps
+    $localRun->createEnv();
+    $localRun->createRun();
+    $localRun->run();
+
+    // return pid
+    $pid = $localRun->pid;
+
     break;
   case 'shared':
     /*if ($status != 100 && !$force_chris_local) {
