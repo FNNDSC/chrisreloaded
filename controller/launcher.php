@@ -237,6 +237,9 @@ $job_path_output = createDir($sshLocal, $job_path);
 $command = str_replace("{OUTPUT}", $job_path, $command);
 $command = str_replace("{FEED_ID}", $feed_id, $command);
 $command = str_replace("{USER_ID}", $user_id, $command);
+$plugin_command_array = str_replace("{OUTPUT}", $job_path, $plugin_command_array);
+$plugin_command_array = str_replace("{FEED_ID}", $feed_id, $plugin_command_array);
+$plugin_command_array = str_replace("{USER_ID}", $user_id, $plugin_command_array);
 
 //
 ////
@@ -249,7 +252,7 @@ $command = str_replace("{USER_ID}", $user_id, $command);
 //
 
 function getJobType($name, $status){
-  if(in_array($plugin_name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL))){
+  if(in_array($name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL))){
     return 'localChris';
   }
   if($status == 100){
@@ -263,7 +266,7 @@ function getJobType($name, $status){
   }
 }
 
-$jobType = getJobType();
+$jobType = getJobType($plugin_name, $status);
 
 switch($jobType){
   case 'localChris':
@@ -279,16 +282,15 @@ switch($jobType){
 
     // set all variables here!
     $localRun->ssh = $sshLocal;
-    $localRun->path = $jobPath;
+    $localRun->path = $job_path;
     $localRun->runtimePath = $runtimePath;
-    $localRun->pluginCommandArray = $pluginCommandArray;
+    $localRun->pluginCommandArray = $plugin_command_array;
     $localRun->userId = $user_id;
     $localRun->groupId = $groupId;
     $localRun->username = $username;
     $localRun->feedId = $feed_id;
     $localRun->status = $status;
     $localRun->statusStep = $status_step;
-    $localRun->pid = $pid;
 
     // run all steps
     $localRun->createEnv();

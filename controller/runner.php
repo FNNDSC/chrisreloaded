@@ -5,7 +5,7 @@ class Runner{
   public $shh = null;
   public $path = '';
   public $runtimePath = '';
-  public $pluginCommandArray = [];
+  public $pluginCommandArray = null;
   public $userId = -1;
   public $groupId = -1;
   public $username = '';
@@ -51,16 +51,16 @@ class Runner{
 
     // 3- RUN command, need some work!
     $command = $this->buildCommand();
-    $ssh->exec(bash('echo "'.$command.'" >> '.$runfile));
+    $this->ssh->exec(bash('echo "'.$command.'" >> '.$runfile));
 
     // 4- update permission after plugin ran
     // to be tested to make sure this is enough
     // needs a bash wrapper for consistency
-    $ssh->exec("echo 'chmod 755 $runtimePath; cd $runtimePath ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");  
+    $this->ssh->exec("echo 'chmod 755 $this->runtimePath; cd $this->runtimePath ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");  
 
     $this->customizeRun();
 
-    $ssh->exec("chmod 755 $runfile");
+    $this->ssh->exec("chmod 755 $runfile");
   }
 
   public function buildCommand(){
@@ -82,9 +82,9 @@ class Runner{
 
 class LocalRunner extends Runner{
   public function prepare(){
-      
-    mkdir($this->runtimePath);
-    shell_exec("cp -R " . rtim($this->path, "/") . " " . CHRIS_TMP);
+    echo $this->runtimePath.PHP_EOL;  
+    mkdir($this->runtimePath, 0755, true);
+    shell_exec("cp -R " . rtrim($this->path, "/") . " " . CHRIS_TMP);
   }	
 
   public function run(){
@@ -101,7 +101,7 @@ class LocalRunner extends Runner{
        
     $executable = $this->pluginCommandArray[0];
     $pluginParametersArray = $this->pluginCommandArray;
-    array_shift($pluginParameterArray);
+    array_shift($pluginParametersArray);
     
     $outputKey = array_search('output', $pluginParametersArray);
     if($outputKey !== false){
@@ -182,7 +182,7 @@ class SharedRunner extends RemoteRunner{
       if($inputKey !== false){
         $valueKey = $inputKey + 1;
         $value = $pluginCommandArray[$valueKey];
-        $value = rtim($value, "/");
+        $value = rtrim($value, "/");
 	$localValue = joinPaths($this->path, '_chrisInput_', $value);
         $ssh->exec('mkdir -p ' . $localValue  . '; cp -Lrn ' . $value . ' ' . $localValue);
 	$pluginCommandArray[$valueKey] = joinPaths($this->runtimePath, '_chrisInput_', $value);
