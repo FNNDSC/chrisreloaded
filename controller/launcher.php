@@ -268,18 +268,35 @@ $jobType = getJobType();
 switch($jobType){
   case 'localChris':
     echo 'localChris!';
-    $groupID =  $sshLocal->exec("id -g");
-    $groupID = trim($groupID);
-
-    $runtimePath = str_replace($plugin_path, CHRIS_TMP, $job_path);
+    
+    // instantiate a local run
     $localRun  = new LocalRunner();
-    // set all variables here!
 
+    // get all required variables
+    $groupId =  $sshLocal->exec("id -g");
+    $groupId= trim($groupId);
+    $runtimePath = str_replace($plugin_path, CHRIS_TMP, $job_path);
+
+    // set all variables here!
+    $localRun->ssh = $sshLocal;
+    $localRun->path = $jobPath;
+    $localRun->runtimePath = $runtimePath;
+    $localRun->pluginCommandArray = $pluginCommandArray;
+    $localRun->userId = $user_id;
+    $localRun->groupId = $groupId;
+    $localRun->username = $username;
+    $localRun->feedId = $feed_id;
+    $localRun->status = $status;
+    $localRun->statusStep = $status_step;
+    $localRun->pid = $pid;
+
+    // run all steps
     $localRun->createEnv();
     $localRun->createRun();
     $localRun->prepare();
     $localRun->run();
 
+    // return pid
     $pid = $localRun->pid;
     break;
   case 'immediate':
