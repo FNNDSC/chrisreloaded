@@ -241,18 +241,21 @@ $plugin_command_array = str_replace("{USER_ID}", $user_id, $plugin_command_array
 //
 //
 
-function getJobType($name, $status){
-  if(in_array($name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL))){
-    return 'localChris';
-  }
-  if($status == 100){
-    return 'immediate';
-  }
-  if(CLUSTER_SHARED_FS){
-    return 'shared';
-  }
-  else{
-    return 'separated';
+if( !function_exists('getJobType')){
+	
+  function getJobType($name, $status){
+    if(in_array($name,explode(',', CHRIS_RUN_AS_CHRIS_LOCAL))){
+      return 'localChris';
+    }
+    if($status == 100){
+      return 'immediate';
+    }
+    if(CLUSTER_SHARED_FS){
+      return 'shared';
+    }
+    else{
+      return 'separated';
+    }
   }
 }
 
@@ -324,6 +327,7 @@ switch($jobType){
     if (!$sharedRun->remoteSsh->login($username, $password)) {
       die('Cluster login Failed');
     }
+
     $sharedRun->remoteHost = trim($sharedRun->remoteSsh->exec('hostname -s 2>/dev/null | tail -n 1'));
     $sharedRun->remoteUser = $username;
     $sharedRun->username = $username;
