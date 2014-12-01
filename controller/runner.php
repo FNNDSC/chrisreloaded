@@ -16,7 +16,7 @@ class Runner{
 
   public function createEnv(){
       
-    $envfile = joinPaths($this->path, '_chrisRun', 'chris.env');
+    $envfile = joinPaths($this->path, '_chrisRun_', 'chris.env');
 
     if($this->runtimePath == ''){
       $this->runtimePath = $this->path;
@@ -146,7 +146,7 @@ class ImmediateRunner extends Runner{
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
   
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-    $this->ssh->exec("echo 'sudo su $this->username  -c \"$viewer_plugin --directory $this->path --output $this->path/..\";' >> $runfile;");
+    $this->ssh->exec("echo '$viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
   }
 
   public function run(){
@@ -164,21 +164,39 @@ class ImmediateRunner extends Runner{
 class RemoteRunner extends Runner{
   public $remoteHost = '';
   public $remoteUser = '';
+  public $remoteSsh = '';
 
   public function createEnv(){
-      
+    
     parent::createEnv();
 
-    $ssh->exec(bash('echo "export ENV_REMOTEHOST='.$remoteHost.'" >>  '.$envfile));
-    $ssh->exec(bash('echo "export ENV_REMOTEUSER='.$remoteUser.'" >>  '.$envfile));
+    $envfile = joinPaths($this->path, '_chrisRun_', 'chris.env');
+
+    $this->ssh->exec(bash('echo "export ENV_REMOTEHOST='.$this->remoteHost.'" >>  '.$envfile));
+    $this->ssh->exec(bash('echo "export ENV_REMOTEUSER='.$this->remoteUser.'" >>  '.$envfile));
+  }
+
+  public function run(){
+
+    $envfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.env');
+    $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
+
+    if (CLUSTER_PORT==22) {
+      $tunnel_host = CLUSTER_HOST;
+    } else {
+      $tunnel_host = $this->remoteHost;
+    }
+
+    // update status to 100%
+
+    $crunWrap = joinPaths(CLUSTER_CHRIS,'src/chrisreloaded/lib/_common/crun.py');
+    $crunWrap = $crunWrap . ' -u ' . $this->username . ' --host ' . $tunnel_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $this->runtimePath . '/_chrisRun_';
+    $cmd = 'nohup /bin/bash -c " source ' . $envfile . ' && ' . $crunWrap . ' -c \'\\\'\' /bin/bash ' . $runfile . ' \'\\\'\' "  </dev/null &>/dev/null &';
+    $pid = $this->remoteSsh->exec(bash($cmd));
   }
 }
 
 class SeparatedRunner extends RemoteRunner{
-}
-
-class SharedRunner extends RemoteRunner{
-      
   public function buildCommand(){
       
     $executable = $this->pluginCommandArray[0];
@@ -214,6 +232,38 @@ class SharedRunner extends RemoteRunner{
     // return new command
     return $executable . ' ' . $parameters;
   }
+}
+
+class SharedRunner extends RemoteRunner{
+  public function customizeRun(){
+    $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
+  
+    $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
+    $this->ssh->exec("echo $viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
+
+    $setStatus = '/usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
+
+    if (CLUSTER_PORT==22) {
+      $tunnel_host = CHRIS_HOST;
+    } else {
+      $tunnel_host = $remoteHost;
+    }
+
+    // update status to 100%
+    // prepend
+    $startToken = TokenC::create();
+    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=1&token='.$startToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlA.std 2> '.$this->path.'/_chrisRun_/curlA.err;\"';
+    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' '.$cmd;
+    $this->ssh->exec('sed -i "1i '.$cmd.'" '.$runfile);
+
+    // append
+    // we need sudo su to run it at the right location after the data has been copied back
+    $endToken = TokenC::create();
+    $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=inc&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err;\"';
+    $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' '.$cmd;
+    $this->ssh->exec('echo "'.$cmd.'" >> '.$runfile);
+
+  } 
 
 }
 

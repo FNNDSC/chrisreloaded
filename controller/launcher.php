@@ -229,24 +229,14 @@ if($jobid != ''){
 $job_path_output = createDir($sshLocal, $job_path);
 
 
-
 //
 // replace ${OUTPUT} pattern in the command and in the parameters
 //
 
-$command = str_replace("{OUTPUT}", $job_path, $command);
-$command = str_replace("{FEED_ID}", $feed_id, $command);
-$command = str_replace("{USER_ID}", $user_id, $command);
 $plugin_command_array = str_replace("{OUTPUT}", $job_path, $plugin_command_array);
 $plugin_command_array = str_replace("{FEED_ID}", $feed_id, $plugin_command_array);
 $plugin_command_array = str_replace("{USER_ID}", $user_id, $plugin_command_array);
 
-//
-////
-//
-//
-//
-//  WARNING, {OUTPUT} .... NOT REPLACEDin pluginCommandArray, only in the $command string....
 //
 //
 //
@@ -323,15 +313,36 @@ switch($jobType){
 
     break;
   case 'shared':
-    /*if ($status != 100 && !$force_chris_local) {
-      $sshCluster  = new Net_SSH2(CLUSTER_HOST);
-      if (!$sshCluster->login($username, $password)) {
-        die('Cluster login Failed');
-      }
-    }
-    */
     echo 'shared';
-    break;
+     // instantiate a local run
+    $sharedRun  = new SharedRunner();
+
+    // set all variables here!
+    $sharedRun->ssh = $sshLocal;
+    // remote ssh
+    $sharedRun->remoteSsh = new Net_SSH2(CLUSTER_HOST);
+    if (!$sharedRun->remoteSsh->login($username, $password)) {
+      die('Cluster login Failed');
+    }
+    $sharedRun->remoteHost = trim($sharedRun->remoteSsh->exec('hostname -s 2>/dev/null | tail -n 1'));
+    $sharedRun->remoteUser = $username;
+    $sharedRun->username = $username;
+    $sharedRun->path = $job_path;
+    $sharedRun->runtimePath = $job_path;
+    $sharedRun->pluginCommandArray = $plugin_command_array;
+    $sharedRun->feedId = $feed_id;
+    $sharedRun->status = $status;
+    $sharedRun->statusStep = $status_step;
+
+    // run all steps
+    $sharedRun->createEnv();
+    $sharedRun->createRun();
+    $sharedRun->run();
+
+    // return pid
+    $pid = $sharedRun->pid;
+
+  break;
   case 'separated':
     /*if ($status != 100 && !$force_chris_local) {
       $sshCluster  = new Net_SSH2(CLUSTER_HOST);
@@ -347,9 +358,6 @@ switch($jobType){
 }
 
 /*
-  } else { //
-    // run on cluster and return pid
-    //
     if (!CLUSTER_SHARED_FS) {
       $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
       $cluster_plugin_path = joinPaths($cluster_user_path, $plugin_name);
@@ -484,40 +492,7 @@ switch($jobType){
       $sshCluster->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
       $sshCluster->exec('chmod 775 '.$runfile);
     } else {
-      $escaped_chris_plugin = str_replace("/", "\/", CHRIS_PLUGINS_FOLDER);
-      $escaped_chris_net_plugin  = str_replace("/", "\/", CHRIS_PLUGINS_FOLDER_NET);
-      $sshLocal->exec("sed -i 's/$escaped_chris_plugin/$escaped_chris_net_plugin/g' $runfile");
-
-      // create the json db for the viewer plugin once the data is in its final location
-      $viewer_plugin = CHRIS_PLUGINS_FOLDER_NET.'/viewer/viewer';
-      $sshLocal->exec("echo '$viewer_plugin --directory $job_path --output $job_path/..;' >> $runfile;");
-
-      //
-      // UPDATE FEED STATUS
-      //
-
-      if (CLUSTER_PORT==22) {
-        $tunnel_host = CHRIS_HOST;
-      } else {
-        $tunnel_host = $cluster_internal_host;
-      }
-
-      $start_token = TokenC::create();
-      $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=set&status=1&token='.$start_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlA.std 2> '.$job_path_output.'/curlA.err;\"';
-      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-      $sshLocal->exec('sed -i "1i '.$cmd.'" '.$runfile);
-
-      $end_token = TokenC::create();
-      $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$feed_id.'&op=inc&status=+'.$status_step.'&token='.$end_token.'\' '.CHRIS_URL.'/api.php > '.$job_path_output.'/curlB.std 2> '.$job_path_output.'/curlB.err;\"';
-      $cmd = 'ssh -p ' .CLUSTER_PORT. ' ' . $username.'@'.$tunnel_host . ' '.$cmd;
-      $sshLocal->exec('echo "'.$cmd.'" >> '.$runfile);
-    }
-
-    $crun_str = joinPaths(CLUSTER_CHRIS_SRC,'lib/_common/crun.py');
-    $crun_str = $crun_str . ' -u ' . $username . ' --host ' . $cluster_internal_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $cluster_job_path_output;
-    $cluster_command = 'nohup /bin/bash -c " source ' . $envfile . ' && ' . $crun_str . ' -c \'\\\'\' /bin/bash ' . $runfile . ' \'\\\'\' "  </dev/null &>/dev/null &';
-    $pid = $sshCluster->exec(bash($cluster_command));
-  }
+   }
 
 */
   // attach pid to feed
