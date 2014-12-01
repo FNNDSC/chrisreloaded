@@ -26,6 +26,11 @@
  *
  */
 
+if(!defined('__CHRIS_ENTRY_POINT__')) define('__CHRIS_ENTRY_POINT__', 666);
+
+// we want the location of the local tmp directory
+require_once (dirname(dirname(dirname(dirname(__FILE__)))).'/config.inc.php');
+
 // convenience method to check if variable is set or not
 function is_set($variable, $value = '') {
   return isset($variable)?$variable:$value;
@@ -39,7 +44,9 @@ $uniqueID = is_set($_POST['UNIQUEID']);
 $dataList = is_set($_POST['DATA']);
 
 // clustertmpdir
-$clusterTmpDir = is_set($_POST['CLUSTER']);
+//$clusterTmpDir = is_set($_POST['CLUSTER']);
+// local tmp directory
+$clusterTmpDir = is_set(CHRIS_TMP);;
 
 
 if($uniqueID != '') {
