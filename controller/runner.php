@@ -82,14 +82,13 @@ class Runner{
 
 class LocalRunner extends Runner{
   public function prepare(){
-    echo $this->runtimePath.PHP_EOL;  
     mkdir($this->runtimePath, 0755, true);
-    shell_exec("cp -R " . rtrim($this->path, "/") . " " . CHRIS_TMP);
+    shell_exec("cp -R " . rtrim($this->path, "/") . "/* " . $this->runtimePath);
   }	
 
   public function run(){
       
-    $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
+    $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
       
     $command = "/bin/bash umask 0002;/bin/bash $runfile;";
     $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
@@ -119,7 +118,7 @@ class LocalRunner extends Runner{
   
     $this->ssh->exec("echo 'sudo chmod -R 755 $this->runtimePath;' >> $runfile;");
     $this->ssh->exec("echo 'sudo chown -R $this->userId:$this->groupId $this->runtimePath;' >> $runfile;");
-    $this->ssh->exec("echo 'sudo su $this->username -c \"cp -rfp $this->runtimePath $this->path\";' >> $runfile;");
+    $this->ssh->exec("echo 'sudo su $this->username -c \"cp -rfp $this->runtimePath/* $this->path\";' >> $runfile;");
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $this->ssh->exec("echo 'sudo su $this->username  -c \"$viewer_plugin --directory $this->path --output $this->path/..\";' >> $runfile;");
     // rm job_path directory
