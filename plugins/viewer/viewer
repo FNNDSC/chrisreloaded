@@ -37,22 +37,11 @@ class Viewer(Plugin):
 
       options = self.options
 
-      # if directory is a file, get containing directory
-      if not os.path.isdir(options.DIRECTORY):
-          options.DIRECTORY = os.path.dirname(options.DIRECTORY)
-
-
+      # GENERAL STRUCTURES
       fibersExt = tuple(['trk'])
       modelsExt = tuple(['obj', 'vtk', 'stl'])
       volumesExt = tuple(['mgh', 'mgz', 'nrrd', 'nii', 'nii.gz'])
       dicomExt = tuple(['dcm', 'ima', 'DCM', 'IMA'])
-
-      # create links only if we create a viewer feed
-      if options.LINKS:
-          dirname = os.path.basename(options.DIRECTORY)
-          print dirname
-          if not os.path.exists(os.path.join(options.output, dirname)):
-              os.symlink(options.DIRECTORY, os.path.join(options.output, dirname))
 
       indexedData = {}
       indexedData['fibers'] = []
@@ -61,40 +50,68 @@ class Viewer(Plugin):
 
       dcmData = {}
 
-      for root, dirs, files in os.walk(options.DIRECTORY, topdown=False, followlinks=True):
-        for fileName in files:
-          if fileName.endswith(fibersExt):
+      # if directory is a file, get containing directory
+      if os.path.isdir(options.DIRECTORY):
+          #options.DIRECTORY = os.path.dirname(options.DIRECTORY)
+
+          # NOT BEING USED YET...
+          # create links only if we create a viewer feed
+          if options.LINKS:
+              dirname = os.path.basename(options.DIRECTORY)
+              print dirname
+              if not os.path.exists(os.path.join(options.output, dirname)):
+                  os.symlink(options.DIRECTORY, os.path.join(options.output, dirname))
+
+          for root, dirs, files in os.walk(options.DIRECTORY, topdown=False, followlinks=True):
+            for fileName in files:
+              #make sure file exists first (broken links, etc.)
+              full_path = os.path.join(root, fileName)
+              if os.path.isfile(full_path):
+                if fileName.endswith(fibersExt):
+                  indexedData['fibers'].append({'file':[fileName], 'url':root})
+                elif fileName.endswith(modelsExt):
+                  indexedData['mesh'].append({'file':[fileName], 'url':root})
+                elif fileName.endswith(volumesExt):
+                  indexedData['volume'].append({'file':[fileName], 'url':root})
+                elif fileName.endswith(dicomExt):
+                  # read file
+                  ds = dicom.read_file(full_path)
+                  # index file
+                  if not ds.PatientID in dcmData:
+                    dcmData[ds.PatientID] = {}
+
+                  if not ds.StudyInstanceUID in dcmData[ds.PatientID]:
+                    dcmData[ds.PatientID][ds.StudyInstanceUID] = {}
+
+                  if not ds.SeriesInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID]:
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID] = {}
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'] = []
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['url'] = root
+
+                  if not ds.SOPInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'].append(fileName)
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = fileName
+
+          # add DCM data to indexed data if any!
+          for patient in dcmData:
+            for study in dcmData[patient]:
+              for series in dcmData[patient][study]:
+                indexedData['volume'].append({'file' : dcmData[patient][study][series]['file'], 'url' : dcmData[patient][study][series]['url']})
+
+          print indexedData
+
+      # it is a file!
+      else:
+          fullFileName = options.DIRECTORY
+          fileName = os.path.basename(fullFileName)
+          root = os.path.dirname(fullFileName)
+          if os.path.isfile(fullFileName):
+            if fileName.endswith(fibersExt):
               indexedData['fibers'].append({'file':[fileName], 'url':root})
-          elif fileName.endswith(modelsExt):
+            elif fileName.endswith(modelsExt):
               indexedData['mesh'].append({'file':[fileName], 'url':root})
-          elif fileName.endswith(volumesExt):
+            elif fileName.endswith(volumesExt):
               indexedData['volume'].append({'file':[fileName], 'url':root})
-          elif fileName.endswith(dicomExt):
-            # read file
-            ds = dicom.read_file(os.path.join(root, fileName))
-            # index file
-            if not ds.PatientID in dcmData:
-              dcmData[ds.PatientID] = {}
-
-            if not ds.StudyInstanceUID in dcmData[ds.PatientID]:
-              dcmData[ds.PatientID][ds.StudyInstanceUID] = {}
-
-            if not ds.SeriesInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID]:
-              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID] = {}
-              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'] = []
-              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['url'] = root
-
-            if not ds.SOPInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
-              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'].append(fileName)
-              dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = fileName
-
-      # add DCM data to indexed data if any!
-      for patient in dcmData:
-        for study in dcmData[patient]:
-          for series in dcmData[patient][study]:
-            indexedData['volume'].append({'file' : dcmData[patient][study][series]['file'], 'url' : dcmData[patient][study][series]['url']})
-
-      print indexedData
 
       if not options.NOTTOFILE:
         path = os.path.join(options.output, '.chris.json')

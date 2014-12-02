@@ -61,6 +61,13 @@ else{
     $content = exec(escapeshellcmd(CHRIS_PLUGINS_FOLDER."/viewer/viewer --directory $directory --output $directory --nottofile"));
 }
 
-$relative_content = str_replace(CHRIS_USERS, 'users', $content);
+// break on space
+$comm = explode(' ', $content);
+// replace 1st occurence
+$escaped_user = str_replace("/", "\/", CHRIS_USERS);
+$rel_comm = preg_replace('/'.$escaped_user.'/', 'users', $comm, 1);
+// put it back together
+$relative_content = implode(' ', $rel_comm);
+//$relative_content = str_replace(CHRIS_USERS, 'users', $content, &$count);
 echo json_encode($relative_content);
 ?>
