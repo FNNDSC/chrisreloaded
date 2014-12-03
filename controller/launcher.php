@@ -363,7 +363,8 @@ switch($jobType){
     $separatedRun->remoteUser = $username;
     $separatedRun->username = $username;
     $separatedRun->path = $job_path;
-    $separatedRun->runtimePath = $job_path;
+    $runtimePath = str_replace($plugin_path, CLUSTER_CHRIS, $job_path);
+    $separatedRun->runtimePath = $runtimePath;
     $separatedRun->pluginCommandArray = $plugin_command_array;
     $separatedRun->feedId = $feed_id;
     $separatedRun->status = $status;
