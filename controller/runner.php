@@ -102,9 +102,9 @@ class LocalRunner extends Runner{
     $pluginParametersArray = $this->pluginCommandArray;
     array_shift($pluginParametersArray);
     
-    $outputKey = array_search('output', $pluginParametersArray);
+    $outputKey = array_search('--output', $pluginParametersArray);
     if($outputKey !== false){
-      $pluginParametersArray[$outputKey + 1] = $runtimePath;
+      $pluginParametersArray[$outputKey + 1] = $this->runtimePath;
     }
 
     $parameters = implode(' ', $pluginParametersArray);
@@ -112,7 +112,7 @@ class LocalRunner extends Runner{
     return $executable . ' ' . $parameters;
   }
 
-  function customizeRun(){
+  public  function customizeRun(){
       
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
   
@@ -153,9 +153,10 @@ class ImmediateRunner extends Runner{
       
     $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
       
-    $command = "/bin/bash umask 0002;/bin/bash $runfile;";
+    $command = "umask 0002;/bin/bash $runfile;";
     $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
-    shell_exec($nohup_wrap);
+    echo $nohup_wrap.PHP_EOL;
+    $this->ssh->exec($nohup_wrap);
     $this->pid = -1;
   }
       
@@ -204,9 +205,9 @@ class SeparatedRunner extends RemoteRunner{
     $pluginParametersArray = $this->pluginCommandArray;
     array_shift($pluginParametersArray);
     
-    $outputKey = array_search('output', $pluginParametersArray);
+    $outputKey = array_search('--output', $pluginParametersArray);
     if($outputKey !== false){
-      $pluginParametersArray[$outputKey + 1] = $runtimePath;
+      $pluginParametersArray[$outputKey + 1] = $this->runtimePath;
     }
 
     $inputOptions = $this->ssh->exec($executable.' --inputs');
@@ -258,8 +259,7 @@ class SeparatedRunner extends RemoteRunner{
     $cmd = $cmd.PHP_EOL.'scp -P ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host.':'.$this->path.'/_chrisInput_.tar.gz ' .$this->runtimePath.';';
 
     // command to remove the compressed file on the chris server
-    // DO IF AFTER, if not can not test separated FS on shared FS
-    //$cmd = $cmd.PHP_EOL.'ssh -p ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' rm '.$runtimePath.'/_chrisInput_.tar.gz;';
+    $cmd = $cmd.PHP_EOL.'ssh -p ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' rm '.$this->path.'/_chrisInput_.tar.gz;';
 
     // command to uncompress the compressed file on the cluster
     $cmd = $cmd.PHP_EOL.'cd '.$this->runtimePath.'; tar -zxf _chrisInput_.tar.gz;';
@@ -342,8 +342,8 @@ class SeparatedRunner extends RemoteRunner{
     // DELETE REMOTE JOB PATH AFTER ALL THE DATA AS BEEN COPIED BACK
     /////
     // DO IF AFTER, if not can not test separated FS on shared FS
-    //$cmd = 'rm -rf '.$this->runtimePath.' &;';
-    //$runfile_str = $runfile_str.PHP_EOL.$cmd;
+    $cmd = 'rm -rf '.$this->runtimePath.' &;';
+    $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     $this->ssh->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
     $this->ssh->exec('chmod 775 '.$runfile);
