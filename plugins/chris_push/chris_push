@@ -136,7 +136,7 @@ class CHRIS_Push(Plugin):
     # SCP it to tmp!
     print "-- SCP zip file to remote tmp: ---"
 
-    command = "scp -P " +  options.PORT + " " + options.output + "*.zip chris@" + options.HOST  + ":"   + data2['tmp']
+    command = "scp -P " +  options.PORT + " " + options.output + "/*.zip chris@" + options.HOST  + ":"   + data2['tmp']
 
     print '- local ssh -'
     print command
