@@ -67,7 +67,7 @@ class Search(Plugin):
       print  'Search String: ' + s
       search_command = current_dir + "/search.php"
       #output directory
-      search_command += " -o " + options.output
+      search_command += " -o " + options.output + '/'
       search_command += " -i " + s
       print 'command:'
       print search_command
