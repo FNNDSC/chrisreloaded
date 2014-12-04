@@ -155,7 +155,6 @@ class ImmediateRunner extends Runner{
       
     $command = "umask 0002;/bin/bash $runfile;";
     $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
-    echo $nohup_wrap.PHP_EOL;
     $this->ssh->exec($nohup_wrap);
     $this->pid = -1;
   }
@@ -190,9 +189,10 @@ class RemoteRunner extends Runner{
 
     // update status to 100%
 
-    $crunWrap = joinPaths(CLUSTER_CHRIS,'src/chrisreloaded/lib/_common/crun.py');
+    $crunWrap = joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'lib/_common/crun.py');
     $crunWrap = $crunWrap . ' -u ' . $this->username . ' --host ' . $tunnel_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $this->runtimePath . '/_chrisRun_';
     $cmd = 'nohup /bin/bash -c " source ' . $envfile . ' && ' . $crunWrap . ' -c \'\\\'\' /bin/bash ' . $runfile . ' \'\\\'\' "  </dev/null &>/dev/null &';
+    echo PHP_EOL.$cmd.PHP_EOL;
     $pid = $this->remoteSsh->exec(bash($cmd));
   }
 }
@@ -228,7 +228,7 @@ class SeparatedRunner extends RemoteRunner{
     // update executable location
     $executableArray = explode( '/' , $executable);
     $executableName = end($executableArray);
-    $executable = joinPaths(CLUSTER_CHRIS, '/src/chrisreloaded/plugins/', $executableName, '/', $executableName);
+    $executable = joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'plugins/', $executableName, '/', $executableName);
 
     $parameters = implode(' ', $pluginParametersArray);
     // return new command
@@ -303,7 +303,7 @@ class SeparatedRunner extends RemoteRunner{
     if (ANONYMIZE_DICOM) {
       $anonfile = joinPaths($this->path, '_chrisRun_', 'chris.anon');
       // copy template over
-      $this->ssh->exec("cp ".joinPaths(CHRIS_SRC, "controller/anonymize.php")." $anonfile");
+      $this->ssh->exec("cp ".joinPaths(CHRIS_HOME, CHRIS_SRC, "controller/anonymize.php")." $anonfile");
       // update template content
       $chrisInput_path_escaped  = str_replace("/", "\/", $this->path.'/_chrisInput_');
       $this->ssh->exec("sed -i 's/\${CHRISINPUT_PATH}/$chrisInput_path_escaped/g' $anonfile");
@@ -312,7 +312,7 @@ class SeparatedRunner extends RemoteRunner{
       $chris_bin_escaped  = str_replace("/", "\/", $chris_bin);
       $this->ssh->exec("sed -i 's/\${CHRIS_BIN}/$chris_bin_escaped/g' $anonfile");
 
-      $chris_scripts = joinPaths(CHRIS_SRC, "../scripts");
+      $chris_scripts = joinPaths(CHRIS_HOME, "scripts");
       $chris_scripts_escaped  = str_replace("/", "\/", $chris_scripts);
       $this->ssh->exec("sed -i 's/\${CHRIS_SCRIPTS}/$chris_scripts_escaped/g' $anonfile");
 
