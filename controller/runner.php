@@ -312,7 +312,7 @@ class SeparatedRunner extends RemoteRunner{
       $chris_bin_escaped  = str_replace("/", "\/", $chris_bin);
       $this->ssh->exec("sed -i 's/\${CHRIS_BIN}/$chris_bin_escaped/g' $anonfile");
 
-      $chris_scripts = joinPaths(CHRIS_HOME, "scripts");
+      $chris_scripts = joinPaths(CHRIS_HOME, "src", "scripts");
       $chris_scripts_escaped  = str_replace("/", "\/", $chris_scripts);
       $this->ssh->exec("sed -i 's/\${CHRIS_SCRIPTS}/$chris_scripts_escaped/g' $anonfile");
 
