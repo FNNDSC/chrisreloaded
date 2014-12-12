@@ -1,10 +1,49 @@
 <?php
+/**
+*
+*            sSSs   .S    S.    .S_sSSs     .S    sSSs
+*           d%%SP  .SS    SS.  .SS~YS%%b   .SS   d%%SP
+*          d%S'    S%S    S%S  S%S   `S%b  S%S  d%S'
+*          S%S     S%S    S%S  S%S    S%S  S%S  S%|
+*          S&S     S%S SSSS%S  S%S    d* S  S&S  S&S
+*          S&S     S&S  SSS&S  S&S   .S* S  S&S  Y&Ss
+*          S&S     S&S    S&S  S&S_sdSSS   S&S  `S&&S
+*          S&S     S&S    S&S  S&S~YSY%b   S&S    `S*S
+*          S*b     S*S    S*S  S*S   `S%b  S*S     l*S
+*          S*S.    S*S    S*S  S*S    S%S  S*S    .S*P
+*           SSSbs  S*S    S*S  S*S    S&S  S*S  sSS*S
+*            YSSP  SSS    S*S  S*S    SSS  S*S  YSS'
+*                         SP   SP          SP
+*                         Y    Y           Y
+*
+*                     R  E  L  O  A  D  E  D
+*
+* (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+*                   Boston Children's Hospital
+*
+*              http://childrenshospital.org/FNNDSC/
+*                        dev@babyMRI.org
+*
+*/
+// prevent direct calls
+if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 
+/**
+ * Runner class. Provides all the common functionnalities for a runner.
+ * A runner is an object that can run a job in a given location given a set of inputs.
+ */
 class Runner{
-      
+
+  // ssh connection to local server
   public $shh = null;
+  // directory where we store/retrive the job on the server
+  // it contains a _chrisRun_ directory
   public $path = '';
+  // directory where we run the job (local or remote)
+  // it contains a _chrisRun_ directory
   public $runtimePath = '';
+  // array containing of the parts of the command
+  // ['plugin_executable', '--input', 'inputvalue', '-output', 'outputvalue', ....]
   public $pluginCommandArray = null;
   public $userId = -1;
   public $groupId = -1;
@@ -14,13 +53,12 @@ class Runner{
   public $statusStep = -1;
   public $pid = -1;
 
+  /**
+   * Create the default chris.env file in the $path
+   */
   public function createEnv(){
       
     $envfile = joinPaths($this->path, '_chrisRun_', 'chris.env');
-
-    if($this->runtimePath == ''){
-      $this->runtimePath = $this->path;
-    }
 
     $this->ssh->exec(bash('echo "export ENV_CHRISRUN_DIR='.$this->runtimePath.'/_chrisRun_" >>  '.$envfile));
     $this->ssh->exec(bash('echo "export ENV_CLUSTERTYPE='.CLUSTER_TYPE.'" >>  '.$envfile));
@@ -35,14 +73,15 @@ class Runner{
     $this->ssh->exec("chmod 644 $envfile");
   }
 
+  /**
+   * Create the default chris.run file in the $path
+   * buildCommand might have to be overloaded if you need to tweek the command.
+   * in the separated FS, it also copies data. This should NOT be happenning. Copy should happen in the chris.run.
+   */
   public function createRun(){
       
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
  
-    if($this->runtimePath == ''){
-      $this->runtimePath = $this->path;
-    }
-
     // 1- log HOSTNAME and time
     $this->ssh->exec(bash('echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$this->runtimePath.'/_chrisRun_/chris.std" >> '.$runfile));
 
@@ -58,50 +97,68 @@ class Runner{
     // needs a bash wrapper for consistency
     $this->ssh->exec("echo 'chmod 755 $this->runtimePath; cd $this->runtimePath ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");  
 
-    $this->customizeRun();
-
+    // make sure to update the permissions of the file
     $this->ssh->exec("chmod 755 $runfile");
   }
 
+  /**
+   * Return the command to be executed to actually run the job.
+   */
   public function buildCommand(){
     return implode(' ' , $this->pluginCommandArray);
   }
 
+  /**
+   * Prepare the system before running. In general nothing has to be done.
+   * On a separated FS for instance, we have to copy the chris.run to the cluster before actually running.
+   */
   public function prepare(){
-    // does nothing, to beoverloaded in childrens...
+    // does nothing, to be overloaded in childrens...
   }	  
 
-  public function customizeRun(){
-    // does nothing, to beoverloaded in childrens...
-  }
-
+  /**
+   * Command to run the job. Schedule it, run it in bash, etc.
+   */
   public function run(){
-    // does nothing, to beoverloaded in childrens...
+    // does nothing, to be overloaded in childrens...
   }
 }
 
-class LocalRunner extends Runner{
+/**
+ * Runner running on the local server.
+ */
+class ServerRunner extends Runner{                                                                                                                         
+      
+  public function run(){
+    // run the job in plain bash
+    $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
+      
+    $command = "umask 0002;/bin/bash $runfile;";
+    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
+    $this->ssh->exec($nohup_wrap);
+    $this->pid = -1;
+  }
+
+}
+
+/**
+ *  Runs on local server as chris.
+ *  See https://github.com/FNNDSC/chrisreloaded/wiki/JobSubmission#local
+ */
+class LocalRunner extends ServerRunner{
+
   public function prepare(){
+    // we copy the _chrisRun_ directory to the runtime path before running.    
     mkdir($this->runtimePath, 0755, true);
     shell_exec("cp -R " . rtrim($this->path, "/") . "/* " . $this->runtimePath);
   }	
 
-  public function run(){
-      
-    $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
-      
-    $command = "/bin/bash umask 0002;/bin/bash $runfile;";
-    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
-    shell_exec($nohup_wrap);
-    $this->pid = -1;
-  }
-      
   public function buildCommand(){
-       
     $executable = $this->pluginCommandArray[0];
     $pluginParametersArray = $this->pluginCommandArray;
     array_shift($pluginParametersArray);
     
+    // we make sure to update the output directory to runtime path
     $outputKey = array_search('--output', $pluginParametersArray);
     if($outputKey !== false){
       $pluginParametersArray[$outputKey + 1] = $this->runtimePath;
@@ -112,20 +169,25 @@ class LocalRunner extends Runner{
     return $executable . ' ' . $parameters;
   }
 
-  public  function customizeRun(){
+  public  function createRun(){
+
+    parent::createRun();
       
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
-  
+
+    // run the viewer plugin to generate the JSON scene
     $this->ssh->exec("echo 'sudo chmod -R 755 $this->runtimePath;' >> $runfile;");
     $this->ssh->exec("echo 'sudo chown -R $this->userId:$this->groupId $this->runtimePath;' >> $runfile;");
     $this->ssh->exec("echo 'sudo su $this->username -c \"cp -rfp $this->runtimePath/* $this->path\";' >> $runfile;");
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $this->ssh->exec("echo 'sudo su $this->username  -c \"$viewer_plugin --directory $this->path --output $this->path/..\";' >> $runfile;");
+
     // rm job_path directory
     $this->ssh->exec("echo 'sudo rm -rf $this->runtimePath;' >> $runfile;");
 
+    // status update if needed
+    // if a job is local and immediate, we run it as local to ensure it works
     $setStatus = '/usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
-
     // update status to 100%
     if($this->status != 100){
       // prepend
@@ -140,27 +202,26 @@ class LocalRunner extends Runner{
   }
 }
 
-class ImmediateRunner extends Runner{
-  function customizeRun(){
+/**
+ *  Runs on local server as user.
+ *  See https://github.com/FNNDSC/chrisreloaded/wiki/JobSubmission#immediate
+ */
+class ImmediateRunner extends ServerRunner{
+  function createRun(){
+	  
+    parent::createRun();
       
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
   
+    // run the viewer plugin to generate the JSON scene
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $this->ssh->exec("echo '$viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
   }
-
-  public function run(){
-      
-    $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
-      
-    $command = "umask 0002;/bin/bash $runfile;";
-    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
-    $this->ssh->exec($nohup_wrap);
-    $this->pid = -1;
-  }
-      
 }
 
+/**
+ * Runner running off a remote location
+ */
 class RemoteRunner extends Runner{
   public $remoteHost = '';
   public $remoteUser = '';
@@ -187,16 +248,17 @@ class RemoteRunner extends Runner{
       $tunnel_host = $this->remoteHost;
     }
 
-    // update status to 100%
-
     $crunWrap = joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'lib/_common/crun.py');
     $crunWrap = $crunWrap . ' -u ' . $this->username . ' --host ' . $tunnel_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $this->runtimePath . '/_chrisRun_';
     $cmd = 'nohup /bin/bash -c " source ' . $envfile . ' && ' . $crunWrap . ' -c \'\\\'\' /bin/bash ' . $runfile . ' \'\\\'\' "  </dev/null &>/dev/null &';
-    echo PHP_EOL.$cmd.PHP_EOL;
     $pid = $this->remoteSsh->exec(bash($cmd));
   }
 }
 
+/**
+ * Runs on a remote cluster, with a separated file system
+ * See https://github.com/FNNDSC/chrisreloaded/wiki/JobSubmission#separated
+ */
 class SeparatedRunner extends RemoteRunner{
   public function buildCommand(){
       
@@ -204,12 +266,15 @@ class SeparatedRunner extends RemoteRunner{
 
     $pluginParametersArray = $this->pluginCommandArray;
     array_shift($pluginParametersArray);
-    
+
+    // update output location to runtime path  
     $outputKey = array_search('--output', $pluginParametersArray);
     if($outputKey !== false){
       $pluginParametersArray[$outputKey + 1] = $this->runtimePath;
     }
 
+    // update all inputs location to somthing within the _chrisInput_ directory
+    // in the chris.run, the first step will be to copy the _chrisInput_ directory over to the remote location
     $inputOptions = $this->ssh->exec($executable.' --inputs');
     $inputOptions = trim(preg_replace('/\s+/', ' ', $inputOptions));
     $inputOptionsArray = explode(',', $inputOptions);
@@ -225,7 +290,7 @@ class SeparatedRunner extends RemoteRunner{
       }
     }
 
-    // update executable location
+    // update executable location to something accessible on the remote location
     $executableArray = explode( '/' , $executable);
     $executableName = end($executableArray);
     $executable = joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'plugins/', $executableName, '/', $executableName);
@@ -235,7 +300,10 @@ class SeparatedRunner extends RemoteRunner{
     return $executable . ' ' . $parameters;
   }
 
-  public function customizeRun(){
+  public function createRun(){
+    
+    parent::createRun();
+    
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
 
     // get the contents of chris.run
@@ -372,22 +440,30 @@ class SeparatedRunner extends RemoteRunner{
 
 }
 
+/**
+ * Runs on a remote cluster, with a shared file system
+ * See https://github.com/FNNDSC/chrisreloaded/wiki/JobSubmission#shared
+ */
 class SharedRunner extends RemoteRunner{
-  public function customizeRun(){
+  
+  public function createRun(){
+
+    parent::createRun();
+    
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
   
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $this->ssh->exec("echo $viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
-
-    $setStatus = '/usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
 
     if (CLUSTER_PORT==22) {
       $tunnel_host = CHRIS_HOST;
     } else {
       $tunnel_host = $this->remoteHost;
     }
+    
+    // update status
+    $setStatus = '/usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
 
-    // update status to 100%
     // prepend
     $startToken = TokenC::create();
     $cmd = '\"'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=1&token='.$startToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlA.std 2> '.$this->path.'/_chrisRun_/curlA.err;\"';
