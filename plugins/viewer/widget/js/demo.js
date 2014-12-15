@@ -132,24 +132,11 @@ _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, files
     path.shift();
     path.shift();
 
+    // we reached the file
     if(depth >= path.length){
-        // loop through tree and look for 'title' match
-        var indexSubTree = -1;
 
-        for (var i=0; i < subtree.length; i++){
-            if(subtree[i].title == obj.title){
-                indexSubTree = i;
-                break;
-            }
-        }
-
-        if(indexSubTree == -1){
-
-            indexSubTree = subtree.length;
-            subtree.push(_CHRIS_INTERACTIVE_PLUGIN_.createTreeFile(obj.file[0], type, obj.url, obj.file, key + indexSubTree.toString()));
-
-        }
-
+        indexSubTree = subtree.length;
+        subtree.push(_CHRIS_INTERACTIVE_PLUGIN_.createTreeFile(obj.file[0], type, obj.url, obj.file, key + indexSubTree.toString()));
         return;
     }
 
