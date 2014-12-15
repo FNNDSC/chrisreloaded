@@ -263,8 +263,6 @@ $jobType = getJobType($plugin_name, $status);
 
 switch($jobType){
   case 'localChris':
-    echo 'localChris!';
-    
     // instantiate a local run
     $localRun  = new LocalRunner();
 
@@ -295,8 +293,6 @@ switch($jobType){
     $pid = $localRun->pid;
     break;
   case 'immediate':
-    echo 'immediate!';
-    
     // instantiate a immediate run
     $immediateRun  = new ImmediateRunner();
 
@@ -316,7 +312,6 @@ switch($jobType){
 
     break;
   case 'shared':
-    echo 'shared';
     // instantiate a shared run
     $sharedRun  = new SharedRunner();
 
@@ -347,7 +342,6 @@ switch($jobType){
     $pid = $sharedRun->pid;
     break;
   case 'separated':
-    echo 'separated';
     // instantiate a shared run
     $separatedRun  = new SeparatedRunner();
 
