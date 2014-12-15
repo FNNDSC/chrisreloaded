@@ -67,7 +67,7 @@ define('CHRIS_HOST', 'chris.tch.harvard.edu');
  * We also use it in this configuration file as a base directory for all the
  * directories ChRIS relies on, such as 'src', 'users', 'log', etc.
  */
-define('CHRIS_HOME', '/neuro/users/chris/dev');
+define('CHRIS_HOME', '/neuro/users/chris');
 /**
  * The transfer protocol.
  * We use it to generate the CHRIS_URL.
@@ -79,7 +79,7 @@ define('CHRIS_TRANSFER_PROTOCOL', 'http');
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
- define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/jorge');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/experimental');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
@@ -99,7 +99,7 @@ define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.tch.harvard.edu');
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'jorge'));
+define('CHRIS_SRC', joinPaths('src', 'chrisreloaded_experimental'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -212,7 +212,7 @@ define('SQL_PASSWORD', 'chris1234');
  * The SQL Database.
  * The name of the database which contains all the ChRIS information.
  */
-define('SQL_DATABASE', 'chrisdev');
+define('SQL_DATABASE', 'chris');
 
 
 // --------------------------------------------------------------------------
@@ -237,7 +237,7 @@ define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.tch.harvard.edu');
  * The destination AETITLE.
  * The remote machine where the data will be pushed after a pacs_pull retrieval.
  */
-define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
+define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRIS');
 /**
  * DCMTK binaries.
  * TODO: It should probably be sitting in the CHRIS/LIBS directory, with the
@@ -282,7 +282,7 @@ define('CHRIS_REMOTES', serialize(array(
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
-    "src"  => "/neuro/users/chris/dev/jorge"))
+    "src"  => "/neuro/users/chris/src/chrisreloaded_experimental"))
 )));
 
 
@@ -341,9 +341,9 @@ define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
  */
 define('CLUSTER_HOST', 'rc-golden');
 /**
-* The tunnel port through which we connect to the chris server from the cluster.
-* This is by default 22 but if a tunnel is needed and it is set up then change it
-* to the actual tunnel port.
+ * The tunnel port through which we connect to the chris server from the cluster.
+ * This is by default 22 but if a tunnel is needed and it is set up then change it
+ * to the actual tunnel port.
  */
 define('CLUSTER_PORT', 22);
 /**
@@ -358,7 +358,13 @@ define('CLUSTER_TYPE', 'crun_hpc_mosix');
  * Set this to true if the cluster shares the file system with the chris server.
  * It will improve performance by exploting the common file system.
  */
-define('CLUSTER_SHARED_FS', false);
+define('CLUSTER_SHARED_FS', true);
+/**
+ * Should dicom files be anonymized before sending them to the cluster?
+ * If the answer is no then set this to false which will improve performance by
+ * skipping the anonymization step.
+ */
+define('ANONYMIZE_DICOM', true);
 /**
  * The ChRIS users location on the cluster.
  * This is the full name of the cluster's directory containing the ChRIS users data.
@@ -366,6 +372,7 @@ define('CLUSTER_SHARED_FS', false);
  * The data is organized by: username/pluginname/feedid
  */
 define('CLUSTER_CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
+define('CLUSTER_CHRIS', CHRIS_HOME);
 /**
  * The ChRIS bin/lib location on the cluster.
  * This is the full name of the cluster's directory containing the ChRIS binaries/libraries that are needed by the plugins.
