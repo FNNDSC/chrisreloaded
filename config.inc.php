@@ -43,7 +43,7 @@ require_once(dirname(__FILE__).'/controller/_util.inc.php');
  * The version.
  * It appears at the bottom of the home page.
  */
-define('CHRIS_VERSION', '2.9-experimental');
+define('CHRIS_VERSION', '2.9-pre-release');
 /**
  * The timezone.
  * It must be defined when we use getTime in php.
@@ -73,13 +73,13 @@ define('CHRIS_HOME', '/neuro/users/chris');
  * We use it to generate the CHRIS_URL.
  * deprecated: Alos used to push a dicom scene to SliceDrop through the api.php.
  */
-define('CHRIS_TRANSFER_PROTOCOL', 'http');
+define('CHRIS_TRANSFER_PROTOCOL', 'https');
 /**
  * The ChRIS url.
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
-define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/experimental');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
@@ -99,7 +99,7 @@ define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris.tch.harvard.edu');
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths('src', 'chrisreloaded_experimental'));
+define('CHRIS_SRC', joinPaths('src', 'chrisreloaded'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -282,7 +282,7 @@ define('CHRIS_REMOTES', serialize(array(
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
-    "src"  => "/neuro/users/chris/src/chrisreloaded_experimental"))
+    "src"  => "/neuro/users/chris/src/chrisreloaded"))
 )));
 
 

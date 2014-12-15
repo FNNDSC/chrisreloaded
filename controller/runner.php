@@ -200,6 +200,17 @@ class LocalRunner extends ServerRunner{
       $this->ssh->exec('echo "sudo su '.$this->username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=inc&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err\"" >> '.$runfile);
     }   
   }
+
+  public function run(){
+    // run the job in plain bash
+    $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
+      
+    $command = "umask 0002;/bin/bash $runfile;";
+    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
+    shell_exec($nohup_wrap);
+    $this->pid = -1;
+  }
+
 }
 
 /**
