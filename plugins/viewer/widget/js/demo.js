@@ -126,6 +126,7 @@ _CHRIS_INTERACTIVE_PLUGIN_.addToTree = function(tree, obj, type){
 _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, files, key){
     // get current location
     var path = obj.url.split('/');
+    var indexSubTree;
     // we do not want to show the following in the tree
     // users/plugin_name/feed_name
     path.shift();
@@ -134,14 +135,13 @@ _CHRIS_INTERACTIVE_PLUGIN_.parseTree = function(subtree, obj, depth, type, files
 
     // we reached the file
     if(depth >= path.length){
-
         indexSubTree = subtree.length;
         subtree.push(_CHRIS_INTERACTIVE_PLUGIN_.createTreeFile(obj.file[0], type, obj.url, obj.file, key + indexSubTree.toString()));
         return;
     }
 
     // subtree is not there, create it
-    var indexSubTree = -1;
+    indexSubTree = -1;
 
     // loop through tree and look for 'title' match
     for (var i=0; i < subtree.length; i++){
