@@ -282,7 +282,25 @@ define('CHRIS_REMOTES', serialize(array(
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
-    "src"  => "/neuro/users/chris/src/chrisreloaded"))
+    "src"  => "/neuro/users/chris/src/chrisreloaded")),
+"MGHPCC" => serialize(array(
+    "sshhost" => "chris-mghpcc",
+    "sshport" => "22",
+    "dicomhost" => "chris-mghpcc",
+    "dicomport" => "10401",
+    "src"  => "/home/chris/src/chrisreloaded")),
+"CRIT" => serialize(array(
+    "sshhost" => "chris-crit",
+    "sshport" => "22",
+    "dicomhost" => "chris-crit",
+    "dicomport" => "10401",
+    "src"  => "/home/chris/src/chrisreloaded")),
+"CHPC" => serialize(array(
+    "sshhost" => "chris-chpc",
+    "sshport" => "22",
+    "dicomhost" => "chris-chpc",
+    "dicomport" => "10502",
+    "src"  => "/home/chris/src/chrisreloaded"))
 )));
 
 

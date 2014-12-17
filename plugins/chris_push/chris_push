@@ -136,7 +136,7 @@ class CHRIS_Push(Plugin):
     # SCP it to tmp!
     print "-- SCP zip file to remote tmp: ---"
 
-    command = "scp -P " +  options.PORT + " " + options.output + "/*.zip chris@" + options.HOST  + ":"   + data2['tmp']
+    command = "scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P " +  options.PORT + " " + options.output + "/*.zip chris@" + options.HOST  + ":"   + data2['tmp']
 
     print '- local ssh -'
     print command
@@ -166,7 +166,7 @@ class CHRIS_Push(Plugin):
 if __name__ == "__main__":
   plugin = CHRIS_Push()
   plugin.add_parameter('Parameters', Plugin.IMAGE, '--directory', action='store', dest='DIR', help='Directory to be pushed')
-  plugin.add_parameter('Parameters', Plugin.COMBOBOX, '--remote', values=['MGH', 'BCH'], action='store', default='MGH', dest='REMOTE', help='Remote CHRIS instance')
+  plugin.add_parameter('Parameters', Plugin.COMBOBOX, '--remote', values=['MGH', 'BCH', 'MGHPCC', 'CRIT', 'CHPC'], action='store', default='MGH', dest='REMOTE', help='Remote CHRIS instance')
   plugin.add_parameter('Parameters', Plugin.STRING, '--user', action='store', default="username", dest='USERNAME', help='Recipient')
 
   plugin.add_parameter('Advanced (Network)', Plugin.STRING, '--host', action='store', default='', dest='HOST', help='Override host')

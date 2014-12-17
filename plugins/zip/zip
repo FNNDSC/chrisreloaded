@@ -39,6 +39,26 @@ class Zip(Plugin):
     Plugin.LICENSE          = 'Opensource (MIT)'
     Plugin.VERSION          = '0.1'
 
+    def ignoreBrokenLinks(self, folder, files):
+	broken = []
+	for filename in files:
+     	    path = os.path.join(folder,filename)
+     	    if os.path.islink(path):
+      	        target_path = os.readlink(path)
+      	      	# Resolve relative symlinks
+      	      	if not os.path.isabs(target_path):
+      	        	target_path = os.path.join(os.path.dirname(path),target_path)             
+                # Check if link is broken
+       	    	if not os.path.exists(target_path):
+                	broken.append(filename)
+       	    else:
+                # If it's not a symlink we're not interested.
+	        continue
+
+        print broken
+	
+	return broken
+
     def run(self):
 
         options = self.options
@@ -48,7 +68,8 @@ class Zip(Plugin):
             zipnamezip  = '%s.zip' % zipname
             destdir     = '%s/%s' % (tmpdir, zipname)
             print('Copying tree from ' + options.input + ' to ' + destdir)
-            shutil.copytree (options.input, destdir)
+	    # we ignore the broken links
+            shutil.copytree (options.input, destdir, False, self.ignoreBrokenLinks)
             cmd         = 'cd ' + tmpdir + '; zip -r %s.zip %s' % (zipname, zipname)
             print(cmd)
             os.system(cmd)
