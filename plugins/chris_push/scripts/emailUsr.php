@@ -72,7 +72,7 @@ $feedname = "ChRIS_Pushed";
 $link .= "&feedname=$feedname";
 $link .= "&status=0";
 $link .= "&status_step=100";
-$command = "--input=$zipfile --unzip";
+$command = "--input $zipfile --unzip";
 $link .= "&ncommand=".urlencode($command);
 
 $message = "Please click on the following link to create a new feed for this data: ".PHP_EOL;
