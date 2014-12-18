@@ -137,7 +137,7 @@ class Runner{
     // update executable location to something accessible on the remote location
     $executableArray = explode( '/' , $executable);
     $executableName = end($executableArray);
-    $executable = joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'plugins/', $executableName, '/', $executableName);
+    $executable = joinPaths(CHRIS_HOME, CHRIS_SRC, 'plugins/', $executableName, '/', $executableName);
 
     $parameters = implode(' ', $pluginParametersArray);
     // return new command
@@ -292,7 +292,9 @@ class RemoteRunner extends Runner{
  */
 class SeparatedRunner extends RemoteRunner{
   /**
-  * Only tweek there is the -L option in the copy command
+  * Tweeks are:
+  * -L option in the copy command
+  * executable location
   */
   public function buildCommand(){
       
