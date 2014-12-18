@@ -43,7 +43,7 @@ require_once(dirname(__FILE__).'/controller/_util.inc.php');
  * The version.
  * It appears at the bottom of the home page.
  */
-define('CHRIS_VERSION', '2.9-experimental');
+define('CHRIS_VERSION', '2.9-pre-release');
 /**
  * The timezone.
  * It must be defined when we use getTime in php.
@@ -99,7 +99,7 @@ define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@nmr.mgh.harvard.edu');
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'src/chrisreloaded'));
+define('CHRIS_SRC', joinPaths('src', 'chrisreloaded'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -282,7 +282,25 @@ define('CHRIS_REMOTES', serialize(array(
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
-    "src"  => "/neuro/users/chris/src/chrisreloaded"))
+    "src"  => "/neuro/users/chris/src/chrisreloaded")),
+"MGHPCC" => serialize(array(
+    "sshhost" => "chris-mghpcc",
+    "sshport" => "22",
+    "dicomhost" => "chris-mghpcc",
+    "dicomport" => "10401",
+    "src"  => "/home/chris/src/chrisreloaded")),
+"CRIT" => serialize(array(
+    "sshhost" => "chris-crit",
+    "sshport" => "22",
+    "dicomhost" => "chris-crit",
+    "dicomport" => "10401",
+    "src"  => "/home/chris/src/chrisreloaded")),
+"CHPC" => serialize(array(
+    "sshhost" => "chris-chpc",
+    "sshport" => "22",
+    "dicomhost" => "chris-chpc",
+    "dicomport" => "10502",
+    "src"  => "/home/chris/src/chrisreloaded"))
 )));
 
 
@@ -372,6 +390,7 @@ define('ANONYMIZE_DICOM', false);
  * The data is organized by: username/pluginname/feedid
  */
 define('CLUSTER_CHRIS_USERS', joinPaths(CHRIS_HOME, 'users'));
+define('CLUSTER_CHRIS', CHRIS_HOME);
 /**
  * The ChRIS bin/lib location on the cluster.
  * This is the full name of the cluster's directory containing the ChRIS binaries/libraries that are needed by the plugins.
