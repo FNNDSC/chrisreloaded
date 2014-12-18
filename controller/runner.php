@@ -104,8 +104,44 @@ class Runner{
   /**
    * Return the command to be executed to actually run the job.
    */
-  public function buildCommand(){
-    return implode(' ' , $this->pluginCommandArray);
+   public function buildCommand(){
+      
+    $executable = $this->pluginCommandArray[0];
+
+    $pluginParametersArray = $this->pluginCommandArray;
+    array_shift($pluginParametersArray);
+
+    // update output location to runtime path  
+    $outputKey = array_search('--output', $pluginParametersArray);
+    if($outputKey !== false){
+      $pluginParametersArray[$outputKey + 1] = $this->runtimePath;
+    }
+
+    // update all inputs location to somthing within the _chrisInput_ directory
+    // in the chris.run, the first step will be to copy the _chrisInput_ directory over to the remote location
+    $inputOptions = $this->ssh->exec($executable.' --inputs');
+    $inputOptions = trim(preg_replace('/\s+/', ' ', $inputOptions));
+    $inputOptionsArray = explode(',', $inputOptions);
+    foreach ($inputOptionsArray as $in) {
+      $inputKey = array_search($in, $pluginParametersArray);
+      if($inputKey !== false){
+        $valueKey = $inputKey + 1;
+        $value = $pluginParametersArray[$valueKey];
+        $value = rtrim($value, "/");
+	$localValue = joinPaths($this->path, '_chrisInput_', $value);
+        $this->ssh->exec('mkdir -p ' . dirname($localValue)  . '; cp -rn ' . $value . ' ' . $localValue);
+	$pluginParametersArray[$valueKey] = joinPaths($this->runtimePath, '_chrisInput_', $value);
+      }
+    }
+
+    // update executable location to something accessible on the remote location
+    $executableArray = explode( '/' , $executable);
+    $executableName = end($executableArray);
+    $executable = joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'plugins/', $executableName, '/', $executableName);
+
+    $parameters = implode(' ', $pluginParametersArray);
+    // return new command
+    return $executable . ' ' . $parameters;
   }
 
   /**
@@ -152,22 +188,6 @@ class LocalRunner extends ServerRunner{
     mkdir($this->runtimePath, 0755, true);
     shell_exec("cp -R " . rtrim($this->path, "/") . "/* " . $this->runtimePath);
   }	
-
-  public function buildCommand(){
-    $executable = $this->pluginCommandArray[0];
-    $pluginParametersArray = $this->pluginCommandArray;
-    array_shift($pluginParametersArray);
-    
-    // we make sure to update the output directory to runtime path
-    $outputKey = array_search('--output', $pluginParametersArray);
-    if($outputKey !== false){
-      $pluginParametersArray[$outputKey + 1] = $this->runtimePath;
-    }
-
-    $parameters = implode(' ', $pluginParametersArray);
-    // return new command
-    return $executable . ' ' . $parameters;
-  }
 
   public  function createRun(){
 
@@ -271,6 +291,9 @@ class RemoteRunner extends Runner{
  * See https://github.com/FNNDSC/chrisreloaded/wiki/JobSubmission#separated
  */
 class SeparatedRunner extends RemoteRunner{
+  /**
+  * Only tweek there is the -L option in the copy command
+  */
   public function buildCommand(){
       
     $executable = $this->pluginCommandArray[0];
