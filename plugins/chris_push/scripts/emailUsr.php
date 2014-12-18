@@ -54,14 +54,20 @@ if(isset($options['z'])){
     $zipfile = $options['z'];
 }
 
-// Get username
-$userMapper = new Mapper('User');
-$userMapper->filter('username = (?)',$username);
-$userResult = $userMapper->get();
-
+// if username is a valid email address, if not try to map username to email address from the DB
 $emailTo = '';
-if(count($userResult['User']) != 0){
-    $emailTo = $userResult['User'][0]->email;
+if (filter_var($username, FILTER_VALIDATE_EMAIL)) {
+    $emailTo = $username;
+}
+else{
+    // Get username
+    $userMapper = new Mapper('User');
+    $userMapper->filter('username = (?)',$username);
+    $userResult = $userMapper->get();
+
+    if(count($userResult['User']) != 0){
+        $emailTo = $userResult['User'][0]->email;
+    }
 }
 
 // Build message and link:
