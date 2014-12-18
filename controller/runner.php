@@ -247,7 +247,7 @@ class ImmediateRunner extends ServerRunner{
     // run the viewer plugin to generate the JSON scene
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $this->ssh->exec("echo '$viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
-  }ss
+  }
 }
 
 /**
