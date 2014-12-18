@@ -39,61 +39,18 @@ class Zip(Plugin):
     Plugin.LICENSE          = 'Opensource (MIT)'
     Plugin.VERSION          = '0.1'
 
-    def ignoreBrokenLinks(self, folder, files):
-	broken = []
-	for filename in files:
-     	    path = os.path.join(folder,filename)
-     	    if os.path.islink(path):
-      	        target_path = os.readlink(path)
-      	      	# Resolve relative symlinks
-      	      	if not os.path.isabs(target_path):
-      	        	target_path = os.path.join(os.path.dirname(path),target_path)             
-                # Check if link is broken
-       	    	if not os.path.exists(target_path):
-                	broken.append(filename)
-       	    else:
-                # If it's not a symlink we're not interested.
-	        continue
-
-        print broken
-	
-	return broken
-
     def run(self):
 
         options = self.options
-        tmpdir = tempfile.mkdtemp('zip', 'chris', self.envVars['ENV_CLUSTER_TMP_DIR'])
         if not options.unzip:
             zipname     = os.path.basename(options.input)
-            zipnamezip  = '%s.zip' % zipname
-            destdir     = '%s/%s' % (tmpdir, zipname)
-            print('Copying tree from ' + options.input + ' to ' + destdir)
-	    # we ignore the broken links
-            shutil.copytree (options.input, destdir, False, self.ignoreBrokenLinks)
-            cmd         = 'cd ' + tmpdir + '; zip -r %s.zip %s' % (zipname, zipname)
+            cmd         = 'cd ' + os.path.dirname(options.input) + '; zip -r ' +  options.output + '/'  + zipname  + '.zip ' + zipname
             print(cmd)
             os.system(cmd)
-            print('Copying %s to %s\n' % (zipnamezip, os.path.join(options.output, zipnamezip)))
-            shutil.copyfile(os.path.join(tmpdir, zipnamezip), os.path.join(options.output, zipnamezip))
         else:
-            # Use the crun shell mechanism
-            shell = crun.crun()
-            shell.echo(True)
-            shell.echoStdOut(True)
-            shell.echoStdErr(True)
-            shell.detach(False)
-            shell.waitForChild(True)
-            zipnamezip  = os.path.basename(options.input)
-            zipname     = os.path.splitext(zipnamezip)[0]
-            unpackroot  = '%s/%s' % (tmpdir, zipname)
-            print('Copying zip from ' + options.input + ' to  ' + tmpdir)
-            shutil.copyfile(options.input, os.path.join(tmpdir, zipnamezip))
-            shell('mkdir -p %s' % (unpackroot))
-            shell('cd %s ; unzip ../%s' % (unpackroot, zipnamezip))
-            print('Copying unpacked tree from %s to %s' % (os.path.join(unpackroot, zipname), os.path.join(options.output, zipname)))
-            shutil.copytree(os.path.join(unpackroot, zipname), os.path.join(options.output, zipname))
-        shutil.rmtree(tmpdir)
-
+            cmd         = 'cd ' + options.output + '; unzip ' + options.input
+            print(cmd)
+            os.system(cmd)
 
 # ENTRYPOINT
 if __name__ == "__main__":
