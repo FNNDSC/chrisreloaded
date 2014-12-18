@@ -43,7 +43,7 @@ require_once(dirname(__FILE__).'/controller/_util.inc.php');
  * The version.
  * It appears at the bottom of the home page.
  */
-define('CHRIS_VERSION', '2.9-experimental');
+define('CHRIS_VERSION', '2.9-pre-release');
 /**
  * The timezone.
  * It must be defined when we use getTime in php.
@@ -100,7 +100,7 @@ define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@chris-mghpcc.tch.harvard.edu');
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths(CHRIS_HOME, 'src/chrisreloaded'));
+define('CHRIS_SRC', joinPaths('src', 'chrisreloaded'));
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -238,7 +238,7 @@ define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris-mghpcc.tch.harvard.edu');
  * The destination AETITLE.
  * The remote machine where the data will be pushed after a pacs_pull retrieval.
  */
-define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
+define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRIS');
 /**
  * DCMTK binaries.
  * TODO: It should probably be sitting in the CHRIS/LIBS directory, with the
@@ -279,10 +279,28 @@ define('CHRIS_REMOTES', serialize(array(
     "dicomport" => "10301",
     "src"  => "/home/chris/src/chrisreloaded")),
 "BCH" => serialize(array(
-    "sshhost" => "localhost",
+    "sshhost" => "chris",
     "sshport" => "22",
     "dicomhost" => "pretoria",
     "dicomport" => "10401",
+    "src"  => "/neuro/users/chris/src/chrisreloaded")),
+"MGHPCC" => serialize(array(
+    "sshhost" => "localhost",
+    "sshport" => "22",
+    "dicomhost" => "chris-mghpcc",
+    "dicomport" => "10401",
+    "src"  => "/home/chris/src/chrisreloaded")),
+"CRIT" => serialize(array(
+    "sshhost" => "chris-crit",
+    "sshport" => "22",
+    "dicomhost" => "chris-crit",
+    "dicomport" => "10401",
+    "src"  => "/home/chris/src/chrisreloaded")),
+"CHPC" => serialize(array(
+    "sshhost" => "chris-chpc",
+    "sshport" => "22",
+    "dicomhost" => "chris-chpc",
+    "dicomport" => "10502",
     "src"  => "/home/chris/src/chrisreloaded"))
 )));
 
@@ -325,7 +343,7 @@ define('CHRIS_USERS_CONFIG_SSHKEY', 'id_rsa');
  * The main use case is if a plugins requires something that the cluster doesn't
  * provide, i.e. php5.
  */
-define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
+define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push,zip');
 
 
 // --------------------------------------------------------------------------
@@ -364,7 +382,7 @@ define('CLUSTER_SHARED_FS', false);
  * If the answer is no then set this to false which will improve performance by
  * skipping the anonymization step.
  */
-define('ANONYMIZE_DICOM', true);
+define('ANONYMIZE_DICOM', false);
 /**
  * The ChRIS location on the cluster.
  * This is the full name of the cluster's directory containing the ChRIS deployment.
