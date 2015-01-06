@@ -160,12 +160,7 @@ class PACSPush(Plugin):
     print "Actual dicomhost = %s" % options.HOST
     print "Actual dicomport = %s" % options.PORT
 
-    # create link to input directory
-    if not os.path.islink(os.path.join(options.output, os.path.basename(options.DIR))):
-      os.symlink(options.DIR, os.path.join(options.output, os.path.basename(options.DIR)))
-
     suffix = ''
-
     # push subdirectories
     # Follow links required since most of chris data from feeds is linked to data/MRN/STUDY/SERIES/
     # Pushable directories are those containing files with any of the extensions in options.EXT
@@ -203,6 +198,10 @@ class PACSPush(Plugin):
 # ENTRYPOINT
 if __name__ == "__main__":
   plugin = PACSPush()
+
+  # list inputs
+  plugin.inputs = "--directory"
+
   plugin.add_parameter('Input', Plugin.IMAGE, '--directory', action='store', dest='DIR', help='Directory to be pushed')
   plugin.add_parameter('Parameters', Plugin.COMBOBOX, '--remote', values=['MGH', 'BCH'], action='store', default='MGH', dest='REMOTE', help='Remote DICOM instance')
   plugin.add_parameter('Advanced', Plugin.STRING, '--extension', action='store', default='dcm', dest='EXT', help='Extension of files to be pushed')
