@@ -124,7 +124,8 @@ class Runner{
     $inputOptionsArray = explode(',', $inputOptions);
     foreach ($inputOptionsArray as $in) {
       $inputKey = array_search($in, $pluginParametersArray);
-      if($inputKey !== false){
+      // if we find match and if match not empty
+      if($inputKey !== false && $in != ''){
         $valueKey = $inputKey + 1;
         $value = $pluginParametersArray[$valueKey];
         $value = rtrim($value, "/");
@@ -316,7 +317,8 @@ class SeparatedRunner extends RemoteRunner{
     $inputOptionsArray = explode(',', $inputOptions);
     foreach ($inputOptionsArray as $in) {
       $inputKey = array_search($in, $pluginParametersArray);
-      if($inputKey !== false){
+      // if we find match and if match not empty
+      if($inputKey !== false && $in != ''){
         $valueKey = $inputKey + 1;
         $value = $pluginParametersArray[$valueKey];
         $value = rtrim($value, "/");
