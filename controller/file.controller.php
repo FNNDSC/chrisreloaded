@@ -78,8 +78,10 @@ class FileC implements FileControllerInterface {
     $dir = CHRIS_USERS.'/'.$userName.'/file_browser/'.$resultsFeed['Feed'][0]->name.'-'.$resultsFeed['Feed'][0]->id.'/';
 
     foreach ($files as $key => $value) {
-      $target_tmp_path = '/tmp/'.basename( $value['name']); 
-      $target_path = $dir.basename( $value['name']); 
+      // escape name first of all!
+      $name = sanitize($value['name']);
+      $target_tmp_path = '/tmp/'.basename( $name );
+      $target_path = $dir.basename( $name );
 
       if(move_uploaded_file($value['tmp_name'], $target_tmp_path)) {
         // all good, set ownership/permissions correctly
