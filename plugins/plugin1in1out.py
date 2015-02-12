@@ -99,14 +99,14 @@ class Plugin1In1Out(Plugin):
           cmdIds.append(cmdId)
           out = '%s/%s' % (chrisRunDir, cmdId)
           exitCodeFilePaths.append(out + '-exitCode.log')
-          if clType == 'local':
+          if clType == 'crun':
               cmd = '%s 2>%s.err >%s.std || (echo $? > %s-exitCode.log)' % (cmd, out, out, out)
           else:
               #write a dummy cmdId.log file too (this is used later to block the python process until all jobs have finished)
               cmd = '%s 2>%s.err >%s.std || (echo $? > %s-exitCode.log);touch %s.log' % (cmd, out, out, out, out)
           misc.file_writeOnce(out + '.run', envStr + '\n' + cmd)
           os.system('chmod 755 ' + out + '.run')
-        if clType == 'local':
+        if clType == 'crun':
             #jobs are not scheduled on a cluster but run locally
             shell = crun.crun()
             shell.echo(False)
