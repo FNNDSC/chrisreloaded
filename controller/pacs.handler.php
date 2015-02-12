@@ -337,8 +337,8 @@ if ($handle = opendir($study_directory)) {
           {
             $emailTo .= ','.$userResult['User'][0]->email;
           }
-          elseif (filter_var($username, FILTER_VALIDATE_EMAIL)){
-            $emailTo .= ','.$username;
+          elseif (filter_var($entry2, FILTER_VALIDATE_EMAIL)){
+            $emailTo .= ','.$entry2;
           }
           elseif($entry2 == 'emaillink'){
             $link = CHRIS_URL."/index.php?";
