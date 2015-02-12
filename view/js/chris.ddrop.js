@@ -110,7 +110,7 @@ _DRAG_AND_DROP_.onDrop = function (e) {
     jQuery.ajax({
                    type : "POST",
                    url : "controller/launcher-web.php",
-                   dataType : "text",
+                   dataType : "json",
                    data : {
                      FEED_PLUGIN : 'file_browser',
                      FEED_NAME : _feed_name,
@@ -120,9 +120,8 @@ _DRAG_AND_DROP_.onDrop = function (e) {
                      FEED_OUTPUT : _output
                    },
                    success : function(data) {
-   _DRAG_AND_DROP_.targetFeed = data.split("\n")[1];
-
-   _DRAG_AND_DROP_.handleFiles(_DRAG_AND_DROP_.targetFiles);
+                     _DRAG_AND_DROP_.targetFeed = data.feedId;
+                     _DRAG_AND_DROP_.handleFiles(_DRAG_AND_DROP_.targetFiles);
                    }
                  });
     return;
@@ -199,7 +198,7 @@ _DRAG_AND_DROP_.onUpload = function (e) {
     jQuery.ajax({
                    type : "POST",
                    url : "controller/launcher-web.php",
-                   dataType : "text",
+                   dataType : "json",
                    data : {
                      FEED_PLUGIN : 'file_browser',
                      FEED_NAME : _feed_name,
@@ -209,9 +208,8 @@ _DRAG_AND_DROP_.onUpload = function (e) {
                      FEED_OUTPUT : _output
                    },
                    success : function(data) {
-   _DRAG_AND_DROP_.targetFeed = data.split("\n")[1];
-
-   _DRAG_AND_DROP_.handleFiles(_DRAG_AND_DROP_.targetFiles);
+                     _DRAG_AND_DROP_.targetFeed = data.feedId;
+                     _DRAG_AND_DROP_.handleFiles(_DRAG_AND_DROP_.targetFiles);
                    }
                  });
     return;
