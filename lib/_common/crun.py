@@ -1247,7 +1247,7 @@ if __name__ == '__main__':
     parser.add_argument("--host", help="connection host")
     parser.add_argument("-s", "--scheduler", help="cluster scheduler type: \
         crun_hpc_launchpad, crun_hpc_slurm, crun_hpc_chpc, crun_hpc_lsf, crun_hpc_lsf_crit \
-        crun_hpc_mosix, crun_hpc_mosix_HPtest, crun_hpc_mosixbash")
+        crun_hpc_mosix, crun_hpc_mosix_HPtest, crun_hpc_mosixbash, crun")
     parser.add_argument("-o", "--out", help="remote standard output file")
     parser.add_argument("-e", "--err", help="remote standard error file")
     parser.add_argument("-m", "--mail", help="user mail")
