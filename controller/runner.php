@@ -96,6 +96,8 @@ class Runner{
     // to be tested to make sure this is enough
     // needs a bash wrapper for consistency
     $this->ssh->exec("echo 'chmod 755 $this->runtimePath; cd $this->runtimePath ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");  
+    // also update permissions of parent directory. it is useful in case the directory containing the runpath was creating with incorrect permissions
+    $this->ssh->exec("echo 'chmod g+rx,o+rx $this->runtimePath/..' >> $runfile;");
 
     // make sure to update the permissions of the file
     $this->ssh->exec("chmod 755 $runfile");
@@ -130,7 +132,7 @@ class Runner{
         $value = $pluginParametersArray[$valueKey];
         $value = rtrim($value, "/");
 	$localValue = joinPaths($this->path, '_chrisInput_', $value);
-        $this->ssh->exec('mkdir -p ' . dirname($localValue)  . '; cp -rn ' . $value . ' ' . $localValue);
+        $this->ssh->exec('umask 002; mkdir -p ' . dirname($localValue)  . '; cp -rn ' . $value . ' ' . $localValue);
 	$pluginParametersArray[$valueKey] = joinPaths($this->runtimePath, '_chrisInput_', $value);
       }
     }
@@ -197,7 +199,6 @@ class LocalRunner extends ServerRunner{
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
 
     // run the viewer plugin to generate the JSON scene
-    $this->ssh->exec("echo 'sudo chmod -R 755 $this->runtimePath;' >> $runfile;");
     $this->ssh->exec("echo 'sudo chown -R $this->userId:$this->groupId $this->runtimePath;' >> $runfile;");
     $this->ssh->exec("echo 'sudo su $this->username -c \"cp -rfp $this->runtimePath/* $this->path\";' >> $runfile;");
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
@@ -323,7 +324,7 @@ class SeparatedRunner extends RemoteRunner{
         $value = $pluginParametersArray[$valueKey];
         $value = rtrim($value, "/");
 	$localValue = joinPaths($this->path, '_chrisInput_', $value);
-        $this->ssh->exec('mkdir -p ' . dirname($localValue)  . '; cp -Lrn ' . $value . ' ' . $localValue);
+        $this->ssh->exec('umask 002; mkdir -p ' . dirname($localValue)  . '; cp -Lrn ' . $value . ' ' . $localValue);
 	$pluginParametersArray[$valueKey] = joinPaths($this->runtimePath, '_chrisInput_', $value);
       }
     }
