@@ -642,7 +642,7 @@ jQuery(document)
                 jQuery.ajax({
                   type : "POST",
                   url : "controller/launcher-web.php",
-                  dataType : "text",
+                  dataType : "json",
                   data : {
                     FEED_PLUGIN : _plugin_name,
                     FEED_NAME : _feed_name,

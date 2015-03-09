@@ -383,5 +383,13 @@ switch($jobType){
   $metaObject->value = $pid;
   FeedC::addMeta($feed_id, Array(0 => $metaObject));
 
-  echo $feed_id;
+  // in case the output buffer was silcenced, reactivate it
+  ob_end_clean();
+
+  $feedInfo = array(
+    "feedId" => $feed_id
+  );
+  $jsonFeedInfo = json_encode($feedInfo);
+
+  echo $jsonFeedInfo;
 ?>

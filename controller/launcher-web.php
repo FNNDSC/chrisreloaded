@@ -1,4 +1,6 @@
 <?php
+// silence output buffer not to pollute JSON which is supposed to be returned.
+ob_start();
 /**
  *
  *            sSSs   .S    S.    .S_sSSs     .S    sSSs
@@ -202,7 +204,6 @@ foreach($parameters as $k0 => $v0){
   // $status
   // $status_step
   include('launcher.php');
-
 }
 
 ?>
