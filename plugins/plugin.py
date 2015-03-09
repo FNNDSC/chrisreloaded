@@ -198,7 +198,10 @@ class Plugin(ArgumentParser):
         if parameter[3]:
           # if element has a user specific configuration, use the provided value
           if parameter[2][2:] in config:
-            xml += '<default>' + str( config[parameter[2][2:]] ) + '</default>'
+            if p_type == self.COMBOBOX:
+              xml += '<default>' + str( config[parameter[2][2:]][0] ) + '</default>'
+            else :
+              xml += '<default>' + str( config[parameter[2][2:]] ) + '</default>'
           # else use the default value       
           else :
             xml += '<default>' + str( parameter[3] ) + '</default>'
@@ -207,10 +210,15 @@ class Plugin(ArgumentParser):
         if parameter[4]:
           xml += '<description>' + str( parameter[4] ) + '</description>'
 
-        if p_type == self.COMBOBOX and parameter[5]:
-          # create element entries
-          for e in parameter[5]:
-            xml += '<element>' + str( e ) + '</element>'
+        if p_type == self.COMBOBOX:
+          if parameter[2][2:] in config:
+            # create element entries
+            for e in config[parameter[2][2:]]:
+              xml += '<element>' + str( e ) + '</element>'
+          elif parameter[5]:
+            # create element entries
+            for e in parameter[5]:
+              xml += '<element>' + str( e ) + '</element>'
 
         xml += end_tag
 
