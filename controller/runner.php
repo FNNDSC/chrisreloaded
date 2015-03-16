@@ -359,7 +359,7 @@ class SeparatedRunner extends RemoteRunner{
     }
 
     // command to compress _chrisInput_ dir on the chris server
-    $cmd = '\"cd '.$this->path.'; tar -zcf _chrisInput_.tar.gz _chrisInput_;\"';
+    $cmd = '\"umask 002;cd '.$this->path.'; tar -zcf _chrisInput_.tar.gz _chrisInput_;\"';
     $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ' .CLUSTER_PORT. ' -o StrictHostKeyChecking=no ' . $this->username.'@'.$tunnel_host. ' '.$cmd;
 
     // command to copy over the compressed _chrisIput_ dir to the cluster
@@ -381,7 +381,7 @@ class SeparatedRunner extends RemoteRunner{
 
     // command to compress $cluster_job_path dir on the cluster (excluding _chrisInput_ dir)
     $data = basename($this->runtimePath);
-    $cmd = 'cd '.$this->runtimePath.'/..; tar -zcf '.$data.'.tar.gz '.$data.' --exclude ' . $this->runtimePath. '/_chrisInput_;';
+    $cmd = 'umask 002; cd '.$this->runtimePath.'/..; tar -zcf '.$data.'.tar.gz '.$data.' --exclude ' . $this->runtimePath. '/_chrisInput_;';
     $runfile_str = $runfile_str.$cmd;
 
     // command to copy over the compressed $cluster_job_path dir to the chris server
@@ -389,7 +389,7 @@ class SeparatedRunner extends RemoteRunner{
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     // command to uncompress and remove the compressed file on the chris server
-    $cmd = '\"cd '.$this->path.'/..; tar -zxf '.$data.'.tar.gz; rm '.$data.'.tar.gz;\"';
+    $cmd = '\"umask 002; cd '.$this->path.'/..; tar -zxf '.$data.'.tar.gz; rm '.$data.'.tar.gz;\"';
     $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
@@ -402,7 +402,7 @@ class SeparatedRunner extends RemoteRunner{
     //
 
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-    $cmd = '\"'.$viewer_plugin.' --directory '.$this->path.' --output '.$this->path.'/..;\"';
+    $cmd = '\"umask 002; '.$viewer_plugin.' --directory '.$this->path.' --output '.$this->path.'/..;\"';
     $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
