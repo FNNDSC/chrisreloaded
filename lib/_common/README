@@ -1,7 +1,0 @@
-Provides common functionality used among many FNNDSC projects.
-
-The __init__.py will always import the 'systemMisc.py' module. It will
-"try" to import the nibabel extensions as well. However, not all systems
-will have nibabel installed. In such cases, the extensions are ignored
-and only the 'systemMisc.py' is imported.
-

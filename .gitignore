@@ -1,6 +1,6 @@
 # bower dependencies
 ############################
-lib/_common
+#lib/_common
 lib/med2image
 lib/phpseclib
 lib/simpletest
