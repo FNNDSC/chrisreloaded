@@ -392,8 +392,8 @@ foreach($received as $key => $value){
 
 // generate JPEG image for each series
 foreach($receivedFSLocation as $key => $value){
-  //$command = "cd $value; med2image.py -i $(/bin/ls -1 *dcm | head -n 1) -o %inputFile%SeriesDescription%ProtocolName -t jpg -s m";
-  //$logFile .= shell_exec($command);
+  $command = "cd $value; ".CHRIS_LIB_FOLDER."/med2image/med2image.py -i $(/bin/ls -1 *dcm | head -n 1) -o %inputFile%SeriesDescription%ProtocolName -t jpg -s m";
+  $logFile .= shell_exec($command);
 }
 
 sendEmail($process_file, $datadirname, $emailTo, $link);
