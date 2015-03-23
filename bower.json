@@ -7,9 +7,9 @@
   "license": "MIT",
   "homepage": "https://github.com/FNNDSC/chrisreloaded/",
   "dependencies": {
-    "_common": "FNNDSC/_common",
-    "phpseclib": "FNNDSC/phpseclib",
-    "med2image": "FNNDSC/med2image",
-    "simpletest": "lox/simpletest"
+    "_common": "FNNDSC/_common#master",
+    "phpseclib": "FNNDSC/phpseclib#master",
+    "med2image": "FNNDSC/med2image#master",
+    "simpletest": "lox/simpletest#master"
   }
 }
