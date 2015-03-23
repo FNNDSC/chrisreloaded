@@ -35,7 +35,7 @@ if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 class Runner{
 
   // ssh connection to local server
-  public $shh = null;
+  public $ssh = null;
   // directory where we store/retrive the job on the server
   // it contains a _chrisRun_ directory
   public $path = '';
