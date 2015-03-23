@@ -35,7 +35,7 @@ if (!defined('__CHRIS_ENTRY_POINT__')) die('Invalid access.');
 class Runner{
 
   // ssh connection to local server
-  public $shh = null;
+  public $ssh = null;
   // directory where we store/retrive the job on the server
   // it contains a _chrisRun_ directory
   public $path = '';
@@ -96,6 +96,8 @@ class Runner{
     // to be tested to make sure this is enough
     // needs a bash wrapper for consistency
     $this->ssh->exec("echo 'chmod 755 $this->runtimePath; cd $this->runtimePath ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");  
+    // also update permissions of parent directory. it is useful in case the directory containing the runpath was creating with incorrect permissions
+    $this->ssh->exec("echo 'chmod g+rx,o+rx $this->runtimePath/..' >> $runfile;");
 
     // make sure to update the permissions of the file
     $this->ssh->exec("chmod 755 $runfile");
@@ -130,7 +132,7 @@ class Runner{
         $value = $pluginParametersArray[$valueKey];
         $value = rtrim($value, "/");
 	$localValue = joinPaths($this->path, '_chrisInput_', $value);
-        $this->ssh->exec('mkdir -p ' . dirname($localValue)  . '; cp -rn ' . $value . ' ' . $localValue);
+        $this->ssh->exec('umask 002; mkdir -p ' . dirname($localValue)  . '; cp -rn ' . $value . ' ' . $localValue);
 	$pluginParametersArray[$valueKey] = joinPaths($this->runtimePath, '_chrisInput_', $value);
       }
     }
@@ -197,7 +199,6 @@ class LocalRunner extends ServerRunner{
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
 
     // run the viewer plugin to generate the JSON scene
-    $this->ssh->exec("echo 'sudo chmod -R 755 $this->runtimePath;' >> $runfile;");
     $this->ssh->exec("echo 'sudo chown -R $this->userId:$this->groupId $this->runtimePath;' >> $runfile;");
     $this->ssh->exec("echo 'sudo su $this->username -c \"cp -rfp $this->runtimePath/* $this->path\";' >> $runfile;");
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
@@ -323,7 +324,7 @@ class SeparatedRunner extends RemoteRunner{
         $value = $pluginParametersArray[$valueKey];
         $value = rtrim($value, "/");
 	$localValue = joinPaths($this->path, '_chrisInput_', $value);
-        $this->ssh->exec('mkdir -p ' . dirname($localValue)  . '; cp -Lrn ' . $value . ' ' . $localValue);
+        $this->ssh->exec('umask 002; mkdir -p ' . dirname($localValue)  . '; cp -Lrn ' . $value . ' ' . $localValue);
 	$pluginParametersArray[$valueKey] = joinPaths($this->runtimePath, '_chrisInput_', $value);
       }
     }
@@ -358,14 +359,14 @@ class SeparatedRunner extends RemoteRunner{
     }
 
     // command to compress _chrisInput_ dir on the chris server
-    $cmd = '\"cd '.$this->path.'; tar -zcf _chrisInput_.tar.gz _chrisInput_;\"';
-    $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P ' .CLUSTER_PORT. ' -o StrictHostKeyChecking=no ' . $this->username.'@'.$tunnel_host. ' '.$cmd;
+    $cmd = '\"umask 002;cd '.$this->path.'; tar -zcf _chrisInput_.tar.gz _chrisInput_;\"';
+    $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ' .CLUSTER_PORT. ' -o StrictHostKeyChecking=no ' . $this->username.'@'.$tunnel_host. ' '.$cmd;
 
     // command to copy over the compressed _chrisIput_ dir to the cluster
     $cmd = $cmd.PHP_EOL.'scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host.':'.$this->path.'/_chrisInput_.tar.gz ' .$this->runtimePath.';';
 
     // command to remove the compressed file on the chris server
-    $cmd = $cmd.PHP_EOL.'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -P ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' rm '.$this->path.'/_chrisInput_.tar.gz;';
+    $cmd = $cmd.PHP_EOL.'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' rm '.$this->path.'/_chrisInput_.tar.gz;';
 
     // command to uncompress the compressed file on the cluster
     $cmd = $cmd.PHP_EOL.'cd '.$this->runtimePath.'; tar -zxf _chrisInput_.tar.gz;';
@@ -380,7 +381,7 @@ class SeparatedRunner extends RemoteRunner{
 
     // command to compress $cluster_job_path dir on the cluster (excluding _chrisInput_ dir)
     $data = basename($this->runtimePath);
-    $cmd = 'cd '.$this->runtimePath.'/..; tar -zcf '.$data.'.tar.gz '.$data.' --exclude ' . $this->runtimePath. '/_chrisInput_;';
+    $cmd = 'umask 002; cd '.$this->runtimePath.'/..; tar -zcf '.$data.'.tar.gz '.$data.' --exclude ' . $this->runtimePath. '/_chrisInput_;';
     $runfile_str = $runfile_str.$cmd;
 
     // command to copy over the compressed $cluster_job_path dir to the chris server
@@ -388,7 +389,7 @@ class SeparatedRunner extends RemoteRunner{
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     // command to uncompress and remove the compressed file on the chris server
-    $cmd = '\"cd '.$this->path.'/..; tar -zxf '.$data.'.tar.gz; rm '.$data.'.tar.gz;\"';
+    $cmd = '\"umask 002; cd '.$this->path.'/..; tar -zxf '.$data.'.tar.gz; rm '.$data.'.tar.gz;\"';
     $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
@@ -401,7 +402,7 @@ class SeparatedRunner extends RemoteRunner{
     //
 
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-    $cmd = '\"'.$viewer_plugin.' --directory '.$this->path.' --output '.$this->path.'/..;\"';
+    $cmd = '\"umask 002; '.$viewer_plugin.' --directory '.$this->path.' --output '.$this->path.'/..;\"';
     $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ' .CLUSTER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' '.$cmd;
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 

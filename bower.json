@@ -1,0 +1,15 @@
+{
+  "name": "scripts",
+  "version": "0.0.1",
+  "authors": [
+    "FNNDSC Developers <dev@babymri.org>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/FNNDSC/chrisreloaded/",
+  "dependencies": {
+    "_common": "FNNDSC/_common#master",
+    "phpseclib": "FNNDSC/phpseclib#master",
+    "med2image": "FNNDSC/med2image#master",
+    "simpletest": "lox/simpletest#master"
+  }
+}

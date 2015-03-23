@@ -97,6 +97,7 @@ $logFile = '';
 
 // keep track of dataset received
 $received = Array();
+$receivedFSLocation = Array();
 
 // move all files from this directory to centralized data
 // 1 file of 1 serie at once
@@ -263,6 +264,10 @@ if ($handle = opendir($study_directory)) {
               else{
                 $logFile .= $datadirname.' already exists'.PHP_EOL;
               }
+              
+              if(!in_array($datadirname, $receivedFSLocation)){
+                array_push($receivedFSLocation, $datadirname);
+              }
 
               // move file at good location
               // CHRIS_DATA/MRN-UID/STUDYDESC-UID/SERIESDESC-UID/index.dcm
@@ -383,6 +388,13 @@ foreach($received as $key => $value){
     }
     Mapper::update($dataResult['Data'][0], $dataResult['Data'][0]->id);
   }
+}
+
+// generate JPEG image for each series
+foreach($receivedFSLocation as $key => $value){
+  $command = "cd $value; ".CHRIS_LIB_FOLDER."/med2image/med2image.py -i $(/bin/ls -1 *dcm | head -n 1) -o %inputFile%SeriesDescription%ProtocolName -t jpg -s m";
+  $logFile .= $command;
+  $logFile .= shell_exec($command);
 }
 
 sendEmail($process_file, $datadirname, $emailTo, $link);

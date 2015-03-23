@@ -153,7 +153,9 @@ if (SecurityC::login_attempt()) {
       $memory = 2048; 
 
       // import launcher.php
+      ob_start();
       include('controller/launcher.php');
+      ob_end_clean();
     }
 
     // then clean URL, back to main entry point
