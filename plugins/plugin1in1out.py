@@ -118,7 +118,7 @@ class Plugin1In1Out(Plugin):
             remUser = self.remoteUser
             remHost = self.remoteHost
             remUserId = self.remoteUserIdentity
-            shell = eval('crun.' + clType.lower() + '(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId, schedulerStdErrDir=%s, schedulerStdOutDir=%s)' % (chrisRunDir, chrisRunDir))
+            shell = eval('crun.' + clType.lower() + '(remoteUser=remUser, remoteHost=remHost, remoteUserIdentity=remUserId, schedulerStdErrDir=chrisRunDir, schedulerStdOutDir=chrisRunDir)')
             for cmdId in cmdIds:
               shell("/bin/bash " + chrisRunDir + '/' + cmdId + '.run', stdoutflush=True, stderrflush=True)
               time.sleep(0.5)
