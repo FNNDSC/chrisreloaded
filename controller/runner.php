@@ -449,7 +449,7 @@ class SeparatedRunner extends RemoteRunner{
     // DELETE REMOTE JOB PATH AFTER ALL THE DATA AS BEEN COPIED BACK
     /////
     // DO IF AFTER, if not can not test separated FS on shared FS
-    $cmd = 'rm -rf '.$this->runtimePath.' &;';
+    $cmd = 'rm -rf '.$this->runtimePath.' &';
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     $this->ssh->exec('echo "'.$runfile_str.'"'.' > '.$runfile);
