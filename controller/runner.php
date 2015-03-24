@@ -83,7 +83,7 @@ class Runner{
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
  
     // 1- log HOSTNAME and time
-    $this->ssh->exec(bash('echo "echo \"\$(date) Running on \$HOSTNAME\" > '.$this->runtimePath.'/_chrisRun_/chris.std" >> '.$runfile));
+    $this->ssh->exec(bash('echo "echo \\\'\'\$(date) Running on \$HOSTNAME\\\'\' > '.$this->runtimePath.'/_chrisRun_/chris.std" >> '.$runfile));
 
     // 2- source the environment
     $this->ssh->exec(bash('echo "source '.$this->runtimePath . '/_chrisRun_/chris.env;" >> '.$runfile));
