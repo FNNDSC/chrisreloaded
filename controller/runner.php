@@ -282,7 +282,7 @@ class RemoteRunner extends Runner{
     }
 
     $crunWrap = joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'lib/_common/crun.py');
-    $crunWrap = $crunWrap . ' -u ' . $this->username . ' --host ' . $tunnel_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $this->runtimePath . '/_chrisRun_';
+    $crunWrap = $crunWrap . ' -u ' . $this->username . ' --out ' . $this->runtimePath . '/_chrisRun_ --err '. $this->runtimePath . '/_chrisRun_ --host ' . $tunnel_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $this->runtimePath . '/_chrisRun_';
     $cmd = 'nohup /bin/bash -c " source ' . $envfile . ' && ' . $crunWrap . ' -c \'\\\'\' /bin/bash ' . $runfile . ' \'\\\'\' "  </dev/null &>/dev/null &';
     $pid = $this->remoteSsh->exec(bash($cmd));
   }
