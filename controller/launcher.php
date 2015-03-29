@@ -318,7 +318,7 @@ switch($jobType){
     // set all variables here!
     $sharedRun->ssh = $sshLocal;
     // remote ssh
-    $sharedRun->remoteSsh = new Net_SSH2(CLUSTER_HOST);
+    $sharedRun->remoteSsh = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
     if (!$sharedRun->remoteSsh->login($username, $password)) {
       die('Cluster login Failed');
     }
@@ -348,7 +348,7 @@ switch($jobType){
     // set all variables here!
     $separatedRun->ssh = $sshLocal;
     // remote ssh
-    $separatedRun->remoteSsh = new Net_SSH2(CLUSTER_HOST);
+    $separatedRun->remoteSsh = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
     if (!$separatedRun->remoteSsh->login($username, $password)) {
       die('Cluster login Failed');
     }

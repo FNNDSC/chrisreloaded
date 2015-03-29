@@ -109,7 +109,7 @@ class UserC implements UserControllerInterface {
 
     if (!isset($username) || !isset($password)) return -1;
 
-    $sshCluster = new Net_SSH2(CLUSTER_HOST);
+    $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
     if ($sshCluster->login($username, $password)) {
 
       // the user credentials are valid on the cluster!
@@ -156,7 +156,7 @@ class UserC implements UserControllerInterface {
 
         //we need to create a new connection object because using the already
         //created $sshCluster doesn't work, maybe its connection times out
-        $sshCluster = new Net_SSH2(CLUSTER_HOST);
+        $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
         $sshCluster->login($username, $password);
 
         // compress .ssh dir
@@ -173,7 +173,7 @@ class UserC implements UserControllerInterface {
         $sshLocal->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz;'));
 
         // remove ssh.tar.gz from the cluster
-        $sshCluster = new Net_SSH2(CLUSTER_HOST);
+        $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
         $sshCluster->login($username, $password);
         if (remoteFileExists($sshCluster, $userHomeDir.'/ssh.tar.gz')) {
           $sshCluster->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz &'));
