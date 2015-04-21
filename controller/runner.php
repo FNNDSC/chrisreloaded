@@ -57,7 +57,7 @@ class Runner{
    * Create the default chris.env file in the $path
    */
   public function createEnv(){
-      
+
     $envfile = joinPaths($this->path, '_chrisRun_', 'chris.env');
 
     $this->ssh->exec(bash('echo "export ENV_CHRISRUN_DIR='.$this->runtimePath.'/_chrisRun_" >>  '.$envfile));
@@ -79,9 +79,9 @@ class Runner{
    * in the separated FS, it also copies data. This should NOT be happenning. Copy should happen in the chris.run.
    */
   public function createRun(){
-      
+
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
- 
+
     // 1- log HOSTNAME and time
     $this->ssh->exec(bash('echo "echo \\\'\'\$(date) Running on \$HOSTNAME\\\'\' > '.$this->runtimePath.'/_chrisRun_/chris.std" >> '.$runfile));
 
@@ -95,7 +95,7 @@ class Runner{
     // 4- update permission after plugin ran
     // to be tested to make sure this is enough
     // needs a bash wrapper for consistency
-    $this->ssh->exec("echo 'chmod 755 $this->runtimePath; cd $this->runtimePath ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");  
+    $this->ssh->exec("echo 'chmod 755 $this->runtimePath; cd $this->runtimePath ; find . -type d -exec chmod o+rx,g+rx {} \; ; find . -type f -exec chmod o+r,g+r {} \;' >> $runfile;");
     // also update permissions of parent directory. it is useful in case the directory containing the runpath was creating with incorrect permissions
     $this->ssh->exec("echo 'chmod g+rx,o+rx $this->runtimePath/..' >> $runfile;");
 
@@ -107,13 +107,13 @@ class Runner{
    * Return the command to be executed to actually run the job.
    */
    public function buildCommand(){
-      
+
     $executable = $this->pluginCommandArray[0];
 
     $pluginParametersArray = $this->pluginCommandArray;
     array_shift($pluginParametersArray);
 
-    // update output location to runtime path  
+    // update output location to runtime path
     $outputKey = array_search('--output', $pluginParametersArray);
     if($outputKey !== false){
       $pluginParametersArray[$outputKey + 1] = $this->runtimePath;
@@ -153,7 +153,7 @@ class Runner{
    */
   public function prepare(){
     // does nothing, to be overloaded in childrens...
-  }	  
+  }
 
   /**
    * Command to run the job. Schedule it, run it in bash, etc.
@@ -166,12 +166,12 @@ class Runner{
 /**
  * Runner running on the local server.
  */
-class ServerRunner extends Runner{                                                                                                                         
-      
+class ServerRunner extends Runner{
+
   public function run(){
     // run the job in plain bash
     $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
-      
+
     $command = "umask 0002;/bin/bash $runfile;";
     $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
     $this->ssh->exec($nohup_wrap);
@@ -187,15 +187,15 @@ class ServerRunner extends Runner{
 class LocalRunner extends ServerRunner{
 
   public function prepare(){
-    // we copy the _chrisRun_ directory to the runtime path before running.    
+    // we copy the _chrisRun_ directory to the runtime path before running.
     mkdir($this->runtimePath, 0755, true);
     shell_exec("cp -R " . rtrim($this->path, "/") . "/* " . $this->runtimePath);
-  }	
+  }
 
   public  function createRun(){
 
     parent::createRun();
-      
+
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
 
     // run the viewer plugin to generate the JSON scene
@@ -220,13 +220,13 @@ class LocalRunner extends ServerRunner{
       // we need sudo su to run it at the right location after the data has been copied back
       $endToken = TokenC::create();
       $this->ssh->exec('echo "sudo su '.$this->username.' -c \"'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=inc&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err\"" >> '.$runfile);
-    }   
+    }
   }
 
   public function run(){
     // run the job in plain bash
     $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
-      
+
     $command = "umask 0002;/bin/bash $runfile;";
     $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
     shell_exec($nohup_wrap);
@@ -241,11 +241,11 @@ class LocalRunner extends ServerRunner{
  */
 class ImmediateRunner extends ServerRunner{
   function createRun(){
-	  
+
     parent::createRun();
-      
+
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
-  
+
     // run the viewer plugin to generate the JSON scene
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $this->ssh->exec("echo '$viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
@@ -261,7 +261,7 @@ class RemoteRunner extends Runner{
   public $remoteSsh = '';
 
   public function createEnv(){
-    
+
     parent::createEnv();
 
     $envfile = joinPaths($this->path, '_chrisRun_', 'chris.env');
@@ -276,7 +276,7 @@ class RemoteRunner extends Runner{
     $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
 
     if (CLUSTER_TO_SERVER_PORT==22) {
-      $tunnel_host = SERVER_TO_CLUSTER_HOST;
+      $tunnel_host = CLUSTER_TO_SERVER_HOST;
     } else {
       $tunnel_host = $this->remoteHost;
     }
@@ -299,13 +299,13 @@ class SeparatedRunner extends RemoteRunner{
   * executable location
   */
   public function buildCommand(){
-      
+
     $executable = $this->pluginCommandArray[0];
 
     $pluginParametersArray = $this->pluginCommandArray;
     array_shift($pluginParametersArray);
 
-    // update output location to runtime path  
+    // update output location to runtime path
     $outputKey = array_search('--output', $pluginParametersArray);
     if($outputKey !== false){
       $pluginParametersArray[$outputKey + 1] = $this->runtimePath;
@@ -340,9 +340,9 @@ class SeparatedRunner extends RemoteRunner{
   }
 
   public function createRun(){
-    
+
     parent::createRun();
-    
+
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
 
     // get the contents of chris.run
@@ -353,7 +353,7 @@ class SeparatedRunner extends RemoteRunner{
     //
 
     if (CLUSTER_TO_SERVER_PORT==22) {
-      $tunnel_host = CHRIS_HOST;
+      $tunnel_host = CLUSTER_TO_SERVER_HOST;
     } else {
       $tunnel_host = $this->remoteHost;
     }
@@ -456,7 +456,7 @@ class SeparatedRunner extends RemoteRunner{
     $this->ssh->exec('chmod 775 '.$runfile);
 
   }
-  
+
   public function prepare(){
     createDir($this->remoteSsh, $this->runtimePath);
 
@@ -484,22 +484,22 @@ class SeparatedRunner extends RemoteRunner{
  * See https://github.com/FNNDSC/chrisreloaded/wiki/JobSubmission#shared
  */
 class SharedRunner extends RemoteRunner{
-  
+
   public function createRun(){
 
     parent::createRun();
-    
+
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
-  
+
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $this->ssh->exec("echo $viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
 
     if (CLUSTER_TO_SERVER_PORT==22) {
-      $tunnel_host = CHRIS_HOST;
+      $tunnel_host = CLUSTER_TO_SERVER_HOST;
     } else {
       $tunnel_host = $this->remoteHost;
     }
-    
+
     // update status
     $setStatus = '/usr/bin/curl --retry 5 --retry-delay 5 --connect-timeout 5 --max-time 30 -v -k --data ';
 
@@ -516,7 +516,7 @@ class SharedRunner extends RemoteRunner{
     $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ' .CLUSTER_TO_SERVER_PORT. ' ' . $this->username.'@'.$tunnel_host . ' '.$cmd.'  >> ' .$this->runtimePath.'/_chrisRun_/chris.std 2> ' .$this->runtimePath. '/_chrisRun_/chris.err';
     $this->ssh->exec('echo "'.$cmd.'" >> '.$runfile);
 
-  } 
+  }
 
 }
 
