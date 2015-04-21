@@ -1,6 +1,8 @@
 ChRIS reloaded
 ==============
 
+[![Join the chat at https://gitter.im/FNNDSC/chrisreloaded](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/FNNDSC/chrisreloaded?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Developed at Boston Children's Hospital in the Fetal-Neonatal Neuroimaging and Developmental Science Center, _ChRIS_ (**Ch**ildren's **R**esearch **I**ntegration **S**ystem), is a novel web-based data storage and data processing workflow manager that provides strict data security while also facilitating secure, realtime interactive collaboration over the Internet and internal Intranets. Although _ChRIS_ can manage any datatype, it is uniquely suited to medical image data, providing the ability to seamlessly collect data from typical sources found in hospitals (such as Picture Archive and Communications Systems, PACS), import from CDs/DVDs, users desktops, etc. _ChRIS_ not only manages data collection and organization, but it also provides a large (and expanding) library of pipelines to analyze imported data. This library is easily extensible via a simple plugin mechanism, and _ChRIS_ also provides the ability to directly interact with compute clusters for data analysis. Moreover, a wide variety of 2D, 3D, and 4D medical image data formats are natively supported and can be directly visualized and manipulated within the browser.
 
 ![alt_tag](https://raw.github.com/FNNDSC/chrisreloaded/master/doc/images/1_feed.png)
