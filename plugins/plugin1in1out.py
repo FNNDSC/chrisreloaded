@@ -52,7 +52,10 @@ class Plugin1In1Out(Plugin):
           shutil.copy(options.input, tempdir + '/mri/' + os.path.basename(copyDir))
         else:
           copyDir = options.input
-          shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
+	  try:
+          	shutil.copytree(copyDir, tempdir + '/mri/' + os.path.basename(copyDir))
+	  except Exception as e:
+		print e
         self.tempdir = tempdir
         # set list of input file paths
         l_extensions = options.extensions.split(',')
