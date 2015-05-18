@@ -356,13 +356,24 @@ define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push');
  * We connect to this machine to schedule jobs on the cluster.
  * This is our *ONLY* way to communicate to the cluster.
  */
-define('CLUSTER_HOST', 'rc-golden');
+define('SERVER_TO_CLUSTER_HOST', 'rc-golden');
+/**
+ * The tunnel port through which we connect to the cluster from the chris server.
+ * This is by default 22 but if a tunnel is needed and it is set up then change it
+ * to the actual tunnel port.
+ */
+define('SERVER_TO_CLUSTER_PORT', 22);
+/**
+ * The server head machine.
+ * We connect to this machine to scp the data when in a NOT shared FS.
+ */
+define('CLUSTER_TO_SERVER_HOST', 'chris.tch.harvard.edu');
 /**
  * The tunnel port through which we connect to the chris server from the cluster.
  * This is by default 22 but if a tunnel is needed and it is set up then change it
  * to the actual tunnel port.
  */
-define('CLUSTER_PORT', 22);
+define('CLUSTER_TO_SERVER_PORT', 22);
 /**
  * The cluster type.
  * We specify the cluster type in order for crun to know how to handle the
