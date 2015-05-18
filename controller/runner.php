@@ -204,6 +204,16 @@ class LocalRunner extends ServerRunner{
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
     $this->ssh->exec("echo 'sudo su $this->username  -c \"$viewer_plugin --directory $this->path --output $this->path/..\";' >> $runfile;");
 
+    $executable = $this->pluginCommandArray[0];
+    /*if( substr($executable, -9) == 'pacs_pull'){
+      $pluginViewerIndex = CHRIS_PLUGINS_FOLDER.'/pacs_pull/viewer/index.html';
+      $this->ssh->exec("echo 'sudo su $this->username -c \"cp $pluginViewerIndex $this->path/..\";' >> $runfile;");
+      $this->ssh->exec("echo 'sudo su $this->username -c \"sed -i s/\\\\\\\${FEEDID}/$this->feedId/g $this->path/../index.html\";' >> $runfile;");
+      $chris_rel_path = str_replace(CHRIS_USERS, "/", $this->path);
+      $chris_rel_path_escaped  = str_replace("/", "\\\\\\\/", $chris_rel_path."/..");
+      $this->ssh->exec("echo 'sudo su $this->username -c \"sed -i s/\\\\\\\${FEEDDIR}/$chris_rel_path_escaped/g $this->path/../index.html\";' >> $runfile;");
+    }
+     */
     // rm job_path directory
     $this->ssh->exec("echo 'sudo rm -rf $this->runtimePath;' >> $runfile;");
 
@@ -275,11 +285,7 @@ class RemoteRunner extends Runner{
     $envfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.env');
     $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
 
-    if (CLUSTER_TO_SERVER_PORT==22) {
-      $tunnel_host = CLUSTER_TO_SERVER_HOST;
-    } else {
-      $tunnel_host = $this->remoteHost;
-    }
+    $tunnel_host = $this->remoteHost;
 
     $crunWrap = joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'lib/_common/crun.py');
     $crunWrap = $crunWrap . ' -u ' . $this->username . ' --out ' . $this->runtimePath . '/_chrisRun_ --err '. $this->runtimePath . '/_chrisRun_ --host ' . $tunnel_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $this->runtimePath . '/_chrisRun_';
