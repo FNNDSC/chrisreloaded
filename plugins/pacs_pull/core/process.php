@@ -446,7 +446,7 @@ $dataLog .= "Data CHRIS ID: ".$data_chris_id.PHP_EOL;
 
 $datadirname = $output_dir.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResult['Patient'][0]->id;
 if(!is_dir($datadirname)){
-mkdir($datadirname);
+  mkdir($datadirname);
 }
 
 // study directory
@@ -457,7 +457,7 @@ $studyResult = $studyMapper->get();
 $study_dir_name = formatStudy($studyResult['Study'][0]->date, $studyResult['Study'][0]->age, $studyResult['Study'][0]->description).'-'.$study_chris_id;
 $studydirname = $datadirname.'/'.$study_dir_name;
 if(!is_dir($studydirname)){
-mkdir($studydirname);
+  mkdir($studydirname);
 }
 
 // create data soft links
@@ -465,11 +465,15 @@ $targetbase = CHRIS_DATA.'/'.$patientResult['Patient'][0]->uid.'-'.$patientResul
 $series_dir_name = $dataResult['Data'][0]->description .'-'. $dataResult['Data'][0]->name;
 $seriesdirnametarget = $targetbase .'/'.$study_dir_name .'/'.$series_dir_name.'-'.$dataResult['Data'][0]->id;
 $seriesdirnamelink = $datadirname .'/'.$study_dir_name .'/'.$series_dir_name.'-'.$dataResult['Data'][0]->id;
-if(!is_link($seriesdirnamelink)){
-// create sof link
-symlink($seriesdirnametarget, $seriesdirnamelink);
+if(file_exists($seriesdirnametarget)){
+  if(!is_link($seriesdirnamelink)){
+    // create sof link
+    symlink($seriesdirnametarget, $seriesdirnamelink);
+  }
 }
-
+else{
+  $dataLog .= "ERROR: Directory does not exist: ".$seriesdirnametarget.PHP_EOL;
+}
 // update feed status?
 $fh = fopen($logFile, 'a')  or die("can't open file");
 fwrite($fh, $dataLog);
