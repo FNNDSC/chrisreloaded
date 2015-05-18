@@ -394,7 +394,7 @@ class SeparatedRunner extends RemoteRunner{
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     // command to remove the compressed file from the cluster
-    $cmd = 'cd '.$this->runtimePath.'; rm '.$data.'.tar.gz &';
+    $cmd = 'rm '.$this->runtimePath.'.tar.gz &';
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
     //
