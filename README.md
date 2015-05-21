@@ -19,6 +19,14 @@ In most cases, the plugin will spawn a job out on an appropriately configured cl
 ## Change log ##
 
 ### current **r2.9** ###
+* Dead symlink handling in plugin1in1out
+* Pacs_pull doesn't create symlinks if target doesn't exists
+* Dicom listener genereate jpg of incoming files
+* Bug fixes in runner.php
+* Generate --err and --out from crun
+* Log more ssh/scp commands in chris.std and chris.err
+* Bower instead of git submodules
+* Pacs_push can email anybody (not only registered users)
 
 ### 2014 06 19 **r2.8** ###
 * Viewer plugin
