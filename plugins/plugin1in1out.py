@@ -77,7 +77,7 @@ class Plugin1In1Out(Plugin):
             fileName = basename
             while fileName in self.outputFileNames:
                 count += 1
-                fileName = basename + str(count)
+                fileName = os.path.splitext(basename)[0] + str(count) + '.' + options.format
             self.outputFileNames.append(fileName)
       
     def removeTempDir(self):
