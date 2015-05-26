@@ -62,15 +62,23 @@ class Plugin1In1Out(Plugin):
         self.inputFilePaths = self.getFilePaths(self.tempdir + '/mri/', l_extensions)
         # set list of output file names
         for filePath in self.inputFilePaths:
-          if filePath.endswith('dcm'):
-            # the output file name is the parent directory name
-            basename_new = os.path.basename(os.path.dirname(filePath)) + '.' + options.format
-          else:
-            # grab just the file name
-            basename = os.path.splitext(os.path.basename(filePath))[0]
-            # add output extension
-            basename_new = basename + '.' + options.format
-          self.outputFileNames.append(basename_new)
+            dirName = os.path.dirname(filePath)
+            if filePath.endswith('dcm'):
+                # the output file name is grandparent-directory-name_parent-directory-name
+                basename = os.path.join(os.path.basename(os.path.dirname(dirName)), os.path.basename(dirName))
+            else:
+                # the output file name is parent-directory-name_file-name
+                basename = os.path.splitext(os.path.basename(filePath))[0]
+                basename = os.path.join(os.path.basename(dirName), basename)
+            # substitute slash by underscore and add output extension    
+            basename = basename.replace('/','_') + '.' + options.format
+            # check if it already exists in the output file names and modify it if neccessary to make it unique   
+            count = 0 
+            fileName = basename
+            while fileName in self.outputFileNames:
+                count += 1
+                fileName = basename + str(count)
+            self.outputFileNames.append(fileName)
       
     def removeTempDir(self):
         shutil.rmtree(self.tempdir)
