@@ -210,6 +210,7 @@ if (!$loggedIn) {
           $result['result'] = FeedC::archive($id);
         }
         else if($what == 'feed_cancel'){
+          // CANCEL ON THE CLUSTER
           $ssh_connection = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
           if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
             die('Login Failed');
@@ -219,7 +220,8 @@ if (!$loggedIn) {
 
         }
         else if($what == 'file') {
-          $ssh_connection = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+          // READ FROM SERVER
+          $ssh_connection = new Net_SSH2(CHRIS_HOST);
           if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
             die('Login Failed');
           }
@@ -236,8 +238,8 @@ if (!$loggedIn) {
           $result['result'] = $name.' written.';
 
         } else if($what == 'feed_merge') {
-          // login since we will modify things on the file system
-          $ssh_connection = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+          // merge on server
+          $ssh_connection = new Net_SSH2(CHRIS_HOST);
           if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
             die('Login Failed');
           }
@@ -263,8 +265,8 @@ if (!$loggedIn) {
           }
 
         } else if($what == 'feed_name') {
-          // login since we will modify things on the file system
-          $ssh_connection = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+          // rename on server
+          $ssh_connection = new Net_SSH2(CHRIS_HOST);
           if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
             die('Login Failed');
           }
