@@ -90,7 +90,10 @@ class Runner{
 
     // 3- RUN command, need some work!
     $command = $this->buildCommand();
-    $this->ssh->exec(bash('echo "'.$command.' >> ' .$this->runtimePath.'/_chrisRun_/chris.std 2> ' .$this->runtimePath. '/_chrisRun_/chris.err" >> '.$runfile));
+    $command = preg_replace('/ "/', '"\'', $command);
+    $command = preg_replace('/" /', '\'"', $command);
+    $command = preg_replace('/\n/', '', $command);
+    $this->ssh->exec("echo '$command >> $this->runtimePath/_chrisRun_/chris.std 2> $this->runtimePath/_chrisRun_/chris.err' >> $runfile");
 
     // 4- update permission after plugin ran
     // to be tested to make sure this is enough
