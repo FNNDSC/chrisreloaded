@@ -41,14 +41,16 @@ class FindSession(Plugin):
     options = self.options
     print Plugin.TITLE
     print Plugin.VERSION
+    print 'HELLO'
     print options.LIST_DIRECTORIES
     #print options.LIST_SERIES
     list_directories = options.LIST_DIRECTORIES.strip().split(" ");
     if list_directories:
       for directory in list_directories:
+        splitted = options.output.split('/')
         print '======================================='
         print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Copy directory over...'
-        command = 'mkdir -p ' + options.output + '/rawdata; chmod 777 ' + options.output + '/rawdata; sudo su ' + options.USERNAME + ' -c "cp -rLv ' + directory + ' ' + options.output  + '/rawdata; chmod 755 ' + options.output + "/rawdata/" + os.path.basename(os.path.normpath(directory)) +  ';  chmod 644 ' +options.output+ '/rawdata/' + os.path.basename(os.path.normpath(directory)) +  '/*;"'
+        command = 'umask 0000; mkdir -p ' + options.output + '/rawdata; chmod 777 ' + '/' + splitted[1] + '/' + splitted[2] + '; chmod 777 ' + options.output + '; chmod 777 ' + options.output + '/rawdata; sudo su ' + options.USERNAME + ' -c "cp -rLv ' + directory + ' ' + options.output  + '/rawdata; chmod 755 ' + options.output + "/rawdata/" + os.path.basename(os.path.normpath(directory)) +  ';  chmod 644 ' +options.output+ '/rawdata/' + os.path.basename(os.path.normpath(directory)) +  '/*;"'
         print command
         output = os.system(command)
         print 'output:'
@@ -65,7 +67,7 @@ class FindSession(Plugin):
     
         print '======================================='
         print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
-        command = current_dir + "/core/process.php -d " + options.output + " -l " + os.path.basename(os.path.normpath(directory))
+        command = current_dir + "/core/process.php -d " + options.output + " -l rawdata/" + os.path.basename(os.path.normpath(directory))
         print 'command:'
         print command
         output = os.system(command)
