@@ -114,13 +114,14 @@ _CHRIS_INTERACTIVE_PLUGIN_.ajaxPull = function() {
   // get all checked elements in the table
   var jSPath = $("#findsession_table input:checked").closest('td').prev('td');
 
-  var src = "\\\"";
+  var src = '';
 
   jSPath.each(function() {
     src += $( this ).html() + ' ';
   });
 
-  src += "\\\"";
+  src = src.trim();
+  src = ' "' + src + '" '; 
 
   var index = _CHRIS_INTERACTIVE_PLUGIN_.getInd('listdirectories');  
   if (index == -1) {
