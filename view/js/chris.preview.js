@@ -160,7 +160,14 @@ _PREVIEW_.preview = function() {
         };
         jQuery("#SLICE").html(Math.floor(_PREVIEW_.object.indexZ + 1));
         jQuery("#SLICE_NB").html(dim[2]);
+
+        _PREVIEW_.renderer.interactor.addEventListener("flipRows", function(e){
+          _PREVIEW_.renderer.flipRows = !_PREVIEW_.renderer.flipRows;
+        });        
         
+        _PREVIEW_.renderer.interactor.addEventListener("flipColumns", function(e){
+          _PREVIEW_.renderer.flipColumns = !_PREVIEW_.renderer.flipColumns;
+        });        
       }
       
     }
