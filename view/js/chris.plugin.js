@@ -582,7 +582,7 @@ jQuery(document)
                           '.parameter_string');
                       // return parameter if string is not empty
                       if (text_input.val() != "") {
-                        _value = '\\\"' + text_input.val() + '\\\"';
+                        _value = ' "' + text_input.val() + '" ';
                       } else {
                         return;
                       }

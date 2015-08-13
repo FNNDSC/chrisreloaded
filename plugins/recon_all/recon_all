@@ -43,6 +43,7 @@ class ReconAll(Plugin):
       # create temp dir
       import tempfile, shutil, subprocess
       tempdir = tempfile.mkdtemp('free', 'surf', self.envVars['ENV_CLUSTER_TMP_DIR'])
+      print tempdir
       shutil.copytree(options.MRI, tempdir + '/MRI')
       # create link for preview during running
       os.symlink( tempdir + '/MRI', options.output + '/Freesurfer' )
@@ -54,7 +55,7 @@ class ReconAll(Plugin):
       cmd = '/bin/bash -c " cd ' + tempdir + '/MRI' + ';source ' + options.FreesurferScript + ' stable;' +  \
             'ln -s \$FREESURFER_HOME/subjects/lh.EC_average .;ln -s \$FREESURFER_HOME/subjects/rh.EC_average .;' + \
             'ln -s \$FREESURFER_HOME/subjects/V1_average .;ln -s \$FREESURFER_HOME/subjects/fsaverage .;' + \
-            'recon-all -subject Freesurfer -i ' + os.path.join( tempdir + '/MRI', files[0] ) + ' -all -notalairach "'
+            'recon-all -subject Freesurfer -i ' + os.path.join( tempdir + '/MRI', files[0] ) + ' -all "'
       print cmd
       #os.system(cmd)
       shell = crun.crun()
