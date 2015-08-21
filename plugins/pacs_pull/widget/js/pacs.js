@@ -315,7 +315,12 @@ _CHRIS_INTERACTIVE_PLUGIN_.advancedCaching = function(data, i) {
     study.NumberOfSeriesRelatedInstances
         .push(data[1].NumberOfSeriesRelatedInstances[i]);
     study.QueryRetrieveLevel.push(data[1].QueryRetrieveLevel[i]);
-    study.RetrieveAETitle.push(data[1].RetrieveAETitle[i]);
+    if(data[1].RetrieveAETitle && data[1].RetrieveAETitle[i] ){
+      study.RetrieveAETitle.push(data[1].RetrieveAETitle[i]);
+    }
+    else{
+      study.RetrieveAETitle.push("nvp");
+    }
     study.Status.push(false);
   }
 }
