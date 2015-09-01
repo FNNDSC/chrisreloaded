@@ -449,18 +449,11 @@ class FeedC implements FeedControllerInterface {
 
           $destinationDirectory = CHRIS_USERS.'/'.$targetname.'/'.$feedResult['Feed'][0]->plugin;
 	  if(!is_dir($destinationDirectory)){
-	    shell_exec("sudo su $targetname -c 'umask 002; mkdir -p $destinationDirectory;'");
+	    mkdir($destinationDirectory, 0755, true);	  
           }
           $destinationDirectory .= '/'.$feedResult['Feed'][0]->name.'-'.$new_id;
 
-	  shell_exec("sudo su $targetname -c 'ln -s $targetDirectory $destinationDirectory;'");
-
-          // we need to change the permission of the target directory to 777 (as the owner)
-          // so that the other user can write to this folder
-          // but only if the targetDirectory is a directory and not a link (a link means it was re-shared)
-          if (is_dir($targetDirectory)) {
-	    shell_exec("sudo su $ownername -c 'chmod -R 777 $targetDirectory;'");
-          }
+	  symlink($targetDirectory, $destinationDirectory);
         }
         else{
           return "Invalid feed id: ". $feed_id;
@@ -709,7 +702,7 @@ class FeedC implements FeedControllerInterface {
 
       // if doesnt exist
       if (!file_exists($masterfeedDirectory.'/'.$dest)) {
-        $ssh_connection->exec('ln -s '.$slavefeedDirectory.'/'.$value.' '.$masterfeedDirectory.'/'.$dest);
+	symlink($slavefeedDirectory.'/'.$value, $masterfeedDirectory.'/'.$dest);   
       }
       else{
         // uh-oh! collision!
@@ -745,10 +738,13 @@ class FeedC implements FeedControllerInterface {
       $dirRoot = joinPaths($cluster_user_path, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
       $dataDir = explode("\n",trim($ssh_connection->exec('ls ' . $dirRoot)));
       foreach ($dataDir as $dir) {
-        $chrisRunPath = joinPaths($dirRoot, $dir, '_chrisRun_');
-        $jobIdFiles = explode("\n",trim($ssh_connection->exec('ls ' . $chrisRunPath . ' | grep .crun.joblist')));
+	$chrisRunPath = joinPaths($dirRoot, $dir, '_chrisRun_');
+        $jobIdFilesDump = shell_exec('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p '.SERVER_TO_CLUSTER_PORT.' '.SERVER_TO_CLUSTER_HOST.' "ls ' . $chrisRunPath . ' | grep .crun.joblist"');
+        $jobIdFiles = explode("\n",trim($jobIdFilesDump));
+        //$jobIdFiles = explode("\n",trim($ssh_connection->exec('ls ' . $chrisRunPath . ' | grep .crun.joblist')));
         foreach ($jobIdFiles as $f) {
-          $ssh_connection->exec($cluster_kill_command . joinPaths($chrisRunPath, $f));
+	  shell_exec('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p '.SERVER_TO_CLUSTER_PORT.' '.SERVER_TO_CLUSTER_HOST.' "'.$cluster_kill_command . joinPaths($chrisRunPath, $f).'"');	
+	  //$ssh_connection->exec($cluster_kill_command . joinPaths($chrisRunPath, $f));
         }
       }
 
@@ -819,7 +815,7 @@ class FeedC implements FeedControllerInterface {
     $new_path = joinPaths(CHRIS_USERS.'/'.$username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
 
     if(!is_link($new_path) and !file_exists($new_path)){
-      $ssh_connection->exec('ln -s '.$old_path.' '.$new_path);
+      symlink($old_path, $new_path);
     }
 
     // find all shared versions of this feed
