@@ -736,14 +736,14 @@ class FeedC implements FeedControllerInterface {
       $cluster_kill_command = $cluster_kill_command . ' -u ' . $username . ' --host ' . SERVER_TO_CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
       $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
       $dirRoot = joinPaths($cluster_user_path, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
-      $dataDir = explode("\n",trim($ssh_connection->exec('ls ' . $dirRoot)));
+      $dataDir = explode("\n",trim(shell_exec('ssh -p '.SERVER_TO_CLUSTER_PORT.' '.SERVER_TO_CLUSTER_HOST.' "ls ' . $dirRoot.'"')));
       foreach ($dataDir as $dir) {
 	$chrisRunPath = joinPaths($dirRoot, $dir, '_chrisRun_');
-        $jobIdFilesDump = shell_exec('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p '.SERVER_TO_CLUSTER_PORT.' '.SERVER_TO_CLUSTER_HOST.' "ls ' . $chrisRunPath . ' | grep .crun.joblist"');
+        $jobIdFilesDump = shell_exec('ssh -p '.SERVER_TO_CLUSTER_PORT.' '.SERVER_TO_CLUSTER_HOST.' "ls ' . $chrisRunPath . ' | grep .crun.joblist"');
         $jobIdFiles = explode("\n",trim($jobIdFilesDump));
         //$jobIdFiles = explode("\n",trim($ssh_connection->exec('ls ' . $chrisRunPath . ' | grep .crun.joblist')));
         foreach ($jobIdFiles as $f) {
-	  shell_exec('ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p '.SERVER_TO_CLUSTER_PORT.' '.SERVER_TO_CLUSTER_HOST.' "'.$cluster_kill_command . joinPaths($chrisRunPath, $f).'"');	
+	  shell_exec('ssh -p '.SERVER_TO_CLUSTER_PORT.' '.SERVER_TO_CLUSTER_HOST.' "'.$cluster_kill_command . joinPaths($chrisRunPath, $f).'"');	
 	  //$ssh_connection->exec($cluster_kill_command . joinPaths($chrisRunPath, $f));
         }
       }
