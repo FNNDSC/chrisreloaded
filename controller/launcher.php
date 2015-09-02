@@ -180,16 +180,6 @@ if ($commandline_mode) {
 // *****************
 
 //
-// TEST SSH CONNECTION TO LOCAL SERVER!
-//
-
-$sshLocal = new Net_SSH2('localhost');
-if (!$sshLocal->login($username, $password)) {
-  die('Server login Failed');
-}
-
-
-//
 // FIRST WE GET ALL THE GENERAL INFORMATION
 //
 
@@ -226,7 +216,7 @@ $job_path = $feed_path;
 if($jobid != ''){
   $job_path .= '/'.$jobid;
 }
-$job_path_output = createDir($sshLocal, $job_path);
+$job_path_output = mkdir($job_path, 0755, true);
 
 
 //
@@ -267,12 +257,12 @@ switch($jobType){
     $localRun  = new LocalRunner();
 
     // get all required variables
-    $groupId =  $sshLocal->exec("id -g");
+    $groupId = shell_exec("id -g");
     $groupId= trim($groupId);
     $runtimePath = str_replace($plugin_path, CHRIS_TMP, $job_path);
 
     // set all variables here!
-    $localRun->ssh = $sshLocal;
+    $localRun->ssh = null;//$sshLocal;
     $localRun->path = $job_path;
     $localRun->runtimePath = $runtimePath;
     $localRun->pluginCommandArray = $plugin_command_array;
@@ -297,7 +287,7 @@ switch($jobType){
     $immediateRun  = new ImmediateRunner();
 
     // set all variables here!
-    $immediateRun->ssh = $sshLocal;
+    $immediateRun->ssh = null;//$sshLocal;
     $immediateRun->path = $job_path;
     $immediateRun->runtimePath = $job_path;
     $immediateRun->pluginCommandArray = $plugin_command_array;
@@ -316,14 +306,14 @@ switch($jobType){
     $sharedRun  = new SharedRunner();
 
     // set all variables here!
-    $sharedRun->ssh = $sshLocal;
+    $sharedRun->ssh = null;// $sshLocal;
     // remote ssh
-    $sharedRun->remoteSsh = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-    if (!$sharedRun->remoteSsh->login($username, $password)) {
-      die('Cluster login Failed');
-    }
+    $sharedRun->remoteSsh = null;//new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+    //if (!$sharedRun->remoteSsh->login($username, $password)) {
+    //  die('Cluster login Failed');
+   // }
 
-    $sharedRun->remoteHost = trim($sharedRun->remoteSsh->exec('hostname -s 2>/dev/null | tail -n 1'));
+    $sharedRun->remoteHost = trim(shell_exec('ssh -p '.SERVER_TO_CLUSTER_PORT.' '.SERVER_TO_CLUSTER_HOST.' "hostname -s 2>/dev/null | tail -n 1"'));
     $sharedRun->remoteUser = $username;
     $sharedRun->username = $username;
     $sharedRun->path = $job_path;
@@ -346,14 +336,14 @@ switch($jobType){
     $separatedRun  = new SeparatedRunner();
 
     // set all variables here!
-    $separatedRun->ssh = $sshLocal;
+    $separatedRun->ssh = null;//$sshLocal;
     // remote ssh
-    $separatedRun->remoteSsh = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-    if (!$separatedRun->remoteSsh->login($username, $password)) {
-      die('Cluster login Failed');
-    }
+    $separatedRun->remoteSsh = null;//new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+    //if (!$separatedRun->remoteSsh->login($username, $password)) {
+    //  die('Cluster login Failed');
+    //}
 
-    $separatedRun->remoteHost = trim($separatedRun->remoteSsh->exec('hostname -s 2>/dev/null | tail -n 1'));
+    $separatedRun->remoteHost = trim(shell_exec('ssh -p '.SERVER_TO_CLUSTER_PORT.' '.SERVER_TO_CLUSTER_HOST.' "hostname -s 2>/dev/null | tail -n 1"'));
     $separatedRun->remoteUser = $username;
     $separatedRun->username = $username;
     $separatedRun->path = $job_path;
