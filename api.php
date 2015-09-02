@@ -211,21 +211,11 @@ if (!$loggedIn) {
         }
         else if($what == 'feed_cancel'){
           // CANCEL ON THE CLUSTER
-          $ssh_connection = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-          if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
-            die('Login Failed');
-          }
-
-          $result['result'] = FeedC::cancel($id, $ssh_connection);
+          $result['result'] = FeedC::cancel($id, null);
 
         }
         else if($what == 'file') {
           // READ FROM SERVER
-          $ssh_connection = new Net_SSH2(CHRIS_HOST);
-          if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
-            die('Login Failed');
-          }
-
           // here we store content to a file
           $name = joinPaths(CHRIS_USERS, $parameters[0]);
 
@@ -233,23 +223,19 @@ if (!$loggedIn) {
           $content = escapeshellarg($parameters[1]);
 
           // replace file contents
-          $ssh_connection->exec("echo ".$content." > ".$name);
+          shell_exec("echo ".$content." > ".$name);
 
           $result['result'] = $name.' written.';
 
         } else if($what == 'feed_merge') {
           // merge on server
-          $ssh_connection = new Net_SSH2(CHRIS_HOST);
-          if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
-            die('Login Failed');
-          }
           // grab the master id
           $master_feed_id = $id;
           // .. and the slave id
           $slave_feed_id = $parameters;
 
           // merge the feeds
-          $merged = FeedC::mergeFeeds($master_feed_id, $slave_feed_id, $ssh_connection);
+          $merged = FeedC::mergeFeeds($master_feed_id, $slave_feed_id, null);
 
           if ($merged) {
             // and archive the slave
@@ -266,11 +252,7 @@ if (!$loggedIn) {
 
         } else if($what == 'feed_name') {
           // rename on server
-          $ssh_connection = new Net_SSH2(CHRIS_HOST);
-          if (!$ssh_connection->login($_SESSION['username'], $_SESSION['password'])) {
-            die('Login Failed');
-          }
-          $result['result'] = FeedC::updateName($id, $parameters, $ssh_connection);
+          $result['result'] = FeedC::updateName($id, $parameters, null);
 
         }
         break;
