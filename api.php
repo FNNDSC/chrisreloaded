@@ -211,7 +211,7 @@ if (!$loggedIn) {
         }
         else if($what == 'feed_cancel'){
           // CANCEL ON THE CLUSTER
-          $result['result'] = FeedC::cancel($id, null);
+          $result['result'] = FeedC::cancel($id);
 
         }
         else if($what == 'file') {
@@ -235,7 +235,7 @@ if (!$loggedIn) {
           $slave_feed_id = $parameters;
 
           // merge the feeds
-          $merged = FeedC::mergeFeeds($master_feed_id, $slave_feed_id, null);
+          $merged = FeedC::mergeFeeds($master_feed_id, $slave_feed_id);
 
           if ($merged) {
             // and archive the slave
@@ -252,7 +252,7 @@ if (!$loggedIn) {
 
         } else if($what == 'feed_name') {
           // rename on server
-          $result['result'] = FeedC::updateName($id, $parameters, null);
+          $result['result'] = FeedC::updateName($id, $parameters);
 
         }
         break;
