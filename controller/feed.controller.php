@@ -57,11 +57,11 @@ interface FeedControllerInterface
   // return the number of running jobs for a user
   static public function getRunningCount($userid);
   // merge two feeds
-  static public function mergeFeeds($master_id, $slave_id, &$ssh_connection);
+  static public function mergeFeeds($master_id, $slave_id);
   // update feed name
-  static public function updateName($id, $name, &$ssh_connection);
+  static public function updateName($id, $name);
   // cancel the job
-  static public function cancel($id, &$ssh_connection);
+  static public function cancel($id);
   // share a feed
   static public function share($feed_ids, $ownerid, $ownername, $targetname);
   // tag/untag a feed
@@ -642,7 +642,7 @@ class FeedC implements FeedControllerInterface {
    * @param int $master_id The master feed id (target for merge).
    * @param int $slave_id The slave feed id.
    */
-  static public function mergeFeeds($master_id, $slave_id, &$ssh_connection) {
+  static public function mergeFeeds($master_id, $slave_id) {
 
     $username = $_SESSION['username'];
 
@@ -719,7 +719,7 @@ class FeedC implements FeedControllerInterface {
    *
    * @param int $id The feed id.
    */
-  static public function cancel($id, &$ssh_connection) {
+  static public function cancel($id) {
 
     // check if feed status is running
     $feedResult = Mapper::getStatic('Feed', $id);
@@ -798,7 +798,7 @@ class FeedC implements FeedControllerInterface {
    * @param int $id The feed id.
    * @param string $name The feed name to set.
    */
-  static public function updateName($id, $name, &$ssh_connection) {
+  static public function updateName($id, $name) {
 
     $username = $_SESSION['username'];
 
