@@ -85,11 +85,9 @@ class FileC implements FileControllerInterface {
 
       if(move_uploaded_file($value['tmp_name'], $target_tmp_path)) {
         // all good, set ownership/permissions correctly
-	shell_exec("sudo chown -R $userID:$groupID $target_tmp_path;");
-	shell_exec("sudo su $userName -c 'cp -rvp $target_tmp_path $target_path';");
-	shell_exec("sudo su $userName -c 'chmod -R 755 $target_path';");
-	shell_exec("sudo su $userName -c 'rm -rv $dir/.chris.json';");
-	shell_exec("sudo rm -rf $target_tmp_path;");
+	shell_exec("cp -rvp $target_tmp_path $target_path;");
+	shell_exec("rm -rv $dir/.chris.json;");
+	shell_exec("rm -rf $target_tmp_path;");
       } else{
         // oops.... something went wrong
         return $value['error'];
