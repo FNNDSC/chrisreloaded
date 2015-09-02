@@ -111,9 +111,6 @@ class UserC implements UserControllerInterface {
     if ($sshCluster->login($username, $password)) {
 
       // the user credentials are valid on the cluster!
-      // setup cluster home directory if needed
-      $userHomeDir = self::setupClusterDir($sshCluster);
-
       $sshLocal = new Net_SSH2('localhost');
       if ($sshLocal->login($username, $password)) {
 
@@ -172,17 +169,16 @@ class UserC implements UserControllerInterface {
   static public function setupServerDir($username, &$ssh) {
 
     $user_path = joinPaths(CHRIS_USERS, $username);
+    $user_config_path = joinPaths($user_path, CHRIS_USERS_CONFIG_DIR);
 
     // create user directory within Chris (if does't exist)
-    if(!file_exists($user_path)){
-      $ssh->exec('mkdir  '.$user_path.'; chmod 775 '.$user_path.';');
+    if(!file_exists($user_config_path)){
+      mkdir($user_config_path, 0777, true);      
     }
 
-    // create users' config directory  (if does't exist)
-    $user_config_path = joinPaths($user_path, CHRIS_USERS_CONFIG_DIR);
-    if(!file_exists($user_config_path)){
-      $ssh->exec('mkdir  '.$user_config_path. '; chmod 775  '.$user_config_path.';');
-    }
+    // make sure user's directory is open enough
+    chmod($user_path, 0777);      
+    chmod($user_config_path, 0777);      
 
     // add default configuration file  (if does't exist)
     $user_config_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_FILE);
