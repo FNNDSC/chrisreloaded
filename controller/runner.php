@@ -57,6 +57,9 @@ class Runner{
    * Create the default chris.env file in the $path
    */
   public function createEnv(){
+    if(!is_dir(joinPaths($this->path, '_chrisRun_'))){
+      mkdir(joinPaths($this->path, '_chrisRun_'), 0755, true);
+    }
 
     $envfile = joinPaths($this->path, '_chrisRun_', 'chris.env');
 
@@ -79,11 +82,14 @@ class Runner{
    * in the separated FS, it also copies data. This should NOT be happenning. Copy should happen in the chris.run.
    */
   public function createRun(){
+    if(!is_dir(joinPaths($this->path, '_chrisRun_'))){
+      mkdir(joinPaths($this->path, '_chrisRun_'), 0755, true);
+    }
 
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
 
     // 1- log HOSTNAME and time
-    shell_exec('echo "echo \\\'\'\$(date) Running on \$HOSTNAME\\\'\' > '.$this->runtimePath.'/_chrisRun_/chris.std" >> '.$runfile);
+    shell_exec('echo "echo \$(date) Running on \$HOSTNAME > '.$this->runtimePath.'/_chrisRun_/chris.std" >> '.$runfile);
 
     // 2- source the environment
     shell_exec('echo "source '.$this->runtimePath . '/_chrisRun_/chris.env;" >> '.$runfile);
@@ -202,10 +208,9 @@ class LocalRunner extends ServerRunner{
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
 
     // run the viewer plugin to generate the JSON scene
-    shell_exec("echo 'sudo chown -R $this->userId:$this->groupId $this->runtimePath;' >> $runfile;");
-    shell_exec("echo 'sudo su $this->username -c \"cp -rfp $this->runtimePath/* $this->path\";' >> $runfile;");
+    shell_exec("echo 'cp -rfp $this->runtimePath/../* $this->path;' >> $runfile;");
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-    shell_exec("echo 'sudo su $this->username  -c \"$viewer_plugin --directory $this->path --output $this->path/..\";' >> $runfile;");
+    shell_exec("echo '$viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
 
     $executable = $this->pluginCommandArray[0];
     /*if( substr($executable, -9) == 'pacs_pull'){
@@ -218,7 +223,7 @@ class LocalRunner extends ServerRunner{
     }
      */
     // rm job_path directory
-    shell_exec("echo 'sudo rm -rf $this->runtimePath;' >> $runfile;");
+    shell_exec("echo 'rm -rf $this->runtimePath;' >> $runfile;");
 
     // status update if needed
     // if a job is local and immediate, we run it as local to ensure it works
@@ -230,14 +235,14 @@ class LocalRunner extends ServerRunner{
       // create curlA.sh
       shell_exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curlA.run');
       shell_exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=1&token='.$startToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlA.std 2> '.$this->path.'/_chrisRun_/curlA.err" >> '.$this->path.'/_chrisRun_/curlA.run');
-      shell_exec("sed -i '1i sudo su $this->username -c \"bash $this->path/_chrisRun_/curlA.run\"' $runfile;");
+      shell_exec("sed -i '1i bash $this->path/_chrisRun_/curlA.run' $runfile;");
 
       // append
       // we need sudo su to run it at the right location after the data has been copied back
       $endToken = TokenC::create();
       shell_exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curlB.run');
       shell_exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err" >> '.$this->path.'/_chrisRun_/curlB.run');
-      shell_exec("echo 'sudo su $this->username -c \"bash $this->path/_chrisRun_/curlB.run\"' >> $runfile;");
+      shell_exec("echo 'bash $this->path/_chrisRun_/curlB.run' >> $runfile;");
     }   
   }
 
