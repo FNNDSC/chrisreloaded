@@ -47,8 +47,6 @@ interface UserControllerInterface
   static public function login($username, $password);
   // Create new user
   static public function create($uid, $username);
-  // Setup the user cluster directory as needed
-  static public function setupClusterDir(&$ssh);
   // Setup the user server directory as needed
   static public function setupServerDir($username, &$ssh);
   // Update user email
@@ -153,32 +151,6 @@ class UserC implements UserControllerInterface {
 
         // setup server directories if needed
         self::setupServerDir($username, $sshLocal);
-
-        //we need to create a new connection object because using the already
-        //created $sshCluster doesn't work, maybe its connection times out
-        $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-        $sshCluster->login($username, $password);
-
-        // compress .ssh dir
-        $sshCluster->exec(bash('cd '.$userHomeDir.'; tar -zcf ssh.tar.gz .ssh;'));
-
-        // copy over the compressed file to the local server,
-        $scp = new Net_SCP($sshCluster);
-        $data = $scp->get($userHomeDir.'/ssh.tar.gz');
-        $scp = new Net_SCP($sshLocal);
-        $scp->put($userHomeDir.'/ssh.tar.gz', $data);
-
-        // uncompress and remove ssh.tar.gz on the local server
-        $sshLocal->exec(bash('cd '.$userHomeDir.'; tar -zxf ssh.tar.gz;'));
-        $sshLocal->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz;'));
-
-        // remove ssh.tar.gz from the cluster
-        $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-        $sshCluster->login($username, $password);
-        if (remoteFileExists($sshCluster, $userHomeDir.'/ssh.tar.gz')) {
-          $sshCluster->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz &'));
-        }
-
       } else {
         // invalid chris server credentials
         $user = -1;
@@ -190,35 +162,6 @@ class UserC implements UserControllerInterface {
     // invalid cluster credentials
     return -1;
 
-  }
-
-  /**
-  * Setup home directories in the cluster.
-  *
-  * @param string $username
-  * @return string The user's home dir path.
-  */
-  static public function setupClusterDir(&$ssh) {
-
-    $userHomeDir = $ssh->exec(bash('pwd'));
-    //remove EOL and white spaces
-    $userHomeDir = trim(preg_replace('/\s+/', ' ', $userHomeDir));
-
-    // generate ssh key for passwordless ssh  (if does't exist)
-    $keyDir = joinPaths($userHomeDir,'.ssh');
-    $user_key_file = joinPaths($keyDir, CHRIS_USERS_CONFIG_SSHKEY);
-    if (!remoteDirExists($ssh, $keyDir)) {
-      $ssh->exec(bash('mkdir -p '.$keyDir.';'));
-    }
-    // do not overwrite the file if it exists
-    $ssh->exec(bash('echo -e \'n\' | ssh-keygen -q -t rsa -N "" -f '.$user_key_file.';'));
-
-    // id_rsa.pub to user's authorized keys if needed
-    $ssh->exec('/bin/bash -c "(cat ~/.ssh/authorized_keys | grep \"$(cat '.$user_key_file.'.pub)\") || (cat '.$user_key_file.'.pub >> ~/.ssh/authorized_keys;ssh-add;)"');
-    // make sure the permissions are correct to allow ssh with id_rsa
-    $ssh->exec('chmod go-w ~/.ssh;chmod 600 ~/.ssh/authorized_keys;chown `whoami` ~/.ssh/authorized_keys;');
-
-    return $userHomeDir;
   }
 
   /**
