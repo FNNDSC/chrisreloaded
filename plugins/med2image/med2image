@@ -39,9 +39,12 @@ class med2image(Plugin1In1Out):
         # execute med2image.py on all MRI volumes within the input tree
         cmds = []
         for inFile, outFileName in itertools.izip(self.inputFilePaths, self.outputFileNames):
-          cmd = 'cd '  + options.output  + '; med2image.py -i ' + inFile + \
-                ' -s ' + options.slices  +                                \
-                ' -d ' + os.path.join(self.tempdir,outFileName)  + ' -o ' + outFileName
+          cmd = 'export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':$PATH; ' + \
+                'cd '  + options.output  + '; ' + \
+                'med2image.py -i ' + inFile + \
+                            ' -s ' + options.slices  + \
+                            ' -d ' + os.path.join(self.tempdir,outFileName)  + \
+                            ' -o ' + outFileName
           cmds.append(cmd)
         print(cmds)
         userErrorStr = 'med2image.py could not convert file in dir %s' % self.tempdir
