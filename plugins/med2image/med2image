@@ -47,7 +47,7 @@ class med2image(Plugin1In1Out):
         userErrorStr = 'med2image.py could not convert file in dir %s' % self.tempdir
         self.execCmd(cmds, userErrorStr)
         # remove temp dir
-        #self.removeTempDir()
+        self.removeTempDir()
 
 
 # ENTRYPOINT
