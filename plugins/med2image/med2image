@@ -39,9 +39,14 @@ class med2image(Plugin1In1Out):
         # execute med2image.py on all MRI volumes within the input tree
         cmds = []
         for inFile, outFileName in itertools.izip(self.inputFilePaths, self.outputFileNames):
-          cmd = 'cd '  + options.output  + '; med2image.py -i ' + inFile + \
-                ' -s ' + options.slices  +                                \
-                ' -d ' + os.path.join(self.tempdir,outFileName)  + ' -o ' + outFileName
+          cmd = 'export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':$PATH; ' + \
+                'cd '  + options.output  + '; ' + \
+                'med2image.py -i ' + inFile + \
+                            ' -s ' + options.slices  + \
+                            ' -d ' + os.path.join(self.tempdir,outFileName)  + \
+                            ' -o ' + outFileName
+          if options.reslice:
+              cmd += ' -r'
           cmds.append(cmd)
         print(cmds)
         userErrorStr = 'med2image.py could not convert file in dir %s' % self.tempdir
@@ -65,4 +70,6 @@ if __name__ == "__main__":
                           dest='extensions', default='dcm,nii', help='input extensions to parse (comma separated)')
     plugin.add_parameter('(Advanced) slice to convert', Plugin.STRING, '--sliceToConvert', action='store',
                           dest='slices', default='-1', help='"-1" converts all slices, "m" converts only middle slice')
+    plugin.add_parameter('(Advanced) reslice in all dimensions', Plugin.BOOLEAN, '--reslice', action='store_true',
+                          dest='reslice', default=True, help='if selected, reslice data along all dimensions (3D data only)')
     plugin.launch()
