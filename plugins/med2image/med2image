@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+#
+#                                                            _
+# med2image
+#
+# (c) 2015 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+from plugin import Plugin
+# import the Plugin1In1Out base class that implements the 1-input-1-output execution model 
+from plugin1in1out import Plugin1In1Out
+#import utilities
+import itertools
+
+
+class med2image(Plugin1In1Out):
+    '''
+    '''
+    Plugin.AUTHORS          = 'FNNDSC (dev@babyMRI.org)'
+    Plugin.TITLE            = 'FNNDSC med2image'
+    Plugin.CATEGORY         = 'Visualization'
+    Plugin.DESCRIPTION      = 'Convert a DICOM or NIfTI to jpg or png'
+    Plugin.DOCUMENTATION    = 'http://wiki'
+    Plugin.LICENSE          = 'Opensource (MIT)'
+    Plugin.VERSION          = '0.1'
+
+    def run(self):
+        options = self.options
+        # create temp dir and migrate data
+        self.copyDataToTempDir()
+        # execute med2image.py on all MRI volumes within the input tree
+        cmds = []
+        for inFile, outFileName in itertools.izip(self.inputFilePaths, self.outputFileNames):
+          cmd = 'cd '  + options.output  + '; med2image.py -i ' + inFile + \
+                ' -s ' + options.slices  +                                \
+                ' -d ' + os.path.join(self.tempdir,outFileName)  + ' -o ' + outFileName
+          cmds.append(cmd)
+        print(cmds)
+        userErrorStr = 'med2image.py could not convert file in dir %s' % self.tempdir
+        self.execCmd(cmds, userErrorStr)
+        # remove temp dir
+        #self.removeTempDir()
+
+
+# ENTRYPOINT
+if __name__ == "__main__":
+    plugin = med2image()
+
+    # list the inputs
+    plugin.inputs = "--input"
+
+    plugin.add_parameter('Input', Plugin.IMAGE, '--input', action='store', dest='input',
+                          help='the image to convert')
+    plugin.add_parameter('Output', Plugin.STRING, '--format', action='store', dest='format',
+                          default='jpg', help='the format to convert to (defined by extension)')
+    plugin.add_parameter('(Advanced) extensions', Plugin.STRING, '--extensions', action='store',
+                          dest='extensions', default='dcm,nii', help='input extensions to parse (comma separated)')
+    plugin.add_parameter('(Advanced) slice to convert', Plugin.STRING, '--sliceToConvert', action='store',
+                          dest='slices', default='-1', help='"-1" converts all slices, "m" converts only middle slice')
+    plugin.launch()
