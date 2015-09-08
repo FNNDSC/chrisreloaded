@@ -312,10 +312,25 @@ _CHRIS_INTERACTIVE_PLUGIN_.advancedCaching = function(data, i) {
     study.PerformedStationAETitle
         .push((typeof(data[0].PerformedStationAETitle) == "undefined" || data[0].PerformedStationAETitle[index] == null) ? "nvp"
             : data[0].PerformedStationAETitle[index]);
+    if(data[1].NumberOfSeriesRelatedInstances && data[1].NumberOfSeriesRelatedInstances[i] != "nvp"){
+      study.NumberOfSeriesRelatedInstances.push(data[1].NumberOfSeriesRelatedInstances[i]);
+    }
+    else if(data[1].InstanceNumber && data[1].InstanceNumber[i]){
+      study.NumberOfSeriesRelatedInstances.push(data[1].InstanceNumber[i]);
+    }
+    else{
+      study.RetrieveAETitle.push("nvp");
+    }
+
     study.NumberOfSeriesRelatedInstances
         .push(data[1].NumberOfSeriesRelatedInstances[i]);
     study.QueryRetrieveLevel.push(data[1].QueryRetrieveLevel[i]);
-    study.RetrieveAETitle.push(data[1].RetrieveAETitle[i]);
+    if(data[1].RetrieveAETitle && data[1].RetrieveAETitle[i] ){
+      study.RetrieveAETitle.push(data[1].RetrieveAETitle[i]);
+    }
+    else{
+      study.RetrieveAETitle.push("nvp");
+    }
     study.Status.push(false);
   }
 }
@@ -350,7 +365,15 @@ _CHRIS_INTERACTIVE_PLUGIN_.advancedFormat = function(data, i) {
   sub.push(((typeof(data[0].PerformedStationAETitle) == "undefined" || data[0].PerformedStationAETitle[index] == null) ? "nvp"
       : data[0].PerformedStationAETitle[index]).replace(/\>/g, "&gt").replace(
       /\</g, "&lt"));
-  sub.push(data[1].NumberOfSeriesRelatedInstances[i]);
+    if(data[1].NumberOfSeriesRelatedInstances && data[1].NumberOfSeriesRelatedInstances[i] != "nvp"){
+      sub.push(data[1].NumberOfSeriesRelatedInstances[i]);
+    }
+    else if(data[1].InstanceNumber && data[1].InstanceNumber[i]){
+      sub.push(data[1].InstanceNumber[i]);
+    }
+    else{
+      sub.push("nvp");
+    }
   // update download icon based on its status
   var status = 0;
   var cached_study = stuid in _CHRIS_INTERACTIVE_PLUGIN_.cachedSeries;

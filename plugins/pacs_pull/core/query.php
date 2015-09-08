@@ -224,6 +224,7 @@ $study_parameter['PerformedStationAETitle'] = '';
 // create series filters
 $series_parameter = Array();
 $series_parameter['NumberOfSeriesRelatedInstances'] = '';
+$series_parameter['InstanceNumber'] = '';
 $series_parameter['SeriesDescription'] = '';
 
 // run query

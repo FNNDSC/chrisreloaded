@@ -154,6 +154,7 @@ $series_parameter['SeriesInstanceUID'] = $series_uid;
 $series_parameter['SeriesDescription'] = '';
 $series_parameter['StudyDescription'] = '';
 $series_parameter['NumberOfSeriesRelatedInstances'] = '';
+$series_parameter['InstanceNumber'] = '';
 $series_parameter['Modality'] = $modality;
 $results = $pacs->queryAll($study_parameter, $series_parameter, null);
 
@@ -261,7 +262,15 @@ if(count($dataResult['Data']) == 0)
 // add data and get its id
 $dataObject = new Data();
 $dataObject->uid = $value;
-$dataObject->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
+if($results[1]['NumberOfSeriesRelatedInstances'][$key] != "nvp"){
+  $dataObject->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
+}
+else if($results[1]['InstanceNumber'][$key]){
+  $dataObject->nb_files = $results[1]['InstanceNumber'][$key];
+}
+else{
+  $dataObject->nb_files = 1;
+}
 $dataObject->description = sanitize($results[1]['SeriesDescription'][$key]);
 $dataObject->plugin = 'pacs_pull';
 $data_chris_id = Mapper::add($dataObject);
@@ -276,7 +285,15 @@ $addDataLog .= 'Data exists...'.PHP_EOL;
 // always update nb of files for safety (sometimes the pacs returns smaller number of file...)
 // if no nb_files provided, update this field in db
 //if($dataResult['Data'][0]->nb_files == 0 && $results[1]['NumberOfSeriesRelatedInstances'][$key] > 0){
-$dataResult['Data'][0]->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
+if($results[1]['NumberOfSeriesRelatedInstances'][$key] != "nvp"){
+  $dataResult['Data'][0]->nb_files = $results[1]['NumberOfSeriesRelatedInstances'][$key];
+}
+else if($results[1]['InstanceNumber'][$key]){
+  $dataResult['Data'][0]->nb_files = $results[1]['InstanceNumber'][$key];
+}
+else{
+  $dataResult['Data'][0]->nb_files = 1;
+}
 // Update database and get object
 Mapper::update($dataResult['Data'][0], $data_chris_id);
 $addDataLog .= 'Update data number of files...'.PHP_EOL;
