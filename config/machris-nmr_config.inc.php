@@ -318,7 +318,7 @@ define('CHRIS_USERS_CONFIG_SSHKEY', 'id_rsa');
  * The main use case is if a plugins requires something that the cluster doesn't
  * provide, i.e. php5.
  */
-define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push,findsession');
+define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push,findsession,med2image');
 
 
 // --------------------------------------------------------------------------
