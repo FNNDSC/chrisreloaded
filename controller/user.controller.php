@@ -174,11 +174,12 @@ class UserC implements UserControllerInterface {
     // create user directory within Chris (if does't exist)
     if(!file_exists($user_config_path)){
       mkdir($user_config_path, 0777, true);      
-    }
 
-    // make sure user's directory is open enough
-    chmod($user_path, 0777);      
-    chmod($user_config_path, 0777);      
+      // make sure user's directory is open enough
+      // so user can modify its configuration even if not part of chris group
+      chmod($user_path, 0777);      
+      chmod($user_config_path, 0777);      
+    }
 
     // add default configuration file  (if does't exist)
     $user_config_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_FILE);
