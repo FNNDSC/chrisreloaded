@@ -289,8 +289,8 @@ class RemoteRunner extends Runner{
 
     $envfile = joinPaths($this->path, '_chrisRun_', 'chris.env');
 
-    $this->ssh->exec(bash('echo "export ENV_REMOTEHOST='.$this->remoteHost.'" >>  '.$envfile));
-    $this->ssh->exec(bash('echo "export ENV_REMOTEUSER='.$this->remoteUser.'" >>  '.$envfile));
+    shell_exec('echo "export ENV_REMOTEHOST='.$this->remoteHost.'" >>  '.$envfile);
+    shell_exec('echo "export ENV_REMOTEUSER='. CHRIS_USERNAME .'" >>  '.$envfile);
   }
 
   public function run(){
@@ -301,9 +301,12 @@ class RemoteRunner extends Runner{
     $tunnel_host = $this->remoteHost;
 
     $crunWrap = joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'lib/_common/crun.py');
-    $crunWrap = $crunWrap . ' -u ' . $this->username . ' --out ' . $this->runtimePath . '/_chrisRun_ --err '. $this->runtimePath . '/_chrisRun_ --host ' . $tunnel_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $this->runtimePath . '/_chrisRun_';
-    $cmd = 'nohup /bin/bash -c " source ' . $envfile . ' && ' . $crunWrap . ' -c \'\\\'\' /bin/bash ' . $runfile . ' \'\\\'\' "  </dev/null &>/dev/null &';
-    $pid = $this->remoteSsh->exec(bash($cmd));
+    $crunWrap = $crunWrap . ' -u ' . CHRIS_USERNAME . ' --out ' . $this->runtimePath . '/_chrisRun_ --err '. $this->runtimePath . '/_chrisRun_ --host ' . $tunnel_host . ' -s ' . CLUSTER_TYPE . ' --saveJobID ' . $this->runtimePath . '/_chrisRun_';
+    shell_exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/chris.schedule.run');
+    shell_exec('echo "source ' . $envfile . ';" >> '.$this->path.'/_chrisRun_/chris.schedule.run');
+    shell_exec('echo "' . $crunWrap . ' -c \' /bin/bash ' . $runfile . '\';" >> '.$this->path.'/_chrisRun_/chris.schedule.run');
+    //error_log('ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' nohup /bin/bash ' . $this->path.'/_chrisRun_/chris.schedule.run'  . ' </dev/null &>/dev/null & \'');
+    $pid = shell_exec('ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' nohup /bin/bash ' . $this->path.'/_chrisRun_/chris.schedule.run'  . ' </dev/null &>/dev/null & \'');
   }
 }
 
@@ -527,7 +530,7 @@ class SharedRunner extends RemoteRunner{
     $runfile = joinPaths($this->path, '_chrisRun_', 'chris.run');
 
     $viewer_plugin = CHRIS_PLUGINS_FOLDER.'/viewer/viewer';
-    $this->ssh->exec("echo $viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
+    shell_exec("echo '$viewer_plugin --directory $this->path --output $this->path/..;' >> $runfile;");
 
     if (CLUSTER_TO_SERVER_PORT==22) {
       $tunnel_host = CLUSTER_TO_SERVER_HOST;
@@ -541,16 +544,16 @@ class SharedRunner extends RemoteRunner{
     // prepend
     $startToken = TokenC::create();
     // create curlA.sh
-    $this->ssh->exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curlA.run');
-    $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=1&token='.$startToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlA.std 2> '.$this->path.'/_chrisRun_/curlA.err" >> '.$this->path.'/_chrisRun_/curlA.run');
-    $this->ssh->exec("sed -i '1i ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p " .CLUSTER_TO_SERVER_PORT. " $this->username@$tunnel_host \"bash $this->path/_chrisRun_/curlA.run\"' $runfile;");
+    shell_exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curlA.run');
+    shell_exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=1&token='.$startToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlA.std 2> '.$this->path.'/_chrisRun_/curlA.err" >> '.$this->path.'/_chrisRun_/curlA.run');
+    shell_exec("sed -i '1i ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p " .CLUSTER_TO_SERVER_PORT. " " . CHRIS_USERNAME . "@$tunnel_host \"bash $this->path/_chrisRun_/curlA.run\"' $runfile;");
 
     // append
     // we need sudo su to run it at the right location after the data has been copied back
     $endToken = TokenC::create();
-    $this->ssh->exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curlB.run');
-    $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err" >> '.$this->path.'/_chrisRun_/curlB.run');
-    $this->ssh->exec("echo 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p " .CLUSTER_TO_SERVER_PORT. " $this->username@$tunnel_host \"bash $this->path/_chrisRun_/curlB.run\"' >> $runfile;");
+    shell_exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curlB.run');
+    shell_exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err" >> '.$this->path.'/_chrisRun_/curlB.run');
+    shell_exec("echo 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p " .CLUSTER_TO_SERVER_PORT. " " . CHRIS_USERNAME . "@$tunnel_host \"bash $this->path/_chrisRun_/curlB.run\"' >> $runfile;");
   } 
 }
 
