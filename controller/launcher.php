@@ -355,9 +355,12 @@ switch($jobType){
 
     $separatedRun->remoteHost = trim($separatedRun->remoteSsh->exec('hostname -s 2>/dev/null | tail -n 1'));
     $separatedRun->remoteUser = $username;
+    if(CHRIS_CLUSTER_USER != "self"){
+      $separatedRun->remoteUser = CHRIS_CLUSTER_USER;
+    }
     $separatedRun->username = $username;
     $separatedRun->path = $job_path;
-    $runtimePath = str_replace($plugin_path, CLUSTER_CHRIS.'/users/'.$username, $job_path);
+    $runtimePath = str_replace($plugin_path, CLUSTER_CHRIS_RUN.'/'.$username, $job_path);
     $separatedRun->runtimePath = $runtimePath;
     $separatedRun->pluginCommandArray = $plugin_command_array;
     $separatedRun->feedId = $feed_id;
