@@ -114,7 +114,11 @@ class UserC implements UserControllerInterface {
 
       // the user credentials are valid on the cluster!
       // setup cluster home directory if needed
-      $userHomeDir = self::setupClusterDir($sshCluster);
+      $userHomeDir = "";
+      if(CHRIS_CLUSTER_USER == "self"){
+        // set up passwordless ssh...
+        $userHomeDir = self::setupClusterDir($sshCluster);
+      }
 
       $sshLocal = new Net_SSH2('localhost');
       if ($sshLocal->login($username, $password)) {
@@ -154,29 +158,31 @@ class UserC implements UserControllerInterface {
         // setup server directories if needed
         self::setupServerDir($username, $sshLocal);
 
-        //we need to create a new connection object because using the already
-        //created $sshCluster doesn't work, maybe its connection times out
-        $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-        $sshCluster->login($username, $password);
+        if($userHomeDir != ""){
+          //we need to create a new connection object because using the already
+          //created $sshCluster doesn't work, maybe its connection times out
+          $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+          $sshCluster->login($username, $password);
 
-        // compress .ssh dir
-        $sshCluster->exec(bash('cd '.$userHomeDir.'; tar -zcf ssh.tar.gz .ssh;'));
+          // compress .ssh dir
+          $sshCluster->exec(bash('cd '.$userHomeDir.'; tar -zcf ssh.tar.gz .ssh;'));
 
-        // copy over the compressed file to the local server,
-        $scp = new Net_SCP($sshCluster);
-        $data = $scp->get($userHomeDir.'/ssh.tar.gz');
-        $scp = new Net_SCP($sshLocal);
-        $scp->put($userHomeDir.'/ssh.tar.gz', $data);
+          // copy over the compressed file to the local server,
+          $scp = new Net_SCP($sshCluster);
+          $data = $scp->get($userHomeDir.'/ssh.tar.gz');
+          $scp = new Net_SCP($sshLocal);
+          $scp->put($userHomeDir.'/ssh.tar.gz', $data);
 
-        // uncompress and remove ssh.tar.gz on the local server
-        $sshLocal->exec(bash('cd '.$userHomeDir.'; tar -zxf ssh.tar.gz;'));
-        $sshLocal->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz;'));
+          // uncompress and remove ssh.tar.gz on the local server
+          $sshLocal->exec(bash('cd '.$userHomeDir.'; tar -zxf ssh.tar.gz;'));
+          $sshLocal->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz;'));
 
-        // remove ssh.tar.gz from the cluster
-        $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-        $sshCluster->login($username, $password);
-        if (remoteFileExists($sshCluster, $userHomeDir.'/ssh.tar.gz')) {
-          $sshCluster->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz &'));
+          // remove ssh.tar.gz from the cluster
+          $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+          $sshCluster->login($username, $password);
+          if (remoteFileExists($sshCluster, $userHomeDir.'/ssh.tar.gz')) {
+            $sshCluster->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz &'));
+          }
         }
 
       } else {
