@@ -436,7 +436,7 @@ class SeparatedRunner extends RemoteRunner{
     // SHOULD WE CALL THAT FROM CHRIS>RUN OR BEFORE SCHEDULING THE JOB?
     // might not be able to sudo su from CHRIS_CLUSTER_USER to $username
     //ANONYMIZATION
-    if (!ANONYMIZE_DICOM) {
+    if (ANONYMIZE_DICOM) {
       $anonfile = joinPaths($this->path, '_chrisRun_', 'chris.anon');
       // copy template over
       $this->ssh->exec("cp ".joinPaths(CHRIS_HOME, CHRIS_SRC, "controller/anonymize.php")." $anonfile");
@@ -448,20 +448,29 @@ class SeparatedRunner extends RemoteRunner{
       $chris_bin_escaped  = str_replace("/", "\/", $chris_bin);
       $this->ssh->exec("sed -i 's/\${CHRIS_BIN}/$chris_bin_escaped/g' $anonfile");
 
+      $chris_freesurfer_escaped = str_replace("/", "\/", CHRIS_ENV_FREESURFER);
+      $this->ssh->exec("sed -i 's/\${CHRIS_FREESURFER}/$chris_freesurfer_escaped/g' $anonfile");
+
       $chris_scripts = joinPaths(CHRIS_HOME, "src", "scripts");
       $chris_scripts_escaped  = str_replace("/", "\/", $chris_scripts);
       $this->ssh->exec("sed -i 's/\${CHRIS_SCRIPTS}/$chris_scripts_escaped/g' $anonfile");
 
       $this->ssh->exec('chmod 755 '.$anonfile);
-      $cmd = '\"';
-      if(CHRIS_CLUSTER_USER != "self" && CLUSTER_SHARED_FS == false){
-        $cmd .= 'sudo su '.$this->username.';';
+      $cmd = '';
+
+      if(CHRIS_CLUSTER_USER != "self"){
+        $cmd .= 'sudo su '.$this->username.' -c \'';
       }
-      $envfile = joinPaths($this->path, '_chrisRun_', 'chris.env');
-      $cmd .= 'source '.$envfile.';';
+
       $cmd .= 'php '.$anonfile.';';
-      $cmd .= '\"';
-      $cmd = 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p ' .CLUSTER_TO_SERVER_PORT. ' ' . $this->remoteUser.'@'.$tunnel_host . ' '.$cmd.'  >> ' .$this->runtimePath.'/_chrisRun_/chris.std 2> ' .$this->runtimePath. '/_chrisRun_/chris.err';
+
+      if(CHRIS_CLUSTER_USER != "self"){
+        $cmd .= '\'';
+      }
+
+      $cmd = "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p " .CLUSTER_TO_SERVER_PORT. " $this->remoteUser@$tunnel_host \"$cmd\"  >> $this->runtimePath/_chrisRun_/chris.std 2> $this->runtimePath/_chrisRun_/chris.err";
+      $cmd = "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p " .CLUSTER_TO_SERVER_PORT. " $this->remoteUser@$tunnel_host ' sudo su ".$this->username." -c \\\"php $anonfile\\\"'";
+      error_log($cmd);
       $runfile_str = $cmd.PHP_EOL.$runfile_str;
     }
 
