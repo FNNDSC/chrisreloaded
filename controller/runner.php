@@ -176,9 +176,9 @@ class ServerRunner extends Runner{
     $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
 
     $command = "umask 0002;/bin/bash $runfile;";
-    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
-    $this->ssh->exec($nohup_wrap);
-    $this->pid = -1;
+    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1& printf $!\'';
+    $this->pid = $this->ssh->exec($nohup_wrap);
+    $this->ssh->exec('echo ' . $this->pid . ' > '.$this->path.'/_chrisRun_/' . $this->pid  . '.immediate.joblist');
   }
 
 }
@@ -246,9 +246,9 @@ class LocalRunner extends ServerRunner{
     $runfile = joinPaths($this->runtimePath, '_chrisRun_', 'chris.run');
 
     $command = "umask 0002;/bin/bash $runfile;";
-    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1 &\'';
-    shell_exec($nohup_wrap);
-    $this->pid = -1;
+    $nohup_wrap = 'bash -c \'nohup bash -c "'.$command.'" > /dev/null 2>&1& printf $!;\'';
+    $this->pid = shell_exec($nohup_wrap);
+    $this->ssh->exec('echo ' . $this->pid . ' > '.$this->path.'/_chrisRun_/' . $this->pid  . '.local.joblist');
   }
 
 }
