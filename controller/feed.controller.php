@@ -731,13 +731,51 @@ class FeedC implements FeedControllerInterface {
     // check if feed status is running
     $feedResult = Mapper::getStatic('Feed', $id);
 
+    // else other delete
     if($feedResult['Feed'][0]->status != 100) {
-
-      // job is running or queued
+      // get user information
       $userMapper = new Mapper('User');
       $userMapper->filter('user.id = (?)', $feedResult['Feed'][0]->user_id);
       $userResult = $userMapper->get();
       $username = $userResult['User'][0]->username;
+
+      // check if feed is local or running on the cluster
+      // if immediate as user
+      $user_path = joinPaths(CHRIS_USERS, $username);
+      $plugin_path = joinPaths($user_path, $feedResult['Feed'][0]->plugin);
+      $feed_path = joinPaths($plugin_path, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
+
+      // immediate & local are there....
+      $immediate = shell_exec('find ' . $feed_path . ' -maxdepth 3 -type f -name \'*.immediate.joblist\'');
+      $immediatePIDs = explode("\n",trim($immediate));
+
+      // if local as chris
+      $local = shell_exec('find ' . $feed_path . ' -maxdepth 3 -type f -name \'*.local.joblist\'');
+      $localPIDs = explode("\n",trim($local));
+
+      // kill all server jobs
+      $serverPIDs = array_merge($immediatePIDs, $localPIDs);
+      foreach ($serverPIDs as $pidFile) {
+        if($pidFile != ''){
+          $pid = explode('.', basename($pidFile))[0];
+          // we kill the first child pid
+          shell_exec('sudo pkill -P $(ps -o pid --no-headers --ppid ' . $pid . ')');
+        }
+      }
+
+      // if separated
+
+      // if single BEU
+      // just change remoteUser
+
+      // if shared FS
+
+      error_log($feedResult['Feed'][0]);
+      // if *.local.joblist or *.immediate.joblist
+
+      // if local, sudo kill -9 pid
+
+      // job is running or queued
       $cluster_kill_command = 'export PYTHONPATH='.joinPaths(CLUSTER_CHRIS, 'lib', 'py'). ';';
       $cluster_kill_command = $cluster_kill_command . joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'lib/_common/crun.py');
       $cluster_kill_command = $cluster_kill_command . ' -u ' . $username . ' --host ' . SERVER_TO_CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
