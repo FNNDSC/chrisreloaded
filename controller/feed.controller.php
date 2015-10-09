@@ -763,30 +763,46 @@ class FeedC implements FeedControllerInterface {
         }
       }
 
-      // if separated
-
-      // if single BEU
-      // just change remoteUser
-
-      // if shared FS
-
-      error_log($feedResult['Feed'][0]);
-      // if *.local.joblist or *.immediate.joblist
-
-      // if local, sudo kill -9 pid
+      // remote user
+      $remoteUser = $username;
+      if(CHRIS_CLUSTER_USER != "self" && CLUSTER_SHARED_FS == false){
+        $remoteUser = CHRIS_CLUSTER_USER;
+      }
 
       // job is running or queued
       $cluster_kill_command = 'export PYTHONPATH='.joinPaths(CLUSTER_CHRIS, 'lib', 'py'). ';';
       $cluster_kill_command = $cluster_kill_command . joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'lib/_common/crun.py');
-      $cluster_kill_command = $cluster_kill_command . ' -u ' . $username . ' --host ' . SERVER_TO_CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
-      $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
-      $dirRoot = joinPaths($cluster_user_path, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
-      $dataDir = explode("\n",trim($ssh_connection->exec('ls ' . $dirRoot)));
+      $cluster_kill_command = $cluster_kill_command . ' -u ' . $remoteUser . ' --host ' . SERVER_TO_CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
+      $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username, $feedResult['Feed'][0]->plugin);
+      if(CHRIS_CLUSTER_USER != "self" && CLUSTER_SHARED_FS == false){
+        $cluster_user_path = joinPaths(CLUSTER_CHRIS_RUN, $username);
+      }
+      $dirRoot = joinPaths($cluster_user_path, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
+      $cmd = 'ls ' . $dirRoot; 
+      $dataDir = null;
+      if(CHRIS_CLUSTER_USER != "self" && CLUSTER_SHARED_FS == false){
+        $dataDir = explode("\n",trim(shell_exec('sudo su '.CHRIS_CLUSTER_USER.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $cmd .' \'"')));
+      }else{
+        $dataDir = explode("\n",trim($ssh_connection->exec($cmd)));
+      }
+
       foreach ($dataDir as $dir) {
         $chrisRunPath = joinPaths($dirRoot, $dir, '_chrisRun_');
-        $jobIdFiles = explode("\n",trim($ssh_connection->exec('ls ' . $chrisRunPath . ' | grep .crun.joblist')));
+        $grepCmd = 'ls ' . $chrisRunPath . ' | grep .crun.joblist';
+        $jobIdFiles = null;
+        if(CHRIS_CLUSTER_USER != "self" && CLUSTER_SHARED_FS == false){
+          $jobIdFiles = explode("\n",trim(shell_exec('sudo su '.CHRIS_CLUSTER_USER.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $grepCmd .' \'"')));
+        }else{
+          $jobIdFiles = explode("\n",trim($ssh_connection->exec($grepCmd)));
+        }
+
         foreach ($jobIdFiles as $f) {
-          $ssh_connection->exec($cluster_kill_command . joinPaths($chrisRunPath, $f));
+          $killCmd = $cluster_kill_command . joinPaths($chrisRunPath, $f);
+          if(CHRIS_CLUSTER_USER != "self" && CLUSTER_SHARED_FS == false){
+            shell_exec('sudo su '.CHRIS_CLUSTER_USER.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $killCmd .' \'"');
+          }else{
+            $ssh_connection->exec($killCmd);
+          }
         }
       }
 
