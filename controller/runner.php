@@ -301,16 +301,19 @@ class RemoteRunner extends Runner{
     $this->ssh->exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/chris.schedule.run');
     $this->ssh->exec('echo "source ' . $envfile . ';" >> '.$this->path.'/_chrisRun_/chris.schedule.run');
     $this->ssh->exec('echo "' . $crunWrap . ' -c \' /bin/bash ' . $runfile . '\';" >> '.$this->path.'/_chrisRun_/chris.schedule.run');
+    $this->ssh->exec('chmod 755 '.$this->path.'/_chrisRun_/chris.schedule.run');
   
   }
   public function run(){
 
-    $cmd = 'nohup /bin/bash ' . $this->path.'/_chrisRun_/chris.schedule.run'  . ' </dev/null &>/dev/null &';
-   
     $pid = -1;
+    
     if(CHRIS_CLUSTER_USER != "self" && CLUSTER_SHARED_FS == false){
+      $cmd = 'nohup /bin/bash ' . $this->runtimePath.'/_chrisRun_/chris.schedule.run'  . ' </dev/null &>/dev/null &';
       $pid = shell_exec('sudo su '.CHRIS_CLUSTER_USER.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $cmd .' \'"');
+      error_log('sudo su '.CHRIS_CLUSTER_USER.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $cmd .' \'"');
     }else{
+      $cmd = 'nohup /bin/bash ' . $this->path.'/_chrisRun_/chris.schedule.run'  . ' </dev/null &>/dev/null &';
       $pid = $this->remoteSsh->exec($cmd);
     }
   }
@@ -500,6 +503,7 @@ class SeparatedRunner extends RemoteRunner{
     // create curlA.sh
     $this->ssh->exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curl.start.run');
     $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=1&token='.$startToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curl.start.std 2> '.$this->path.'/_chrisRun_/curl.start.err" >> '.$this->path.'/_chrisRun_/curl.start.run');
+    $this->ssh->exec('chmod 755 >> '.$this->path.'/_chrisRun_/curl.start.run');
     $tmpcmd = "";
     if(CHRIS_CLUSTER_USER == "self"){
       $tmpcmd = '\" bash '.$this->path.'/_chrisRun_/curl.start.run;\"';
@@ -514,6 +518,7 @@ class SeparatedRunner extends RemoteRunner{
     $endToken = TokenC::create();
     $this->ssh->exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curl.stop.run');
     $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curl.stop.std 2> '.$this->path.'/_chrisRun_/curl.stop.err" >> '.$this->path.'/_chrisRun_/curl.stop.run');
+    $this->ssh->exec('chmod 755 >> '.$this->path.'/_chrisRun_/curl.stop.run');
     $tmpcmd = "";
     if(CHRIS_CLUSTER_USER == "self"){
       $tmpcmd = '\" bash '.$this->path.'/_chrisRun_/curl.stop.run;\"';
@@ -546,6 +551,7 @@ class SeparatedRunner extends RemoteRunner{
     $this->ssh->exec('echo "#!/bin/bash" > '.$preparefile);
     $this->ssh->exec('echo "ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \'umask 022; mkdir -p '.$chrisRun.'\'" >> '.$preparefile);
     $this->ssh->exec('echo "ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \'scp -P '.CLUSTER_TO_SERVER_PORT.' '. CLUSTER_TO_SERVER_HOST.':'.$chrisRunFiles.' '.$chrisRun.'\'" >> '.$preparefile);
+    $this->ssh->exec('chmod 755 '.$preparefile);
     
     // append how we will run this script
     $this->ssh->exec('echo -e "\n\n#\n# shell_exec\n# sudo su '.$this->remoteUser.' -c \"bash '.$preparefile.'\"\n#" >> '.$preparefile);
