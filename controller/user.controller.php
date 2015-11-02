@@ -108,10 +108,11 @@ class UserC implements UserControllerInterface {
   static public function login($username, $password) {
 
     if (!isset($username) || !isset($password)) return -1;
-
+    error_log('ssh to cluster');
+    error_log(SERVER_TO_CLUSTER_HOST);
     $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
     if ($sshCluster->login($username, $password)) {
-
+      error_log('logged in!');
       // the user credentials are valid on the cluster!
       // setup cluster home directory if needed
       $userHomeDir = "";
