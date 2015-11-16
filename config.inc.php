@@ -204,7 +204,7 @@ define('SQL_HOST', 'brain.chpc.ac.za');
  * This is the name of user we use to interact with the ChRIS database.
  * This user must have privileges on the target database.
  */
-define('SQL_USERNAME', 'chris');
+define('SQL_USERNAME', 'toor');
 /**
  * The SQL User password.
  */

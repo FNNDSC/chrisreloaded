@@ -183,9 +183,9 @@ if ($commandline_mode) {
 // TEST SSH CONNECTION TO LOCAL SERVER!
 //
 
-$sshLocal = new Net_SSH2('localhost');
-if (!$sshLocal->login($username, $password)) {
-  die('Server login Failed');
+$sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+if (!$sshCluster->login($username, $password)) {
+  die('Cluster login Failed');
 }
 
 
@@ -226,7 +226,9 @@ $job_path = $feed_path;
 if($jobid != ''){
   $job_path .= '/'.$jobid;
 }
-$job_path_output = createDir($sshLocal, $job_path);
+
+$job_path_output = joinPaths($job_path, '_chrisRun_');//createDir($sshLocal, $job_path);
+shell_exec('sudo su '.$username.' -c "umask 0002; mkdir -p '.$job_path_output.';"');
 
 
 //
@@ -267,12 +269,12 @@ switch($jobType){
     $localRun  = new LocalRunner();
 
     // get all required variables
-    $groupId =  $sshLocal->exec("id -g");
+    $uid = shell_exec('id -g '.$username);
+    $groupId = preg_replace('/\n/', '', $uid);
     $groupId= trim($groupId);
     $runtimePath = str_replace($plugin_path, CHRIS_TMP, $job_path);
 
     // set all variables here!
-    $localRun->ssh = $sshLocal;
     $localRun->path = $job_path;
     $localRun->runtimePath = $runtimePath;
     $localRun->pluginCommandArray = $plugin_command_array;
@@ -297,10 +299,10 @@ switch($jobType){
     $immediateRun  = new ImmediateRunner();
 
     // set all variables here!
-    $immediateRun->ssh = $sshLocal;
     $immediateRun->path = $job_path;
     $immediateRun->runtimePath = $job_path;
     $immediateRun->pluginCommandArray = $plugin_command_array;
+    $immediateRun->username = $username;
 
     // run all steps
     $immediateRun->createEnv();
@@ -316,13 +318,8 @@ switch($jobType){
     $sharedRun  = new SharedRunner();
 
     // set all variables here!
-    $sharedRun->ssh = $sshLocal;
     // remote ssh
-    $sharedRun->remoteSsh = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-    if (!$sharedRun->remoteSsh->login($username, $password)) {
-      die('Cluster login Failed');
-    }
-
+    $sharedRun->remoteSsh = $sshCluster;
     $sharedRun->remoteHost = trim($sharedRun->remoteSsh->exec('hostname -s 2>/dev/null | tail -n 1'));
     $sharedRun->remoteUser = $username;
     $sharedRun->username = $username;
@@ -346,13 +343,8 @@ switch($jobType){
     $separatedRun  = new SeparatedRunner();
 
     // set all variables here!
-    $separatedRun->ssh = $sshLocal;
     // remote ssh
-    $separatedRun->remoteSsh = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-    if (!$separatedRun->remoteSsh->login($username, $password)) {
-      die('Cluster login Failed');
-    }
-
+    $separatedRun->remoteSsh = $sshCluster;
     $separatedRun->remoteHost = trim($separatedRun->remoteSsh->exec('hostname -s 2>/dev/null | tail -n 1'));
     $separatedRun->remoteUser = $username;
     if(CHRIS_CLUSTER_USER != "self"){
