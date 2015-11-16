@@ -59,13 +59,13 @@ define('CHRIS_MAINTENANCE', false);
 /**
  * The chris' host machine.
  */
-define('CHRIS_HOST', 'brain.chpc.ac.za');
+define('CHRIS_HOST', 'cerebri.chpc.ac.za');
 
 /**
  * The user running jobs on the cluster
  * Specify <username> or "self" to run the jobs as the logged in user
  */
- define('CHRIS_CLUSTER_USER', 'rpienaar');
+ define('CHRIS_CLUSTER_USER', 'repiXnar');
 
 /**
  * The chris user home directory.
@@ -74,7 +74,7 @@ define('CHRIS_HOST', 'brain.chpc.ac.za');
  * We also use it in this configuration file as a base directory for all the
  * directories ChRIS relies on, such as 'src', 'users', 'log', etc.
  */
-define('CHRIS_HOME', '/home/toor/');
+define('CHRIS_HOME', '/home/CtFoorx/');
 /**
  * The transfer protocol.
  * We use it to generate the CHRIS_URL.
@@ -198,17 +198,17 @@ define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
  * The SQL Host name.
  * This is the name of the machine hosting the ChRIS database.
  */
-define('SQL_HOST', 'brain.chpc.ac.za');
+define('SQL_HOST', 'cereb.ac.za');
 /**
  * The SQL Username.
  * This is the name of user we use to interact with the ChRIS database.
  * This user must have privileges on the target database.
  */
-define('SQL_USERNAME', 'toor');
+define('SQL_USERNAME', 'torista');
 /**
  * The SQL User password.
  */
-define('SQL_PASSWORD', 'chris1234');
+define('SQL_PASSWORD', 'cricri1234');
 /**
  * The SQL Database.
  * The name of the database which contains all the ChRIS information.
