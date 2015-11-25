@@ -791,11 +791,7 @@ class FeedC implements FeedControllerInterface {
 
         foreach ($jobIdFiles as $f) {
           $killCmd = $cluster_kill_command . joinPaths($chrisRunPath, $f);
-            error_log('$killCmd');
-            error_log($killCmd);
             shell_exec('sudo su '.$remoteUser.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $killCmd .' \'"');
-            $ssh_connection->exec($killCmd);
-            error_log('sudo su '.$remoteUser.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $killCmd .' \'"');
         }
       }
 
