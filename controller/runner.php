@@ -236,7 +236,7 @@ class LocalRunner extends ServerRunner{
       // we need sudo su to run it at the right location after the data has been copied back
       $endToken = TokenC::create();
       $this->ssh->exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curlB.run');
-      $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err" >> '.$this->path.'/_chrisRun_/curlB.run');
+      $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=inc&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err" >> '.$this->path.'/_chrisRun_/curlB.run');
       $this->ssh->exec("echo 'sudo su $this->username -c \"bash $this->path/_chrisRun_/curlB.run\"' >> $runfile;");
     }   
   }
@@ -471,7 +471,7 @@ class SeparatedRunner extends RemoteRunner{
     // we need sudo su to run it at the right location after the data has been copied back
     $endToken = TokenC::create();
     $this->ssh->exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curlB.run');
-    $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err" >> '.$this->path.'/_chrisRun_/curlB.run');
+    $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=inc&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err" >> '.$this->path.'/_chrisRun_/curlB.run');
     $cmd = "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p " .CLUSTER_TO_SERVER_PORT. " $this->username@$tunnel_host 'bash $this->path/_chrisRun_/curlB.run'";
     $runfile_str = $runfile_str.PHP_EOL.$cmd;
 
@@ -544,7 +544,7 @@ class SharedRunner extends RemoteRunner{
     // we need sudo su to run it at the right location after the data has been copied back
     $endToken = TokenC::create();
     $this->ssh->exec('echo "#!/bin/bash" > '.$this->path.'/_chrisRun_/curlB.run');
-    $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=set&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err" >> '.$this->path.'/_chrisRun_/curlB.run');
+    $this->ssh->exec('echo "'.$setStatus.'\'action=set&what=feed_status&feedid='.$this->feedId.'&op=inc&status=+'.$this->statusStep.'&token='.$endToken.'\' '.CHRIS_URL.'/api.php > '.$this->path.'/_chrisRun_/curlB.std 2> '.$this->path.'/_chrisRun_/curlB.err" >> '.$this->path.'/_chrisRun_/curlB.run');
     $this->ssh->exec("echo 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p " .CLUSTER_TO_SERVER_PORT. " $this->username@$tunnel_host \"bash $this->path/_chrisRun_/curlB.run\"' >> $runfile;");
   } 
 }
