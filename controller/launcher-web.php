@@ -59,6 +59,7 @@ if (!SecurityC::login()) {
 }
 
 $status_step = number_format (100 / count($parameters), 2);
+$increment = 1;
 
 foreach($parameters as $k0 => $v0){
 
@@ -192,6 +193,10 @@ foreach($parameters as $k0 => $v0){
     }
   }
 
+  $last = false;
+  if($increment == count($parameters)){
+    $last = true;
+  }
   // The following variables have to be defined to be picked up
   // by launcher.php
   // $command
@@ -203,7 +208,9 @@ foreach($parameters as $k0 => $v0){
   // $memory
   // $status
   // $status_step
+  // $last
   include('launcher.php');
+  $increment++;
 }
 
 ?>

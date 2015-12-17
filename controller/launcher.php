@@ -70,6 +70,7 @@ if ($commandline_mode) {
     "status::", // Optional value
     "statusstep::",
     "memory::", // Optional value
+    "last::", // Optional value
     "help"    // Optional value
   );
 
@@ -160,6 +161,12 @@ if ($commandline_mode) {
   $memory = 2048;
   if (array_key_exists('memory', $options)) {
     $memory = $options['memory'];
+  }
+  
+  // unsilce the ob if last job, if --last is provided, use this value
+  $last = true;
+  if (array_key_exists('last', $options)) {
+    $last = $options['last'];
   }
 
 }
@@ -384,8 +391,9 @@ switch($jobType){
   FeedC::addMeta($feed_id, Array(0 => $metaObject));
 
   // in case the output buffer was silcenced, reactivate it
-  ob_end_clean();
-
+  if($last == true){
+    ob_end_clean();
+  }
   $feedInfo = array(
     "feedId" => $feed_id
   );
