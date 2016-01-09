@@ -166,5 +166,11 @@ class Plugin1In1Out(Plugin):
               misc.file_writeOnce(os.path.join(chrisRunDir, 'ERROR-user-' + outFileName[:ix] + '.err'), userErrStr + ' ' + outFileName)
             rfile.close()
           else:
-            shutil.copyfile(os.path.join(self.tempdir, outFileName), os.path.join(self.options.output, outFileName))
+            src = os.path.join(self.tempdir, outFileName)
+            dst = os.path.join(self.options.output, outFileName)
+            if os.path.isfile(src):
+                shutil.copyfile(src, dst)
+            if os.path.isdir(src):
+                shutil.copytree(src, dst)
+                
             
