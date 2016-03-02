@@ -59,13 +59,13 @@ define('CHRIS_MAINTENANCE', false);
 /**
  * The chris' host machine.
  */
-define('CHRIS_HOST', 'cerebri.chpc.ac.za');
+define('CHRIS_HOST', 'chris.tch.harvard.edu');
 
 /**
- * The user running jobs on the cluster
- * Specify <username> or "self" to run the jobs as the logged in user
- */
- define('CHRIS_CLUSTER_USER', 'repiXnar');
+* The user running jobs on the cluster
+* Specify <username> or "self" to run the jobs as the logged in user
+*/
+define('CHRIS_CLUSTER_USER', 'rudolphpienaar');
 
 /**
  * The chris user home directory.
@@ -74,7 +74,7 @@ define('CHRIS_HOST', 'cerebri.chpc.ac.za');
  * We also use it in this configuration file as a base directory for all the
  * directories ChRIS relies on, such as 'src', 'users', 'log', etc.
  */
-define('CHRIS_HOME', '/home/CtFoorx/');
+define('CHRIS_HOME', '/neuro/users/chris/dev');
 /**
  * The transfer protocol.
  * We use it to generate the CHRIS_URL.
@@ -86,7 +86,7 @@ define('CHRIS_TRANSFER_PROTOCOL', 'http');
  * It is being used in several places, for instance when we want to send a curl
  * request to our ChRIS server, from the cluster where the job is running.
  */
- define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://brain.chpc.ac.za');
+define('CHRIS_URL', CHRIS_TRANSFER_PROTOCOL.'://chris.tch.harvard.edu/nicolas');
 /**
  * The ChRIS mail suffix.
  * When a user logs in for the first time, we assing him an email address.
@@ -107,7 +107,7 @@ define('CHRIS_PLUGIN_EMAIL_FROM', 'plugin@brain.chpc.ac.za');
  * This is the full name of the directory containing the ChRIS source code.
  * This directory contains the index.php file.
  */
-define('CHRIS_SRC', joinPaths('src', 'chrisreloaded'));
+define('CHRIS_SRC', 'nicolas');
 /**
  * The ChRIS data location.
  * This is the full name of the directory containing the ChRIS data.
@@ -198,22 +198,22 @@ define('CHRIS_PLUGINS_FOLDER_RELATIVE', 'plugins');
  * The SQL Host name.
  * This is the name of the machine hosting the ChRIS database.
  */
-define('SQL_HOST', 'cereb.ac.za');
+define('SQL_HOST', 'chris');
 /**
  * The SQL Username.
  * This is the name of user we use to interact with the ChRIS database.
  * This user must have privileges on the target database.
  */
-define('SQL_USERNAME', 'torista');
+define('SQL_USERNAME', 'chris');
 /**
  * The SQL User password.
  */
-define('SQL_PASSWORD', 'cricri1234');
+define('SQL_PASSWORD', 'chris1234');
 /**
  * The SQL Database.
  * The name of the database which contains all the ChRIS information.
  */
-define('SQL_DATABASE', 'chris');
+define('SQL_DATABASE', 'chrisdev');
 
 
 // --------------------------------------------------------------------------
@@ -238,7 +238,7 @@ define('CHRIS_DICOM_EMAIL_FROM', 'dicom@chris.org');
  * The destination AETITLE.
  * The remote machine where the data will be pushed after a pacs_pull retrieval.
  */
-define('DICOM_DESTINATION_AETITLE', 'CHPC');
+define('DICOM_DESTINATION_AETITLE', 'FNNDSC-CHRISDEV');
 /**
  * DCMTK binaries.
  * TODO: It should probably be sitting in the CHRIS/LIBS directory, with the
@@ -334,7 +334,7 @@ define('CHRIS_USERS_CONFIG_DIR', 'config');
  * This is the name of the file containing the user specific configuration.
  * This file is located in the user configuration directory.
  */
-define('CHRIS_USERS_CONFIG_FILE', '.chris.conf');
+define('CHRIS_USERS_CONFIG_FILE', 'configuration');
 /**
  * The user id rsa file.
  * This is a file generated on log in if it doesn't exist.
@@ -370,9 +370,8 @@ define('CHRIS_RUN_AS_CHRIS_LOCAL', 'pacs_pull,search,pacs_push,chris_push,zip');
  * We connect to this machine to schedule jobs on the cluster.
  * This is our *ONLY* way to communicate to the cluster.
  */
-//<<<<<<< Updated upstream
-define('CLUSTER_HOST', 'sun.chpc.ac.za');
-define('SERVER_TO_CLUSTER_HOST', 'sun.chpc.ac.za');
+define('CLUSTER_HOST', 'rc-golden.tch.harvard.edu');
+define('SERVER_TO_CLUSTER_HOST', 'rc-golden.tch.harvard.edu');
 /**
  * The tunnel port through which we connect to the cluster from the chris server.
  * This is by default 22 but if a tunnel is needed and it is set up then change it
@@ -383,13 +382,13 @@ define('SERVER_TO_CLUSTER_PORT', 22);
  * The server head machine.
  * We connect to this machine to scp the data when in a NOT shared FS.
  */
-define('CLUSTER_TO_SERVER_HOST', 'sun.chpc.ac.za');
+define('CLUSTER_TO_SERVER_HOST', 'chris.tch.harvard.edu');
 /**
 * The tunnel port through which we connect to the chris server from the cluster.
 * This is by default 22 but if a tunnel is needed and it is set up then change it
 * to the actual tunnel port.
  */
-define('CLUSTER_TO_SERVER_PORT', 5120);
+define('CLUSTER_TO_SERVER_PORT', 22);
 /**
  * The cluster type.
  * We specify the cluster type in order for crun to know how to handle the
@@ -397,7 +396,7 @@ define('CLUSTER_TO_SERVER_PORT', 5120);
  * Valid cluster types:
  * crun or any of its subclasses
  */
-define('CLUSTER_TYPE', 'crun_hpc_chpc');
+define('CLUSTER_TYPE', 'crun_hpc_mosix');
 /**
  * Set this to true if the cluster shares the file system with the chris server.
  * It will improve performance by exploting the common file system.
@@ -413,10 +412,13 @@ define('ANONYMIZE_DICOM', true);
  * The ChRIS location on the cluster.
  * This is the full name of the cluster's directory containing the ChRIS deployment.
  */
+define('CLUSTER_CHRIS', CHRIS_HOME);
+define('CLUSTER_CHRIS_RUN', joinPaths(CHRIS_HOME, 'run'));
 /**
  * The ChRIS source location in the cluster.
  * This is the full name of the directory containing the ChRIS source code.
  */
+define('CLUSTER_CHRIS_SRC', joinPaths(CLUSTER_CHRIS, 'nicolas'));
 
 // --------------------------------------------------------------------------
 //
@@ -428,13 +430,10 @@ define('ANONYMIZE_DICOM', true);
  * The ChRIS location on the cluster.
  * This is the full name of the cluster's directory containing the ChRIS deployment.
  */
-define('CLUSTER_CHRIS', '/lustre/SCRATCH5/cubic/chris');
 /**
  * The ChRIS source location in the cluster.
  * This is the full name of the directory containing the ChRIS source code.
  */
-define('CLUSTER_CHRIS_SRC', joinPaths(CLUSTER_CHRIS, 'src/chrisreloaded'));
-define('CLUSTER_CHRIS_RUN', joinPaths(CLUSTER_CHRIS, 'run'));
 // --------------------------------------------------------------------------
 //
 // CHRIS ENVIRNOMENT EXTRA SETUP
@@ -447,9 +446,9 @@ define('CLUSTER_CHRIS_RUN', joinPaths(CLUSTER_CHRIS, 'run'));
  * It should only be related to the plugin.py or similar.
  * It shouldn't add any plugin specific library.
  */
-define('CHRIS_ENV_PYTHONPATH', joinPaths(CHRIS_HOME, 'lib', 'pymodules'));
-// for anonymization on separated file systems
-define('CHRIS_ENV_FREESURFER', '/home/chris/packages/scripts/neuro-fs');
+ define('CHRIS_ENV_PYTHONPATH', joinPaths(CHRIS_HOME, 'lib', 'pymodules'));
+ // for anonymization on separated file systems
+ define('CHRIS_ENV_FREESURFER', '/neuro/arch/scripts/neuro-fs');
 
 
 // --------------------------------------------------------------------------
