@@ -1,0 +1,137 @@
+#!/usr/bin/env python
+# _           _ _                            _     _
+#| |         | | |                          | |   | |
+#| | _   ____| | | ___     _ _ _  ___   ____| | _ | |
+#| || \ / _  ) | |/ _ \   | | | |/ _ \ / ___) |/ || |
+#| | | ( (/ /| | | |_| |  | | | | |_| | |   | ( (_| |
+#|_| |_|\____)_|_|\___/    \____|\___/|_|   |_|\____|
+#
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys, time
+
+sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+from plugin import Plugin
+
+sys.path.append( os.path.join(os.path.dirname(__file__), 'libs/pydicom-0.9.8') )
+import dicom, json
+
+class Viewer(Plugin):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  Plugin.TITLE = 'Image Viewer Interactive Plugin'
+  Plugin.CATEGORY = 'Visualization'
+  Plugin.DESCRIPTION = 'Look at your data'
+  Plugin.DOCUMENTATION = 'http://wiki'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.1'
+
+  def run(self):
+
+      options = self.options
+
+      # GENERAL STRUCTURES
+      fibersExt = tuple(['trk'])
+      modelsExt = tuple(['obj', 'vtk', 'stl'])
+      volumesExt = tuple(['mgh', 'mgz', 'nrrd', 'nii', 'nii.gz'])
+      dicomExt = tuple(['dcm', 'ima', 'DCM', 'IMA'])
+
+      indexedData = {}
+      indexedData['fibers'] = []
+      indexedData['mesh'] = []
+      indexedData['volume'] = []
+
+      dcmData = {}
+
+      # if directory is a file, get containing directory
+      if os.path.isdir(options.DIRECTORY):
+          #options.DIRECTORY = os.path.dirname(options.DIRECTORY)
+
+          # NOT BEING USED YET...
+          # create links only if we create a viewer feed
+          if options.LINKS:
+              dirname = os.path.basename(options.DIRECTORY)
+              print dirname
+              if not os.path.exists(os.path.join(options.output, dirname)):
+                  os.symlink(options.DIRECTORY, os.path.join(options.output, dirname))
+
+          for root, dirs, files in os.walk(options.DIRECTORY, topdown=False, followlinks=True):
+            for fileName in files:
+              #make sure file exists first (broken links, etc.)
+              full_path = os.path.join(root, fileName)
+              if os.path.isfile(full_path):
+                if fileName.endswith(fibersExt):
+                  indexedData['fibers'].append({'file':[fileName], 'url':root})
+                elif fileName.endswith(modelsExt):
+                  indexedData['mesh'].append({'file':[fileName], 'url':root})
+                elif fileName.endswith(volumesExt):
+                  indexedData['volume'].append({'file':[fileName], 'url':root})
+                elif fileName.endswith(dicomExt):
+                  # read file
+                  ds = dicom.read_file(full_path)
+                  # index file
+                  if not ds.PatientID in dcmData:
+                    dcmData[ds.PatientID] = {}
+
+                  if not ds.StudyInstanceUID in dcmData[ds.PatientID]:
+                    dcmData[ds.PatientID][ds.StudyInstanceUID] = {}
+
+                  if not ds.SeriesInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID]:
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID] = {}
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'] = []
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['url'] = root
+
+                  if not ds.SOPInstanceUID in dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]:
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID]['file'].append(fileName)
+                    dcmData[ds.PatientID][ds.StudyInstanceUID][ds.SeriesInstanceUID][ds.SOPInstanceUID] = fileName
+
+          # add DCM data to indexed data if any!
+          for patient in dcmData:
+            for study in dcmData[patient]:
+              for series in dcmData[patient][study]:
+                indexedData['volume'].append({'file' : dcmData[patient][study][series]['file'], 'url' : dcmData[patient][study][series]['url']})
+
+          print indexedData
+
+      # it is a file!
+      else:
+          fullFileName = options.DIRECTORY
+          fileName = os.path.basename(fullFileName)
+          root = os.path.dirname(fullFileName)
+          if os.path.isfile(fullFileName):
+            if fileName.endswith(fibersExt):
+              indexedData['fibers'].append({'file':[fileName], 'url':root})
+            elif fileName.endswith(modelsExt):
+              indexedData['mesh'].append({'file':[fileName], 'url':root})
+            elif fileName.endswith(volumesExt):
+              indexedData['volume'].append({'file':[fileName], 'url':root})
+
+      if not options.NOTTOFILE:
+        path = os.path.join(options.output, '.chris.json')
+        f = open(path,'w')
+        f.write(json.dumps(indexedData))
+        f.close()
+      else:
+        print json.dumps(indexedData)
+
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = Viewer()
+
+  # this in an interactive plugin
+  plugin.interactive = True
+
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--directory', action='store', dest='DIRECTORY', default='', help='Directory to be visualized')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', dest='FEEDID', default='', help='Feed ID to be viewed')
+
+  plugin.add_parameter('HIDDEN', Plugin.BOOLEAN, '--nottofile', default=False, action='store_true',dest='NOTTOFILE', help='Cset')
+  plugin.add_parameter('HIDDEN', Plugin.BOOLEAN, '--links', default=False, action='store_true',dest='LINKS', help='Create links for the dataset')
+
+  plugin.launch()

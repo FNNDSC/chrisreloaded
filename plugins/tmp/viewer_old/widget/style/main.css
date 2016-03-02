@@ -1,0 +1,186 @@
+.renderer{
+	display: block;
+	float: left;
+	min-height: 30px;
+	margin-left: 0;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	overflow:hidden;
+}
+
+.largeRenderer{
+	width:100%;
+	height:70%;
+	position:relative;
+}
+
+.smallRenderers{
+	height:30%;
+}
+
+.xSmallRenderer{
+	width: 33%;
+	height:100%;
+}
+
+.smallRenderer{
+	width:34%;
+	height:100%;
+	border-left: 1px solid #FFF;
+	border-right: 1px solid #FFF;
+}
+
+.border-top{
+	height:calc(100% - 1px);
+	border: 1px solid black;
+	border-bottom: none;
+	border-left: none;
+	border-right: none;
+}
+
+.yellow{
+	border-color: yellow;
+}
+
+.red{
+	border-color: red;
+}
+
+.green{
+	border-color: green;
+}
+
+.blue{
+	border-color: blue;
+}
+
+.x-controller {
+	top:10px;
+	right:10px;
+}
+
+.topLeftContainer {
+  padding-top:10px;
+  padding-left:10px;
+}
+
+div > canvas {
+	display: block;
+}
+
+/*Widget containers*/
+.topLeftContainer, .x-controller {
+	position: absolute;
+}
+
+/*COLLABORATE Widget*/
+.collaborate-btn{
+	position: relative;
+	z-index: 1;
+	width:100%;
+}
+
+.collaborate-btn > button {
+  color: #FFF;
+  font-size: 11px;
+	background-color:black;
+  /*background-color: rgb(70, 206, 135);*/
+  border: none;
+	width: 100%;
+	text-align: left;
+}
+
+.collaborate-btn > button.collaborating {
+	background-color: rgb(206, 92, 70);
+}
+
+/*FILESELECT Widget*/
+
+.volumeIcon .fancytree-icon{
+
+	background-image: url('http://www.iconsdb.com/icons/preview/white/brain-xxl.png');
+	background-size: contain;
+
+}
+
+.fibersIcon .fancytree-icon{
+
+	background-image: url('https://kwikom.com/images/misc/leopard-fiber-optic-cable_128x128-2.png');
+	background-size: contain;
+
+}
+
+.meshIcon .fancytree-icon{
+
+	background-image: url('http://cdn-img.easyicon.net/png/55/5501.png');
+	background-size: contain;
+
+}
+
+span.fancytree-node span.fancytree-icon:hover{
+
+	background-position: initial;
+
+}
+
+.bordered {
+  max-width: 350px;
+  margin-bottom: -1px;
+  color: grey;
+  border: 1px solid;
+	margin-top:none;
+	position: relative;
+	z-index: 1;
+	width:100%;
+	font-size: 11px;
+}
+
+.bordered > summary {
+	padding: 1px 6px;
+	color: #FFF;
+	background-color: #000;
+}
+
+.content {
+	border-top: 1px solid;
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.fileselectwidget > ul{
+	margin: 0;
+}
+
+ol, ul {
+	list-style-type: none;
+}
+
+div.interactive_plugin_content {
+	background-color: none;
+}
+
+#fileselect-btn {
+  color: #FFF;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  padding: 5px;
+}
+
+/* select style*/
+.c select {
+  width: initial;
+  border: none;
+  height: initial;
+  line-height: initial;
+  padding: initial;
+  font-size: inherit;
+  font-weight: inherit;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+  margin: inherit;
+  font-size: inherit;
+  vertical-align: inherit;
+}
