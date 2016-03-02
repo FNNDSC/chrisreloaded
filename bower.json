@@ -10,6 +10,7 @@
     "_common": "https://github.com/FNNDSC/_common.git#master",
     "phpseclib": "https://github.com/FNNDSC/phpseclib.git#master",
     "med2image": "https://github.com/FNNDSC/med2image.git#master",
-    "simpletest": "https://github.com/lox/simpletest.git#master"
+    "simpletest": "https://github.com/lox/simpletest.git#master",
+    "mi2b2": "https://github.com/FNNDSC/mi2b2.git#master"
   }
 }

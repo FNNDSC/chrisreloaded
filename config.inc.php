@@ -280,10 +280,10 @@ define('CHRIS_REMOTES', serialize(array(
     "src"  => "/home/chris/src/chrisreloaded")),
 "BCH" => serialize(array(
     "sshhost" => "localhost",
-    "sshport" => "2214",
-    "dicomhost" => "brain.chpc.ac.za",
-    "dicomport" => "10402",
-    "src"  => "/neuro/users/chris/src/chrisreloaded")),
+    "sshport" => "22",
+    "dicomhost" => "pretoria",
+    "dicomport" => "10401",
+    "src"  => "/neuro/users/chris/dev/nicolas")),
 "MGHPCC" => serialize(array(
     "sshhost" => "chris-mghpcc",
     "sshport" => "22",

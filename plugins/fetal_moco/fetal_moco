@@ -1,0 +1,101 @@
+#!/usr/bin/env python
+#
+# Fetal MRI Motion Correction plugin for ChRIS reloaded
+#
+#
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+from plugin import Plugin
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc
+
+class FetalMoco(Plugin):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC (dev@babyMRI.org)'
+  Plugin.TITLE = 'Fetal MRI Motion Correction'
+  Plugin.CATEGORY = 'Registration'
+  Plugin.DESCRIPTION = 'Fetal MRI Motion Correction based on a method by Oxford University'
+  Plugin.DOCUMENTATION = 'http://wiki'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.1'
+
+  def run(self):
+    # we expect a directory as input
+    options = self.options
+    options.ImageDir = self.validate('directory', options.ImageDir, 'nii');
+    #search for the subdirectory where the image files are actually located
+    inputFilePaths = self.getFilePaths(options.ImageDir, ['nii'])
+    if not inputFilePaths:
+      raise IOError("No .nii image file was found under directory " + options.ImageDir)
+    #assume all images are in the same directory (the directory of the first found .nii file)
+    options.ImageDir = os.path.dirname(inputFilePaths[0])
+    fileList = os.listdir(options.ImageDir)
+    if 'mask.nii' not in fileList:
+      misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!: \n' + errStr)
+      errStr = "No mask file 'mask.nii' was found in " + options.ImageDir
+      raise IOError(errStr)
+    fileList.remove('mask.nii')
+    imgList = []
+    templateName = ''
+    for fileName in fileList:
+      #build list of .nii image files and find the template image
+      if os.path.isfile(os.path.join(options.ImageDir, fileName)):
+        if (fileName.lower().find('template') != -1) and fileName.endswith('.nii'):
+          templateName = fileName
+        elif fileName.endswith('.nii'):
+          imgList.append(fileName)
+    if not templateName:
+      errStr = "No template file was found in " + options.ImageDir
+      misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!: \n' + errStr)
+      raise IOError(errStr)
+    #make the template the first image
+    imgList.insert(0, templateName)
+    nImg = len(imgList)
+    cmd = options.FetalMocoDir + '/reconstruction ' + os.path.join(options.output, 'out.nii')
+    cmd += ' ' + unicode(nImg) + ' '
+    for img in imgList:
+      cmd += os.path.join(options.ImageDir, img) + ' '
+    cmd += 'id ' * nImg
+    cmd += '-mask ' + os.path.join(options.ImageDir, 'mask.nii') + ' -thickness '
+    for img in imgList:
+      thick = img[img.rfind('-') + 1 : (len(img)-6)]
+      cmd += thick + ' '
+    cmd += '-debug -packages ' + '1 ' * nImg
+    #create link to input directory
+    if not os.path.islink(os.path.join(options.output, os.path.basename(options.ImageDir))):
+      os.symlink(options.ImageDir, os.path.join(options.output, os.path.basename(options.ImageDir)))
+    #create progress dir for itermediate output files
+    progressDir = os.path.join(options.output, 'progress')
+    if not os.path.exists(progressDir):
+      os.makedirs(progressDir)
+    cmd = 'cd ' + progressDir + ';' + cmd
+    #os.system(cmd)
+    shell = crun.crun()
+    shell.echo(False)
+    shell.waitForChild(True)
+    shell(cmd)
+    str_exitCode = str(shell.exitCode())
+    if str_exitCode != "0":
+      misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
+
+
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = FetalMoco()
+  
+  plugin.inputs = "--imagedir";
+
+  plugin.add_parameter('Input', Plugin.IMAGE, '--imagedir', action='store', dest='ImageDir', help='The images directory')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--fetamocodir', action='store', dest='FetalMocoDir',
+                        default=plugin.envVars['ENV_FETALMOCO_DIR'], help='Moco app directory')
+  plugin.launch()

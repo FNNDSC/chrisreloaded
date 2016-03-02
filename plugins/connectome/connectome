@@ -1,0 +1,196 @@
+#!/usr/bin/env python
+#                                 _                       
+#  ___ ___  _ __  _ __   ___  ___| |_ ___  _ __ ___   ___ 
+# / __/ _ \| '_ \| '_ \ / _ \/ __| __/ _ \| '_ ` _ \ / _ \
+#| (_| (_) | | | | | | |  __/ (__| || (_) | | | | | |  __/
+# \___\___/|_| |_|_| |_|\___|\___|\__\___/|_| |_| |_|\___|
+#                                                         
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+from plugin import Plugin
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
+
+class Connectome(Plugin):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
+  Plugin.TITLE = 'Connectome'
+  Plugin.CATEGORY = 'Diffusion'
+  Plugin.DESCRIPTION = '''
+  Perform a full diffusion MRI processing pipeline, from raw Diffusion/T1/T2 data to multi-resolution connection matrices.<br/>
+  <b>Usage</b><br/>
+  1. Drag and drop a directory containing the diffusion images from the feed panel to the input dti field.<br/>
+  2. Drag and drop a directory containing the structural images from the feed panel to the input t1 field.<br/>
+  3. Tune the parameters.<br/>
+  4. Start the plugin.
+  '''
+  Plugin.DOCUMENTATION = 'https://github.com/FNNDSC/chrisreloaded/wiki/Plugin-connectome'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.1'
+
+  def run(self):
+
+    options = self.options
+    
+    # we expect directories as input
+    options.dti = self.validate('directory', options.dti);
+    options.t1 = self.validate('directory', options.t1);
+    
+    # create/format input directory to fit connectome_meta requierements
+    input_dir = os.path.join(options.output, 'input')
+    # create input directory
+    if not os.path.exists(input_dir):
+      os.makedirs(input_dir)
+    # get dti images
+    dti_files = [d for d in os.listdir(options.dti) if not os.path.isdir(d) and os.path.splitext(d)[1] == ".dcm"]
+    # check incoming dti directory
+    if not len(dti_files) > 0:
+      print options.dti + ' doesn\'t contain any *.dcm files' 
+      sys.exit(0)
+        # link them!
+    for dti_file in dti_files:      
+      # rename
+      os.symlink(os.path.join(options.dti, dti_file), os.path.join(input_dir, dti_file))
+      
+    # get t1 images
+    t1_files = [d for d in os.listdir(options.t1) if not os.path.isdir(d) and os.path.splitext(d)[1] == ".dcm"]
+    # check incoming t1 directory
+    if not len(t1_files) > 0:
+      print options.t1 + ' doesn\'t contain any *.dcm files' 
+      sys.exit(0)
+    # link them!
+    for t1_file in t1_files:
+      os.symlink(os.path.join(options.t1, t1_file), os.path.join(input_dir, t1_file))
+    
+    #base command
+    command = options.ConnectomeMetaScript;
+
+    command += ' --tract-meta-stages 12'
+    
+    # stages
+    if not options.eddy:
+      command += ' -k '
+    
+    #mask1
+    command += ' --m1 ' + options.m1 + ' --m1-lower-threshold ' + options.m1lowerthreshold + ' --m1-upper-threshold ' + options.m1upperthreshold
+    
+    #mask2
+    if options.usem2:
+      command += ' --m2 ' + options.m2 + ' --m2-lower-threshold ' + options.m2lowerthreshold + ' --m2-upper-threshold ' + options.m2upperthreshold
+        
+    #angle threshold
+    command += ' --angle-threshold ' + options.anglethreshold
+    #verbose
+    command += ' -v 10'
+    
+    #recon algo
+    if options.recalgo == '2nd_Order_Runga_Hutta':
+      command += ' -A rk2'
+    elif options.recalgo == 'Interpolated_Streamline':
+      command += ' -A sl'
+    elif options.recalgo == 'Tensorline':
+      command += ' -A tl'
+
+    #image model
+    if options.immodel == 'HARDI':
+      command += ' -I hardi'
+    
+    #gradient image
+    if options.usegradient:
+      command += ' -g ' + options.gradient
+      
+    #b0 value
+    if options.useb0:
+      command += ' -B ' + options.b0
+    
+    #invert gradients
+    if options.invertx:
+      command += ' -X'
+    if options.inverty:
+      command += ' -Y'
+    if options.invertz:
+      command += ' -Z'
+    
+    command += ' -O ' + options.output
+    command += ' -L ' + options.output
+    command += ' -o _log'
+    command += ' -R _log'
+    
+    #all freesurfer args - only 1 supported for now
+    # tailarach
+    if not options.tailarach:
+      command += ' -F -notailarach'
+      
+        # grab the first dti dicom input file
+    # dti dicom file
+    command += ' -D ' + input_dir
+    command += ' -d ' + dti_files[0]
+    
+    # grab the first t1 dicom input file
+    # t1 dicom file
+    command += ' -1 ' + t1_files[0]
+    
+    command += ' -f'
+      
+    command = '/bin/bash -c " export PATH=' + self.envVars['ENV_SCRIPT_DIR'] + ':' + self.envVars['ENV_DTK_DIR'] + \
+              ':' + self.envVars['ENV_MRICRON_DIR'] + ':\$PATH; export PYTHONPATH=' + self.envVars['ENV_CMP_DIR'] + \
+              ':\$PYTHONPATH;source ' + self.envVars['ENV_CONNECTOME_SCRIPT'] + ';export DTDIR=' + \
+              self.envVars['ENV_DTK_DIR'] + ';export DSI_PATH=' + self.envVars['ENV_DTK_DIR'] + '/matrices' + \
+              ';export PATH=\$DTDIR:\$PATH;source ' + self.envVars['ENV_FSL_SCRIPT'] +';' + command + ' "'
+    print command
+    #os.system(cmd)
+    shell = crun.crun()
+    shell.echo(False)
+    shell.waitForChild(True)
+    shell(command)
+    str_exitCode = str(shell.exitCode())
+    if str_exitCode != "0":
+      misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
+
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = Connectome()
+  #inputs
+  plugin.add_parameter('Input', Plugin.IMAGE, '--dti', action='store', dest='dti', help='the DTI scan')
+  plugin.add_parameter('Input', Plugin.IMAGE, '--t1', action='store', dest='t1', help='the T1 scan')
+  
+  #general
+  plugin.add_parameter('General', Plugin.BOOLEAN, '--tailarach', default=False, action='store_true', dest='tailarach', help='Perform Tailarach')
+  plugin.add_parameter('General', Plugin.INTEGER, '--anglethreshold', default='35', action='store', dest='anglethreshold', help='Angle threshold filtering')
+  plugin.add_parameter('General', Plugin.COMBOBOX, '--recalgo', values=['FACT', '2nd_Order_Runga_Hutta', 'Interpolated_Streamline', 'Tensorline'], default='FACT', action='store', dest='recalgo', help='Reconstruction Algorithm')
+  plugin.add_parameter('General', Plugin.COMBOBOX, '--immodel', values=['DTI', 'HARDI'], default='DTI', action='store', dest='immodel', help='Image Model')
+  plugin.add_parameter('General', Plugin.BOOLEAN, '--eddy', default=False, action='store_true', dest='eddy', help='Run eddy correction')
+  
+  #Mask Filter
+  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.COMBOBOX, '--m1', values=['DWI', 'FA', 'ADC'], default='DWI', action='store', dest='m1', help='Volume to be used as 1st mask filter')
+  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.DOUBLE, '--m1lowerthreshold', default='0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
+  plugin.add_parameter('1st Mask Filter (Advanced)', Plugin.DOUBLE, '--m1upperthreshold', default='1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
+  
+  #2nd Mask Filter
+  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.BOOLEAN, '--usem2', default=False, action='store_true', dest='usem2', help='Use 2nd mask filter')
+  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.COMBOBOX, '--m2', values=['DWI', 'FA', 'ADC'], default='FA', action='store', dest='m2', help='Volume to be used as 2nd mask filter')
+  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.DOUBLE, '--m2lowerthreshold', default='0', action='store', dest='m1lowerthreshold', help='Lower mask threshold')
+  plugin.add_parameter('2nd Mask Filter (Advanced)', Plugin.DOUBLE, '--m2upperthreshold', default='1', action='store', dest='m1upperthreshold', help='Upper mask threshold')
+  
+  # gradients
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--usegradient', default=False, action='store_true', dest='usegradient', help='Manually upload gradient')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.IMAGE, '--gradient', action='store', dest='gradient', help='Gradient file')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--useb0', default=False, action='store_true', dest='useb0', help='Manually specify number of B0 volumes')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.INTEGER, '--b0', default='1', action='store', dest='b0', help='Number of B0 volumes')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertx', default=False, action='store_true', dest='invertx', help='Invert X gradient')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--inverty', default=False, action='store_true', dest='inverty', help='Invert Y gradient')
+  plugin.add_parameter('Gradient (Advanced)', Plugin.BOOLEAN, '--invertz', default=False, action='store_true', dest='invertz', help='Invert Z gradient')
+
+  plugin.add_parameter('Advanced', Plugin.STRING, '--connectomemetacript', action='store', dest='ConnectomeMetaScript',
+                          default=plugin.envVars['ENV_CONNECTOME_META_SCRIPT'], help='The images directory')
+  plugin.launch()

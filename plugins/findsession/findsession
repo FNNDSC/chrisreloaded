@@ -1,0 +1,113 @@
+#!/usr/bin/env python
+#
+# Findsession plugin for ChRIS reloaded
+#
+#  _____ _           _                   _             
+# |  ___(_)_ __   __| |___  ___  ___ ___(_) ___  _ __  
+# | |_  | | '_ \ / _` / __|/ _ \/ __/ __| |/ _ \| '_ \ 
+# |  _| | | | | | (_| \__ \  __/\__ \__ \ | (_) | | | |
+# |_|   |_|_| |_|\__,_|___/\___||___/___/_|\___/|_| |_|
+#                                                      
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+from plugin import Plugin
+
+import datetime as d
+
+class FindSession(Plugin):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
+  Plugin.TITLE = 'Findsession'
+  Plugin.CATEGORY = 'NMR'
+  Plugin.DESCRIPTION = '''
+  Wrapper around NRM,MGH findsession
+'''
+
+  Plugin.DOCUMENTATION = 'https://github.com/FNNDSC/chrisreloaded/'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.3'
+
+  def run(self):
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    options = self.options
+    print Plugin.TITLE
+    print Plugin.VERSION
+    print 'HELLO'
+    print options.LIST_DIRECTORIES
+    #print options.LIST_SERIES
+    list_directories = options.LIST_DIRECTORIES.strip().split(" ");
+    if list_directories:
+      for directory in list_directories:
+        splitted = options.output.split('/')
+        print '======================================='
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Copy directory over...'
+        command = 'umask 0000; mkdir -p ' + options.output + '/rawdata; chmod 777 ' + '/' + splitted[1] + '/' + splitted[2] + '; chmod 777 ' + options.output + '; chmod 777 ' + options.output + '/rawdata; sudo su ' + options.USERNAME + ' -c "cp -rLv ' + directory + ' ' + options.output  + '/rawdata; chmod 755 ' + options.output + "/rawdata/" + os.path.basename(os.path.normpath(directory)) +  ';  chmod 644 ' +options.output+ '/rawdata/' + os.path.basename(os.path.normpath(directory)) +  '/*;"'
+        print command
+        output = os.system(command)
+        print 'output:'
+        print output
+
+        print '======================================='
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start pushing...'
+        command = current_dir + "/../pacs_push/pacs_push --directory " + options.output + "/rawdata/" + os.path.basename(os.path.normpath(directory)) + " --host " + options.HOST + " --port " + options.PORT + " --extension '*' --aetitle " + options.AETITLE + " --output " + options.output 
+        print 'command:'
+        print command
+        output = os.system(command)
+        print 'output:'
+        print output
+    
+        print '======================================='
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
+        command = current_dir + "/core/process.php -d " + options.output + " -l rawdata/" + os.path.basename(os.path.normpath(directory))
+        print 'command:'
+        print command
+        output = os.system(command)
+        print 'output:'
+        print output
+
+        print '======================================='
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start cleaning...'
+        # cleanup input directory
+        # to avoid pushing 2 times same data
+        for root, dirs, files in os.walk(os.path.join(options.output, 'input'), topdown=False):
+          for name in files:
+            os.unlink(os.path.join(root, name))
+
+        #delete link created by pacs_push plugin
+        # this link is broken anyway, since the plugin was running in /tmp directory and is then deleted
+        os.unlink( os.path.join( options.output,os.path.basename(os.path.normpath(directory)) ) )
+
+        
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = FindSession()
+  
+  # this is an interactive plugin
+  plugin.interactive = True
+
+  # define the parameters
+  plugin.add_parameter('Parameters', Plugin.STRING, '--name', action='store', dest='NAME', help='Exact name of the subject')
+  plugin.add_parameter('Parameters', Plugin.STRING, '--sessionid', action='store', dest='SESSIONID', help='Session ID substring')
+  plugin.add_parameter('Parameters', Plugin.STRING, '--subjectid', action='store', dest='SUBJECTID', help='Subject ID')
+  plugin.add_parameter('Parameters', Plugin.STRING, '--project', action='store', dest='PROJECT', help='Project name')
+  plugin.add_parameter('Date', Plugin.STRING, '--dateon', action='store', dest='ON', help='Date of the session YYYY-MM-DD')
+  plugin.add_parameter('Date', Plugin.BOOLEAN, '--datepastfourmonths', action='store_true', dest='PAST4M', help='Session was in past 4 months')
+  plugin.add_parameter('Date', Plugin.STRING, '--datesince', action='store', dest='SINCE', help='Sessions since YYYY-MM-DD')
+  plugin.add_parameter('Date', Plugin.BOOLEAN, '--datetoday', action='store_true', dest='TODAY', help='Session was today')
+  plugin.add_parameter('More (ADVANCED)', Plugin.STRING, '--experimenter', action='store', dest='XPERIMNTR', help='Experimenter')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--listdirectories', action='store', dest='LIST_DIRECTORIES', help='Directories to be pushed to ChRIS')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--username', action='store', dest='USERNAME', default='chris', help='Username of the person running the feed')
+  plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--host', action='store', default='kaos.nmr.mgh.harvard.edu',  dest='HOST', help='Target host')
+  plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--port', action='store', default='10402', dest='PORT', help='Target port')
+  plugin.add_parameter('Target (ADVANCED)', Plugin.STRING, '--aetitle', action='store', default="default", dest='AETITLE', help='User AETITLE')
+  plugin.add_parameter('Advanced', Plugin.STRING, '--findsessionscript', action='store', dest='FindSessionScript', default=plugin.envVars['ENV_FINDSESSION_SCRIPT'], help='The find session script')
+  plugin.launch()

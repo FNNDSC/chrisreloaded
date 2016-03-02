@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+#
+#                                                            _           
+# 
+# Author: Mathieu Dehaes, PhD (mathieu <dot> dehaes <at> childrens <dot> harvard <dot> edu)
+#
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#
+
+# import the plugin.py superclass
+import os, sys
+sys.path.append( os.path.join(os.path.dirname(__file__), '../') )
+from plugin import Plugin
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
+
+class FcMRI(Plugin):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC - Mathieu Dehaes, PhD'
+  Plugin.TITLE = 'Resting State Connectivity Analysis'
+  Plugin.CATEGORY = 'fMRI'
+  Plugin.DESCRIPTION = 'Resting State based-ICA'
+  Plugin.DOCUMENTATION = 'http://durban.tch.harvard.edu/wiki/index.php/FcMRI'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.1'
+
+  def run(self):
+
+    # we expect file as input
+    options = self.options
+    options.Functional = self.validate('file', options.Functional);
+    
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    cmd = '/bin/bash -c " cd ' + options.output + ';source ' + options.FreesurferScript + ' stable;' + \
+              current_dir + '/fcMRI.wrapper ' + options.Functional + ' ' + options.Timeseries_to_skip + ' ' + \
+              options.Anatomical + ' ' + options.BET_parameter + ' ' + options.Size_in_mm + ' ' + \
+              options.Results_Folder + ' ' + str(options.Number_of_ICA_components) + ' "'
+    #os.system(cmd)
+    shell = crun.crun()
+    shell.echo(False)
+    shell.waitForChild(True)
+    shell(cmd)
+    str_exitCode = str(shell.exitCode())
+    if str_exitCode != "0":
+      misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
+
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = FcMRI()
+  # minimum required memory to start the plugin
+  plugin.memory = 20480
+
+  # Data input
+  plugin.add_parameter('Data', Plugin.IMAGE, '--Functional', action='store', dest='Functional',
+                        help='Functional fMRI 4D volume')
+  plugin.add_parameter('Data', Plugin.INTEGER, '--Timeseries_to_skip', default = 4, action='store',
+                        dest='Timeseries_to_skip', help='Functional 4D time-series to skip (default 4)')
+  plugin.add_parameter('Data', Plugin.IMAGE, '--Anatomical', action='store', dest='Anatomical',
+                        help='Anatomical 3D volume')
+  
+  # Brain extraction parameter
+  plugin.add_parameter('Brain Extraction', Plugin.DOUBLE, '--BET_parameter', default = 0.5, action='store', dest='BET_parameter',
+                        help='Adjust FSL bet parameter between 0 and 1 (smaller value gives larger brain contour estimate)')
+  
+  # Resampling option
+  plugin.add_parameter('Resampling', Plugin.COMBOBOX, '--Size_in_mm', values=[-1, 2, 3], default='None', action='store', dest='Size_in_mm',
+                       help='For adult or yound adult dataset (default is -1, i.e. no resampling for neonates and infants less than 2 yr-old)')
+  
+  # Results section to be defined
+  plugin.add_parameter('Results', Plugin.STRING, '--Results_Folder', default = 'ICA_Results', action='store', dest='Results_Folder',
+                        help='Specify a folder where ICA results are written')
+  
+  # Number of IC 
+  plugin.add_parameter('ICA', Plugin.INTEGER, '--Number_of_ICA_components', default = -1, action='store', dest='Number_of_ICA_components',
+                        help='Automatic estimation (default = -1, recommended), otherwise specify the number of ICA components to extract')
+
+  #Freesurfer script 
+  plugin.add_parameter('Advanced', Plugin.STRING, '--freesurferscript', action='store', dest='FreesurferScript',
+                       default=plugin.envVars['ENV_FREESURFER_SCRIPT'], help='The images directory')
+  
+  plugin.launch()
