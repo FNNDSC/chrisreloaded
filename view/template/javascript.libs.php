@@ -8,6 +8,11 @@
 <script type="text/javascript" src="view/js/jquery.apprise.min.js"></script>
 <script type="text/javascript" src="view/js/jquery.touchpunch.js"></script>
 <script type="text/javascript" src="view/js/jquery.toggle.buttons.js"></script>
+
+<!-- THREEJS and VJS -->
+<script type="text/javascript" src="view/js/viewer/babel-polyfill.min.js"></script>
+<script type="text/javascript" src="view/js/viewer/three.min.js"></script>
+<script src="https://rawgit.com/FNNDSC/vjs/master/dist/vjs.js"></script>
 <!-- Seach boxes-->
 <script src="lib/select2-3.4.2/select2.js"></script>
 <!-- Feature detection-->
