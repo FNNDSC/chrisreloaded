@@ -61,7 +61,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.destroy = function(data) {
 
 /**
  * Create the base objects of the interactive plugin
- * Sets up all the connection
  *
  * feedID is important to create the common room for collaboration
  */
@@ -70,7 +69,6 @@ _CHRIS_INTERACTIVE_PLUGIN_.create = function(feedID, data) {
     if(typeof(view) == 'undefined' || view == null){
         view = new viewer.Viewer(data);
     }
-    view.connect(feedID);
 }
 
 /**
