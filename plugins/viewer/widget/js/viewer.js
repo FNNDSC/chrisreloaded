@@ -181,6 +181,10 @@ viewer.Viewer.prototype.on2DContMove = function(color, event){
   }
   //
   var colors = ['red', 'green', 'blue'];
+  var index = colors.indexOf(color);
+  if (index > -1) {
+    colors.splice(index, 1);
+  }
 
   // raycast
   var container = document.getElementById(color);
