@@ -74,6 +74,7 @@ class FileC implements FileControllerInterface {
     $userID = $resultsFeed['Feed'][0]->user_id;
     $userName = $resultsUser['User'][0]->username;
     $groupID = shell_exec("sudo su $userName -c 'id -g';");
+    $groupID = preg_replace('/\n/', '', $groupID);
 
     $dir = CHRIS_USERS.'/'.$userName.'/file_browser/'.$resultsFeed['Feed'][0]->name.'-'.$resultsFeed['Feed'][0]->id.'/';
 

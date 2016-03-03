@@ -5,6 +5,7 @@
 $chrisInput_path = "${CHRISINPUT_PATH}";
 $chris_bin = "${CHRIS_BIN}";
 $chris_scripts = "${CHRIS_SCRIPTS}";
+$chris_freesurfer = "${CHRIS_FREESURFER}";
 
 $dir_iter = new RecursiveDirectoryIterator($chrisInput_path, RecursiveDirectoryIterator::SKIP_DOTS);
 $iter = new RecursiveIteratorIterator($dir_iter, RecursiveIteratorIterator::SELF_FIRST);
@@ -21,7 +22,7 @@ foreach ($iter as $dir => $dirObj) {
 foreach ($dir_array as $dir) {
     $dicomFiles = glob($dir."/*.dcm");
         if (count($dicomFiles)) {
-		shell_exec("PATH=$chris_bin:$chris_scripts:\$PATH; dcmanon_meta.bash -P -O " . $dir . " -D " . $dir);
+		shell_exec("bash -c 'PATH=$chris_bin:$chris_scripts:\$PATH; source $chris_freesurfer stable; dcmanon_meta.bash -P -O " . $dir . " -D " . $dir."'");
 	}
 }	
 

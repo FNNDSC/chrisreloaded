@@ -1,3 +1,12 @@
+.databrowser.truncate{
+  display: inline-block;
+  height: 16px;
+  max-width: calc(100% - 16px);
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+
 UL.jqueryFileTree {
 	font-family: Verdana, sans-serif;
 	font-size: 11px;

@@ -340,6 +340,9 @@ jQuery(document)
 
           // set default plugin to the first one
           var _first_plugin = jQuery("#search");
+          if(!_first_plugin.length){
+            _first_plugin = jQuery('#cart_plugins .item').first();
+          }
           var _first_plugin_id = _first_plugin.attr('id');
           // .. activate it in the carousel
           _first_plugin.addClass("active");

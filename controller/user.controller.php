@@ -50,7 +50,7 @@ interface UserControllerInterface
   // Setup the user cluster directory as needed
   static public function setupClusterDir(&$ssh);
   // Setup the user server directory as needed
-  static public function setupServerDir($username, &$ssh);
+  static public function setupServerDir($username);
   // Update user email
   static public function setEmail($uid, $email);
 }
@@ -108,16 +108,19 @@ class UserC implements UserControllerInterface {
   static public function login($username, $password) {
 
     if (!isset($username) || !isset($password)) return -1;
-
+    error_log('ssh to cluster');
+    error_log(SERVER_TO_CLUSTER_HOST);
     $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
     if ($sshCluster->login($username, $password)) {
-
+      error_log('logged in!');
       // the user credentials are valid on the cluster!
       // setup cluster home directory if needed
-      $userHomeDir = self::setupClusterDir($sshCluster);
+      $userHomeDir = "";
+      if(CHRIS_CLUSTER_USER == "self"){
+        // set up passwordless ssh...
+        $userHomeDir = self::setupClusterDir($sshCluster);
+      }
 
-      $sshLocal = new Net_SSH2('localhost');
-      if ($sshLocal->login($username, $password)) {
 
         // the user credentials are valid on the chris server!
         // make sure this user is also allowed to access chris by checking the user table and grabbing the user id
@@ -133,8 +136,9 @@ class UserC implements UserControllerInterface {
         }
         // else add user in the database
         else{
-          $uid = $sshLocal->exec(bash('id -u '.$username));
-
+          $uid = shell_exec('id -u '.$username);
+          $uid = preg_replace('/\n/', '', $uid);
+          error_log($uid);
           $report = "=========================================". PHP_EOL;
           $report .= date('Y-m-d h:i:s'). ' ---> New user logging in...'. PHP_EOL;
           $report .= $username. PHP_EOL;
@@ -152,37 +156,42 @@ class UserC implements UserControllerInterface {
         }
 
         // setup server directories if needed
-        self::setupServerDir($username, $sshLocal);
+        self::setupServerDir($username);
 
-        //we need to create a new connection object because using the already
-        //created $sshCluster doesn't work, maybe its connection times out
-        $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-        $sshCluster->login($username, $password);
+        if($userHomeDir != "" && CHRIS_CLUSTER_USER == "self"){
+          //we need to create a new connection object because using the already
+          //created $sshCluster doesn't work, maybe its connection times out
+          $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+          $sshCluster->login($username, $password);
 
-        // compress .ssh dir
-        $sshCluster->exec(bash('cd '.$userHomeDir.'; tar -zcf ssh.tar.gz .ssh;'));
+          // compress .ssh dir
+          $sshCluster->exec(bash('cd '.$userHomeDir.'; tar -zcf ssh.tar.gz .ssh;'));
 
-        // copy over the compressed file to the local server,
-        $scp = new Net_SCP($sshCluster);
-        $data = $scp->get($userHomeDir.'/ssh.tar.gz');
-        $scp = new Net_SCP($sshLocal);
-        $scp->put($userHomeDir.'/ssh.tar.gz', $data);
+          // copy over the compressed file to the local server,
+          $scp = new Net_SCP($sshCluster);
+          $data = $scp->get($userHomeDir.'/ssh.tar.gz');
+          
+          $sshLocal = new Net_SSH2('localhost');
+          $sshLocal->login($username, $password);
+          $scp = new Net_SCP($sshLocal);
+          $scp->put($userHomeDir.'/ssh.tar.gz', $data);
 
-        // uncompress and remove ssh.tar.gz on the local server
-        $sshLocal->exec(bash('cd '.$userHomeDir.'; tar -zxf ssh.tar.gz;'));
-        $sshLocal->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz;'));
+          // uncompress and remove ssh.tar.gz on the local server
+          $sshLocal->exec(bash('cd '.$userHomeDir.'; tar -zxf ssh.tar.gz;'));
+          $sshLocal->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz;'));
 
-        // remove ssh.tar.gz from the cluster
-        $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
-        $sshCluster->login($username, $password);
-        if (remoteFileExists($sshCluster, $userHomeDir.'/ssh.tar.gz')) {
-          $sshCluster->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz &'));
+          // remove ssh.tar.gz from the cluster
+          $sshCluster = new Net_SSH2(SERVER_TO_CLUSTER_HOST, SERVER_TO_CLUSTER_PORT);
+          $sshCluster->login($username, $password);
+          if (remoteFileExists($sshCluster, $userHomeDir.'/ssh.tar.gz')) {
+            $sshCluster->exec(bash('rm '.$userHomeDir.'/ssh.tar.gz &'));
+          }
         }
 
-      } else {
+      //} else {
         // invalid chris server credentials
-        $user = -1;
-      }
+      //  $user = -1;
+      //}
 
       return $user;
     }
@@ -226,29 +235,29 @@ class UserC implements UserControllerInterface {
   *
   * @param string $username
   */
-  static public function setupServerDir($username, &$ssh) {
+  static public function setupServerDir($username) {
 
     $user_path = joinPaths(CHRIS_USERS, $username);
 
     // create user directory within Chris (if does't exist)
     if(!file_exists($user_path)){
-      $ssh->exec('mkdir  '.$user_path.'; chmod 775 '.$user_path.';');
+      shell_exec('sudo su '.$username.' -c "mkdir  '.$user_path.'; chmod 775 '.$user_path.';"');
     }
 
     // create users' config directory  (if does't exist)
     $user_config_path = joinPaths($user_path, CHRIS_USERS_CONFIG_DIR);
     if(!file_exists($user_config_path)){
-      $ssh->exec('mkdir  '.$user_config_path. '; chmod 775  '.$user_config_path.';');
+      shell_exec('sudo su '.$username.' -c "mkdir  '.$user_config_path.'; chmod 775 '.$user_config_path.';"');
     }
 
     // add default configuration file  (if does't exist)
     $user_config_file = joinPaths($user_config_path, CHRIS_USERS_CONFIG_FILE);
     $chris_config_file = joinPaths(CHRIS_HOME, CHRIS_SRC, CHRIS_USERS_CONFIG_FILE);
     if(!file_exists($user_config_file)){
-      $ssh->exec('cp  '.$chris_config_file.' '.$user_config_file. ';chmod 664  '.$user_config_file.';');
+      shell_exec('sudo su '.$username.' -c "cp  '.$chris_config_file.' '.$user_config_file. ';chmod 664  '.$user_config_file.';"');
     }
 
-    $ssh->exec("sed -i 's/\${USERNAME}/$username/g' $user_config_file");
+    shell_exec('sudo su '.$username.' -c "sed -i \'s/\${USERNAME}/'.$username.'/g\' '.$user_config_file.'";');
   }
 
   /**

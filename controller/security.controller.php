@@ -88,6 +88,9 @@ class SecurityC implements SecurityControllerInterface {
 
     // validate the credentials
     if (!$valid) {
+      error_log('security controller');
+      error_log($username);
+      error_log($password);
       $user_id = UserC::login($username, $password);
     } else {
       return true;

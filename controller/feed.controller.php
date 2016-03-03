@@ -57,11 +57,11 @@ interface FeedControllerInterface
   // return the number of running jobs for a user
   static public function getRunningCount($userid);
   // merge two feeds
-  static public function mergeFeeds($master_id, $slave_id, &$ssh_connection);
+  static public function mergeFeeds($master_id, $slave_id);
   // update feed name
-  static public function updateName($id, $name, &$ssh_connection);
+  static public function updateName($id, $name);
   // cancel the job
-  static public function cancel($id, &$ssh_connection);
+  static public function cancel($id);
   // share a feed
   static public function share($feed_ids, $ownerid, $ownername, $targetname);
   // tag/untag a feed
@@ -649,7 +649,7 @@ class FeedC implements FeedControllerInterface {
    * @param int $master_id The master feed id (target for merge).
    * @param int $slave_id The slave feed id.
    */
-  static public function mergeFeeds($master_id, $slave_id, &$ssh_connection) {
+  static public function mergeFeeds($master_id, $slave_id) {
 
     $username = $_SESSION['username'];
 
@@ -709,7 +709,8 @@ class FeedC implements FeedControllerInterface {
 
       // if doesnt exist
       if (!file_exists($masterfeedDirectory.'/'.$dest)) {
-        $ssh_connection->exec('ln -s '.$slavefeedDirectory.'/'.$value.' '.$masterfeedDirectory.'/'.$dest);
+        error_log('sudo su '.$username.' -c "ln -s '.$slavefeedDirectory.'/'.$value.' '.$masterfeedDirectory.'/'.$dest.'"');
+        shell_exec('sudo su '.$username.' -c "ln -s '.$slavefeedDirectory.'/'.$value.' '.$masterfeedDirectory.'/'.$dest.'"');
       }
       else{
         // uh-oh! collision!
@@ -726,32 +727,75 @@ class FeedC implements FeedControllerInterface {
    *
    * @param int $id The feed id.
    */
-  static public function cancel($id, &$ssh_connection) {
+  static public function cancel($id) {
 
     // check if feed status is running
     $feedResult = Mapper::getStatic('Feed', $id);
 
+    // else other delete
     if($feedResult['Feed'][0]->status != 100) {
-
-      // job is running or queued
+      // get user information
       $userMapper = new Mapper('User');
       $userMapper->filter('user.id = (?)', $feedResult['Feed'][0]->user_id);
       $userResult = $userMapper->get();
       $username = $userResult['User'][0]->username;
-      $cluster_kill_command = 'export PYTHONPATH='.joinPaths(CLUSTER_CHRIS, 'lib', 'py'). ';';
-      $cluster_kill_command = $cluster_kill_command . joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'lib/_common/crun.py');
-      $cluster_kill_command = $cluster_kill_command . ' -u ' . $username . ' --host ' . SERVER_TO_CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
-      $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username);
-      $dirRoot = joinPaths($cluster_user_path, $feedResult['Feed'][0]->plugin, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
-      $dataDir = explode("\n",trim($ssh_connection->exec('ls ' . $dirRoot)));
-      foreach ($dataDir as $dir) {
-        $chrisRunPath = joinPaths($dirRoot, $dir, '_chrisRun_');
-        $jobIdFiles = explode("\n",trim($ssh_connection->exec('ls ' . $chrisRunPath . ' | grep .crun.joblist')));
-        foreach ($jobIdFiles as $f) {
-          $ssh_connection->exec($cluster_kill_command . joinPaths($chrisRunPath, $f));
+
+      // check if feed is local or running on the cluster
+      // if immediate as user
+      $user_path = joinPaths(CHRIS_USERS, $username);
+      $plugin_path = joinPaths($user_path, $feedResult['Feed'][0]->plugin);
+      $feed_path = joinPaths($plugin_path, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
+
+      // immediate & local are there....
+      $immediate = shell_exec('find ' . $feed_path . ' -maxdepth 3 -type f -name \'*.immediate.joblist\'');
+      $immediatePIDs = explode("\n",trim($immediate));
+
+      // if local as chris
+      $local = shell_exec('find ' . $feed_path . ' -maxdepth 3 -type f -name \'*.local.joblist\'');
+      $localPIDs = explode("\n",trim($local));
+
+      // kill all server jobs
+      $serverPIDs = array_merge($immediatePIDs, $localPIDs);
+      foreach ($serverPIDs as $pidFile) {
+        if($pidFile != ''){
+          $pid = explode('.', basename($pidFile))[0];
+          // we kill the first child pid
+          shell_exec('sudo pkill -P $(ps -o pid --no-headers --ppid ' . $pid . ')');
         }
       }
 
+      // remote user
+      $remoteUser = $username;
+      if(CHRIS_CLUSTER_USER != "self" && CLUSTER_SHARED_FS == false){
+        $remoteUser = CHRIS_CLUSTER_USER;
+      }
+
+      // job is running or queued
+      $cluster_kill_command = 'export PYTHONPATH='.joinPaths(CLUSTER_CHRIS, 'lib', 'py'). ';';
+      $cluster_kill_command = $cluster_kill_command . joinPaths(CLUSTER_CHRIS, CHRIS_SRC, 'lib/_common/crun.py');
+      $cluster_kill_command = $cluster_kill_command . ' -u ' . $remoteUser . ' --host ' . SERVER_TO_CLUSTER_HOST . ' -s '. CLUSTER_TYPE . ' --kill ';
+      $cluster_user_path = joinPaths(CLUSTER_CHRIS, 'users', $username, $feedResult['Feed'][0]->plugin);
+      if(CHRIS_CLUSTER_USER != "self" && CLUSTER_SHARED_FS == false){
+        $cluster_user_path = joinPaths(CLUSTER_CHRIS_RUN, $username);
+      }
+      $dirRoot = joinPaths($cluster_user_path, $feedResult['Feed'][0]->name.'-'.$feedResult['Feed'][0]->id);
+      $cmd = 'ls ' . $dirRoot; 
+      $dataDir = null;
+      $dataDir = explode("\n",trim(shell_exec('sudo su '.$remoteUser.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $cmd .' \'"')));     
+
+      foreach ($dataDir as $dir) {
+        $chrisRunPath = joinPaths($dirRoot, $dir, '_chrisRun_');
+        $grepCmd = 'ls ' . $chrisRunPath . ' | grep .crun.joblist';
+        $jobIdFiles = null;
+        $jobIdFiles = explode("\n",trim(shell_exec('sudo su '.$remoteUser.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $grepCmd .' \'"')));
+
+        foreach ($jobIdFiles as $f) {
+          $killCmd = $cluster_kill_command . joinPaths($chrisRunPath, $f);
+            shell_exec('sudo su '.$remoteUser.' -c " ssh -p ' .SERVER_TO_CLUSTER_PORT. ' ' . SERVER_TO_CLUSTER_HOST . ' \' '. $killCmd .' \'"');
+        }
+      }
+
+            error_log("DONE KILL");
       // set status to canceled
       $status = 101;
 
@@ -802,7 +846,7 @@ class FeedC implements FeedControllerInterface {
    * @param int $id The feed id.
    * @param string $name The feed name to set.
    */
-  static public function updateName($id, $name, &$ssh_connection) {
+  static public function updateName($id, $name) {
 
     $username = $_SESSION['username'];
 
@@ -819,7 +863,7 @@ class FeedC implements FeedControllerInterface {
     $new_path = joinPaths(CHRIS_USERS.'/'.$username, $feedResult['Feed'][0]->plugin, $safe_name.'-'.$feedResult['Feed'][0]->id);
 
     if(!is_link($new_path) and !file_exists($new_path)){
-      $ssh_connection->exec('ln -s '.$old_path.' '.$new_path);
+      shell_exec('sudo su '.$username.' -c "ln -s '.$old_path.' '.$new_path.'"');
     }
 
     // find all shared versions of this feed

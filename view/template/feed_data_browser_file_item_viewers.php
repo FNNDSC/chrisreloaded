@@ -1,5 +1,5 @@
 <?php
-
+/**
 switch(strtoupper($GLOBALS['ext'])) {
 
   case 'NII':
@@ -25,5 +25,5 @@ switch(strtoupper($GLOBALS['ext'])) {
 <?php
 
 }
-
+*/
 ?>

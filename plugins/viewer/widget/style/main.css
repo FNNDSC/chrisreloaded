@@ -16,16 +16,24 @@
 }
 
 .smallRenderers{
-	height:30%;
+	/*height:30%;*/
+        height:100%;
 }
 
 .xSmallRenderer{
-	width: 33%;
+	/*width: 50%;*/
+        width: 33%;
 	height:100%;
+        border: 1px solid #F9F9F9;
+        position:relative;
+}
+
+.xSmallRenderer.red{
+  width: 34%;
 }
 
 .smallRenderer{
-	width:34%;
+	width:50%;
 	height:100%;
 	border-left: 1px solid #FFF;
 	border-right: 1px solid #FFF;
@@ -44,23 +52,43 @@
 }
 
 .red{
-	border-color: red;
+	border-color: #F44336;
 }
 
 .green{
-	border-color: green;
+	border-color: #8BC34A;
 }
 
 .blue{
-	border-color: blue;
+	border-color: #00BCD4;
+}
+
+.controls {
+  width: 100%;
+  position: absolute;
+  top: 0;
+}
+
+.red.controls {
+  border: 1px solid #F44336;
+}
+
+.green.controls {
+  border: 1px solid #8BC34A;
+}
+
+.blue.controls {
+  border: 1px solid #00BCD4;
 }
 
 .x-controller {
 	top:10px;
 	right:10px;
+        z-index: 10;
 }
 
 .topLeftContainer {
+  display:none;
   padding-top:10px;
   padding-left:10px;
 }
@@ -99,21 +127,21 @@ div > canvas {
 
 .volumeIcon .fancytree-icon{
 
-	background-image: url('http://www.iconsdb.com/icons/preview/white/brain-xxl.png');
+	/*background-image: url('http://www.iconsdb.com/icons/preview/white/brain-xxl.png');*/
 	background-size: contain;
 
 }
 
 .fibersIcon .fancytree-icon{
 
-	background-image: url('https://kwikom.com/images/misc/leopard-fiber-optic-cable_128x128-2.png');
+	/*background-image: url('https://kwikom.com/images/misc/leopard-fiber-optic-cable_128x128-2.png');*/
 	background-size: contain;
 
 }
 
 .meshIcon .fancytree-icon{
 
-	background-image: url('http://cdn-img.easyicon.net/png/55/5501.png');
+	/*background-image: url('http://cdn-img.easyicon.net/png/55/5501.png');*/
 	background-size: contain;
 
 }
