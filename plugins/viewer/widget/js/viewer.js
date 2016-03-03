@@ -24,6 +24,13 @@ viewer.Viewer = function(jsonObj) {
   //Parse the json file
   this.source = jsonObj;
 
+
+  //
+  this.shiftDown = false;
+  this.onWindowKeyPressed = this.onWindowKeyPressed.bind(this)
+  window.addEventListener('keydown', this.onWindowKeyPressed, false);
+  window.addEventListener('keyup', this.onWindowKeyPressed, false);
+
   // GUI
   this.redVolWidget = null;
   this.greenVolWidget = null;
@@ -100,7 +107,6 @@ viewer.Viewer = function(jsonObj) {
   this.animate();
 
   // connect scroll event
-  var self = this;
   this.redOnScroll = this.onScroll.bind(this, 'red', 'z');
   this.redControls.addEventListener('OnScroll', this.redOnScroll);
   this.greenOnScroll = this.onScroll.bind(this, 'green', 'x');
@@ -142,29 +148,37 @@ viewer.Viewer = function(jsonObj) {
   
 
   //Event handlers for switching renderers
-  self.on2DContDblClickBindRed = self.on2DContDblClick.bind(self, 'red');
+  this.on2DContDblClickBindRed = this.on2DContDblClick.bind(this, 'red');
   document.getElementById('first').
-    addEventListener('dblclick', self.on2DContDblClickBindRed);
-  self.on2DContDblClickBindGreen = self.on2DContDblClick.bind(self, 'green');
+    addEventListener('dblclick', this.on2DContDblClickBindRed);
+  this.on2DContDblClickBindGreen = this.on2DContDblClick.bind(this, 'green');
   document.getElementById('second').
-    addEventListener('dblclick', self.on2DContDblClickBindGreen);
-  self.on2DContDblClickBindBlue = self.on2DContDblClick.bind(self, 'blue');
+    addEventListener('dblclick', this.on2DContDblClickBindGreen);
+  this.on2DContDblClickBindBlue = this.on2DContDblClick.bind(this, 'blue');
   document.getElementById('third').
-    addEventListener('dblclick', self.on2DContDblClickBindBlue);
+    addEventListener('dblclick', this.on2DContDblClickBindBlue);
 
   // Event handler to 
-  self.on2DContClickBindRed = self.on2DContClick.bind(self, 'red');
+  this.on2DContMoveBindRed = this.on2DContMove.bind(this, 'red');
   document.getElementById('first').
-    addEventListener('click', self.on2DContClickBindRed);
-  self.on2DContClickBindGreen = self.on2DContClick.bind(self, 'green');
+    addEventListener('mousemove', this.on2DContMoveBindRed);
+  this.on2DContMoveBindGreen = this.on2DContMove.bind(this, 'green');
   document.getElementById('second').
-    addEventListener('click', self.on2DContClickBindGreen);
-  self.on2DContClickBindBlue = self.on2DContClick.bind(self, 'blue');
+    addEventListener('mousemove', this.on2DContMoveBindGreen);
+  this.on2DContMoveBindBlue = this.on2DContMove.bind(this, 'blue');
   document.getElementById('third').
-    addEventListener('click', self.on2DContClickBindBlue);
+    addEventListener('mousemove', this.on2DContMoveBindBlue);
 }
 
-viewer.Viewer.prototype.on2DContClick = function(color, event){
+viewer.Viewer.prototype.onWindowKeyPressed = function(event){
+  this.shiftDown = event.shiftKey;
+}
+
+viewer.Viewer.prototype.on2DContMove = function(color, event){
+
+  if(!this.shiftDown){
+    return;
+  }
   //
   var colors = ['red', 'green', 'blue'];
 
@@ -702,19 +716,22 @@ viewer.Viewer.prototype.destroy = function(){
     if(this.fileSelectTree){
       $("#" + this.treeContainerId).fancytree("destroy");
     }
+    //
+    window.removeEventListener('keydown', this.onWindowKeyPressed);
+    window.removeEventListener('keyup', this.onWindowKeyPressed);
 
     // listeners
     document.getElementById('first').removeEventListener('dblclick', this.on2DContDblClickBindRed);
     document.getElementById('second').removeEventListener('dblclick', this.on2DContDblClickBindGreen);
     document.getElementById('third').removeEventListener('dblclick', this.on2DContDblClickBindBlue);
 
-    document.getElementById('first').removeEventListener('click', this.on2DContClickBindRed);
-    document.getElementById('second').removeEventListener('click', this.on2DContClickBindGreen);
-    document.getElementById('third').removeEventListener('click', this.on2DContClickBindBlue);
+    document.getElementById('first').removeEventListener('mousemove', this.on2DContMoveBindRed);
+    document.getElementById('second').removeEventListener('mousemove', this.on2DContMoveBindGreen);
+    document.getElementById('third').removeEventListener('mousemove', this.on2DContMoveBindBlue);
 
 
     // connect resize event
-    window.removeEventListener('resize', self.onWindowResize);
+    window.removeEventListener('resize', this.onWindowResize);
 
     // controller widget must be destroyed if any!
     if(this.redVolWidget != null){
