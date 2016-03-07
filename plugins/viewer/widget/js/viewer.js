@@ -27,6 +27,12 @@ viewer.Viewer = function(jsonObj) {
 
   //
   this.shiftDown = false;
+  this.ctrlDown = false;
+  this.drag = {
+    x: null,
+    y: null
+  };
+
   this.onWindowKeyPressed = this.onWindowKeyPressed.bind(this)
   window.addEventListener('keydown', this.onWindowKeyPressed, false);
   window.addEventListener('keyup', this.onWindowKeyPressed, false);
@@ -35,9 +41,11 @@ viewer.Viewer = function(jsonObj) {
   this.redVolWidget = null;
   this.greenVolWidget = null;
   this.blueVolWidget = null;
-  //this.stackFolder = null;
+  this.redImageFolder = null;
   this.redFolder = null;
+  this.greenImageFolder = null;
   this.greenFolder = null;
+  this.blueImageFolder = null;
   this.blueFolder = null;
 
   this.maximized = false;
@@ -172,14 +180,79 @@ viewer.Viewer = function(jsonObj) {
 
 viewer.Viewer.prototype.onWindowKeyPressed = function(event){
   this.shiftDown = event.shiftKey;
+
+  this.ctrlDown = event.ctrlKey;
+  if(!this.ctrlDown){
+    this.drag.x = null;
+    this.drag.y = null;
+  }
 }
 
 viewer.Viewer.prototype.on2DContMove = function(color, event){
 
-  if(!this.shiftDown){
-    return;
+  if(this.shiftDown){
+    //
+    this.trackPosition(color, event);
   }
-  //
+
+  if(this.ctrlDown){
+    this.trackWindowLevel(color, event);
+  }
+
+}
+
+viewer.Viewer.prototype.trackWindowLevel = function(color, event){
+  if(this.drag.x === null){
+    this.drag.x = event.offsetX;
+    this.drag.y = event.offsetY;
+  }
+  
+  var threshold = 15;
+  var container = document.getElementById(color);
+
+  var colors = ['red', 'green', 'blue'];
+  var index = colors.indexOf(color);
+  if (index > -1) {
+    colors.splice(index, 1);
+  }
+
+  var dynamicRange = this.stack.minMax[1] - this.stack.minMax[0];
+  dynamicRange /= container.clientWidth;
+
+  // update target slice
+  this[color + 'StackHelper'].slice.intensityAuto = false;
+  if(Math.abs(event.offsetX - this.drag.x) > threshold){
+    // window width
+    this[color + 'StackHelper'].slice.windowWidth += dynamicRange * (event.offsetX - this.drag.x);
+    this.drag.x = event.offsetX;
+  }
+
+  if(Math.abs(event.offsetY - this.drag.y) > threshold){
+    // window center
+    this[color + 'StackHelper'].slice.windowCenter -= dynamicRange * (event.offsetY - this.drag.y);
+    this.drag.y = event.offsetY;
+  }
+
+  // update others accordingly
+  for(var i = 0; i<colors.length; i++){
+
+    this[colors[i] + 'StackHelper'].slice.windowWidth = this[color + 'StackHelper'].slice.windowWidth;
+    this[colors[i] + 'StackHelper'].slice.windowCenter = this[color + 'StackHelper'].slice.windowCenter;
+
+  }
+
+  if(Math.abs(event.offsetX - this.drag.x) > threshold){
+    // window width
+    for(var i = 0; i<colors.length; i++){
+      this[colors[i] + 'StackHelper'].slice.windowWidth += dynamicRange * (event.offsetX - this.drag.x);
+    }
+    this.drag.x = event.offsetX;
+  }
+
+
+}
+
+viewer.Viewer.prototype.trackPosition = function(color, event){
   var colors = ['red', 'green', 'blue'];
   var index = colors.indexOf(color);
   if (index > -1) {
@@ -217,8 +290,8 @@ viewer.Viewer.prototype.on2DContMove = function(color, event){
       }
     }
   }
-
 }
+
 
 viewer.Viewer.prototype.on2DContDblClick = function(cont){
   var renderers = ['red', 'green', 'blue'];
@@ -522,10 +595,6 @@ viewer.Viewer.prototype.setVolume = function(nodeObj) {
     self.blueCamera.init(self.stack.zCosine, self.stack.xCosine, self.stack.yCosine, self.blueControls, box);
     self.blueCamera.adjust([self.blueThreeD.clientWidth, self.blueThreeD.clientHeight], 2);
 
-    //
-    //self.camera.invertColumns();
-    //self.camera.invertRows();
-
     self.onWindowResize();
 
     // CREATE LUT
@@ -573,6 +642,7 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     var redCustomContainer = document.getElementById("redControls");
     redCustomContainer.appendChild(this.redVolWidget.domElement);
     this.redVolWidget.container = redCustomContainer;
+    this.redImageFolder = this.redVolWidget.addFolder('Image');
     this.redFolder = this.redVolWidget.addFolder('Slice');
 
     //second
@@ -580,6 +650,7 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     var greenCustomContainer = document.getElementById("greenControls");
     greenCustomContainer.appendChild(this.greenVolWidget.domElement);
     this.greenVolWidget.container = greenCustomContainer;
+    this.greenImageFolder = this.greenVolWidget.addFolder('Image');
     this.greenFolder = this.greenVolWidget.addFolder('Slice');
 
     // third
@@ -587,65 +658,69 @@ viewer.Viewer.prototype.createVolWidget = function(container) {
     var blueCustomContainer = document.getElementById("blueControls");
     blueCustomContainer.appendChild(this.blueVolWidget.domElement);
     this.blueVolWidget.container = blueCustomContainer;
+    this.blueImageFolder = this.blueVolWidget.addFolder('Image');
     this.blueFolder = this.blueVolWidget.addFolder('Slice');
 
-    //this.stackFolder = this.redVolWidget.addFolder('Stack');
     this.populateVolWidget();
 }
 
 viewer.Viewer.prototype.updateVolWidget = function() {
-  //this.destroyStackFolder();
+  this.destroyImageFolder('red');
   this.destroyColorFolder('red');
+  this.destroyImageFolder('green');
   this.destroyColorFolder('green');
+  this.destroyImageFolder('blue');
   this.destroyColorFolder('blue');
   this.populateVolWidget();
 }
 
 viewer.Viewer.prototype.populateVolWidget = function(){
-  
-  // STACK
-  //
-  //this.createStackFolder();
-  //this.stackFolder.open();
 
-  // RED, GREEN and BLUE
+  // RED
   //
+  this.createImageFolder('red');
   this.createColorFolder('red', this.stack.dimensionsIJK.z - 1);
   this.redFolder.open();
+
+  // GREEN
+  this.createImageFolder('green');
   this.createColorFolder('green', this.stack.dimensionsIJK.x - 1);
   this.greenFolder.open();
+
+  // BLUE
+  this.createImageFolder('blue');
   this.createColorFolder('blue', this.stack.dimensionsIJK.y - 1);
   this.blueFolder.open();
 
 }
 
-viewer.Viewer.prototype.createStackFolder = function(){
+viewer.Viewer.prototype.createImageFolder = function(color){
 
   var self = this;
 
-  this.stackFolder.windowWidth = this.stackFolder.add(this.redStackHelper.slice, 'windowWidth', 1, this.stack.minMax[1]).step(1).listen();
-  this.stackFolder.windowWidth.onChange(function(value){
+  this[color + 'ImageFolder'].windowWidth = this[color + 'ImageFolder'].add(this[color + 'StackHelper'].slice, 'windowWidth', 1, this.stack.minMax[1]).step(1).listen();
+  this[color + 'ImageFolder'].windowWidth.onChange(function(value){
     self.redStackHelper.slice.windowWidth = value;
     self.greenStackHelper.slice.windowWidth = value;
     self.blueStackHelper.slice.windowWidth = value;
   });
 
-  this.stackFolder.windowCenter = this.stackFolder.add(this.redStackHelper.slice, 'windowCenter', this.stack.minMax[0], this.stack.minMax[1]).step(1).listen();
-  this.stackFolder.windowCenter.onChange(function(value){
+  this[color + 'ImageFolder'].windowCenter = this[color + 'ImageFolder'].add(this[color + 'StackHelper'].slice, 'windowCenter', this.stack.minMax[0], this.stack.minMax[1]).step(1).listen();
+  this[color + 'ImageFolder'].windowCenter.onChange(function(value){
     self.redStackHelper.slice.windowCenter = value;
     self.greenStackHelper.slice.windowCenter = value;
     self.blueStackHelper.slice.windowCenter = value;
   });
 
-  this.stackFolder.intensityAuto = this.stackFolder.add(this.redStackHelper.slice, 'intensityAuto');
-  this.stackFolder.intensityAuto.onChange(function(value){
+  this[color + 'ImageFolder'].intensityAuto = this[color + 'ImageFolder'].add(this[color + 'StackHelper'].slice, 'intensityAuto').listen();
+  this[color + 'ImageFolder'].intensityAuto.onChange(function(value){
     self.redStackHelper.slice.intensityAuto = value;
     self.greenStackHelper.slice.intensityAuto = value;
     self.blueStackHelper.slice.intensityAuto = value;
   });
 
-  this.stackFolder.invert = this.stackFolder.add(this.redStackHelper.slice, 'invert');
-  this.stackFolder.invert.onChange(function(value){
+  this[color + 'ImageFolder'].invert = this[color + 'ImageFolder'].add(this[color + 'StackHelper'].slice, 'invert').listen();
+  this[color + 'ImageFolder'].invert.onChange(function(value){
     self.redStackHelper.slice.invert = value;
     self.greenStackHelper.slice.invert = value;
     self.blueStackHelper.slice.invert = value;
@@ -653,12 +728,12 @@ viewer.Viewer.prototype.createStackFolder = function(){
 
 }
 
-viewer.Viewer.prototype.destroyStackFolder = function(){
+viewer.Viewer.prototype.destroyImageFolder = function(color){
 
-  this.stackFolder.remove(this.stackFolder.windowWidth);
-  this.stackFolder.remove(this.stackFolder.windowCenter);
-  this.stackFolder.remove(this.stackFolder.intensityAuto);
-  this.stackFolder.remove(this.stackFolder.invert);
+  this[color + 'ImageFolder'].remove(this[color + 'ImageFolder'].windowWidth);
+  this[color + 'ImageFolder'].remove(this[color + 'ImageFolder'].windowCenter);
+  this[color + 'ImageFolder'].remove(this[color + 'ImageFolder'].intensityAuto);
+  this[color + 'ImageFolder'].remove(this[color + 'ImageFolder'].invert);
 
 }
 
@@ -739,19 +814,20 @@ viewer.Viewer.prototype.destroy = function(){
 
     // controller widget must be destroyed if any!
     if(this.redVolWidget != null){
-        this.redVolWidget.container.removeChild(this.redVolWidget.container.lastChild);
-        this.redVolWidget = null;
+      this.redVolWidget.container.removeChild(this.redVolWidget.container.lastChild);
+      this.redVolWidget = null;
+      this.redImageFolder = null;
+      this.redFolder = null;
 
-        this.greenVolWidget.container.removeChild(this.greenVolWidget.container.lastChild);
-        this.greenVolWidget = null;
+      this.greenVolWidget.container.removeChild(this.greenVolWidget.container.lastChild);
+      this.greenVolWidget = null;
+      this.greenImageFolder = null;
+      this.greenFolder = null;
 
-        this.blueVolWidget.container.removeChild(this.blueVolWidget.container.lastChild);
-        this.blueVolWidget = null;
-
-        //this.stackFolder = null;
-        this.redFolder = null;
-        this.greenFolder = null;
-        this.blueFolder = null;
+      this.blueVolWidget.container.removeChild(this.blueVolWidget.container.lastChild);
+      this.blueVolWidget = null;
+      this.blueImageFolder = null;
+      this.blueFolder = null;
     }
 
     // delete stack and stackHelper...
