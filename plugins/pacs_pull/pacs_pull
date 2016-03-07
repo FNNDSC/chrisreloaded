@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+#
+# PACS pull plugin for ChRIS reloaded
+#
+#  _ __   __ _  ___ ___   _ __  _   _| | |
+# | '_ \ / _` |/ __/ __| | '_ \| | | | | |
+# | |_) | (_| | (__\__ \ | |_) | |_| | | |
+# | .__/ \__,_|\___|___/ | .__/ \__,_|_|_|
+# |_|                    |_|              
+#
+# (c) 2012 Fetal-Neonatal Neuroimaging & Developmental Science Center
+#                   Boston Children's Hospital
+#
+#              http://childrenshospital.org/FNNDSC/
+#                        dev@babyMRI.org
+#
+
+# import the plugin.py superclass
+import os, sys, shutil
+sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
+from plugin import Plugin
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../lib'))
+from  _common import crun
+from  _common import systemMisc as misc 
+import datetime as d
+
+class PACSPull(Plugin):
+  '''
+  '''
+  Plugin.AUTHORS = 'FNNDSC Dev Team (dev@babyMRI.org)'
+  Plugin.TITLE = 'PACS_pull'
+  Plugin.CATEGORY = 'PACS'
+  Plugin.DESCRIPTION = '''
+  Pull data from a PACS system to your ChRIS server.<br/>
+  Retrieve data based on:
+  <ul>
+  <li><b>Patient:</b> MRN, Name</li>
+  <li><b>Series:</b> Date, Modality, Station, Study description, Series description</li>
+  </ul>
+  
+  Advanced queries mechanism to search over:
+  
+  <ul>
+  <li><b>Full Name:</b> in the NAME field, Lastname^Firstname</li>
+  <li><b>Multiple patients:</b>in the MRN field, multiple MRN separated by a white space (MRN1 MRN2 MRN2 ...)</li>
+  <li><b>Multiple days:</b> in the DATE field, start and end date separated by a dash (yyyymmdd-yyyymmdd)</li>
+  </ul>
+  <b>Example</b><br/>
+  <b>Date:</b> <b>20130101-20130501</b> returns all data-sets acquired between 01-01-2013 and 05-01-2013. <br/>
+  <b>Name:</b> <b>Nico</b> returns all data-sets where the patient first or last name is Nico. It will <b>NOT</b> return anything if the patient name contains Nico, for instance, Nicolas.
+  '''
+
+  Plugin.DOCUMENTATION = 'https://github.com/FNNDSC/chrisreloaded/wiki/Plugin-pacs-pull'
+  Plugin.LICENSE = 'Opensource (MIT)'
+  Plugin.VERSION = '0.3'
+
+  def run(self):
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    options = self.options
+    print Plugin.TITLE
+    print Plugin.VERSION
+    print options.LIST_SERIES
+    
+    fh = open(options.LIST_SERIES, 'r' )
+    list_series = fh.readlines()
+    
+    #list_series = options.LIST_SERIES.strip().split(" ");
+    if list_series:
+      for pair in list_series:
+        study, series = pair.split(",");
+        # process!!
+        print '======================================='
+        print  d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Start processing...'
+        command = current_dir + "/core/process.php -u " + options.USER_ID + " -f " + options.FEED_ID + " -s " + options.SERVER_IP + " -p " + options.SERVER_PORT + " -a " + options.USER_AET + " -c " + options.USER_AEC + " -o " + options.output + " -d " + study + " -e " + series 
+        print 'command:'
+        print command
+        #output = os.system(command)
+        shell = crun.crun()
+        shell.echo(False)
+        shell.waitForChild(True)
+        shell(command)
+        str_exitCode = str(shell.exitCode())
+        print 'output:'
+        print str_exitCode
+        # evaluate processing step
+        if str_exitCode != "0":
+          misc.file_writeOnce(os.path.join(self.chrisRunDir, 'ERROR.err'), 'Plugin returned error!')
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: FAILURE'
+          print 'EXIT pacs_pull plugin NOW'
+          print '(see process.log for more information)'
+        else:
+          print d.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + ' ---> Processing: SUCCESS'
+          print '(see process.log for more information)'
+      shutil.move(options.LIST_SERIES, options.output)
+
+        
+# ENTRYPOINT
+if __name__ == "__main__":
+  plugin = PACSPull()
+  
+  # this is an interactive plugin
+  plugin.interactive = True
+  
+  # define the parameters
+  plugin.add_parameter('Simple parameters', Plugin.STRING, '--mrn', action='store', dest='MRN', help='MRN to be pulled')
+  plugin.add_parameter('Simple parameters', Plugin.STRING, '--name', action='store', dest='NAME', help='NAME to be pulled')
+  plugin.add_parameter('Simple parameters', Plugin.STRING, '--studydate', action='store', dest='DATE', help='DATE to be pulled')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--sex', action='store', dest='SEX', help='SEX of the patient')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--modality', action='store', default='MR', dest='MOD', help='MODality to be pulled')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--station', action='store', dest='STA', help='STAtion to be pulled')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--studydesc', action='store', dest='STUD', help='STUdy Description to be pulled')
+  plugin.add_parameter('Extra parameters (advanced)', Plugin.STRING, '--seriesdesc', action='store', dest='SERD', help='SERies Description to be pulled')
+  plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--aet', action='store', default='FNNDSC-CHRIS', dest='USER_AET', help='Calling AETitle')
+  plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--aec', action='store', default='ANY', dest='USER_AEC', help='Called AETitle')
+  plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--serverip', action='store', default='134.174.12.21', dest='SERVER_IP', help='Server IP')
+  plugin.add_parameter('Settings (advanced)', Plugin.STRING, '--serverport', action='store', default='104', dest='SERVER_PORT', help='Server Port')
+  plugin.add_parameter('Settings (advanced)', Plugin.BOOLEAN, '--anonymize', default=False, action='store_true', dest='ANONYM', help='Partially hide patient information')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--clustertmpdir', action='store', dest='CLUSTER', default=plugin.envVars['ENV_CHRIS_TMP_DIR'], help='TMP DIR')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--listseries', action='store', dest='LIST_SERIES', help='Series to be downloaded: "study_uid,series_uid study_uid,series_uid, etc."')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--feedid', action='store', default="{FEED_ID}", dest='FEED_ID', help='Feed ID')
+  plugin.add_parameter('HIDDEN', Plugin.STRING, '--userid', action='store', default="{USER_ID}", dest='USER_ID', help='User ID')
+  plugin.launch()

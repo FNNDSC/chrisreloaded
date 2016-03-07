@@ -1,0 +1,12 @@
+=======================================
+2015-06-01 05:01:33 ---> Instantiate PACS class...
+Server: 
+Port: 
+AEtitle: 
+=======================================
+2015-06-01 05:01:33 ---> Test connection to server...
+Server: 
+Port: 
+Cannot connect to the server....
+Stopping pre_process.php Line: 120
+EXIT CODE 1

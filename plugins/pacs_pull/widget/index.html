@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<link rel="stylesheet" type="text/css"
+ src="plugins/pacs_pull/widget/css/jquery.dataTables.css" />
+<link rel="stylesheet" type="text/css"
+ src="plugins/pacs_pull/widget/css/pacs.css" />
+ 
+<style>
+table.table thead .sorting {
+  background: url('plugins/pacs_pull/widget/gfx/sort_both.png') no-repeat center right;
+}
+
+table.table thead .sorting_asc {
+  background: url('plugins/pacs_pull/widget/gfx/sort_asc.png') no-repeat center right;
+}
+
+table.table thead .sorting_desc {
+  background: url('plugins/pacs_pull/widget/gfx/sort_desc.png') no-repeat center right;
+}
+
+table.table thead .sorting_asc_disabled {
+  background: url('plugins/pacs_pull/widget/gfx/sort_asc_disabled.png') no-repeat center right;
+}
+
+table.table thead .sorting_desc_disabled {
+  background: url('plugins/pacs_pull/widget/gfx/sort_desc_disabled.png') no-repeat center right;
+}
+</style>
+
+</head>
+
+<body>
+
+ <div class="container-fluid">
+      <div id="PACS-RESULTS" class='row-fluid'>
+      <div class='span12'>
+        <h4>
+         Group results by:
+         <div class="btn-group" data-toggle="buttons-radio">
+          <button id="STUDY_VIEW" type="button" class="btn btn-primary" style="font-size:14px!important;">Study</button>
+          <button id="SERIES_VIEW" type="button"
+           class="btn btn-primary active" style="font-size:14px!important;">Series</button>
+         </div>
+         <button id="PULL" class="btn btn-success pull-right">Pull Selection</button>
+         <button id="DOWNLOAD" class="btn btn-success pull-right">Selection to CSV</button>
+        </h4>
+        <div id='SC-RESULTS' class='row-fluid'></div>
+
+      </div>
+     </div>
+ </div>
+ 
+ <script type="text/javascript"
+  src="plugins/pacs_pull/widget/js/jquery.dataTables.min.js"></script>
+ <script type="text/javascript"
+  src="plugins/pacs_pull/widget/js/DT_bootstrap.js"></script>
+ <script type="text/javascript"
+  src="plugins/pacs_pull/widget/js/pacs.js"></script>
+</body>
+</html>
