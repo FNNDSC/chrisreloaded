@@ -89,7 +89,7 @@ if(isset($options['y'])){
 //
 // 1- CREATE PRE-PROCESS LOG FILE
 //
-$logFile = $output_dir.'process.log';
+$logFile = $output_dir.'/process.log';
 
 //
 // 2- INSTANTIATE PACS CLASS

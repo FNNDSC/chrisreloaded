@@ -462,14 +462,14 @@ class PACS implements PACSInterface {
     // 2- get value
     // value should be formated as follow
     // [VALUE]
-    $tmpsplit = split('\[', $lines[$i]);
+    $tmpsplit = preg_split('#\[#', $lines[$i]);
     // we didn't find any "[": no value was provided
     if(count($tmpsplit) == 1){
       $array[$field][] =  'nvp';
     }
     // else, finish splitting and append value to result array
     else{
-      $value = split('\]', $tmpsplit[1]);
+      $value = preg_split('#\]#', $tmpsplit[1]);
       $array[$field][] = utf8_encode(trim($value[0]));
     }
 
@@ -510,7 +510,7 @@ class PACS implements PACSInterface {
 
     // parse output
     // split each line output
-    $lines = split("\n", $command_output);
+    $lines = preg_split('#\n#', $command_output);
     $i = 0;
     $count = count($lines) - 1;
     $output = Array();
@@ -818,6 +818,7 @@ class PACS implements PACSInterface {
     // Does data exist: SeriesInstanceUID
     if (array_key_exists('SeriesInstanceUID',$process_file))
     {
+
       // does data (series) exist??
       $dataMapper = new Mapper('Data');
       $dataMapper->filter('uid = (?)',$process_file['SeriesInstanceUID'][0] );
@@ -865,6 +866,7 @@ class PACS implements PACSInterface {
         $data_chris_id = Mapper::add($dataObject);
       }
       else{
+        
         // todo: update time and status here...!
         if($dataResult['Data'][0]->name == ''){
           if(array_key_exists('ProtocolName',$process_file))
